@@ -9,12 +9,13 @@ import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
+    VISITOR_TOKEN_COOKIE,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-    VISITOR_TOKEN_COOKIE,
 } from '@/lib/visitor-token';
 
 import {
+    type TestsCase,
     allDeprecatedThemePresets,
     allLocales,
     allSidebarBackgroundStyles,
@@ -24,7 +25,6 @@ import {
     getCustomizationURL,
     headerLinks,
     runTestCases,
-    TestsCase,
     waitForCookiesDialog,
 } from './util';
 
@@ -43,7 +43,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
-                        0,
+                        0
                     );
                 },
             },
@@ -114,20 +114,20 @@ const testCases: TestsCase[] = [
                     await spaceDrowpdown.click();
 
                     const variantSelectionDropdown = page.locator(
-                        'css=[data-testid="space-dropdown-button"] + div',
+                        'css=[data-testid="space-dropdown-button"] + div'
                     );
                     // the customized space title
                     await expect(
                         variantSelectionDropdown.getByRole('link', {
                             name: 'Multi-Variants',
-                        }),
+                        })
                     ).toBeVisible();
 
                     // the NON-customized space title
                     await expect(
                         variantSelectionDropdown.getByRole('link', {
                             name: 'RFCs',
-                        }),
+                        })
                     ).toBeVisible();
                 },
             },
@@ -156,7 +156,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/2.0/reference/api-reference/pets?fallback=true'
                     );
                 },
             },
@@ -179,7 +179,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets?fallback=true'
                     );
                 },
             },
@@ -195,7 +195,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 })(),
@@ -214,7 +214,7 @@ const testCases: TestsCase[] = [
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/2.0/reference/api-reference/pets?fallback=true',
+                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/2.0/reference/api-reference/pets?fallback=true'
                     );
                 },
             },
@@ -331,7 +331,7 @@ const testCases: TestsCase[] = [
                         for (const p of document.querySelectorAll('p')) {
                             if (
                                 p.textContent?.includes(
-                                    'This image has intrinsic 400px width, but renders as 300px:',
+                                    'This image has intrinsic 400px width, but renders as 300px:'
                                 )
                             ) {
                                 p.style.color = 'transparent';
@@ -413,7 +413,7 @@ const testCases: TestsCase[] = [
                     await page.waitForFunction(() => {
                         const fonts = Array.from(document.fonts.values());
                         const mjxFonts = fonts.filter(
-                            (font) => font.family === 'MJXZERO' || font.family === 'MJXTEX',
+                            (font) => font.family === 'MJXZERO' || font.family === 'MJXTEX'
                         );
                         return (
                             mjxFonts.length === 2 &&
@@ -643,7 +643,7 @@ const testCases: TestsCase[] = [
                     const sharedSpaceLink = page.locator('a.underline');
                     await sharedSpaceLink.click();
                     await expect(
-                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                        page.getByRole('heading', { level: 1, name: 'shared' })
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
@@ -663,7 +663,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await page.locator('a.underline').click();
                     await expect(
-                        page.getByRole('heading', { level: 1, name: 'shared' }),
+                        page.getByRole('heading', { level: 1, name: 'shared' })
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
@@ -700,7 +700,7 @@ const testCases: TestsCase[] = [
                 url: 'invalid/',
                 run: async (page) => {
                     await expect(
-                        page.getByText('Authentication missing to access this content'),
+                        page.getByText('Authentication missing to access this content')
                     ).toBeVisible();
                 },
                 screenshot: false,
@@ -722,13 +722,13 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `first?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
                     await expect(
-                        page.getByRole('heading', { level: 1, name: 'first' }),
+                        page.getByRole('heading', { level: 1, name: 'first' })
                     ).toBeVisible();
                 },
                 screenshot: false,
@@ -744,13 +744,13 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `second?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
                     await expect(
-                        page.getByRole('heading', { level: 1, name: 'second' }),
+                        page.getByRole('heading', { level: 1, name: 'second' })
                     ).toBeVisible();
                 },
                 screenshot: false,
@@ -772,7 +772,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `?jwt_token=${token}`;
                 })(),
@@ -789,7 +789,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `spacea?jwt_token=${token}`;
                 })(),
@@ -806,7 +806,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `spaceb?jwt_token=${token}`;
                 })(),
@@ -823,7 +823,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `spacec?jwt_token=${token}`;
                 })(),
@@ -846,7 +846,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `?jwt_token=${token}`;
                 })(),
@@ -863,13 +863,13 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `first?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
                     await expect(
-                        page.getByRole('heading', { level: 1, name: 'first' }),
+                        page.getByRole('heading', { level: 1, name: 'first' })
                     ).toBeVisible();
                 },
                 screenshot: false,
@@ -885,7 +885,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `custom-page?jwt_token=${token}`;
                 })(),
@@ -902,7 +902,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `custom-page/inner-page?jwt_token=${token}`;
                 })(),
@@ -927,7 +927,7 @@ const testCases: TestsCase[] = [
                         'invalidKey',
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return [
                         {
@@ -952,13 +952,13 @@ const testCases: TestsCase[] = [
                         'invalidKey',
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `?jwt_token=${token}`;
                 })(),
                 run: async (page) => {
                     await expect(page.locator('pre')).toContainText(
-                        'Error while validating the JWT token. Reason: The token signature is invalid.',
+                        'Error while validating the JWT token. Reason: The token signature is invalid.'
                     );
                 },
             },
@@ -1047,7 +1047,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `?jwt_token=${token}`;
                 })(),
@@ -1074,7 +1074,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `?jwt_token=${token}`;
                 })(),
@@ -1102,7 +1102,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return `?jwt_token=${token}`;
                 })(),
@@ -1154,7 +1154,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return [
                         {
@@ -1193,7 +1193,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return [
                         {
@@ -1233,7 +1233,7 @@ const testCases: TestsCase[] = [
                         privateKey,
                         {
                             expiresIn: '24h',
-                        },
+                        }
                     );
                     return [
                         {

@@ -6,7 +6,7 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
 import { Link } from '@/components/primitives';
-import { SectionsList } from '@/lib/api';
+import type { SectionsList } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { SectionIcon } from './SectionIcon';
@@ -24,11 +24,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
     const [offset, setOffset] = React.useState<number | null>(null);
     const scrollableViewRef = React.useRef<HTMLDivElement>(null);
 
-    const onNodeUpdate = (
-        trigger: HTMLButtonElement | null,
-        itemValue: string,
-        size: number = 0,
-    ) => {
+    const onNodeUpdate = (trigger: HTMLButtonElement | null, itemValue: string, size = 0) => {
         const windowWidth = document.documentElement.clientWidth;
         if (windowWidth < 768) {
             // if the screen is small don't offset the menu
@@ -45,7 +41,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
             const bufferRight = windowWidth - (16 + viewportWidth); // offset the menu viewport should not pass on the right side of the window
             setOffset(
                 // constrain to within the window with some buffer on the left and right we don't want the menu to enter
-                Math.min(bufferRight, Math.max(bufferLeft, Math.round(triggerOffset))),
+                Math.min(bufferRight, Math.max(bufferLeft, Math.round(triggerOffset)))
             );
         } else if (!value) {
             setOffset(null);
@@ -69,7 +65,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                         const isActiveGroup =
                             isGroup &&
                             Boolean(
-                                sectionOrGroup.sections.find((s) => s.id === currentSection.id),
+                                sectionOrGroup.sections.find((s) => s.id === currentSection.id)
                             );
                         const isActive = isActiveGroup || id === currentSection.id;
                         return (
@@ -82,7 +78,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
                                                     onNodeUpdate(
                                                         node,
                                                         id,
-                                                        sectionOrGroup.sections.length,
+                                                        sectionOrGroup.sections.length
                                                     )
                                                 }
                                                 asChild
@@ -148,7 +144,7 @@ export function SiteSectionTabs(props: { sections: SectionsList }) {
  */
 const SectionTab = React.forwardRef(function SectionTab(
     props: { isActive: boolean; title: string; icon?: IconName; url: string },
-    ref: React.Ref<HTMLAnchorElement>,
+    ref: React.Ref<HTMLAnchorElement>
 ) {
     const { isActive, title, icon, url, ...rest } = props;
     return (
@@ -159,7 +155,7 @@ const SectionTab = React.forwardRef(function SectionTab(
                 'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 my-2',
                 isActive
                     ? 'text-primary-subtle'
-                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
+                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
             )}
             href={url}
         >
@@ -177,7 +173,7 @@ const SectionTab = React.forwardRef(function SectionTab(
  */
 const SectionGroupTab = React.forwardRef(function SectionGroupTab(
     props: { isActive: boolean; title: string; icon?: IconName },
-    ref: React.Ref<HTMLButtonElement>,
+    ref: React.Ref<HTMLButtonElement>
 ) {
     const { isActive, title, icon, ...rest } = props;
     return (
@@ -188,7 +184,7 @@ const SectionGroupTab = React.forwardRef(function SectionGroupTab(
                 'relative group flex select-none items-center justify-between rounded straight-corners:rounded-none transition-colors px-3 py-1 my-2',
                 isActive
                     ? 'text-primary-subtle'
-                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong',
+                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
             )}
         >
             <span className="flex gap-2 items-center w-full truncate">
@@ -223,7 +219,7 @@ function SectionGroupTileList(props: { sections: SiteSection[]; currentSection: 
         <ul
             className={tcls(
                 'grid w-full md:w-max p-2 sm:grid-cols-1',
-                sections.length < MIN_ITEMS_FOR_COLS ? 'md:grid-cols-1' : 'md:grid-cols-2',
+                sections.length < MIN_ITEMS_FOR_COLS ? 'md:grid-cols-1' : 'md:grid-cols-2'
             )}
         >
             {sections.map((section) => (
@@ -251,7 +247,7 @@ function SectionGroupTile(props: { section: SiteSection; isActive: boolean }) {
                     'flex flex-col p-3 gap-2 rounded w-full min-h-12 select-none transition-colors hover:bg-tint-hover',
                     isActive
                         ? 'text-primary hover:text-primary-strong focus:text-primary-strong'
-                        : 'text-tint hover:text-tint-strong focus:text-tint-strong',
+                        : 'text-tint hover:text-tint-strong focus:text-tint-strong'
                 )}
             >
                 <div className="flex gap-2 items-center w-full font-medium light:text-dark dark:text-light">

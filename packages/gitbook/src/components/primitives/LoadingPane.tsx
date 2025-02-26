@@ -1,4 +1,4 @@
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 type TileSizes = 12 | 24 | 48 | 96;
 
@@ -49,7 +49,7 @@ export const LoadingPane = (props: {
                 'overflow-hidden',
                 'relative',
                 'grid',
-                style,
+                style
             )}
         >
             <div
@@ -59,7 +59,7 @@ export const LoadingPane = (props: {
                     'grid',
                     'grid-area-1-1',
                     'overflow-hidden',
-                    tileStyle,
+                    tileStyle
                 )}
             >
                 <div
@@ -81,7 +81,7 @@ export const LoadingPane = (props: {
                             ? `[background-image:radial-gradient(circle_closest-side,_var(--tw-gradient-stops)_0,_var(--tw-gradient-stops)_33%,_var(--tw-gradient-stops)_66%)]`
                             : `[background-image:conic-gradient(from_-90deg_at_50%_50%,_var(--tw-gradient-stops)_0deg,_var(--tw-gradient-stops)_90deg,_var(--tw-gradient-stops)_280deg)]`,
                         delayStyle,
-                        gridStyle,
+                        gridStyle
                     )}
                 ></div>
             </div>

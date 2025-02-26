@@ -1,5 +1,5 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
+import { type RevisionPage, RevisionPageDocument, type RevisionPageGroup } from '@gitbook/api';
+import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { hasPageVisibleDescendant } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -44,7 +44,7 @@ export function PageGroupItem(props: {
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
-                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
+                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint'
                 )}
             >
                 <TOCPageIcon page={page} />

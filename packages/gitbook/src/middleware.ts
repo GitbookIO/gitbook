@@ -1,22 +1,22 @@
-import { ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
-import { setTag, setContext } from '@sentry/nextjs';
+import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
+import { setContext, setTag } from '@sentry/nextjs';
 import { fetchSiteContextByIds } from '@v2/lib/context';
 import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
-import { NextResponse, NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
 
 import {
-    PublishedContentWithCache,
-    getPublishedContentByUrl,
+    DEFAULT_API_ENDPOINT,
+    type PublishedContentWithCache,
     api,
+    getPublishedContentByUrl,
+    getPublishedContentSite,
     getSpace,
     userAgent,
     withAPI,
-    DEFAULT_API_ENDPOINT,
-    getPublishedContentSite,
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
@@ -24,7 +24,7 @@ import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/li
 import { validateSerializedCustomization } from '@/lib/customization';
 import { setMiddlewareHeader } from '@/lib/middleware';
 import {
-    VisitorTokenLookup,
+    type VisitorTokenLookup,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
@@ -131,7 +131,7 @@ export async function middleware(request: NextRequest) {
             }),
             contextId: undefined,
         },
-        () => lookupSiteForURL(mode, request, inputURL),
+        () => lookupSiteForURL(mode, request, inputURL)
     );
     if ('error' in resolved) {
         return new NextResponse(resolved.error.message, {
@@ -200,7 +200,7 @@ export async function middleware(request: NextRequest) {
 
             const scripts = siteData?.scripts ?? [];
             return getContentSecurityPolicy(scripts, nonce);
-        },
+        }
     );
 
     const headers = new Headers(request.headers);
@@ -218,7 +218,7 @@ export async function middleware(request: NextRequest) {
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set(
         'x-gitbook-basepath',
-        mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath),
+        mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath)
     );
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
@@ -281,7 +281,7 @@ export async function middleware(request: NextRequest) {
         // A long-standing bug in Nextjs causes modifying cookies in Server Actions to refresh the page and cause root rerenders.
         // https://github.com/vercel/next.js/issues/50163
         // We don't set the cookies if we're in a server action.
-        isServerAction ? undefined : resolved.cookies,
+        isServerAction ? undefined : resolved.cookies
     );
 
     // Add method so Cloudflare can use it for caching
@@ -381,7 +381,7 @@ function getInputURL(request: NextRequest): {
 async function lookupSiteForURL(
     mode: URLLookupMode,
     request: NextRequest,
-    url: URL,
+    url: URL
 ): Promise<LookupResult> {
     switch (mode) {
         case 'single': {
@@ -411,7 +411,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
     const spaceId = process.env.GITBOOK_SPACE_ID;
     if (!spaceId) {
         throw new Error(
-            `Missing GITBOOK_SPACE_ID environment variable. It should be passed when using GITBOOK_MODE=single.`,
+            `Missing GITBOOK_SPACE_ID environment variable. It should be passed when using GITBOOK_MODE=single.`
         );
     }
 
@@ -419,7 +419,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
     const apiToken = getDefaultAPIToken(apiCtx.client.endpoint);
     if (!apiToken) {
         throw new Error(
-            `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`,
+            `Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.`
         );
     }
 
@@ -441,7 +441,7 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
     const rawSiteUrl = request.headers.get('x-gitbook-site-url');
     if (!rawSiteUrl) {
         throw new Error(
-            `Missing x-gitbook-site-url header. It should be passed when using GITBOOK_MODE=proxy.`,
+            `Missing x-gitbook-site-url header. It should be passed when using GITBOOK_MODE=proxy.`
         );
     }
 
@@ -478,7 +478,7 @@ async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<Lo
  */
 async function lookupSiteOrSpaceInMultiIdMode(
     request: NextRequest,
-    url: URL,
+    url: URL
 ): Promise<LookupResult> {
     const basePathParts: string[] = [];
     const pathSegments = url.pathname.slice(1).split('/');
@@ -570,7 +570,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
     // (the cache is not dependend on the auth token, so it could leak data)
     if (source.kind === 'space') {
         await withAPI({ client: gitbookAPI, contextId }, () =>
-            getSpace.revalidate(source.id, undefined),
+            getSpace.revalidate(source.id, undefined)
         );
     }
 
@@ -582,7 +582,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
                 organizationId: decoded.organization,
                 siteId: source.id,
                 siteShareKey: undefined,
-            }),
+            })
         );
     }
 
@@ -682,7 +682,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
                 target: 'content',
                 redirect: new URL(
                     `/` + redirect.hostname + redirect.pathname + redirect.search,
-                    url,
+                    url
                 ).toString(),
             };
         }
@@ -706,13 +706,13 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
  */
 async function lookupSiteByAPI(
     lookupURL: URL,
-    visitorTokenLookup: VisitorTokenLookup,
+    visitorTokenLookup: VisitorTokenLookup
 ): Promise<LookupResult> {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
     console.log(
-        `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`,
+        `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`
     );
 
     // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
@@ -727,7 +727,7 @@ async function lookupSiteByAPI(
             redirectOnError || undefined,
             {
                 signal,
-            },
+            }
         );
 
         if ('error' in data) {
@@ -755,8 +755,8 @@ async function lookupSiteByAPI(
                                 'location',
                                 joinPath(
                                     redirect.searchParams.get('location') ?? '',
-                                    alternative.extraPath,
-                                ),
+                                    alternative.extraPath
+                                )
                             );
                             data.redirect = redirect.toString();
                         }
@@ -821,7 +821,7 @@ async function lookupSiteByAPI(
  */
 function getLookupResultForVisitorAuth(
     basePath: string,
-    visitorTokenLookup: VisitorTokenLookup,
+    visitorTokenLookup: VisitorTokenLookup
 ): Partial<LookupResult> {
     return {
         // No caching for content served with visitor auth
@@ -916,7 +916,7 @@ function encodePathname(pathname: string): string {
 
 function decodeGitBookTokenCookie(
     sourceId: string,
-    cookie: string | undefined,
+    cookie: string | undefined
 ): { apiToken: string; apiEndpoint: string | undefined } | undefined {
     if (!cookie) {
         return;
@@ -938,7 +938,7 @@ function decodeGitBookTokenCookie(
 function encodeGitBookTokenCookie(
     spaceId: string,
     token: string,
-    apiEndpoint: string | undefined,
+    apiEndpoint: string | undefined
 ): string {
     return JSON.stringify({ s: spaceId, t: token, e: apiEndpoint });
 }
@@ -951,7 +951,7 @@ function writeCookies<R extends NextResponse>(
             value: string;
             options?: Partial<ResponseCookie>;
         }
-    > = {},
+    > = {}
 ): R {
     Object.entries(cookies).forEach(([key, { value, options }]) => {
         response.cookies.set(key, value, options);

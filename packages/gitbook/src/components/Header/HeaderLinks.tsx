@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -13,7 +13,7 @@ export async function HeaderLinks({ children }: HeaderLinksProps) {
         <div
             className={tcls(
                 styles.containerHeaderlinks,
-                'grow shrink flex justify-end items-center gap-x-4 lg:gap-x-6 min-w-9 z-20 lg:[&>.button+.button]:-ml-2',
+                'grow shrink flex justify-end items-center gap-x-4 lg:gap-x-6 min-w-9 z-20 lg:[&>.button+.button]:-ml-2'
             )}
         >
             {children}

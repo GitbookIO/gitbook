@@ -1,10 +1,10 @@
+import { GitBookAPIError } from '@gitbook/api';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { GitBookAPIError } from '@gitbook/api';
 
 import { removeTrailingSlash } from '@/lib/paths';
-import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { getPublishedContentByURL } from '@v2/lib/data';
+import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
     matcher: ['/((?!_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
@@ -40,7 +40,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
                 {
                     error: result.error.message,
                 },
-                { status: result.error.code },
+                { status: result.error.code }
             );
         } else {
             throw result.error;

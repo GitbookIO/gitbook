@@ -31,12 +31,5 @@
         "release": "wrangler deploy",
         "release:preview": "wrangler deploy && wrangler deploy --env preview"
     },
-    "files": [
-        "dist",
-        "src",
-        "bin",
-        "data",
-        "README.md",
-        "CHANGELOG.md"
-    ]
+    "files": ["dist", "src", "bin", "data", "README.md", "CHANGELOG.md"]
 }

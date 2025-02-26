@@ -1,13 +1,13 @@
-import { DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
+import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import { Link } from '../primitives';
+import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
-import { Link } from '../primitives';
 
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context } = props;
@@ -47,7 +47,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         'items-center',
                         'gap-1',
                         'border-r',
-                        'border-tint-subtle',
+                        'border-tint-subtle'
                     )}
                 >
                     <div>
@@ -60,7 +60,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                         className={tcls(
                             'text-xs',
                             'text-tint',
-                            'group-hover/file:text-tint-strong',
+                            'group-hover/file:text-tint-strong'
                         )}
                     >
                         {getHumanFileSize(file.size)}

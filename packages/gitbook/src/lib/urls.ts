@@ -42,7 +42,7 @@ export function getPDFUrl(url: URL, params: PDFSearchParams): URL {
 
 export function getPDFUrlSearchParams(
     params: PDFSearchParams,
-    searchParams = new URLSearchParams({}),
+    searchParams = new URLSearchParams({})
 ): URLSearchParams {
     if (params?.page) {
         searchParams.set('page', params.page);

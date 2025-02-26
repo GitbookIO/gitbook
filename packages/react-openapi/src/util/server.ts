@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 
 /**
  * Get the default URL for the server.

@@ -1,12 +1,12 @@
 import { CustomizationHeaderPreset, CustomizationSidebarBackgroundStyle } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
-import { CONTAINER_STYLE } from '@/components/layout';
 import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
+import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
@@ -72,7 +72,7 @@ export function SpaceLayout(props: {
 
                     // Ensure the footer is display below the viewport even if the content is not enough
                     withFooter && 'min-h-[calc(100vh-64px)]',
-                    withTopHeader ? null : 'lg:min-h-screen',
+                    withTopHeader ? null : 'lg:min-h-screen'
                 )}
             >
                 <TableOfContents
@@ -86,7 +86,7 @@ export function SpaceLayout(props: {
                                     'lg:flex',
                                     'grow-0',
                                     'flex-wrap',
-                                    'dark:shadow-light/1',
+                                    'dark:shadow-light/1'
                                 )}
                             >
                                 <HeaderLogo context={context} />
@@ -105,7 +105,7 @@ export function SpaceLayout(props: {
                                                     getSpaceLanguage(customization),
                                                     customization.aiSearch.enabled
                                                         ? 'search_or_ask'
-                                                        : 'search',
+                                                        : 'search'
                                                 )}
                                             </span>
                                         </SearchButton>

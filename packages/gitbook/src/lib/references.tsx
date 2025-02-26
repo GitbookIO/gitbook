@@ -1,10 +1,16 @@
-import { ContentRef, RevisionFile, RevisionReusableContent, SiteSpace, Space } from '@gitbook/api';
+import type {
+    ContentRef,
+    RevisionFile,
+    RevisionReusableContent,
+    SiteSpace,
+    Space,
+} from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
-import { fetchSpaceContextByIds, type GitBookAnyContext } from '@v2/lib/context';
+import { type GitBookAnyContext, fetchSpaceContextByIds } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
 import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
-import React from 'react';
+import type React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
@@ -13,7 +19,7 @@ import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
 import { findSiteSpaceById } from './sites';
-import { ClassValue } from './tailwind';
+import type { ClassValue } from './tailwind';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -55,7 +61,7 @@ export interface ResolveContentRefOptions {
 export async function resolveContentRef(
     contentRef: ContentRef,
     context: GitBookAnyContext,
-    options: ResolveContentRefOptions = {},
+    options: ResolveContentRefOptions = {}
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, iconStyle } = options;
     const { linker, dataFetcher, space, revisionId, pages } = context;
@@ -107,7 +113,7 @@ export async function resolveContentRef(
                 return null;
             }
 
-            let anchor = contentRef.kind === 'page' ? undefined : contentRef.anchor;
+            const anchor = contentRef.kind === 'page' ? undefined : contentRef.anchor;
             const isCurrentPage = page.id === activePage?.id;
 
             let text = '';
@@ -241,7 +247,7 @@ export async function resolveContentRef(
  */
 async function getBestTargetSpace(
     context: GitBookAnyContext,
-    spaceId: string,
+    spaceId: string
 ): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
     const { dataFetcher } = context;
 
@@ -250,7 +256,7 @@ async function getBestTargetSpace(
             dataFetcher.getSpace({
                 spaceId,
                 shareKey: context?.shareKey,
-            }),
+            })
         ),
         'site' in context
             ? ignoreAPIError(
@@ -258,7 +264,7 @@ async function getBestTargetSpace(
                       organizationId: context.organizationId,
                       siteId: context.site.id,
                       siteShareKey: context.shareKey,
-                  }),
+                  })
               )
             : null,
     ]);
@@ -279,7 +285,7 @@ async function getBestTargetSpace(
 async function resolveContentRefInSpace(
     spaceId: string,
     context: GitBookAnyContext,
-    contentRef: ContentRef,
+    contentRef: ContentRef
 ) {
     const [spaceContext, bestTargetSpace] = await Promise.all([
         ignoreAPIError(
@@ -288,7 +294,7 @@ async function resolveContentRefInSpace(
                 shareKey: context?.shareKey,
                 changeRequest: undefined,
                 revision: undefined,
-            }),
+            })
         ),
         getBestTargetSpace(context, spaceId),
     ]);
@@ -300,7 +306,7 @@ async function resolveContentRefInSpace(
 
     // Resolve URLs relative to the space.
     const baseURL = new URL(
-        bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app,
+        bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app
     );
     const linker = createLinker({
         host: baseURL.host,

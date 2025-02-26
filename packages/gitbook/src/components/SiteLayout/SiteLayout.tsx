@@ -1,6 +1,6 @@
 import { CustomizationThemeMode } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
-import { Metadata, Viewport } from 'next';
+import type { GitBookSiteContext } from '@v2/lib/context';
+import type { Metadata, Viewport } from 'next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import React from 'react';
 import * as ReactDOM from 'react-dom';

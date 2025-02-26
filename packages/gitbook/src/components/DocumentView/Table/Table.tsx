@@ -1,10 +1,10 @@
-import { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
+import type { DocumentBlockTable, DocumentTableRecord } from '@gitbook/api';
 import assertNever from 'assert-never';
 
+import type { BlockProps } from '../Block';
+import { isBlockOffscreen } from '../utils';
 import { ViewCards } from './ViewCards';
 import { ViewGrid } from './ViewGrid';
-import { BlockProps } from '../Block';
-import { isBlockOffscreen } from '../utils';
 
 export type TableRecordKV = [string, DocumentTableRecord];
 

@@ -1,6 +1,6 @@
-import { MaybePromise } from 'p-map';
+import type { MaybePromise } from 'p-map';
 
-import { waitUntil, getRequestContext } from './waitUntil';
+import { getRequestContext, waitUntil } from './waitUntil';
 
 /**
  * Execute a function for each input in parallel and return the first result.
@@ -69,7 +69,7 @@ export async function race<I, R>(
          * @default false
          */
         fallbackOnNull?: boolean;
-    } = {},
+    } = {}
 ): Promise<R | null> {
     const { signal, timeout, blockTimeout, blockFallback, fallbackOnNull = false } = options;
     const result = await new Promise<R | null>((resolve, reject) => {
@@ -145,8 +145,8 @@ export async function race<I, R>(
                             blockFallbackError = error;
                             blockFallbackRunning = false;
                         }
-                    },
-                ),
+                    }
+                )
             );
         };
 
@@ -182,7 +182,7 @@ export async function race<I, R>(
                         (error) => {
                             // Ignore errors
                             logIgnoredError(`input ${inputIndex} failed with`, error);
-                        },
+                        }
                     )
                     .finally(() => {
                         pending -= 1;
@@ -197,7 +197,7 @@ export async function race<I, R>(
                                 }
                             }
                         }
-                    }),
+                    })
             );
         });
     });
@@ -264,7 +264,7 @@ type SingletonFunction<Key extends string, Args extends any[], Result> = ((
  * Create a map of singleton operations in a safe way for Cloudflare worker
  */
 export function singletonMap<Key extends string, Args extends any[], Result>(
-    execute: (key: Key, ...args: Args) => Promise<Result>,
+    execute: (key: Key, ...args: Args) => Promise<Result>
 ): SingletonFunction<Key, Args, Result> {
     const states = new WeakMap<object, Map<string, Promise<Result>>>();
 
@@ -321,7 +321,7 @@ export function batch<Args extends any[], R>(
          * Skip the batching for a single call.
          */
         skip?: (...args: Args) => MaybePromise<boolean>;
-    },
+    }
 ): (...args: Args) => Promise<R> {
     const { delay, groupBy = () => 'default', skip = () => false } = options;
 
@@ -354,7 +354,7 @@ export function batch<Args extends any[], R>(
                             currentExecutions.forEach(([, , reject]) => {
                                 reject(error);
                             });
-                        },
+                        }
                     );
                 }, delay);
             }
@@ -386,7 +386,7 @@ export type AsyncMutexFunction<T> = ((fn: () => Promise<T>) => Promise<T>) & {
      */
     runBlocking: <ReturnType>(
         fn: () => Promise<ReturnType>,
-        options?: MutexOperationOptions,
+        options?: MutexOperationOptions
     ) => Promise<ReturnType>;
 };
 
@@ -475,7 +475,7 @@ export function asyncMutexFunction<T>(): AsyncMutexFunction<T> {
  * Try catch a promise and return the result or the error.
  */
 export async function tryCatch<T>(
-    promise: Promise<T>,
+    promise: Promise<T>
 ): Promise<{ data: T; error?: undefined } | { data?: undefined; error: Error }> {
     try {
         return { data: await promise };

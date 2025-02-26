@@ -4,6 +4,6 @@ body:not(.katex-loaded) .katex-html {
 }
 
 /** Align the MathJax output with the font-size used by KaTeX */
-mjx-container[jax='CHTML'] {
+mjx-container[jax="CHTML"] {
     font-size: 1.21em;
 }

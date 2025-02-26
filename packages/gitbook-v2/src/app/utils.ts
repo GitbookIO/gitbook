@@ -38,7 +38,7 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
             url: url.toString(),
             visitorAuthToken: null,
             redirectOnError: false,
-        },
+        }
     );
 }
 
@@ -70,7 +70,7 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
 
             // TODO: set it only when the token comes from the cookies.
             redirectOnError: true,
-        },
+        }
     );
 }
 

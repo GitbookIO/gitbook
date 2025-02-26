@@ -1,4 +1,4 @@
-import { SiteSpace, Space } from '@gitbook/api';
+import { type SiteSpace, Space } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -16,7 +16,7 @@ export function SpacesDropdown(props: {
         <Dropdown
             className={tcls(
                 'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
-                'group-focus-within/dropdown:group-hover/dropdown:visible', // When the dropdown is already open, it should remain visible when hovered
+                'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
             )}
             button={(buttonProps) => (
                 <div
@@ -57,7 +57,7 @@ export function SpacesDropdown(props: {
                         'contrast-more:group-hover/dropdown:ring-tint-hover',
                         'contrast-more:group-focus-within/dropdown:ring-tint-hover',
 
-                        className,
+                        className
                     )}
                 >
                     <span className={tcls('line-clamp-2', 'grow')}>{siteSpace.title}</span>

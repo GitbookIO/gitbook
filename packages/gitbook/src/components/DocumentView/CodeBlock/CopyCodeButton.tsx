@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Client component to copy the code of a code block.
@@ -52,7 +52,7 @@ export function CopyCodeButton(props: { codeId: string; style: ClassValue }) {
  * ignoring the empty white space we use for empty lines (represented with a class "ew").
  */
 function getCodeText(code: HTMLElement): string {
-    let text: string = '';
+    let text = '';
 
     const iterate = (node: Node) => {
         if (node instanceof HTMLBRElement) {

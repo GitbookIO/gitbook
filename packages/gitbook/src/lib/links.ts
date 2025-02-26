@@ -1,9 +1,9 @@
 import 'server-only';
 
 import {
-    RevisionPage,
-    RevisionPageDocument,
-    RevisionPageGroup,
+    type RevisionPage,
+    type RevisionPageDocument,
+    type RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
 import { headers } from 'next/headers';
@@ -80,7 +80,7 @@ export async function getBaseUrl(): Promise<string> {
 /**
  * Create an absolute href in the current content.
  */
-export async function getAbsoluteHref(href: string, withHost: boolean = false): Promise<string> {
+export async function getAbsoluteHref(href: string, withHost = false): Promise<string> {
     const base = withHost ? await getBaseUrl() : await getBasePath();
     return `${base}${href.startsWith('/') ? href.slice(1) : href}`;
 }
@@ -103,7 +103,7 @@ export async function getPageHref(
     page: RevisionPageDocument | RevisionPageGroup,
     context: PageHrefContext = {},
     /** Anchor to link to in the page. */
-    anchor?: string,
+    anchor?: string
 ): Promise<string> {
     const { pdf } = context;
 
@@ -130,7 +130,7 @@ export async function getPageHref(
  */
 export function getPagePDFContainerId(
     page: RevisionPageDocument | RevisionPageGroup,
-    anchor?: string,
+    anchor?: string
 ): string {
     return `pdf-page-${page.id}` + (anchor ? `-${anchor}` : '');
 }

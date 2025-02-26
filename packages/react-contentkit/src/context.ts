@@ -1,4 +1,4 @@
-import { ContentKitAction, RequestRenderIntegrationUI } from '@gitbook/api';
+import type { ContentKitAction, RequestRenderIntegrationUI } from '@gitbook/api';
 import * as React from 'react';
 
 /**
@@ -42,7 +42,7 @@ export interface ContentKitClientContextType {
 }
 
 export const ContentKitClientContext = React.createContext<ContentKitClientContextType | null>(
-    null,
+    null
 );
 
 /**

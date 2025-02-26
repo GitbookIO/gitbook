@@ -7,15 +7,15 @@ import React, { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tString, useLanguage } from '@/intl/client';
-import { SiteContentPointer } from '@/lib/api';
+import type { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
+import { LoadingPane } from '../primitives/LoadingPane';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
-import { SearchResults, SearchResultsRef } from './SearchResults';
+import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
-import { SearchState, UpdateSearchState, useSearch } from './useSearch';
-import { LoadingPane } from '../primitives/LoadingPane';
+import { type SearchState, type UpdateSearchState, useSearch } from './useSearch';
 
 interface SearchModalProps {
     revisionId: string;
@@ -40,7 +40,7 @@ export function SearchModal(props: SearchModalProps) {
             e.preventDefault();
             setSearchState({ ask: false, query: '', global: false });
         },
-        [],
+        []
     );
 
     // Add a global class on the body when the search modal is open
@@ -90,7 +90,7 @@ export function SearchModal(props: SearchModalProps) {
                             'z-30',
                             'px-4',
                             'pt-4',
-                            'md:pt-[min(8vh,6rem)]',
+                            'md:pt-[min(8vh,6rem)]'
                         )}
                         onClick={() => {
                             onClose();
@@ -111,7 +111,7 @@ export function SearchModal(props: SearchModalProps) {
                                             'fixed',
                                             'inset-0',
                                             'z-10',
-                                            'pointer-events-none',
+                                            'pointer-events-none'
                                         )}
                                     >
                                         <LoadingPane
@@ -142,7 +142,7 @@ function SearchModalBody(
         state: SearchState;
         setSearchState: UpdateSearchState;
         onClose: (to?: string) => void;
-    },
+    }
 ) {
     const {
         pointer,
@@ -239,7 +239,7 @@ function SearchModalBody(
                 'shadow-2xl',
                 'overflow-hidden',
                 'dark:ring-inset',
-                'dark:ring-tint',
+                'dark:ring-tint'
             )}
             onClick={(event) => {
                 event.stopPropagation();
@@ -251,7 +251,7 @@ function SearchModalBody(
                     'flex-row',
                     'items-start',
                     state.query !== null ? 'border-b' : null,
-                    'border-tint-subtle',
+                    'border-tint-subtle'
                 )}
             >
                 <div className={tcls('p-2', 'pl-4', 'pt-4')}>
@@ -265,7 +265,7 @@ function SearchModalBody(
                         'flex-wrap',
                         'gap-y-0',
                         'gap-x-4',
-                        'items-end',
+                        'items-end'
                     )}
                 >
                     <input
@@ -283,11 +283,11 @@ function SearchModalBody(
                             'p-2',
                             'focus:outline-none',
                             'bg-transparent',
-                            'whitespace-pre-line',
+                            'whitespace-pre-line'
                         )}
                         placeholder={tString(
                             language,
-                            withAsk ? 'search_ask_input_placeholder' : 'search_input_placeholder',
+                            withAsk ? 'search_ask_input_placeholder' : 'search_input_placeholder'
                         )}
                         spellCheck="false"
                         autoComplete="off"

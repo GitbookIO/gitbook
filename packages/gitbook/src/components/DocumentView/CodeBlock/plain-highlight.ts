@@ -1,4 +1,4 @@
-import { DocumentBlockCode } from '@gitbook/api';
+import type { DocumentBlockCode } from '@gitbook/api';
 
 import { getNodeText } from '@/lib/document';
 
@@ -9,7 +9,7 @@ import type { HighlightLine, HighlightToken, RenderedInline } from './highlight'
  */
 export function plainHighlight(
     block: DocumentBlockCode,
-    inlines: RenderedInline[],
+    inlines: RenderedInline[]
 ): HighlightLine[] {
     const inlinesCopy = Array.from(inlines);
     return block.nodes.map((lineBlock) => {

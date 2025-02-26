@@ -1,4 +1,4 @@
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Match a string against a query and render the matching text in bold.

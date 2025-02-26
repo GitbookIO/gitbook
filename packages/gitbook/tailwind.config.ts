@@ -41,7 +41,7 @@ function generateShades(color: string) {
             acc[shade] = `rgb(${hexToRgb(rawShades[`${shade}`])} / <alpha-value>)`;
             return acc;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
     );
 
     shadeMap.DEFAULT = shadeMap[500];
@@ -55,7 +55,7 @@ function opacity() {
             acc[index] = `${opacity / 100}`;
             return acc;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
     );
 }
 
@@ -105,13 +105,13 @@ const config: Config = {
 
                 // Add each semantic color
                 ...Object.fromEntries(
-                    semanticColors.map((color) => [color, generateVarShades(color)]),
+                    semanticColors.map((color) => [color, generateVarShades(color)])
                 ),
                 ...Object.fromEntries(
                     semanticColors.map((color) => [
                         `contrast-${color}`,
                         generateVarShades(`contrast-${color}`),
-                    ]),
+                    ])
                 ),
 
                 yellow: generateShades('#f4e28d'),
@@ -150,7 +150,7 @@ const config: Config = {
                             ColorCategory.components,
                             ColorCategory.accents,
                         ]),
-                    ]),
+                    ])
                 ),
             },
             gradientColorStops: {
@@ -178,7 +178,7 @@ const config: Config = {
                             ColorCategory.components,
                             ColorCategory.accents,
                         ]),
-                    ]),
+                    ])
                 ),
             },
             borderColor: {
@@ -196,7 +196,7 @@ const config: Config = {
                     semanticColors.map((color) => [
                         color,
                         generateVarShades(color, [ColorCategory.borders, ColorCategory.accents]),
-                    ]),
+                    ])
                 ),
             },
             ringColor: {
@@ -208,7 +208,7 @@ const config: Config = {
                     semanticColors.map((color) => [
                         color,
                         generateVarShades(color, [ColorCategory.borders]),
-                    ]),
+                    ])
                 ),
             },
             outlineColor: {
@@ -220,7 +220,7 @@ const config: Config = {
                     semanticColors.map((color) => [
                         color,
                         generateVarShades(color, [ColorCategory.borders]),
-                    ]),
+                    ])
                 ),
             },
             boxShadowColor: {
@@ -232,7 +232,7 @@ const config: Config = {
                     semanticColors.map((color) => [
                         color,
                         generateVarShades(color, [ColorCategory.borders]),
-                    ]),
+                    ])
                 ),
             },
             textColor: {
@@ -261,7 +261,7 @@ const config: Config = {
                                 ColorCategory.accents,
                             ]),
                         ],
-                    ]),
+                    ])
                 ),
             },
             textDecorationColor: {
@@ -290,7 +290,7 @@ const config: Config = {
                                 ColorCategory.accents,
                             ]),
                         ],
-                    ]),
+                    ])
                 ),
             },
             animation: {
@@ -491,7 +491,7 @@ const config: Config = {
                         for (const themeVariant of customisationVariants.theme) {
                             addVariant(
                                 `${themeVariant}-${variant}`, // theme-clean-tint, theme-clean-no-tint, theme-muted-tint, ...
-                                `html.${variant}.${themeVariant} &`, // html.theme-clean.tint, html.theme-clean.no-tint, ...
+                                `html.${variant}.${themeVariant} &` // html.theme-clean.tint, html.theme-clean.no-tint, ...
                             );
                         }
                     }

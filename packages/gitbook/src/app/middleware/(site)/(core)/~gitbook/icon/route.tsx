@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import React from 'react';
 
 import { getEmojiForCode } from '@/lib/emojis';
@@ -40,35 +40,33 @@ export async function GET(req: NextRequest) {
     const contentTitle = site.title;
 
     return new ImageResponse(
-        (
-            <div
-                tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
+        <div
+            tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
+            style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
+            <h2
+                tw={tcls(
+                    size.textSize,
+                    'font-bold',
+                    'tracking-tight',
+                    options.theme === 'light' ? 'text-black' : 'text-white'
+                )}
             >
-                <h2
-                    tw={tcls(
-                        size.textSize,
-                        'font-bold',
-                        'tracking-tight',
-                        options.theme === 'light' ? 'text-black' : 'text-white',
-                    )}
-                >
-                    {'emoji' in customization.favicon
-                        ? getEmojiForCode(customization.favicon.emoji)
-                        : contentTitle.slice(0, 1).toUpperCase()}
-                </h2>
-            </div>
-        ),
+                {'emoji' in customization.favicon
+                    ? getEmojiForCode(customization.favicon.emoji)
+                    : contentTitle.slice(0, 1).toUpperCase()}
+            </h2>
+        </div>,
         {
             width: size.width,
             height: size.height,
-        },
+        }
     );
 }
 

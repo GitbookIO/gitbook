@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import { SearchAskState } from './SearchAskAnswer';
+import type { SearchAskState } from './SearchAskAnswer';
 
 type SearchAskContextValue = [
     askState: SearchAskState | null,

@@ -1,8 +1,8 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
 
-import { CacheBackend, CacheEntry, CacheEntryLookup, CacheEntryMeta } from './types';
-import { getCacheMaxAge } from './utils';
 import { trace } from '../tracing';
+import type { CacheBackend, CacheEntry, CacheEntryLookup, CacheEntryMeta } from './types';
+import { getCacheMaxAge } from './utils';
 
 const cacheVersion = 2;
 
@@ -39,7 +39,7 @@ export const cloudflareKVCache: CacheBackend = {
                 span.setAttribute('hit', !!kvEntry);
 
                 return kvEntry;
-            },
+            }
         );
     },
     async set(entry) {
@@ -65,7 +65,7 @@ export const cloudflareKVCache: CacheBackend = {
                 await kv.put(kvKey, JSON.stringify(entry), {
                     expirationTtl: secondsFromNow,
                 });
-            },
+            }
         );
     },
     async del(entries) {
@@ -78,7 +78,7 @@ export const cloudflareKVCache: CacheBackend = {
             entries.map(async (entry) => {
                 const kvKey = getKey(entry);
                 await kv.delete(kvKey);
-            }),
+            })
         );
     },
     async revalidateTags(tags) {
@@ -91,7 +91,7 @@ export const cloudflareKVCache: CacheBackend = {
 
         const pendingDeletions: Array<Promise<unknown>> = [];
 
-        const iterateKVPage = async (prefix: string, cursor: string | null, max: number = 3) => {
+        const iterateKVPage = async (prefix: string, cursor: string | null, max = 3) => {
             const entries = await kv.list<KVTagMetadata>({
                 prefix,
                 cursor,
@@ -114,7 +114,7 @@ export const cloudflareKVCache: CacheBackend = {
         await Promise.all(
             tags.map(async (tag) => {
                 await iterateKVPage(getTagPrefix(tag), null);
-            }),
+            })
         );
 
         await Promise.all(pendingDeletions);

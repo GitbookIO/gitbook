@@ -6,20 +6,20 @@ import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { iterateStreamResponse } from '@/lib/actions';
-import { SiteContentPointer } from '@/lib/api';
+import type { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
+import { useTrackEvent } from '../Insights';
+import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
-    OrderedComputedResult,
-    searchSiteSpaceContent,
+    type OrderedComputedResult,
     searchAllSiteContent,
+    searchSiteSpaceContent,
     streamRecommendedQuestions,
 } from './server-actions';
-import { useTrackEvent } from '../Insights';
-import { Loading } from '../primitives';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -54,7 +54,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         pointer: SiteContentPointer;
         onSwitchToAsk: () => void;
     },
-    ref: React.Ref<SearchResultsRef>,
+    ref: React.Ref<SearchResultsRef>
 ) {
     const { children, query, pointer, revisionId, withAsk, global, onSwitchToAsk } = props;
 
@@ -134,9 +134,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 if (!results) {
                     captureException(
                         new Error(
-                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`,
+                            `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`
                         ),
-                        { extra: { results } },
+                        { extra: { results } }
                     );
                     setResultsState({ results: [], fetching: false });
                     return;
@@ -196,7 +196,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 return Math.max(Math.min(prev + delta, results.length - 1), 0);
             });
         },
-        [results],
+        [results]
     );
 
     const select = React.useCallback(() => {
@@ -218,7 +218,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             },
             select,
         }),
-        [moveBy, select],
+        [moveBy, select]
     );
 
     if (resultsState.fetching) {

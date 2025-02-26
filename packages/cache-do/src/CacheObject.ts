@@ -1,5 +1,5 @@
-import { encode, decode } from '@msgpack/msgpack';
 import { DurableObject } from 'cloudflare:workers';
+import { decode, encode } from '@msgpack/msgpack';
 import { LRUMap } from 'lru_map';
 
 export interface CacheObjectDescriptor {
@@ -137,7 +137,7 @@ export class CacheObject extends DurableObject {
      */
     public async purge() {
         return this.logOperation({ operation: 'purge' }, async (setLog) => {
-            let result = new Set<string>();
+            const result = new Set<string>();
 
             try {
                 // List all the keys in the cache object.
@@ -174,7 +174,7 @@ export class CacheObject extends DurableObject {
                 const toDeleteSet = new Set<string>();
 
                 for (const [key, exp] of entries) {
-                    const timestamp = parseInt(key.split('.')[1]);
+                    const timestamp = Number.parseInt(key.split('.')[1]);
                     if (timestamp < Date.now()) {
                         toDeleteSet.add(key);
                         for (let i = 0; i < exp.c; i++) {
@@ -218,10 +218,10 @@ export class CacheObject extends DurableObject {
      */
     async logOperation<T>(
         log: Record<string, unknown>,
-        fn: (update: (log: Record<string, unknown>) => void) => Promise<T>,
+        fn: (update: (log: Record<string, unknown>) => void) => Promise<T>
     ): Promise<T> {
         const objectId = this.ctx.id.name ?? this.ctx.id.toString();
-        let update: Record<string, unknown> = {};
+        const update: Record<string, unknown> = {};
         const start = performance.now();
         try {
             return await fn((arg) => {
@@ -265,7 +265,7 @@ function encodeChunks<T>(key: string, value: T): Record<string, Uint8Array> {
 function decodeChunks<T>(entries: Map<string, Uint8Array>): { value: T; size: number } | undefined {
     const chunks = Array.from(entries.entries())
         .map(([key, value]) => {
-            const index = parseInt(key.split('.').pop()!);
+            const index = Number.parseInt(key.split('.').pop()!);
             return [index, value] as const;
         })
         .sort(([a], [b]) => a - b)

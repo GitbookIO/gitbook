@@ -1,12 +1,12 @@
 import {
+    isCSV,
     isFormData,
-    isPDF,
     isFormUrlEncoded,
+    isGraphQL,
+    isPDF,
+    isPlainObject,
     isText,
     isXML,
-    isCSV,
-    isGraphQL,
-    isPlainObject,
 } from './contentTypeChecks';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
@@ -171,7 +171,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             const headerString = headers
                 ? Object.entries(headers)
                       .map(([key, value]) =>
-                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``,
+                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ``
                       )
                       .join('\n') + '\n'
                 : '';

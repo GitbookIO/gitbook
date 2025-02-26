@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 type ProxyRequest = {
     url: string;
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error(
             'Scalar API Client Proxy Error',
-            (error as Error).stack ?? (error as Error).message ?? error,
+            (error as Error).stack ?? (error as Error).message ?? error
         );
         return NextResponse.json({
             data: 'Scalar API Client Proxy Error',

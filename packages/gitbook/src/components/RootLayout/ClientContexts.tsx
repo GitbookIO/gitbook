@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 import { TranslateContext } from '@/intl/client';
-import { TranslationLanguage } from '@/intl/translations';
+import type { TranslationLanguage } from '@/intl/translations';
 
 export function ClientContexts(props: {
     language: TranslationLanguage;

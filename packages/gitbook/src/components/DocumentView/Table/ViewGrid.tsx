@@ -1,10 +1,10 @@
-import { DocumentTableViewGrid } from '@gitbook/api';
+import type { DocumentTableViewGrid } from '@gitbook/api';
 import * as React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
 import { RecordRow } from './RecordRow';
-import { TableViewProps } from './Table';
+import type { TableViewProps } from './Table';
 import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
 
@@ -39,7 +39,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         className={tcls(
                             tableWidth,
                             styles.rowGroup,
-                            'straight-corners:rounded-none',
+                            'straight-corners:rounded-none'
                         )}
                     >
                         <div role="row" className={tcls('flex', 'w-full')}>
@@ -52,7 +52,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                         className={tcls(
                                             styles.columnHeader,
                                             alignment === 'right' ? 'text-right' : null,
-                                            alignment === 'center' ? 'text-center' : null,
+                                            alignment === 'center' ? 'text-center' : null
                                         )}
                                         style={{
                                             width: getColumnWidth({

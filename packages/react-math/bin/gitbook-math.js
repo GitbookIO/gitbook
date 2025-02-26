@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
+import fs from 'fs/promises';
 
 /**
  * Scripts to copy the assets to a public folder.

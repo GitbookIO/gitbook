@@ -6,14 +6,14 @@ import url from 'url';
  */
 export function getKitPath() {
     let source = path.dirname(
-        url.fileURLToPath(import.meta.resolve('@fortawesome/fontawesome-free/package.json')),
+        url.fileURLToPath(import.meta.resolve('@fortawesome/fontawesome-free/package.json'))
     );
     try {
         source = path.resolve(
             path.dirname(
-                url.fileURLToPath(import.meta.resolve('@gitbook/fontawesome-pro/package.json')),
+                url.fileURLToPath(import.meta.resolve('@gitbook/fontawesome-pro/package.json'))
             ),
-            'icons',
+            'icons'
         );
     } catch (error) {
         console.warn('⚠️ Could not find the Pro kit, using the free kit instead');

@@ -1,4 +1,4 @@
-import {
+import type {
     DocumentBlock,
     DocumentBlockListItem,
     DocumentBlockListOrdered,
@@ -10,7 +10,7 @@ import { assert } from 'ts-essentials';
 import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
 
@@ -22,7 +22,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
         (parent && parent.type === 'list-ordered') ||
             parent.type === 'list-unordered' ||
             parent.type === 'list-tasks',
-        'Invalid parent list type',
+        'Invalid parent list type'
     );
 
     const blocksElement = (
@@ -39,7 +39,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                 '[&:is(h3)>div]:mt-0',
                 '[&:is(h4)>div]:mt-0',
                 // Override the "mx-auto" class from UnwrappedBlocks
-                'mx-0',
+                'mx-0'
             )}
             style="space-y-2 flex flex-col flex-1"
         />
@@ -137,7 +137,7 @@ function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.R
             className={tcls(
                 textStyle.textSize,
                 textStyle.lineHeight,
-                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-tint',
+                'flex items-center justify-center mr-1 min-h-[1lh] min-w-6 text-tint'
             )}
         >
             {props.children}

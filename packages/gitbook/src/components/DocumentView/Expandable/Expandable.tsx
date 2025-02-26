@@ -1,13 +1,13 @@
-import { DocumentBlockExpandable } from '@gitbook/api';
+import type { DocumentBlockExpandable } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
-import { Details } from './Details';
-import { BlockProps } from '../Block';
+import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
+import { Details } from './Details';
 
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     const { block, style, ancestorBlocks, document, context } = props;
@@ -39,7 +39,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     'text-tint',
                     'group-hover/expandable:text-tint-strong',
                     'group-open/expandable:text-tint-strong',
-                    '[&::-webkit-details-marker]:hidden',
+                    '[&::-webkit-details-marker]:hidden'
                 )}
             >
                 <Icon
@@ -51,7 +51,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'mb-1',
                         'transition-transform',
                         'shrink-0',
-                        'group-open/expandable:rotate-90',
+                        'group-open/expandable:rotate-90'
                     )}
                 />
                 <Inlines
@@ -71,7 +71,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'flex',
                         'items-center',
                         'dark:shadow-none',
-                        'dark:ring-0',
+                        'dark:ring-0'
                     )}
                 >
                     <Icon
@@ -82,7 +82,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                             'transition-colors',
                             'text-transparent',
                             'group-hover/expandable:text-tint-subtle',
-                            'contrast-more:group-hover/expandable:text-tint-strong',
+                            'contrast-more:group-hover/expandable:text-tint-strong'
                         )}
                     />
                 </a>

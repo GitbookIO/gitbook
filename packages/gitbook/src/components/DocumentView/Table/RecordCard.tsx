@@ -1,19 +1,23 @@
-import { ContentRef, DocumentTableViewCards, SiteInsightsLinkPosition } from '@gitbook/api';
+import {
+    type ContentRef,
+    type DocumentTableViewCards,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 import React from 'react';
 
 import { Link } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
-import { TableRecordKV, TableViewProps } from './Table';
+import type { TableRecordKV, TableViewProps } from './Table';
 import { getRecordValue } from './utils';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
         record: TableRecordKV;
-    },
+    }
 ) {
     const { view, record, context, block, isOffscreen } = props;
 
@@ -65,7 +69,7 @@ export async function RecordCard(
                           'min-[432px]:grid-cols-none',
                           'min-[432px]:grid-rows-[auto,1fr]',
                       ]
-                    : 'grid-rows-[auto,1fr]',
+                    : 'grid-rows-[auto,1fr]'
             )}
         >
             {cover ? (
@@ -90,7 +94,7 @@ export async function RecordCard(
                         'object-cover',
                         coverIsSquareOrPortrait
                             ? ['min-[432px]:h-auto', 'min-[432px]:aspect-video']
-                            : ['h-auto', 'aspect-video'],
+                            : ['h-auto', 'aspect-video']
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload
@@ -108,7 +112,7 @@ export async function RecordCard(
                     'text-sm',
                     target
                         ? ['transition-colors', 'text-tint', 'group-hover:text-tint-strong']
-                        : ['text-tint-strong'],
+                        : ['text-tint-strong']
                 )}
             >
                 {view.columns.map((column) => {

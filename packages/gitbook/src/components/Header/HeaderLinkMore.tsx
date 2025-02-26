@@ -1,11 +1,11 @@
 import {
-    CustomizationContentLink,
-    CustomizationHeaderItem,
+    type CustomizationContentLink,
+    type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { GitBookSiteContext } from '@v2/lib/context';
-import React from 'react';
+import type { GitBookSiteContext } from '@v2/lib/context';
+import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -34,7 +34,7 @@ export function HeaderLinkMore(props: {
                 'theme-bold:hover:text-header-link/8',
                 'flex',
                 'gap-1',
-                'items-center',
+                'items-center'
             )}
         >
             <span className="sr-only">{label}</span>

@@ -1,10 +1,10 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
+import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
+import { useIntersectionObserver } from 'usehooks-ts';
 import { Markdown } from './Markdown';
 import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
-import { useIntersectionObserver } from 'usehooks-ts';
 
 export type Tab = {
     key: Key;
@@ -32,7 +32,7 @@ function useOpenAPITabsContext() {
  * The OpenAPI Tabs wrapper component.
  */
 export function OpenAPITabs(
-    props: React.PropsWithChildren<TabsProps & { items: Tab[]; stateKey?: string }>,
+    props: React.PropsWithChildren<TabsProps & { items: Tab[]; stateKey?: string }>
 ) {
     const { children, items, stateKey } = props;
     const isVisible = stateKey

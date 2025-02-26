@@ -1,8 +1,8 @@
 import { validate } from '@scalar/openapi-parser';
 import { OpenAPIParseError } from './error';
 import { createFileSystem } from './filesystem';
-import type { Filesystem, OpenAPIV3xDocument } from './types';
 import type { ParseOpenAPIInput } from './parse';
+import type { Filesystem, OpenAPIV3xDocument } from './types';
 
 /**
  * Parse a raw string into an OpenAPI document.
@@ -10,7 +10,7 @@ import type { ParseOpenAPIInput } from './parse';
  * It can throw an `OpenAPIFetchError` if the document is invalid.
  */
 export async function parseOpenAPIV3(
-    input: ParseOpenAPIInput,
+    input: ParseOpenAPIInput
 ): Promise<Filesystem<OpenAPIV3xDocument>> {
     const { value, rootURL, trust } = input;
     const specification = trust

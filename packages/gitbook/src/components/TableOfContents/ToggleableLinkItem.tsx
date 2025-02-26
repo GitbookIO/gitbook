@@ -6,9 +6,9 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { useScrollToActiveTOCItem } from './TOCScroller';
 import { useCurrentPagePath, useToggleAnimation } from '../hooks';
-import { Link, LinkInsightsProps } from '../primitives';
+import { Link, type LinkInsightsProps } from '../primitives';
+import { useScrollToActiveTOCItem } from './TOCScroller';
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -19,7 +19,7 @@ export function ToggleableLinkItem(
         pathname: string;
         children: React.ReactNode;
         descendants: React.ReactNode;
-    } & LinkInsightsProps,
+    } & LinkInsightsProps
 ) {
     const { href, children, descendants, pathname, insights } = props;
 
@@ -87,7 +87,7 @@ export function ToggleableLinkItem(
                         'contrast-more:ring-1',
                         'contrast-more:ring-primary',
                         'contrast-more:hover:ring-primary-hover',
-                    ],
+                    ]
                 )}
             >
                 {children}
@@ -109,7 +109,7 @@ export function ToggleableLinkItem(
                             'after:h-7',
                             'hover:bg-tint-active',
                             'hover:text-current',
-                            isActive ? ['hover:bg-tint-hover'] : [],
+                            isActive ? ['hover:bg-tint-hover'] : []
                         )}
                         onClick={(event) => {
                             event.preventDefault();
@@ -131,7 +131,7 @@ export function ToggleableLinkItem(
                                 'group-hover:opacity-11',
                                 'contrast-more:opacity-11',
 
-                                isVisible ? ['rotate-90'] : ['rotate-0'],
+                                isVisible ? ['rotate-90'] : ['rotate-0']
                             )}
                         />
                     </span>

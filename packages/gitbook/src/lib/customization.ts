@@ -1,4 +1,4 @@
-import { SiteCustomizationSettings } from '@gitbook/api';
+import type { SiteCustomizationSettings } from '@gitbook/api';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { headers } from 'next/headers';
 import rison from 'rison';
@@ -8,7 +8,7 @@ import rison from 'rison';
  * otherwise returns the original API-provided settings.
  */
 export async function getDynamicCustomizationSettings(
-    settings: SiteCustomizationSettings,
+    settings: SiteCustomizationSettings
 ): Promise<SiteCustomizationSettings> {
     const headersList = await headers();
     const extend = headersList.get(MiddlewareHeaders.Customization);
@@ -21,7 +21,7 @@ export async function getDynamicCustomizationSettings(
             console.error(
                 `Failed to parse ${MiddlewareHeaders.Customization} header (ignored): ${
                     (error as Error).stack ?? (error as Error).message ?? error
-                }`,
+                }`
             );
         }
     }

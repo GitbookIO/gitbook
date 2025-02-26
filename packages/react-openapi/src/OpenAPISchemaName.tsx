@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;

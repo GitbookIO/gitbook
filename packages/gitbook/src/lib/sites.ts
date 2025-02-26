@@ -1,4 +1,4 @@
-import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import type { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 
 /**
  * Get all sections from a site structure.
@@ -6,7 +6,7 @@ import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 export function getSiteStructureSections(siteStructure: SiteStructure) {
     return siteStructure.type === 'sections'
         ? siteStructure.structure.flatMap((item) =>
-              item.object === 'site-section-group' ? item.sections : item,
+              item.object === 'site-section-group' ? item.sections : item
           )
         : [];
 }

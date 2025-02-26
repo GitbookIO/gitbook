@@ -1,7 +1,7 @@
 import {
-    ContentRef,
-    ContentRefUser,
-    DocumentBlockTable,
+    type ContentRef,
+    type ContentRefUser,
+    type DocumentBlockTable,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
@@ -16,11 +16,11 @@ import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 
-import { TableRecordKV } from './Table';
-import { getColumnAlignment, VerticalAlignment } from './utils';
-import { BlockProps } from '../Block';
+import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
+import type { TableRecordKV } from './Table';
+import { type VerticalAlignment, getColumnAlignment } from './utils';
 
 /**
  * Render the value for a column in a record.
@@ -32,7 +32,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         record: TableRecordKV;
         column: string;
         verticalAlignment?: VerticalAlignment;
-    },
+    }
 ) {
     const {
         tag: Tag = 'div',
@@ -148,10 +148,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                   kind: 'file',
                                   file: fileId,
                               },
-                              context.contentContext,
+                              context.contentContext
                           )
-                        : null,
-                ),
+                        : null
+                )
             );
 
             return (
@@ -262,7 +262,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     }
 
                     return [contentRef, resolved] as const;
-                }),
+                })
             );
 
             return (
@@ -291,7 +291,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                     <span className={tcls('inline-flex', 'gap-2', 'flex-wrap')}>
                         {(value as string[]).map((selectId) => {
                             const option = definition.options.find(
-                                (option) => option.value === selectId,
+                                (option) => option.value === selectId
                             );
 
                             if (!option) {
@@ -308,7 +308,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                         'py-1',
                                         'px-2',
                                         'bg-primary',
-                                        'text-primary-strong',
+                                        'text-primary-strong'
                                     )}
                                 >
                                     {option.label}

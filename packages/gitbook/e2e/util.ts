@@ -3,7 +3,7 @@ import {
     CustomizationBackground,
     CustomizationCorners,
     CustomizationFont,
-    CustomizationHeaderItem,
+    type CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLinksStyle,
@@ -11,14 +11,14 @@ import {
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     CustomizationTheme,
-    CustomizationThemedColor,
     CustomizationThemeMode,
-    SiteCustomizationSettings,
+    type CustomizationThemedColor,
+    type SiteCustomizationSettings,
 } from '@gitbook/api';
-import { BrowserContext, expect, Page, test } from '@playwright/test';
+import { type BrowserContext, type Page, expect, test } from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
-import { DeepPartial } from 'ts-essentials';
+import type { DeepPartial } from 'ts-essentials';
 
 import { getContentTestURL } from '../tests/utils';
 
@@ -151,7 +151,7 @@ export function runTestCases(testCases: TestsCase[]) {
                                 ...cookie,
                                 domain: new URL(url).host,
                                 path: '/',
-                            })),
+                            }))
                         );
                     }
                     await page.goto(url);
@@ -312,7 +312,7 @@ async function waitForIcons(page: Page) {
                     throw new Error('No mask-image');
                 }
                 await loadImage(url);
-            }),
+            })
         );
     });
 }
@@ -327,7 +327,7 @@ async function waitForTOCScrolling(page: Page) {
         await expect(toc).toBeVisible();
         await page.evaluate(() => {
             const tocScrollContainer = document.querySelector(
-                '[data-testid="table-of-contents"] [data-testid="toc-scroll-container"]',
+                '[data-testid="table-of-contents"] [data-testid="toc-scroll-container"]'
             );
             if (!tocScrollContainer) {
                 throw new Error('TOC scroll container not found');

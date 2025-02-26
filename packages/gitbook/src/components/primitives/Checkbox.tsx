@@ -35,7 +35,7 @@ export const Checkbox = React.forwardRef<
             'data-[state=checked]:text-contrast-primary-solid',
             'contrast-more:ring-tint-12',
             { small: 'size-4', medium: 'size-5' }[size],
-            className,
+            className
         )}
         {...props}
     >

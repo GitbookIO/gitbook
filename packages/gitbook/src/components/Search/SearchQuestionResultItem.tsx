@@ -4,8 +4,8 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { useSearchLink } from './useSearch';
 import { Link } from '../primitives';
+import { useSearchLink } from './useSearch';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {
@@ -14,7 +14,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         onClick: () => void;
         recommended?: boolean;
     },
-    ref: React.Ref<HTMLAnchorElement>,
+    ref: React.Ref<HTMLAnchorElement>
 ) {
     const { question, recommended = false, active, onClick } = props;
     const language = useLanguage();
@@ -37,7 +37,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'bg-primary',
                     'text-contrast-primary',
                     'hover:bg-primary-hover',
-                ],
+                ]
             )}
             {...getLinkProp({
                 ask: true,
@@ -51,7 +51,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'shrink-0',
                     'mt-1.5',
                     'mr-4',
-                    active ? ['text-primary'] : ['text-tint-subtle'],
+                    active ? ['text-primary'] : ['text-tint-subtle']
                 )}
             />
             <div className="w-full">
@@ -72,7 +72,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'rounded',
                     'self-center',
                     'straight-corners:rounded-none',
-                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6'],
+                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6']
                 )}
             >
                 <Icon

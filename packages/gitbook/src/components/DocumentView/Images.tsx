@@ -1,17 +1,17 @@
-import {
+import type {
     DocumentBlockImage,
     DocumentBlockImageDimension,
     DocumentBlockImages,
     JSONDocument,
 } from '@gitbook/api';
 
-import { Image, ImageResponsiveSize } from '@/components/utils';
+import { Image, type ImageResponsiveSize } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Caption } from './Caption';
-import { DocumentContext } from './DocumentView';
+import type { DocumentContext } from './DocumentView';
 
 export function Images(props: BlockProps<DocumentBlockImages>) {
     const { document, block, ancestorBlocks, style, context, isEstimatedOffscreen } = props;
@@ -29,7 +29,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 align === 'center' && 'justify-center',
                 align === 'right' && 'justify-end',
                 align === 'left' && 'justify-start',
-                isMultipleImages && ['grid', 'grid-flow-col', 'max-w-none'],
+                isMultipleImages && ['grid', 'grid-flow-col', 'max-w-none']
             )}
         >
             {block.nodes.map((node: any, i: number) => (
@@ -120,7 +120,7 @@ async function ImageBlock(props: {
  */
 function getImageDimension<DefaultValue>(
     dimension: DocumentBlockImageDimension | undefined,
-    defaultValue: DefaultValue,
+    defaultValue: DefaultValue
 ): string | DefaultValue {
     if (typeof dimension === 'number') {
         return `${dimension}px`;

@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useHash } from '@/components/hooks';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 /**
  * Details component rendered on client so it can expand dependent on url hash changes.
@@ -60,7 +60,7 @@ export function Details(props: {
                 //select last in group
                 '[&:not(:has(+_&))]:mb-5',
                 '[&:not(:has(+_&))]:rounded-b-lg',
-                '[&:not(:has(+_&))]:border-b',
+                '[&:not(:has(+_&))]:border-b'
             )}
         >
             {children}

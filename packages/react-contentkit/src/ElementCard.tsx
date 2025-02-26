@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
 import classNames from 'classnames';
+import type React from 'react';
 
-import { ContentKitClientElementProps } from './types';
-import { ContentKitCard } from '@gitbook/api';
+import type { ContentKitCard } from '@gitbook/api';
 import { useContentKitClientContext } from './context';
+import type { ContentKitClientElementProps } from './types';
 
 /**
  * Interactive card element.
@@ -17,7 +17,7 @@ export function ElementCard(
             hint: React.ReactNode | null;
             buttons: React.ReactNode[];
         }
-    >,
+    >
 ) {
     const { element, children, icon, hint, buttons } = props;
     const clientContext = useContentKitClientContext();
@@ -26,7 +26,7 @@ export function ElementCard(
         <div
             className={classNames(
                 'contentkit-card',
-                element.onPress ? 'contentkit-card-pressable' : null,
+                element.onPress ? 'contentkit-card-pressable' : null
             )}
             onClick={() => {
                 if (element.onPress) {

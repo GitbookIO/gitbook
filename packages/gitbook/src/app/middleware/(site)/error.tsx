@@ -32,7 +32,7 @@ export default function ErrorPage(props: {
                 'flex',
                 'items-center',
                 'justify-center',
-                'p-7',
+                'p-7'
             )}
         >
             <div>

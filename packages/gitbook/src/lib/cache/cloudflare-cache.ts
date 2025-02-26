@@ -1,14 +1,14 @@
 import { Buffer } from 'node:buffer';
 
-import type { CacheStorage, Cache, Response as WorkerResponse } from '@cloudflare/workers-types';
+import type { Cache, CacheStorage, Response as WorkerResponse } from '@cloudflare/workers-types';
 
-import { CacheBackend, CacheEntry } from './types';
+import { trace } from '../tracing';
+import type { CacheBackend, CacheEntry } from './types';
 import {
     NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS,
     getCacheMaxAge,
     isCacheEntryImmutable,
 } from './utils';
-import { trace } from '../tracing';
 
 const cacheVersion = 2;
 
@@ -41,7 +41,7 @@ export const cloudflareCache: CacheBackend = {
 
                 const cacheEntry = await deserializeEntry(response);
                 return cacheEntry;
-            },
+            }
         );
     },
     async set(entry) {
@@ -55,7 +55,7 @@ export const cloudflareCache: CacheBackend = {
                 async () => {
                     const cacheKey = await serializeKey(entry.meta.key);
                     await cache.put(cacheKey, serializeEntry(entry));
-                },
+                }
             );
         }
     },
@@ -66,7 +66,7 @@ export const cloudflareCache: CacheBackend = {
                 entries.map(async (entry) => {
                     const cacheKey = await serializeKey(entry.key);
                     await cache.delete(cacheKey);
-                }),
+                })
             );
         }
     },
@@ -91,7 +91,7 @@ async function serializeKey(key: string): Promise<string> {
         {
             name: 'SHA-256',
         },
-        new TextEncoder().encode(key),
+        new TextEncoder().encode(key)
     );
 
     const hash = Buffer.from(digest).toString('base64');
@@ -112,7 +112,7 @@ function serializeEntry(entry: CacheEntry): WorkerResponse {
         10,
         // When the entry is immutable, we can cache it for the entire duration.
         // Else we cache it for a very short time.
-        isCacheEntryImmutable(entry.meta) ? undefined : NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS,
+        isCacheEntryImmutable(entry.meta) ? undefined : NON_IMMUTABLE_LOCAL_CACHE_MAX_AGE_SECONDS
     );
     headers.set('Cache-Control', `public, max-age=${maxAge}`);
     headers.set('Cache-Tag', cacheTags.join(','));

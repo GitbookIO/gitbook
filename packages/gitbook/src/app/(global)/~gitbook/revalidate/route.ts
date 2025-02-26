@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { revalidateTags } from '@/lib/cache';
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
             {
                 error: 'tags must be an array',
             },
-            { status: 400 },
+            { status: 400 }
         );
     }
 

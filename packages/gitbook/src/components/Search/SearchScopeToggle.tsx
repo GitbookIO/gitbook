@@ -64,7 +64,7 @@ function ToggleButton(props: { onClick: () => void; children: React.ReactNode; a
                 'border-b-2',
                 'whitespace-pre',
                 '-mb-[1px]',
-                active ? ['text-primary', 'border-primary'] : ['border-transparent'],
+                active ? ['text-primary', 'border-primary'] : ['border-transparent']
             )}
         >
             {children}

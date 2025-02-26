@@ -1,4 +1,4 @@
-import { TranslationLanguage } from './types';
+import type { TranslationLanguage } from './types';
 
 export const ja: TranslationLanguage = {
     locale: 'ja',

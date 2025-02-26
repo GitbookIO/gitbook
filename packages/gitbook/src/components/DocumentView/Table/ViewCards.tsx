@@ -1,9 +1,9 @@
-import { DocumentTableViewCards } from '@gitbook/api';
+import type { DocumentTableViewCards } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
 import { RecordCard } from './RecordCard';
-import { TableViewProps } from './Table';
+import type { TableViewProps } from './Table';
 
 export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
     const { block, view, records, style } = props;
@@ -17,7 +17,7 @@ export function ViewCards(props: TableViewProps<DocumentTableViewCards>) {
                 'grid-cols-1',
                 'min-[432px]:grid-cols-2',
                 view.cardSize === 'large' ? 'md:grid-cols-2' : 'md:grid-cols-3',
-                block.data.fullWidth ? 'large:flex-column' : null,
+                block.data.fullWidth ? 'large:flex-column' : null
             )}
         >
             {records.map((record) => {

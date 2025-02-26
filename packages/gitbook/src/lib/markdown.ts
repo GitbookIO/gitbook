@@ -1,5 +1,5 @@
 import { micromark } from 'micromark';
-import { gfmHtml, gfm } from 'micromark-extension-gfm';
+import { gfm, gfmHtml } from 'micromark-extension-gfm';
 
 /**
  * Parse markdown and output HTML.

@@ -1,9 +1,9 @@
 'use client';
 
-import { Transition, motion, useReducedMotion } from 'framer-motion';
+import { type Transition, motion, useReducedMotion } from 'framer-motion';
 import React from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 export function AsideSectionHighlight({
     transition,

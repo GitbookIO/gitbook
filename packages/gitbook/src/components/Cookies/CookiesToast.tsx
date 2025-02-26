@@ -57,7 +57,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'left-16',
                 'max-w-md',
                 'text-balance',
-                'sm:left-auto',
+                'sm:left-auto'
             )}
         >
             <p id={describedById} className={tcls('text-sm')}>
@@ -66,7 +66,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'cookies_prompt',
                     <StyledLink href={privacyPolicy}>
                         {t(language, 'cookies_prompt_privacy')}
-                    </StyledLink>,
+                    </StyledLink>
                 )}
             </p>
             <button
@@ -83,7 +83,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'justify-center',
                     'items-center',
                     'rounded-sm',
-                    'hover:bg-tint-hover',
+                    'hover:bg-tint-hover'
                 )}
                 title={tString(language, 'cookies_close')}
             >

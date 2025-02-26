@@ -1,4 +1,4 @@
-import { LoadPlugin } from '@scalar/openapi-parser';
+import type { LoadPlugin } from '@scalar/openapi-parser';
 
 export const fetchUrlsDefaultConfiguration = {
     limit: 40,
@@ -46,7 +46,7 @@ export const fetchURLs: (customConfiguration: {
             // Limit the number of requests
             if (configuration?.limit !== false && numberOfRequests >= configuration?.limit) {
                 console.warn(
-                    `[fetchUrls] Maximum number of requests reeached (${configuration?.limit}), skipping request`,
+                    `[fetchUrls] Maximum number of requests reeached (${configuration?.limit}), skipping request`
                 );
                 return undefined;
             }

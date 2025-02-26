@@ -1,4 +1,4 @@
-import { DocumentBlockCode, JSONDocument } from '@gitbook/api';
+import type { DocumentBlockCode, JSONDocument } from '@gitbook/api';
 import { useId } from 'react';
 
 import { CodeBlock } from './CodeBlock';

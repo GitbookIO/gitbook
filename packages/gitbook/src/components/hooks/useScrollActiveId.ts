@@ -8,7 +8,7 @@ export function useScrollActiveId(
     options: {
         rootMargin?: string;
         threshold?: number;
-    } = {},
+    } = {}
 ) {
     const { rootMargin, threshold = 0.5 } = options;
 
@@ -33,7 +33,7 @@ export function useScrollActiveId(
                 if (sectionId) {
                     sectionsIntersectingMap.current.set(
                         sectionId,
-                        entry.isIntersecting && entry.intersectionRatio >= threshold,
+                        entry.isIntersecting && entry.intersectionRatio >= threshold
                     );
                 }
             });
@@ -42,7 +42,7 @@ export function useScrollActiveId(
              * Find the first section that is intersecting the viewport (is visible)
              */
             const firstActiveSection = Array.from(sectionsIntersectingMap.current.entries()).find(
-                ([, isIntersecting]) => isIntersecting,
+                ([, isIntersecting]) => isIntersecting
             );
 
             if (firstActiveSection) {

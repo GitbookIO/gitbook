@@ -1,11 +1,11 @@
 import { CustomizationSettings, Site, SiteCustomizationSettings } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { Image } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
 import { SpaceIcon } from '../Space/SpaceIcon';
+import { Link } from '../primitives';
 
 interface HeaderLogoProps {
     context: GitBookSiteContext;
@@ -59,7 +59,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         'max-h-10',
                         'lg:max-h-12',
                         'h-full',
-                        'w-auto',
+                        'w-auto'
                     )}
                 />
             ) : (
@@ -98,7 +98,7 @@ function LogoFallback(props: HeaderLogoProps) {
                     'text-base/tight',
                     'lg:text-lg/tight',
                     'text-tint-strong',
-                    'theme-bold:text-header-link',
+                    'theme-bold:text-header-link'
                 )}
             >
                 {site.title}

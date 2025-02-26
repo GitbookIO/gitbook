@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 
 import { useHash, useIsMounted } from '@/components/hooks';
 import * as storage from '@/lib/local-storage';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 interface TabsState {
     activeIds: {
@@ -68,7 +68,7 @@ export function DynamicTabs(
     props: TabsInput & {
         tabsBody: React.ReactNode[];
         style: ClassValue;
-    },
+    }
 ) {
     const { id, tabs, tabsBody, style } = props;
 
@@ -108,7 +108,7 @@ export function DynamicTabs(
                     : prev.activeTitles,
             }));
         },
-        [id, setTabsState],
+        [id, setTabsState]
     );
 
     /**
@@ -148,7 +148,7 @@ export function DynamicTabs(
                 'flex',
                 'overflow-hidden',
                 'flex-col',
-                style,
+                style
             )}
         >
             <div
@@ -161,7 +161,7 @@ export function DynamicTabs(
                     'after:flex-[1]',
                     'after:bg-tint-12/1',
                     // if last tab is selected, apply rounded to :after element
-                    '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md',
+                    '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
                 )}
             >
                 {tabs.map((tab) => (
@@ -221,7 +221,7 @@ export function DynamicTabs(
                                       'after:[:has(+_&.active-tab)]:border-transparent',
                                       'after:[:has(&_+)]:border-transparent',
                                   ]
-                                : null,
+                                : null
                         )}
                     >
                         {tab.title}

@@ -1,9 +1,9 @@
 import type {
-    DocumentText,
-    DocumentInline,
-    DocumentFragment,
-    JSONDocument,
     DocumentBlock,
+    DocumentFragment,
+    DocumentInline,
+    DocumentText,
+    JSONDocument,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
@@ -34,7 +34,7 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
  * Get the text of a block/inline.
  */
 export function getNodeText(
-    node: JSONDocument | DocumentText | DocumentFragment | DocumentInline | DocumentBlock,
+    node: JSONDocument | DocumentText | DocumentFragment | DocumentInline | DocumentBlock
 ): string {
     switch (node.object) {
         case 'text':
@@ -58,7 +58,7 @@ export function getNodeText(
  */
 export function getNodeFragmentByType(
     node: DocumentInline | DocumentBlock,
-    type: string,
+    type: string
 ): DocumentFragment | null {
     if (!('fragments' in node)) {
         return null;
@@ -72,7 +72,7 @@ export function getNodeFragmentByType(
  */
 export function getNodeFragmentByName(
     node: DocumentInline | DocumentBlock,
-    name: string,
+    name: string
 ): DocumentFragment | null {
     if (!('fragments' in node)) {
         return null;
@@ -85,7 +85,7 @@ export function getNodeFragmentByName(
  * Test if a node is empty.
  */
 export function isNodeEmpty(
-    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock | JSONDocument,
+    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock | JSONDocument
 ): boolean {
     if ((node.object === 'block' || node.object === 'inline') && node.isVoid) {
         return false;
@@ -149,7 +149,7 @@ export function getBlockById(document: JSONDocument, id: string): DocumentBlock 
  */
 function findBlock(
     container: JSONDocument | DocumentBlock | DocumentFragment,
-    test: (block: DocumentBlock) => boolean,
+    test: (block: DocumentBlock) => boolean
 ): DocumentBlock | null {
     if (!('nodes' in container)) {
         return null;

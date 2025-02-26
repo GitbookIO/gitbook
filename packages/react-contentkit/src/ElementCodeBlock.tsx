@@ -1,9 +1,9 @@
-import { ContentKitCodeBlock } from '@gitbook/api';
+import type { ContentKitCodeBlock } from '@gitbook/api';
 import React from 'react';
 
-import { ContentKitServerElementProps } from './types';
-import { resolveDynamicBinding } from './dynamic';
 import { DefaultCodeBlock, ElementCodeBlockClient } from './ElementCodeBlockClient';
+import { resolveDynamicBinding } from './dynamic';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementCodeBlock(props: ContentKitServerElementProps<ContentKitCodeBlock>) {
     const { element, context, state } = props;

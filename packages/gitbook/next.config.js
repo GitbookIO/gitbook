@@ -34,7 +34,7 @@ module.exports = withSentryConfig(
                         __RRWEB_EXCLUDE_IFRAME__: true,
                         __RRWEB_EXCLUDE_SHADOW_DOM__: true,
                         __SENTRY_EXCLUDE_REPLAY_WORKER__: true,
-                    }),
+                    })
                 );
             }
 
@@ -79,5 +79,5 @@ module.exports = withSentryConfig(
         // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
         tunnelRoute: '/~gitbook/monitoring',
         disableLogger: true,
-    },
+    }
 );

@@ -4,10 +4,10 @@ import { forwardRef, useId } from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { CopyCodeButton } from './CopyCodeButton';
-import type { HighlightLine, HighlightToken } from './highlight';
 import { AnnotationPopover } from '../Annotation/AnnotationPopover';
 import type { BlockProps } from '../Block';
+import { CopyCodeButton } from './CopyCodeButton';
+import type { HighlightLine, HighlightToken } from './highlight';
 
 import './theme.css';
 import './CodeBlockRenderer.css';
@@ -21,7 +21,7 @@ type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'sty
  */
 export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
-    ref: React.ForwardedRef<HTMLDivElement>,
+    ref: React.ForwardedRef<HTMLDivElement>
 ) {
     const { block, style, lines } = props;
 
@@ -47,14 +47,14 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 className={tcls(
                     '[grid-area:2/1] relative overflow-auto bg-tint theme-gradient:bg-tint-12/1 ring-tint-subtle hide-scroll',
                     'rounded-md straight-corners:rounded-sm',
-                    title && 'rounded-ss-none',
+                    title && 'rounded-ss-none'
                 )}
             >
                 <code
                     id={id}
                     className={tcls(
                         'min-w-full inline-grid grid-cols-[auto_1fr] p-2 [count-reset:line]',
-                        withWrap && 'whitespace-pre-wrap',
+                        withWrap && 'whitespace-pre-wrap'
                     )}
                 >
                     {lines.map((line, index) => (
