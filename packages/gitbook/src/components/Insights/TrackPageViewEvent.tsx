@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 
-import { useTrackEvent } from './InsightsProvider';
+import { type InsightsEventPageContext, useTrackEvent } from './InsightsProvider';
 
 /**
  * Track a page view event.
  */
-export function TrackPageViewEvent(props: { pageId: string | null; revisionId: string }) {
-    const { pageId, revisionId } = props;
+export function TrackPageViewEvent(props: InsightsEventPageContext) {
+    const { pageId } = props;
     const trackEvent = useTrackEvent();
 
     React.useEffect(() => {
@@ -18,10 +18,9 @@ export function TrackPageViewEvent(props: { pageId: string | null; revisionId: s
             },
             {
                 pageId,
-                revisionId,
             },
         );
-    }, [pageId, revisionId, trackEvent]);
+    }, [pageId, trackEvent]);
 
     return null;
 }

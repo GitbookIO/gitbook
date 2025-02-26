@@ -54,7 +54,13 @@ export function SpaceLayout(props: {
             enabled={withTracking}
             apiHost={context.dataFetcher.apiEndpoint}
             visitorAuthToken={context.visitorAuthToken}
-            {...getSitePointerFromContext(context)}
+            organizationId={context.organizationId}
+            siteId={context.site.id}
+            siteSectionId={context.sections?.current?.id ?? null}
+            siteSpaceId={context.siteSpace.id}
+            siteShareKey={context.shareKey ?? null}
+            revisionId={context.revisionId}
+            spaceId={context.space.id}
         >
             <Header withTopHeader={withTopHeader} context={context} />
             <div

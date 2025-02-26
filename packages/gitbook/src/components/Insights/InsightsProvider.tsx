@@ -5,7 +5,6 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useEventCallback, useDebounceCallback } from 'usehooks-ts';
 
-import { SiteContentPointer } from '@/lib/api';
 import * as cookies from '@/lib/cookies';
 
 import { getSession } from './sessions';
@@ -16,14 +15,21 @@ export type InsightsEventName = api.SiteInsightsEvent['type'];
 /**
  * Global context for all events in the session.
  */
-type InsightsEventContext = SiteContentPointer;
+type InsightsEventContext = {
+    organizationId: string;
+    siteId: string;
+    siteSectionId: string | null;
+    siteSpaceId: string | null;
+    siteShareKey: string | null;
+    spaceId: string;
+    revisionId: string;
+};
 
 /**
  * Context for an event on a page.
  */
-interface InsightsEventPageContext {
+export interface InsightsEventPageContext {
     pageId: string | null;
-    revisionId: string;
 }
 
 /**
@@ -269,8 +275,8 @@ function transformEvents(input: {
         siteSpace: input.context.siteSpaceId ?? null,
         space: input.context.spaceId,
         siteShareKey: input.context.siteShareKey ?? null,
+        revision: input.context.revisionId,
         page: input.pageContext.pageId,
-        revision: input.pageContext.revisionId,
     };
 
     return input.events.map((partialEvent) => {
