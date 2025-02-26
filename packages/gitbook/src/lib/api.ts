@@ -967,25 +967,6 @@ export const renderIntegrationUi = cache({
 });
 
 /**
- * Fetch an embed.
- * We don't cache them by cache tag, as we never purge them (they expire after 7 days).
- */
-export const getEmbedByUrl = cache({
-    name: 'api.getEmbedByUrl',
-    get: async (url: string, options: CacheFunctionOptions) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.urls.getEmbedByUrl(
-            { url },
-            {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            }
-        );
-        return cacheResponse(response);
-    },
-});
-
-/**
  * Fetch an embed in a space.
  */
 export const getEmbedByUrlInSpace = cache({

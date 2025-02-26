@@ -1,6 +1,6 @@
 import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
-import { unstable_cacheTag as cacheTag } from 'next/cache';
+import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import {
     getChangeRequestCacheTag,
     getHostnameCacheTag,
@@ -118,6 +118,12 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 source: params.source,
             });
         },
+        getEmbedByUrl(params) {
+            return getEmbedByUrl(input, {
+                url: params.url,
+                spaceId: params.spaceId,
+            });
+        },
 
         //
         // API that are not tied to the token
@@ -138,6 +144,8 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
 
 async function getUserById(input: DataFetcherInput, userId: string) {
     'use cache';
+
+    cacheLife('days');
 
     try {
         const res = await getAPI(input).users.getUserById(userId);
@@ -160,6 +168,7 @@ async function getSpace(
 ) {
     'use cache';
 
+    cacheLife('days');
     cacheTag(getSpaceCacheTag(params.spaceId));
 
     const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
@@ -176,6 +185,8 @@ async function getChangeRequest(
     }
 ) {
     'use cache';
+
+    cacheLife('minutes');
 
     try {
         const res = await getAPI(input).spaces.getChangeRequestById(
@@ -203,6 +214,8 @@ async function getRevision(
 ) {
     'use cache';
 
+    cacheLife('max');
+
     const res = await getAPI(input).spaces.getRevisionById(params.spaceId, params.revisionId, {
         metadata: params.metadata,
     });
@@ -218,6 +231,8 @@ async function getRevisionPages(
     }
 ) {
     'use cache';
+
+    cacheLife('max');
 
     const res = await getAPI(input).spaces.listPagesInRevisionById(
         params.spaceId,
@@ -238,6 +253,8 @@ async function getRevisionFile(
     }
 ) {
     'use cache';
+
+    cacheLife('max');
 
     try {
         const res = await getAPI(input).spaces.getFileInRevisionById(
@@ -265,8 +282,9 @@ async function getRevisionPageByPath(
 ) {
     'use cache';
 
-    const encodedPath = encodeURIComponent(params.path);
+    cacheLife('max');
 
+    const encodedPath = encodeURIComponent(params.path);
     try {
         const res = await getAPI(input).spaces.getPageInRevisionByPath(
             params.spaceId,
@@ -293,6 +311,8 @@ async function getDocument(
 ) {
     'use cache';
 
+    cacheLife('max');
+
     const res = await getAPI(input).spaces.getDocumentById(params.spaceId, params.documentId);
     return res.data;
 }
@@ -305,6 +325,9 @@ async function getComputedDocument(
     }
 ) {
     'use cache';
+
+    // TODO: we need to resolve dependencies and pass them in the cache key
+    cacheLife('days');
 
     const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
         source: params.source,
@@ -321,6 +344,8 @@ async function getReusableContent(
     }
 ) {
     'use cache';
+
+    cacheLife('max');
 
     try {
         const res = await getAPI(input).spaces.getReusableContentInRevisionById(
@@ -348,6 +373,7 @@ async function getLatestOpenAPISpecVersionContent(
     'use cache';
 
     cacheTag(getOpenAPISpecCacheTag(params.organizationId, params.slug));
+    cacheLife('days');
 
     try {
         const res = await getAPI(input).orgs.getLatestOpenApiSpecVersionContent(
@@ -378,6 +404,7 @@ async function getPublishedContentByUrl(
 
     const hostname = new URL(url).hostname;
     cacheTag(getHostnameCacheTag(hostname));
+    cacheLife('days');
 
     const res = await getAPI(input).urls.getPublishedContentByUrl({
         url,
@@ -401,7 +428,10 @@ async function getPublishedContentSite(
     }
 ) {
     'use cache';
+
     cacheTag(getSiteCacheTag(params.siteId));
+    cacheLife('days');
+
     const res = await getAPI(input).orgs.getPublishedContentSite(
         params.organizationId,
         params.siteId,
@@ -422,6 +452,9 @@ async function getSiteRedirectBySource(
     }
 ) {
     'use cache';
+
+    cacheTag(getSiteCacheTag(params.siteId));
+    cacheLife('days');
 
     try {
         const res = await getAPI(input).orgs.getSiteRedirectBySource(
@@ -447,6 +480,22 @@ async function getSiteRedirectBySource(
 
         throw error;
     }
+}
+
+async function getEmbedByUrl(
+    input: DataFetcherInput,
+    params: {
+        url: string;
+        spaceId: string;
+    }
+) {
+    'use cache';
+
+    cacheLife('weeks');
+
+    const api = getAPI(input);
+    const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
+    return res.data;
 }
 
 function getAPI(input: DataFetcherInput) {

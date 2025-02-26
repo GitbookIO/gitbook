@@ -121,4 +121,9 @@ export interface GitBookDataFetcher {
         siteShareKey: string | undefined;
         source: string;
     }): Promise<{ redirect: api.SiteRedirect | null; target: string } | null>;
+
+    /**
+     * Get an embed by its URL.
+     */
+    getEmbedByUrl(params: { url: string; spaceId: string }): Promise<api.Embed>;
 }
