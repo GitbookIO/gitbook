@@ -13,6 +13,7 @@ export function SpacesDropdown(props: {
     className?: string;
 }) {
     const { context, siteSpace, siteSpaces, className } = props;
+    const { linker } = context;
 
     return (
         <Dropdown
@@ -75,7 +76,7 @@ export function SpacesDropdown(props: {
                             id: otherSiteSpace.id,
                             title: otherSiteSpace.title,
                             url: otherSiteSpace.urls.published
-                                ? context.linker.toLinkForContent(otherSiteSpace.urls.published)
+                                ? linker.toLinkForContent(otherSiteSpace.urls.published)
                                 : otherSiteSpace.space.urls.app,
                         }}
                         active={otherSiteSpace.id === siteSpace.id}
