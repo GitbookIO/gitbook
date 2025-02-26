@@ -1,6 +1,5 @@
 'use client';
 
-import type { SiteSection } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
@@ -91,9 +90,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                             </NavigationMenu.Trigger>
                                             <NavigationMenu.Content className="absolute top-0 left-0 z-20 w-full data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft md:w-max">
                                                 <SectionGroupTileList
-                                                    sections={
-                                                        sectionOrGroup.sections as SiteSection[]
-                                                    }
+                                                    sections={sectionOrGroup.sections}
                                                     currentSection={currentSection}
                                                 />
                                             </NavigationMenu.Content>
