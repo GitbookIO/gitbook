@@ -3,10 +3,11 @@ import { OpenAPIV3 } from '@gitbook/openapi-parser';
 /**
  * Get the default URL for the server.
  */
-export function getDefaultServerURL(servers: OpenAPIV3.ServerObject[]): null | string {
+export function getDefaultServerURL(servers: OpenAPIV3.ServerObject[]): string {
     const server = servers[0];
     if (!server) {
-        return null;
+        // Return empty string if no server is found to display nothing
+        return '';
     }
 
     return interpolateServerURL(server);
