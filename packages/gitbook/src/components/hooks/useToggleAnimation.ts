@@ -17,7 +17,7 @@ const hide = {
     },
 };
 
-const staggerMenuItems = stagger(0.02, { ease: (p) => Math.pow(p, 2) });
+const staggerMenuItems = stagger(0.02, { ease: (p) => p ** 2 });
 
 export function useToggleAnimation({
     hasDescendants,
@@ -47,7 +47,7 @@ export function useToggleAnimation({
                     { opacity: 1 },
                     {
                         delay: staggerMenuItems,
-                    },
+                    }
                 );
             else {
                 animate(selector, { opacity: 0 });

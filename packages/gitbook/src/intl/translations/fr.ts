@@ -1,4 +1,4 @@
-import { TranslationLanguage } from './types';
+import type { TranslationLanguage } from './types';
 
 export const fr: TranslationLanguage = {
     locale: 'fr',

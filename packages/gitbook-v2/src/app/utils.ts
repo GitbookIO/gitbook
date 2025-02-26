@@ -38,7 +38,7 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
             url: url.toString(),
             visitorAuthToken: null,
             redirectOnError: false,
-        },
+        }
     );
 }
 
@@ -70,7 +70,7 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
 
             // TODO: set it only when the token comes from the cookies.
             redirectOnError: true,
-        },
+        }
     );
 }
 
@@ -103,7 +103,7 @@ function createLinkerFromParams(params: RouteLayoutParams) {
 
 function getSiteURLFromParams(params: RouteLayoutParams) {
     const decoded = decodeURIComponent(params.siteURL);
-    const url = new URL('https://' + decoded);
+    const url = new URL(`https://${decoded}`);
     return url;
 }
 

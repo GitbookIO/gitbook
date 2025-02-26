@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 
 /**
  * Get the default URL for the server.
@@ -23,9 +23,8 @@ export function interpolateServerURL(server: OpenAPIV3.ServerObject) {
         .map((part) => {
             if (part.kind === 'text') {
                 return part.text;
-            } else {
-                return server.variables?.[part.name]?.default ?? `{${part.name}}`;
             }
+            return server.variables?.[part.name]?.default ?? `{${part.name}}`;
         })
         .join('');
 }

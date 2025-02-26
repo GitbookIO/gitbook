@@ -1,4 +1,5 @@
-import {
+import { getSiteStructureSections } from '@/lib/sites';
+import type {
     ChangeRequest,
     RevisionPage,
     RevisionPageDocument,
@@ -11,12 +12,11 @@ import {
     SiteStructure,
     Space,
 } from '@gitbook/api';
+import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
-import { getSiteStructureSections } from '@/lib/sites';
-import { createDataFetcher, GitBookDataFetcher } from '@v2/lib/data';
-import { GitBookSpaceLinker, appendPrefixToLinker } from './links';
-import { ImageResizer } from './images';
+import type { ImageResizer } from './images';
+import { type GitBookSpaceLinker, appendPrefixToLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -111,7 +111,7 @@ export async function fetchSiteContextByURL(
         url: string;
         visitorAuthToken: string | null;
         redirectOnError: boolean;
-    },
+    }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
     const data = await dataFetcher.getPublishedContentByUrl({
@@ -142,7 +142,7 @@ export async function fetchSiteContextByURL(
             changeRequest: data.changeRequest,
             revision: data.revision,
             visitorAuthToken: input.visitorAuthToken,
-        },
+        }
     );
 
     const siteContext = {
@@ -168,7 +168,7 @@ export async function fetchSiteContextByIds(
         changeRequest: string | undefined;
         revision: string | undefined;
         visitorAuthToken: string | null;
-    },
+    }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
 
@@ -211,11 +211,13 @@ export async function fetchSiteContextByIds(
             if (siteSpaceSettings) {
                 return siteSpaceSettings;
             }
+
             // We got the pointer from an API and customizations from another.
             // It's possible that the two are unsynced leading to not found customizations for the space.
             // It's better to fallback on customization of the site that displaying an error.
             console.warn('Customization not found for site space', ids.siteSpace);
         }
+
         return customizations.site;
     })();
 
@@ -243,7 +245,7 @@ export async function fetchSpaceContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
-    },
+    }
 ): Promise<GitBookSpaceContext> {
     const { dataFetcher } = baseContext;
 

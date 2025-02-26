@@ -2,12 +2,12 @@
     "name": "gitbook",
     "version": "0.1.0",
     "devDependencies": {
+        "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.27.12",
-        "prettier": "^3.0.3",
-        "turbo": "^2.4.1-canary.2",
+        "turbo": "^2.4.4",
         "vercel": "^39.3.0"
     },
-    "packageManager": "bun@1.1.18",
+    "packageManager": "bun@1.2.3",
     "overrides": {
         "@codemirror/state": "6.4.1",
         "react": "18.3.1",
@@ -20,11 +20,9 @@
         "build": "turbo run build",
         "build:v2": "turbo run build:v2",
         "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",
-        "lint": "turbo run lint",
-        "lint:fix": "turbo run lint -- --fix",
         "typecheck": "turbo run typecheck",
-        "format": "prettier ./ --ignore-unknown --write",
-        "format:check": "prettier ./ --ignore-unknown --list-different",
+        "format": "biome check --write ./",
+        "format:check": "biome check --diagnostic-level=error ./",
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "e2e-customers": "turbo run e2e-customers",
@@ -34,9 +32,7 @@
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },
-    "workspaces": [
-        "packages/*"
-    ],
+    "workspaces": ["packages/*"],
     "patchedDependencies": {
         "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch"

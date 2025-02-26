@@ -1,14 +1,14 @@
 import {
-    resizeImage,
-    checkIsSizableImageURL,
-    CloudflareImageOptions,
     CURRENT_SIGNATURE_VERSION,
+    type CloudflareImageOptions,
+    type SignatureVersion,
+    checkIsSizableImageURL,
     isSignatureVersion,
-    SignatureVersion,
-    verifyImageSignature,
     parseImageAPIURL,
+    resizeImage,
+    verifyImageSignature,
 } from '@v2/lib/images';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 import { getHost } from '@/lib/links';
 
@@ -20,7 +20,7 @@ export const runtime = 'edge';
  * Fetch and resize an image.
  */
 export async function GET(request: NextRequest) {
-    let urlParam = request.nextUrl.searchParams.get('url');
+    const urlParam = request.nextUrl.searchParams.get('url');
     const signature = request.nextUrl.searchParams.get('sign');
 
     if (!urlParam || !signature) {
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     const signatureVersion = parseSignatureVersion(request.nextUrl.searchParams.get('sv'));
     if (!signatureVersion) {
-        return new Response(`Invalid sv parameter`, { status: 400 });
+        return new Response('Invalid sv parameter', { status: 400 });
     }
 
     const url = parseImageAPIURL(urlParam);
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
             url,
             host: await getHost(),
         },
-        { signature, version: signatureVersion },
+        { signature, version: signatureVersion }
     );
     if (!verified) {
         return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
         }
 
         return response;
-    } catch (error) {
+    } catch (_error) {
         // Redirect to the original image if resizing fails
         return NextResponse.redirect(url, 302);
     }

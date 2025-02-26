@@ -1,19 +1,19 @@
-import { DocumentBlock, JSONDocument } from '@gitbook/api';
+import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 import React from 'react';
 
 import {
-    SkeletonParagraph,
-    SkeletonHeading,
     SkeletonCard,
+    SkeletonHeading,
     SkeletonImage,
+    SkeletonParagraph,
     SkeletonSmall,
 } from '@/components/primitives';
-import { ClassValue } from '@/lib/tailwind';
+import type { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
 import { Divider } from './Divider';
-import { DocumentContextProps } from './DocumentView';
+import type { DocumentContextProps } from './DocumentView';
 import { Drawing } from './Drawing';
 import { Embed } from './Embed';
 import { Expandable } from './Expandable';
@@ -47,7 +47,7 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
 /**
  * Alternative to `assertNever` that returns `null` instead of throwing an error.
  */
-function nullIfNever(value: never): null {
+function nullIfNever(_value: never): null {
     return null;
 }
 

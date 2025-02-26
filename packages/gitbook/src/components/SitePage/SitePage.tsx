@@ -1,7 +1,7 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
-import { Metadata, Viewport } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
 
@@ -11,14 +11,8 @@ import { getAbsoluteHref } from '@/lib/links';
 import { getPagePath, resolveFirstDocument } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
-import {
-    fetchPageData,
-    getPathnameParam,
-    normalizePathname,
-    PageParams,
-    PagePathParams,
-} from './fetch';
 import { PageClientLayout } from './PageClientLayout';
+import { type PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from './fetch';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -56,7 +50,7 @@ export async function SitePage(props: SitePageProps) {
             context.linker.toPathForPage({
                 pages: context.pages,
                 page: pageTarget.page,
-            }),
+            })
         );
     }
 
@@ -82,7 +76,7 @@ export async function SitePage(props: SitePageProps) {
                 <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-            <div className="flex flex-row-reverse justify-end grow">
+            <div className="flex grow flex-row-reverse justify-end">
                 <PageAside
                     page={page}
                     document={document}
@@ -174,7 +168,7 @@ async function getPageDataWithFallback(args: {
                 context.linker.toPathForPage({
                     pages: context.pages,
                     page: rootPage?.page,
-                }),
+                })
             );
         }
 

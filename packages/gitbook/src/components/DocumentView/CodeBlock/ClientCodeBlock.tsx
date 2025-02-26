@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
 
-import type { HighlightLine, RenderedInline } from './highlight';
 import type { BlockProps } from '../Block';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
+import type { HighlightLine, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
 
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
@@ -41,9 +41,19 @@ export function ClientCodeBlock(props: ClientBlockProps) {
                 // We use requestIdleCallback to avoid blocking the main thread
                 // when scrolling.
                 if (typeof requestIdleCallback === 'function') {
-                    requestIdleCallback(() => highlight(block, inlines).then(setLines));
+                    requestIdleCallback(() =>
+                        highlight(block, inlines).then((result) => {
+                            if (!canceled) {
+                                setLines(result);
+                            }
+                        })
+                    );
                 } else {
-                    highlight(block, inlines).then(setLines);
+                    highlight(block, inlines).then((result) => {
+                        if (!canceled) {
+                            setLines(result);
+                        }
+                    });
                 }
             });
             return () => {

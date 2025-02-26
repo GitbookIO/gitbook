@@ -1,25 +1,25 @@
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { Suspense } from 'react';
 
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
-import { t, getSpaceLanguage } from '@/intl/server';
+import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
+import { SearchButton } from '../Search';
+import { SiteSectionTabs } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
-import { SpacesDropdown } from './SpacesDropdown';
-import { SearchButton } from '../Search';
-import { SiteSectionTabs } from '../SiteSections';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+import { SpacesDropdown } from './SpacesDropdown';
 
 /**
  * Render the header for the space.
  */
 export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
     const { context, withTopHeader } = props;
-    const { site, siteSpace, siteSpaces, sections, customization } = context;
+    const { siteSpace, siteSpaces, sections, customization } = context;
     const isMultiVariants = siteSpaces.length > 1;
 
     return (
@@ -44,16 +44,16 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                 'theme-gradient-tint:bg-gradient-tint',
                 'contrast-more:bg-tint-base',
 
-                withTopHeader ? null : 'lg:hidden mobile-only',
+                withTopHeader ? null : 'mobile-only lg:hidden',
                 'text-sm',
-                'backdrop-blur-lg',
+                'backdrop-blur-lg'
             )}
         >
             <div
                 className={tcls(
                     'theme-bold:bg-header-background',
                     'theme-bold:shadow-[0px_1px_0px]',
-                    'theme-bold:shadow-tint-12/2',
+                    'theme-bold:shadow-tint-12/2'
                 )}
             >
                 <div className={tcls('scroll-nojump')}>
@@ -69,14 +69,14 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             'min-h-16',
                             'sm:h-16',
                             isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
-                            CONTAINER_STYLE,
+                            CONTAINER_STYLE
                         )}
                     >
                         <div
                             className={tcls(
                                 'flex max-w-full',
                                 isMultiVariants && 'page-no-toc:max-[400px]:w-full',
-                                'shrink min-w-0 gap-2 lg:gap-4 justify-start items-center',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                             )}
                         >
                             <HeaderMobileMenu
@@ -86,29 +86,20 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'text-tint-strong',
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'theme-bold:hover:bg-header-link/3',
+                                    'theme-bold:hover:bg-header-link/3'
                                 )}
                             />
                             <HeaderLogo context={context} />
                         </div>
 
                         {isMultiVariants && (
-                            <div className="hidden page-no-toc:flex mr-auto">
+                            <div className="mr-auto page-no-toc:flex hidden">
                                 <SpacesDropdown
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
-                                    className={`theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4
-                                            theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 
-                                            theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6
-                                            theme-bold:dark:group-hover/dropdown:bg-header-link/3 theme-bold:dark:group-hover/dropdown:text-header-link theme-bold:dark:group-hover/dropdown:ring-header-link/6
-                                            theme-bold:group-focus-within/dropdown:bg-header-link/3 theme-bold:group-focus-within/dropdown:text-header-link theme-bold:group-focus-within/dropdown:ring-header-link/6
-                                            theme-bold:dark:group-focus-within/dropdown:bg-header-link/3 theme-bold:dark:group-focus-within/dropdown:text-header-link theme-bold:dark:group-focus-within/dropdown:ring-header-link/6
-                                            
-                                            theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link
-                                            theme-bold:contrast-more:group-hover/dropdown:text-header-link theme-bold:contrast-more:group-hover/dropdown:ring-header-link
-                                            theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link
-                                            theme-bold:contrast-more:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link
-                                            theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link`}
+                                    className={
+                                        'theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4 theme-bold:group-focus-within/dropdown:bg-header-link/3 theme-bold:group-focus-within/dropdown:text-header-link theme-bold:group-focus-within/dropdown:ring-header-link/6 theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6 theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:group-hover/dropdown:text-header-link theme-bold:contrast-more:group-hover/dropdown:ring-header-link theme-bold:contrast-more:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 theme-bold:dark:group-hover/dropdown:bg-header-link/3 theme-bold:dark:group-hover/dropdown:text-header-link theme-bold:dark:group-hover/dropdown:ring-header-link/6 theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link theme-bold:dark:group-focus-within/dropdown:bg-header-link/3 theme-bold:dark:group-focus-within/dropdown:text-header-link theme-bold:dark:group-focus-within/dropdown:ring-header-link/6 theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link'
+                                    }
                                 />
                             </div>
                         )}
@@ -131,7 +122,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'md:min-w-56',
                                 'grow-0',
                                 'shrink-0',
-                                'justify-self-end',
+                                'justify-self-end'
                             )}
                         >
                             <Suspense fallback={null}>
@@ -167,7 +158,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                             getSpaceLanguage(customization),
                                             customization.aiSearch.enabled
                                                 ? 'search_or_ask'
-                                                : 'search',
+                                                : 'search'
                                         )}
                                         ...
                                     </span>

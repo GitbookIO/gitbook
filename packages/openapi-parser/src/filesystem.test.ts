@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import type { Server } from 'bun';
 import { createFileSystem } from './filesystem';
-import { Server } from 'bun';
 
 async function serveFixture(fixture: string) {
     return new Response(await Bun.file(new URL(`./fixtures/${fixture}`, import.meta.url)).bytes(), {
@@ -37,10 +37,10 @@ describe('#createFileSystem', () => {
             rootURL: url,
         });
         expect(filesystem).toHaveLength(4);
-        expect(filesystem[0]!.isEntrypoint).toBe(true);
-        expect(filesystem[1]!.isEntrypoint).toBe(false);
-        expect(filesystem[1]!.filename).toBe('user.yaml');
-        expect(filesystem[2]!.filename).toBe('../tag.yaml');
-        expect(filesystem[3]!.filename).toBe('http://localhost:3020/root/pet.yaml');
+        expect(filesystem[0]?.isEntrypoint).toBe(true);
+        expect(filesystem[1]?.isEntrypoint).toBe(false);
+        expect(filesystem[1]?.filename).toBe('user.yaml');
+        expect(filesystem[2]?.filename).toBe('../tag.yaml');
+        expect(filesystem[3]?.filename).toBe('http://localhost:3020/root/pet.yaml');
     });
 });

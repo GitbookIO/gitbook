@@ -1,4 +1,4 @@
-import { RevisionPage } from '@gitbook/api';
+import type { RevisionPage } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -33,7 +33,7 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
                       ]
                     : '',
 
-                'shrink-0',
+                'shrink-0'
             )}
         />
     );

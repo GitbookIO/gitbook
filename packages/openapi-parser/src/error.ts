@@ -19,7 +19,7 @@ export class OpenAPIParseError extends Error {
             code: OpenAPIParseErrorCode;
             rootURL?: string | null;
             cause?: Error;
-        },
+        }
     ) {
         super(message, { cause: options.cause });
         this.code = options.code;

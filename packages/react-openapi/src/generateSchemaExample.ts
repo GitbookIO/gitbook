@@ -14,7 +14,7 @@ type GenerateSchemaExampleOptions = Pick<
  */
 export function generateSchemaExample(
     schema: OpenAPIV3.SchemaObject,
-    options?: GenerateSchemaExampleOptions,
+    options?: GenerateSchemaExampleOptions
 ): JSONValue | undefined {
     return getExampleFromSchema(
         schema,
@@ -35,7 +35,7 @@ export function generateSchemaExample(
             },
             ...options,
         },
-        3, // Max depth for circular references
+        3 // Max depth for circular references
     );
 }
 
@@ -44,7 +44,7 @@ export function generateSchemaExample(
  */
 export function generateMediaTypeExample(
     mediaType: OpenAPIV3.MediaTypeObject,
-    options?: GenerateSchemaExampleOptions,
+    options?: GenerateSchemaExampleOptions
 ): JSONValue | undefined {
     if (mediaType.example) {
         return mediaType.example;

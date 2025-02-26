@@ -1,9 +1,9 @@
 import {
-    CustomizationContentLink,
-    CustomizationFooterGroup,
+    type CustomizationContentLink,
+    type CustomizationFooterGroup,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import { GitBookAnyContext } from '@v2/lib/context';
+import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -17,7 +17,7 @@ export function FooterLinksGroup(props: {
     const { group, context } = props;
 
     return (
-        <nav className="text-sm flex flex-col gap-4">
+        <nav className="flex flex-col gap-4 text-sm">
             <h4 className="font-semibold">{group.title}</h4>
             <ul className="flex flex-col items-start gap-4">
                 {group.links.map((link, index) => {
@@ -56,7 +56,7 @@ async function FooterLink(props: { link: CustomizationContentLink; context: GitB
                 'links-accent:hover:underline',
                 'links-accent:underline-offset-4',
                 'links-accent:decoration-primary-subtle',
-                'links-accent:decoration-[3px]',
+                'links-accent:decoration-[3px]'
             )}
             insights={{
                 type: 'link_click',

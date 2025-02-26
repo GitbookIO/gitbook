@@ -1,9 +1,9 @@
-import { DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook/api';
+import { type DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
-import { resolveContentRef, ResolvedContentRef } from '@/lib/references';
+import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
@@ -46,7 +46,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
 }
 
 async function SpaceRefCard(
-    props: { resolved: ResolvedContentRef } & BlockProps<DocumentBlockContentRef>,
+    props: { resolved: ResolvedContentRef } & BlockProps<DocumentBlockContentRef>
 ) {
     const { context, style, resolved } = props;
     const spaceId = context.contentContext?.space.id;

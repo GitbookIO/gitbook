@@ -1,4 +1,4 @@
-import { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 
 import { isPageIndexable } from './seo';
 
@@ -9,11 +9,11 @@ export type FlatPageEntry = { page: RevisionPageDocument; depth: number };
  */
 function flattenPages(
     rootPages: RevisionPage[],
-    filter: (page: RevisionPageDocument | RevisionPageGroup) => boolean,
+    filter: (page: RevisionPageDocument | RevisionPageGroup) => boolean
 ): FlatPageEntry[] {
     const flattenPage = (
         page: RevisionPageDocument | RevisionPageGroup,
-        depth: number,
+        depth: number
     ): FlatPageEntry[] => {
         const allowed = filter(page);
         if (!allowed) {
@@ -23,13 +23,13 @@ function flattenPages(
         return [
             ...(page.type === 'document' ? [{ page, depth }] : []),
             ...page.pages.flatMap((child) =>
-                child.type === 'document' ? flattenPage(child, depth + 1) : [],
+                child.type === 'document' ? flattenPage(child, depth + 1) : []
             ),
         ];
     };
 
     return rootPages.flatMap((page) =>
-        page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : [],
+        page.type === 'group' || page.type === 'document' ? flattenPage(page, 0) : []
     );
 }
 

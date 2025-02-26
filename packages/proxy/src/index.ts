@@ -49,7 +49,7 @@ export function proxyToGitBook(options: ProxyToGitBookOptions): ProxySite {
     const site: ProxySite = {
         match: (request) => {
             const pathname = typeof request === 'string' ? request : new URL(request.url).pathname;
-            return pathname === basePath || pathname.startsWith(basePath + '/');
+            return pathname === basePath || pathname.startsWith(`${basePath}/`);
         },
 
         request: (originRequest) => {
@@ -89,7 +89,7 @@ function normalizeBasePath(basePath: string): string {
 }
 
 function withLeadingSlash(path: string): string {
-    return path.startsWith('/') ? path : '/' + path;
+    return path.startsWith('/') ? path : `/${path}`;
 }
 
 function withoutTrailingSlash(path: string): string {

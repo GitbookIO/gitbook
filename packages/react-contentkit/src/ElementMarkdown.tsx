@@ -1,9 +1,8 @@
-import { ContentKitMarkdown } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitMarkdown } from '@gitbook/api';
 
-import { ContentKitServerElementProps } from './types';
 import { ElementMarkdownClient } from './ElementMarkdownClient';
 import { resolveDynamicBinding } from './dynamic';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementMarkdown(props: ContentKitServerElementProps<ContentKitMarkdown>) {
     const { element, context, state } = props;

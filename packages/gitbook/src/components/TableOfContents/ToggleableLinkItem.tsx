@@ -6,9 +6,9 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { useScrollToActiveTOCItem } from './TOCScroller';
 import { useCurrentPagePath, useToggleAnimation } from '../hooks';
-import { Link, LinkInsightsProps } from '../primitives';
+import { Link, type LinkInsightsProps } from '../primitives';
+import { useScrollToActiveTOCItem } from './TOCScroller';
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -19,7 +19,7 @@ export function ToggleableLinkItem(
         pathname: string;
         children: React.ReactNode;
         descendants: React.ReactNode;
-    } & LinkInsightsProps,
+    } & LinkInsightsProps
 ) {
     const { href, children, descendants, pathname, insights } = props;
 
@@ -28,7 +28,7 @@ export function ToggleableLinkItem(
     const isActive = currentPagePath === pathname;
     const hasDescendants = !!descendants;
     const hasActiveDescendant =
-        hasDescendants && (isActive || currentPagePath.startsWith(pathname + '/'));
+        hasDescendants && (isActive || currentPagePath.startsWith(`${pathname}/`));
 
     const [isVisible, setIsVisible] = React.useState(hasActiveDescendant);
 
@@ -56,11 +56,11 @@ export function ToggleableLinkItem(
                 className={tcls(
                     'group/toclink relative transition-colors',
                     'flex flex-row justify-between',
-                    'p-1.5 pl-3 rounded-md straight-corners:rounded-none',
-                    'text-sm font-normal text-balance text-tint-strong/7 hover:text-tint-strong hover:bg-tint-hover contrast-more:text-tint-strong',
+                    'rounded-md straight-corners:rounded-none p-1.5 pl-3',
+                    'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
                     'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
-                    'before:contents[] before:absolute before:inset-y-0 before:-left-px',
-                    '[&+div_a]:pl-5 sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none sidebar-list-line:rounded-l-none',
+                    'before:contents[] before:-left-px before:absolute before:inset-y-0',
+                    'sidebar-list-line:rounded-l-none sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none [&+div_a]:pl-5 sidebar-list-default:[&+div_a]:before:w-px',
 
                     isActive && [
                         'font-semibold',
@@ -87,7 +87,7 @@ export function ToggleableLinkItem(
                         'contrast-more:ring-1',
                         'contrast-more:ring-primary',
                         'contrast-more:hover:ring-primary-hover',
-                    ],
+                    ]
                 )}
             >
                 {children}
@@ -109,7 +109,7 @@ export function ToggleableLinkItem(
                             'after:h-7',
                             'hover:bg-tint-active',
                             'hover:text-current',
-                            isActive ? ['hover:bg-tint-hover'] : [],
+                            isActive ? ['hover:bg-tint-hover'] : []
                         )}
                         onClick={(event) => {
                             event.preventDefault();
@@ -131,7 +131,7 @@ export function ToggleableLinkItem(
                                 'group-hover:opacity-11',
                                 'contrast-more:opacity-11',
 
-                                isVisible ? ['rotate-90'] : ['rotate-0'],
+                                isVisible ? ['rotate-90'] : ['rotate-0']
                             )}
                         />
                     </span>

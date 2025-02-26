@@ -1,0 +1,167 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "vcs": {
+        "enabled": false,
+        "clientKind": "git",
+        "useIgnoreFile": false
+    },
+    "files": {
+        "ignoreUnknown": false,
+        "ignore": [
+            "**/node_modules/**/*",
+            "**/dist/**/*",
+            "**/build/**/*",
+            "**/public/**/*",
+            "**/.next/**/*",
+            "**/.open-next/**/*",
+            "**/.turbo/**/*",
+            "**/.vercel/**/*",
+            "**/.cache/**/*",
+            "**/.wrangler/**/*",
+            "packages/openapi-parser/src/fixtures/**/*"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "useEditorconfig": true,
+        "formatWithErrors": false,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineEnding": "lf",
+        "lineWidth": 100,
+        "attributePosition": "auto",
+        "bracketSpacing": true
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "performance": {
+                "noDelete": "warn"
+            },
+            "security": {
+                "noDangerouslySetInnerHtml": "off"
+            },
+            "complexity": {
+                "noForEach": "off",
+                "noUselessFragments": "warn",
+                "noBannedTypes": "warn"
+            },
+            "correctness": {
+                "noUndeclaredVariables": "error",
+                "noUnusedVariables": "error",
+                "useArrayLiterals": "error",
+                "useHookAtTopLevel": "error",
+                "noUnusedImports": "error",
+                "noVoidElementsWithChildren": "warn",
+                "useJsxKeyInIterable": "warn",
+                "useExhaustiveDependencies": "warn"
+            },
+            "style": {
+                "noNonNullAssertion": "warn",
+                "noParameterAssign": "off",
+                "useThrowOnlyError": "error"
+            },
+            "suspicious": {
+                "noConsole": "warn",
+                "noExplicitAny": "warn",
+                "noImplicitAnyLet": "warn",
+                "noConfusingVoidType": "warn",
+                "noControlCharactersInRegex": "warn",
+                "noPrototypeBuiltins": "warn",
+                "noAssignInExpressions": "warn",
+                "noArrayIndexKey": "warn"
+            },
+            "a11y": {
+                "useSemanticElements": "warn",
+                "useKeyWithClickEvents": "warn",
+                "noSvgWithoutTitle": "warn",
+                "useButtonType": "warn",
+                "useIframeTitle": "warn",
+                "useAltText": "warn",
+                "noPositiveTabindex": "warn",
+                "useFocusableInteractive": "warn",
+                "useAriaPropsForRole": "warn",
+                "useValidAnchor": "warn",
+                "noLabelWithoutControl": "warn",
+                "noNoninteractiveTabindex": "warn"
+            },
+            "nursery": {
+                "useSortedClasses": {
+                    "level": "error",
+                    "fix": "safe",
+                    "options": {
+                        "attributes": ["class", "className", "style"],
+                        "functions": ["clsx", "tw"]
+                    }
+                }
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "jsxQuoteStyle": "double",
+            "quoteProperties": "asNeeded",
+            "trailingCommas": "es5",
+            "semicolons": "always",
+            "arrowParentheses": "always",
+            "bracketSameLine": false,
+            "quoteStyle": "single",
+            "attributePosition": "auto",
+            "bracketSpacing": true
+        }
+    },
+    "overrides": [
+        {
+            "include": [
+                "packages/gitbook/**/*",
+                "packages/gitbook-v2/**/*",
+                "packages/react-openapi/**/*",
+                "packages/react-math/**/*",
+                "packages/react-contentkit/**/*",
+                "packages/icons/**/*"
+            ],
+            "javascript": {
+                "globals": ["React"]
+            }
+        },
+        {
+            "include": ["packages/gitbook/**/*"],
+            "javascript": {
+                "globals": ["React", "GitBookIntegrationEvent"]
+            }
+        },
+        {
+            "include": ["*.css"],
+            "javascript": {
+                "globals": ["theme"]
+            }
+        },
+        {
+            "include": ["*.test.ts", "packages/gitbook/tests/**/*"],
+            "javascript": {
+                "globals": ["Bun"]
+            }
+        },
+        {
+            "include": [
+                "packages/cache-do/**/*",
+                "packages/gitbook/cf-env.d.ts",
+                "packages/gitbook/src/cloudflare-entrypoint.ts"
+            ],
+            "javascript": {
+                "globals": [
+                    "DurableObjectLocationHint",
+                    "DurableObjectNamespace",
+                    "DurableObjectStub",
+                    "ContinentCode",
+                    "Fetcher",
+                    "ExportedHandler"
+                ]
+            }
+        }
+    ]
+}

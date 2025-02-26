@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import fs from 'fs/promises';
-import path from 'path';
-import url from 'url';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import url from 'node:url';
 
 /**
  * Scripts to copy the assets to a public folder.
@@ -17,12 +17,10 @@ async function main() {
 
     // Copy the assets
     await Promise.all([
-        fs.cp(path.join(source, 'es5'), path.join(outputFolder, 'mathjax@' + packageJson.version), {
+        fs.cp(path.join(source, 'es5'), path.join(outputFolder, `mathjax@${packageJson.version}`), {
             recursive: true,
         }),
     ]);
-
-    console.log(`🎉 MathJaX assets copied to ${outputFolder}`);
 }
 
 main().catch(console.error);

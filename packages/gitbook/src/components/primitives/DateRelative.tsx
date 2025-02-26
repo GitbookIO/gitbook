@@ -17,7 +17,7 @@ export function DateRelative(props: { value: string }) {
             () => {
                 setNow(Date.now());
             },
-            30 * 60 * 1000,
+            30 * 60 * 1000
         );
 
         return () => {

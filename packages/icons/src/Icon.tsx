@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 
-import { IconName, IconStyle } from './types';
-import { getIconStyle } from './getIconStyle';
 import { getIconAssetURL, useIcons } from './IconsProvider';
+import { getIconStyle } from './getIconStyle';
+import type { IconName, IconStyle } from './types';
 
 /**
  * Props for the icon component.
@@ -39,7 +39,7 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
  */
 export const Icon = React.forwardRef(function Icon(
     props: IconProps,
-    ref: React.Ref<SVGSVGElement>,
+    ref: React.Ref<SVGSVGElement>
 ) {
     const context = useIcons();
     const {
@@ -64,7 +64,7 @@ export const Icon = React.forwardRef(function Icon(
                 ...(size ? { width: size, height: size } : {}),
                 ...rest.style,
             }}
-            className={'gb-icon ' + className}
-        ></svg>
+            className={`gb-icon ${className}`}
+        />
     );
 });

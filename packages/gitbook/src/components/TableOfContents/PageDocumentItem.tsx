@@ -1,9 +1,11 @@
-import { RevisionPage, RevisionPageDocument, SiteInsightsLinkPosition } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
-
-import { getPageHref } from '@/lib/links';
 import { getPagePath, hasPageVisibleDescendant } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
+import {
+    type RevisionPage,
+    type RevisionPageDocument,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
+import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
@@ -42,7 +44,7 @@ export async function PageDocumentItem(props: {
                                 'my-2',
                                 'border-tint-subtle',
                                 'sidebar-list-default:border-l',
-                                'sidebar-list-line:border-l',
+                                'sidebar-list-line:border-l'
                             )}
                             context={context}
                         />

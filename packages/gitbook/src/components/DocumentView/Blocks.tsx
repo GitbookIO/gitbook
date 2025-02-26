@@ -1,9 +1,9 @@
-import { DocumentBlock, JSONDocument } from '@gitbook/api';
+import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
-import { tcls, ClassValue } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Block } from './Block';
-import { DocumentContextProps } from './DocumentView';
+import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
 
 /**
@@ -19,7 +19,7 @@ export function Blocks<TBlock extends DocumentBlock, Tag extends React.ElementTy
 
         /** Props to pass to the wrapper element */
         wrapperProps?: React.ComponentProps<Tag>;
-    },
+    }
 ) {
     const { tag: Tag = 'div', style, wrapperProps, ...blocksProps } = props;
 
@@ -68,7 +68,7 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                         key={node.key}
                         block={node}
                         style={[
-                            'w-full mx-auto decoration-primary/6',
+                            'mx-auto w-full decoration-primary/6',
                             node.data && 'fullWidth' in node.data && node.data.fullWidth
                                 ? 'max-w-screen-xl'
                                 : 'max-w-3xl',

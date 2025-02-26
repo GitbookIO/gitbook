@@ -1,5 +1,5 @@
-import { encode, decode } from '@msgpack/msgpack';
 import { DurableObject } from 'cloudflare:workers';
+import { decode, encode } from '@msgpack/msgpack';
 import { LRUMap } from 'lru_map';
 
 export interface CacheObjectDescriptor {
@@ -137,7 +137,7 @@ export class CacheObject extends DurableObject {
      */
     public async purge() {
         return this.logOperation({ operation: 'purge' }, async (setLog) => {
-            let result = new Set<string>();
+            const result = new Set<string>();
 
             try {
                 // List all the keys in the cache object.
@@ -149,11 +149,7 @@ export class CacheObject extends DurableObject {
                 entries.forEach((exp) => {
                     result.add(exp.k);
                 });
-            } catch (error) {
-                // If an error occurs, reset the cache object.
-                // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
-                console.error('Error during purge, resetting the cache object', error);
-            }
+            } catch (_error) {}
 
             await this.reset();
             return Array.from(result);
@@ -174,7 +170,7 @@ export class CacheObject extends DurableObject {
                 const toDeleteSet = new Set<string>();
 
                 for (const [key, exp] of entries) {
-                    const timestamp = parseInt(key.split('.')[1]);
+                    const timestamp = Number.parseInt(key.split('.')[1]);
                     if (timestamp < Date.now()) {
                         toDeleteSet.add(key);
                         for (let i = 0; i < exp.c; i++) {
@@ -194,10 +190,7 @@ export class CacheObject extends DurableObject {
                 if (toDelete.length) {
                     await this.ctx.storage.setAlarm(Date.now() + 12 * 60 * 60 * 1000);
                 }
-            } catch (error) {
-                // If an error occurs, reset the cache object.
-                // This is a safety mechanism to prevent the cache object from being stuck in a bad state.
-                console.error('Error during alarm, reset the cache object', error);
+            } catch (_error) {
                 await this.reset();
             }
         });
@@ -218,10 +211,10 @@ export class CacheObject extends DurableObject {
      */
     async logOperation<T>(
         log: Record<string, unknown>,
-        fn: (update: (log: Record<string, unknown>) => void) => Promise<T>,
+        fn: (update: (log: Record<string, unknown>) => void) => Promise<T>
     ): Promise<T> {
         const objectId = this.ctx.id.name ?? this.ctx.id.toString();
-        let update: Record<string, unknown> = {};
+        const update: Record<string, unknown> = {};
         const start = performance.now();
         try {
             return await fn((arg) => {
@@ -265,7 +258,7 @@ function encodeChunks<T>(key: string, value: T): Record<string, Uint8Array> {
 function decodeChunks<T>(entries: Map<string, Uint8Array>): { value: T; size: number } | undefined {
     const chunks = Array.from(entries.entries())
         .map(([key, value]) => {
-            const index = parseInt(key.split('.').pop()!);
+            const index = Number.parseInt(key.split('.').pop()!);
             return [index, value] as const;
         })
         .sort(([a], [b]) => a - b)

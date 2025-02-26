@@ -1,4 +1,4 @@
-import type { CacheObject, CacheObjectDescriptor } from './CacheObject';
+import type { CacheObject } from './CacheObject';
 
 export type CacheLocationId = ContinentCode;
 const allLocations: CacheLocationId[] = ['AF', 'AS', 'NA', 'SA', 'AN', 'EU', 'OC'];
@@ -30,7 +30,7 @@ export class CacheObjectStub {
         /** ID of the location to target */
         private locationId: CacheLocationId,
         /** Name of the tag */
-        private tag: string,
+        private tag: string
     ) {
         const groupId = getCacheObjectIdName(this.locationId, this.tag);
         this.stub = this.doNamespace.get(this.doNamespace.idFromName(groupId), {
@@ -85,7 +85,7 @@ export class CacheObjectStub {
                 });
                 const locationkeys = await cacheGroup.purge();
                 locationkeys.forEach((key) => keys.add(key));
-            }),
+            })
         );
 
         return keys;

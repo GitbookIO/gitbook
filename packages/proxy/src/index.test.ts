@@ -25,7 +25,7 @@ describe('.request', () => {
         expect(proxiedRequest.headers.get('X-Forwarded-Host')).toBe('example.com');
         expect(proxiedRequest.headers.get('X-GitBook-BasePath')).toBe('/docs');
         expect(proxiedRequest.headers.get('X-GitBook-Site-URL')).toBe(
-            'https://org.gitbook.io/example/',
+            'https://org.gitbook.io/example/'
         );
     });
 
@@ -39,7 +39,7 @@ describe('.request', () => {
         expect(proxiedRequest.headers.get('X-Forwarded-Host')).toBe('example.com');
         expect(proxiedRequest.headers.get('X-GitBook-BasePath')).toBe('/docs');
         expect(proxiedRequest.headers.get('X-GitBook-Site-URL')).toBe(
-            'https://org.gitbook.io/example/',
+            'https://org.gitbook.io/example/'
         );
     });
 
@@ -53,7 +53,7 @@ describe('.request', () => {
         expect(proxiedRequest.headers.get('X-Forwarded-Host')).toBe('example.com');
         expect(proxiedRequest.headers.get('X-GitBook-BasePath')).toBe('/docs');
         expect(proxiedRequest.headers.get('X-GitBook-Site-URL')).toBe(
-            'https://org.gitbook.io/example/',
+            'https://org.gitbook.io/example/'
         );
     });
 });

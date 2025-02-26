@@ -24,7 +24,8 @@ export function isCookiesTrackingDisabled() {
 
     if (state === 'yes') {
         return false;
-    } else if (state === 'no') {
+    }
+    if (state === 'no') {
         return true;
     }
 

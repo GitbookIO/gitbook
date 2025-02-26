@@ -1,30 +1,30 @@
-import 'server-only';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import 'server-only';
 
 import {
+    type ComputedContentSource,
     GitBookAPI,
     GitBookAPIError,
-    HttpResponse,
-    List,
-    PublishedSiteContentLookup,
-    RequestRenderIntegrationUI,
-    RevisionFile,
-    RevisionReusableContent,
-    SiteSpace,
-    Space,
-    SiteSection,
-    PublishedSiteContent,
-    SiteSectionGroup,
-    ComputedContentSource,
+    type HttpResponse,
+    type List,
+    type PublishedSiteContent,
+    type PublishedSiteContentLookup,
+    type RequestRenderIntegrationUI,
+    type RevisionFile,
+    type RevisionReusableContent,
+    type SiteSection,
+    type SiteSectionGroup,
+    type SiteSpace,
+    type Space,
 } from '@gitbook/api';
-import { GitBookDataFetcher } from '@v2/lib/data/types';
+import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 
 import { batch } from './async';
 import { buildVersion } from './build';
 import {
-    CacheFunctionOptions,
+    type CacheFunctionOptions,
     cache,
     cacheResponse,
     noCacheFetchOptions,
@@ -109,7 +109,7 @@ export const DEFAULT_API_ENDPOINT = process.env.GITBOOK_API_URL ?? 'https://api.
  */
 export async function apiWithToken(
     apiToken: string,
-    contextId: string | undefined,
+    contextId: string | undefined
 ): Promise<GitBookAPIContext> {
     const headersList = await headers();
     const apiEndpoint = headersList.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
@@ -138,7 +138,7 @@ export async function api(): Promise<GitBookAPIContext> {
 
     if (!apiToken) {
         throw new Error(
-            'Missing GitBook API token, please check that the request is correctly processed by the middleware',
+            'Missing GitBook API token, please check that the request is correctly processed by the middleware'
         );
     }
 
@@ -222,7 +222,7 @@ export const getLatestOpenAPISpecVersionContent = cache({
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
-                },
+                }
             );
             return cacheResponse(response, { revalidateBefore: 60 * 60 });
         } catch (error) {
@@ -253,7 +253,7 @@ export const getPublishedContentByUrl = cache({
         visitorAuthToken: string | undefined,
         // Prefer undefined for a better cache key.
         redirectOnError: true | undefined,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         try {
             const apiCtx = await api();
@@ -266,7 +266,7 @@ export const getPublishedContentByUrl = cache({
                 {
                     signal: options.signal,
                     ...noCacheFetchOptions,
-                },
+                }
             );
 
             const parsed = parseCacheResponse(response);
@@ -316,7 +316,7 @@ export const getSpace = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
@@ -344,7 +344,7 @@ export const getChangeRequest = cache({
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
-                },
+                }
             );
 
             return cacheResponse(response, {
@@ -389,7 +389,7 @@ export const getRevision = cache({
         spaceId: string,
         revisionId: string,
         fetchOptions: GetRevisionOptions,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.spaces.getRevisionById(
@@ -401,7 +401,7 @@ export const getRevision = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
 
         return cacheResponse(response, fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day);
@@ -421,7 +421,7 @@ export const getRevisionPages = cache({
         spaceId: string,
         revisionId: string,
         fetchOptions: GetRevisionOptions,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.spaces.listPagesInRevisionById(
@@ -433,7 +433,7 @@ export const getRevisionPages = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
 
         return cacheResponse(response, {
@@ -456,7 +456,7 @@ export const getRevisionPageByPath = cache({
         spaceId: string,
         revisionId: string,
         pagePath: string,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         const encodedPath = encodeURIComponent(pagePath);
 
@@ -472,7 +472,7 @@ export const getRevisionPageByPath = cache({
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
-                },
+                }
             );
 
             return cacheResponse(response, cacheTtl_7days);
@@ -501,7 +501,7 @@ const getRevisionFileById = cache({
         spaceId: string,
         revisionId: string,
         fileId: string,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         try {
             const apiCtx = await api();
@@ -515,7 +515,7 @@ const getRevisionFileById = cache({
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
-                },
+                }
             );
 
             return cacheResponse(response, cacheTtl_7days);
@@ -538,7 +538,7 @@ const getRevisionReusableContentById = cache({
         spaceId: string,
         revisionId: string,
         reusableContentId: string,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         try {
             const apiCtx = await api();
@@ -552,7 +552,7 @@ const getRevisionReusableContentById = cache({
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
-                },
+                }
             );
 
             return cacheResponse(response, cacheTtl_7days);
@@ -588,13 +588,13 @@ const getRevisionAllFiles = cache({
                     {
                         ...noCacheFetchOptions,
                         signal: options.signal,
-                    },
+                    }
                 );
                 return response;
             },
             {
                 limit: 1000,
-            },
+            }
         );
 
         const files: { [fileId: string]: RevisionFile } = {};
@@ -635,19 +635,18 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
                 files = await getRevisionAllFiles(spaceId, revisionId);
             }
 
-            return executions.map(([spaceId, revisionId, fileId]) => files[fileId] ?? null);
-        } else {
-            // Fetch file individually
-            return Promise.all(
-                executions.map(([spaceId, revisionId, fileId]) =>
-                    getRevisionFileById(spaceId, revisionId, fileId),
-                ),
-            );
+            return executions.map(([_spaceId, _revisionId, fileId]) => files[fileId] ?? null);
         }
+        // Fetch file individually
+        return Promise.all(
+            executions.map(([spaceId, revisionId, fileId]) =>
+                getRevisionFileById(spaceId, revisionId, fileId)
+            )
+        );
     },
     {
         delay: 20,
-        groupBy: (spaceId, revisionId) => spaceId + '/' + revisionId,
+        groupBy: (spaceId, revisionId) => `${spaceId}/${revisionId}`,
         skip: async (spaceId, revisionId, fileId) => {
             return (
                 (await getRevision.hasInMemory(spaceId, revisionId, {
@@ -657,7 +656,7 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
                 (await getRevisionFileById.hasInMemory(spaceId, revisionId, fileId))
             );
         },
-    },
+    }
 );
 
 /**
@@ -666,7 +665,7 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
 export const getReusableContent = async (
     spaceId: string,
     revisionId: string,
-    reusableContentId: string,
+    reusableContentId: string
 ): Promise<RevisionReusableContent | null> => {
     const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
         metadata: false,
@@ -676,12 +675,11 @@ export const getReusableContent = async (
         const revision = await getRevision(spaceId, revisionId, { metadata: false });
         return (
             revision.reusableContents.find(
-                (reusableContent) => reusableContent.id === reusableContentId,
+                (reusableContent) => reusableContent.id === reusableContentId
             ) ?? null
         );
-    } else {
-        return getRevisionReusableContentById(spaceId, revisionId, reusableContentId);
     }
+    return getRevisionReusableContentById(spaceId, revisionId, reusableContentId);
 };
 
 /**
@@ -703,7 +701,7 @@ export const getDocument = cache({
             {
                 signal: options.signal,
                 ...noCacheFetchOptions,
-            },
+            }
         );
         return cacheResponse(response, cacheTtl_7days);
     },
@@ -734,7 +732,7 @@ export const getComputedDocument = cache({
             {
                 signal: options.signal,
                 ...noCacheFetchOptions,
-            },
+            }
         );
         return cacheResponse(response, cacheTtl_7days);
     },
@@ -766,7 +764,7 @@ export const getSiteRedirectBySource = cache({
             siteShareKey: string | undefined;
             source: string;
         },
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         // Validate the source to avoid unnecessary API calls.
         if (!validateSiteRedirectSource(args.source)) {
@@ -787,7 +785,7 @@ export const getSiteRedirectBySource = cache({
                 {
                     ...noCacheFetchOptions,
                     signal: options.signal,
-                },
+                }
             );
             return cacheResponse(response, cacheTtl_1day);
         } catch (error) {
@@ -817,7 +815,7 @@ export const getSiteRedirectBySource = cache({
  */
 export const getSite = cache({
     name: 'api.getSite',
-    tag: (organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
+    tag: (_organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
     getKeySuffix: getAPIContextId,
     get: async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();
@@ -844,7 +842,7 @@ export const getPublishedContentSite = cache({
             siteId: string /** Site share key that can be used as context to resolve site space published urls */;
             siteShareKey: string | undefined;
         },
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.orgs.getPublishedContentSite(
@@ -856,7 +854,7 @@ export const getPublishedContentSite = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
         return cacheResponse(response, {
             revalidateBefore: 60 * 60,
@@ -894,7 +892,7 @@ export function parseSpacesFromSiteSpaces(siteSpaces: SiteSpace[]) {
 export async function getSpaceContentData(
     dataFetcher: GitBookDataFetcher,
     pointer: SpaceContentPointer,
-    shareKey: string | undefined,
+    shareKey: string | undefined
 ) {
     const [space, changeRequest] = await Promise.all([
         dataFetcher.getSpace({
@@ -933,7 +931,7 @@ export async function getSpaceContentData(
  */
 export const searchSiteContent = cache({
     name: 'api.searchSiteContent',
-    tag: (organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
+    tag: (_organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
     getKeySuffix: getAPIContextId,
     get: async (
         organizationId: string,
@@ -944,8 +942,8 @@ export const searchSiteContent = cache({
             | { mode: 'current'; siteSpaceId: string }
             | { mode: 'specific'; siteSpaceIds: string[] },
         /** A cache bust param to avoid revalidating lot of cache entries by tags */
-        cacheBust?: string,
-        options?: CacheFunctionOptions,
+        _cacheBust?: string,
+        options?: CacheFunctionOptions
     ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.orgs.searchSiteContent(
@@ -959,7 +957,7 @@ export const searchSiteContent = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options?.signal,
-            },
+            }
         );
 
         return cacheResponse(response, {
@@ -977,7 +975,7 @@ export const renderIntegrationUi = cache({
     get: async (
         integrationName: string,
         request: RequestRenderIntegrationUI,
-        options: CacheFunctionOptions,
+        options: CacheFunctionOptions
     ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.integrations.renderIntegrationUiWithPost(
@@ -986,7 +984,7 @@ export const renderIntegrationUi = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
         return cacheResponse(response);
     },
@@ -1005,7 +1003,7 @@ export const getEmbedByUrl = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
         return cacheResponse(response);
     },
@@ -1025,7 +1023,7 @@ export const getEmbedByUrlInSpace = cache({
             {
                 ...noCacheFetchOptions,
                 signal: options.signal,
-            },
+            }
         );
         return cacheResponse(response, cacheTtl_7days);
     },
@@ -1036,7 +1034,7 @@ export const getEmbedByUrlInSpace = cache({
  */
 export function getAPICacheTag(
     spec: // All data related to a user
-    | {
+        | {
               tag: 'user';
               user: string;
           }
@@ -1094,7 +1092,7 @@ export function getAPICacheTag(
               tag: 'openapi';
               organization: string;
               openAPISpec: string;
-          },
+          }
 ): string {
     switch (spec.tag) {
         case 'user':
@@ -1143,10 +1141,7 @@ export function userAgent(): string {
 /**
  * Ignore error for an API call.
  */
-export async function ignoreAPIError<T>(
-    promise: Promise<T>,
-    ignoreAll: boolean = false,
-): Promise<T | null> {
+export async function ignoreAPIError<T>(promise: Promise<T>, ignoreAll = false): Promise<T | null> {
     try {
         return await promise;
     } catch (error) {
@@ -1173,7 +1168,7 @@ async function getAll<T, E>(
     >,
     options: {
         limit?: number;
-    } = {},
+    } = {}
 ): Promise<
     HttpResponse<
         List & {
@@ -1187,7 +1182,8 @@ async function getAll<T, E>(
     let page: string | undefined = undefined;
     const result: T[] = [];
 
-    while (1) {
+    const maxPages = 100;
+    for (let i = 0; i < maxPages; i++) {
         const response = await getPage({ page, limit });
         result.push(...response.data.items);
 
@@ -1199,5 +1195,5 @@ async function getAll<T, E>(
         }
     }
 
-    throw new Error('Unreachable');
+    throw new Error('Pagination limit reached');
 }

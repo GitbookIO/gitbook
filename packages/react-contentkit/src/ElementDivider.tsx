@@ -1,8 +1,7 @@
-import { ContentKitDivider } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitDivider } from '@gitbook/api';
 
-import { ContentKitServerElementProps } from './types';
 import classNames from 'classnames';
+import type { ContentKitServerElementProps } from './types';
 
 export function ElementDivider(props: ContentKitServerElementProps<ContentKitDivider>) {
     const { element } = props;
@@ -11,7 +10,7 @@ export function ElementDivider(props: ContentKitServerElementProps<ContentKitDiv
         <div
             className={classNames(
                 'contentkit-divider',
-                `contentkit-divider-${element.size ?? 'medium'}`,
+                `contentkit-divider-${element.size ?? 'medium'}`
             )}
         />
     );

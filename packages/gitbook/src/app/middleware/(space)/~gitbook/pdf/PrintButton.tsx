@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { PolymorphicComponentProp } from '@/components/utils/types';
+import type { PolymorphicComponentProp } from '@/components/utils/types';
 
 export function PrintButton(props: PolymorphicComponentProp<'button'>) {
     const { className, children, ...rest } = props;

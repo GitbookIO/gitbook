@@ -1,21 +1,21 @@
 'use client';
 
 import {
-    SiteAds,
+    type SiteAds,
     SiteAdsStatus,
-    SiteInsightsAdPlacement,
-    SiteInsightsAd,
+    type SiteInsightsAd,
+    type SiteInsightsAdPlacement,
     SiteInsightsTrademarkPlacement,
 } from '@gitbook/api';
 import * as React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { renderAd } from './renderAd';
-import { useHasBeenInViewport } from '../hooks/useHasBeenInViewport';
 import { useTrackEvent } from '../Insights';
+import { useHasBeenInViewport } from '../hooks/useHasBeenInViewport';
 import { Link } from '../primitives';
+import { renderAd } from './renderAd';
 
 /**
  * Zone ID provided by BuySellAds for the preview.
@@ -125,7 +125,6 @@ export function Ad({
 function AdSponsoredLink(props: { spaceId: string }) {
     const { spaceId } = props;
     const language = useLanguage();
-    const trackEvent = useTrackEvent();
 
     const viaUrl = new URL('https://www.gitbook.com');
     viaUrl.searchParams.set('utm_source', 'content');

@@ -1,5 +1,5 @@
-import { DocumentBlockParagraph, JSONDocument } from '@gitbook/api';
-import { it, expect } from 'bun:test';
+import { expect, it } from 'bun:test';
+import type { DocumentBlockParagraph, JSONDocument } from '@gitbook/api';
 
 import { isBlockOffscreen } from './isBlockOffscreen';
 
@@ -27,7 +27,7 @@ it('should return true if block is offscreen', () => {
             document,
             block: p2,
             ancestorBlocks: [],
-        }),
+        })
     ).toBe(false);
 
     expect(
@@ -37,7 +37,7 @@ it('should return true if block is offscreen', () => {
                 block: p2,
                 ancestorBlocks: [],
             },
-            5,
-        ),
+            5
+        )
     ).toBe(true);
 });

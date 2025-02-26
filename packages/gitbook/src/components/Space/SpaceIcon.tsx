@@ -1,4 +1,4 @@
-import { CustomizationThemedURL } from '@gitbook/api';
+import type { CustomizationThemedURL } from '@gitbook/api';
 
 import { Image } from '@/components/utils';
 import { getAbsoluteHref } from '@/lib/links';
@@ -12,7 +12,7 @@ export async function SpaceIcon(
     props: { icon?: CustomizationThemedURL; emoji?: string } & Omit<
         React.ComponentProps<typeof Image>,
         'sources'
-    >,
+    >
 ) {
     const { icon, emoji, alt, ...imageProps } = props;
 
@@ -42,14 +42,14 @@ export async function SpaceIcon(
                           light: {
                               src: await getAbsoluteHref(
                                   '~gitbook/icon?size=medium&theme=light',
-                                  true,
+                                  true
                               ),
                               size: { width: 256, height: 256 },
                           },
                           dark: {
                               src: await getAbsoluteHref(
                                   '~gitbook/icon?size=medium&theme=dark',
-                                  true,
+                                  true
                               ),
                               size: { width: 256, height: 256 },
                           },

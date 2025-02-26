@@ -1,5 +1,5 @@
 import { cacheBackends } from './backends';
-import { CacheEntryLookup } from './types';
+import type { CacheEntryLookup } from './types';
 
 interface RevalidateTagsStats {
     [key: string]: {
@@ -45,14 +45,14 @@ export async function revalidateTags(tags: string[]): Promise<{
                 entries.set(key, { tag, key });
                 keysByBackend.set(backendIndex, [...(keysByBackend.get(backendIndex) ?? []), key]);
             });
-        }),
+        })
     );
 
     // Clear the keys on the backends that didn't return them
     await Promise.all(
         cacheBackends.map(async (backend, backendIndex) => {
             const unclearedEntries = Array.from(entries.values()).filter(
-                (entry) => !keysByBackend.get(backendIndex)?.includes(entry.key),
+                (entry) => !keysByBackend.get(backendIndex)?.includes(entry.key)
             );
 
             if (unclearedEntries.length > 0) {
@@ -65,16 +65,13 @@ export async function revalidateTags(tags: string[]): Promise<{
                 } catch (error) {
                     if (error instanceof Error && error.message === 'Too many subrequests.') {
                         if (backend.replication === 'local') {
-                            console.warn(
-                                `Too many subrequests, skipping cache del for local backend ${backend.name}`,
-                            );
                             return;
                         }
                     }
                     throw error;
                 }
             }
-        }),
+        })
     );
 
     return {

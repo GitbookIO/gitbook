@@ -1,8 +1,7 @@
-import { type ContentKitRenderOutput } from '@gitbook/api';
-import React from 'react';
+import type { ContentKitRenderOutput } from '@gitbook/api';
 
 import { Element } from './Element';
-import { ContentKitServerContext } from './types';
+import type { ContentKitServerContext } from './types';
 
 /**
  * Generic component to render a ContentKit output.

@@ -8,6 +8,7 @@
         "isolatedModules": true,
         "incremental": true,
         "noEmit": true,
+        "noPropertyAccessFromIndexSignature": false,
         "types": [
             "bun-types" // add Bun global
         ]

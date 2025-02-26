@@ -1,7 +1,7 @@
-import { it, expect, describe } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 
-import { resolveOpenAPIOperation } from './resolveOpenAPIOperation';
 import { parseOpenAPI, traverse } from '@gitbook/openapi-parser';
+import { resolveOpenAPIOperation } from './resolveOpenAPIOperation';
 
 async function fetchFilesystem(url: string) {
     const response = await fetch(url);
@@ -19,7 +19,7 @@ async function fetchFilesystem(url: string) {
 describe('#resolveOpenAPIOperation', () => {
     it('should resolve refs', async () => {
         const filesystem = await fetchFilesystem(
-            'https://petstore3.swagger.io/api/v3/openapi.json',
+            'https://petstore3.swagger.io/api/v3/openapi.json'
         );
         const resolved = await resolveOpenAPIOperation(filesystem, { method: 'put', path: '/pet' });
 
@@ -49,7 +49,7 @@ describe('#resolveOpenAPIOperation', () => {
 
     it('should support yaml', async () => {
         const filesystem = await fetchFilesystem(
-            'https://petstore3.swagger.io/api/v3/openapi.yaml',
+            'https://petstore3.swagger.io/api/v3/openapi.yaml'
         );
         const resolved = await resolveOpenAPIOperation(filesystem, { method: 'put', path: '/pet' });
 
@@ -98,7 +98,7 @@ describe('#resolveOpenAPIOperation', () => {
 
     it('should resolve to null if the method is not supported', async () => {
         const filesystem = await fetchFilesystem(
-            'https://petstore3.swagger.io/api/v3/openapi.json',
+            'https://petstore3.swagger.io/api/v3/openapi.json'
         );
         const resolved = await resolveOpenAPIOperation(filesystem, {
             method: 'dontexist',
@@ -144,7 +144,7 @@ describe('#resolveOpenAPIOperation', () => {
 
     it('should resolve a ref with whitespace', async () => {
         const filesystem = await fetchFilesystem(
-            ' https://petstore3.swagger.io/api/v3/openapi.json',
+            ' https://petstore3.swagger.io/api/v3/openapi.json'
         );
         const resolved = await resolveOpenAPIOperation(filesystem, {
             method: 'put',

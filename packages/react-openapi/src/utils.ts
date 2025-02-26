@@ -1,7 +1,7 @@
 import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 
 export function checkIsReference(
-    input: unknown,
+    input: unknown
 ): input is OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
 }
@@ -32,7 +32,7 @@ export function resolveDescription(object: OpenAPIV3.SchemaObject | AnyObject) {
 export function extractDescriptions(object: AnyObject) {
     return {
         description: object.description,
-        ['x-gitbook-description-html']:
+        'x-gitbook-description-html':
             'x-gitbook-description-html' in object
                 ? object['x-gitbook-description-html']
                 : undefined,
@@ -61,7 +61,7 @@ export function resolveFirstExample(object: AnyObject) {
  * Extract the description, example and deprecated from parameter.
  */
 export function resolveParameterSchema(
-    parameter: OpenAPIV3.ParameterBaseObject,
+    parameter: OpenAPIV3.ParameterBaseObject
 ): OpenAPIV3.SchemaObject {
     const schema = checkIsReference(parameter.schema) ? undefined : parameter.schema;
     return {
@@ -79,7 +79,7 @@ export function resolveParameterSchema(
  * Transform a parameter object to a property object.
  */
 export function parameterToProperty(
-    parameter: OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject,
+    parameter: OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject
 ): {
     propertyName: string | undefined;
     schema: OpenAPIV3.SchemaObject;

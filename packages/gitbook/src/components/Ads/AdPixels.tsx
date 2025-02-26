@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import { tcls } from '@/lib/tailwind';
 
 /**

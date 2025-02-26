@@ -26,7 +26,7 @@ type SignFn = (input: SignFnInput) => MaybePromise<string>;
  */
 export async function verifyImageSignature(
     input: SignFnInput,
-    { signature, version }: { signature: string; version: SignatureVersion },
+    { signature, version }: { signature: string; version: SignatureVersion }
 ): Promise<boolean> {
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);

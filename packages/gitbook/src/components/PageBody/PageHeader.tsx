@@ -1,9 +1,9 @@
-import { RevisionPage, RevisionPageDocument } from '@gitbook/api';
+import type { RevisionPage, RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
 
 import { getPageHref } from '@/lib/links';
-import { AncestorRevisionPage } from '@/lib/pages';
+import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import { PageIcon } from '../PageIcon';
@@ -39,22 +39,22 @@ export async function PageHeader(props: {
                                 'items-center',
                                 'gap-1.5',
                                 'contrast-more:underline',
-                                'contrast-more:decoration-current',
+                                'contrast-more:decoration-current'
                             )}
                         >
                             <PageIcon
                                 page={breadcrumb}
-                                style="size-4 flex items-center justify-center text-base leading-none"
+                                style="flex size-4 items-center justify-center text-base leading-none"
                             />
                             {breadcrumb.title}
                         </StyledLink>
                     </li>
-                    {index != ancestors.length - 1 && (
+                    {index !== ancestors.length - 1 && (
                         <Icon icon="chevron-right" className={tcls('size-3', 'text-tint-subtle')} />
                     )}
                 </Fragment>
             );
-        }),
+        })
     );
 
     return (
@@ -70,7 +70,7 @@ export async function PageHeader(props: {
             )}
             {page.layout.title ? (
                 <h1 className={tcls('text-4xl', 'font-bold', 'flex', 'items-center', 'gap-4')}>
-                    <PageIcon page={page} style={['text-tint-subtle   ', 'shrink-0']} />
+                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
                     {page.title}
                 </h1>
             ) : null}

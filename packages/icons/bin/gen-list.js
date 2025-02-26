@@ -1,7 +1,6 @@
-import fs from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
-import url from 'url';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import url from 'node:url';
 
 import { getKitPath } from './kit.js';
 
@@ -11,7 +10,7 @@ import { getKitPath } from './kit.js';
 async function main() {
     const source = getKitPath();
     const icons = JSON.parse(
-        await fs.readFile(path.join(source, 'metadata/icon-families.json'), 'utf8'),
+        await fs.readFile(path.join(source, 'metadata/icon-families.json'), 'utf8')
     );
 
     // Only these families have exceptions
@@ -55,7 +54,6 @@ async function main() {
         writeDataFile('styles-map', JSON.stringify(onlyStyles, null, 2)),
         writeDataFile('icons', JSON.stringify(result, null, 2)),
     ]);
-    console.log(`🎉 ${result.length} icons found`);
 }
 
 async function writeDataFile(name, content) {
@@ -76,7 +74,6 @@ async function writeDataFile(name, content) {
     ]);
 }
 
-main().catch((error) => {
-    console.error(error);
+main().catch((_error) => {
     process.exit(1);
 });

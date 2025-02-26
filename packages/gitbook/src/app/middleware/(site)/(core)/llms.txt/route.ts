@@ -1,8 +1,8 @@
-import { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import type { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
 import assertNever from 'assert-never';
-import { ListItem, Paragraph, Root, RootContent } from 'mdast';
+import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { getPublishedContentSite, getRevisionPages } from '@/lib/api';
 import { getAbsoluteHref } from '@/lib/links';
@@ -17,7 +17,7 @@ export const runtime = 'edge';
 /**
  * Generate a llms.txt file for the site.
  */
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
     const pointer = await getSiteContentPointer();
 
     const { structure: siteStructure, site } = await getPublishedContentSite({
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
             },
-        },
+        }
     );
 }
 
@@ -85,7 +85,7 @@ async function getNodesFromSections(siteSections: SiteSection[]): Promise<RootCo
                 },
                 ...siteSpaceNodes,
             ];
-        }),
+        })
     );
     return all.flat();
 }
@@ -100,7 +100,7 @@ async function getNodesFromSiteSpaces(
          * Includes a heading for each site space.
          */
         heading?: boolean;
-    },
+    }
 ): Promise<RootContent[]> {
     const all = await Promise.all(
         siteSpaces.map(async (siteSpace): Promise<RootContent[]> => {
@@ -116,7 +116,7 @@ async function getNodesFromSiteSpaces(
                 pages.map(async ({ page }): Promise<ListItem> => {
                     const url = await getAbsoluteHref(
                         joinPath(new URL(siteSpaceUrl).pathname, getPagePath(rootPages, page)),
-                        true,
+                        true
                     );
                     const children: Paragraph['children'] = [
                         {
@@ -132,7 +132,7 @@ async function getNodesFromSiteSpaces(
                         type: 'listItem',
                         children: [{ type: 'paragraph', children }],
                     };
-                }),
+                })
             );
             const nodes: RootContent[] = [];
             if (options.heading) {
@@ -148,7 +148,7 @@ async function getNodesFromSiteSpaces(
                 children: listChildren,
             });
             return nodes;
-        }),
+        })
     );
     return all.flat();
 }

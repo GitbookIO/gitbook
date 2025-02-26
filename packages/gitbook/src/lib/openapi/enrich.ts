@@ -1,4 +1,4 @@
-import { traverse, Filesystem } from '@gitbook/openapi-parser';
+import { type Filesystem, traverse } from '@gitbook/openapi-parser';
 
 import { parseMarkdown } from '../markdown';
 

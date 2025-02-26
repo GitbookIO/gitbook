@@ -19,10 +19,6 @@ export async function getPublishedContentByURL(input: {
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
-    console.log(
-        `lookup content for url "${url.toString()}", with ${lookup.urls.length} alternatives`,
-    );
-
     const result = await race(lookup.urls, async (alternative, { signal }) => {
         const api = new GitBookAPI({
             authToken: GITBOOK_API_TOKEN ?? undefined,
@@ -43,8 +39,8 @@ export async function getPublishedContentByURL(input: {
                     headers: {
                         'x-gitbook-force-cache': 'true',
                     },
-                },
-            ),
+                }
+            )
         );
 
         if (callResult.error) {
@@ -76,8 +72,8 @@ export async function getPublishedContentByURL(input: {
                                 'location',
                                 joinPath(
                                     redirect.searchParams.get('location') ?? '',
-                                    alternative.extraPath,
-                                ),
+                                    alternative.extraPath
+                                )
                             );
                             data.redirect = redirect.toString();
                         }
@@ -155,7 +151,7 @@ export function getURLLookupAlternatives(input: URL) {
                 throw new Error(
                     `Invalid extraPath ${extraPath} for url ${adding.toString()}, already set to ${
                         existing.extraPath
-                    }`,
+                    }`
                 );
             }
             return;

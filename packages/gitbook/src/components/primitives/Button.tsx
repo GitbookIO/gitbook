@@ -1,10 +1,10 @@
 'use client';
 
-import type { ComponentPropsWithoutRef, HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
-import { tcls, ClassValue } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { Link, LinkInsightsProps } from './Link';
+import { Link, type LinkInsightsProps } from './Link';
 
 type ButtonProps = {
     href?: string;
@@ -81,7 +81,7 @@ export function Button({
         'truncate',
         variantClasses,
         sizeClasses,
-        className,
+        className
     );
 
     if (href) {

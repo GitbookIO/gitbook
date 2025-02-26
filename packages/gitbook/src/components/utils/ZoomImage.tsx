@@ -16,7 +16,7 @@ import styles from './ZoomImage.module.css';
 export function ZoomImage(
     props: React.ComponentPropsWithoutRef<'img'> & {
         src: string;
-    },
+    }
 ) {
     const { src, alt, width } = props;
 
@@ -99,7 +99,7 @@ export function ZoomImage(
                 onLoad?.();
             };
         },
-        [src],
+        [src]
     );
 
     // When closing the modal, animate the transition back to the original image
@@ -110,7 +110,7 @@ export function ZoomImage(
             },
             () => {
                 setActive(false);
-            },
+            }
         );
     }, []);
 
@@ -136,7 +136,7 @@ export function ZoomImage(
                             alt={alt ?? ''}
                             onClose={onClose}
                         />,
-                        document.body,
+                        document.body
                     )}
                 </>
             ) : (
@@ -169,7 +169,7 @@ export function ZoomImage(
                     className={classNames(
                         props.className,
                         zoomable ? styles.zoomImg : null,
-                        active ? styles.zoomImageActive : null,
+                        active ? styles.zoomImageActive : null
                     )}
                 />
             )}
@@ -219,8 +219,8 @@ function ZoomImageModal(props: {
                     'justify-center',
                     'bg-tint-base/4',
                     'backdrop-blur-2xl',
-                    'p-8',
-                ),
+                    'p-8'
+                )
             )}
             onClick={onClose}
         >
@@ -252,7 +252,7 @@ function ZoomImageModal(props: {
                     'border',
                     'border-tint',
                     'shadow-sm',
-                    'hover:shadow-md',
+                    'hover:shadow-md'
                 )}
                 onClick={onClose}
             >

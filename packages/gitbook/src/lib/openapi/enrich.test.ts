@@ -1,5 +1,5 @@
-import { parseOpenAPI } from '@gitbook/openapi-parser';
 import { describe, expect, it } from 'bun:test';
+import { parseOpenAPI } from '@gitbook/openapi-parser';
 
 import { enrichFilesystem } from './enrich';
 
@@ -13,7 +13,7 @@ describe('#enrichFilesystem', () => {
         });
         const enriched = await enrichFilesystem(filesystem);
         expect(enriched[0].specification.paths['/pet'].put['x-gitbook-description-html']).toBe(
-            '<p>Social platform</p>',
+            '<p>Social platform</p>'
         );
     });
 });

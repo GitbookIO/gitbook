@@ -34,7 +34,7 @@
         },
         // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "^build", "generate"]
+            "dependsOn": ["^typecheck", "build", "generate"]
         },
         // Lint the package for style errors
         "lint": {

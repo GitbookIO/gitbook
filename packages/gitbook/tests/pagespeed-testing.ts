@@ -1,6 +1,6 @@
 import psi from 'psi';
 
-import { getContentTestURL, getTargetURL } from './utils';
+import { getContentTestURL } from './utils';
 
 interface Test {
     url: string;
@@ -24,17 +24,11 @@ const tests: Array<Test> = [
     },
 ];
 
-console.log(`Starting PageSpeed testing with ${getTargetURL()}...`);
-
 for (const test of tests) {
     const url = getContentTestURL(test.url);
-
-    console.log(`Testing ${url} on ${test.strategy}...`);
     await psi.output(url, {
         strategy: test.strategy,
         threshold: test.threshold,
         key: process.env.PAGESPEED_API_KEY,
     });
-
-    console.log('');
 }

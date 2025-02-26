@@ -1,7 +1,7 @@
 'use client';
 
 import { PageFeedbackRating } from '@gitbook/api';
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { type ButtonHTMLAttributes } from 'react';
 
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
@@ -16,11 +16,10 @@ const MAX_COMMENT_LENGTH = 512;
  * Form to submit feedback on a page.
  */
 export function PageFeedbackForm(props: {
-    orientation?: 'horizontal' | 'vertical';
     pageId: string;
     className?: string;
 }) {
-    const { orientation = 'vertical', pageId, className } = props;
+    const { className } = props;
     const languages = useLanguage();
     const trackEvent = useTrackEvent();
     const inputRef = React.useRef<HTMLTextAreaElement>(null);
@@ -53,7 +52,7 @@ export function PageFeedbackForm(props: {
 
     // Focus the comment input when the rating is submitted
     React.useEffect(() => {
-        if (!!rating) {
+        if (rating) {
             inputRef.current?.focus();
         }
     }, [rating]);
@@ -62,27 +61,27 @@ export function PageFeedbackForm(props: {
         <div className={tcls('flex flex-col gap-3 text-sm', className)}>
             <div className="flex flex-wrap items-center gap-2">
                 <p>{t(languages, 'was_this_helpful')}</p>
-                <div className="bg-tint-base border border-tint-subtle contrast-more:border-tint-12 rounded-full">
+                <div className="rounded-full border border-tint-subtle bg-tint-base contrast-more:border-tint-12">
                     <div className="flex">
                         <RatingButton
                             rating={PageFeedbackRating.Bad}
                             label={tString(languages, 'was_this_helpful_negative')}
                             onClick={() => onSubmitRating(PageFeedbackRating.Bad)}
-                            active={rating == PageFeedbackRating.Bad}
+                            active={rating === PageFeedbackRating.Bad}
                             disabled={rating !== undefined}
                         />
                         <RatingButton
                             rating={PageFeedbackRating.Ok}
                             label={tString(languages, 'was_this_helpful_neutral')}
                             onClick={() => onSubmitRating(PageFeedbackRating.Ok)}
-                            active={rating == PageFeedbackRating.Ok}
+                            active={rating === PageFeedbackRating.Ok}
                             disabled={rating !== undefined}
                         />
                         <RatingButton
                             rating={PageFeedbackRating.Good}
                             label={tString(languages, 'was_this_helpful_positive')}
                             onClick={() => onSubmitRating(PageFeedbackRating.Good)}
-                            active={rating == PageFeedbackRating.Good}
+                            active={rating === PageFeedbackRating.Good}
                             disabled={rating !== undefined}
                         />
                     </div>
@@ -95,7 +94,7 @@ export function PageFeedbackForm(props: {
                             <textarea
                                 ref={inputRef}
                                 name="comment"
-                                className="grow ring-1 ring-inset bg-tint-base ring-tint contrast-more:ring-tint-12 min-h-16 max-h-40 rounded straight-corners:rounded-none p-2 placeholder:text-sm placeholder:text-tint contrast-more:placeholder:text-tint-strong"
+                                className="max-h-40 min-h-16 grow rounded straight-corners:rounded-none bg-tint-base p-2 ring-1 ring-tint ring-inset placeholder:text-sm placeholder:text-tint contrast-more:ring-tint-12 contrast-more:placeholder:text-tint-strong"
                                 placeholder={tString(languages, 'was_this_helpful_comment')}
                                 aria-label={tString(languages, 'was_this_helpful_comment')}
                                 onChange={(e) => setComment(e.target.value)}
@@ -103,7 +102,7 @@ export function PageFeedbackForm(props: {
                                 rows={3}
                                 maxLength={MAX_COMMENT_LENGTH}
                             />
-                            <div className="flex gap-4 items-center justify-between">
+                            <div className="flex items-center justify-between gap-4">
                                 <Button
                                     size="small"
                                     onClick={() => onSubmitComment(rating, comment)}
@@ -113,7 +112,7 @@ export function PageFeedbackForm(props: {
                                 {comment.length > MAX_COMMENT_LENGTH * 0.8 ? (
                                     <span
                                         className={
-                                            comment.length == MAX_COMMENT_LENGTH
+                                            comment.length === MAX_COMMENT_LENGTH
                                                 ? 'text-red-500'
                                                 : ''
                                         }
@@ -138,7 +137,7 @@ function RatingButton(
         label: string;
         onClick: () => void;
         active: boolean;
-    } & ButtonHTMLAttributes<HTMLButtonElement>,
+    } & ButtonHTMLAttributes<HTMLButtonElement>
 ) {
     const { rating, label, onClick, active, ...attr } = props;
 
@@ -152,12 +151,12 @@ function RatingButton(
     return (
         <button
             className={tcls(
-                'p-2 hover:bg-primary-hover hover:text-primary-strong first:pl-2.5 last:pr-2.5 first:rounded-l-full last:rounded-r-full',
+                'p-2 first:rounded-l-full first:pl-2.5 last:rounded-r-full last:pr-2.5 hover:bg-primary-hover hover:text-primary-strong',
                 'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit disabled:dark:hover:text-inherit',
-                'contrast-more:hover:ring-1 ring-tint',
+                'ring-tint contrast-more:hover:ring-1',
                 active
                     ? 'bg-primary-active text-primary-strong disabled:hover:bg-primary-active disabled:hover:text-primary-strong contrast-more:ring-2 contrast-more:hover:ring-2'
-                    : 'disabled:opacity-7 disabled:contrast-more:ring-0',
+                    : 'disabled:opacity-7 disabled:contrast-more:ring-0'
             )}
             type="button"
             {...attr}

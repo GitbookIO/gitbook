@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import type * as React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -20,7 +20,7 @@ export function Toolbar(props: { children: React.ReactNode }) {
                 'rounded-full',
                 'truncate',
                 'text-tint-1',
-                'dark:text-tint-12',
+                'dark:text-tint-12'
             )}
         >
             {children}
@@ -56,7 +56,7 @@ export function ToolbarButton(props: React.HTMLProps<HTMLAnchorElement>) {
                 'hover:bg-tint-12',
                 'dark:hover:bg-tint-1',
                 'hover:shadow-lg',
-                'cursor-pointer',
+                'cursor-pointer'
             )}
         >
             {children}

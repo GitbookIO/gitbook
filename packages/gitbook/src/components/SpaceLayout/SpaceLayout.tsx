@@ -1,12 +1,12 @@
-import { CustomizationHeaderPreset, CustomizationSidebarBackgroundStyle } from '@gitbook/api';
-import { GitBookSiteContext } from '@v2/lib/context';
+import { CustomizationHeaderPreset } from '@gitbook/api';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
-import { CONTAINER_STYLE } from '@/components/layout';
 import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
+import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
@@ -29,19 +29,12 @@ export function SpaceLayout(props: {
     children: React.ReactNode;
 }) {
     const { context, withTracking, children } = props;
-    const { siteSpace, customization, site, sections, siteSpaces } = context;
+    const { siteSpace, customization, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const withSections = Boolean(sections && sections.list.length > 0);
     const isMultiVariants = Boolean(siteSpaces.length > 1);
-    const headerOffset = {
-        sectionsHeader: withSections,
-        topHeader: withTopHeader,
-        sidebarBackgroundFilled:
-            'sidebar' in customization.styling &&
-            customization.styling.sidebar.background === CustomizationSidebarBackgroundStyle.Filled,
-    };
 
     const withFooter =
         customization.themes.toggeable ||
@@ -72,7 +65,7 @@ export function SpaceLayout(props: {
 
                     // Ensure the footer is display below the viewport even if the content is not enough
                     withFooter && 'min-h-[calc(100vh-64px)]',
-                    withTopHeader ? null : 'lg:min-h-screen',
+                    withTopHeader ? null : 'lg:min-h-screen'
                 )}
             >
                 <TableOfContents
@@ -86,7 +79,7 @@ export function SpaceLayout(props: {
                                     'lg:flex',
                                     'grow-0',
                                     'flex-wrap',
-                                    'dark:shadow-light/1',
+                                    'dark:shadow-light/1'
                                 )}
                             >
                                 <HeaderLogo context={context} />
@@ -105,7 +98,7 @@ export function SpaceLayout(props: {
                                                     getSpaceLanguage(customization),
                                                     customization.aiSearch.enabled
                                                         ? 'search_or_ask'
-                                                        : 'search',
+                                                        : 'search'
                                                 )}
                                             </span>
                                         </SearchButton>
@@ -127,7 +120,6 @@ export function SpaceLayout(props: {
                             )}
                         </>
                     }
-                    headerOffset={headerOffset}
                 />
                 <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
             </div>

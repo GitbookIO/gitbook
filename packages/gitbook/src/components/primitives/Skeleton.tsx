@@ -1,4 +1,4 @@
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { LoadingPane } from './LoadingPane';
 

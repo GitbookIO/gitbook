@@ -8,7 +8,7 @@ const HAS_INTERSECTION_OBSERVER = typeof IntersectionObserver !== 'undefined';
  */
 export function useHasBeenInViewport(
     containerRef: React.RefObject<HTMLElement>,
-    options?: Pick<IntersectionObserverInit, 'root' | 'rootMargin' | 'threshold'>,
+    options?: Pick<IntersectionObserverInit, 'root' | 'rootMargin' | 'threshold'>
 ) {
     const [visible, setVisible] = useState(false);
     useEffect(() => {
@@ -34,7 +34,7 @@ export function useHasBeenInViewport(
                 root: options?.root,
                 rootMargin: options?.rootMargin,
                 threshold: options?.threshold,
-            },
+            }
         );
 
         observer.observe(containerRef.current);

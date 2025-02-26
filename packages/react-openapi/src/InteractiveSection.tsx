@@ -69,7 +69,7 @@ export function InteractiveSection(props: {
                 'openapi-section',
                 toggeable ? 'openapi-section-toggeable' : null,
                 className,
-                toggeable ? `${className}-${state.isExpanded ? 'opened' : 'closed'}` : null,
+                toggeable ? `${className}-${state.isExpanded ? 'opened' : 'closed'}` : null
             )}
         >
             {header ? (
@@ -84,7 +84,7 @@ export function InteractiveSection(props: {
                     <div
                         className={clsx(
                             'openapi-section-header-content',
-                            `${className}-header-content`,
+                            `${className}-header-content`
                         )}
                     >
                         {(children || selectedTab?.body) && toggeable ? (
@@ -106,7 +106,7 @@ export function InteractiveSection(props: {
                     <div
                         className={clsx(
                             'openapi-section-header-controls',
-                            `${className}-header-controls`,
+                            `${className}-header-controls`
                         )}
                         onClick={(event) => {
                             event.stopPropagation();
@@ -117,7 +117,7 @@ export function InteractiveSection(props: {
                                 className={clsx(
                                     'openapi-section-select',
                                     'openapi-select',
-                                    `${className}-tabs-select`,
+                                    `${className}-tabs-select`
                                 )}
                                 value={selectedTab?.key ?? ''}
                                 onChange={(event) => {

@@ -1,12 +1,12 @@
-import { CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { InteractiveSection } from './InteractiveSection';
-import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
-import { createStateKey } from './utils';
-import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
-import { checkIsReference } from './utils';
+import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
+import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
+import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
+import { createStateKey } from './utils';
+import { checkIsReference } from './utils';
 
 /**
  * Display code samples to execute the operation.
@@ -37,7 +37,7 @@ export function OpenAPICodeSample(props: {
             if (example !== undefined && param.name) {
                 searchParams.append(
                     param.name,
-                    String(Array.isArray(example) ? example[0] : example),
+                    String(Array.isArray(example) ? example[0] : example)
                 );
             }
         }
@@ -149,7 +149,7 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
             }
 
             return {
-                Authorization: scheme + ' ' + format,
+                Authorization: `${scheme} ${format}`,
             };
         }
         case 'apiKey': {

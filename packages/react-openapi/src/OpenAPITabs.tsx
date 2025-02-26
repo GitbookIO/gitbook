@@ -1,12 +1,12 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { Key, Tab, TabList, TabPanel, Tabs, TabsProps } from 'react-aria-components';
+import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
+import { useIntersectionObserver } from 'usehooks-ts';
 import { Markdown } from './Markdown';
 import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
-import { useIntersectionObserver } from 'usehooks-ts';
 
-export type Tab = {
+export type TabItem = {
     key: Key;
     label: string;
     body: React.ReactNode;
@@ -14,8 +14,8 @@ export type Tab = {
 };
 
 type OpenAPITabsContextData = {
-    items: Tab[];
-    selectedTab: Tab;
+    items: TabItem[];
+    selectedTab: TabItem;
 };
 
 const OpenAPITabsContext = createContext<OpenAPITabsContextData | null>(null);
@@ -32,17 +32,16 @@ function useOpenAPITabsContext() {
  * The OpenAPI Tabs wrapper component.
  */
 export function OpenAPITabs(
-    props: React.PropsWithChildren<TabsProps & { items: Tab[]; stateKey?: string }>,
+    props: React.PropsWithChildren<TabsProps & { items: TabItem[]; stateKey?: string }>
 ) {
     const { children, items, stateKey } = props;
-    const isVisible = stateKey
-        ? useIntersectionObserver({
-              threshold: 0.1,
-              rootMargin: '200px',
-          })
-        : true;
-    const defaultTab = items[0] as Tab;
-    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState<Tab>();
+    const [ref, isIntersectionVisible] = useIntersectionObserver({
+        threshold: 0.1,
+        rootMargin: '200px',
+    });
+    const isVisible = stateKey ? isIntersectionVisible : true;
+    const defaultTab = items[0] as TabItem;
+    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState<TabItem>();
     const [selectedTabKey, setSelectedTabKey] = useState(() => {
         if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
             const tabFromState = syncedTabs.get(stateKey);
@@ -50,7 +49,7 @@ export function OpenAPITabs(
         }
         return items[0]?.key;
     });
-    const [selectedTab, setSelectedTab] = useState<Tab>(defaultTab);
+    const [selectedTab, setSelectedTab] = useState<TabItem>(defaultTab);
 
     const handleSelectionChange = (key: Key) => {
         setSelectedTabKey(key);
@@ -94,6 +93,7 @@ export function OpenAPITabs(
     return (
         <OpenAPITabsContext.Provider value={contextValue}>
             <Tabs
+                ref={ref}
                 className="openapi-tabs"
                 onSelectionChange={handleSelectionChange}
                 selectedKey={selectedTab?.key}

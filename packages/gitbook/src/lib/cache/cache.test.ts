@@ -1,10 +1,15 @@
-import { beforeEach, describe, expect, it, Mock, mock } from 'bun:test';
+import { type Mock, beforeEach, describe, expect, it, mock } from 'bun:test';
 import hash from 'object-hash';
 
-import { CacheDefinition, CacheFunction, CacheFunctionOptions, cache } from './cache';
+import {
+    type CacheDefinition,
+    type CacheFunction,
+    type CacheFunctionOptions,
+    cache,
+} from './cache';
 
 describe('cache', () => {
-    const impl = mock((arg: string) => 'test-' + arg);
+    const impl = mock((arg: string) => `test-${arg}`);
 
     let fn: CacheFunction<[string], string>;
     let testId = 0;
@@ -18,8 +23,8 @@ describe('cache', () => {
 
         fn = cache({
             name: `cache-${testId}`,
-            tag: (arg) => 'test',
-            get: async (arg: string, options: CacheFunctionOptions) => {
+            tag: (_arg) => 'test',
+            get: async (arg: string, _options: CacheFunctionOptions) => {
                 await new Promise((resolve) => setTimeout(resolve, 20));
                 return {
                     data: impl(arg),
@@ -72,7 +77,7 @@ describe('cache', () => {
 });
 
 describe('cache with suffix key', () => {
-    const impl = mock((arg: string) => 'test-' + arg);
+    const impl = mock((arg: string) => `test-${arg}`);
     const getKeySuffixImpl: Mock<NonNullable<CacheDefinition<[string], string>['getKeySuffix']>> =
         mock(async () => hash({ test: 1 }));
 
@@ -89,8 +94,8 @@ describe('cache with suffix key', () => {
         fn = cache({
             name: `cache-with-suffix-${testId}`,
             getKeySuffix: getKeySuffixImpl,
-            tag: (arg) => 'test',
-            get: async (arg: string, options: CacheFunctionOptions) => {
+            tag: (_arg) => 'test',
+            get: async (arg: string, _options: CacheFunctionOptions) => {
                 await new Promise((resolve) => setTimeout(resolve, 20));
                 return {
                     data: impl(arg),

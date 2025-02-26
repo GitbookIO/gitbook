@@ -1,6 +1,6 @@
-import { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
+import type { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
 
-import { SiteContentPointer, SpaceContentPointer } from '@/lib/api';
+import type { SiteContentPointer, SpaceContentPointer } from '@/lib/api';
 import { getSiteContentPointer, getSpacePointer } from '@/lib/pointer';
 import { fetchV1ContextForSitePointer, fetchV1ContextForSpacePointer } from '@/lib/v1';
 
@@ -16,7 +16,7 @@ export async function getSiteOrSpacePointerForPDF(): Promise<
 > {
     try {
         return await getSiteContentPointer();
-    } catch (error) {
+    } catch (_error) {
         return getSpacePointer();
     }
 }

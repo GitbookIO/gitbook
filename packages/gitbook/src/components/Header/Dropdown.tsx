@@ -1,9 +1,9 @@
 import { Icon } from '@gitbook/icons';
-import { DetailedHTMLProps, HTMLAttributes, useId } from 'react';
+import { type DetailedHTMLProps, type HTMLAttributes, useId } from 'react';
 
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { Link, LinkInsightsProps } from '../primitives';
+import { Link, type LinkInsightsProps } from '../primitives';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -25,7 +25,7 @@ export function Dropdown<E extends HTMLElement>(props: {
     const dropdownId = useId();
 
     return (
-        <div className={tcls('group/dropdown', 'relative flex shrink min-w-0')}>
+        <div className={tcls('group/dropdown', 'relative flex min-w-0 shrink')}>
             {button({
                 id: dropdownId,
                 tabIndex: 0,
@@ -51,7 +51,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'duration-1000',
                     'group-hover/dropdown:visible',
                     'group-focus-within/dropdown:visible',
-                    className,
+                    className
                 )}
             >
                 <div
@@ -66,7 +66,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                         'overflow-auto',
                         'ring-1',
                         'ring-tint-subtle',
-                        'focus:outline-none',
+                        'focus:outline-none'
                     )}
                 >
                     {children}
@@ -90,7 +90,7 @@ export function DropdownChevron() {
                 'ms-1',
                 'transition-all',
                 'group-hover/dropdown:opacity-11',
-                'group-focus-within/dropdown:rotate-180',
+                'group-focus-within/dropdown:rotate-180'
             )}
         />
     );
@@ -114,7 +114,7 @@ export function DropdownMenuItem(
         active?: boolean;
         className?: ClassValue;
         children: React.ReactNode;
-    } & LinkInsightsProps,
+    } & LinkInsightsProps
 ) {
     const { children, active = false, href, className, insights } = props;
 
@@ -125,10 +125,10 @@ export function DropdownMenuItem(
                 prefetch={false}
                 insights={insights}
                 className={tcls(
-                    'px-3 py-1 text-sm rounded straight-corners:rounded-sm',
+                    'rounded straight-corners:rounded-sm px-3 py-1 text-sm',
                     active ? 'bg-primary text-primary-strong' : null,
                     'hover:bg-tint-hover',
-                    className,
+                    className
                 )}
             >
                 {children}
@@ -137,6 +137,6 @@ export function DropdownMenuItem(
     }
 
     return (
-        <div className={tcls('text-xs px-3 py-1 font-medium text-tint', className)}>{children}</div>
+        <div className={tcls('px-3 py-1 font-medium text-tint text-xs', className)}>{children}</div>
     );
 }

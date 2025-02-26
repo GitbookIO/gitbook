@@ -1,9 +1,9 @@
-import { DocumentBlockStepperStep } from '@gitbook/api';
+import type { DocumentBlockStepperStep } from '@gitbook/api';
 import { assert } from 'ts-essentials';
 
 import { tcls } from '@/lib/tailwind';
 
-import { BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 
 export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
@@ -30,17 +30,17 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     })();
 
     return (
-        <div className={tcls('flex flex-row gap-4 md:gap-8 max-w-3xl w-full mx-auto', style)}>
+        <div className={tcls('mx-auto flex w-full max-w-3xl flex-row gap-4 md:gap-8', style)}>
             <div className="relative select-none">
                 <div
                     className={tcls(
                         'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-subtle tabular-nums',
-                        'font-medium text-primary',
+                        'font-medium text-primary'
                     )}
                 >
                     {index + 1}
                 </div>
-                <div className="absolute bottom-2 left-[0.875rem] top-9 w-px bg-primary-subtle can-override-bg" />
+                <div className="can-override-bg absolute top-9 bottom-2 left-[0.875rem] w-px bg-primary-subtle" />
             </div>
             <Blocks
                 {...contextProps}

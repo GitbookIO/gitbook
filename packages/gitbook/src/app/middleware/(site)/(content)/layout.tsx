@@ -1,11 +1,11 @@
 import { getThemeFromMiddleware } from '@v2/lib/middleware';
-import { Metadata, Viewport } from 'next';
-import React from 'react';
+import type { Metadata, Viewport } from 'next';
+import type React from 'react';
 
 import {
+    SiteLayout,
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
-    SiteLayout,
 } from '@/components/SiteLayout';
 import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { getSiteContentPointer } from '@/lib/pointer';

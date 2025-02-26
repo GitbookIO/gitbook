@@ -1,13 +1,13 @@
 import { Icon } from '@gitbook/icons';
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { DateRelative } from '../primitives';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
-import { DateRelative } from '../primitives';
 
 interface AdminToolbarProps {
     context: GitBookSiteContext;
@@ -34,7 +34,7 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
                 'p-2',
                 'max-w-md',
                 'border-tint-12/1',
-                'backdrop-blur-md',
+                'backdrop-blur-md'
             )}
         >
             <React.Suspense fallback={null}>{props.children}</React.Suspense>
@@ -83,7 +83,7 @@ async function ChangeRequestToolbar(props: { context: GitBookSiteContext }) {
                     <p>
                         #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
                     </p>
-                    <p className="text-xs text-tint-2 dark:text-tint-11">
+                    <p className="text-tint-2 text-xs dark:text-tint-11">
                         Change request updated <DateRelative value={changeRequest.updatedAt} />
                     </p>
                 </ToolbarBody>
@@ -124,7 +124,7 @@ async function RevisionToolbar(props: { context: GitBookSiteContext }) {
                         Revision created <DateRelative value={revision.createdAt} />
                     </p>
                     {revision.git ? (
-                        <p className="text-xs text-tint-2 dark:text-tint-11">
+                        <p className="text-tint-2 text-xs dark:text-tint-11">
                             {revision.git.message}
                         </p>
                     ) : null}

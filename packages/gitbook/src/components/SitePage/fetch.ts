@@ -1,7 +1,7 @@
-import { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { redirect } from 'next/navigation';
 
-import { resolvePagePath, resolvePageId } from '@/lib/pages';
+import { resolvePageId, resolvePagePath } from '@/lib/pages';
 
 export interface PagePathParams {
     pathname?: string | string[];
