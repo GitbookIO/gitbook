@@ -8,13 +8,15 @@
 	"files": {
 		"ignoreUnknown": false,
 		"ignore": [
-			"**/node_modules/**",
-			"**/dist/**",
-			"**/build/**",
-			"**/public/**",
-			"**/.next/**",
-			"**/.open-next/**",
-			"**/.turbo/**"
+			"**/node_modules/**/*",
+			"**/dist/**/*",
+			"**/build/**/*",
+			"**/public/**/*",
+			"**/.next/**/*",
+			"**/.open-next/**/*",
+			"**/.turbo/**/*",
+			"**/.vercel/**/*",
+			"**/.cache/**/*"
 		]
 	},
 	"formatter": {
