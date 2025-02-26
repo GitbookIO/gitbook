@@ -20,6 +20,7 @@ import {
     getReusableContent,
     getRevision,
     getRevisionFile,
+    getRevisionPageByPath,
     getRevisionPages,
     getSiteRedirectBySource,
     getSpace,
@@ -118,6 +119,10 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             return getRevisionPages(params.spaceId, params.revisionId, {
                 metadata: params.metadata,
             });
+        },
+
+        getRevisionPageByPath(params) {
+            return getRevisionPageByPath(params.spaceId, params.revisionId, params.path);
         },
 
         getReusableContent(params) {
