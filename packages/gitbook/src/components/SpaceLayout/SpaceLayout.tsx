@@ -113,6 +113,7 @@ export function SpaceLayout(props: {
                             )}
                             {isMultiVariants && (
                                 <SpacesDropdown
+                                    context={context}
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
                                     className={tcls('w-full')}

@@ -95,6 +95,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         {isMultiVariants && (
                             <div className="mr-auto page-no-toc:flex hidden">
                                 <SpacesDropdown
+                                    context={context}
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
                                     className={
