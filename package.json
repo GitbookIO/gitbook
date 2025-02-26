@@ -21,7 +21,7 @@
         "build:v2": "turbo run build:v2",
         "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",
         "typecheck": "turbo run typecheck",
-        "format": "biome check --write ./",
+        "format": "biome check --unsafe --write ./",
         "format:check": "biome check ./",
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
