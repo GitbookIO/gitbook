@@ -39,7 +39,7 @@ jobs:
                   echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
               if: 1 && !startsWith(github.ref, 'refs/heads/main')
             - name: Build Next.js with next-on-pages
-              run: bun run turbo build:cloudflare
+              run: bun run turbo gitbook#build:cloudflare
               env:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
