@@ -7,7 +7,15 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": []
+		"ignore": [
+			"**/node_modules/**",
+			"**/dist/**",
+			"**/build/**",
+			"**/public/**",
+			"**/.next/**",
+			"**/.open-next/**",
+			"**/.turbo/**"
+		]
 	},
 	"formatter": {
 		"enabled": true,
