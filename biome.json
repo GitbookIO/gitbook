@@ -1,26 +1,27 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": {
-		"enabled": false,
-		"clientKind": "git",
-		"useIgnoreFile": false
-	},
-	"files": {
-		"ignoreUnknown": false,
-		"ignore": [
-			"**/node_modules/**/*",
-			"**/dist/**/*",
-			"**/build/**/*",
-			"**/public/**/*",
-			"**/.next/**/*",
-			"**/.open-next/**/*",
-			"**/.turbo/**/*",
-			"**/.vercel/**/*",
-			"**/.cache/**/*"
-		]
-	},
-	"formatter": {
-		"enabled": true,
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "vcs": {
+        "enabled": false,
+        "clientKind": "git",
+        "useIgnoreFile": false
+    },
+    "files": {
+        "ignoreUnknown": false,
+        "ignore": [
+            "**/node_modules/**/*",
+            "**/dist/**/*",
+            "**/build/**/*",
+            "**/public/**/*",
+            "**/.next/**/*",
+            "**/.open-next/**/*",
+            "**/.turbo/**/*",
+            "**/.vercel/**/*",
+            "**/.cache/**/*",
+			"**/.wrangler/**/*"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
         "useEditorconfig": true,
         "formatWithErrors": false,
         "indentStyle": "space",
@@ -29,22 +30,22 @@
         "lineWidth": 100,
         "attributePosition": "auto",
         "bracketSpacing": true
-	},
-	"organizeImports": {
-		"enabled": true
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"performance": {
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "performance": {
                 "noDelete": "warn"
             },
-			"complexity": {
+            "complexity": {
                 "noForEach": "off",
                 "noUselessFragments": "warn"
             },
-			"correctness": {
+            "correctness": {
                 "noUndeclaredVariables": "error",
                 "noUnusedVariables": "error",
                 "useArrayLiterals": "error",
@@ -93,11 +94,11 @@
                     }
                 }
             }
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"jsxQuoteStyle": "double",
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "jsxQuoteStyle": "double",
             "quoteProperties": "asNeeded",
             "trailingCommas": "es5",
             "semicolons": "always",
@@ -106,6 +107,37 @@
             "quoteStyle": "single",
             "attributePosition": "auto",
             "bracketSpacing": true
+        }
+    },
+	"overrides": [
+		{
+			"include": ["packages/cache-do/**/*"],
+			"javascript": {
+				"globals": [
+					"DurableObjectLocationHint",
+					"DurableObjectNamespace",
+					"DurableObjectStub",
+					"ContinentCode"
+				]
+			}
+		},
+		{
+			"include": ["packages/gitbook/**/*", "packages/gitbook-v2/**/*", "packages/react-openapi/**/*", "packages/react-math/**/*",
+			"packages/react-contentkit/**/*", "packages/icons/**/*"
+		],
+			"javascript": {
+				"globals": [
+					"React"
+				]
+			}
+		},
+		{
+			"include": ["*.css"],
+			"javascript": {
+				"globals": [
+					"theme"
+				]
+			}
 		}
-	}
+	]
 }
