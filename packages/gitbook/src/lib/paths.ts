@@ -9,9 +9,12 @@ export function joinPath(...parts: string[]): string {
  * Remove the trailing slash from a path.
  */
 export function removeTrailingSlash(path: string): string {
-    if (path === '/') {
-        return path;
-    }
-
     return path.replace(/\/+$/, '');
+}
+
+/**
+ * Remove the leading slash from a path.
+ */
+export function removeLeadingSlash(path: string): string {
+    return path.replace(/^\/+/, '');
 }

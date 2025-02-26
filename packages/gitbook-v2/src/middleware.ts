@@ -66,7 +66,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         dynamicHeaders ? 'dynamic' : 'static',
         mode,
         encodeURIComponent(url.host + data.basePath),
-        encodeURIComponent(removeTrailingSlash(data.pathname)),
+        encodeURIComponent(removeTrailingSlash(data.pathname) || '/'),
     ].join('/');
 
     return NextResponse.rewrite(new URL('/' + route, request.url), {
