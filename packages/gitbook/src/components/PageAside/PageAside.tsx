@@ -176,6 +176,10 @@ export async function PageAside(props: {
                                             'items-center',
                                             'text-sm',
                                             'hover:text-tint-strong',
+                                            'links-accent:hover:underline',
+                                            'links-accent:hover:underline-offset-4',
+                                            'links-accent:hover:decoration-[3px]',
+                                            'links-accent:hover:decoration-primary-subtle',
                                             'py-2',
                                         )}
                                     >
@@ -201,6 +205,10 @@ export async function PageAside(props: {
                                             'items-center',
                                             'text-sm',
                                             'hover:text-tint-strong',
+                                            'links-accent:hover:underline',
+                                            'links-accent:hover:underline-offset-4',
+                                            'links-accent:hover:decoration-[3px]',
+                                            'links-accent:hover:decoration-primary-subtle',
                                             'py-2',
                                         )}
                                     >
