@@ -26,7 +26,7 @@ export function PageBody(props: {
     withPageFeedback: boolean;
 }) {
     const { page, context, ancestors, document, withPageFeedback } = props;
-    const { space, customization } = context;
+    const { customization } = context;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
@@ -85,12 +85,7 @@ export function PageBody(props: {
                 )}
 
                 {page.layout.pagination && customization.pagination.enabled ? (
-                    <PageFooterNavigation
-                        space={space}
-                        customization={customization}
-                        pages={context.pages}
-                        page={page}
-                    />
+                    <PageFooterNavigation context={context} page={page} />
                 ) : null}
 
                 <div

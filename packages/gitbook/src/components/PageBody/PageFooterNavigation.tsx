@@ -1,35 +1,28 @@
-import {
-    type CustomizationSettings,
-    type Revision,
-    type RevisionPageDocument,
-    type SiteCustomizationSettings,
-    SiteInsightsLinkPosition,
-    type Space,
-} from '@gitbook/api';
+import { type Revision, type RevisionPageDocument, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import type React from 'react';
 
 import { getSpaceLanguage, t } from '@/intl/server';
-import { getPageHref } from '@/lib/links';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { Link, type LinkInsightsProps } from '../primitives';
 
 /**
  * Show cards to go to previous/next pages at the bottom.
  */
 export async function PageFooterNavigation(props: {
-    space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    context: GitBookSiteContext;
     pages: Revision['pages'];
     page: RevisionPageDocument;
 }) {
-    const { customization, pages, page } = props;
+    const { context, page } = props;
+    const { customization, pages, linker } = context;
     const { previous, next } = resolvePrevNextPages(pages, page);
     const language = getSpaceLanguage(customization);
-    const previousHref = previous ? await getPageHref(pages, previous) : '';
-    const nextHref = next ? await getPageHref(pages, next) : '';
+    const previousHref = previous ? linker.toPathForPage({ pages, page: previous }) : '';
+    const nextHref = next ? linker.toPathForPage({ pages, page: next }) : '';
 
     return (
         <div
