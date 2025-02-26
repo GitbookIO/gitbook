@@ -1,7 +1,8 @@
 import { GitBookAPIError } from '@gitbook/api';
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
+import { getContentSecurityPolicy } from '@/lib/csp';
 import { removeTrailingSlash } from '@/lib/paths';
 import { getPublishedContentByURL } from '@v2/lib/data';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
@@ -13,12 +14,16 @@ export const config = {
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
-    const extracted = extractURL(request);
-    if (extracted) {
-        return serveSiteByURL(request, extracted);
-    }
+    try {
+        const extracted = extractURL(request);
+        if (extracted) {
+            return serveSiteByURL(request, extracted);
+        }
 
-    return NextResponse.next();
+        return NextResponse.next();
+    } catch (error) {
+        return serveErrorResponse(error as Error);
+    }
 }
 
 /**
@@ -35,14 +40,6 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     });
 
     if (result.error) {
-        if (result.error instanceof GitBookAPIError) {
-            return NextResponse.json(
-                {
-                    error: result.error.message,
-                },
-                { status: result.error.code }
-            );
-        }
         throw result.error;
     }
 
@@ -68,9 +65,28 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         encodeURIComponent(removeTrailingSlash(data.pathname) || '/'),
     ].join('/');
 
-    return NextResponse.rewrite(new URL(`/${route}`, request.url), {
+    const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
         headers: requestHeaders,
     });
+
+    // Add Content Security Policy header
+    response.headers.set('content-security-policy', getContentSecurityPolicy());
+
+    return response;
+}
+
+/**
+ * Serve an error response.
+ */
+function serveErrorResponse(error: Error) {
+    if (error instanceof GitBookAPIError) {
+        return NextResponse.json(
+            { error: error.message },
+            { status: 500, headers: { 'content-type': 'application/json' } }
+        );
+    }
+
+    throw error;
 }
 
 /**

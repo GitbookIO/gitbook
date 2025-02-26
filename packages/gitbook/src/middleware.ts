@@ -1,6 +1,5 @@
 import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setContext, setTag } from '@sentry/nextjs';
-import { fetchSiteContextByIds } from '@v2/lib/context';
 import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
@@ -20,7 +19,7 @@ import {
 } from '@/lib/api';
 import { race } from '@/lib/async';
 import { buildVersion } from '@/lib/build';
-import { createContentSecurityPolicyNonce, getContentSecurityPolicy } from '@/lib/csp';
+import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import { setMiddlewareHeader } from '@/lib/middleware';
 import {
@@ -32,7 +31,6 @@ import {
 } from '@/lib/visitor-token';
 
 import { joinPath } from './lib/paths';
-import { getV1BaseContext } from './lib/v1';
 
 export const config = {
     matcher:
@@ -168,40 +166,9 @@ export async function middleware(request: NextRequest) {
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
 
     const contextId = 'site' in resolved ? resolved.contextId : undefined;
-    const nonce = createContentSecurityPolicyNonce();
-    const csp = await withAPI(
-        {
-            client: new GitBookAPI({
-                endpoint: apiEndpoint,
-                authToken: resolved.apiToken,
-                userAgent: userAgent(),
-            }),
-            contextId,
-        },
-        async () => {
-            const siteData =
-                'site' in resolved
-                    ? await fetchSiteContextByIds(await getV1BaseContext(), {
-                          organization: resolved.organization,
-                          site: resolved.site,
-                          siteSection: resolved.siteSection,
-                          siteSpace: resolved.siteSpace,
-                          space: resolved.space,
-                          shareKey: resolved.shareKey,
-                          changeRequest: resolved.changeRequest,
-                          revision: resolved.revision,
-                          visitorAuthToken: resolved.visitorToken ?? null,
-                      })
-                    : null;
-
-            const scripts = siteData?.scripts ?? [];
-            return getContentSecurityPolicy(scripts, nonce);
-        }
-    );
+    const csp = getContentSecurityPolicy();
 
     const headers = new Headers(request.headers);
-    // https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
-    headers.set('x-nonce', nonce);
     headers.set('content-security-policy', csp);
     // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
     headers.set('x-forwarded-host', inputURL.host);

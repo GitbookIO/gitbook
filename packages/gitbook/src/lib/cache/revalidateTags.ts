@@ -1,3 +1,4 @@
+import { assertIsNotV2 } from '../v2';
 import { cacheBackends } from './backends';
 import type { CacheEntryLookup } from './types';
 
@@ -22,6 +23,8 @@ interface RevalidateTagsStats {
 export async function revalidateTags(tags: string[]): Promise<{
     stats: RevalidateTagsStats;
 }> {
+    assertIsNotV2();
+
     if (tags.length === 0) {
         return { stats: {} };
     }
