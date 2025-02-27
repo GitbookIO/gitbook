@@ -238,7 +238,7 @@ async function searchSiteContent(
         siteId: context.site.id,
         query,
         cacheBust,
-        ...scope,
+        scope,
     });
 
     return (

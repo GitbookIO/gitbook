@@ -155,9 +155,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         },
 
         async searchSiteContent(params) {
-            const { organizationId, siteId, query, cacheBust, ...scope } = params;
-
-            // @ts-ignore - no fully compatible, but fine enough
+            const { organizationId, siteId, query, cacheBust, scope } = params;
             const result = await searchSiteContent(organizationId, siteId, query, scope, cacheBust);
             return result.items;
         },

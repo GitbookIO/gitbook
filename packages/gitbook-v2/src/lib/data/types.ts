@@ -142,12 +142,15 @@ export interface GitBookDataFetcher {
     /**
      * Search content in a site.
      */
-    searchSiteContent(
-        params: Parameters<api.GitBookAPI['orgs']['searchSiteContent']>[2] & {
-            organizationId: string;
-            siteId: string;
-            /** Cache bust to ensure the search results are fresh when the space is updated. */
-            cacheBust?: string;
-        }
-    ): Promise<api.SearchSpaceResult[]>;
+    searchSiteContent(params: {
+        organizationId: string;
+        siteId: string;
+        query: string;
+        scope:
+            | { mode: 'all' }
+            | { mode: 'current'; siteSpaceId: string }
+            | { mode: 'specific'; siteSpaceIds: string[] };
+        /** Cache bust to ensure the search results are fresh when the space is updated. */
+        cacheBust?: string;
+    }): Promise<api.SearchSpaceResult[]>;
 }
