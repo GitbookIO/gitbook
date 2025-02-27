@@ -93,7 +93,7 @@
 
 /** Buttons */
 .contentkit-button {
-    @apply text-sm px-3 py-1.5 inline-block rounded-md straight-corners:rounded-none place-self-start ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all grow-0 shrink-0 truncate w-full;
+    @apply text-sm px-3 h-8 text-center inline-block py-1.5 rounded-md straight-corners:rounded-none place-self-start ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all grow-0 shrink-0 truncate w-full;
 }
 
 .contentkit-button-style-primary {
@@ -106,6 +106,10 @@
 
 .contentkit-button .contentkit-icon {
     @apply w-4 h-4;
+}
+
+.contentkit-button-loading {
+    @apply size-5 flex mx-auto animate-spin;
 }
 
 /** Modals */
