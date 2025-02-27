@@ -62,7 +62,7 @@ export async function GET() {
 async function getUrlsFromSiteStructure(siteStructure: SiteStructure): Promise<string[]> {
     switch (siteStructure.type) {
         case 'sections':
-            return getUrlsFromSiteSections(getSiteStructureSections(siteStructure));
+            return getUrlsFromSiteSections(getSiteStructureSections(siteStructure, { ignoreGroups: true }));
         case 'siteSpaces':
             return getUrlsFromSiteSpaces(siteStructure.structure);
         default:

@@ -1,13 +1,16 @@
-import type { SiteSection, SiteSpace, SiteStructure } from '@gitbook/api';
+import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
 
 /**
- * Get all sections from a site structure.
+ * Get all sections from a site structure. If `includeGroups` is false, flat to not include SiteSectionGroups.
  */
-export function getSiteStructureSections(siteStructure: SiteStructure) {
+export function getSiteStructureSections(siteStructure: SiteStructure, options: { ignoreGroups: true }): SiteSection[];
+export function getSiteStructureSections(siteStructure: SiteStructure, options?: { ignoreGroups: false }): SiteSection[] | SiteSectionGroup[];
+export function getSiteStructureSections(siteStructure: SiteStructure, options?: { ignoreGroups: boolean }) {
+    const { ignoreGroups } = options ?? { ignoreGroups: false };
     return siteStructure.type === 'sections'
-        ? siteStructure.structure.flatMap((item) =>
+        ? ignoreGroups ? siteStructure.structure.flatMap((item) =>
               item.object === 'site-section-group' ? item.sections : item
-          )
+          ) : siteStructure.structure
         : [];
 }
 

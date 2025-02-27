@@ -53,7 +53,7 @@ export function checkIsRootPointer(
 ): boolean {
     switch (siteStructure.type) {
         case 'sections': {
-            return getSiteStructureSections(siteStructure).some(
+            return getSiteStructureSections(siteStructure, { ignoreGroups: true }).some(
                 (structure) =>
                     structure.default &&
                     structure.id === pointer.siteSectionId &&
