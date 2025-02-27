@@ -238,8 +238,8 @@ const testCases: TestsCase[] = [
                     await page.waitForURL(
                         'https://gitbook-open-e2e-sites.gitbook.io/sections/sections-4'
                     );
-                }
-            }
+                },
+            },
         ],
     },
     {
