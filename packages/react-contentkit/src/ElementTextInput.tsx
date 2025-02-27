@@ -29,6 +29,7 @@ export function ElementTextInput(props: ContentKitClientElementProps<ContentKitT
                 value={value}
                 placeholder={element.placeholder}
                 onChange={onChange}
+                rows={4}
             />
         );
     }
