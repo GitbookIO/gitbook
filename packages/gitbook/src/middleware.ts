@@ -1,4 +1,9 @@
-import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
+import {
+    type ContentAPITokenPayload,
+    CustomizationThemeMode,
+    GitBookAPI,
+    type PublishedSiteContent,
+} from '@gitbook/api';
 import { setContext, setTag } from '@sentry/nextjs';
 import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
@@ -184,7 +189,9 @@ export async function middleware(request: NextRequest) {
     headers.set('x-gitbook-origin-basepath', originBasePath);
     headers.set(
         'x-gitbook-basepath',
-        mode === 'proxy' ? originBasePath : joinPath(originBasePath, resolved.basePath)
+        mode === 'proxy'
+            ? getProxyModeBasePath(inputURL, resolved)
+            : joinPath(originBasePath, resolved.basePath)
     );
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
@@ -343,7 +350,10 @@ function getInputURL(request: NextRequest): {
     // to determine the site to serve.
     const xGitbookSite = request.headers.get('x-gitbook-site-url');
     if (xGitbookSite) {
-        mode = 'proxy';
+        return {
+            mode: 'proxy',
+            url: new URL(xGitbookSite),
+        };
     }
 
     return { url, mode };
@@ -408,16 +418,8 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
  * GITBOOK_MODE=proxy
  * When proxying a site on a different base URL.
  */
-async function lookupSiteInProxy(request: NextRequest, _url: URL): Promise<LookupResult> {
-    const rawSiteUrl = request.headers.get('x-gitbook-site-url');
-    if (!rawSiteUrl) {
-        throw new Error(
-            'Missing x-gitbook-site-url header. It should be passed when using GITBOOK_MODE=proxy.'
-        );
-    }
-
-    const siteUrl = new URL(rawSiteUrl);
-    return await lookupSiteInMultiMode(request, siteUrl);
+async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<LookupResult> {
+    return await lookupSiteInMultiMode(request, url);
 }
 
 /**
@@ -932,4 +934,22 @@ function writeCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+/**
+ * Compute the final base path for a site served in proxy mode.
+ * For e.g. if the input URL is `https://example.com/docs/v2/foo/bar` on which
+ * the site is served at `https://example.com/docs` and the resolved base path is `/v2`
+ * then the proxy site path would be `/docs/v2/`.
+ */
+function getProxyModeBasePath(
+    input: URL,
+    resolved: Pick<PublishedSiteContent, 'basePath' | 'pathname'>
+): string {
+    const inputPathname = stripURLSearch(input).pathname;
+    const proxySitePath = inputPathname
+        .replace(resolved.pathname, '')
+        .replace(resolved.basePath, '');
+
+    return joinPath(normalizePathname(proxySitePath), resolved.basePath);
 }
