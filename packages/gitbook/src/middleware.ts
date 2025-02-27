@@ -433,7 +433,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
  * GITBOOK_MODE=proxy
  * When proxying a site on a different base URL.
  */
-async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<LookupResult> {
+async function lookupSiteInProxy(request: NextRequest, _url: URL): Promise<LookupResult> {
     const rawSiteUrl = request.headers.get('x-gitbook-site-url');
     if (!rawSiteUrl) {
         throw new Error(
@@ -441,7 +441,7 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
         );
     }
 
-    const siteUrl = new URL(rawSiteUrl)
+    const siteUrl = new URL(rawSiteUrl);
     return await lookupSiteInMultiMode(request, siteUrl);
 }
 
