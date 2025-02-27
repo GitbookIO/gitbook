@@ -7,13 +7,13 @@ import {
 } from '@gitbook/react-contentkit';
 
 import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
-import { INTEGRATIONS_HOST } from '@/lib/csp';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
+import { GITBOOK_INTEGRATIONS_HOST } from '@v2/lib/env';
 
 import type { BlockProps } from '../Block';
-import './contentkit.css';
 import { PlainCodeBlock } from '../CodeBlock';
+import './contentkit.css';
 
 const outputContext: ContentKitServerContext = {
     icons: {
@@ -74,7 +74,7 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     return (
         <div className={tcls(style)}>
             <ContentKit
-                security={{ firstPartyDomains: [INTEGRATIONS_HOST] }}
+                security={{ firstPartyDomains: [GITBOOK_INTEGRATIONS_HOST] }}
                 initialInput={initialInput}
                 initialOutput={initialOutput}
                 render={async (request) => {

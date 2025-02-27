@@ -16,6 +16,7 @@ import {
     getChangeRequest,
     getComputedDocument,
     getDocument,
+    getEmbedByUrlInSpace,
     getLatestOpenAPISpecVersionContent,
     getPublishedContentByUrl,
     getPublishedContentSite,
@@ -135,6 +136,10 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getSiteRedirectBySource(params) {
             return getSiteRedirectBySource(params);
+        },
+
+        getEmbedByUrl(params) {
+            return getEmbedByUrlInSpace(params.spaceId, params.url);
         },
     };
 }

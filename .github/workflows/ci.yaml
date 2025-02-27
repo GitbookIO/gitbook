@@ -235,6 +235,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing
         needs: deploy
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -259,6 +260,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2
         needs: deploy-v2-vercel
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -284,6 +286,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers
         needs: deploy
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -309,6 +312,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -351,6 +355,7 @@ jobs:
     format:
         runs-on: ubuntu-latest
         name: Format
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -364,6 +369,7 @@ jobs:
     test:
         runs-on: ubuntu-latest
         name: Test
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -378,6 +384,7 @@ jobs:
         # CI to check that the repository builds correctly on a machine without the credentials
         runs-on: ubuntu-latest
         name: Build (Open Source)
+        timeout-minutes: 6
         env:
             NPM_TOKEN_READONLY: ''
         steps:
@@ -393,6 +400,7 @@ jobs:
     typecheck:
         runs-on: ubuntu-latest
         name: Typecheck
+        timeout-minutes: 6
         steps:
             - name: Checkout
               uses: actions/checkout@v4

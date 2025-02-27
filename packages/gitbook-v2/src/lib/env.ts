@@ -36,3 +36,9 @@ export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT ?? 'GitBook-Ope
 export const GITBOOK_DISABLE_TRACKING = Boolean(
     !!process.env.GITBOOK_DISABLE_TRACKING || process.env.NODE_ENV !== 'production'
 );
+
+/**
+ * Hostname serving the integrations.
+ */
+export const GITBOOK_INTEGRATIONS_HOST =
+    process.env.GITBOOK_INTEGRATIONS_HOST ?? 'integrations.gitbook.com';

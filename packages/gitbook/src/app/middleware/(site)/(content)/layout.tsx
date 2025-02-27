@@ -7,7 +7,6 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
-import { getContentSecurityPolicyNonce } from '@/lib/csp';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { shouldTrackEvents } from '@/lib/tracking';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
@@ -21,14 +20,12 @@ export const dynamic = 'force-dynamic';
 export default async function ContentLayout(props: { children: React.ReactNode }) {
     const { children } = props;
 
-    const nonce = await getContentSecurityPolicyNonce();
     const context = await fetchLayoutData();
     const queryStringTheme = await getThemeFromMiddleware();
 
     return (
         <SiteLayout
             context={context}
-            nonce={nonce}
             forcedTheme={queryStringTheme}
             withTracking={await shouldTrackEvents()}
         >

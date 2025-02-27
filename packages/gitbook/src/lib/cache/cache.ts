@@ -3,6 +3,7 @@ import hash from 'object-hash';
 import { captureException } from '../../sentry';
 import { race, singletonMap } from '../async';
 import { type TraceSpan, trace } from '../tracing';
+import { assertIsNotV2 } from '../v2';
 import { waitUntil } from '../waitUntil';
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
@@ -82,6 +83,7 @@ export function cache<Args extends any[], Result>(
 
     const revalidate = singletonMap(
         async (key: string, signal: AbortSignal | undefined, ...args: Args) => {
+            assertIsNotV2();
             return await trace(
                 {
                     name: key,
@@ -235,6 +237,7 @@ export function cache<Args extends any[], Result>(
     // During development, for now it fetches data twice between the middleware and the handler.
     // TODO: find a way to share the cache between the two.
     const cacheFn = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
+        assertIsNotV2();
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
 
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
@@ -254,6 +257,7 @@ export function cache<Args extends any[], Result>(
     };
 
     cacheFn.revalidate = async (...rawArgs: Args | [...Args, CacheFunctionOptions]) => {
+        assertIsNotV2();
         const [args, { signal }] = extractCacheFunctionOptions<Args>(rawArgs);
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
         const cacheKeySuffix = cacheDef.getKeySuffix ? await cacheDef.getKeySuffix() : undefined;
@@ -264,6 +268,7 @@ export function cache<Args extends any[], Result>(
     };
 
     cacheFn.hasInMemory = async (...args: Args) => {
+        assertIsNotV2();
         const cacheArgs = cacheDef.getKeyArgs ? cacheDef.getKeyArgs(args) : args;
         const cacheKeySuffix = cacheDef.getKeySuffix ? await cacheDef.getKeySuffix() : undefined;
         const key = getCacheKey(cacheDef.name, cacheArgs, cacheKeySuffix);
