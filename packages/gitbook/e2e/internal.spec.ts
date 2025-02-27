@@ -234,7 +234,7 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     const sectionGroupDropdown = await page.getByText('Test Section Group 1');
                     await sectionGroupDropdown.hover();
-                    await page.getByText('Section B');
+                    await expect(page.getByRole('link', { name: 'Section B' })).toBeVisible();
                 },
             },
             {
