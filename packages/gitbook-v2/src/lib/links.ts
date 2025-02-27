@@ -88,7 +88,7 @@ export function appendBasePathToLinker(
         },
 
         toAbsoluteURL(absolutePath: string): string {
-            return linker.toAbsoluteURL(joinPaths(basePath, absolutePath));
+            return linker.toAbsoluteURL(absolutePath);
         },
 
         toPathForPage({ pages, page, anchor }) {

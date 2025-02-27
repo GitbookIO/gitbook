@@ -36,10 +36,23 @@ describe('appendBasePathToLinker', () => {
     const prefixedRoot = appendBasePathToLinker(root, '/section/variant');
     const prefixedVariantInSection = appendBasePathToLinker(variantInSection, '/base');
 
-    it('should return the correct path', () => {
-        expect(prefixedRoot.toPathInContent('some/path')).toBe('/section/variant/some/path');
-        expect(prefixedVariantInSection.toPathInContent('some/path')).toBe(
-            '/section/variant/base/some/path'
-        );
+    describe('toPathInContent', () => {
+        it('should return the correct path', () => {
+            expect(prefixedRoot.toPathInContent('some/path')).toBe('/section/variant/some/path');
+            expect(prefixedVariantInSection.toPathInContent('some/path')).toBe(
+                '/section/variant/base/some/path'
+            );
+        });
+    });
+
+    describe('toAbsoluteURL', () => {
+        it('should return the correct path', () => {
+            expect(prefixedRoot.toAbsoluteURL('some/path')).toBe(
+                'https://docs.company.com/some/path'
+            );
+            expect(prefixedVariantInSection.toAbsoluteURL('some/path')).toBe(
+                'https://docs.company.com/some/path'
+            );
+        });
     });
 });
