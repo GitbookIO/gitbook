@@ -46,17 +46,15 @@ function getInputElement(props: {
 }) {
     const { element, context, state } = props;
 
+    //!!TODO add support for:
+    // - select
+    // - switch
+    // - radio
+    // - checkbox
+
     switch (element.type) {
         case 'textinput':
             return <ElementTextInput element={element} />;
-        case 'select':
-            return <select></select>;
-        case 'switch':
-            return <input type="checkbox" />;
-        case 'radio':
-            return <input type="radio" />;
-        case 'checkbox':
-            return <input type="checkbox" />;
         case 'button':
             return (
                 <ElementButton
