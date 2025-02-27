@@ -5,8 +5,7 @@ import { generateMediaTypeExample, generateSchemaExample } from './generateSchem
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
-import { createStateKey } from './utils';
-import { checkIsReference } from './utils';
+import { checkIsReference, createStateKey } from './utils';
 
 /**
  * Display code samples to execute the operation.
@@ -95,8 +94,8 @@ export function OpenAPICodeSample(props: {
                         typeof sample.lang === 'string'
                     );
                 })
-                .map((sample) => ({
-                    key: `redocly-${sample.lang}`,
+                .map((sample, index) => ({
+                    key: `redocly-${sample.lang}-${index}`,
                     label: sample.label,
                     body: context.renderCodeBlock({
                         code: sample.source,
