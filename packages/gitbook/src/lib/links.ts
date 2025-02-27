@@ -45,6 +45,11 @@ export async function getBasePath(): Promise<string> {
 export async function getHost(): Promise<string> {
     assertIsNotV2();
     const headersList = await headers();
+    const mode = headersList.get('x-gitbook-mode');
+    if (mode === 'proxy') {
+        return headersList.get('x-forwarded-host') ?? '';
+    }
+
     return headersList.get('x-gitbook-host') ?? headersList.get('host') ?? '';
 }
 
