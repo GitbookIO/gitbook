@@ -49,7 +49,10 @@ export async function serveLLMsTxt(context: GitBookSiteContext) {
 async function getNodesFromSiteStructure(context: GitBookSiteContext): Promise<RootContent[]> {
     switch (context.structure.type) {
         case 'sections':
-            return getNodesFromSections(context, getSiteStructureSections(context.structure));
+            return getNodesFromSections(
+                context,
+                getSiteStructureSections(context.structure, { ignoreGroups: true })
+            );
         case 'siteSpaces':
             return getNodesFromSiteSpaces(context, context.structure.structure, { heading: true });
         default:

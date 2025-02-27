@@ -107,7 +107,10 @@ function getUrlsFromSiteStructure(context: GitBookSiteContext): string[] {
     const { structure } = context;
     switch (structure.type) {
         case 'sections':
-            return getUrlsFromSiteSections(context, getSiteStructureSections(structure));
+            return getUrlsFromSiteSections(
+                context,
+                getSiteStructureSections(structure, { ignoreGroups: true })
+            );
         case 'siteSpaces':
             return getUrlsFromSiteSpaces(context, structure.structure);
         default:
