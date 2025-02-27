@@ -379,7 +379,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
 type OpenAPISchemaAlternatives = [
     OpenAPIV3.SchemaObject[],
-    OpenAPIV3.DiscriminatorObject | undefined
+    OpenAPIV3.DiscriminatorObject | undefined,
 ];
 
 /**
