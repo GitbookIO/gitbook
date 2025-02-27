@@ -129,6 +129,7 @@ function getDynamicHeaders(_request: NextRequest): null | Record<string, string>
 
 /**
  * Encode path in a site content.
+ * Special paths are not encoded and passed to be handled by the route handlers.
  */
 function encodePathInSiteContent(rawPathname: string) {
     const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));

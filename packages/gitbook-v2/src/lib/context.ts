@@ -283,6 +283,31 @@ export async function fetchSpaceContextByIds(
     };
 }
 
+/**
+ * Check if the context is the root one for a site.
+ * Meaning we are on the default section / space.
+ */
+export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
+    const { structure } = context;
+    switch (structure.type) {
+        case 'sections': {
+            return getSiteStructureSections(structure).some(
+                (structure) =>
+                    structure.default &&
+                    structure.id === context.sections?.current.id &&
+                    structure.siteSpaces.some(
+                        (siteSpace) => siteSpace.default && siteSpace.id === context.siteSpace.id
+                    )
+            );
+        }
+        case 'siteSpaces': {
+            return structure.structure.some(
+                (siteSpace) => siteSpace.default && siteSpace.id === context.siteSpace.id
+            );
+        }
+    }
+}
+
 function parseSiteSectionsList(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure);
     const section = sections.find((section) => section.id === siteSectionId);
