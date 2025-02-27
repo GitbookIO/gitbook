@@ -60,7 +60,9 @@ export async function GET(_req: NextRequest) {
 async function getNodesFromSiteStructure(siteStructure: SiteStructure): Promise<RootContent[]> {
     switch (siteStructure.type) {
         case 'sections':
-            return getNodesFromSections(getSiteStructureSections(siteStructure, { ignoreGroups: true }));
+            return getNodesFromSections(
+                getSiteStructureSections(siteStructure, { ignoreGroups: true })
+            );
         case 'siteSpaces':
             return getNodesFromSiteSpaces(siteStructure.structure, { heading: true });
         default:

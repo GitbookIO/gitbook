@@ -3,14 +3,25 @@ import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@g
 /**
  * Get all sections from a site structure. If `includeGroups` is false, flat to not include SiteSectionGroups.
  */
-export function getSiteStructureSections(siteStructure: SiteStructure, options: { ignoreGroups: true }): SiteSection[];
-export function getSiteStructureSections(siteStructure: SiteStructure, options?: { ignoreGroups: false }): SiteSection[] | SiteSectionGroup[];
-export function getSiteStructureSections(siteStructure: SiteStructure, options?: { ignoreGroups: boolean }) {
+export function getSiteStructureSections(
+    siteStructure: SiteStructure,
+    options: { ignoreGroups: true }
+): SiteSection[];
+export function getSiteStructureSections(
+    siteStructure: SiteStructure,
+    options?: { ignoreGroups: false }
+): SiteSection[] | SiteSectionGroup[];
+export function getSiteStructureSections(
+    siteStructure: SiteStructure,
+    options?: { ignoreGroups: boolean }
+) {
     const { ignoreGroups } = options ?? { ignoreGroups: false };
     return siteStructure.type === 'sections'
-        ? ignoreGroups ? siteStructure.structure.flatMap((item) =>
-              item.object === 'site-section-group' ? item.sections : item
-          ) : siteStructure.structure
+        ? ignoreGroups
+            ? siteStructure.structure.flatMap((item) =>
+                  item.object === 'site-section-group' ? item.sections : item
+              )
+            : siteStructure.structure
         : [];
 }
 

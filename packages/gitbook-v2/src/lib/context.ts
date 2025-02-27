@@ -189,7 +189,9 @@ export async function fetchSiteContextByIds(
         ...(customizations.site?.title ? { title: customizations.site.title } : {}),
     };
 
-    const sections = ids.siteSection ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection) : null;
+    const sections = ids.siteSection
+        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
+        : null;
 
     const siteSpace = (
         siteStructure.type === 'siteSpaces' && siteStructure.structure
