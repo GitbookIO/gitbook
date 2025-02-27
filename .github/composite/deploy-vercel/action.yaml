@@ -1,0 +1,58 @@
+name: 'Deploy vercel'
+description: 'Deploy GitBook to Vercel'
+inputs:
+  vercel-org:
+    description: 'Vercel organization'
+    required: true
+  vercel-project:
+    description: 'Vercel project'
+    required: true
+  vercel-token:
+    description: 'Vercel token'
+    required: true
+  environment:
+    description: 'Environment to deploy to'
+    required: true
+outputs:
+    deployment-url: 
+      description: "Deployment URL"
+      value: ${{ steps.deploy.outputs.deployment-url }}
+runs:
+    using: 'composite'
+    steps:
+        - name: Setup Bun
+          uses: ./.github/composite/setup-bun
+        - name: Install dependencies
+          run: bun install --frozen-lockfile
+          shell: bash
+          env:
+              PUPPETEER_SKIP_DOWNLOAD: 1
+        - name: Sets env vars for environment
+          shell: bash
+          run: |
+              echo "VERCEL_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
+        - name: Pull Vercel Environment Information
+          run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }}
+          shell: bash
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
+        - name: Build Project Artifacts
+          run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }}
+          shell: bash
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
+        - name: Deploy Project Artifacts to Vercel
+          id: deploy
+          shell: bash
+          run: |
+              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }})
+              echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
+        - name: Outputs
+          shell: bash
+          run: |
+              echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
