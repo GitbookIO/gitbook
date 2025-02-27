@@ -6,9 +6,9 @@ import { serveRobotsTxt } from '@/routes/robots';
 
 export const runtime = 'edge';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
     const pointer = await getSiteContentPointer();
     const context = await fetchV1ContextForSitePointer(pointer);
 
-    return serveRobotsTxt(context, request);
+    return serveRobotsTxt(context);
 }
