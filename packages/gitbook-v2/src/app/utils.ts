@@ -1,12 +1,7 @@
 import { fetchSiteContextByURL } from '@v2/lib/context';
 import { createDataFetcher } from '@v2/lib/data';
-import {
-    GITBOOK_API_TOKEN,
-    GITBOOK_API_URL,
-    GITBOOK_IMAGE_RESIZE_URL,
-    GITBOOK_URL,
-} from '@v2/lib/env';
-import { createImageResizer, createNoopImageResizer } from '@v2/lib/images';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from '@v2/lib/env';
+import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 import { headers } from 'next/headers';
 
@@ -30,13 +25,11 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
     const url = getSiteURLFromParams(params);
 
     const dataFetcher = createDataFetcher();
-    const linker = createLinkerFromParams(params);
-    const imageResizer = GITBOOK_IMAGE_RESIZE_URL
-        ? createImageResizer({
-              host: url.host,
-              linker,
-          })
-        : createNoopImageResizer();
+    const { linker, host } = createLinkerFromParams(params);
+    const imageResizer = createImageResizer({
+        host,
+        linker,
+    });
 
     return fetchSiteContextByURL(
         {
@@ -65,13 +58,11 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
         apiEndpoint: headersSet.get('x-gitbook-api') ?? GITBOOK_API_URL,
     });
 
-    const linker = createLinkerFromParams(params);
-    const imageResizer = GITBOOK_IMAGE_RESIZE_URL
-        ? createImageResizer({
-              host: url.host,
-              linker,
-          })
-        : createNoopImageResizer();
+    const { linker, host } = createLinkerFromParams(params);
+    const imageResizer = createImageResizer({
+        host,
+        linker,
+    });
 
     return fetchSiteContextByURL(
         {
@@ -102,10 +93,13 @@ function createLinkerFromParams(params: RouteLayoutParams) {
     const mode = getModeFromParams(params.mode);
 
     if (mode === 'url-host') {
-        return createLinker({
+        return {
+            linker: createLinker({
+                host: url.host,
+                pathname: '/',
+            }),
             host: url.host,
-            pathname: '/',
-        });
+        };
     }
 
     const gitbookURL = new URL(GITBOOK_URL);
@@ -121,7 +115,10 @@ function createLinkerFromParams(params: RouteLayoutParams) {
         return `/url/${urlObject.host}${urlObject.pathname}`;
     };
 
-    return linker;
+    return {
+        linker,
+        host: gitbookURL.host,
+    };
 }
 
 function getSiteURLFromParams(params: RouteLayoutParams) {

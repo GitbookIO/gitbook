@@ -2,6 +2,8 @@ import 'server-only';
 
 import fnv1a from '@sindresorhus/fnv1a';
 import type { MaybePromise } from 'p-map';
+import { assert } from 'ts-essentials';
+import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY } from '../env';
 
 /**
  * GitBook has supported different version of image signing in the past. To maintain backwards
@@ -55,10 +57,11 @@ const fnv1aUtf8Buffer = new Uint8Array(512);
  * The signature is relative to the current site being rendered to avoid serving images from other sites on the same domain.
  */
 const generateSignatureV2: SignFn = async (input) => {
+    assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
     const all = [
         input.url,
         input.host, // The hostname is used to avoid serving images from other sites on the same domain
-        process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+        GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
     ]
         .filter(Boolean)
         .join(':');
@@ -74,7 +77,8 @@ const fnv1aUtf8BufferV1 = new Uint8Array(512);
  * to know that it was the algorithm that was used.
  */
 const generateSignatureV1: SignFn = async (input) => {
-    const all = [input.url, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
+    assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
+    const all = [input.url, GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     return fnv1a(all, { utf8Buffer: fnv1aUtf8BufferV1 }).toString(16);
 };
 
@@ -84,7 +88,8 @@ const generateSignatureV1: SignFn = async (input) => {
  * but still exist in previously generated and cached content.
  */
 const generateSignatureV0: SignFn = async (input) => {
-    const all = [input.url, process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
+    assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
+    const all = [input.url, GITBOOK_IMAGE_RESIZE_SIGNING_KEY].filter(Boolean).join(':');
     const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(all));
 
     // Convert ArrayBuffer to hex string

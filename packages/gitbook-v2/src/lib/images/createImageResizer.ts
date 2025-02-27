@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { GITBOOK_IMAGE_RESIZE_URL } from '../env';
+import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY, GITBOOK_IMAGE_RESIZE_URL } from '../env';
 import type { GitBookSpaceLinker } from '../links';
 import { type SignatureVersion, generateImageSignature } from './signatures';
 import type { ImageResizer } from './types';
@@ -41,6 +41,10 @@ export function createImageResizer({
     /** The host name of the current site. */
     host: string;
 }): ImageResizer {
+    if (!GITBOOK_IMAGE_RESIZE_URL || !GITBOOK_IMAGE_RESIZE_SIGNING_KEY) {
+        return createNoopImageResizer();
+    }
+
     return {
         getResizedImageURL: (urlInput) => {
             if (!checkIsSizableImageURL(urlInput)) {
@@ -102,13 +106,6 @@ export function createNoopImageResizer(): ImageResizer {
 }
 
 /**
- * Return true if images resizing is enabled.
- */
-export function isImageResizingEnabled(): boolean {
-    return !!process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY;
-}
-
-/**
  * Check if a URL is an HTTP URL.
  */
 export function checkIsHttpURL(input: string | URL): boolean {
@@ -152,7 +149,7 @@ export async function getImageSize(
     input: string,
     defaultSize: Partial<CloudflareImageOptions> = {}
 ): Promise<{ width: number; height: number } | null> {
-    if (!isImageResizingEnabled() || !checkIsSizableImageURL(input)) {
+    if (!checkIsSizableImageURL(input)) {
         return null;
     }
 

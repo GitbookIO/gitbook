@@ -56,3 +56,5 @@ export const GITBOOK_INTEGRATIONS_HOST =
  * It should be a Cloudflare domain with image resizing enabled.
  */
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
+export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
+    process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
