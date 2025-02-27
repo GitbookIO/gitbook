@@ -10,7 +10,6 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { getSitePointerFromContext } from '@/lib/v1';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -129,11 +128,9 @@ export function SpaceLayout(props: {
 
             <React.Suspense fallback={null}>
                 <SearchModal
-                    revisionId={context.revisionId}
                     spaceTitle={siteSpace.title}
                     withAsk={customization.aiSearch.enabled}
                     isMultiVariants={isMultiVariants}
-                    pointer={getSitePointerFromContext(context)}
                 />
             </React.Suspense>
         </InsightsProvider>

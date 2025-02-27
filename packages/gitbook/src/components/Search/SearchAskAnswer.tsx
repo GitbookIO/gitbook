@@ -8,7 +8,6 @@ import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import type { TranslationLanguage } from '@/intl/translations';
 import { iterateStreamResponse } from '@/lib/actions';
-import type { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { useTrackEvent } from '../Insights';
@@ -32,7 +31,7 @@ export type SearchAskState =
 /**
  * Fetch and render the answers to a question.
  */
-export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
+export function SearchAskAnswer(props: { query: string }) {
     const { query } = props;
 
     const language = useLanguage();

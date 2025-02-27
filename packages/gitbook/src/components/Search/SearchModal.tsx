@@ -7,7 +7,6 @@ import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tString, useLanguage } from '@/intl/client';
-import type { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { LoadingPane } from '../primitives/LoadingPane';
@@ -18,11 +17,9 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { type SearchState, type UpdateSearchState, useSearch } from './useSearch';
 
 interface SearchModalProps {
-    revisionId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
     withAsk: boolean;
-    pointer: SiteContentPointer;
 }
 
 /**
@@ -144,16 +141,7 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     }
 ) {
-    const {
-        pointer,
-        revisionId,
-        spaceTitle,
-        withAsk,
-        isMultiVariants,
-        state,
-        setSearchState,
-        onClose,
-    } = props;
+    const { spaceTitle, withAsk, isMultiVariants, state, setSearchState, onClose } = props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -299,17 +287,13 @@ function SearchModalBody(
             {!state.ask || !withAsk ? (
                 <SearchResults
                     ref={resultsRef}
-                    pointer={pointer}
-                    revisionId={revisionId}
                     global={isMultiVariants && state.global}
                     query={state.query}
                     withAsk={withAsk}
                     onSwitchToAsk={onSwitchToAsk}
                 />
             ) : null}
-            {state.query && state.ask && withAsk ? (
-                <SearchAskAnswer pointer={pointer} query={state.query} />
-            ) : null}
+            {state.query && state.ask && withAsk ? <SearchAskAnswer query={state.query} /> : null}
         </motion.div>
     );
 }
