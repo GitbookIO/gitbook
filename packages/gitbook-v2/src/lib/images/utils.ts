@@ -8,7 +8,7 @@ export async function getResizedImageURL(
     url: string,
     options: ResizeImageOptions
 ) {
-    const getURL = resizer.resize(url);
+    const getURL = resizer.getResizedImageURL(url);
     if (!getURL) {
         return url;
     }
