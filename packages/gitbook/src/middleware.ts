@@ -441,9 +441,7 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
         );
     }
 
-    const siteUrl = new URL(rawSiteUrl);
-    siteUrl.pathname = joinPath(siteUrl.pathname, url.pathname);
-
+    const siteUrl = new URL(rawSiteUrl)
     return await lookupSiteInMultiMode(request, siteUrl);
 }
 
