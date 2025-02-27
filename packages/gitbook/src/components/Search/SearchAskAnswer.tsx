@@ -33,13 +33,12 @@ export type SearchAskState =
  * Fetch and render the answers to a question.
  */
 export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
-    const { pointer, query } = props;
+    const { query } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
     const [askState, setAskState] = useSearchAskContext();
-    const { organizationId, siteId, siteSpaceId } = pointer;
 
     React.useEffect(() => {
         let cancelled = false;
@@ -52,7 +51,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 query,
             });
 
-            const response = streamAskQuestion({ pointer, question: query });
+            const response = streamAskQuestion({ question: query });
             const stream = iterateStreamResponse(response);
 
             // When we pass in "ask" mode, the query could still be updated by the client
@@ -81,7 +80,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [organizationId, siteId, siteSpaceId, query, setAskState, setSearchState, trackEvent]);
+    }, [query, setAskState, setSearchState, trackEvent]);
 
     React.useEffect(() => {
         return () => {

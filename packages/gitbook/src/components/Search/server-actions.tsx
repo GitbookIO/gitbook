@@ -183,13 +183,16 @@ export async function streamRecommendedQuestions() {
         );
 
         for await (const chunk of apiStream) {
+            console.log('chunk', chunk);
             stream.update(chunk);
         }
     })()
         .then(() => {
+            console.log('done');
             stream.done();
         })
         .catch((error) => {
+            console.log('error', error);
             stream.error(error);
         });
 
