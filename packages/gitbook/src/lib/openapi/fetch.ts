@@ -66,12 +66,12 @@ async function baseResolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOp
     }
 }
 
-async function fetchFilesystem(url: string) {
+function fetchFilesystem(url: string) {
     if (isV2()) {
-        return await fetchFilesystemV2(url);
+        return fetchFilesystemV2(url);
     }
 
-    return await fetchFilesystemV1(url);
+    return fetchFilesystemV1(url);
 }
 
 const fetchFilesystemV1 = cache({
