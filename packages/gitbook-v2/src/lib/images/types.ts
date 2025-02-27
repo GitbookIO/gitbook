@@ -20,10 +20,10 @@ export type ImageResizer = {
      * @param input - The image URL to resize.
      * @param options - The options to resize the image.
      */
-    resize(input: string): null | ((options: ResizeImageOptions) => Promise<string>);
+    getResizedImageURL(imageURL: string): null | ((options: ResizeImageOptions) => Promise<string>);
 
     /**
      * Get the size of an image.
      */
-    getImageSize(input: string, options: GetImageSizeOptions): Promise<ImageSize | null>;
+    getImageSize(imageURL: string, options: GetImageSizeOptions): Promise<ImageSize | null>;
 };

@@ -50,3 +50,9 @@ export const GITBOOK_DISABLE_TRACKING = Boolean(
  */
 export const GITBOOK_INTEGRATIONS_HOST =
     process.env.GITBOOK_INTEGRATIONS_HOST ?? 'integrations.gitbook.com';
+
+/**
+ * Endpoint to use for resizing images.
+ * It should be a Cloudflare domain with image resizing enabled.
+ */
+export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;

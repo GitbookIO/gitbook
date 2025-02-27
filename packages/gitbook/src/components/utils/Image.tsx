@@ -258,7 +258,7 @@ async function getImageAttributes(params: {
     const { sizes, source, quality, resize } = params;
     let src = source.src;
 
-    const getURL = resize ? resize.resize(source.src) : null;
+    const getURL = resize ? resize.getResizedImageURL(source.src) : null;
 
     if (!getURL) {
         return {
