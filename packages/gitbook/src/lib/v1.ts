@@ -28,6 +28,7 @@ import {
     getSiteRedirectBySource,
     getSpace,
     getUserById,
+    searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
 import { getBasePath, getHost } from './links';
@@ -90,7 +91,6 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         // @ts-ignore - types are compatible enough, and this will not be called in v1 this way
         getPublishedContentByUrl(params) {
-            console.log('getPublishedContentByUrl', params);
             return getPublishedContentByUrl(
                 params.url,
                 params.visitorAuthToken ?? undefined,
@@ -152,6 +152,14 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getEmbedByUrl(params) {
             return getEmbedByUrlInSpace(params.spaceId, params.url);
+        },
+
+        async searchSiteContent(params) {
+            const { organizationId, siteId, query, cacheBust, ...scope } = params;
+
+            // @ts-ignore - no fully compatible, but fine enough
+            const result = await searchSiteContent(organizationId, siteId, query, scope, cacheBust);
+            return result.items;
         },
     };
 
