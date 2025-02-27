@@ -1,7 +1,12 @@
 import { fetchSiteContextByURL } from '@v2/lib/context';
 import { createDataFetcher } from '@v2/lib/data';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from '@v2/lib/env';
-import { createNoopImageResizer } from '@v2/lib/images';
+import {
+    GITBOOK_API_TOKEN,
+    GITBOOK_API_URL,
+    GITBOOK_IMAGE_RESIZE_URL,
+    GITBOOK_URL,
+} from '@v2/lib/env';
+import { createImageResizer, createNoopImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 import { headers } from 'next/headers';
 
@@ -26,7 +31,12 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
 
     const dataFetcher = createDataFetcher();
     const linker = createLinkerFromParams(params);
-    const imageResizer = createNoopImageResizer();
+    const imageResizer = GITBOOK_IMAGE_RESIZE_URL
+        ? createImageResizer({
+              host: url.host,
+              linker,
+          })
+        : createNoopImageResizer();
 
     return fetchSiteContextByURL(
         {
@@ -56,7 +66,12 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
     });
 
     const linker = createLinkerFromParams(params);
-    const imageResizer = createNoopImageResizer();
+    const imageResizer = GITBOOK_IMAGE_RESIZE_URL
+        ? createImageResizer({
+              host: url.host,
+              linker,
+          })
+        : createNoopImageResizer();
 
     return fetchSiteContextByURL(
         {
