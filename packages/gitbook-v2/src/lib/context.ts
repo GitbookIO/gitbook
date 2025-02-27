@@ -189,7 +189,9 @@ export async function fetchSiteContextByIds(
         ...(customizations.site?.title ? { title: customizations.site.title } : {}),
     };
 
-    const sections = ids.siteSection ? parseSiteSectionsList(siteStructure, ids.siteSection) : null;
+    const sections = ids.siteSection
+        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
+        : null;
 
     const siteSpace = (
         siteStructure.type === 'siteSpaces' && siteStructure.structure
@@ -283,9 +285,14 @@ export async function fetchSpaceContextByIds(
     };
 }
 
-function parseSiteSectionsList(structure: SiteStructure, siteSectionId: string) {
-    const sections = getSiteStructureSections(structure);
-    const section = sections.find((section) => section.id === siteSectionId);
+function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
+    const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
+    const section = parseCurrentSection(structure, siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');
-    return { list: sections, current: section } satisfies SiteSections;
+    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
+}
+
+function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
+    const sections = getSiteStructureSections(structure, { ignoreGroups: true });
+    return sections.find((section) => section.id === siteSectionId);
 }

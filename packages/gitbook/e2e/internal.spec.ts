@@ -221,6 +221,37 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'GitBook Site (Sections and Section Groups)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
+        tests: [
+            {
+                name: 'Site with sections and section groups',
+                url: '',
+            },
+            {
+                name: 'Section group dropdown',
+                url: '',
+                run: async (page) => {
+                    await page.getByRole('button', { name: 'Test Section Group 1' }).hover();
+                    await expect(page.getByRole('link', { name: /Section B/ })).toBeVisible();
+                },
+            },
+            {
+                name: 'Section group link',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    const sectionGroupDropdown = await page.getByText('Test Section Group 1');
+                    await sectionGroupDropdown.hover();
+                    await page.getByText('Section B').click();
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/sections/sections-4'
+                    );
+                },
+            },
+        ],
+    },
+    {
         name: 'GitBook',
         baseUrl: 'https://docs.gitbook.com',
         tests: [
