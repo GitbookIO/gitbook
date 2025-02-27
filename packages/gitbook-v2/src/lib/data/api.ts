@@ -514,24 +514,18 @@ async function getEmbedByUrl(
 
 async function searchSiteContent(
     input: DataFetcherInput,
-    params: Parameters<GitBookAPI['orgs']['searchSiteContent']>[2] & {
-        organizationId: string;
-        siteId: string;
-        /** Cache bust to ensure the search results are fresh when the space is updated. */
-        cacheBust?: string;
-    }
+    params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
 ) {
     'use cache';
 
-    const { organizationId, siteId, ...rest } = params;
+    const { organizationId, siteId, query, scope } = params;
 
     cacheLife('days');
 
-    const res = await getAPI(input).orgs.searchSiteContent(
-        params.organizationId,
-        params.siteId,
-        rest
-    );
+    const res = await getAPI(input).orgs.searchSiteContent(organizationId, siteId, {
+        query,
+        ...scope,
+    });
     return res.data.items;
 }
 
