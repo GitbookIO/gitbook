@@ -63,7 +63,10 @@ export async function CustomizationRootLayout(props: {
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && `sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
-                'links' in customization.styling && `links-${customization.styling.links}`
+                'links' in customization.styling && `links-${customization.styling.links}`,
+                fontNotoColorEmoji.variable,
+                fonts[customization.styling.font].variable,
+                ibmPlexMono.variable
             )}
         >
             <head>
@@ -115,9 +118,6 @@ export async function CustomizationRootLayout(props: {
             </head>
             <body
                 className={tcls(
-                    fontNotoColorEmoji.className,
-                    `${fonts[customization.styling.font].className}`,
-                    `${ibmPlexMono.variable}`,
                     'bg-tint-base',
                     'theme-muted:bg-tint-subtle',
                     'theme-bold-tint:bg-tint-subtle',
