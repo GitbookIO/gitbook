@@ -1,5 +1,12 @@
 # gitbook
 
+## 0.6.4
+
+### Patch Changes
+
+-   2ae76f9: Change how a site in proxy mode is resolved
+-   027a859: Add support for links style customization option
+
 ## 0.6.3
 
 ### Patch Changes
