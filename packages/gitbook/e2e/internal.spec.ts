@@ -221,6 +221,16 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'GitBook Site (Sections and Section Groups)',
+        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
+        tests: [
+            {
+                name: 'Site with sections and section groups',
+                url: ''
+            }
+        ]
+    },
+    {
         name: 'GitBook',
         baseUrl: 'https://docs.gitbook.com',
         tests: [
