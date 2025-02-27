@@ -3,8 +3,8 @@
     @apply flex gap-4;
 }
 
-/** If more than one stack is present, add a margin bottom */
-.contentkit-stack:not(:last-child) {
+/** Add margin bottom to all stacks that are not the last child and have a form */
+.contentkit-stack:not(:last-child):has(.contentkit-form) {
     @apply mb-4;
 }
 
