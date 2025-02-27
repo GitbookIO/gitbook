@@ -226,9 +226,9 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'Site with sections and section groups',
-                url: ''
-            }
-        ]
+                url: '',
+            },
+        ],
     },
     {
         name: 'GitBook',
