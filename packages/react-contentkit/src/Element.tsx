@@ -194,7 +194,7 @@ function Elements(props: {
 function ensureStackElements(
     type: 'hstack' | 'vstack',
     elements: ContentKitDescendantElement[],
-    align?: 'start' | 'center' | 'end',
+    align?: 'start' | 'center' | 'end'
 ): ContentKitDescendantElement[] {
     if (elements.length === 1) {
         return elements;

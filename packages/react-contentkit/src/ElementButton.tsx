@@ -12,7 +12,7 @@ export function ElementButton(
     props: ContentKitClientElementProps<ContentKitButton> & {
         icon: React.ReactNode | null;
         trailingIcon: React.ReactNode | null;
-    },
+    }
 ) {
     const { element, icon, trailingIcon } = props;
     const clientContext = useContentKitClientContext();
@@ -27,7 +27,7 @@ export function ElementButton(
             title={element.tooltip}
             className={classNames(
                 'contentkit-button',
-                `contentkit-button-style-${element.style ?? 'secondary'}`,
+                `contentkit-button-style-${element.style ?? 'secondary'}`
             )}
             onClick={(event) => {
                 if (element.disabled || loading) {

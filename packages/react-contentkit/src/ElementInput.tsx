@@ -1,5 +1,4 @@
-import React from 'react';
-import {
+import type {
     ContentKitButton,
     ContentKitCheckbox,
     ContentKitCodeBlock,
@@ -9,12 +8,12 @@ import {
     ContentKitSwitch,
     ContentKitTextInput,
 } from '@gitbook/api';
-import { ContentKitServerContext } from './types';
-import { ElementTextInput } from './ElementTextInput';
 import classNames from 'classnames';
 import { ElementButton } from './ElementButton';
 import { ElementCodeBlock } from './ElementCodeBlock';
 import { ElementIcon } from './ElementIcon';
+import { ElementTextInput } from './ElementTextInput';
+import type { ContentKitServerContext } from './types';
 
 export function ElementInput(props: {
     element: ContentKitInput;
