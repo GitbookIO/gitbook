@@ -1,6 +1,7 @@
 'use client';
 
 import type { ContentKitButton } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import classNames from 'classnames';
@@ -11,7 +12,7 @@ export function ElementButton(
     props: ContentKitClientElementProps<ContentKitButton> & {
         icon: React.ReactNode | null;
         trailingIcon: React.ReactNode | null;
-    }
+    },
 ) {
     const { element, icon, trailingIcon } = props;
     const clientContext = useContentKitClientContext();
@@ -19,8 +20,7 @@ export function ElementButton(
     const [loading, setLoading] = React.useState(false);
 
     // TODO:
-    // - loading
-    // - confirm
+    // - confirm dialog
 
     return (
         <button
@@ -28,7 +28,6 @@ export function ElementButton(
             className={classNames(
                 'contentkit-button',
                 `contentkit-button-style-${element.style ?? 'secondary'}`,
-                loading ? 'contentkit-button-loading' : null
             )}
             onClick={(event) => {
                 if (element.disabled || loading) {
@@ -43,11 +42,17 @@ export function ElementButton(
                 });
             }}
         >
-            {icon}
-            {element.label ? (
-                <span className="contentkit-button-label">{element.label}</span>
-            ) : null}
-            {trailingIcon}
+            {loading ? (
+                <Icon icon="spinner" className="contentkit-button-loading" />
+            ) : (
+                <>
+                    {icon}
+                    {element.label ? (
+                        <span className="contentkit-button-label">{element.label}</span>
+                    ) : null}
+                    {trailingIcon}
+                </>
+            )}
         </button>
     );
 }

@@ -180,7 +180,8 @@
       "name": "@gitbook/react-contentkit",
       "version": "0.6.0",
       "dependencies": {
-        "@gitbook/api": "0.96.1",
+        "@gitbook/api": "^0.96.1",
+        "@gitbook/icons": "workspace:*",
         "assert-never": "^1.2.1",
         "classnames": "^2.5.1",
       },
@@ -611,8 +612,6 @@
     "@gitbook/colors": ["@gitbook/colors@workspace:packages/colors"],
 
     "@gitbook/emoji-codepoints": ["@gitbook/emoji-codepoints@workspace:packages/emoji-codepoints"],
-
-    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.8", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.6.0" } }, "sha512-i4PgiuGyUb52Muhc52kK3aMJIMfMkA2RbPW30tre8a6M8T6mWTfYo6gafSgjNvF1vH29zcuB8oBYnF0gO4XcHA=="],
 
     "@gitbook/icons": ["@gitbook/icons@workspace:packages/icons"],
 
