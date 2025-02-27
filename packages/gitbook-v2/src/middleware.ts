@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
-import { removeTrailingSlash } from '@/lib/paths';
+import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { getPublishedContentByURL } from '@v2/lib/data';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
@@ -62,8 +62,10 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         dynamicHeaders ? 'dynamic' : 'static',
         mode,
         encodeURIComponent(url.host + data.basePath),
-        encodeURIComponent(removeTrailingSlash(data.pathname) || '/'),
+        encodePathInSiteContent(data.pathname),
     ].join('/');
+
+    console.log('route', route);
 
     const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
         headers: requestHeaders,
@@ -123,4 +125,19 @@ function getDynamicHeaders(_request: NextRequest): null | Record<string, string>
     // - check token in cookies
     // - check special headers or query string
     return null;
+}
+
+/**
+ * Encode path in a site content.
+ * Special paths are not encoded and passed to be handled by the route handlers.
+ */
+function encodePathInSiteContent(rawPathname: string) {
+    const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+    switch (pathname) {
+        case 'sitemap.xml':
+        case 'robots.txt':
+            return pathname;
+        default:
+            return encodeURIComponent(pathname || '/');
+    }
 }
