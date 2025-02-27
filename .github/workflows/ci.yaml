@@ -93,7 +93,6 @@ jobs:
             - name: Deploy ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
               id: deploy
               uses: ./.github/composite/deploy-vercel
-              if: startsWith(github.ref, 'refs/heads/main')
               with:
                   environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
                   vercel-org: ${{ secrets.VERCEL_ORG_ID }}
