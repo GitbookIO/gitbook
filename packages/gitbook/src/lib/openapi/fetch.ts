@@ -6,6 +6,7 @@ import type { GitBookAnyContext } from '@v2/lib/context';
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
 
 import { resolveContentRef } from '../references';
+import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
 
 const weakmap = new WeakMap<DocumentBlockOpenAPI, ResolveOpenAPIBlockResult>();
@@ -65,32 +66,18 @@ async function baseResolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOp
     }
 }
 
-const fetchFilesystem = cache({
+function fetchFilesystem(url: string) {
+    if (isV2()) {
+        return fetchFilesystemV2(url);
+    }
+
+    return fetchFilesystemV1(url);
+}
+
+const fetchFilesystemV1 = cache({
     name: 'openapi.fetch.v6',
     get: async (url: string, options: CacheFunctionOptions) => {
-        // Wrap the raw string to prevent invalid URLs from being passed to fetch.
-        // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
-        // https://github.com/cloudflare/workerd/issues/1957
-        const response = await fetch(new URL(url), {
-            ...noCacheFetchOptions,
-            signal: options.signal,
-        });
-
-        if (!response.ok) {
-            throw new Error(
-                `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`
-            );
-        }
-
-        const text = await response.text();
-        const filesystem = await parseOpenAPI({
-            value: text,
-            rootURL: url,
-            // If we fetch the OpenAPI specification
-            // it's the legacy system, it means the spec can be trusted here.
-            trust: true,
-        });
-        const richFilesystem = await enrichFilesystem(filesystem);
+        const richFilesystem = await fetchFilesystemUncached(url, options);
         return {
             // Cache for 4 hours
             ttl: 24 * 60 * 60,
@@ -100,3 +87,44 @@ const fetchFilesystem = cache({
         };
     },
 });
+
+async function fetchFilesystemV2(url: string) {
+    'use cache';
+
+    // TODO: add cache lifetime once we can use next.js 15 code here
+
+    const response = await fetchFilesystemUncached(url);
+
+    return response;
+}
+
+async function fetchFilesystemUncached(
+    url: string,
+    options?: {
+        signal?: AbortSignal;
+    }
+) {
+    // Wrap the raw string to prevent invalid URLs from being passed to fetch.
+    // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
+    // https://github.com/cloudflare/workerd/issues/1957
+    const response = await fetch(new URL(url), {
+        ...noCacheFetchOptions,
+        signal: options?.signal,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`);
+    }
+
+    const text = await response.text();
+    const filesystem = await parseOpenAPI({
+        value: text,
+        rootURL: url,
+        // If we fetch the OpenAPI specification
+        // it's the legacy system, it means the spec can be trusted here.
+        trust: true,
+    });
+    const richFilesystem = await enrichFilesystem(filesystem);
+
+    return richFilesystem;
+}
