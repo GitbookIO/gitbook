@@ -97,6 +97,7 @@ jobs:
                   environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
                   vercel-org: ${{ secrets.VERCEL_ORG_ID }}
                   vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
     deploy-v2-vercel-staging:
         name: Deploy v2 to Vercel (staging)
         runs-on: ubuntu-latest
@@ -120,6 +121,7 @@ jobs:
                   environment: staging
                   vercel-org: ${{ secrets.VERCEL_ORG_ID }}
                   vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker
         runs-on: ubuntu-latest
@@ -132,9 +134,6 @@ jobs:
             statuses: write
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
-        env:
-            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4

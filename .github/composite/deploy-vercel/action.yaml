@@ -7,6 +7,9 @@ inputs:
   vercel-project:
     description: 'Vercel project'
     required: true
+  vercel-token:
+    description: 'Vercel token'
+    required: true
   environment:
     description: 'Environment to deploy to'
     required: true
@@ -27,19 +30,19 @@ runs:
           run: |
               echo "VERCEL_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
         - name: Pull Vercel Environment Information
-          run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+          run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }}
           env:
             VERCEL_ORG_ID: ${{ inputs.vercel-org }}
             VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
         - name: Build Project Artifacts
-          run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+          run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }}
           env:
             VERCEL_ORG_ID: ${{ inputs.vercel-org }}
             VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           run: |
-              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }})
+              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }})
               echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           env:
             VERCEL_ORG_ID: ${{ inputs.vercel-org }}
