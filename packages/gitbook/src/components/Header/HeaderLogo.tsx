@@ -3,8 +3,8 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 import { Image } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';
 
-import { SpaceIcon } from '../Space/SpaceIcon';
 import { Link } from '../primitives';
+import { CurrentContentIcon } from './CurrentContentIcon';
 
 interface HeaderLogoProps {
     context: GitBookSiteContext;
@@ -70,20 +70,16 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 
 function LogoFallback(props: HeaderLogoProps) {
     const { context } = props;
-    const { customization, site } = context;
-    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : undefined;
-    const customEmoji = 'emoji' in customization.favicon ? customization.favicon.emoji : undefined;
+    const { site } = context;
 
     return (
         <>
-            <SpaceIcon
-                icon={customIcon}
-                emoji={customEmoji}
+            <CurrentContentIcon
+                context={context}
                 alt=""
                 sizes={[{ width: 32 }]}
                 style={['object-contain', 'size-8']}
                 fetchPriority="high"
-                resize={context.imageResizer}
             />
             <div
                 className={tcls(
