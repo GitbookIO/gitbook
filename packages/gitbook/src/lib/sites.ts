@@ -1,7 +1,8 @@
 import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
 
 /**
- * Get all sections from a site structure. If `includeGroups` is false, flat to not include SiteSectionGroups.
+ * Get all sections from a site structure.
+ * Set the `ignoreGroups` option to true to flatten the list to only include SiteSection and to not include SiteSectionGroups.
  */
 export function getSiteStructureSections(
     siteStructure: SiteStructure,
