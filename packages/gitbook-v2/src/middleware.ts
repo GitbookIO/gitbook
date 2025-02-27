@@ -49,8 +49,12 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
+    const routeType = dynamicHeaders ? 'dynamic' : 'static';
+
     const requestHeaders = new Headers(request.headers);
+    requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
+    requestHeaders.set(MiddlewareHeaders.SiteURL, `${url.origin}${data.basePath}`);
     if (dynamicHeaders) {
         for (const [key, value] of Object.entries(dynamicHeaders)) {
             requestHeaders.set(key, value);
@@ -59,7 +63,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     const route = [
         'sites',
-        dynamicHeaders ? 'dynamic' : 'static',
+        routeType,
         mode,
         encodeURIComponent(url.host + data.basePath),
         encodeURIComponent(removeTrailingSlash(data.pathname) || '/'),

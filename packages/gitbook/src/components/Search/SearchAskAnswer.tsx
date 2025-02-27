@@ -1,14 +1,13 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
+import { readStreamableValue } from 'ai/rsc';
 import React from 'react';
 
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import type { TranslationLanguage } from '@/intl/translations';
-import { iterateStreamResponse } from '@/lib/actions';
-import type { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { useTrackEvent } from '../Insights';
@@ -32,14 +31,13 @@ export type SearchAskState =
 /**
  * Fetch and render the answers to a question.
  */
-export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: string }) {
-    const { pointer, query } = props;
+export function SearchAskAnswer(props: { query: string }) {
+    const { query } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
     const [askState, setAskState] = useSearchAskContext();
-    const { organizationId, siteId, siteSpaceId } = pointer;
 
     React.useEffect(() => {
         let cancelled = false;
@@ -52,19 +50,19 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 query,
             });
 
-            const response = streamAskQuestion({ pointer, question: query });
-            const stream = iterateStreamResponse(response);
-
             // When we pass in "ask" mode, the query could still be updated by the client
             // we ensure that the query is up-to-date before starting the stream.
             setSearchState((prev) => (prev ? { ...prev, query, ask: true } : null));
 
-            for await (const chunk of stream) {
+            const { stream } = await streamAskQuestion({ question: query });
+            for await (const chunk of readStreamableValue(stream)) {
                 if (cancelled) {
                     return;
                 }
 
-                setAskState({ type: 'answer', answer: chunk });
+                if (chunk) {
+                    setAskState({ type: 'answer', answer: chunk });
+                }
             }
         })().catch(() => {
             if (cancelled) {
@@ -81,7 +79,7 @@ export function SearchAskAnswer(props: { pointer: SiteContentPointer; query: str
                 cancelled = true;
             }
         };
-    }, [organizationId, siteId, siteSpaceId, query, setAskState, setSearchState, trackEvent]);
+    }, [query, setAskState, setSearchState, trackEvent]);
 
     React.useEffect(() => {
         return () => {

@@ -11,6 +11,18 @@ export interface GitBookDataFetcher {
     apiEndpoint: string;
 
     /**
+     * Get an API client for the current context.
+     */
+    api(): Promise<api.GitBookAPI>;
+
+    /**
+     * Create a data fetcher authenticated with a specific token.
+     */
+    withToken(input: {
+        apiToken: string;
+    }): GitBookDataFetcher;
+
+    /**
      * Get a user by its ID.
      */
     getUserById(userId: string): Promise<api.User | null>;
@@ -126,4 +138,19 @@ export interface GitBookDataFetcher {
      * Get an embed by its URL.
      */
     getEmbedByUrl(params: { url: string; spaceId: string }): Promise<api.Embed>;
+
+    /**
+     * Search content in a site.
+     */
+    searchSiteContent(params: {
+        organizationId: string;
+        siteId: string;
+        query: string;
+        scope:
+            | { mode: 'all' }
+            | { mode: 'current'; siteSpaceId: string }
+            | { mode: 'specific'; siteSpaceIds: string[] };
+        /** Cache bust to ensure the search results are fresh when the space is updated. */
+        cacheBust?: string;
+    }): Promise<api.SearchSpaceResult[]>;
 }

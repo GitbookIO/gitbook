@@ -28,6 +28,7 @@ import {
     getSiteRedirectBySource,
     getSpace,
     getUserById,
+    searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
 import { getBasePath, getHost } from './links';
@@ -70,8 +71,19 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
 async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
     const apiClient = await api();
 
-    return {
+    const dataFetcher: GitBookDataFetcher = {
         apiEndpoint: apiClient.client.endpoint,
+
+        async api() {
+            const result = await api();
+            return result.client;
+        },
+
+        withToken() {
+            // In v1, the token is global and controlled by the middleware.
+            // We don't need to do anything special here.
+            return dataFetcher;
+        },
 
         getUserById(userId) {
             return getUserById(userId);
@@ -141,7 +153,15 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         getEmbedByUrl(params) {
             return getEmbedByUrlInSpace(params.spaceId, params.url);
         },
+
+        async searchSiteContent(params) {
+            const { organizationId, siteId, query, cacheBust, scope } = params;
+            const result = await searchSiteContent(organizationId, siteId, query, scope, cacheBust);
+            return result.items;
+        },
     };
+
+    return dataFetcher;
 }
 
 /**
