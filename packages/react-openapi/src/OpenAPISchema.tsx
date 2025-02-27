@@ -49,20 +49,13 @@ export function OpenAPISchemaProperty(
 
     if (alternatives?.[0]?.length) {
         return (
-            <InteractiveSection id={id} className={clsx('openapi-schema', className)}>
-                <OpenAPISchemaPresentation {...props} />
-                {alternatives[0].map((alternative, index) => (
-                    <OpenAPISchemaAlternative
-                        key={`alternative-${index}`}
-                        schema={alternative}
-                        circularRefs={circularRefs}
-                        context={context}
-                    />
-                ))}
-                {parentCircularRef ? (
-                    <OpenAPISchemaCircularRef id={parentCircularRef} schema={schema} />
-                ) : null}
-            </InteractiveSection>
+            <OpenAPISchemaAlternativesItem
+                {...props}
+                circularRefs={circularRefs}
+                context={context}
+                alternatives={alternatives}
+                parentCircularRef={parentCircularRef}
+            />
         );
     }
 
@@ -173,6 +166,25 @@ function OpenAPISchemaAlternative(props: {
     const id = useId();
     const subProperties = getSchemaProperties(schema);
     const description = resolveDescription(schema);
+    const alternatives = getSchemaAlternatives(schema, new Set(circularRefs?.keys()));
+
+    if (alternatives?.[0]?.length && !subProperties?.length) {
+        return (
+            <>
+                {description ? (
+                    <Markdown source={description} className="openapi-schema-description" />
+                ) : null}
+                <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
+                    <OpenAPISchemaAlternativesItem
+                        schema={schema}
+                        circularRefs={circularRefs}
+                        context={context}
+                        alternatives={alternatives}
+                    />
+                </OpenAPIDisclosure>
+            </>
+        );
+    }
 
     return (
         <>
@@ -190,6 +202,35 @@ function OpenAPISchemaAlternative(props: {
                 />
             </OpenAPIDisclosure>
         </>
+    );
+}
+
+function OpenAPISchemaAlternativesItem(
+    props: OpenAPISchemaPropertyEntry & {
+        circularRefs?: CircularRefsIds;
+        context: OpenAPIClientContext;
+        alternatives: OpenAPISchemaAlternatives;
+        parentCircularRef?: string;
+    }
+) {
+    const id = useId();
+    const { schema, circularRefs, context, alternatives, parentCircularRef } = props;
+
+    return (
+        <InteractiveSection id={id} className={clsx('openapi-schema')}>
+            <OpenAPISchemaPresentation {...props} />
+            {alternatives[0].map((alternative, index) => (
+                <OpenAPISchemaAlternative
+                    key={`alternative-${index}`}
+                    schema={alternative}
+                    circularRefs={circularRefs}
+                    context={context}
+                />
+            ))}
+            {parentCircularRef ? (
+                <OpenAPISchemaCircularRef id={parentCircularRef} schema={schema} />
+            ) : null}
+        </InteractiveSection>
     );
 }
 
@@ -336,13 +377,18 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
     return null;
 }
 
+type OpenAPISchemaAlternatives = [
+    OpenAPIV3.SchemaObject[],
+    OpenAPIV3.DiscriminatorObject | undefined,
+];
+
 /**
  * Get the alternatives to display for a schema.
  */
 export function getSchemaAlternatives(
     schema: OpenAPIV3.SchemaObject,
     ancestors: Set<OpenAPIV3.SchemaObject> = new Set()
-): null | [OpenAPIV3.SchemaObject[], OpenAPIV3.DiscriminatorObject | undefined] {
+): null | OpenAPISchemaAlternatives {
     const downAncestors = new Set(ancestors).add(schema);
 
     if (schema.anyOf) {
@@ -408,7 +454,9 @@ export function getSchemaTitle(
         if (schema.format) {
             type += ` · ${schema.format}`;
         }
-    } else if ('anyOf' in schema) {
+    }
+
+    if ('anyOf' in schema) {
         type = 'any of';
     } else if ('oneOf' in schema) {
         type = 'one of';
