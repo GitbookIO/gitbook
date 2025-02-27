@@ -1,13 +1,13 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
+import { readStreamableValue } from 'ai/rsc';
 import React from 'react';
 
 import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import type { TranslationLanguage } from '@/intl/translations';
-import { iterateStreamResponse } from '@/lib/actions';
 import { tcls } from '@/lib/tailwind';
 
 import { useTrackEvent } from '../Insights';
@@ -50,19 +50,19 @@ export function SearchAskAnswer(props: { query: string }) {
                 query,
             });
 
-            const response = streamAskQuestion({ question: query });
-            const stream = iterateStreamResponse(response);
-
             // When we pass in "ask" mode, the query could still be updated by the client
             // we ensure that the query is up-to-date before starting the stream.
             setSearchState((prev) => (prev ? { ...prev, query, ask: true } : null));
 
-            for await (const chunk of stream) {
+            const { stream } = await streamAskQuestion({ question: query });
+            for await (const chunk of readStreamableValue(stream)) {
                 if (cancelled) {
                     return;
                 }
 
-                setAskState({ type: 'answer', answer: chunk });
+                if (chunk) {
+                    setAskState({ type: 'answer', answer: chunk });
+                }
             }
         })().catch(() => {
             if (cancelled) {

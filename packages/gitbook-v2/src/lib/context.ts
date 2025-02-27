@@ -174,8 +174,7 @@ export async function fetchSiteContextByURL(
     const context = await fetchSiteContextByIds(
         {
             ...baseContext,
-            dataFetcher: createDataFetcher({
-                apiEndpoint: dataFetcher.apiEndpoint,
+            dataFetcher: dataFetcher.withToken({
                 apiToken: data.apiToken,
             }),
         },

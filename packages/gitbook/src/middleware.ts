@@ -83,6 +83,8 @@ export type LookupResult = PublishedContentWithCache & {
     cookies?: LookupCookies;
     /** Visitor authentication token */
     visitorToken?: string;
+    /** URL of the site */
+    siteURL?: string;
 };
 
 /**
@@ -200,7 +202,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // Compatibility with v2
-    headers.set(MiddlewareHeaders.SiteURL, `${inputURL.origin}${resolved.basePath}`);
+    if (resolved.siteURL) {
+        headers.set(MiddlewareHeaders.SiteURL, resolved.siteURL);
+    }
 
     // For tests, we make it possible to enable search indexation
     // using a query parameter.
@@ -766,14 +770,23 @@ async function lookupSiteByAPI(
         return null;
     });
 
-    return (
-        result ?? {
-            error: {
-                code: 404,
-                message: 'No content found',
-            },
+    if (result) {
+        if ('site' in result) {
+            return {
+                ...result,
+                siteURL: `${lookupURL.origin}${result.basePath}`,
+            };
         }
-    );
+
+        return result;
+    }
+
+    return {
+        error: {
+            code: 404,
+            message: 'No content found',
+        },
+    };
 }
 
 /**

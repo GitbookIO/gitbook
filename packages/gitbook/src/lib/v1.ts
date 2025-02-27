@@ -70,12 +70,18 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
 async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
     const apiClient = await api();
 
-    return {
+    const dataFetcher: GitBookDataFetcher = {
         apiEndpoint: apiClient.client.endpoint,
 
         async api() {
             const result = await api();
             return result.client;
+        },
+
+        withToken() {
+            // In v1, the token is global and controlled by the middleware.
+            // We don't need to do anything special here.
+            return dataFetcher;
         },
 
         getUserById(userId) {
@@ -84,6 +90,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         // @ts-ignore - types are compatible enough, and this will not be called in v1 this way
         getPublishedContentByUrl(params) {
+            console.log('getPublishedContentByUrl', params);
             return getPublishedContentByUrl(
                 params.url,
                 params.visitorAuthToken ?? undefined,
@@ -147,6 +154,8 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             return getEmbedByUrlInSpace(params.spaceId, params.url);
         },
     };
+
+    return dataFetcher;
 }
 
 /**

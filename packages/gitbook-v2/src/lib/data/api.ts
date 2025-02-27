@@ -39,6 +39,13 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
             return getAPI(input);
         },
 
+        withToken({ apiToken }) {
+            return createDataFetcher({
+                ...input,
+                apiToken,
+            });
+        },
+
         //
         // API that are tied to the token
         //

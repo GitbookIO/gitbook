@@ -13,7 +13,6 @@ import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/li
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
-import { streamResponse } from '@/lib/actions';
 import { getAbsoluteHref } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { findSiteSpaceById } from '@/lib/sites';
@@ -93,77 +92,93 @@ export async function searchSiteSpaceContent(query: string): Promise<OrderedComp
 /**
  * Server action to ask a question in a space.
  */
-export const streamAskQuestion = streamResponse(async function* ({
+export async function streamAskQuestion({
     question,
 }: {
     question: string;
 }) {
-    const context = await fetchServerActionSiteContext(
-        isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
-    );
+    const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
-    const apiClient = await context.dataFetcher.api();
+    (async () => {
+        const context = await fetchServerActionSiteContext(
+            isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
+        );
 
-    const stream = apiClient.orgs.streamAskInSite(
-        context.organizationId,
-        context.site.id,
-        {
-            question,
-            context: {
-                siteSpaceId: context.siteSpace.id,
+        const apiClient = await context.dataFetcher.api();
+
+        const stream = apiClient.orgs.streamAskInSite(
+            context.organizationId,
+            context.site.id,
+            {
+                question,
+                context: {
+                    siteSpaceId: context.siteSpace.id,
+                },
+                scope: {
+                    mode: 'default',
+                    // Include the current site space regardless.
+                    includedSiteSpaces: [context.siteSpace.id],
+                },
             },
-            scope: {
-                mode: 'default',
-                // Include the current site space regardless.
-                includedSiteSpaces: [context.siteSpace.id],
-            },
-        },
-        { format: 'document' }
-    );
+            { format: 'document' }
+        );
 
-    const spacePromises = new Map<string, Promise<RevisionPage[]>>();
-    for await (const chunk of stream) {
-        const answer = chunk.answer;
+        const spacePromises = new Map<string, Promise<RevisionPage[]>>();
+        for await (const chunk of stream) {
+            const answer = chunk.answer;
 
-        // Register the space of each page source into the promise queue.
-        const spaces = answer.sources
-            .map((source) => {
-                if (source.type !== 'page') {
-                    return null;
-                }
+            // Register the space of each page source into the promise queue.
+            const spaces = answer.sources
+                .map((source) => {
+                    if (source.type !== 'page') {
+                        return null;
+                    }
 
-                if (!spacePromises.has(source.space)) {
-                    spacePromises.set(
-                        source.space,
-                        context.dataFetcher.getRevisionPages({
-                            spaceId: source.space,
-                            revisionId: source.revision,
-                            metadata: false,
-                        })
-                    );
-                }
+                    if (!spacePromises.has(source.space)) {
+                        spacePromises.set(
+                            source.space,
+                            context.dataFetcher.getRevisionPages({
+                                spaceId: source.space,
+                                revisionId: source.revision,
+                                metadata: false,
+                            })
+                        );
+                    }
 
-                return source.space;
-            })
-            .filter(filterOutNullable);
+                    return source.space;
+                })
+                .filter(filterOutNullable);
 
-        // Get the pages for all spaces referenced by this answer.
-        const pages = await Promise.all(
-            spaces.map(async (space) => {
-                const pages = await spacePromises.get(space);
-                return { space, pages };
-            })
-        ).then((results) => {
-            return results.reduce((map, result) => {
-                if (result.pages) {
-                    map.set(result.space, result.pages);
-                }
-                return map;
-            }, new Map<string, RevisionPage[]>());
+            // Get the pages for all spaces referenced by this answer.
+            const pages = await Promise.all(
+                spaces.map(async (space) => {
+                    const pages = await spacePromises.get(space);
+                    return { space, pages };
+                })
+            ).then((results) => {
+                return results.reduce((map, result) => {
+                    if (result.pages) {
+                        map.set(result.space, result.pages);
+                    }
+                    return map;
+                }, new Map<string, RevisionPage[]>());
+            });
+            responseStream.update(
+                await transformAnswer(context, { answer: chunk.answer, spacePages: pages })
+            );
+        }
+    })()
+        .then(() => {
+            responseStream.done();
+        })
+        .catch((error) => {
+            responseStream.error(error);
         });
-        yield await transformAnswer(context, { answer: chunk.answer, spacePages: pages });
-    }
-});
+
+    return {
+        stream: responseStream.value,
+    };
+}
 
 /**
  * Stream a list of suggested questions for the site.
@@ -173,7 +188,7 @@ export async function streamRecommendedQuestions() {
         isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
     );
 
-    const stream = createStreamableValue<SearchAIRecommendedQuestionStream | undefined>();
+    const responseStream = createStreamableValue<SearchAIRecommendedQuestionStream | undefined>();
 
     (async () => {
         const apiClient = await context.dataFetcher.api();
@@ -183,20 +198,17 @@ export async function streamRecommendedQuestions() {
         );
 
         for await (const chunk of apiStream) {
-            console.log('chunk', chunk);
-            stream.update(chunk);
+            responseStream.update(chunk);
         }
     })()
         .then(() => {
-            console.log('done');
-            stream.done();
+            responseStream.done();
         })
         .catch((error) => {
-            console.log('error', error);
-            stream.error(error);
+            responseStream.error(error);
         });
 
-    return { stream: stream.value };
+    return { stream: responseStream.value };
 }
 
 /**

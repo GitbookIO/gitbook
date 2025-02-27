@@ -16,6 +16,13 @@ export interface GitBookDataFetcher {
     api(): Promise<api.GitBookAPI>;
 
     /**
+     * Create a data fetcher authenticated with a specific token.
+     */
+    withToken(input: {
+        apiToken: string;
+    }): GitBookDataFetcher;
+
+    /**
      * Get a user by its ID.
      */
     getUserById(userId: string): Promise<api.User | null>;
