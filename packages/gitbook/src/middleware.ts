@@ -30,6 +30,7 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
+import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { joinPath } from './lib/paths';
 
 export const config = {
@@ -198,6 +199,9 @@ export async function middleware(request: NextRequest) {
         }
     }
 
+    // Compatibility with v2
+    headers.set(MiddlewareHeaders.SiteURL, `${inputURL.origin}${resolved.basePath}`);
+
     // For tests, we make it possible to enable search indexation
     // using a query parameter.
     const xGitBookSearchIndexation =
@@ -229,7 +233,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (resolved.visitorToken) {
-        headers.set('x-gitbook-visitor-token', resolved.visitorToken);
+        headers.set(MiddlewareHeaders.VisitorToken, resolved.visitorToken);
     }
 
     const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());

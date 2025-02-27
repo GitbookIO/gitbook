@@ -15,8 +15,9 @@ import type {
 import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
-import type { ImageResizer } from './images';
-import { type GitBookSpaceLinker, appendPrefixToLinker } from './links';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
+import { type ImageResizer, createNoopImageResizer } from './images';
+import { type GitBookSpaceLinker, appendPrefixToLinker, createLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -101,6 +102,52 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
     page: RevisionPageDocument;
 };
+
+/**
+ * Get the base context for a request.
+ */
+export function getBaseContext(input: {
+    siteURL: URL | string;
+    urlMode: 'url' | 'url-host';
+    apiToken?: string | null;
+    apiEndpoint?: string;
+}) {
+    const url = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
+    const urlMode = input.urlMode;
+
+    const dataFetcher = createDataFetcher({
+        apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
+        apiEndpoint: input.apiEndpoint ?? GITBOOK_API_URL,
+    });
+    const imageResizer = createNoopImageResizer();
+    const gitbookURL = new URL(GITBOOK_URL);
+
+    const linker =
+        urlMode === 'url-host'
+            ? createLinker({
+                  host: url.host,
+                  pathname: '/',
+              })
+            : createLinker({
+                  protocol: gitbookURL.protocol,
+                  host: gitbookURL.host,
+                  pathname: `/url/${url.host}`,
+              });
+
+    if (urlMode === 'url') {
+        // Create link in the same format for links to other sites/sections.
+        linker.toLinkForContent = (rawURL: string) => {
+            const urlObject = new URL(rawURL);
+            return `/url/${urlObject.host}${urlObject.pathname}`;
+        };
+    }
+
+    return {
+        dataFetcher,
+        imageResizer,
+        linker,
+    };
+}
 
 /**
  * Fetch the context of a site for a given URL and a base context.

@@ -22,11 +22,14 @@ export function streamResponse<T, P extends any[]>(
  * Iterate over the response of an async generator function.
  */
 export function iterateStreamResponse<T>(streamResponse: Promise<StreamResponseChunk<T>>) {
+    console.log('iterateStreamResponse initial', streamResponse);
     return {
         [Symbol.asyncIterator]: () => ({
             current: streamResponse,
             async next() {
-                const { iteratorResult, next } = await this.current;
+                const value = await this.current;
+                console.log('iterateStreamResponse next', value);
+                const { iteratorResult, next } = value;
 
                 if (next) this.current = next;
                 else iteratorResult.done = true;

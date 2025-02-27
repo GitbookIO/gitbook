@@ -35,6 +35,10 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
     return {
         apiEndpoint: input.apiEndpoint,
 
+        async api() {
+            return getAPI(input);
+        },
+
         //
         // API that are tied to the token
         //
@@ -123,6 +127,9 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 url: params.url,
                 spaceId: params.spaceId,
             });
+        },
+        searchSiteContent(params) {
+            return searchSiteContent(input, params);
         },
 
         //
@@ -496,6 +503,29 @@ async function getEmbedByUrl(
     const api = getAPI(input);
     const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
     return res.data;
+}
+
+async function searchSiteContent(
+    input: DataFetcherInput,
+    params: Parameters<GitBookAPI['orgs']['searchSiteContent']>[2] & {
+        organizationId: string;
+        siteId: string;
+        /** Cache bust to ensure the search results are fresh when the space is updated. */
+        cacheBust?: string;
+    }
+) {
+    'use cache';
+
+    const { organizationId, siteId, ...rest } = params;
+
+    cacheLife('days');
+
+    const res = await getAPI(input).orgs.searchSiteContent(
+        params.organizationId,
+        params.siteId,
+        rest
+    );
+    return res.data.items;
 }
 
 function getAPI(input: DataFetcherInput) {

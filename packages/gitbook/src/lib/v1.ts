@@ -73,6 +73,11 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
     return {
         apiEndpoint: apiClient.client.endpoint,
 
+        async api() {
+            const result = await api();
+            return result.client;
+        },
+
         getUserById(userId) {
             return getUserById(userId);
         },

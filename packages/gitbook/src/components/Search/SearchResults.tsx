@@ -1,12 +1,11 @@
 'use client';
 
 import { captureException } from '@sentry/nextjs';
+import { readStreamableValue } from 'ai/rsc';
 import assertNever from 'assert-never';
 import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
-import { iterateStreamResponse } from '@/lib/actions';
-import type { SiteContentPointer } from '@/lib/api';
 import { tcls } from '@/lib/tailwind';
 
 import { useTrackEvent } from '../Insights';
@@ -48,15 +47,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         children?: React.ReactNode;
         query: string;
-        revisionId: string;
         global: boolean;
         withAsk: boolean;
-        pointer: SiteContentPointer;
         onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, pointer, revisionId, withAsk, global, onSwitchToAsk } = props;
+    const { children, query, withAsk, global, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -93,10 +90,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     return;
                 }
 
-                const response = streamRecommendedQuestions(pointer.organizationId, pointer.siteId);
-                const stream = iterateStreamResponse(response);
+                const { stream } = await streamRecommendedQuestions();
+                for await (const entry of readStreamableValue(stream)) {
+                    if (!entry) {
+                        continue;
+                    }
 
-                for await (const { question } of stream) {
+                    const { question } = entry;
                     if (questions.has(question)) {
                         continue;
                     }
@@ -124,8 +124,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
         let cancelled = false;
         const timeout = setTimeout(async () => {
             const results = await (global
-                ? searchAllSiteContent(query, pointer)
-                : searchSiteSpaceContent(query, pointer, revisionId));
+                ? searchAllSiteContent(query)
+                : searchSiteSpaceContent(query));
 
             if (cancelled) {
                 return;
@@ -154,7 +154,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, global, pointer, revisionId, withAsk, trackEvent]);
+    }, [query, global, withAsk, trackEvent]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAsk) {
