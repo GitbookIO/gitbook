@@ -16,9 +16,6 @@ outputs:
       value: ${{ steps.deploy.outputs.deployment-url }}
 runs:
     using: 'composite'
-    env:
-      VERCEL_ORG_ID: ${{ inputs.vercel-org }}
-      VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
     steps:
         - name: Setup Bun
           uses: ./.github/composite/setup-bun
@@ -31,13 +28,22 @@ runs:
               echo "VERCEL_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
         - name: Pull Vercel Environment Information
           run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
         - name: Build Project Artifacts
           run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }}
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           run: |
               DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ secrets.VERCEL_TOKEN }})
               echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
         - name: Outputs
           run: |
               echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
