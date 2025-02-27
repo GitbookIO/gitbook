@@ -4,7 +4,7 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 /**
  * Generate a robots.txt for a site.
  */
-export async function serveRobotsTxt(context: GitBookSiteContext, _req: Request) {
+export async function serveRobotsTxt(context: GitBookSiteContext) {
     const { linker } = context;
 
     const lines = [

@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-import { serveRobotsTxt } from '@/routes/robots';
+import { servePagesSitemap } from '@/routes/sitemap';
 import { type RouteLayoutParams, getStaticSiteContext } from '@v2/app/utils';
 
 export const dynamic = 'force-static';
@@ -10,5 +10,5 @@ export async function GET(
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const context = await getStaticSiteContext(await params);
-    return serveRobotsTxt(context);
+    return servePagesSitemap(context);
 }

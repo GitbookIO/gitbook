@@ -3,6 +3,7 @@ import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
 
 import { joinPath } from '@/lib/paths';
+import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
@@ -10,7 +11,7 @@ import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context
 /**
  * Generate a root sitemap that point to all sitemap-pages.xml.
  */
-export async function serveRootSitemap(context: GitBookSiteContext) {
+export function serveRootSitemap(context: GitBookSiteContext) {
     if (!checkIsRootSiteContext(context)) {
         return new Response('Root sitemap is only served from the root of the site', {
             status: 404,
@@ -27,6 +28,60 @@ export async function serveRootSitemap(context: GitBookSiteContext) {
                     name: 'sitemap',
                     children: [{ name: 'loc', text: url }],
                 })),
+                attrs: {
+                    xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9',
+                },
+            },
+        ],
+        {
+            xmlHeader: true,
+            prettyPrint: true,
+        }
+    );
+
+    return new Response(xml, {
+        headers: {
+            'Content-Type': 'application/xml',
+        },
+    });
+}
+
+/**
+ * Generate a sitemap.xml for the pages of the content.
+ */
+export function servePagesSitemap(context: GitBookSiteContext) {
+    const { linker } = context;
+    const pages = getIndexablePages(context.pages);
+
+    const urls = pages.map(({ page, depth }) => {
+        // Decay priority with depth
+        const priority = 2 ** (-0.25 * depth);
+        // Normalize to keep 2 decimals
+        const normalizedPriority = Math.floor(100 * priority) / 100;
+        const lastModified = page.updatedAt || page.createdAt;
+
+        const url: { loc: string; priority: number; lastmod?: string } = {
+            priority: normalizedPriority,
+            loc: linker.toAbsoluteURL(
+                linker.toPathForPage({
+                    pages: context.pages,
+                    page,
+                })
+            ),
+        };
+
+        if (lastModified) {
+            url.lastmod = new Date(lastModified).toISOString();
+        }
+
+        return { url };
+    });
+
+    const xml = jsontoxml(
+        [
+            {
+                name: 'urlset',
+                children: urls,
                 attrs: {
                     xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9',
                 },

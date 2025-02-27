@@ -1,12 +1,12 @@
 import type { NextRequest } from 'next/server';
 
-import { serveRobotsTxt } from '@/routes/robots';
+import { serveRootSitemap } from '@/routes/sitemap';
 import { type RouteLayoutParams, getDynamicSiteContext } from '@v2/app/utils';
 
 export async function GET(
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const context = await getDynamicSiteContext(await params);
-    return serveRobotsTxt(context, request);
+    return serveRootSitemap(context);
 }
