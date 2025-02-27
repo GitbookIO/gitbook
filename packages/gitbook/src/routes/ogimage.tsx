@@ -1,20 +1,37 @@
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationFont, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { type PageParams, fetchPageData } from '@/components/SitePage';
-import { googleFontsMap } from '@/fonts';
-import { getAbsoluteHref } from '@/lib/links';
+import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
+
+const googleFontsMap: { [fontName in CustomizationFont]: string } = {
+    [CustomizationFont.Inter]: 'Inter',
+    [CustomizationFont.FiraSans]: 'Fira Sans Extra Condensed',
+    [CustomizationFont.IBMPlexSerif]: 'IBM Plex Serif',
+    [CustomizationFont.Lato]: 'Lato',
+    [CustomizationFont.Merriweather]: 'Merriweather',
+    [CustomizationFont.NotoSans]: 'Noto Sans',
+    [CustomizationFont.OpenSans]: 'Open Sans',
+    [CustomizationFont.Overpass]: 'Overpass',
+    [CustomizationFont.Poppins]: 'Poppins',
+    [CustomizationFont.Raleway]: 'Raleway',
+    [CustomizationFont.Roboto]: 'Roboto',
+    [CustomizationFont.RobotoSlab]: 'Roboto Slab',
+    [CustomizationFont.SourceSansPro]: 'Source Sans 3',
+    [CustomizationFont.Ubuntu]: 'Ubuntu',
+    [CustomizationFont.ABCFavorit]: 'Inter',
+};
 
 /**
  * Render the OpenGraph image for a site content.
  */
 export async function serveOGImage(baseContext: GitBookSiteContext, params: PageParams) {
     const { context, pageTarget } = await fetchPageData(baseContext, params);
-    const { customization, site } = context;
+    const { customization, site, linker } = context;
     const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
@@ -61,10 +78,8 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
 
-    const [gridWhite, gridBlack] = await Promise.all([
-        getAbsoluteHref('~gitbook/static/images/ogimage-grid-white.png', true),
-        getAbsoluteHref('~gitbook/static/images/ogimage-grid-black.png', true),
-    ]);
+    const gridWhite = getAssetURL('images/ogimage-grid-white.png');
+    const gridBlack = getAssetURL('images/ogimage-grid-black.png');
 
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
@@ -119,9 +134,8 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
                 </span>
             );
-        const src = await getAbsoluteHref(
-            `~gitbook/icon?size=medium&theme=${customization.themes.default}`,
-            true
+        const src = linker.toAbsoluteURL(
+            linker.toPathInSpace(`~gitbook/icon?size=medium&theme=${customization.themes.default}`)
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();

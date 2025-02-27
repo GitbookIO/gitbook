@@ -9,6 +9,14 @@ export const GITBOOK_URL =
           '');
 
 /**
+ * URL at which static assets are served.
+ */
+export const GITBOOK_ASSETS_URL =
+    process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : (process.env.GITBOOK_ASSETS_PREFIX ?? GITBOOK_URL);
+
+/**
  * GitBook app URL.
  */
 export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? 'https://app.gitbook.com';

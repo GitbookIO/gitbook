@@ -9,11 +9,11 @@ import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
-import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
 import { getAbsoluteHref, getBaseUrl } from '@/lib/links';
 import { isSiteIndexable } from '@/lib/seo';
 
+import { GITBOOK_API_URL, GITBOOK_ASSETS_URL } from '@v2/lib/env';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
@@ -31,9 +31,9 @@ export async function SiteLayout(props: {
 
     const { scripts, customization } = context;
 
-    ReactDOM.preconnect(context.dataFetcher.apiEndpoint);
-    if (assetsDomain) {
-        ReactDOM.preconnect(assetsDomain);
+    ReactDOM.preconnect(GITBOOK_API_URL);
+    if (GITBOOK_ASSETS_URL) {
+        ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
     scripts.forEach(({ script }) => {

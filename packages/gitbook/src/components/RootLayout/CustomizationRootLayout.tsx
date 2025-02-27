@@ -24,7 +24,7 @@ import { IconStyle, IconsProvider } from '@gitbook/icons';
 
 import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
-import { getStaticFileURL } from '@/lib/assets';
+import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
 import { ClientContexts } from './ClientContexts';
@@ -127,11 +127,11 @@ export async function CustomizationRootLayout(props: {
                 )}
             >
                 <IconsProvider
-                    assetsURL={process.env.GITBOOK_ICONS_URL ?? getStaticFileURL('icons')}
+                    assetsURL={process.env.GITBOOK_ICONS_URL ?? getAssetURL('icons')}
                     assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
                     assetsByStyles={{
                         'custom-icons': {
-                            assetsURL: getStaticFileURL('icons'),
+                            assetsURL: getAssetURL('icons'),
                         },
                     }}
                     iconStyle={

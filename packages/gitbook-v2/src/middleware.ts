@@ -133,7 +133,14 @@ function getDynamicHeaders(_request: NextRequest): null | Record<string, string>
  */
 function encodePathInSiteContent(rawPathname: string) {
     const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+
+    if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
+        return pathname;
+    }
+
     switch (pathname) {
+        case '~gitbook/icon':
+        case 'llms.txt':
         case 'sitemap.xml':
         case 'robots.txt':
             return pathname;
