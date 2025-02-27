@@ -88,6 +88,8 @@ jobs:
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Deploy production
               id: deploy
               uses: ./.github/composite/deploy-vercel
@@ -109,6 +111,8 @@ jobs:
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Deploy staging
               id: deploy
               uses: ./.github/composite/deploy-vercel
