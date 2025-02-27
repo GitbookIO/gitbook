@@ -228,6 +228,18 @@ const testCases: TestsCase[] = [
                 name: 'Site with sections and section groups',
                 url: '',
             },
+            {
+                name: 'Section group dropdown',
+                url: '',
+                run: async (page) => {
+                    const sectionGroupDropdown = await page.getByText('Test Section Group 1');
+                    await sectionGroupDropdown.hover();
+                    await page.getByText('Section B').click();
+                    await page.waitForURL(
+                        'https://gitbook-open-e2e-sites.gitbook.io/sections/sections-4'
+                    );
+                }
+            }
         ],
     },
     {
