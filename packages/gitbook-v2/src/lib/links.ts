@@ -3,15 +3,24 @@ import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@git
 
 /**
  * Generic interface to generate links based on a given context.
+ *
+ * URL levels:
+ *
+ * https://docs.company.com/section/variant/page
+ *
+ * toPathInContent('some/path') => /section/variant/some/path
+ * toPathForPage({ pages, page }) => /section/variant/some/path
+ * toAbsoluteURL('some/path') => https://docs.company.com/some/path
  */
 export interface GitBookSpaceLinker {
     /**
-     * Generate an absolute path for a relative path in the current space content.
+     * Generate an absolute path for a relative path to the current content.
      */
-    toPathInSpace(relativePath: string): string;
+    toPathInContent(relativePath: string): string;
 
     /**
-     * Generate an absolute path for a page in the current space.
+     * Generate an absolute path for a page in the current content.
+     * The result should NOT be passed to `toPathInContent`.
      */
     toPathForPage(input: {
         pages: RevisionPage[];
@@ -20,7 +29,7 @@ export interface GitBookSpaceLinker {
     }): string;
 
     /**
-     * Generate an absolute URL for a given path.
+     * Generate an absolute URL for a given path relative to the host of the current content.
      */
     toAbsoluteURL(absolutePath: string): string;
 
@@ -46,7 +55,7 @@ export function createLinker(
     }
 
     const linker: GitBookSpaceLinker = {
-        toPathInSpace(relativePath: string): string {
+        toPathInContent(relativePath: string): string {
             return joinPaths(servedOn.pathname, relativePath);
         },
 
@@ -55,7 +64,7 @@ export function createLinker(
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+            return linker.toPathInContent(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
 
         toLinkForContent(url: string): string {
@@ -69,22 +78,22 @@ export function createLinker(
 /**
  * Append a prefix to a linker.
  */
-export function appendPrefixToLinker(
+export function appendBasePathToLinker(
     linker: GitBookSpaceLinker,
-    prefix: string
+    basePath: string
 ): GitBookSpaceLinker {
     const linkerWithPrefix: GitBookSpaceLinker = {
-        toPathInSpace(relativePath: string): string {
-            return linker.toPathInSpace(joinPaths(prefix, relativePath));
+        toPathInContent(relativePath: string): string {
+            return linker.toPathInContent(joinPaths(basePath, relativePath));
         },
 
         toAbsoluteURL(absolutePath: string): string {
-            return linker.toAbsoluteURL(joinPaths(prefix, absolutePath));
+            return linker.toAbsoluteURL(joinPaths(basePath, absolutePath));
         },
 
         toPathForPage({ pages, page, anchor }) {
             return (
-                linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) +
+                linkerWithPrefix.toPathInContent(getPagePath(pages, page)) +
                 (anchor ? `#${anchor}` : '')
             );
         },

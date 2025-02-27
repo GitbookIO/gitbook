@@ -16,7 +16,7 @@ import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import type { ImageResizer } from './images';
-import { type GitBookSpaceLinker, appendPrefixToLinker } from './links';
+import { type GitBookSpaceLinker, appendBasePathToLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -147,7 +147,7 @@ export async function fetchSiteContextByURL(
 
     const siteContext = {
         ...context,
-        linker: appendPrefixToLinker(context.linker, data.basePath),
+        linker: appendBasePathToLinker(context.linker, data.basePath),
     };
 
     return siteContext;

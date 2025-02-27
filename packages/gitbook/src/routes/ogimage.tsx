@@ -135,7 +135,9 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 </span>
             );
         const src = linker.toAbsoluteURL(
-            linker.toPathInSpace(`~gitbook/icon?size=medium&theme=${customization.themes.default}`)
+            linker.toPathInContent(
+                `~gitbook/icon?size=medium&theme=${customization.themes.default}`
+            )
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();
