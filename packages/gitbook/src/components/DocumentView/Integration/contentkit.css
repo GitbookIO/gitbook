@@ -3,8 +3,13 @@
     @apply flex gap-4;
 }
 
+/** Add margin bottom to all stacks that are not the last child and have a form */
+.contentkit-stack:not(:last-child):has(.contentkit-form) {
+    @apply mb-4;
+}
+
 .contentkit-hstack {
-    @apply flex-row gap-4 items-center;
+    @apply flex-row gap-3 items-center;
 }
 .contentkit-hstack.contentkit-stack-align-center {
     @apply justify-center;
@@ -88,17 +93,23 @@
 
 /** Buttons */
 .contentkit-button {
-    @apply flex gap-2 items-center justify-center px-2 py-1 rounded
-        border border-tint hover:border-tint-hover
-        text-tint hover:text-tint-strong;
+    @apply text-sm px-3 h-8 text-center inline-block py-1.5 rounded-md straight-corners:rounded-none place-self-start ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-105 active:scale-100 transition-all grow-0 shrink-0 truncate w-full;
+}
+
+.contentkit-button-style-primary {
+    @apply bg-primary-solid text-contrast-primary-solid hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover ring-0 contrast-more:ring-1;
+}
+
+.contentkit-button-style-secondary {
+    @apply bg-tint text-tint hover:bg-tint-hover hover:text-primary contrast-more:bg-tint-subtle;
 }
 
 .contentkit-button .contentkit-icon {
     @apply w-4 h-4;
 }
 
-.contentkit-button .contentkit-button-label {
-    @apply text-sm font-medium text-tint-strong;
+.contentkit-button-loading {
+    @apply size-5 flex mx-auto animate-spin;
 }
 
 /** Modals */
@@ -143,7 +154,21 @@
 
 /** Text input */
 .contentkit-textinput {
-    @apply w-full px-2 py-1 rounded border border-tint text-sm text-tint;
+    @apply w-full rounded border border-tint text-tint-strong placeholder:text-tint flex resize-none flex-1 px-2 py-1.5 text-sm bg-transparent whitespace-pre-line;
+    @apply focus:outline-primary focus:border-primary;
+}
+
+/** Form */
+.contentkit-form {
+    @apply flex flex-col gap-1;
+}
+
+.contentkit-form:not(:first-of-type) {
+    @apply mt-4;
+}
+
+.contentkit-label {
+    @apply text-sm font-medium text-tint-strong;
 }
 
 /** Dividers */
