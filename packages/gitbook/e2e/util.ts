@@ -155,11 +155,6 @@ export function runTestCases(testCases: TestsCase[]) {
                         );
                     }
 
-                    // Disable the Vercel toolbar
-                    await page.setExtraHTTPHeaders({
-                        'x-vercel-skip-toolbar': '1',
-                    });
-
                     await page.goto(url);
                     if (testEntry.run) {
                         await testEntry.run(page);
