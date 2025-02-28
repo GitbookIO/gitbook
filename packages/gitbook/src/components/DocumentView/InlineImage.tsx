@@ -68,7 +68,7 @@ async function getImageSizes(
         case 'line': {
             const imageSize =
                 src.file?.dimensions ??
-                (await context?.imageResizer.getImageSize(src.href, {
+                (await context?.imageResizer?.getImageSize(src.href, {
                     dpr: 3,
                 }));
             // We estimate that the maximum height of the line will be 40px

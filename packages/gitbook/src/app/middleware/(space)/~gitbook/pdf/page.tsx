@@ -99,7 +99,7 @@ export default async function PDFHTMLOutput(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInSpace(''))}
+                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInContent(''))}
                         className={tcls(
                             'flex',
                             'flex-row',

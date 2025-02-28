@@ -16,8 +16,8 @@ import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
-import { type ImageResizer, createNoopImageResizer } from './images';
-import { type GitBookSpaceLinker, appendPrefixToLinker, createLinker } from './links';
+import { type ImageResizer, createImageResizer } from './images';
+import { type GitBookSpaceLinker, appendBasePathToLinker, createLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -36,7 +36,7 @@ export type GitBookBaseContext = {
     /**
      * Image resizer to resize images.
      */
-    imageResizer: ImageResizer;
+    imageResizer?: ImageResizer;
 };
 
 /**
@@ -119,7 +119,6 @@ export function getBaseContext(input: {
         apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
         apiEndpoint: input.apiEndpoint ?? GITBOOK_API_URL,
     });
-    const imageResizer = createNoopImageResizer();
     const gitbookURL = new URL(GITBOOK_URL);
 
     const linker =
@@ -142,10 +141,18 @@ export function getBaseContext(input: {
         };
     }
 
+    const imageResizer = createImageResizer({
+        host: urlMode === 'url-host' ? url.host : gitbookURL.host,
+
+        // To ensure image resizing work for proxied sites,
+        // we serve images from the root of the site.
+        linker: appendBasePathToLinker(linker, url.pathname),
+    });
+
     return {
         dataFetcher,
-        imageResizer,
         linker,
+        imageResizer,
     };
 }
 
@@ -193,7 +200,7 @@ export async function fetchSiteContextByURL(
 
     const siteContext = {
         ...context,
-        linker: appendPrefixToLinker(context.linker, data.basePath),
+        linker: appendBasePathToLinker(context.linker, data.basePath),
     };
 
     return siteContext;
@@ -235,7 +242,9 @@ export async function fetchSiteContextByIds(
         ...(customizations.site?.title ? { title: customizations.site.title } : {}),
     };
 
-    const sections = ids.siteSection ? parseSiteSectionsList(siteStructure, ids.siteSection) : null;
+    const sections = ids.siteSection
+        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
+        : null;
 
     const siteSpace = (
         siteStructure.type === 'siteSpaces' && siteStructure.structure
@@ -329,9 +338,39 @@ export async function fetchSpaceContextByIds(
     };
 }
 
-function parseSiteSectionsList(structure: SiteStructure, siteSectionId: string) {
-    const sections = getSiteStructureSections(structure);
-    const section = sections.find((section) => section.id === siteSectionId);
+/**
+ * Check if the context is the root one for a site.
+ * Meaning we are on the default section / space.
+ */
+export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
+    const { structure } = context;
+    switch (structure.type) {
+        case 'sections': {
+            return getSiteStructureSections(structure, { ignoreGroups: true }).some(
+                (structure) =>
+                    structure.default &&
+                    structure.id === context.sections?.current.id &&
+                    structure.siteSpaces.some(
+                        (siteSpace) => siteSpace.default && siteSpace.id === context.siteSpace.id
+                    )
+            );
+        }
+        case 'siteSpaces': {
+            return structure.structure.some(
+                (siteSpace) => siteSpace.default && siteSpace.id === context.siteSpace.id
+            );
+        }
+    }
+}
+
+function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
+    const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
+    const section = parseCurrentSection(structure, siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');
-    return { list: sections, current: section } satisfies SiteSections;
+    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
+}
+
+function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
+    const sections = getSiteStructureSections(structure, { ignoreGroups: true });
+    return sections.find((section) => section.id === siteSectionId);
 }

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY, GITBOOK_IMAGE_RESIZE_URL } from '../env';
 import type { GitBookSpaceLinker } from '../links';
 import { type SignatureVersion, generateImageSignature } from './signatures';
 import type { ImageResizer } from './types';
@@ -40,8 +41,12 @@ export function createImageResizer({
     /** The host name of the current site. */
     host: string;
 }): ImageResizer {
+    if (!GITBOOK_IMAGE_RESIZE_URL || !GITBOOK_IMAGE_RESIZE_SIGNING_KEY) {
+        return createNoopImageResizer();
+    }
+
     return {
-        resize: (urlInput) => {
+        getResizedImageURL: (urlInput) => {
             if (!checkIsSizableImageURL(urlInput)) {
                 return null;
             }
@@ -57,7 +62,9 @@ export function createImageResizer({
                     url: urlInput,
                 });
 
-                const url = new URL(linker.toAbsoluteURL('/~gitbook/image'));
+                const url = new URL(
+                    linker.toAbsoluteURL(linker.toPathInContent('/~gitbook/image'))
+                );
                 url.searchParams.set('url', getImageAPIUrl(urlInput));
 
                 if (options.width) {
@@ -95,16 +102,9 @@ export function createImageResizer({
  */
 export function createNoopImageResizer(): ImageResizer {
     return {
-        resize: () => null,
+        getResizedImageURL: () => null,
         getImageSize: async (_input) => null,
     };
-}
-
-/**
- * Return true if images resizing is enabled.
- */
-export function isImageResizingEnabled(): boolean {
-    return !!process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY;
 }
 
 /**
@@ -151,7 +151,7 @@ export async function getImageSize(
     input: string,
     defaultSize: Partial<CloudflareImageOptions> = {}
 ): Promise<{ width: number; height: number } | null> {
-    if (!isImageResizingEnabled() || !checkIsSizableImageURL(input)) {
+    if (!checkIsSizableImageURL(input)) {
         return null;
     }
 
@@ -198,33 +198,25 @@ export async function resizeImage(
 
     // Since Cloudflare Images options on fetch are not supported on Cloudflare Pages,
     // we need to use the Cloudflare Image Resize API directly.
-    if (process.env.GITBOOK_IMAGE_RESIZE_URL) {
-        const response = await fetch(
-            `${process.env.GITBOOK_IMAGE_RESIZE_URL}${stringifyOptions(
-                resizeOptions
-            )}/${encodeURIComponent(input)}`,
-            {
-                headers: {
-                    // Pass the `Accept` header, as Cloudflare uses this to validate the format.
-                    Accept:
-                        resizeOptions.format === 'json'
-                            ? 'application/json'
-                            : `image/${resizeOptions.format || 'jpeg'}`,
-                },
-                signal,
-            }
-        );
-
-        return response;
+    if (!GITBOOK_IMAGE_RESIZE_URL) {
+        throw new Error('GITBOOK_IMAGE_RESIZE_URL is not set');
     }
 
-    return fetch(parsed, {
-        // @ts-ignore
-        cf: {
-            image: resizeOptions,
-        },
-        signal,
-    });
+    return await fetch(
+        `${GITBOOK_IMAGE_RESIZE_URL}${stringifyOptions(
+            resizeOptions
+        )}/${encodeURIComponent(input)}`,
+        {
+            headers: {
+                // Pass the `Accept` header, as Cloudflare uses this to validate the format.
+                Accept:
+                    resizeOptions.format === 'json'
+                        ? 'application/json'
+                        : `image/${resizeOptions.format || 'jpeg'}`,
+            },
+            signal,
+        }
+    );
 }
 
 function stringifyOptions(options: CloudflareImageOptions): string {
