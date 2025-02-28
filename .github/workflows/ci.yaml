@@ -239,12 +239,6 @@ jobs:
               env:
                   BASE_URL: ${{needs.deploy.outputs.deployment-url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                  name: playwright-test-results
-                  path: packages/gitbook/test-results/
-                  retention-days: 3
     visual-testing-v2:
         runs-on: ubuntu-latest
         name: Visual Testing v2
@@ -265,12 +259,6 @@ jobs:
                   BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'v2'
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                  name: playwright-test-results
-                  path: packages/gitbook/test-results/
-                  retention-days: 3
     visual-testing-customers:
         runs-on: ubuntu-latest
         name: Visual Testing Customers
@@ -291,12 +279,6 @@ jobs:
                   BASE_URL: ${{needs.deploy.outputs.deployment-url}}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers'
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                  name: playwright-test-results-customers
-                  path: packages/gitbook/test-results/
-                  retention-days: 3
     visual-testing-customers-v2:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
@@ -317,12 +299,6 @@ jobs:
                   BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                  name: playwright-test-results-customers
-                  path: packages/gitbook/test-results/
-                  retention-days: 3
     pagespeed-testing:
         runs-on: ubuntu-latest
         name: PageSpeed Testing
