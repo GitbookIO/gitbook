@@ -35,7 +35,7 @@ export type GitBookBaseContext = {
     /**
      * Image resizer to resize images.
      */
-    imageResizer: ImageResizer;
+    imageResizer?: ImageResizer;
 };
 
 /**

@@ -140,6 +140,7 @@ function encodePathInSiteContent(rawPathname: string) {
 
     switch (pathname) {
         case '~gitbook/icon':
+        case '~gitbook/image':
         case 'llms.txt':
         case 'sitemap.xml':
         case 'robots.txt':

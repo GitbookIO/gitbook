@@ -52,7 +52,11 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
 
     const imageResizer = createImageResizer({
         host,
-        linker,
+        // In V1, we always resize at the top level of the hostname, not relative to the content.
+        linker: createLinker({
+            host,
+            pathname: '/',
+        }),
     });
 
     return {

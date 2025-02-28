@@ -62,7 +62,9 @@ export function createImageResizer({
                     url: urlInput,
                 });
 
-                const url = new URL(linker.toAbsoluteURL('/~gitbook/image'));
+                const url = new URL(
+                    linker.toAbsoluteURL(linker.toPathInContent('/~gitbook/image'))
+                );
                 url.searchParams.set('url', getImageAPIUrl(urlInput));
 
                 if (options.width) {

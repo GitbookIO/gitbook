@@ -21,21 +21,15 @@ export type RouteParams = RouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(params: RouteLayoutParams) {
     const url = getSiteURLFromParams(params);
 
     const dataFetcher = createDataFetcher();
     const { linker, host } = createLinkerFromParams(params);
-    const imageResizer = createImageResizer({
-        host,
-        linker,
-    });
-
-    return fetchSiteContextByURL(
+    const context = await fetchSiteContextByURL(
         {
             dataFetcher,
             linker,
-            imageResizer,
         },
         {
             url: url.toString(),
@@ -43,6 +37,13 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
             redirectOnError: false,
         }
     );
+
+    context.imageResizer = createImageResizer({
+        host,
+        linker: context.linker,
+    });
+
+    return context;
 }
 
 /**
@@ -59,16 +60,11 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
     });
 
     const { linker, host } = createLinkerFromParams(params);
-    const imageResizer = createImageResizer({
-        host,
-        linker,
-    });
 
-    return fetchSiteContextByURL(
+    const context = await fetchSiteContextByURL(
         {
             dataFetcher,
             linker,
-            imageResizer,
         },
         {
             url: url.toString(),
@@ -78,6 +74,13 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
             redirectOnError: true,
         }
     );
+
+    context.imageResizer = createImageResizer({
+        host,
+        linker: context.linker,
+    });
+
+    return context;
 }
 
 /**
