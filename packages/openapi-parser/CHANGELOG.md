@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.0.1
+
+### Patch Changes
+
+-   0924259: Expose helper `shouldIgnoreEntity`
+
 ## 2.0.0
 
 ### Major Changes

@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.6.4
+
+### Patch Changes
+
+-   9b914d1: Fix getProxyModeBasePath that was computing incorrect base path in some scenarios
+-   2ae76f9: Change how a site in proxy mode is resolved
+-   027a859: Add support for links style customization option
+-   3e11678: fix: lost section groups
+-   3319375: Support OpenAPI operation block
+-   Updated dependencies [722f02e]
+-   Updated dependencies [0924259]
+    -   @gitbook/react-openapi@1.0.4
+    -   @gitbook/openapi-parser@2.0.1
+
 ## 0.6.3
 
 ### Patch Changes
