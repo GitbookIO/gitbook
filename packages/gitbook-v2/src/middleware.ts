@@ -107,11 +107,20 @@ function serveErrorResponse(error: Error) {
 }
 
 /**
- * The URL of the GitBook content can be passed in 2 different ways:
+ * The URL of the GitBook content can be passed in 3 different ways:
+ * - The request URL is in the `X-GitBook-URL` header.
  * - Hostname is in the `X-GitBook-Host` header and the pathname is the path in the request URL.
  * - The request URL is matching `/url/:url`
  */
 function extractURL(request: NextRequest): URLWithMode | null {
+    const xGitbookUrl = request.headers.get('x-gitbook-url');
+    if (xGitbookUrl) {
+        return {
+            url: new URL(xGitbookUrl),
+            mode: 'url-host',
+        };
+    }
+
     const xGitbookHost = request.headers.get('x-gitbook-host');
     if (xGitbookHost) {
         return {
