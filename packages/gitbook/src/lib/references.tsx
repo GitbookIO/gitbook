@@ -53,6 +53,12 @@ export interface ResolveContentRefOptions {
      * Styles to apply to the icon.
      */
     iconStyle?: ClassValue;
+
+    /**
+     * Resolve the content URL as absolute.
+     * @default false
+     */
+    resolveAsAbsoluteURL?: boolean;
 }
 
 /**
@@ -63,7 +69,7 @@ export async function resolveContentRef(
     context: GitBookAnyContext,
     options: ResolveContentRefOptions = {}
 ): Promise<ResolvedContentRef | null> {
-    const { resolveAnchorText = false, iconStyle } = options;
+    const { resolveAnchorText = false, resolveAsAbsoluteURL = false, iconStyle } = options;
     const { linker, dataFetcher, space, revisionId, pages } = context;
 
     const activePage = 'page' in context ? context.page : undefined;
@@ -144,8 +150,10 @@ export async function resolveContentRef(
                 icon = <PageIcon page={page} style={iconStyle} />;
             }
 
+            const href = linker.toPathForPage({ page, pages, anchor });
+
             return {
-                href: linker.toPathForPage({ page, pages, anchor }),
+                href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
                 text,
                 emoji,
                 icon,
@@ -311,11 +319,18 @@ async function resolveContentRefInSpace(
         pathname: baseURL.pathname,
     });
 
-    const resolved = await resolveContentRef(contentRef, {
-        ...spaceContext,
-        space,
-        linker,
-    });
+    const resolved = await resolveContentRef(
+        contentRef,
+        {
+            ...spaceContext,
+            space,
+            linker,
+        },
+        {
+            // Resolve pages as absolute URLs as we are in a different site.
+            resolveAsAbsoluteURL: true,
+        }
+    );
 
     if (!resolved) {
         return null;
