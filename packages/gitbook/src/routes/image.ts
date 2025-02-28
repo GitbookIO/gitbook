@@ -45,7 +45,10 @@ export async function serveResizedImage(request: Request) {
         { signature, version: signatureVersion }
     );
     if (!verified) {
-        return new Response(`Invalid signature "${signature ?? ''}" for "${url}"`, { status: 400 });
+        return new Response(
+            `Invalid signature "${signature ?? ''}" (version ${signatureVersion}) for "${url}" on "${requestURL.host}"`,
+            { status: 400 }
+        );
     }
 
     if (signatureVersion !== CURRENT_SIGNATURE_VERSION) {
