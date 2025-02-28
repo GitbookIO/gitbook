@@ -3,7 +3,8 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
-import { removeTrailingSlash } from '@/lib/paths';
+import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
@@ -15,11 +16,25 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {
+        /**
+         * Serve image resizing requests (all requests containing `/~gitbook/image`).
+         * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
+         * and serve from a single route handler.
+         *
+         * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
+         * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
+         */
+        if (request.nextUrl.pathname.endsWith('/~gitbook/image')) {
+            return serveResizedImage(request);
+        }
+
+        // Route all requests to a site
         const extracted = extractURL(request);
         if (extracted) {
             return serveSiteByURL(request, extracted);
         }
 
+        // Handle the rest with the router default logic
         return NextResponse.next();
     } catch (error) {
         return serveErrorResponse(error as Error);
@@ -62,8 +77,10 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         dynamicHeaders ? 'dynamic' : 'static',
         mode,
         encodeURIComponent(url.host + data.basePath),
-        encodeURIComponent(removeTrailingSlash(data.pathname) || '/'),
+        encodePathInSiteContent(data.pathname),
     ].join('/');
+
+    console.log('route', route);
 
     const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
         headers: requestHeaders,
@@ -123,4 +140,27 @@ function getDynamicHeaders(_request: NextRequest): null | Record<string, string>
     // - check token in cookies
     // - check special headers or query string
     return null;
+}
+
+/**
+ * Encode path in a site content.
+ * Special paths are not encoded and passed to be handled by the route handlers.
+ */
+function encodePathInSiteContent(rawPathname: string) {
+    const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+
+    if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
+        return pathname;
+    }
+
+    switch (pathname) {
+        case '~gitbook/icon':
+        case '~gitbook/image':
+        case 'llms.txt':
+        case 'sitemap.xml':
+        case 'robots.txt':
+            return pathname;
+        default:
+            return encodeURIComponent(pathname || '/');
+    }
 }

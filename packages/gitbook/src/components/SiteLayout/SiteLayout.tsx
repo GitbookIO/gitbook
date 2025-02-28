@@ -9,11 +9,10 @@ import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
-import { assetsDomain } from '@/lib/assets';
 import { buildVersion } from '@/lib/build';
-import { getAbsoluteHref, getBaseUrl } from '@/lib/links';
 import { isSiteIndexable } from '@/lib/seo';
 
+import { GITBOOK_API_URL, GITBOOK_ASSETS_URL } from '@v2/lib/env';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
@@ -31,9 +30,9 @@ export async function SiteLayout(props: {
 
     const { scripts, customization } = context;
 
-    ReactDOM.preconnect(context.dataFetcher.apiEndpoint);
-    if (assetsDomain) {
-        ReactDOM.preconnect(assetsDomain);
+    ReactDOM.preconnect(GITBOOK_API_URL);
+    if (GITBOOK_ASSETS_URL) {
+        ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }
 
     scripts.forEach(({ script }) => {
@@ -91,26 +90,30 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
 }
 
 export async function generateSiteLayoutMetadata(context: GitBookSiteContext): Promise<Metadata> {
-    const { site, customization } = context;
+    const { site, customization, linker } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     return {
         title: site.title,
         generator: `GitBook (${buildVersion()})`,
-        metadataBase: new URL(await getBaseUrl()),
+        // metadataBase: new URL(await getBaseUrl()),
         icons: {
             icon: [
                 {
                     url:
                         customIcon?.light ??
-                        (await getAbsoluteHref('~gitbook/icon?size=small&theme=light', true)),
+                        linker.toAbsoluteURL(
+                            linker.toPathInContent('~gitbook/icon?size=small&theme=light')
+                        ),
                     type: 'image/png',
                     media: '(prefers-color-scheme: light)',
                 },
                 {
                     url:
                         customIcon?.dark ??
-                        (await getAbsoluteHref('~gitbook/icon?size=small&theme=dark', true)),
+                        linker.toAbsoluteURL(
+                            linker.toPathInContent('~gitbook/icon?size=small&theme=dark')
+                        ),
                     type: 'image/png',
                     media: '(prefers-color-scheme: dark)',
                 },

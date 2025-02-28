@@ -1,7 +1,7 @@
 import { fetchSiteContextByURL } from '@v2/lib/context';
 import { createDataFetcher } from '@v2/lib/data';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from '@v2/lib/env';
-import { createNoopImageResizer } from '@v2/lib/images';
+import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 import { headers } from 'next/headers';
 
@@ -21,18 +21,15 @@ export type RouteParams = RouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(params: RouteLayoutParams) {
     const url = getSiteURLFromParams(params);
 
     const dataFetcher = createDataFetcher();
-    const linker = createLinkerFromParams(params);
-    const imageResizer = createNoopImageResizer();
-
-    return fetchSiteContextByURL(
+    const { linker, host } = createLinkerFromParams(params);
+    const context = await fetchSiteContextByURL(
         {
             dataFetcher,
             linker,
-            imageResizer,
         },
         {
             url: url.toString(),
@@ -40,6 +37,13 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
             redirectOnError: false,
         }
     );
+
+    context.imageResizer = createImageResizer({
+        host,
+        linker: context.linker,
+    });
+
+    return context;
 }
 
 /**
@@ -55,14 +59,12 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
         apiEndpoint: headersSet.get('x-gitbook-api') ?? GITBOOK_API_URL,
     });
 
-    const linker = createLinkerFromParams(params);
-    const imageResizer = createNoopImageResizer();
+    const { linker, host } = createLinkerFromParams(params);
 
-    return fetchSiteContextByURL(
+    const context = await fetchSiteContextByURL(
         {
             dataFetcher,
             linker,
-            imageResizer,
         },
         {
             url: url.toString(),
@@ -72,6 +74,13 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
             redirectOnError: true,
         }
     );
+
+    context.imageResizer = createImageResizer({
+        host,
+        linker: context.linker,
+    });
+
+    return context;
 }
 
 /**
@@ -87,10 +96,13 @@ function createLinkerFromParams(params: RouteLayoutParams) {
     const mode = getModeFromParams(params.mode);
 
     if (mode === 'url-host') {
-        return createLinker({
+        return {
+            linker: createLinker({
+                host: url.host,
+                pathname: '/',
+            }),
             host: url.host,
-            pathname: '/',
-        });
+        };
     }
 
     const gitbookURL = new URL(GITBOOK_URL);
@@ -106,7 +118,10 @@ function createLinkerFromParams(params: RouteLayoutParams) {
         return `/url/${urlObject.host}${urlObject.pathname}`;
     };
 
-    return linker;
+    return {
+        linker,
+        host: gitbookURL.host,
+    };
 }
 
 function getSiteURLFromParams(params: RouteLayoutParams) {

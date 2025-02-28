@@ -16,7 +16,7 @@ import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import type { ImageResizer } from './images';
-import { type GitBookSpaceLinker, appendPrefixToLinker } from './links';
+import { type GitBookSpaceLinker, appendBasePathToLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -35,7 +35,7 @@ export type GitBookBaseContext = {
     /**
      * Image resizer to resize images.
      */
-    imageResizer: ImageResizer;
+    imageResizer?: ImageResizer;
 };
 
 /**
@@ -147,7 +147,7 @@ export async function fetchSiteContextByURL(
 
     const siteContext = {
         ...context,
-        linker: appendPrefixToLinker(context.linker, data.basePath),
+        linker: appendBasePathToLinker(context.linker, data.basePath),
     };
 
     return siteContext;
@@ -283,6 +283,31 @@ export async function fetchSpaceContextByIds(
         revisionId,
         shareKey: ids.shareKey,
     };
+}
+
+/**
+ * Check if the context is the root one for a site.
+ * Meaning we are on the default section / space.
+ */
+export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
+    const { structure } = context;
+    switch (structure.type) {
+        case 'sections': {
+            return getSiteStructureSections(structure, { ignoreGroups: true }).some(
+                (structure) =>
+                    structure.default &&
+                    structure.id === context.sections?.current.id &&
+                    structure.siteSpaces.some(
+                        (siteSpace) => siteSpace.default && siteSpace.id === context.siteSpace.id
+                    )
+            );
+        }
+        case 'siteSpaces': {
+            return structure.structure.some(
+                (siteSpace) => siteSpace.default && siteSpace.id === context.siteSpace.id
+            );
+        }
+    }
 }
 
 function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {

@@ -40,7 +40,7 @@ export async function SitePage(props: SitePageProps) {
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(context.linker.toAbsoluteURL(pathname));
+            redirect(context.linker.toPathInContent(pathname));
         } else {
             notFound();
         }
@@ -137,7 +137,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         openGraph: {
             images: [
                 customization.socialPreview.url ??
-                    linker.toAbsoluteURL(linker.toPathInSpace(`~gitbook/ogimage/${page.id}`)),
+                    linker.toAbsoluteURL(linker.toPathInContent(`~gitbook/ogimage/${page.id}`)),
             ],
         },
         robots:

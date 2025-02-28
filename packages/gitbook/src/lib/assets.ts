@@ -1,14 +1,8 @@
-let assetsDomain = '';
-if (process.env.GITBOOK_ASSETS_PREFIX) {
-    const parsed = new URL(process.env.GITBOOK_ASSETS_PREFIX);
-    assetsDomain = `${parsed.protocol}//${parsed.host}`;
-}
+import { GITBOOK_ASSETS_URL } from '@v2/lib/env';
 
 /**
  * Create a public URL for an asset.
  */
-export function getStaticFileURL(path: string): string {
-    return `${assetsDomain}/~gitbook/static/${path}`;
+export function getAssetURL(path: string): string {
+    return `${GITBOOK_ASSETS_URL}/~gitbook/static/${path}`;
 }
-
-export { assetsDomain };
