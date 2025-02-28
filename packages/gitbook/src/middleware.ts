@@ -1,9 +1,4 @@
-import {
-    type ContentAPITokenPayload,
-    CustomizationThemeMode,
-    GitBookAPI,
-    type PublishedSiteContent,
-} from '@gitbook/api';
+import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
 import { setContext, setTag } from '@sentry/nextjs';
 import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
@@ -35,7 +30,8 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
-import { joinPath } from './lib/paths';
+import { joinPath, normalizePathname } from '@/lib/paths';
+import { getProxyModeBasePath } from '@/lib/proxy';
 
 export const config = {
     matcher:
@@ -854,15 +850,6 @@ function stripURLBasePath(url: URL, basePath: string): URL {
     return stripped;
 }
 
-/** Normalize a pathname to make it start with a slash */
-function normalizePathname(pathname: string): string {
-    if (!pathname.startsWith('/')) {
-        pathname = `/${pathname}`;
-    }
-
-    return pathname;
-}
-
 function stripURLSearch(url: URL): URL {
     const stripped = new URL(url.toString());
     stripped.search = '';
@@ -917,22 +904,4 @@ function writeCookies<R extends NextResponse>(
     });
 
     return response;
-}
-
-/**
- * Compute the final base path for a site served in proxy mode.
- * For e.g. if the input URL is `https://example.com/docs/v2/foo/bar` on which
- * the site is served at `https://example.com/docs` and the resolved base path is `/v2`
- * then the proxy site path would be `/docs/v2/`.
- */
-function getProxyModeBasePath(
-    input: URL,
-    resolved: Pick<PublishedSiteContent, 'basePath' | 'pathname'>
-): string {
-    const inputPathname = stripURLSearch(input).pathname;
-    const proxySitePath = inputPathname
-        .replace(resolved.pathname, '')
-        .replace(resolved.basePath, '');
-
-    return joinPath(normalizePathname(proxySitePath), resolved.basePath);
 }
