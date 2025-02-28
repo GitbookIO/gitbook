@@ -66,6 +66,7 @@ export function createImageResizer({
                     linker.toAbsoluteURL(linker.toPathInContent('/~gitbook/image'))
                 );
                 url.searchParams.set('url', getImageAPIUrl(urlInput));
+                url.searchParams.set('host', host);
 
                 if (options.width) {
                     url.searchParams.set('width', options.width.toString());
