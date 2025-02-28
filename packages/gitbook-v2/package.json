@@ -6,7 +6,7 @@
         "next": "canary",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "@gitbook/api": "^0.96.0",
+        "@gitbook/api": "0.96.1",
         "@sindresorhus/fnv1a": "^3.1.0",
         "server-only": "^0.0.1"
     },
