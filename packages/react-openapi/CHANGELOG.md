@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.0.4
+
+### Patch Changes
+
+-   722f02e: Fix recursion in OpenAPISchemaAlternative
+-   Updated dependencies [0924259]
+    -   @gitbook/openapi-parser@2.0.1
+
 ## 1.0.3
 
 ### Patch Changes
