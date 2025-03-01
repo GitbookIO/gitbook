@@ -87,7 +87,9 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     console.log('route', route);
 
     const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
-        headers: requestHeaders,
+        request: {
+            headers: requestHeaders,
+        },
     });
 
     // Add Content Security Policy header
