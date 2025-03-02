@@ -5,7 +5,6 @@ import {
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
 import { type RouteLayoutParams, getDynamicSiteContext } from '@v2/app/utils';
-import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 import { getThemeFromMiddleware, getVisitorAuthTokenFromMiddleware } from '@v2/lib/middleware';
 
 interface SiteDynamicLayoutProps {
@@ -25,7 +24,6 @@ export default async function SiteDynamicLayout({
             <SiteLayout
                 context={context}
                 forcedTheme={forcedTheme}
-                withTracking={!GITBOOK_DISABLE_TRACKING}
                 visitorAuthToken={visitorAuthToken}
             >
                 {children}
