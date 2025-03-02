@@ -17,12 +17,18 @@ interface Props {
 type TDisclosureGroup = {
     id: string;
     label: string | React.ReactNode;
-    tabs?: {
-        id: string;
-        label: string | React.ReactNode;
-        body?: React.ReactNode;
-    }[];
-};
+} & (
+    | {
+          tabs?: {
+              id: string;
+              label: string | React.ReactNode;
+              body?: React.ReactNode;
+          }[];
+      }
+    | {
+          body?: React.ReactNode;
+      }
+);
 
 const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
 
@@ -61,7 +67,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
 
     const panelRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
-    const isDisabled = groupState?.isDisabled || !group.tabs?.length || false;
+    const isDisabled = groupState?.isDisabled || ('tabs' in group && !group.tabs?.length) || false;
     const { buttonProps: triggerProps, panelProps } = useDisclosure(
         {
             ...props,
@@ -74,9 +80,19 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
 
-    const defaultTab = group.tabs?.[0]?.id || '';
+    const defaultTab =
+        'tabs' in group && group.tabs?.[0]
+            ? (group.tabs[0]?.id ?? '')
+            : 'body' in group
+              ? 'body'
+              : '';
     const [selectedTabKey, setSelectedTabKey] = useState(defaultTab);
-    const selectedTab = group.tabs?.find((tab) => tab.id === selectedTabKey);
+    const selectedTab =
+        'tabs' in group
+            ? group.tabs?.find((tab) => tab.id === selectedTabKey)
+            : 'body' in group
+              ? { id: 'body', body: group.body }
+              : null;
 
     return (
         <div className="openapi-disclosure-group" aria-expanded={state.isExpanded}>
@@ -103,7 +119,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
 
                     {group.label}
                 </button>
-                {group.tabs ? (
+                {'tabs' in group && group.tabs ? (
                     <div className="openapi-disclosure-group-mediatype">
                         {group.tabs?.length > 1 ? (
                             <select
@@ -121,7 +137,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
                                     </option>
                                 ))}
                             </select>
-                        ) : group.tabs[0] ? (
+                        ) : group.tabs[0]?.label ? (
                             <span>{group.tabs[0].label}</span>
                         ) : null}
                     </div>
