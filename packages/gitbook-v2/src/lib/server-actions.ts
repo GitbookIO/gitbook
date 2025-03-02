@@ -7,6 +7,7 @@ import {
 
 /**
  * Get the base context for a server action.
+ * This function should only be called in a server action.
  */
 export async function getServerActionBaseContext() {
     const siteURL = await getSiteURLFromMiddleware();

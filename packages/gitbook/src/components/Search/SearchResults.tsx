@@ -91,7 +91,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 }
 
                 const response = await streamRecommendedQuestions();
-                console.log('recommendedQuestions', response);
                 for await (const entry of readStreamableValue(response.stream)) {
                     if (!entry) {
                         continue;
