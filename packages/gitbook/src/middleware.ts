@@ -207,6 +207,10 @@ export async function middleware(request: NextRequest) {
         headers.set(MiddlewareHeaders.SiteURLData, JSON.stringify(resolved));
     }
 
+    if (resolved.visitorToken) {
+        headers.set(MiddlewareHeaders.VisitorAuthToken, resolved.visitorToken);
+    }
+
     // For tests, we make it possible to enable search indexation
     // using a query parameter.
     const xGitBookSearchIndexation =

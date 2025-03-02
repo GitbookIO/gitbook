@@ -1,4 +1,4 @@
-import { getThemeFromMiddleware } from '@v2/lib/middleware';
+import { getThemeFromMiddleware, getVisitorAuthTokenFromMiddleware } from '@v2/lib/middleware';
 import type { Metadata, Viewport } from 'next';
 import type React from 'react';
 
@@ -22,12 +22,14 @@ export default async function ContentLayout(props: { children: React.ReactNode }
 
     const context = await fetchLayoutData();
     const queryStringTheme = await getThemeFromMiddleware();
+    const visitorAuthToken = await getVisitorAuthTokenFromMiddleware();
 
     return (
         <SiteLayout
             context={context}
             forcedTheme={queryStringTheme}
             withTracking={await shouldTrackEvents()}
+            visitorAuthToken={visitorAuthToken}
         >
             {children}
         </SiteLayout>

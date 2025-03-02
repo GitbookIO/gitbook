@@ -36,6 +36,11 @@ export enum MiddlewareHeaders {
      * Token to use for the API.
      */
     APIToken = 'x-gitbook-token',
+
+    /**
+     * The visitor token used to access this content
+     */
+    VisitorAuthToken = 'x-gitbook-visitor-token',
 }
 
 /**
@@ -97,4 +102,18 @@ export async function getThemeFromMiddleware() {
     return queryStringTheme === 'light'
         ? CustomizationThemeMode.Light
         : CustomizationThemeMode.Dark;
+}
+
+/**
+ * Get the visitor auth token from the middleware headers.
+ * This function should only be called in a dynamic route.
+ */
+export async function getVisitorAuthTokenFromMiddleware(): Promise<string | null> {
+    const headersList = await headers();
+    const visitorAuthToken = headersList.get(MiddlewareHeaders.VisitorAuthToken);
+    if (!visitorAuthToken) {
+        return null;
+    }
+
+    return visitorAuthToken;
 }
