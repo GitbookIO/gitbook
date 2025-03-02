@@ -1,21 +1,26 @@
-import type { DocumentBlockOpenAPI } from '@gitbook/api';
+import type { DocumentBlockOpenAPI, DocumentBlockOpenAPIOperation } from '@gitbook/api';
 import { OpenAPIParseError, parseOpenAPI } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
 
+import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
 
-const weakmap = new WeakMap<DocumentBlockOpenAPI, ResolveOpenAPIBlockResult>();
+export type AnyOpenAPIOperationBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
+
+const weakmap = new WeakMap<AnyOpenAPIOperationBlock, Promise<ResolveOpenAPIBlockResult>>();
 
 /**
  * Cache the result of resolving an OpenAPI block.
  * It is important because the resolve is called in sections and in the block itself.
  */
-export function resolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOpenAPIBlockResult {
+export function resolveOpenAPIBlock(
+    args: ResolveOpenAPIBlockArgs
+): Promise<ResolveOpenAPIBlockResult> {
     if (weakmap.has(args.block)) {
         return weakmap.get(args.block)!;
     }
@@ -26,30 +31,38 @@ export function resolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOpenA
 }
 
 type ResolveOpenAPIBlockArgs = {
-    block: DocumentBlockOpenAPI;
+    block: AnyOpenAPIOperationBlock;
     context: GitBookAnyContext;
 };
-type ResolveOpenAPIBlockResult = Promise<
+export type ResolveOpenAPIBlockResult =
     | { error?: undefined; data: OpenAPIOperationData | null; specUrl: string | null }
-    | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined }
->;
+    | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined };
 /**
  * Resolve OpenAPI block.
  */
-async function baseResolveOpenAPIBlock(args: ResolveOpenAPIBlockArgs): ResolveOpenAPIBlockResult {
+async function baseResolveOpenAPIBlock(
+    args: ResolveOpenAPIBlockArgs
+): Promise<ResolveOpenAPIBlockResult> {
     const { context, block } = args;
     if (!block.data.path || !block.data.method) {
         return { data: null, specUrl: null };
     }
 
-    const resolved = block.data.ref ? await resolveContentRef(block.data.ref, context) : null;
+    const ref = block.data.ref;
+    const resolved = ref ? await resolveContentRef(ref, context) : null;
 
     if (!resolved) {
         return { data: null, specUrl: null };
     }
 
     try {
-        const filesystem = resolved.openAPIFilesystem ?? (await fetchFilesystem(resolved.href));
+        const filesystem = await (() => {
+            if (ref.kind === 'openapi') {
+                assert(resolved.openAPIFilesystem);
+                return resolved.openAPIFilesystem;
+            }
+            return fetchFilesystem(resolved.href);
+        })();
 
         const data = await resolveOpenAPIOperation(filesystem, {
             path: block.data.path,

@@ -585,6 +585,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         pathname: normalizePathname(pathSegments.join('/')),
         apiToken,
         apiEndpoint,
+        contextId,
         cookies,
     };
 }

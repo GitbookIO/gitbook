@@ -2,4 +2,4 @@
 '@gitbook/openapi-parser': patch
 ---
 
-Expose helper `shouldIgnoreEntity`
+Fix typing of `shouldIgnoreEntity`

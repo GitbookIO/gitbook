@@ -28,6 +28,7 @@ jobs:
               uses: changesets/action@v1
               with:
                   publish: npm run release
+                  version: npm run changeset-version
               env:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761

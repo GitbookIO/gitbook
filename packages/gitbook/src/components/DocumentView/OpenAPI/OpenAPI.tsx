@@ -1,8 +1,8 @@
-import type { DocumentBlockOpenAPI, JSONDocument } from '@gitbook/api';
+import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { OpenAPIOperation } from '@gitbook/react-openapi';
 
-import { resolveOpenAPIBlock } from '@/lib/openapi/fetch';
+import { type AnyOpenAPIOperationBlock, resolveOpenAPIBlock } from '@/lib/openapi/fetch';
 import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from '../Block';
@@ -10,22 +10,22 @@ import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 
-import './style.css';
 import './scalar.css';
+import './style.css';
 
 /**
- * Render an OpenAPI block.
+ * Render an openapi block or an openapi-operation block.
  */
-export async function OpenAPI(props: BlockProps<DocumentBlockOpenAPI>) {
+export async function OpenAPI(props: BlockProps<AnyOpenAPIOperationBlock>) {
     const { style } = props;
     return (
-        <div className={tcls('w-full', 'flex', 'flex-row', style, 'max-w-full')}>
+        <div className={tcls('flex w-full', style, 'max-w-full')}>
             <OpenAPIBody {...props} />
         </div>
     );
 }
 
-async function OpenAPIBody(props: BlockProps<DocumentBlockOpenAPI>) {
+async function OpenAPIBody(props: BlockProps<AnyOpenAPIOperationBlock>) {
     const { block, context } = props;
 
     if (!context.contentContext) {
