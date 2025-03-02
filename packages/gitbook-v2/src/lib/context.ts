@@ -108,14 +108,13 @@ export function getBaseContext(input: {
     siteURL: URL | string;
     urlMode: 'url' | 'url-host';
     apiToken?: string | null;
-    apiEndpoint?: string;
 }) {
     const url = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
     const urlMode = input.urlMode;
 
     const dataFetcher = createDataFetcher({
         apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
-        apiEndpoint: input.apiEndpoint ?? GITBOOK_API_URL,
+        apiEndpoint: GITBOOK_API_URL,
     });
     const gitbookURL = new URL(GITBOOK_URL);
 

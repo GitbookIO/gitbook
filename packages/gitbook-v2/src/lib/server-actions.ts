@@ -1,5 +1,4 @@
 import { type GitBookBaseContext, fetchSiteContextByURLLookup, getBaseContext } from './context';
-import { GITBOOK_API_TOKEN } from './env';
 import {
     getSiteURLDataFromMiddleware,
     getSiteURLFromMiddleware,
@@ -17,7 +16,7 @@ export async function getServerActionBaseContext() {
     return getBaseContext({
         siteURL,
         urlMode,
-        apiToken: siteURLData.apiToken ?? GITBOOK_API_TOKEN,
+        apiToken: siteURLData.apiToken,
     });
 }
 
