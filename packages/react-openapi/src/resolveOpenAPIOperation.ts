@@ -6,11 +6,12 @@ import {
     type OpenAPIV3_1,
     type OpenAPIV3xDocument,
     dereference,
+    shouldIgnoreEntity,
 } from '@gitbook/openapi-parser';
 import type { OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
 
-export { toJSON, fromJSON };
+export { fromJSON, toJSON };
 
 /**
  * Resolve an OpenAPI operation in a file and compile it to a more usable format.
@@ -39,7 +40,7 @@ export async function resolveOpenAPIOperation(
         };
     }
 
-    const servers = 'servers' in schema ? (schema.servers ?? []) : [];
+    const servers = 'servers' in schema ? schema.servers ?? [] : [];
     const security = flattenSecurities(operation.security ?? schema.security ?? []);
 
     // Resolve securities
@@ -54,12 +55,15 @@ export async function resolveOpenAPIOperation(
         }
     }
 
+    const components = flattenComponents(schema);
+
     return {
         servers,
         operation,
         method,
         path,
         securities,
+        components,
         'x-codeSamples':
             typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
         'x-hideTryItPanel':
@@ -161,4 +165,17 @@ function flattenSecurities(security: OpenAPIV3.SecurityRequirementObject[]) {
             [authType]: config,
         }));
     });
+}
+
+function flattenComponents(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document
+): [string, OpenAPIV3.SchemaObject][] {
+    const components = Object.keys(schema?.components?.schemas ?? {}).length
+        ? schema?.components?.schemas
+        : {};
+
+    return Object.entries(components ?? {})
+        .filter(([, schema]) => !shouldIgnoreEntity(schema))
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([name, schema]) => [name, schema]);
 }
