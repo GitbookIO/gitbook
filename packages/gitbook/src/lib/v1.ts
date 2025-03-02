@@ -7,7 +7,6 @@ import {
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
-import { headers } from 'next/headers';
 
 import {
     type SiteContentPointer,
@@ -173,7 +172,6 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
  */
 export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) {
     const baseContext = await getV1BaseContext();
-    const headersList = await headers();
 
     const context = await fetchSiteContextByIds(baseContext, {
         organization: pointer.organizationId,
