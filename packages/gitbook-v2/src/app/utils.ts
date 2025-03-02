@@ -1,7 +1,9 @@
-import { fetchSiteContextByURL, getBaseContext } from '@v2/lib/context';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL } from '@v2/lib/env';
-import { MiddlewareHeaders } from '@v2/lib/middleware';
-import { headers } from 'next/headers';
+import {
+    fetchSiteContextByURL,
+    fetchSiteContextByURLLookup,
+    getBaseContext,
+} from '@v2/lib/context';
+import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -40,22 +42,14 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
  */
 export async function getDynamicSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
-    const headersSet = await headers();
+    const siteURLData = await getSiteURLDataFromMiddleware();
 
-    return fetchSiteContextByURL(
+    return fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
             urlMode: getModeFromParams(params.mode),
-            apiToken: headersSet.get(MiddlewareHeaders.APIToken) ?? GITBOOK_API_TOKEN,
-            apiEndpoint: headersSet.get(MiddlewareHeaders.APIEndpoint) ?? GITBOOK_API_URL,
         }),
-        {
-            url: siteURL.toString(),
-            visitorAuthToken: headersSet.get(MiddlewareHeaders.VisitorToken),
-
-            // TODO: set it only when the token comes from the cookies.
-            redirectOnError: true,
-        }
+        siteURLData
     );
 }
 

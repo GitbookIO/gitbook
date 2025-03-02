@@ -1,6 +1,7 @@
 import { getSiteStructureSections } from '@/lib/sites';
 import type {
     ChangeRequest,
+    PublishedSiteContentLookup,
     RevisionPage,
     RevisionPageDocument,
     Site,
@@ -17,7 +18,7 @@ import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
-import { type GitBookSpaceLinker, appendBasePathToLinker, createLinker } from './links';
+import { type GitBookSpaceLinker, createLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -91,9 +92,6 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Scripts to load for the site. */
     scripts: SiteIntegrationScript[];
-
-    /** Visitor token used to fetch the site */
-    visitorAuthToken: string | null;
 };
 
 /**
@@ -125,12 +123,12 @@ export function getBaseContext(input: {
         urlMode === 'url-host'
             ? createLinker({
                   host: url.host,
-                  pathname: '/',
+                  pathname: url.pathname,
               })
             : createLinker({
                   protocol: gitbookURL.protocol,
                   host: gitbookURL.host,
-                  pathname: `/url/${url.host}`,
+                  pathname: `/url/${url.host}${url.pathname}`,
               });
 
     if (urlMode === 'url') {
@@ -146,7 +144,7 @@ export function getBaseContext(input: {
 
         // To ensure image resizing work for proxied sites,
         // we serve images from the root of the site.
-        linker: appendBasePathToLinker(linker, url.pathname),
+        linker: linker,
     });
 
     return {
@@ -174,11 +172,22 @@ export async function fetchSiteContextByURL(
         redirectOnError: input.redirectOnError,
     });
 
+    return fetchSiteContextByURLLookup(baseContext, data);
+}
+
+/**
+ * Fetch the context of a site using the resolution of a URL
+ */
+export async function fetchSiteContextByURLLookup(
+    baseContext: GitBookBaseContext,
+    data: PublishedSiteContentLookup
+): Promise<GitBookSiteContext> {
+    const { dataFetcher } = baseContext;
     if ('redirect' in data) {
         redirect(data.redirect);
     }
 
-    const context = await fetchSiteContextByIds(
+    return await fetchSiteContextByIds(
         {
             ...baseContext,
             dataFetcher: dataFetcher.withToken({
@@ -194,16 +203,8 @@ export async function fetchSiteContextByURL(
             shareKey: data.shareKey,
             changeRequest: data.changeRequest,
             revision: data.revision,
-            visitorAuthToken: input.visitorAuthToken,
         }
     );
-
-    const siteContext = {
-        ...context,
-        linker: appendBasePathToLinker(context.linker, data.basePath),
-    };
-
-    return siteContext;
 }
 
 /**
@@ -220,7 +221,6 @@ export async function fetchSiteContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
-        visitorAuthToken: string | null;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -286,7 +286,6 @@ export async function fetchSiteContextByIds(
         structure: siteStructure,
         sections,
         scripts,
-        visitorAuthToken: ids.visitorAuthToken,
     };
 }
 

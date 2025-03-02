@@ -8,7 +8,7 @@ import type {
     SiteSpace,
     Space,
 } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
@@ -20,6 +20,7 @@ import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 
 import { isV2 } from '@/lib/v2';
+import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
@@ -59,9 +60,7 @@ export interface AskAnswerResult {
  * Server action to search content in the entire site.
  */
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = await fetchServerActionSiteContext(
-        isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
-    );
+    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
 
     return await searchSiteContent(context, {
         query,
@@ -73,19 +72,16 @@ export async function searchAllSiteContent(query: string): Promise<OrderedComput
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = await fetchServerActionSiteContext(
-        isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
-    );
+    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const siteURLData = await getSiteURLDataFromMiddleware();
 
     return await searchSiteContent(context, {
         query,
         // If we have a siteSectionId that means its a sections site use `current` mode
         // which searches in the current space + all default spaces of sections
-        scope: context.sections?.current
-            ? { mode: 'current', siteSpaceId: context.siteSpace.id }
-            : { mode: 'specific', siteSpaceIds: [context.siteSpace.id] },
-        // We want to break cache for this specific space if the revisionId is different so use it as a cache busting key
-        cacheBust: context.revisionId,
+        scope: siteURLData.siteSection
+            ? { mode: 'current', siteSpaceId: siteURLData.siteSpace }
+            : { mode: 'specific', siteSpaceIds: [siteURLData.siteSpace] },
     });
 }
 
@@ -184,17 +180,16 @@ export async function streamAskQuestion({
  * Stream a list of suggested questions for the site.
  */
 export async function streamRecommendedQuestions() {
-    const context = await fetchServerActionSiteContext(
-        isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
-    );
+    const siteURLData = await getSiteURLDataFromMiddleware();
+    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
 
     const responseStream = createStreamableValue<SearchAIRecommendedQuestionStream | undefined>();
 
     (async () => {
         const apiClient = await context.dataFetcher.api();
         const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
-            context.organizationId,
-            context.site.id
+            siteURLData.organization,
+            siteURLData.site
         );
 
         for await (const chunk of apiStream) {
@@ -215,31 +210,37 @@ export async function streamRecommendedQuestions() {
  * Search for content in a site by scoping the search to all content, a specific spaces or current space.
  */
 async function searchSiteContent(
-    context: GitBookSiteContext,
+    context: GitBookBaseContext,
     args: {
         query: string;
         scope:
             | { mode: 'all' }
             | { mode: 'current'; siteSpaceId: string }
             | { mode: 'specific'; siteSpaceIds: string[] };
-        cacheBust?: string;
     }
 ): Promise<OrderedComputedResult[]> {
-    const { dataFetcher, structure } = context;
+    const { dataFetcher } = context;
+    const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const { scope, query, cacheBust } = args;
+    const { scope, query } = args;
 
     if (query.length <= 1) {
         return [];
     }
 
-    const searchResults = await dataFetcher.searchSiteContent({
-        organizationId: context.organizationId,
-        siteId: context.site.id,
-        query,
-        cacheBust,
-        scope,
-    });
+    const [searchResults, { structure }] = await Promise.all([
+        dataFetcher.searchSiteContent({
+            organizationId: siteURLData.organization,
+            siteId: siteURLData.site,
+            query,
+            scope,
+        }),
+        dataFetcher.getPublishedContentSite({
+            organizationId: siteURLData.organization,
+            siteId: siteURLData.site,
+            siteShareKey: siteURLData.shareKey,
+        }),
+    ]);
 
     return (
         await Promise.all(

@@ -184,7 +184,6 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
         shareKey: pointer.siteShareKey,
         changeRequest: pointer.changeRequestId,
         revision: pointer.revisionId,
-        visitorAuthToken: headersList.get('x-gitbook-visitor-token'),
     });
 
     context.customization = await getDynamicCustomizationSettings(context.customization);

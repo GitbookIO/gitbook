@@ -202,11 +202,9 @@ export async function middleware(request: NextRequest) {
         if (resolved.shareKey) {
             headers.set('x-gitbook-content-site-share-key', resolved.shareKey);
         }
-    }
 
-    // Compatibility with v2
-    if (resolved.siteURL) {
-        headers.set(MiddlewareHeaders.SiteURL, resolved.siteURL);
+        // For server actions that use v2 code
+        headers.set(MiddlewareHeaders.SiteURLData, JSON.stringify(resolved));
     }
 
     // For tests, we make it possible to enable search indexation
@@ -237,10 +235,6 @@ export async function middleware(request: NextRequest) {
 
     if (apiEndpoint) {
         headers.set('x-gitbook-api', apiEndpoint);
-    }
-
-    if (resolved.visitorToken) {
-        headers.set(MiddlewareHeaders.VisitorToken, resolved.visitorToken);
     }
 
     const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());
