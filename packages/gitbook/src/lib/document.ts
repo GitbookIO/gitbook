@@ -22,7 +22,7 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
         if (node.data && 'fullWidth' in node.data && node.data.fullWidth) {
             return true;
         }
-        if (node.type === 'swagger') {
+        if (node.type === 'swagger' || node.type === 'openapi-operation') {
             return true;
         }
     }
@@ -120,7 +120,8 @@ export function getBlockTitle(block: DocumentBlock): string {
             return block.data.title ?? '';
         }
 
-        case 'swagger': {
+        case 'swagger':
+        case 'openapi-operation': {
             return `${block.data.method?.toUpperCase()} ${block.data.path}`;
         }
         default:
