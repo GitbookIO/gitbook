@@ -35,6 +35,17 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
     return {
         apiEndpoint: input.apiEndpoint,
 
+        async api() {
+            return getAPI(input);
+        },
+
+        withToken({ apiToken }) {
+            return createDataFetcher({
+                ...input,
+                apiToken,
+            });
+        },
+
         //
         // API that are tied to the token
         //
@@ -123,6 +134,9 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
                 url: params.url,
                 spaceId: params.spaceId,
             });
+        },
+        searchSiteContent(params) {
+            return searchSiteContent(input, params);
         },
 
         //
@@ -496,6 +510,23 @@ async function getEmbedByUrl(
     const api = getAPI(input);
     const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
     return res.data;
+}
+
+async function searchSiteContent(
+    input: DataFetcherInput,
+    params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
+) {
+    'use cache';
+
+    const { organizationId, siteId, query, scope } = params;
+
+    cacheLife('days');
+
+    const res = await getAPI(input).orgs.searchSiteContent(organizationId, siteId, {
+        query,
+        ...scope,
+    });
+    return res.data.items;
 }
 
 function getAPI(input: DataFetcherInput) {

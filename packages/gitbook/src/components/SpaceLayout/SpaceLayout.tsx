@@ -10,7 +10,6 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { getSitePointerFromContext } from '@/lib/v1';
 
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -25,10 +24,13 @@ export function SpaceLayout(props: {
     /** Whether to enable tracking of events into site insights. */
     withTracking: boolean;
 
+    /** The visitor token used to access this content */
+    visitorAuthToken: string | null;
+
     /** The children of the layout. */
     children: React.ReactNode;
 }) {
-    const { context, withTracking, children } = props;
+    const { context, withTracking, visitorAuthToken, children } = props;
     const { siteSpace, customization, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -46,7 +48,7 @@ export function SpaceLayout(props: {
         <InsightsProvider
             enabled={withTracking}
             apiHost={context.dataFetcher.apiEndpoint}
-            visitorAuthToken={context.visitorAuthToken}
+            visitorAuthToken={visitorAuthToken}
             organizationId={context.organizationId}
             siteId={context.site.id}
             siteSectionId={context.sections?.current?.id ?? null}
@@ -129,11 +131,9 @@ export function SpaceLayout(props: {
 
             <React.Suspense fallback={null}>
                 <SearchModal
-                    revisionId={context.revisionId}
                     spaceTitle={siteSpace.title}
                     withAsk={customization.aiSearch.enabled}
                     isMultiVariants={isMultiVariants}
-                    pointer={getSitePointerFromContext(context)}
                 />
             </React.Suspense>
         </InsightsProvider>

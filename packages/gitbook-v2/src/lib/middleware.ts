@@ -1,14 +1,51 @@
-import { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationThemeMode, type PublishedSiteContent } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 export enum MiddlewareHeaders {
+    /**
+     * Type of the route (static or dynamic)
+     */
+    RouteType = 'x-gitbook-route-type',
+
+    /**
+     * The URL of the site (without the pathname)
+     */
+    SiteURL = 'x-gitbook-site-url',
+
+    /**
+     * The data associated with the URL.
+     */
+    SiteURLData = 'x-gitbook-site-url-data',
+
+    /**
+     * The mode of the URL (url or url-host)
+     */
     URLMode = 'x-gitbook-url-mode',
+
+    /**
+     * The theme of the page (light or dark)
+     */
     Theme = 'x-gitbook-theme',
+
+    /**
+     * The customization override to apply.
+     */
     Customization = 'x-gitbook-customization',
+
+    /**
+     * Token to use for the API.
+     */
+    APIToken = 'x-gitbook-token',
+
+    /**
+     * The visitor token used to access this content
+     */
+    VisitorAuthToken = 'x-gitbook-visitor-token',
 }
 
 /**
  * Get the URL mode from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
  */
 export async function getURLModeFromMiddleware(): Promise<'url' | 'url-host'> {
     const headersList = await headers();
@@ -21,7 +58,39 @@ export async function getURLModeFromMiddleware(): Promise<'url' | 'url-host'> {
 }
 
 /**
+ * Get the site URL data from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
+ */
+export async function getSiteURLDataFromMiddleware(): Promise<PublishedSiteContent> {
+    const headersList = await headers();
+    const siteURLData = headersList.get(MiddlewareHeaders.SiteURLData);
+
+    if (!siteURLData) {
+        throw new Error(
+            'Site URL data is not set by the middleware. This should only be called in a server action or a dynamic route.'
+        );
+    }
+
+    return JSON.parse(siteURLData);
+}
+
+/**
+ * Get the URL from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
+ */
+export async function getSiteURLFromMiddleware(): Promise<string> {
+    const headersList = await headers();
+    const siteURL = headersList.get(MiddlewareHeaders.SiteURL);
+    if (!siteURL) {
+        throw new Error('URL mode is not set by the middleware');
+    }
+
+    return siteURL;
+}
+
+/**
  * For preview, the theme can be set via query string (?theme=light).
+ * This function should only be called in a dynamic route.
  */
 export async function getThemeFromMiddleware() {
     const headersList = await headers();
@@ -33,4 +102,18 @@ export async function getThemeFromMiddleware() {
     return queryStringTheme === 'light'
         ? CustomizationThemeMode.Light
         : CustomizationThemeMode.Dark;
+}
+
+/**
+ * Get the visitor auth token from the middleware headers.
+ * This function should only be called in a dynamic route.
+ */
+export async function getVisitorAuthTokenFromMiddleware(): Promise<string | null> {
+    const headersList = await headers();
+    const visitorAuthToken = headersList.get(MiddlewareHeaders.VisitorAuthToken);
+    if (!visitorAuthToken) {
+        return null;
+    }
+
+    return visitorAuthToken;
 }

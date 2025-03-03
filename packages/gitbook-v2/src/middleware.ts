@@ -64,8 +64,13 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
+    const routeType = dynamicHeaders ? 'dynamic' : 'static';
+
     const requestHeaders = new Headers(request.headers);
+    requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
+    requestHeaders.set(MiddlewareHeaders.SiteURL, `${url.origin}${data.basePath}`);
+    requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
     if (dynamicHeaders) {
         for (const [key, value] of Object.entries(dynamicHeaders)) {
             requestHeaders.set(key, value);
@@ -74,16 +79,18 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     const route = [
         'sites',
-        dynamicHeaders ? 'dynamic' : 'static',
+        routeType,
         mode,
         encodeURIComponent(url.host + data.basePath),
         encodePathInSiteContent(data.pathname),
     ].join('/');
 
-    console.log('route', route);
+    console.log(`rewriting to ${route}`);
 
     const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
-        headers: requestHeaders,
+        request: {
+            headers: requestHeaders,
+        },
     });
 
     // Add Content Security Policy header

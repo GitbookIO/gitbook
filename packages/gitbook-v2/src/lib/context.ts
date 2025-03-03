@@ -1,6 +1,7 @@
 import { getSiteStructureSections } from '@/lib/sites';
 import type {
     ChangeRequest,
+    PublishedSiteContentLookup,
     RevisionPage,
     RevisionPageDocument,
     Site,
@@ -15,8 +16,9 @@ import type {
 import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
-import type { ImageResizer } from './images';
-import { type GitBookSpaceLinker, appendBasePathToLinker } from './links';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
+import { type ImageResizer, createImageResizer } from './images';
+import { type GitBookSpaceLinker, createLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -90,9 +92,6 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Scripts to load for the site. */
     scripts: SiteIntegrationScript[];
-
-    /** Visitor token used to fetch the site */
-    visitorAuthToken: string | null;
 };
 
 /**
@@ -101,6 +100,58 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
     page: RevisionPageDocument;
 };
+
+/**
+ * Get the base context for a request.
+ */
+export function getBaseContext(input: {
+    siteURL: URL | string;
+    urlMode: 'url' | 'url-host';
+    apiToken?: string | null;
+}) {
+    const url = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
+    const urlMode = input.urlMode;
+
+    const dataFetcher = createDataFetcher({
+        apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
+        apiEndpoint: GITBOOK_API_URL,
+    });
+    const gitbookURL = new URL(GITBOOK_URL);
+
+    const linker =
+        urlMode === 'url-host'
+            ? createLinker({
+                  host: url.host,
+                  pathname: url.pathname,
+              })
+            : createLinker({
+                  protocol: gitbookURL.protocol,
+                  host: gitbookURL.host,
+                  pathname: `/url/${url.host}${url.pathname}`,
+              });
+
+    if (urlMode === 'url') {
+        // Create link in the same format for links to other sites/sections.
+        linker.toLinkForContent = (rawURL: string) => {
+            const urlObject = new URL(rawURL);
+            return `/url/${urlObject.host}${urlObject.pathname}`;
+        };
+    }
+
+    const imageResizer = createImageResizer({
+        host: urlMode === 'url-host' ? url.host : gitbookURL.host,
+
+        // To ensure image resizing work for proxied sites,
+        // we serve images from the root of the site.
+        linker: linker,
+    });
+
+    return {
+        dataFetcher,
+        linker,
+        imageResizer,
+    };
+}
 
 /**
  * Fetch the context of a site for a given URL and a base context.
@@ -120,15 +171,25 @@ export async function fetchSiteContextByURL(
         redirectOnError: input.redirectOnError,
     });
 
+    return fetchSiteContextByURLLookup(baseContext, data);
+}
+
+/**
+ * Fetch the context of a site using the resolution of a URL
+ */
+export async function fetchSiteContextByURLLookup(
+    baseContext: GitBookBaseContext,
+    data: PublishedSiteContentLookup
+): Promise<GitBookSiteContext> {
+    const { dataFetcher } = baseContext;
     if ('redirect' in data) {
         redirect(data.redirect);
     }
 
-    const context = await fetchSiteContextByIds(
+    return await fetchSiteContextByIds(
         {
             ...baseContext,
-            dataFetcher: createDataFetcher({
-                apiEndpoint: dataFetcher.apiEndpoint,
+            dataFetcher: dataFetcher.withToken({
                 apiToken: data.apiToken,
             }),
         },
@@ -141,16 +202,8 @@ export async function fetchSiteContextByURL(
             shareKey: data.shareKey,
             changeRequest: data.changeRequest,
             revision: data.revision,
-            visitorAuthToken: input.visitorAuthToken,
         }
     );
-
-    const siteContext = {
-        ...context,
-        linker: appendBasePathToLinker(context.linker, data.basePath),
-    };
-
-    return siteContext;
 }
 
 /**
@@ -167,7 +220,6 @@ export async function fetchSiteContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
-        visitorAuthToken: string | null;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -233,7 +285,6 @@ export async function fetchSiteContextByIds(
         structure: siteStructure,
         sections,
         scripts,
-        visitorAuthToken: ids.visitorAuthToken,
     };
 }
 

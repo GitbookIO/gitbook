@@ -32,6 +32,7 @@ import {
 
 import { joinPath, normalizePathname } from '@/lib/paths';
 import { getProxyModeBasePath } from '@/lib/proxy';
+import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
     matcher:
@@ -83,6 +84,8 @@ export type LookupResult = PublishedContentWithCache & {
     cookies?: LookupCookies;
     /** Visitor authentication token */
     visitorToken?: string;
+    /** URL of the site */
+    siteURL?: string;
 };
 
 /**
@@ -199,6 +202,13 @@ export async function middleware(request: NextRequest) {
         if (resolved.shareKey) {
             headers.set('x-gitbook-content-site-share-key', resolved.shareKey);
         }
+
+        // For server actions that use v2 code
+        headers.set(MiddlewareHeaders.SiteURLData, JSON.stringify(resolved));
+    }
+
+    if (resolved.visitorToken) {
+        headers.set(MiddlewareHeaders.VisitorAuthToken, resolved.visitorToken);
     }
 
     // For tests, we make it possible to enable search indexation
@@ -229,10 +239,6 @@ export async function middleware(request: NextRequest) {
 
     if (apiEndpoint) {
         headers.set('x-gitbook-api', apiEndpoint);
-    }
-
-    if (resolved.visitorToken) {
-        headers.set('x-gitbook-visitor-token', resolved.visitorToken);
     }
 
     const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());
@@ -761,14 +767,23 @@ async function lookupSiteByAPI(
         return null;
     });
 
-    return (
-        result ?? {
-            error: {
-                code: 404,
-                message: 'No content found',
-            },
+    if (result) {
+        if ('site' in result) {
+            return {
+                ...result,
+                siteURL: `${lookupURL.origin}${result.basePath}`,
+            };
         }
-    );
+
+        return result;
+    }
+
+    return {
+        error: {
+            code: 404,
+            message: 'No content found',
+        },
+    };
 }
 
 /**

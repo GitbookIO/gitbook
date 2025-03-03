@@ -5,6 +5,8 @@ import { headers } from 'next/headers';
 
 import { getV1BaseContext } from '@/lib/v1';
 
+import { isV2 } from '@/lib/v2';
+import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
@@ -41,7 +43,7 @@ interface FetchPlaceholderAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    const baseContext = await getV1BaseContext();
+    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
 
     const mode = options.source === 'live' ? options.mode : 'classic';
     const result = options.source === 'live' ? await fetchAd(options) : await getPlaceholderAd();
@@ -64,9 +66,9 @@ export async function renderAd(options: FetchAdOptions) {
         children: (
             <>
                 {mode === 'classic' || !('callToAction' in ad) ? (
-                    <AdClassicRendering ad={ad} insightsAd={insightsAd} context={baseContext} />
+                    <AdClassicRendering ad={ad} insightsAd={insightsAd} context={context} />
                 ) : (
-                    <AdCoverRendering ad={ad} insightsAd={insightsAd} context={baseContext} />
+                    <AdCoverRendering ad={ad} insightsAd={insightsAd} context={context} />
                 )}
                 {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
             </>

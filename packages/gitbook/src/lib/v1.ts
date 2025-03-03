@@ -7,7 +7,6 @@ import {
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
-import { headers } from 'next/headers';
 
 import {
     type SiteContentPointer,
@@ -28,6 +27,7 @@ import {
     getSiteRedirectBySource,
     getSpace,
     getUserById,
+    searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
 import { getBasePath, getHost } from './links';
@@ -74,8 +74,19 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
 async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
     const apiClient = await api();
 
-    return {
+    const dataFetcher: GitBookDataFetcher = {
         apiEndpoint: apiClient.client.endpoint,
+
+        async api() {
+            const result = await api();
+            return result.client;
+        },
+
+        withToken() {
+            // In v1, the token is global and controlled by the middleware.
+            // We don't need to do anything special here.
+            return dataFetcher;
+        },
 
         getUserById(userId) {
             return getUserById(userId);
@@ -145,7 +156,15 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         getEmbedByUrl(params) {
             return getEmbedByUrlInSpace(params.spaceId, params.url);
         },
+
+        async searchSiteContent(params) {
+            const { organizationId, siteId, query, cacheBust, scope } = params;
+            const result = await searchSiteContent(organizationId, siteId, query, scope, cacheBust);
+            return result.items;
+        },
     };
+
+    return dataFetcher;
 }
 
 /**
@@ -153,7 +172,6 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
  */
 export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) {
     const baseContext = await getV1BaseContext();
-    const headersList = await headers();
 
     const context = await fetchSiteContextByIds(baseContext, {
         organization: pointer.organizationId,
@@ -164,7 +182,6 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
         shareKey: pointer.siteShareKey,
         changeRequest: pointer.changeRequestId,
         revision: pointer.revisionId,
-        visitorAuthToken: headersList.get('x-gitbook-visitor-token'),
     });
 
     context.customization = await getDynamicCustomizationSettings(context.customization);
