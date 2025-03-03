@@ -1,3 +1,14 @@
+'use client';
+
+import { createContext, useContext, useRef, useState } from 'react';
+import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
+import {
+    type DisclosureGroupProps,
+    type DisclosureGroupState,
+    useDisclosureGroupState,
+    useDisclosureState,
+} from 'react-stately';
+
 interface Props {
     groups: TDisclosureGroup[];
     icon?: React.ReactNode;
@@ -12,15 +23,6 @@ type TDisclosureGroup = {
         body?: React.ReactNode;
     }[];
 };
-
-import { createContext, useContext, useRef, useState } from 'react';
-import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
-import {
-    type DisclosureGroupProps,
-    type DisclosureGroupState,
-    useDisclosureGroupState,
-    useDisclosureState,
-} from 'react-stately';
 
 const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
 

@@ -1,5 +1,5 @@
-import { InteractiveSection } from './InteractiveSection';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { StaticSection } from './StaticSection';
 import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
@@ -117,9 +117,9 @@ export function OpenAPICodeSample(props: {
 
     return (
         <OpenAPITabs stateKey={createStateKey('codesample')} items={samples}>
-            <InteractiveSection header={<OpenAPITabsList />} className="openapi-codesample">
+            <StaticSection header={<OpenAPITabsList />} className="openapi-codesample">
                 <OpenAPITabsPanels />
-            </InteractiveSection>
+            </StaticSection>
         </OpenAPITabs>
     );
 }

@@ -1,12 +1,10 @@
-'use client';
-
 import type { OpenAPI } from '@gitbook/openapi-parser';
 
-import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
+import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { parameterToProperty } from './utils';
 
@@ -32,7 +30,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
 
             {parameterGroups.map((group) => {
                 return (
-                    <InteractiveSection
+                    <StaticSection
                         key={group.key}
                         className="openapi-parameters"
                         header={group.label}
@@ -41,7 +39,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                             properties={group.parameters.map(parameterToProperty)}
                             context={context}
                         />
-                    </InteractiveSection>
+                    </StaticSection>
                 );
             })}
 

@@ -1,8 +1,8 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
+import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './types';
 
 /**
@@ -15,7 +15,7 @@ export function OpenAPIResponses(props: {
     const { responses, context } = props;
 
     return (
-        <InteractiveSection header="Responses" className="openapi-responses">
+        <StaticSection header="Responses" className="openapi-responses">
             <OpenAPIDisclosureGroup
                 allowsMultipleExpanded
                 icon={context.icons.chevronRight}
@@ -58,6 +58,6 @@ export function OpenAPIResponses(props: {
                     }
                 )}
             />
-        </InteractiveSection>
+        </StaticSection>
     );
 }
