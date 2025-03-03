@@ -25,12 +25,6 @@ const config = {
     dangerous: {
         enableCacheInterception: false,
     },
-
-    experimental: {
-        serverActions: {
-            allowedOrigins: ['*', '*.*', '*.*.*', '*.*.*.*', '*.*.*.*.*'],
-        },
-    },
 };
 
 export default config;
