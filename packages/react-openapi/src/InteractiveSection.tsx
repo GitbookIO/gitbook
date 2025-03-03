@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { useRef, useState } from 'react';
+import { type ComponentPropsWithoutRef, forwardRef, useRef, useState } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
 
@@ -9,6 +9,63 @@ interface InteractiveSectionTab {
     key: string;
     label: string;
     body: React.ReactNode;
+}
+
+export function Section(props: ComponentPropsWithoutRef<'div'>) {
+    return <div {...props} className={clsx('openapi-section', props.className)} />;
+}
+
+export function SectionHeader(props: ComponentPropsWithoutRef<'div'>) {
+    return (
+        <div
+            {...props}
+            className={clsx(
+                'openapi-section-header',
+                props.className && `${props.className}-header`
+            )}
+        />
+    );
+}
+
+export function SectionHeaderContent(props: ComponentPropsWithoutRef<'div'>) {
+    return (
+        <div
+            {...props}
+            className={clsx(
+                'openapi-section-header-content',
+                props.className && `${props.className}-header-content`
+            )}
+        />
+    );
+}
+
+export const SectionBody = forwardRef(function SectionBody(
+    props: ComponentPropsWithoutRef<'div'>,
+    ref: React.ForwardedRef<HTMLDivElement>
+) {
+    return (
+        <div
+            ref={ref}
+            {...props}
+            className={clsx('openapi-section-body', props.className && `${props.className}-body`)}
+        />
+    );
+});
+
+export function StaticSection(props: {
+    className: string;
+    header: React.ReactNode;
+    children: React.ReactNode;
+}) {
+    const { className, header, children } = props;
+    return (
+        <Section className={className}>
+            <SectionHeader className={className}>
+                <SectionHeaderContent className={className}>{header}</SectionHeaderContent>
+            </SectionHeader>
+            <SectionBody className={className}>{children}</SectionBody>
+        </Section>
+    );
 }
 
 /**
@@ -63,7 +120,7 @@ export function InteractiveSection(props: {
     const { isFocusVisible, focusProps } = useFocusRing();
 
     return (
-        <div
+        <Section
             id={id}
             className={clsx(
                 'openapi-section',
@@ -73,20 +130,15 @@ export function InteractiveSection(props: {
             )}
         >
             {header ? (
-                <div
+                <SectionHeader
                     onClick={() => {
                         if (toggeable) {
                             state.toggle();
                         }
                     }}
-                    className={clsx('openapi-section-header', `${className}-header`)}
+                    className={className}
                 >
-                    <div
-                        className={clsx(
-                            'openapi-section-header-content',
-                            `${className}-header-content`
-                        )}
-                    >
+                    <SectionHeaderContent className={className}>
                         {(children || selectedTab?.body) && toggeable ? (
                             <button
                                 {...mergeProps(buttonProps, focusProps)}
@@ -102,7 +154,7 @@ export function InteractiveSection(props: {
                             </button>
                         ) : null}
                         {header}
-                    </div>
+                    </SectionHeaderContent>
                     <div
                         className={clsx(
                             'openapi-section-header-controls',
@@ -133,23 +185,19 @@ export function InteractiveSection(props: {
                             </select>
                         ) : null}
                     </div>
-                </div>
+                </SectionHeader>
             ) : null}
             {(!toggeable || state.isExpanded) && (children || selectedTab?.body) ? (
-                <div
-                    ref={panelRef}
-                    {...panelProps}
-                    className={clsx('openapi-section-body', `${className}-body`)}
-                >
+                <SectionBody ref={panelRef} {...panelProps} className={className}>
                     {children}
                     {selectedTab?.body}
-                </div>
+                </SectionBody>
             ) : null}
             {overlay ? (
                 <div className={clsx('openapi-section-overlay', `${className}-overlay`)}>
                     {overlay}
                 </div>
             ) : null}
-        </div>
+        </Section>
     );
 }

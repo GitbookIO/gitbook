@@ -2,7 +2,7 @@
 
 import type { OpenAPI } from '@gitbook/openapi-parser';
 
-import { InteractiveSection } from './InteractiveSection';
+import { StaticSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
@@ -32,7 +32,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
 
             {parameterGroups.map((group) => {
                 return (
-                    <InteractiveSection
+                    <StaticSection
                         key={group.key}
                         className="openapi-parameters"
                         header={group.label}
@@ -41,7 +41,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                             properties={group.parameters.map(parameterToProperty)}
                             context={context}
                         />
-                    </InteractiveSection>
+                    </StaticSection>
                 );
             })}
 

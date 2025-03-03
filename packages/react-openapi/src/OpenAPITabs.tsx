@@ -1,10 +1,9 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
-import { useIntersectionObserver } from 'usehooks-ts';
 import { Markdown } from './Markdown';
-import { useSyncedTabsGlobalState } from './useSyncedTabsGlobalState';
+import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
 
 export type TabItem = {
     key: Key;
@@ -15,7 +14,7 @@ export type TabItem = {
 
 type OpenAPITabsContextData = {
     items: TabItem[];
-    selectedTab: TabItem;
+    selectedTab: TabItem | null;
 };
 
 const OpenAPITabsContext = createContext<OpenAPITabsContextData | null>(null);
@@ -35,74 +34,59 @@ export function OpenAPITabs(
     props: React.PropsWithChildren<TabsProps & { items: TabItem[]; stateKey?: string }>
 ) {
     const { children, items, stateKey } = props;
-    const [ref, isIntersectionVisible] = useIntersectionObserver({
-        threshold: 0.1,
-        rootMargin: '200px',
-    });
-    const isVisible = stateKey ? isIntersectionVisible : true;
-    const defaultTab = items[0] as TabItem;
-    const [syncedTabs, setSyncedTabs] = useSyncedTabsGlobalState<TabItem>();
-    const [selectedTabKey, setSelectedTabKey] = useState(() => {
-        if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
-            const tabFromState = syncedTabs.get(stateKey);
-            return tabFromState?.key ?? items[0]?.key;
-        }
-        return items[0]?.key;
-    });
-    const [selectedTab, setSelectedTab] = useState<TabItem>(defaultTab);
-
-    const handleSelectionChange = (key: Key) => {
-        setSelectedTabKey(key);
-        if (stateKey) {
-            const tab = items.find((item) => item.key === key);
-
-            if (!tab) {
-                return;
+    const [tabKey, setTabKey] = useState<Key | null>(() => {
+        if (stateKey && typeof window !== 'undefined') {
+            const store = getOrCreateTabStoreByKey(stateKey);
+            const tabKey = store.getState().tabKey;
+            if (tabKey) {
+                return tabKey;
             }
-
-            setSyncedTabs((state) => {
-                const newState = new Map(state);
-                newState.set(stateKey, tab);
-                return newState;
-            });
         }
-    };
-
+        return items[0]?.key ?? null;
+    });
+    const selectedTab = items.find((item) => item.key === tabKey) ?? items[0] ?? null;
+    const cancelDeferRef = useRef<(() => void) | null>(null);
     useEffect(() => {
-        if (isVisible && stateKey && syncedTabs && syncedTabs.has(stateKey)) {
-            const tabFromState = syncedTabs.get(stateKey);
-
-            if (!items.some((item) => item.key === tabFromState?.key)) {
-                return setSelectedTab(defaultTab);
-            }
-
-            if (tabFromState && tabFromState?.key !== selectedTab?.key) {
-                const tabFromItems = items.find((item) => item.key === tabFromState.key);
-
-                if (!tabFromItems) {
-                    return;
-                }
-
-                setSelectedTab(tabFromItems);
-            }
+        if (!stateKey) {
+            return undefined;
         }
-    }, [isVisible, stateKey, syncedTabs, selectedTabKey]);
-
+        const store = getOrCreateTabStoreByKey(stateKey);
+        return store.subscribe((state) => {
+            cancelDeferRef.current?.();
+            cancelDeferRef.current = defer(() => setTabKey(state.tabKey));
+        });
+    }, [stateKey]);
+    useEffect(() => {
+        return () => cancelDeferRef.current?.();
+    }, []);
     const contextValue = useMemo(() => ({ items, selectedTab }), [items, selectedTab]);
-
     return (
         <OpenAPITabsContext.Provider value={contextValue}>
             <Tabs
-                ref={ref}
                 className="openapi-tabs"
-                onSelectionChange={handleSelectionChange}
-                selectedKey={selectedTab?.key}
+                onSelectionChange={(tabKey) => {
+                    setTabKey(tabKey);
+                    if (stateKey) {
+                        const store = getOrCreateTabStoreByKey(stateKey);
+                        store.setState({ tabKey });
+                    }
+                }}
+                selectedKey={tabKey}
             >
                 {children}
             </Tabs>
         </OpenAPITabsContext.Provider>
     );
 }
+
+const defer = (fn: () => void) => {
+    if (typeof requestIdleCallback === 'function') {
+        const id = requestIdleCallback(fn);
+        return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(fn, 0);
+    return () => clearTimeout(id);
+};
 
 /**
  * The OpenAPI Tabs list component.
@@ -116,14 +100,14 @@ export function OpenAPITabsList() {
         <TabList className="openapi-tabs-list">
             {items.map((tab) => (
                 <Tab
+                    key={tab.key}
+                    id={tab.key}
                     style={({ isFocusVisible }) => ({
                         outline: isFocusVisible
                             ? '2px solid rgb(var(--primary-color-500)/0.4)'
                             : 'none',
                     })}
                     className="openapi-tabs-tab"
-                    key={`Tab-${tab.key}`}
-                    id={tab.key}
                 >
                     {tab.label}
                 </Tab>
@@ -144,12 +128,10 @@ export function OpenAPITabsPanels() {
         return null;
     }
 
+    const key = selectedTab.key.toString();
+
     return (
-        <TabPanel
-            key={`TabPanel-${selectedTab.key}`}
-            id={selectedTab.key.toString()}
-            className="openapi-tabs-panel"
-        >
+        <TabPanel key={key} id={key} className="openapi-tabs-panel">
             {selectedTab.body}
             {selectedTab.description ? (
                 <Markdown source={selectedTab.description} className="openapi-tabs-footer" />

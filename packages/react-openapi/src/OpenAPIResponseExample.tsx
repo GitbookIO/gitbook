@@ -1,5 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { InteractiveSection } from './InteractiveSection';
+import { StaticSection } from './InteractiveSection';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { generateSchemaExample } from './generateSchemaExample';
 import { json2xml } from './json2xml';
@@ -84,9 +84,9 @@ export function OpenAPIResponseExample(props: {
 
     return (
         <OpenAPITabs stateKey={createStateKey('response-example')} items={tabs}>
-            <InteractiveSection header={<OpenAPITabsList />} className="openapi-response-example">
+            <StaticSection header={<OpenAPITabsList />} className="openapi-response-example">
                 <OpenAPITabsPanels />
-            </InteractiveSection>
+            </StaticSection>
         </OpenAPITabs>
     );
 }
@@ -134,12 +134,9 @@ function OpenAPIResponse(props: {
 
     return (
         <OpenAPITabs stateKey={createStateKey('response-media-types')} items={tabs}>
-            <InteractiveSection
-                header={<OpenAPITabsList />}
-                className="openapi-response-media-types"
-            >
+            <StaticSection header={<OpenAPITabsList />} className="openapi-response-media-types">
                 <OpenAPITabsPanels />
-            </InteractiveSection>
+            </StaticSection>
         </OpenAPITabs>
     );
 }
@@ -173,23 +170,19 @@ function OpenAPIResponseMediaType(props: {
             key: example.key,
             label: example.example.summary || example.key,
             body: (
-                <OpenAPIExample
-                    example={firstExample.example}
-                    context={props.context}
-                    syntax={syntax}
-                />
+                <OpenAPIExample example={example.example} context={props.context} syntax={syntax} />
             ),
         };
     });
 
     return (
         <OpenAPITabs stateKey={createStateKey('response-media-type-examples')} items={tabs}>
-            <InteractiveSection
+            <StaticSection
                 header={<OpenAPITabsList />}
                 className="openapi-response-media-type-examples"
             >
                 <OpenAPITabsPanels />
-            </InteractiveSection>
+            </StaticSection>
         </OpenAPITabs>
     );
 }
