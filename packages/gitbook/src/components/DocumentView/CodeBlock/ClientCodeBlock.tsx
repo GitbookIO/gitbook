@@ -3,8 +3,9 @@
 import type { DocumentBlockCode } from '@gitbook/api';
 import { useEffect, useRef, useState } from 'react';
 
-import { useHasBeenInViewport } from '@/components/hooks/useHasBeenInViewport';
-
+import { useInViewportListener } from '@/components/hooks/useInViewportListener';
+import { useScrollListener } from '@/components/hooks/useScrollListener';
+import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
 import type { HighlightLine, RenderedInline } from './highlight';
@@ -21,6 +22,8 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> &
 export function ClientCodeBlock(props: ClientBlockProps) {
     const { block, style, inlines } = props;
     const blockRef = useRef<HTMLDivElement>(null);
+    const processedRef = useRef(false);
+    const isInViewportRef = useRef<boolean | null>(null);
     const [lines, setLines] = useState<HighlightLine[]>(() => plainHighlight(block, []));
 
     // Preload the highlighter when the block is mounted.
@@ -28,39 +31,44 @@ export function ClientCodeBlock(props: ClientBlockProps) {
         import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block));
     }, [block]);
 
-    // Check if the block is in the viewport to start highlighting it.
-    const hasBeenInViewport = useHasBeenInViewport(blockRef, {
-        rootMargin: '200px',
-    });
-
-    // Highlight the block when it's in the viewport.
-    useEffect(() => {
-        if (hasBeenInViewport) {
-            let canceled = false;
-            import('./highlight').then(({ highlight }) => {
-                // We use requestIdleCallback to avoid blocking the main thread
-                // when scrolling.
-                if (typeof requestIdleCallback === 'function') {
-                    requestIdleCallback(() =>
-                        highlight(block, inlines).then((result) => {
-                            if (!canceled) {
-                                setLines(result);
-                            }
-                        })
-                    );
-                } else {
-                    highlight(block, inlines).then((result) => {
-                        if (!canceled) {
-                            setLines(result);
-                        }
-                    });
-                }
-            });
-            return () => {
-                canceled = true;
-            };
+    const runHighlight = useEventCallback(() => {
+        if (processedRef.current) {
+            return;
         }
-    }, [hasBeenInViewport, block, inlines]);
+        if (typeof window !== 'undefined') {
+            import('./highlight').then(({ highlight }) => {
+                highlight(block, inlines).then((lines) => {
+                    setLines(lines);
+                    processedRef.current = true;
+                });
+            });
+        }
+    });
+    const debouncedRunHighlight = useDebounceCallback(runHighlight, 1000);
+
+    useInViewportListener(
+        blockRef,
+        (isInViewport, disconnect) => {
+            // Disconnect once in viewport
+            if (isInViewport) {
+                disconnect();
+                // If it's initially in viewport, we need to run the highlight
+                if (isInViewportRef.current === null) {
+                    runHighlight();
+                }
+            }
+            isInViewportRef.current = isInViewport;
+        },
+        { rootMargin: '200px' }
+    );
+
+    const handleScroll = useDebounceCallback(() => {
+        if (isInViewportRef.current) {
+            debouncedRunHighlight();
+        }
+    }, 80);
+
+    useScrollListener(handleScroll, useRef(typeof window !== 'undefined' ? window : null));
 
     return <CodeBlockRenderer ref={blockRef} block={block} style={style} lines={lines} />;
 }
