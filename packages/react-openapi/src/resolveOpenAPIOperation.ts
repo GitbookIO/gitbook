@@ -55,7 +55,10 @@ export async function resolveOpenAPIOperation(
         }
     }
 
-    const components = flattenComponents(schema);
+    let components: OpenAPIOperationData['components'] = [];
+    if (schema.components) {
+        components = getOpenAPIComponents(schema);
+    }
 
     return {
         servers,
@@ -167,15 +170,10 @@ function flattenSecurities(security: OpenAPIV3.SecurityRequirementObject[]) {
     });
 }
 
-function flattenComponents(
+function getOpenAPIComponents(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document
 ): [string, OpenAPIV3.SchemaObject][] {
-    const components = Object.keys(schema?.components?.schemas ?? {}).length
-        ? schema?.components?.schemas
-        : {};
+    const schemas = schema.components?.schemas ?? {};
 
-    return Object.entries(components ?? {})
-        .filter(([, schema]) => !shouldIgnoreEntity(schema))
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([name, schema]) => [name, schema]);
+    return Object.entries(schemas).filter(([, schema]) => !shouldIgnoreEntity(schema));
 }
