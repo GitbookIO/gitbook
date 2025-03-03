@@ -155,6 +155,21 @@ export function runTestCases(testCases: TestsCase[]) {
                         );
                     }
 
+                    // Set the header to disable the Vercel toolbar
+                    // But only on the main document as it'd cause CORS issues on other resources
+                    await page.route('**/*', async (route, request) => {
+                        if (request.resourceType() === 'document') {
+                            await route.continue({
+                                headers: {
+                                    ...request.headers(),
+                                    'x-vercel-skip-toolbar': '1',
+                                },
+                            });
+                        } else {
+                            await route.continue();
+                        }
+                    });
+
                     await page.goto(url);
                     if (testEntry.run) {
                         await testEntry.run(page);
