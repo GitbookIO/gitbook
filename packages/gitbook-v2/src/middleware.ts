@@ -78,6 +78,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     }
 
     // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
+    requestHeaders.delete('x-forwarded-host');
     requestHeaders.set('x-forwarded-host', url.host);
     requestHeaders.set('origin', url.origin);
 
