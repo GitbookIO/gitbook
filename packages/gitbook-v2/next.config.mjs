@@ -6,12 +6,6 @@
 const nextConfig = {
     experimental: {
         useCache: true,
-        serverActions: {
-            // Allow all origins for server actions
-            // as we serve content on a lot of domains
-            // Server actions are secured by the middleware.
-            allowedOrigins: ['*', '*.*', '*.*.*', '*.*.*.*', '*.*.*.*.*'],
-        },
     },
 
     env: {
