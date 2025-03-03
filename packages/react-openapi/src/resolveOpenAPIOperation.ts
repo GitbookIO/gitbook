@@ -40,7 +40,7 @@ export async function resolveOpenAPIOperation(
         };
     }
 
-    const servers = 'servers' in schema ? schema.servers ?? [] : [];
+    const servers = 'servers' in schema ? (schema.servers ?? []) : [];
     const security = flattenSecurities(operation.security ?? schema.security ?? []);
 
     // Resolve securities

@@ -15,7 +15,7 @@ interface Props {
  * Display an interactive OpenAPI disclosure.
  * The label is optional and defaults to "child attributes".
  */
-export function OpenAPIDisclosure({ context, children, label }: Props): React.JSX.Element {
+export function OpenAPIDisclosure({ context, children, label }: Props) {
     const state = useDisclosureState({});
     const panelRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);

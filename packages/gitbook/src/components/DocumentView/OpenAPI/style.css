@@ -196,7 +196,7 @@
     @apply select-all font-mono font-normal text-tint-strong;
 }
 
-.openapi-schema-propertyname[data-deprecated='true'] {
+.openapi-schema-propertyname[data-deprecated="true"] {
     @apply line-through opacity-9;
 }
 
@@ -405,7 +405,7 @@
     -ms-overflow-style: none;
 }
 
-.openapi-path-title[data-deprecated='true'] {
+.openapi-path-title[data-deprecated="true"] {
     @apply line-through;
 }
 
@@ -484,7 +484,7 @@
     @apply transition-all;
 }
 
-.openapi-section-toggle[aria-expanded='true'] > svg {
+.openapi-section-toggle[aria-expanded="true"] > svg {
     @apply rotate-90;
 }
 
@@ -507,7 +507,7 @@
     @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
 }
 
-.openapi-tabs-tab[aria-selected='true'] {
+.openapi-tabs-tab[aria-selected="true"] {
     @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
 }
 
@@ -545,7 +545,7 @@
     @apply invisible;
 }
 
-.openapi-disclosure-group-trigger[aria-expanded='true'] .openapi-response-description {
+.openapi-disclosure-group-trigger[aria-expanded="true"] .openapi-response-description {
     @apply whitespace-normal;
 }
 
@@ -561,7 +561,7 @@
     @apply pb-2.5;
 }
 
-.openapi-disclosure-group-trigger[aria-expanded='true'] > .openapi-disclosure-group-icon > svg {
+.openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
     @apply rotate-90;
 }
 
@@ -590,19 +590,19 @@
     @apply size-3 shrink-0 transition-transform duration-300;
 }
 
-.openapi-disclosure-trigger[aria-expanded='true'] svg {
+.openapi-disclosure-trigger[aria-expanded="true"] svg {
     @apply rotate-45;
 }
 
-.openapi-disclosure-trigger[aria-expanded='true'] {
+.openapi-disclosure-trigger[aria-expanded="true"] {
     @apply w-full rounded-lg border-b rounded-b-none;
 }
 
-.openapi-disclosure-trigger[aria-expanded='false'] {
+.openapi-disclosure-trigger[aria-expanded="false"] {
     @apply w-auto;
 }
 
-.openapi-disclosure-panel[aria-hidden='false'] {
+.openapi-disclosure-panel[aria-hidden="false"] {
     @apply border-b border-x border-tint-subtle rounded-b-lg;
 }
 
