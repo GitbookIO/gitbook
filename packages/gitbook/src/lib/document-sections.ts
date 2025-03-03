@@ -37,7 +37,7 @@ export async function getDocumentSections(
             });
         }
 
-        if (block.type === 'swagger' && block.meta?.id) {
+        if ((block.type === 'swagger' || block.type === 'openapi-operation') && block.meta?.id) {
             const { data: operation } = await resolveOpenAPIBlock({
                 block,
                 context,
