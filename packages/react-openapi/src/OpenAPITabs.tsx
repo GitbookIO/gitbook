@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
+import { useEventCallback } from 'usehooks-ts';
 import { Markdown } from './Markdown';
 import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
 
@@ -44,6 +45,16 @@ export function OpenAPITabs(
         }
         return items[0]?.key ?? null;
     });
+    const selectTab = useEventCallback((key: Key | null) => {
+        if (!key || key === tabKey) {
+            return;
+        }
+        const tab = items.find((item) => item.key === key);
+        if (!tab) {
+            return;
+        }
+        setTabKey(key);
+    });
     const selectedTab = items.find((item) => item.key === tabKey) ?? items[0] ?? null;
     const cancelDeferRef = useRef<(() => void) | null>(null);
     useEffect(() => {
@@ -53,9 +64,9 @@ export function OpenAPITabs(
         const store = getOrCreateTabStoreByKey(stateKey);
         return store.subscribe((state) => {
             cancelDeferRef.current?.();
-            cancelDeferRef.current = defer(() => setTabKey(state.tabKey));
+            cancelDeferRef.current = defer(() => selectTab(state.tabKey));
         });
-    }, [stateKey]);
+    }, [stateKey, selectTab]);
     useEffect(() => {
         return () => cancelDeferRef.current?.();
     }, []);
@@ -65,7 +76,7 @@ export function OpenAPITabs(
             <Tabs
                 className="openapi-tabs"
                 onSelectionChange={(tabKey) => {
-                    setTabKey(tabKey);
+                    selectTab(tabKey);
                     if (stateKey) {
                         const store = getOrCreateTabStoreByKey(stateKey);
                         store.setState({ tabKey });
