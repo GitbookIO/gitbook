@@ -1,12 +1,10 @@
-'use client';
-
 import type { OpenAPI } from '@gitbook/openapi-parser';
 
-import { StaticSection } from './InteractiveSection';
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchema';
 import { OpenAPISecurities } from './OpenAPISecurities';
+import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { parameterToProperty } from './utils';
 

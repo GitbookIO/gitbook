@@ -1,6 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { StaticSection } from './InteractiveSection';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { StaticSection } from './StaticSection';
 import { generateSchemaExample } from './generateSchemaExample';
 import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';

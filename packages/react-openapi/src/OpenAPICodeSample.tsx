@@ -1,5 +1,5 @@
-import { StaticSection } from './InteractiveSection';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { StaticSection } from './StaticSection';
 import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';

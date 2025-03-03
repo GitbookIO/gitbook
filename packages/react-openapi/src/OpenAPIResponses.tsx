@@ -1,8 +1,8 @@
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import { StaticSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
+import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './types';
 
 /**
