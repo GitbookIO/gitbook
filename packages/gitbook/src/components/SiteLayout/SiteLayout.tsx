@@ -23,10 +23,11 @@ export async function SiteLayout(props: {
     nonce?: string;
     context: GitBookSiteContext;
     forcedTheme?: CustomizationThemeMode | null;
+    withTracking: boolean;
     visitorAuthToken: string | null;
     children: React.ReactNode;
 }) {
-    const { context, nonce, forcedTheme, visitorAuthToken, children } = props;
+    const { context, nonce, forcedTheme, withTracking, visitorAuthToken, children } = props;
 
     const { scripts, customization } = context;
 
@@ -51,7 +52,11 @@ export async function SiteLayout(props: {
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
             >
-                <SpaceLayout context={context} visitorAuthToken={visitorAuthToken}>
+                <SpaceLayout
+                    context={context}
+                    withTracking={withTracking}
+                    visitorAuthToken={visitorAuthToken}
+                >
                     {children}
                 </SpaceLayout>
 

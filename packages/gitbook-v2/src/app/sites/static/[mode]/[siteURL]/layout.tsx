@@ -6,6 +6,7 @@ import {
 } from '@/components/SiteLayout';
 import { type RouteLayoutParams, getStaticSiteContext } from '@v2/app/utils';
 import { getSiteCacheTag } from '@v2/lib/cache';
+import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 
 interface SiteStaticLayoutProps {
@@ -24,7 +25,11 @@ export default async function SiteStaticLayout({
 
     return (
         <CustomizationRootLayout customization={context.customization}>
-            <SiteLayout context={context} visitorAuthToken={null}>
+            <SiteLayout
+                context={context}
+                withTracking={!GITBOOK_DISABLE_TRACKING}
+                visitorAuthToken={null}
+            >
                 {children}
             </SiteLayout>
         </CustomizationRootLayout>
