@@ -1,3 +1,4 @@
+'use client';
 import type React from 'react';
 import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';

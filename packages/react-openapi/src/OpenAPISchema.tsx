@@ -119,9 +119,9 @@ export function OpenAPISchemaProperties(props: {
 
     return (
         <div id={id} className="openapi-schema-properties">
-            {properties.map((property) => (
+            {properties.map((property, index) => (
                 <OpenAPISchemaProperty
-                    key={property.propertyName}
+                    key={index}
                     circularRefs={circularRefs}
                     {...property}
                     context={context}

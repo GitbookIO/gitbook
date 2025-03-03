@@ -80,10 +80,6 @@ export function OpenAPITabs(
 }
 
 const defer = (fn: () => void) => {
-    if (typeof requestIdleCallback === 'function') {
-        const id = requestIdleCallback(fn);
-        return () => cancelIdleCallback(id);
-    }
     const id = setTimeout(fn, 0);
     return () => clearTimeout(id);
 };
