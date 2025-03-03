@@ -1,3 +1,3 @@
-export function OpenAPIModelSchema(): JSX.Element {
+export function OpenAPIModelSchema() {
     return <></>;
 }
