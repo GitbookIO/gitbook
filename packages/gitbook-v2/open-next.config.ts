@@ -25,6 +25,14 @@ const config = {
     dangerous: {
         enableCacheInterception: false,
     },
+
+    experimental: {
+        serverActions: {
+            allowedOrigins: process.env.GITBOOK_URL
+                ? [new URL(process.env.GITBOOK_URL).hostname]
+                : [],
+        },
+    },
 };
 
 export default config;
