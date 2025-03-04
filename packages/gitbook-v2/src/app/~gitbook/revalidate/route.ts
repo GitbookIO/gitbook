@@ -23,6 +23,8 @@ export async function POST(req: NextRequest) {
         }
 
         body.tags.forEach((tag) => {
+            // biome-ignore lint/suspicious/noConsole: we want to log here
+            console.log(`Revalidating tag: ${tag}`);
             revalidateTag(tag);
         });
 
