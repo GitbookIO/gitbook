@@ -229,12 +229,12 @@ export async function middleware(request: NextRequest) {
 
     const customization = url.searchParams.get('customization');
     if (customization && validateSerializedCustomization(customization)) {
-        headers.set('x-gitbook-customization', customization);
+        headers.set(MiddlewareHeaders.Customization, customization);
     }
 
     const theme = url.searchParams.get('theme');
     if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
-        headers.set('x-gitbook-theme', theme);
+        headers.set(MiddlewareHeaders.Theme, theme);
     }
 
     if (apiEndpoint) {

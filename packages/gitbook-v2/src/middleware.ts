@@ -1,8 +1,9 @@
-import { GitBookAPIError } from '@gitbook/api';
+import { CustomizationThemeMode, GitBookAPIError } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
+import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
@@ -100,6 +101,10 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     // Add Content Security Policy header
     response.headers.set('content-security-policy', getContentSecurityPolicy());
+    // Basic security headers
+    response.headers.set('strict-transport-security', 'max-age=31536000');
+    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+    response.headers.set('x-content-type-options', 'nosniff');
 
     return response;
 }
@@ -149,12 +154,24 @@ function extractURL(request: NextRequest): URLWithMode | null {
 /**
  * Evaluate if a request is dynamic or static.
  */
-function getDynamicHeaders(_url: URL, _request: NextRequest): null | Record<string, string> {
+function getDynamicHeaders(url: URL, _request: NextRequest): null | Record<string, string> {
+    const headers: Record<string, string> = {};
+
+    // Preview of customization
+    const customization = url.searchParams.get('customization');
+    if (customization && validateSerializedCustomization(customization)) {
+        headers[MiddlewareHeaders.Customization] = customization;
+    }
+    const theme = url.searchParams.get('theme');
+    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
+        headers[MiddlewareHeaders.Theme] = theme;
+    }
+
     // TODO:
     // - check token in query string
     // - check token in cookies
     // - check special headers or query string
-    return null;
+    return Object.keys(headers).length > 0 ? headers : null;
 }
 
 /**
