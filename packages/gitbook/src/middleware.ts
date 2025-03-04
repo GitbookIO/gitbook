@@ -23,9 +23,9 @@ import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import { setMiddlewareHeader } from '@/lib/middleware';
 import {
+    type ResponseCookies,
     type VisitorTokenLookup,
-    getVisitorAuthCookieName,
-    getVisitorAuthCookieValue,
+    getResponseCookiesForVisitorAuth,
     getVisitorToken,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
@@ -69,19 +69,11 @@ type URLLookupMode =
      */
     | 'multi-id';
 
-export type LookupCookies = Record<
-    string,
-    {
-        value: string;
-        options?: Partial<ResponseCookie>;
-    }
->;
-
 export type LookupResult = PublishedContentWithCache & {
     /** API endpoint to use for the content post lookup */
     apiEndpoint?: string;
     /** Cookies to store on the response */
-    cookies?: LookupCookies;
+    cookies?: ResponseCookies;
     /** Visitor authentication token */
     visitorToken?: string;
     /** URL of the site */
@@ -551,7 +543,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         );
     }
 
-    const cookies: LookupCookies = {
+    const cookies: ResponseCookies = {
         [cookieName]: {
             value: encodeGitBookTokenCookie(source.id, apiToken, apiEndpoint),
             options: {
@@ -798,29 +790,7 @@ function getLookupResultForVisitorAuth(
         // No caching for content served with visitor auth
         cacheMaxAge: undefined,
         cacheTags: [],
-        cookies: {
-            /**
-             * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
-             * as a cookie on the response.
-             *
-             * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
-             */
-            ...(visitorTokenLookup?.source === 'url' ||
-            (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
-                visitorTokenLookup.basePath === basePath)
-                ? {
-                      [getVisitorAuthCookieName(basePath)]: {
-                          value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
-                          options: {
-                              httpOnly: true,
-                              sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-                              secure: process.env.NODE_ENV === 'production',
-                              maxAge: 7 * 24 * 60 * 60,
-                          },
-                      },
-                  }
-                : {}),
-        },
+        cookies: getResponseCookiesForVisitorAuth(basePath, visitorTokenLookup),
     };
 }
 
