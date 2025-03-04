@@ -3,8 +3,8 @@ import {
     generateSitePageMetadata,
     generateSitePageViewport,
 } from '@/components/SitePage';
+import { getCacheTag } from '@gitbook/cache-tags';
 import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@v2/app/utils';
-import { getSiteCacheTag } from '@v2/lib/cache';
 import type { Metadata, Viewport } from 'next';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 
@@ -21,7 +21,12 @@ export default async function Page(props: PageProps) {
     const context = await getStaticSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
-    cacheTag(getSiteCacheTag(context.site.id));
+    cacheTag(
+        getCacheTag({
+            tag: 'site',
+            site: context.site.id,
+        })
+    );
 
     return <SitePage context={context} pageParams={{ pathname }} redirectOnFallback={true} />;
 }

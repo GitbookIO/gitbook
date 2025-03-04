@@ -1,0 +1,24 @@
+{
+    "name": "@gitbook/cache-tags",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "version": "0.0.0",
+    "dependencies": {
+        "@gitbook/api": "0.96.1"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3"
+    },
+    "scripts": {
+        "build": "tsc",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w"
+    },
+    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+}

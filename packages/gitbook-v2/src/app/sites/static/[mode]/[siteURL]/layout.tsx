@@ -4,8 +4,8 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
+import { getCacheTag } from '@gitbook/cache-tags';
 import { type RouteLayoutParams, getStaticSiteContext } from '@v2/app/utils';
-import { getSiteCacheTag } from '@v2/lib/cache';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 
@@ -21,7 +21,12 @@ export default async function SiteStaticLayout({
 
     const context = await getStaticSiteContext(await params);
 
-    cacheTag(getSiteCacheTag(context.site.id));
+    cacheTag(
+        getCacheTag({
+            tag: 'site',
+            site: context.site.id,
+        })
+    );
 
     return (
         <CustomizationRootLayout customization={context.customization}>

@@ -1,3 +1,4 @@
+import { getCacheTag } from '@gitbook/cache-tags';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import 'server-only';
 
@@ -14,7 +15,6 @@ import {
     type RevisionReusableContent,
 } from '@gitbook/api';
 import type { GitBookDataFetcher } from '@v2/lib/data/types';
-import assertNever from 'assert-never';
 import { headers } from 'next/headers';
 
 import { batch } from './async';
@@ -171,7 +171,7 @@ export type PublishedContentWithCache =
 export const getUserById = cache({
     name: 'api.getUserById',
     tag: (userId) =>
-        getAPICacheTag({
+        getCacheTag({
             tag: 'user',
             user: userId,
         }),
@@ -204,7 +204,7 @@ export const getUserById = cache({
 export const getLatestOpenAPISpecVersionContent = cache({
     name: 'api.getLatestOpenApiSpecVersionContent',
     tag: (organization, openAPISpec) =>
-        getAPICacheTag({
+        getCacheTag({
             tag: 'openapi',
             organization,
             openAPISpec,
@@ -240,7 +240,7 @@ export const getLatestOpenAPISpecVersionContent = cache({
 export const getPublishedContentByUrl = cache({
     name: 'api.getPublishedContentByUrl.v4',
     tag: (url) =>
-        getAPICacheTag({
+        getCacheTag({
             tag: 'url',
             hostname: new URL(url).hostname,
         }),
@@ -301,7 +301,7 @@ export const getPublishedContentByUrl = cache({
  */
 export const getSpace = cache({
     name: 'api.getSpace',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
+    tag: (spaceId) => getCacheTag({ tag: 'space', space: spaceId }),
     get: async (spaceId: string, shareKey: string | undefined, options: CacheFunctionOptions) => {
         const apiCtx = await api();
         const response = await apiCtx.client.spaces.getSpaceById(
@@ -330,7 +330,7 @@ function checkHasErrorCode(error: unknown, code: number) {
 export const getChangeRequest = cache({
     name: 'api.getChangeRequest',
     tag: (spaceId, changeRequestId) =>
-        getAPICacheTag({ tag: 'change-request', space: spaceId, changeRequest: changeRequestId }),
+        getCacheTag({ tag: 'change-request', space: spaceId, changeRequest: changeRequestId }),
     get: async (spaceId: string, changeRequestId: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();
         try {
@@ -379,7 +379,7 @@ const getAPIContextId = async () => {
 export const getRevision = cache({
     name: 'api.getRevision.v2',
     tag: (spaceId, revisionId) =>
-        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -411,7 +411,7 @@ export const getRevision = cache({
 export const getRevisionPages = cache({
     name: 'api.getRevisionPages.v4',
     tag: (spaceId, revisionId) =>
-        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -446,7 +446,7 @@ export const getRevisionPages = cache({
 export const getRevisionPageByPath = cache({
     name: 'api.getRevisionPageByPath.v3',
     tag: (spaceId, revisionId) =>
-        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -492,7 +492,7 @@ export const getRevisionPageByPath = cache({
 const getRevisionFileById = cache({
     name: 'api.getRevisionFile.v3',
     tag: (spaceId, revisionId) =>
-        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (
         spaceId: string,
         revisionId: string,
@@ -528,7 +528,7 @@ const getRevisionFileById = cache({
 const getRevisionReusableContentById = cache({
     name: 'api.getRevisionReusableContentById.v1',
     tag: (spaceId, revisionId) =>
-        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -569,7 +569,7 @@ const getRevisionReusableContentById = cache({
 const getRevisionAllFiles = cache({
     name: 'api.getRevisionAllFiles.v2',
     tag: (spaceId, revisionId) =>
-        getAPICacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
     get: async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
         const response = await getAll(
             async (params) => {
@@ -684,7 +684,7 @@ export const getReusableContent = async (
 export const getDocument = cache({
     name: 'api.getDocument.v2',
     tag: (spaceId, documentId) =>
-        getAPICacheTag({ tag: 'document', space: spaceId, document: documentId }),
+        getCacheTag({ tag: 'document', space: spaceId, document: documentId }),
     getKeySuffix: getAPIContextId,
     get: async (spaceId: string, documentId: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();
@@ -713,7 +713,7 @@ export const getDocument = cache({
 export const getComputedDocument = cache({
     name: 'api.getComputedDocument',
     tag: (spaceId, source) =>
-        getAPICacheTag({
+        getCacheTag({
             tag: 'computed-document',
             space: spaceId,
             integration: source.integration,
@@ -750,7 +750,7 @@ function validateSiteRedirectSource(source: string) {
  */
 export const getSiteRedirectBySource = cache({
     name: 'api.getSiteRedirectBySource',
-    tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
+    tag: ({ siteId }) => getCacheTag({ tag: 'site', site: siteId }),
     getKeySuffix: getAPIContextId,
     get: async (
         args: {
@@ -811,7 +811,7 @@ export const getSiteRedirectBySource = cache({
  */
 export const getSite = cache({
     name: 'api.getSite',
-    tag: (_organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
+    tag: (_organizationId, siteId) => getCacheTag({ tag: 'site', site: siteId }),
     getKeySuffix: getAPIContextId,
     get: async (organizationId: string, siteId: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();
@@ -830,7 +830,7 @@ export const getSite = cache({
  */
 export const getPublishedContentSite = cache({
     name: 'api.getPublishedContentSite',
-    tag: ({ siteId }) => getAPICacheTag({ tag: 'site', site: siteId }),
+    tag: ({ siteId }) => getCacheTag({ tag: 'site', site: siteId }),
     getKeySuffix: getAPIContextId,
     get: async (
         args: {
@@ -907,7 +907,7 @@ export async function getSpaceContentData(
  */
 export const searchSiteContent = cache({
     name: 'api.searchSiteContent',
-    tag: (_organizationId, siteId) => getAPICacheTag({ tag: 'site', site: siteId }),
+    tag: (_organizationId, siteId) => getCacheTag({ tag: 'site', site: siteId }),
     getKeySuffix: getAPIContextId,
     get: async (
         organizationId: string,
@@ -947,7 +947,7 @@ export const searchSiteContent = cache({
  */
 export const renderIntegrationUi = cache({
     name: 'api.renderIntegrationUi',
-    tag: (integrationName) => getAPICacheTag({ tag: 'integration', integration: integrationName }),
+    tag: (integrationName) => getCacheTag({ tag: 'integration', integration: integrationName }),
     get: async (
         integrationName: string,
         request: RequestRenderIntegrationUI,
@@ -971,7 +971,7 @@ export const renderIntegrationUi = cache({
  */
 export const getEmbedByUrlInSpace = cache({
     name: 'api.getEmbedByUrlInSpace',
-    tag: (spaceId) => getAPICacheTag({ tag: 'space', space: spaceId }),
+    tag: (spaceId) => getCacheTag({ tag: 'space', space: spaceId }),
     get: async (spaceId: string, url: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();
         const response = await apiCtx.client.spaces.getEmbedByUrlInSpace(
@@ -985,99 +985,6 @@ export const getEmbedByUrlInSpace = cache({
         return cacheResponse(response, cacheTtl_7days);
     },
 });
-
-/**
- * Create a cache tag for the API.
- */
-export function getAPICacheTag(
-    spec: // All data related to a user
-        | {
-              tag: 'user';
-              user: string;
-          }
-        // All data related to a space
-        | {
-              tag: 'space';
-              space: string;
-          }
-        // All data related to an integration
-        | {
-              tag: 'integration';
-              integration: string;
-          }
-        // All data related to a change request
-        | {
-              tag: 'change-request';
-              space: string;
-              changeRequest: string;
-          }
-        // Immutable data related to a revision
-        | {
-              tag: 'revision';
-              space: string;
-              revision: string;
-          }
-        // Immutable data related to a document
-        | {
-              tag: 'document';
-              space: string;
-              document: string;
-          }
-        // Immutable data related to a computed document
-        | {
-              tag: 'computed-document';
-              space: string;
-              integration: string;
-          }
-        // All data related to the URL of a content
-        | {
-              tag: 'url';
-              hostname: string;
-          }
-        // All data related to a collection
-        | {
-              tag: 'collection';
-              collection: string;
-          }
-        // All data related to a site
-        | {
-              tag: 'site';
-              site: string;
-          }
-        // All data related to an OpenAPI spec
-        | {
-              tag: 'openapi';
-              organization: string;
-              openAPISpec: string;
-          }
-): string {
-    switch (spec.tag) {
-        case 'user':
-            return `user:${spec.user}`;
-        case 'url':
-            return `url:${spec.hostname}`;
-        case 'space':
-            return `space:${spec.space}`;
-        case 'change-request':
-            return `space:${spec.space}:change-request:${spec.changeRequest}`;
-        case 'revision':
-            return `space:${spec.space}:revision:${spec.revision}`;
-        case 'document':
-            return `space:${spec.space}:document:${spec.document}`;
-        case 'computed-document':
-            return `space:${spec.space}:computed-document:${spec.integration}`;
-        case 'collection':
-            return `collection:${spec.collection}`;
-        case 'site':
-            return `site:${spec.site}`;
-        case 'integration':
-            return `integration:${spec.integration}`;
-        case 'openapi':
-            return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
-        default:
-            assertNever(spec);
-    }
-}
 
 /**
  * Return the user agent to use for API requests.
