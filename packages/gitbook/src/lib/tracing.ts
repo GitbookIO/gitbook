@@ -36,7 +36,7 @@ export async function trace<T>(
                 },
             };
 
-            const _start = now();
+            const start = now();
             try {
                 return await fn(span);
             } catch (error) {
@@ -44,7 +44,9 @@ export async function trace<T>(
                 throw error;
             } finally {
                 if (process.env.SILENT !== 'true') {
-                    const _end = now();
+                    const end = now();
+                    // biome-ignore lint/suspicious/noConsole: we want to log performance data
+                    console.log(`trace ${completeName} ${end - start}ms`, attributes);
                 }
             }
         }

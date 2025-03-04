@@ -129,7 +129,7 @@ export function cache<Args extends any[], Result>(
         async (key: string, signal: AbortSignal | undefined, span: TraceSpan, ...args: Args) => {
             const timeStart = now();
             let readCacheDuration = 0;
-            let _fetchDuration = 0;
+            let fetchDuration = 0;
 
             let result: readonly [CacheEntry, string] | null = null;
             const tag = cacheDef.tag?.(...args);
@@ -179,7 +179,7 @@ export function cache<Args extends any[], Result>(
                             const upstream = await revalidate(key, fallbackOps.signal, ...args);
 
                             readCacheDuration = timeFetch - timeStart;
-                            _fetchDuration = now() - timeFetch;
+                            fetchDuration = now() - timeFetch;
                             return [upstream, 'fetch'] as const;
                         },
 
@@ -219,10 +219,18 @@ export function cache<Args extends any[], Result>(
                 );
             }
 
-            const _totalDuration = now() - timeStart;
+            const totalDuration = now() - timeStart;
 
             // Log
             if (process.env.SILENT !== 'true') {
+                // biome-ignore lint/suspicious/noConsole: we want to log here
+                console.log(
+                    `cache: ${key} ${cacheStatus}${
+                        cacheStatus === 'hit' ? ` on ${backendName}` : ''
+                    } in total ${totalDuration.toFixed(0)}ms, fetch in ${fetchDuration.toFixed(
+                        0
+                    )}ms, read in ${readCacheDuration.toFixed(0)}ms`
+                );
             }
 
             if (savedEntry.meta.revalidatesAt && savedEntry.meta.revalidatesAt < Date.now()) {
