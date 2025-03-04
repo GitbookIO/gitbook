@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.0.2
+
+### Patch Changes
+
+-   53f5dbe: Fix typing of `shouldIgnoreEntity`
+
 ## 2.0.1
 
 ### Patch Changes

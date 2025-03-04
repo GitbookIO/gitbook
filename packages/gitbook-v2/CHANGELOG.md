@@ -1,5 +1,13 @@
 # gitbook-v2
 
+## 0.1.2
+
+### Patch Changes
+
+-   05ffd0e: Improving data cache management for computed content
+-   Updated dependencies [05ffd0e]
+    -   @gitbook/cache-tags@0.1.0
+
 ## 0.1.1
 
 ### Patch Changes

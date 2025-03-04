@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.6.5
+
+### Patch Changes
+
+-   05ffd0e: Improving data cache management for computed content
+-   8beb5d6: Add input elements to ContentKit
+-   Updated dependencies [53f5dbe]
+-   Updated dependencies [05ffd0e]
+-   Updated dependencies [8beb5d6]
+    -   @gitbook/openapi-parser@2.0.2
+    -   @gitbook/cache-tags@0.1.0
+    -   @gitbook/react-contentkit@0.6.1
+    -   @gitbook/react-openapi@1.0.5
+
 ## 0.6.4
 
 ### Patch Changes
