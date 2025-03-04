@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import crypto from 'node:crypto';
+import { NextResponse } from 'next/server';
 import { GITBOOK_SECRET } from './env';
 
 /**
