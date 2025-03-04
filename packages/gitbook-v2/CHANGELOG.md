@@ -1,5 +1,11 @@
 # gitbook-v2
 
+## 0.2.0
+
+### Minor Changes
+
+-   76c7974: Add route to revalidate cached data
+
 ## 0.1.2
 
 ### Patch Changes
