@@ -6,7 +6,6 @@ import {
     type OpenAPIV3_1,
     type OpenAPIV3xDocument,
     dereference,
-    shouldIgnoreEntity,
 } from '@gitbook/openapi-parser';
 import type { OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
@@ -55,18 +54,12 @@ export async function resolveOpenAPIOperation(
         }
     }
 
-    let components: OpenAPIOperationData['components'] = [];
-    if (schema.components) {
-        components = getOpenAPIComponents(schema);
-    }
-
     return {
         servers,
         operation,
         method,
         path,
         securities,
-        components,
         'x-codeSamples':
             typeof schema['x-codeSamples'] === 'boolean' ? schema['x-codeSamples'] : undefined,
         'x-hideTryItPanel':
@@ -81,7 +74,7 @@ const dereferenceCache = new WeakMap<Filesystem, Promise<OpenAPIV3xDocument>>();
 /**
  * Memoized version of `dereferenceSchema`.
  */
-function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
+export function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
     if (dereferenceCache.has(filesystem)) {
         return dereferenceCache.get(filesystem) as Promise<OpenAPIV3xDocument>;
     }
@@ -168,12 +161,4 @@ function flattenSecurities(security: OpenAPIV3.SecurityRequirementObject[]) {
             [authType]: config,
         }));
     });
-}
-
-function getOpenAPIComponents(
-    schema: OpenAPIV3.Document | OpenAPIV3_1.Document
-): [string, OpenAPIV3.SchemaObject][] {
-    const schemas = schema.components?.schemas ?? {};
-
-    return Object.entries(schemas).filter(([, schema]) => !shouldIgnoreEntity(schema));
 }

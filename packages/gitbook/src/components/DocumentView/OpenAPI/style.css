@@ -619,3 +619,15 @@
 .openapi-section-body.openapi-schema.openapi-schema-root {
     @apply space-y-2.5;
 }
+
+.openapi-models-properties {
+    @apply border border-tint-subtle rounded-lg;
+}
+
+.openapi-models-properties .openapi-schema-body {
+    @apply p-2.5;
+}
+
+.openapi-models .openapi-disclosure-group-panel > .openapi-section > .openapi-schema-body {
+    @apply py-0;
+}

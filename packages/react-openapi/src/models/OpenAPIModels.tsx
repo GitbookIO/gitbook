@@ -1,19 +1,19 @@
 import clsx from 'clsx';
 
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
-import { OpenAPISchemaProperty } from '../OpenAPISchema';
-import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIOperationData } from '../types';
+import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIModelsData } from '../types';
+import { OpenAPIModelSchema } from './OpenAPIModelSchema';
 
 /**
  * Display OpenAPI Models.
  */
 export function OpenAPIModels(props: {
     className?: string;
-    data: OpenAPIOperationData;
+    data: OpenAPIModelsData;
     context: OpenAPIContextProps;
 }) {
     const { className, data, context } = props;
-    const { components } = data;
+    const { models } = data;
 
     const clientContext: OpenAPIClientContext = {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
@@ -23,18 +23,18 @@ export function OpenAPIModels(props: {
 
     return (
         <div className={clsx('openapi-models', className)}>
-            {components.length ? (
+            {models.length ? (
                 <OpenAPIDisclosureGroup
                     allowsMultipleExpanded
                     icon={context.icons.chevronRight}
-                    groups={components.map(([name, schema]) => ({
+                    groups={models.map(([name, schema]) => ({
                         id: name,
                         label: (
                             <div className="openapi-response-tab-content" key={`model-${name}`}>
                                 <span className="openapi-response-statuscode">{name}</span>
                             </div>
                         ),
-                        body: <OpenAPISchemaProperty schema={schema} context={clientContext} />,
+                        body: <OpenAPIModelSchema schema={schema} context={clientContext} />,
                     }))}
                 />
             ) : null}

@@ -166,7 +166,7 @@ function OpenAPISchemaAlternative(props: {
 /**
  * Render a circular reference to a schema.
  */
-function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
+export function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
     const { id, schema } = props;
 
     return (
@@ -198,12 +198,9 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     );
 }
 
-export function OpenAPISchemaPresentation(
-    props: { property: OpenAPISchemaPropertyEntry } & { showType?: boolean }
-) {
+export function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry }) {
     const {
         property: { schema, propertyName, required },
-        showType = true,
     } = props;
 
     const description = resolveDescription(schema);
@@ -213,7 +210,7 @@ export function OpenAPISchemaPresentation(
         <div className="openapi-schema-presentation">
             <OpenAPISchemaName
                 schema={schema}
-                type={showType ? getSchemaTitle(schema) : undefined}
+                type={getSchemaTitle(schema)}
                 propertyName={propertyName}
                 required={required}
             />
