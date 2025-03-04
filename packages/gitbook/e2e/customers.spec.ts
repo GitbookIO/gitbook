@@ -226,11 +226,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/' }],
     },
     {
-        name: 'docs.solv.finance',
-        baseUrl: 'https://docs.solv.finance',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'docs.fluentbit.io',
         baseUrl: 'https://docs.fluentbit.io',
         tests: [{ name: 'Home', url: '/' }],
