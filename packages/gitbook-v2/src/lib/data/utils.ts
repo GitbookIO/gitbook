@@ -1,4 +1,4 @@
-import type { RevisionPageDocument } from '@gitbook/api';
+import type { RevisionPageDocument, Space } from '@gitbook/api';
 import type { GitBookDataFetcher } from './types';
 
 /**
@@ -6,14 +6,18 @@ import type { GitBookDataFetcher } from './types';
  */
 export async function getPageDocument(
     dataFetcher: GitBookDataFetcher,
-    spaceId: string,
+    space: Space,
     page: RevisionPageDocument
 ) {
     if (page.documentId) {
-        return dataFetcher.getDocument({ spaceId, documentId: page.documentId });
+        return dataFetcher.getDocument({ spaceId: space.id, documentId: page.documentId });
     }
     if (page.computed) {
-        return dataFetcher.getComputedDocument({ spaceId, source: page.computed });
+        return dataFetcher.getComputedDocument({
+            organizationId: space.organization,
+            spaceId: space.id,
+            source: page.computed,
+        });
     }
 
     return null;

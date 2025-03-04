@@ -1,13 +1,7 @@
 import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
+import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
-import {
-    getChangeRequestCacheTag,
-    getHostnameCacheTag,
-    getOpenAPISpecCacheTag,
-    getSiteCacheTag,
-    getSpaceCacheTag,
-} from '../cache';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -125,6 +119,7 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         },
         getComputedDocument(params) {
             return getComputedDocument(input, {
+                organizationId: params.organizationId,
                 spaceId: params.spaceId,
                 source: params.source,
             });
@@ -183,7 +178,12 @@ async function getSpace(
     'use cache';
 
     cacheLife('days');
-    cacheTag(getSpaceCacheTag(params.spaceId));
+    cacheTag(
+        getCacheTag({
+            tag: 'space',
+            space: params.spaceId,
+        })
+    );
 
     const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
         shareKey: params.shareKey,
@@ -207,7 +207,13 @@ async function getChangeRequest(
             params.spaceId,
             params.changeRequestId
         );
-        cacheTag(getChangeRequestCacheTag(params.spaceId, res.data.id));
+        cacheTag(
+            getCacheTag({
+                tag: 'change-request',
+                space: params.spaceId,
+                changeRequest: res.data.id,
+            })
+        );
         return res.data;
     } catch (error) {
         if (checkHasErrorCode(error, 404)) {
@@ -335,13 +341,23 @@ async function getComputedDocument(
     input: DataFetcherInput,
     params: {
         spaceId: string;
+        organizationId: string;
         source: ComputedContentSource;
     }
 ) {
     'use cache';
 
-    // TODO: we need to resolve dependencies and pass them in the cache key
     cacheLife('days');
+
+    cacheTag(
+        ...getComputedContentSourceCacheTags(
+            {
+                spaceId: params.spaceId,
+                organizationId: params.organizationId,
+            },
+            params.source
+        )
+    );
 
     const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
         source: params.source,
@@ -386,7 +402,13 @@ async function getLatestOpenAPISpecVersionContent(
 ) {
     'use cache';
 
-    cacheTag(getOpenAPISpecCacheTag(params.organizationId, params.slug));
+    cacheTag(
+        getCacheTag({
+            tag: 'openapi',
+            organization: params.organizationId,
+            openAPISpec: params.slug,
+        })
+    );
     cacheLife('days');
 
     try {
@@ -417,7 +439,12 @@ async function getPublishedContentByUrl(
     const { url, visitorAuthToken, redirectOnError } = params;
 
     const hostname = new URL(url).hostname;
-    cacheTag(getHostnameCacheTag(hostname));
+    cacheTag(
+        getCacheTag({
+            tag: 'url',
+            hostname,
+        })
+    );
     cacheLife('days');
 
     const res = await getAPI(input).urls.getPublishedContentByUrl({
@@ -427,7 +454,12 @@ async function getPublishedContentByUrl(
     });
 
     if ('site' in res.data) {
-        cacheTag(getSiteCacheTag(res.data.site));
+        cacheTag(
+            getCacheTag({
+                tag: 'site',
+                site: res.data.site,
+            })
+        );
     }
 
     return res.data;
@@ -443,7 +475,12 @@ async function getPublishedContentSite(
 ) {
     'use cache';
 
-    cacheTag(getSiteCacheTag(params.siteId));
+    cacheTag(
+        getCacheTag({
+            tag: 'site',
+            site: params.siteId,
+        })
+    );
     cacheLife('days');
 
     const res = await getAPI(input).orgs.getPublishedContentSite(
@@ -467,7 +504,12 @@ async function getSiteRedirectBySource(
 ) {
     'use cache';
 
-    cacheTag(getSiteCacheTag(params.siteId));
+    cacheTag(
+        getCacheTag({
+            tag: 'site',
+            site: params.siteId,
+        })
+    );
     cacheLife('days');
 
     try {

@@ -22,6 +22,17 @@
         "wrangler": "^3.109.2",
       },
     },
+    "packages/cache-tags": {
+      "name": "@gitbook/cache-tags",
+      "version": "0.0.0",
+      "dependencies": {
+        "@gitbook/api": "0.96.1",
+        "assert-never": "^1.2.1",
+      },
+      "devDependencies": {
+        "typescript": "^5.5.3",
+      },
+    },
     "packages/colors": {
       "name": "@gitbook/colors",
       "version": "0.2.0",
@@ -42,6 +53,7 @@
       "dependencies": {
         "@gitbook/api": "0.96.1",
         "@gitbook/cache-do": "workspace:*",
+        "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -122,6 +134,7 @@
       "version": "0.1.1",
       "dependencies": {
         "@gitbook/api": "0.96.1",
+        "@gitbook/cache-tags": "workspace:*",
         "@sindresorhus/fnv1a": "^3.1.0",
         "next": "^15.2.0",
         "react": "^19.0.0",
@@ -617,6 +630,8 @@
     "@gitbook/api": ["@gitbook/api@0.96.1", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-E1hpaFNFoEyc8E4rIQyC6UD3kErGXAI0lKt04zYQQYOBLjRIQ57D4oNIIJBjWn4hHeSxRxWvW3NcxzvOGMmIqQ=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
+
+    "@gitbook/cache-tags": ["@gitbook/cache-tags@workspace:packages/cache-tags"],
 
     "@gitbook/colors": ["@gitbook/colors@workspace:packages/colors"],
 
