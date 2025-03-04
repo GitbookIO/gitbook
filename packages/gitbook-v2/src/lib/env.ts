@@ -62,4 +62,4 @@ export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
 /**
  * Secret used to validate requests from the GitBook app.
  */
-export const GITBOOK_APP_SECRET = process.env.GITBOOK_APP_SECRET ?? null;
+export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
