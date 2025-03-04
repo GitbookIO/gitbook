@@ -103,6 +103,7 @@ export interface GitBookDataFetcher {
      * Get a computed document by its space ID and computed source.
      */
     getComputedDocument(params: {
+        organizationId: string;
         spaceId: string;
         source: api.ComputedContentSource;
     }): Promise<api.JSONDocument>;

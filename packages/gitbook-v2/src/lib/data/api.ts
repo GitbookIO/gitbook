@@ -1,5 +1,5 @@
 import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
-import { getCacheTag } from '@gitbook/cache-tags';
+import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import type { GitBookDataFetcher } from './types';
@@ -340,13 +340,23 @@ async function getComputedDocument(
     input: DataFetcherInput,
     params: {
         spaceId: string;
+        organizationId: string;
         source: ComputedContentSource;
     }
 ) {
     'use cache';
 
-    // TODO: we need to resolve dependencies and pass them in the cache key
     cacheLife('days');
+
+    cacheTag(
+        ...getComputedContentSourceCacheTags(
+            {
+                spaceId: params.spaceId,
+                organizationId: params.organizationId,
+            },
+            params.source
+        )
+    );
 
     const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
         source: params.source,

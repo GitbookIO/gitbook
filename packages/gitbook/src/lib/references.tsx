@@ -130,7 +130,7 @@ export async function resolveContentRef(
                 text = `#${anchor}`;
 
                 if (resolveAnchorText) {
-                    const document = await getPageDocument(dataFetcher, space.id, page);
+                    const document = await getPageDocument(dataFetcher, space, page);
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {

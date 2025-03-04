@@ -128,7 +128,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         },
 
         getComputedDocument(params) {
-            return getComputedDocument(params.spaceId, params.source);
+            return getComputedDocument(params.organizationId, params.spaceId, params.source);
         },
 
         getRevisionPages(params) {

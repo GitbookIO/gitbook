@@ -1,4 +1,4 @@
-import { getCacheTag } from '@gitbook/cache-tags';
+import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import 'server-only';
 
@@ -712,14 +712,21 @@ export const getDocument = cache({
  */
 export const getComputedDocument = cache({
     name: 'api.getComputedDocument',
-    tag: (spaceId, source) =>
-        getCacheTag({
-            tag: 'computed-document',
-            space: spaceId,
-            integration: source.integration,
-        }),
+    tag: (organizationId, spaceId, source) =>
+        getComputedContentSourceCacheTags(
+            {
+                organizationId,
+                spaceId,
+            },
+            source
+        )[0],
     getKeySuffix: getAPIContextId,
-    get: async (spaceId: string, source: ComputedContentSource, options: CacheFunctionOptions) => {
+    get: async (
+        _organizationId: string,
+        spaceId: string,
+        source: ComputedContentSource,
+        options: CacheFunctionOptions
+    ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.spaces.getComputedDocument(
             spaceId,

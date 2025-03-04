@@ -1,3 +1,6 @@
+import type { ComputedContentSource } from '@gitbook/api';
+import assertNever from 'assert-never';
+
 /**
  * Get a stringified cache tag for a given object.
  */
@@ -67,14 +70,6 @@ export function getCacheTag(
               hostname: string;
           }
         /**
-         * All data related to a collection
-         * @deprecated - in v2, we no longer use collections
-         */
-        | {
-              tag: 'collection';
-              collection: string;
-          }
-        /**
          * All data related to a site
          */
         | {
@@ -105,8 +100,6 @@ export function getCacheTag(
             return `space:${spec.space}:document:${spec.document}`;
         case 'computed-document':
             return `space:${spec.space}:computed-document:${spec.integration}`;
-        case 'collection':
-            return `collection:${spec.collection}`;
         case 'site':
             return `site:${spec.site}`;
         case 'integration':
@@ -114,6 +107,69 @@ export function getCacheTag(
         case 'openapi':
             return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
         default:
-            throw new Error(`Unknown cache tag: ${spec}`);
+            assertNever(spec);
     }
+}
+
+/**
+ * Get the tags for a computed content source.
+ */
+export function getComputedContentSourceCacheTags(
+    inContext: {
+        spaceId: string;
+        organizationId: string;
+    },
+    source: ComputedContentSource
+) {
+    const tags: string[] = [];
+
+    // We add the dependencies as tags, to ensure that the computed content is invalidated
+    // when the dependencies are updated.
+    const dependencies = Object.values(source.dependencies ?? {});
+    if (dependencies.length > 0) {
+        dependencies.forEach((dependency) => {
+            switch (dependency.ref.kind) {
+                case 'space':
+                    tags.push(
+                        getCacheTag({
+                            tag: 'space',
+                            space: dependency.ref.space,
+                        })
+                    );
+                    break;
+                case 'openapi':
+                    tags.push(
+                        getCacheTag({
+                            tag: 'openapi',
+                            organization: inContext.organizationId,
+                            openAPISpec: dependency.ref.spec,
+                        })
+                    );
+                    break;
+                default:
+                    // Do not throw for unknown dependency types
+                    // as it might mean we are lacking behind the API version
+                    break;
+            }
+        });
+    } else {
+        // Push a dummy tag, as the v1 is only using the first tag
+        tags.push(
+            getCacheTag({
+                tag: 'computed-document',
+                space: inContext.spaceId,
+                integration: source.integration,
+            })
+        );
+    }
+
+    // We invalidate the computed content when a new version of the integration is deployed.
+    tags.push(
+        getCacheTag({
+            tag: 'integration',
+            integration: source.integration,
+        })
+    );
+
+    return tags;
 }
