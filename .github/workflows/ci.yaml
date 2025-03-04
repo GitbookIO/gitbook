@@ -169,7 +169,7 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: ./
-                  wranglerVersion: '3.82.0'
+                  wranglerVersion: '3.112.0'
                   command: versions upload --config ./packages/gitbook-v2/wrangler.toml
             - name: Outputs
               run: |
