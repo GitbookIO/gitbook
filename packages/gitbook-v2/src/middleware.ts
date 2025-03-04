@@ -93,8 +93,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     ].join('/');
 
     console.log(`rewriting to ${route}`);
-
-    const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
+    const response = NextResponse.rewrite(new URL(`/${route}`, url.toString()), {
         request: {
             headers: requestHeaders,
         },
