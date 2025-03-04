@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
              * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
              */
             if (extracted.url.pathname.endsWith('/~gitbook/image')) {
-                return serveResizedImage(request);
+                return serveResizedImage(new Request(extracted.url.toString(), request));
             }
 
             return serveSiteByURL(request, extracted);

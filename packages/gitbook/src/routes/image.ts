@@ -38,7 +38,7 @@ export async function serveResizedImage(request: Request) {
 
     // Verify the signature
     const host =
-        request.headers.get('x-gitbook-host') ??
+        request.headers.get('x-gitbook-host') ?? // Only for v1, to be removed
         request.headers.get('x-forwarded-host') ??
         request.headers.get('host') ??
         requestURL.host;
