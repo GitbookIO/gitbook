@@ -10,7 +10,7 @@ import {
 import type { OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
 
-export { toJSON, fromJSON };
+export { fromJSON, toJSON };
 
 /**
  * Resolve an OpenAPI operation in a file and compile it to a more usable format.
@@ -74,7 +74,7 @@ const dereferenceCache = new WeakMap<Filesystem, Promise<OpenAPIV3xDocument>>();
 /**
  * Memoized version of `dereferenceSchema`.
  */
-function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
+export function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
     if (dereferenceCache.has(filesystem)) {
         return dereferenceCache.get(filesystem) as Promise<OpenAPIV3xDocument>;
     }

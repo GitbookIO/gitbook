@@ -3,6 +3,10 @@
     @apply flex-1 flex flex-col gap-4 mb-14;
 }
 
+.openapi-models {
+    @apply flex flex-col mb-14 flex-1;
+}
+
 .openapi-columns {
     @apply grid grid-cols-1 lg:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
 }
@@ -617,4 +621,16 @@
 
 .openapi-section-body.openapi-schema.openapi-schema-root-body {
     @apply space-y-2.5;
+}
+
+.openapi-models-properties {
+    @apply border border-tint-subtle rounded-lg;
+}
+
+.openapi-models-properties .openapi-schema-body {
+    @apply p-2.5;
+}
+
+.openapi-models .openapi-disclosure-group-panel > .openapi-section > .openapi-schema-body {
+    @apply py-0;
 }
