@@ -11,6 +11,6 @@
     "prettier.enable": false,
     "editor.defaultFormatter": "biomejs.biome",
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit"
+        "source.organizeImports.biome": "explicit"
     }
 }

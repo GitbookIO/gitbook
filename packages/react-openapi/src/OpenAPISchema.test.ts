@@ -1,5 +1,5 @@
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { describe, expect, it } from 'bun:test';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { getSchemaAlternatives } from './OpenAPISchema';
 
 describe('getSchemaAlternatives', () => {
