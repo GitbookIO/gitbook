@@ -1,5 +1,11 @@
 # @gitbook/react-contentkit
 
+## 0.6.1
+
+### Patch Changes
+
+-   8beb5d6: Add input elements to ContentKit
+
 ## 0.6.0
 
 ### Minor Changes
