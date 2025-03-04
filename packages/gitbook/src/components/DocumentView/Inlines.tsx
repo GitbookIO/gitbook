@@ -24,23 +24,19 @@ export function Inlines<T extends DocumentInline | DocumentText>(
 ) {
     const { nodes, document, ancestorInlines, ...contextProps } = props;
 
-    return (
-        <>
-            {nodes.map((node) => {
-                if (node.object === 'text') {
-                    return <Text key={node.key} text={node} />;
-                }
+    return nodes.map((node) => {
+        if (node.object === 'text') {
+            return <Text key={node.key} text={node} />;
+        }
 
-                return (
-                    <Inline
-                        key={node.key}
-                        inline={node}
-                        document={document}
-                        ancestorInlines={ancestorInlines}
-                        {...contextProps}
-                    />
-                );
-            })}
-        </>
-    );
+        return (
+            <Inline
+                key={node.key}
+                inline={node}
+                document={document}
+                ancestorInlines={ancestorInlines}
+                {...contextProps}
+            />
+        );
+    });
 }
