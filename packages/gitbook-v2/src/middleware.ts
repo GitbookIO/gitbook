@@ -45,8 +45,8 @@ export async function middleware(request: NextRequest) {
  * Serve site by URL.
  */
 async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
-    const dynamicHeaders = getDynamicHeaders(request);
     const { url, mode } = urlWithMode;
+    const dynamicHeaders = getDynamicHeaders(url, request);
 
     const result = await getPublishedContentByURL({
         url: url.toString(),
@@ -121,22 +121,13 @@ function serveErrorResponse(error: Error) {
 /**
  * The URL of the GitBook content can be passed in 3 different ways:
  * - The request URL is in the `X-GitBook-URL` header.
- * - Hostname is in the `X-GitBook-Host` header and the pathname is the path in the request URL.
  * - The request URL is matching `/url/:url`
  */
 function extractURL(request: NextRequest): URLWithMode | null {
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
-            url: new URL(xGitbookUrl),
-            mode: 'url-host',
-        };
-    }
-
-    const xGitbookHost = request.headers.get('x-gitbook-host');
-    if (xGitbookHost) {
-        return {
-            url: new URL(`https://${xGitbookHost}${request.nextUrl.pathname}`),
+            url: appendQueryParams(new URL(xGitbookUrl), request.nextUrl.searchParams),
             mode: 'url-host',
         };
     }
@@ -144,7 +135,10 @@ function extractURL(request: NextRequest): URLWithMode | null {
     const prefix = '/url/';
     if (request.nextUrl.pathname.startsWith(prefix)) {
         return {
-            url: new URL(`https://${request.nextUrl.pathname.slice(prefix.length)}`),
+            url: appendQueryParams(
+                new URL(`https://${request.nextUrl.pathname.slice(prefix.length)}`),
+                request.nextUrl.searchParams
+            ),
             mode: 'url',
         };
     }
@@ -155,7 +149,7 @@ function extractURL(request: NextRequest): URLWithMode | null {
 /**
  * Evaluate if a request is dynamic or static.
  */
-function getDynamicHeaders(_request: NextRequest): null | Record<string, string> {
+function getDynamicHeaders(_url: URL, _request: NextRequest): null | Record<string, string> {
     // TODO:
     // - check token in query string
     // - check token in cookies
@@ -184,4 +178,15 @@ function encodePathInSiteContent(rawPathname: string) {
         default:
             return encodeURIComponent(pathname || '/');
     }
+}
+
+/**
+ * Append all the query params from a URL to another URL.
+ */
+function appendQueryParams(url: URL, from: URLSearchParams) {
+    for (const [key, value] of from.entries()) {
+        url.searchParams.set(key, value);
+    }
+
+    return url;
 }
