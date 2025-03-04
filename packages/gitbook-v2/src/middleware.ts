@@ -77,6 +77,10 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         }
     }
 
+    // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
+    requestHeaders.set('x-forwarded-host', request.nextUrl.host);
+    requestHeaders.set('origin', request.nextUrl.origin);
+
     const route = [
         'sites',
         routeType,
@@ -87,7 +91,8 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     console.log(`rewriting to ${route}`);
 
-    const response = NextResponse.rewrite(new URL(`/${route}`, request.url), {
+    const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
+    const response = NextResponse.rewrite(rewrittenURL, {
         request: {
             headers: requestHeaders,
         },
