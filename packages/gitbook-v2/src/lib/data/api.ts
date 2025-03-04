@@ -119,6 +119,7 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         },
         getComputedDocument(params) {
             return getComputedDocument(input, {
+                organizationId: params.organizationId,
                 spaceId: params.spaceId,
                 source: params.source,
             });
