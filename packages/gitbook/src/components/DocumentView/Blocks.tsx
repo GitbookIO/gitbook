@@ -52,33 +52,29 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
 
     let isOffscreen = false;
 
-    return (
-        <>
-            {nodes.map((node) => {
-                isOffscreen =
-                    isOffscreen ||
-                    isBlockOffscreen({
-                        document: props.document,
-                        block: node,
-                        ancestorBlocks: props.ancestorBlocks,
-                    });
+    return nodes.map((node) => {
+        isOffscreen =
+            isOffscreen ||
+            isBlockOffscreen({
+                document: props.document,
+                block: node,
+                ancestorBlocks: props.ancestorBlocks,
+            });
 
-                return (
-                    <Block
-                        key={node.key}
-                        block={node}
-                        style={[
-                            'mx-auto w-full decoration-primary/6',
-                            node.data && 'fullWidth' in node.data && node.data.fullWidth
-                                ? 'max-w-screen-xl'
-                                : 'max-w-3xl',
-                            blockStyle,
-                        ]}
-                        isEstimatedOffscreen={isOffscreen}
-                        {...contextProps}
-                    />
-                );
-            })}
-        </>
-    );
+        return (
+            <Block
+                key={node.key}
+                block={node}
+                style={[
+                    'mx-auto w-full decoration-primary/6',
+                    node.data && 'fullWidth' in node.data && node.data.fullWidth
+                        ? 'max-w-screen-xl'
+                        : 'max-w-3xl',
+                    blockStyle,
+                ]}
+                isEstimatedOffscreen={isOffscreen}
+                {...contextProps}
+            />
+        );
+    });
 }

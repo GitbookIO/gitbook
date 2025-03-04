@@ -134,7 +134,7 @@
     @apply flex flex-col;
 }
 
-.openapi-schema-body {
+.openapi-schema {
     @apply py-2.5 flex flex-col gap-2;
 }
 
@@ -142,18 +142,15 @@
     @apply divide-y divide-tint-subtle;
 }
 
-.openapi-disclosure-group-panel
-    > .openapi-schema-properties
-    > *:first-child
-    > .openapi-schema-body {
+.openapi-disclosure-group-panel > .openapi-schema-properties > *:first-child > .openapi-schema {
     @apply pt-0;
 }
 
-.openapi-responsebody > .openapi-schema-properties > *:last-child > .openapi-schema-body {
+.openapi-responsebody > .openapi-schema-properties > .openapi-schema:last-child {
     @apply pb-0;
 }
 
-.openapi-responsebody > .openapi-schema-properties > *:only-child > .openapi-schema-body {
+.openapi-responsebody > .openapi-schema-properties > .openapi-schema:only-child {
     @apply py-0;
 }
 
@@ -602,7 +599,7 @@
     @apply border-b border-x border-tint-subtle rounded-b-lg;
 }
 
-.openapi-disclosure-panel .openapi-schema-body {
+.openapi-disclosure-panel .openapi-schema {
     @apply p-2.5;
 }
 
@@ -615,6 +612,6 @@
     @apply pt-0 mt-0;
 }
 
-.openapi-section-body.openapi-schema.openapi-schema-root-body {
+.openapi-section-body.openapi-schema.openapi-schema-root {
     @apply space-y-2.5;
 }
