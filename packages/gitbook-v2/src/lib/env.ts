@@ -58,3 +58,8 @@ export const GITBOOK_INTEGRATIONS_HOST =
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+
+/**
+ * Secret used to validate requests from the GitBook app.
+ */
+export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
