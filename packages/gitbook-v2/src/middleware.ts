@@ -93,7 +93,8 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     // We rewrite using the site URL as the base URL to ensure server actions are allowed
     // as Next.js seems to be using this URL as a host/-xforwarded-host, replacing the original header.
-    const response = NextResponse.rewrite(new URL(`/${route}`, url.toString()), {
+    const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
+    const response = NextResponse.rewrite(rewrittenURL, {
         request: {
             headers: requestHeaders,
         },
