@@ -1,9 +1,15 @@
-import { GitBookAPIError } from '@gitbook/api';
+import { CustomizationThemeMode, GitBookAPIError } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
+import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import {
+    type VisitorTokenLookup,
+    getResponseCookiesForVisitorAuth,
+    getVisitorToken,
+} from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
@@ -48,7 +54,7 @@ export async function middleware(request: NextRequest) {
  */
 async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     const { url, mode } = urlWithMode;
-    const dynamicHeaders = getDynamicHeaders(url, request);
+    const dynamic = getDynamicResponse(url, request);
 
     const result = await getPublishedContentByURL({
         url: url.toString(),
@@ -66,15 +72,15 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
-    const routeType = dynamicHeaders ? 'dynamic' : 'static';
+    const routeType = dynamic ? 'dynamic' : 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
     requestHeaders.set(MiddlewareHeaders.SiteURL, `${url.origin}${data.basePath}`);
     requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
-    if (dynamicHeaders) {
-        for (const [key, value] of Object.entries(dynamicHeaders)) {
+    if (dynamic?.headers) {
+        for (const [key, value] of Object.entries(dynamic.headers)) {
             requestHeaders.set(key, value);
         }
     }
@@ -102,6 +108,17 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     // Add Content Security Policy header
     response.headers.set('content-security-policy', getContentSecurityPolicy());
+    // Basic security headers
+    response.headers.set('strict-transport-security', 'max-age=31536000');
+    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+    response.headers.set('x-content-type-options', 'nosniff');
+
+    if (dynamic?.visitorToken) {
+        const cookies = getResponseCookiesForVisitorAuth(data.basePath, dynamic.visitorToken);
+        for (const [key, value] of Object.entries(cookies)) {
+            response.cookies.set(key, value.value, value.options);
+        }
+    }
 
     return response;
 }
@@ -151,12 +168,33 @@ function extractURL(request: NextRequest): URLWithMode | null {
 /**
  * Evaluate if a request is dynamic or static.
  */
-function getDynamicHeaders(_url: URL, _request: NextRequest): null | Record<string, string> {
-    // TODO:
-    // - check token in query string
-    // - check token in cookies
-    // - check special headers or query string
-    return null;
+function getDynamicResponse(
+    url: URL,
+    request: NextRequest
+): null | {
+    headers: Record<string, string>;
+    visitorToken: VisitorTokenLookup;
+} {
+    const headers: Record<string, string> = {};
+
+    // Preview of customization/theme
+    const customization = url.searchParams.get('customization');
+    if (customization && validateSerializedCustomization(customization)) {
+        headers[MiddlewareHeaders.Customization] = customization;
+    }
+    const theme = url.searchParams.get('theme');
+    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
+        headers[MiddlewareHeaders.Theme] = theme;
+    }
+
+    // Visitor authentication
+    // @ts-ignore - request typing
+    const visitorToken = getVisitorToken(request, url);
+    if (visitorToken) {
+        headers[MiddlewareHeaders.VisitorAuthToken] = visitorToken.token;
+    }
+
+    return Object.keys(headers).length > 0 || visitorToken ? { headers, visitorToken } : null;
 }
 
 /**

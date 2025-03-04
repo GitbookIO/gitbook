@@ -33,11 +33,6 @@ export enum MiddlewareHeaders {
     Customization = 'x-gitbook-customization',
 
     /**
-     * Token to use for the API.
-     */
-    APIToken = 'x-gitbook-token',
-
-    /**
      * The visitor token used to access this content
      */
     VisitorAuthToken = 'x-gitbook-visitor-token',

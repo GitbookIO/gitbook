@@ -5,6 +5,18 @@ const VISITOR_AUTH_PARAM = 'jwt_token';
 const VISITOR_AUTH_COOKIE_ROOT = 'gitbook-visitor-token~';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 
+export type ResponseCookie = {
+    value: string;
+    options?: Partial<{
+        httpOnly: boolean;
+        sameSite: boolean | 'lax' | 'strict' | 'none' | undefined;
+        secure: boolean;
+        maxAge: number;
+    }>;
+};
+
+export type ResponseCookies = Record<string, ResponseCookie>;
+
 /**
  * The contents of the visitor authentication cookie.
  */
@@ -60,6 +72,39 @@ export function getVisitorToken(
     if (visitorCustomToken) {
         return { source: 'gitbook-visitor-cookie', token: visitorCustomToken };
     }
+}
+
+/**
+ * Return the lookup result for content served with visitor auth. It basically disables caching
+ * and sets a cookie with the visitor auth token.
+ */
+export function getResponseCookiesForVisitorAuth(
+    basePath: string,
+    visitorTokenLookup: VisitorTokenLookup
+): ResponseCookies {
+    return {
+        /**
+         * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
+         * as a cookie on the response.
+         *
+         * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
+         */
+        ...(visitorTokenLookup?.source === 'url' ||
+        (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
+            visitorTokenLookup.basePath === basePath)
+            ? {
+                  [getVisitorAuthCookieName(basePath)]: {
+                      value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
+                      options: {
+                          httpOnly: true,
+                          sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+                          secure: process.env.NODE_ENV === 'production',
+                          maxAge: 7 * 24 * 60 * 60,
+                      },
+                  },
+              }
+            : {}),
+    };
 }
 
 /**
