@@ -13,7 +13,7 @@
     },
     "devDependencies": {
         "gitbook": "*",
-        "@opennextjs/cloudflare": "^0.5.3",
+        "@opennextjs/cloudflare": "^0.5.8",
         "tailwindcss": "^3.4.0",
         "postcss": "^8"
     },
