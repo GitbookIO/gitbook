@@ -139,8 +139,7 @@ export function getBaseContext(input: {
     }
 
     const imageResizer = createImageResizer({
-        host: urlMode === 'url-host' ? url.host : gitbookURL.host,
-
+        host: url.host,
         // To ensure image resizing work for proxied sites,
         // we serve images from the root of the site.
         linker: linker,

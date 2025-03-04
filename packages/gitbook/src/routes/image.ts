@@ -13,7 +13,15 @@ import { NextResponse } from 'next/server';
 /**
  * Resize an image using the Cloudflare Image API.
  */
-export async function serveResizedImage(request: Request) {
+export async function serveResizedImage(
+    request: Request,
+    requestOptions: {
+        /**
+         * The host to use for the image.
+         */
+        host?: string;
+    } = {}
+) {
     const requestURL = new URL(request.url);
     const urlParam = requestURL.searchParams.get('url');
     const signature = requestURL.searchParams.get('sign');
@@ -38,7 +46,8 @@ export async function serveResizedImage(request: Request) {
 
     // Verify the signature
     const host =
-        request.headers.get('x-gitbook-host') ??
+        requestOptions.host ??
+        request.headers.get('x-gitbook-host') ?? // Only for v1, to be removed
         request.headers.get('x-forwarded-host') ??
         request.headers.get('host') ??
         requestURL.host;

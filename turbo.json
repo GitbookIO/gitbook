@@ -8,10 +8,6 @@
             "dependsOn": ["^generate"],
             "outputs": ["dist"]
         },
-        "@gitbook/icons#generate": {
-            "dependsOn": ["^generate"],
-            "outputs": ["data/*.json"]
-        },
         // Build the package for publishing
         "build": {
             "dependsOn": ["^build", "generate"],
