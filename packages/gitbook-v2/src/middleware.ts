@@ -15,7 +15,6 @@ export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
     ],
-    skipTrailingSlashRedirect: true,
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
