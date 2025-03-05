@@ -12,7 +12,10 @@ import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
-    matcher: ['/((?!_next/static|_next/image).*)'],
+    matcher: [
+        '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
+    ],
+    skipTrailingSlashRedirect: true,
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
