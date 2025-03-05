@@ -5,7 +5,7 @@ import {
     type OpenAPIV3xDocument,
     shouldIgnoreEntity,
 } from '@gitbook/openapi-parser';
-import { memoDereferenceFilesystem } from '../resolveOpenAPIOperation';
+import { memoDereferenceFilesystem } from '../memoDereferenceFilesystem';
 import type { OpenAPIModelsData } from '../types';
 
 //!!TODO: We should return only the models that are used in the block. Still a WIP awaiting future work.

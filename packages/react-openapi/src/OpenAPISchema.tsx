@@ -166,7 +166,7 @@ function OpenAPISchemaAlternative(props: {
 /**
  * Render a circular reference to a schema.
  */
-export function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
+function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaObject }) {
     const { id, schema } = props;
 
     return (
@@ -180,7 +180,7 @@ export function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.
 /**
  * Render the enum value for a schema.
  */
-export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
+function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     const { enumValues } = props;
 
     return (
@@ -198,7 +198,10 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     );
 }
 
-export function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry }) {
+/**
+ * Render the top row of a schema. e.g: name, type, and required status.
+ */
+function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry }) {
     const {
         property: { schema, propertyName, required },
     } = props;
@@ -245,9 +248,7 @@ export function OpenAPISchemaPresentation(props: { property: OpenAPISchemaProper
 /**
  * Get the sub-properties of a schema.
  */
-export function getSchemaProperties(
-    schema: OpenAPIV3.SchemaObject
-): null | OpenAPISchemaPropertyEntry[] {
+function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISchemaPropertyEntry[] {
     // check array AND schema.items as this is sometimes null despite what the type indicates
     if (schema.type === 'array' && schema.items && !checkIsReference(schema.items)) {
         const items = schema.items;
@@ -360,7 +361,7 @@ function flattenAlternatives(
     }, []);
 }
 
-export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
+function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     // Otherwise try to infer a nice title
     let type = 'any';
 

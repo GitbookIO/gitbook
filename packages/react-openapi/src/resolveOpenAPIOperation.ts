@@ -1,12 +1,12 @@
 import { fromJSON, toJSON } from 'flatted';
 
-import {
-    type Filesystem,
-    type OpenAPIV3,
-    type OpenAPIV3_1,
-    type OpenAPIV3xDocument,
-    dereference,
+import type {
+    Filesystem,
+    OpenAPIV3,
+    OpenAPIV3_1,
+    OpenAPIV3xDocument,
 } from '@gitbook/openapi-parser';
+import { memoDereferenceFilesystem } from './memoDereferenceFilesystem';
 import type { OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
 
@@ -67,34 +67,6 @@ export async function resolveOpenAPIOperation(
                 ? schema['x-hideTryItPanel']
                 : undefined,
     };
-}
-
-const dereferenceCache = new WeakMap<Filesystem, Promise<OpenAPIV3xDocument>>();
-
-/**
- * Memoized version of `dereferenceSchema`.
- */
-export function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
-    if (dereferenceCache.has(filesystem)) {
-        return dereferenceCache.get(filesystem) as Promise<OpenAPIV3xDocument>;
-    }
-
-    const promise = dereferenceFilesystem(filesystem);
-    dereferenceCache.set(filesystem, promise);
-    return promise;
-}
-
-/**
- * Dereference an OpenAPI schema.
- */
-async function dereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
-    const result = await dereference(filesystem);
-
-    if (!result.schema) {
-        throw new Error('Failed to dereference OpenAPI document');
-    }
-
-    return result.schema as OpenAPIV3xDocument;
 }
 
 /**
