@@ -138,6 +138,7 @@ function OpenAPISchemaAlternative(props: {
 }) {
     const { schema, circularRefs, context } = props;
     const description = resolveDescription(schema);
+    const properties = getSchemaProperties(schema);
 
     return (
         <>
@@ -145,11 +146,19 @@ function OpenAPISchemaAlternative(props: {
                 <Markdown source={description} className="openapi-schema-description" />
             ) : null}
             <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
-                <OpenAPISchemaProperty
-                    property={{ schema }}
-                    circularRefs={circularRefs}
-                    context={context}
-                />
+                {properties?.length ? (
+                    <OpenAPISchemaProperties
+                        properties={properties}
+                        circularRefs={circularRefs}
+                        context={context}
+                    />
+                ) : (
+                    <OpenAPISchemaProperty
+                        property={{ schema }}
+                        circularRefs={circularRefs}
+                        context={context}
+                    />
+                )}
             </OpenAPIDisclosure>
         </>
     );
@@ -245,8 +254,6 @@ export function OpenAPISchemaPresentation(props: { property: OpenAPISchemaProper
     );
 }
 
-const EMPTY_ADDITIONAL_PROPERTIES: OpenAPIV3.SchemaObject = {};
-
 /**
  * Get the sub-properties of a schema.
  */
@@ -261,8 +268,10 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
         // If the items are a primitive type, we don't need to display them
         if (
-            items.type &&
-            ['string', 'number', 'boolean', 'integer'].includes(items.type) &&
+            (items.type === 'string' ||
+                items.type === 'number' ||
+                items.type === 'boolean' ||
+                items.type === 'integer') &&
             !items.enum
         ) {
             return null;
@@ -293,10 +302,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
         if (schema.additionalProperties && !checkIsReference(schema.additionalProperties)) {
             result.push({
                 propertyName: 'Other properties',
-                schema:
-                    schema.additionalProperties === true
-                        ? EMPTY_ADDITIONAL_PROPERTIES
-                        : schema.additionalProperties,
+                schema: schema.additionalProperties === true ? {} : schema.additionalProperties,
             });
         }
 
@@ -356,10 +362,10 @@ function flattenAlternatives(
             if (schemas) {
                 acc.push(...schemas);
             }
-        } else {
-            acc.push(schemaOrRef);
+            return acc;
         }
 
+        acc.push(schemaOrRef);
         return acc;
     }, []);
 }
