@@ -1,4 +1,4 @@
-import type { LoadPlugin } from '@scalar/openapi-parser';
+import { type LoadPlugin, normalize } from '@scalar/openapi-parser';
 
 export const fetchUrlsDefaultConfiguration = {
     limit: 40,
@@ -52,7 +52,13 @@ export const fetchURLs: (customConfiguration: {
                 numberOfRequests++;
                 const url = getReferenceUrl({ value, rootURL: configuration.rootURL });
                 const response = await fetch(url);
-                return await response.text();
+                if (!response.ok) {
+                    return undefined;
+                }
+                const text = await response.text();
+                // Try to normalize the text to be sure it's a valid JSON or YAML.
+                await normalize(text);
+                return text;
             } catch (_error: any) {
                 return undefined;
             }

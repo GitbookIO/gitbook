@@ -676,19 +676,6 @@ components:
             xml:
                 name: address
             type: object
-        Category:
-            x-swagger-router-model: io.swagger.petstore.model.Category
-            properties:
-                id:
-                    type: integer
-                    format: int64
-                    example: 1
-                name:
-                    type: string
-                    example: Dogs
-            xml:
-                name: category
-            type: object
         User:
             $ref: 'user.yaml#/components/schemas/User'
         Tag:
@@ -696,17 +683,9 @@ components:
         Pet:
             $ref: 'http://localhost:3020/root/pet.yaml#/components/schemas/Pet'
         ApiResponse:
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                type:
-                    type: string
-                message:
-                    type: string
-            xml:
-                name: '##default'
-            type: object
+            $ref: 'http://localhost:3020/root/not-found.yaml'
+        Category:
+            $ref: 'http://localhost:3020/root/invalid.txt'
     requestBodies:
         Pet:
             content:
