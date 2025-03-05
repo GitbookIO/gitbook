@@ -5,11 +5,7 @@ import { NextResponse } from 'next/server';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
-import {
-    type VisitorTokenLookup,
-    getResponseCookiesForVisitorAuth,
-    getVisitorToken,
-} from '@/lib/visitor-token';
+import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
@@ -54,12 +50,18 @@ export async function middleware(request: NextRequest) {
  */
 async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     const { url, mode } = urlWithMode;
-    const dynamic = getDynamicResponse(url, request);
+
+    // Visitor authentication
+    // @ts-ignore - request typing
+    const visitorToken = getVisitorToken(request, url);
 
     const result = await getPublishedContentByURL({
         url: url.toString(),
-        visitorAuthToken: null,
-        redirectOnError: false,
+        visitorAuthToken: visitorToken?.token ?? null,
+        // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+        // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+        // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+        redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
     });
 
     if (result.error) {
@@ -72,17 +74,27 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
-    const routeType = dynamic ? 'dynamic' : 'static';
+    // TODO: improve condition here to only set dynamic when there is a visitor token
+    // + site is adaptive content or VA
+    // We need to extend the API for this.
+    let routeType = visitorToken ? 'dynamic' : 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
     requestHeaders.set(MiddlewareHeaders.SiteURL, `${url.origin}${data.basePath}`);
     requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
-    if (dynamic?.headers) {
-        for (const [key, value] of Object.entries(dynamic.headers)) {
-            requestHeaders.set(key, value);
-        }
+
+    // Preview of customization/theme
+    const customization = url.searchParams.get('customization');
+    if (customization && validateSerializedCustomization(customization)) {
+        routeType = 'dynamic';
+        requestHeaders.set(MiddlewareHeaders.Customization, customization);
+    }
+    const theme = url.searchParams.get('theme');
+    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
+        routeType = 'dynamic';
+        requestHeaders.set(MiddlewareHeaders.Theme, theme);
     }
 
     // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
@@ -113,8 +125,8 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
     response.headers.set('x-content-type-options', 'nosniff');
 
-    if (dynamic?.visitorToken) {
-        const cookies = getResponseCookiesForVisitorAuth(data.basePath, dynamic.visitorToken);
+    if (visitorToken) {
+        const cookies = getResponseCookiesForVisitorAuth(data.basePath, visitorToken);
         for (const [key, value] of Object.entries(cookies)) {
             response.cookies.set(key, value.value, value.options);
         }
@@ -163,38 +175,6 @@ function extractURL(request: NextRequest): URLWithMode | null {
     }
 
     return null;
-}
-
-/**
- * Evaluate if a request is dynamic or static.
- */
-function getDynamicResponse(
-    url: URL,
-    request: NextRequest
-): null | {
-    headers: Record<string, string>;
-    visitorToken: VisitorTokenLookup;
-} {
-    const headers: Record<string, string> = {};
-
-    // Preview of customization/theme
-    const customization = url.searchParams.get('customization');
-    if (customization && validateSerializedCustomization(customization)) {
-        headers[MiddlewareHeaders.Customization] = customization;
-    }
-    const theme = url.searchParams.get('theme');
-    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
-        headers[MiddlewareHeaders.Theme] = theme;
-    }
-
-    // Visitor authentication
-    // @ts-ignore - request typing
-    const visitorToken = getVisitorToken(request, url);
-    if (visitorToken) {
-        headers[MiddlewareHeaders.VisitorAuthToken] = visitorToken.token;
-    }
-
-    return Object.keys(headers).length > 0 || visitorToken ? { headers, visitorToken } : null;
 }
 
 /**
