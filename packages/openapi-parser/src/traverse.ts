@@ -29,7 +29,7 @@ export async function traverse<T extends AnyObject | AnyObject[]>(
     }
 
     const keys = Object.keys(specification);
-    const promises = await Promise.all(
+    const results = await Promise.all(
         keys.map(async (key, index) => {
             const value = specification[key];
             const processed = await traverse(value, transform, [...path, key], seen);
@@ -39,8 +39,8 @@ export async function traverse<T extends AnyObject | AnyObject[]>(
 
     // Promise.all does not guarantee the order of the results
     // So we need to sort them to preserve the original order
-    promises.sort((a, b) => a.index - b.index);
-    for (const { key, value } of promises) {
+    results.sort((a, b) => a.index - b.index);
+    for (const { key, value } of results) {
         result[key] = value;
     }
 

@@ -6,7 +6,7 @@ import type {
     OpenAPIV3_1,
     OpenAPIV3xDocument,
 } from '@gitbook/openapi-parser';
-import { memoDereferenceFilesystem } from './memoDereferenceFilesystem';
+import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
 
@@ -23,7 +23,7 @@ export async function resolveOpenAPIOperation(
     }
 ): Promise<OpenAPIOperationData | null> {
     const { path, method } = operationDescriptor;
-    const schema = await memoDereferenceFilesystem(filesystem);
+    const schema = await dereferenceFilesystem(filesystem);
     let operation = getOperationByPathAndMethod(schema, path, method);
 
     if (!operation) {

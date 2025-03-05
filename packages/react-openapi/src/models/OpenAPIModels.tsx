@@ -1,6 +1,4 @@
 import clsx from 'clsx';
-
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
 import { OpenAPIRootSchema } from '../OpenAPISchema';
 import { Section, SectionBody } from '../StaticSection';
@@ -39,14 +37,14 @@ export function OpenAPIModels(props: {
  * It displays a single model or a disclosure group for multiple models.
  */
 function OpenAPIRootModelsSchema(props: {
-    models: [string, OpenAPIV3.SchemaObject][];
+    models: OpenAPIModelsData['models'];
     context: OpenAPIClientContext;
 }) {
     const { models, context } = props;
 
     // If there is only one model, we show it directly.
     if (models.length === 1) {
-        const schema = models?.[0]?.[1];
+        const schema = models?.[0]?.schema;
 
         if (!schema) {
             return null;
@@ -66,7 +64,7 @@ function OpenAPIRootModelsSchema(props: {
         <OpenAPIDisclosureGroup
             allowsMultipleExpanded
             icon={context.icons.chevronRight}
-            groups={models.map(([name, schema]) => ({
+            groups={models.map(({ name, schema }) => ({
                 id: name,
                 label: (
                     <div className="openapi-response-tab-content" key={`model-${name}`}>

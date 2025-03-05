@@ -15,10 +15,6 @@ export function createStateKey(key: string, scope?: string) {
  * Check if an object has a description. Either at the root level or in items.
  */
 function hasDescription(object: AnyObject) {
-    if (Array.isArray(object)) {
-        return object.some(hasDescription);
-    }
-
     return 'description' in object || 'x-gitbook-description-html' in object;
 }
 
@@ -28,10 +24,6 @@ function hasDescription(object: AnyObject) {
 export function resolveDescription(object: OpenAPIV3.SchemaObject | AnyObject) {
     // If the object has items and has a description, we resolve the description from items
     if ('items' in object && typeof object.items === 'object' && hasDescription(object.items)) {
-        if (Array.isArray(object.items)) {
-            return resolveDescription(object.items[0]);
-        }
-
         return resolveDescription(object.items);
     }
 
@@ -75,9 +67,6 @@ export function resolveFirstExample(object: AnyObject) {
 
     // Resolve example from items if it exists
     if (object.items && typeof object.items === 'object') {
-        if (Array.isArray(object.items)) {
-            return formatExample(object.items[0].example);
-        }
         return formatExample(object.items.example);
     }
 

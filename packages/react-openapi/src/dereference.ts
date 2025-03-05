@@ -5,12 +5,12 @@ const dereferenceCache = new WeakMap<Filesystem, Promise<OpenAPIV3xDocument>>();
 /**
  * Memoized version of `dereferenceSchema`.
  */
-export function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
+export function dereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
     if (dereferenceCache.has(filesystem)) {
         return dereferenceCache.get(filesystem) as Promise<OpenAPIV3xDocument>;
     }
 
-    const promise = dereferenceFilesystem(filesystem);
+    const promise = baseDereferenceFilesystem(filesystem);
     dereferenceCache.set(filesystem, promise);
     return promise;
 }
@@ -18,7 +18,7 @@ export function memoDereferenceFilesystem(filesystem: Filesystem): Promise<OpenA
 /**
  * Dereference an OpenAPI schema.
  */
-async function dereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
+async function baseDereferenceFilesystem(filesystem: Filesystem): Promise<OpenAPIV3xDocument> {
     const result = await dereference(filesystem);
 
     if (!result.schema) {
