@@ -624,10 +624,10 @@
     @apply border border-tint-subtle rounded-lg;
 }
 
-.openapi-models-properties .openapi-schema-body {
+.openapi-models-properties .openapi-schema-properties > .openapi-schema {
     @apply p-2.5;
 }
 
-.openapi-models .openapi-disclosure-group-panel > .openapi-section > .openapi-schema-body {
+.openapi-models .openapi-disclosure-group-panel > .openapi-section {
     @apply py-0;
 }
