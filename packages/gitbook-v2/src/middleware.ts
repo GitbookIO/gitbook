@@ -74,10 +74,9 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
-    // TODO: improve condition here to only set dynamic when there is a visitor token
-    // + site is adaptive content or VA
-    // We need to extend the API for this.
-    let routeType = visitorToken ? 'dynamic' : 'static';
+    // `contextId` is provided when the authentication has specific visitor claims
+    // In the future, we might want to use a more explicit properties.
+    let routeType = data.contextId ? 'dynamic' : 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
