@@ -73,13 +73,18 @@ function OpenAPIRootModelsSchema(props: {
                         <span className="openapi-response-statuscode">{name}</span>
                     </div>
                 ),
-                body: (
-                    <Section className="openapi-section-models">
-                        <SectionBody>
-                            <OpenAPIRootSchema schema={schema} context={context} />
-                        </SectionBody>
-                    </Section>
-                ),
+                tabs: [
+                    {
+                        id: 'model',
+                        body: (
+                            <Section className="openapi-section-models">
+                                <SectionBody>
+                                    <OpenAPIRootSchema schema={schema} context={context} />
+                                </SectionBody>
+                            </Section>
+                        ),
+                    },
+                ],
             }))}
         />
     );
