@@ -172,12 +172,26 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         };
     }
 
-    // Skip requests to main host
-    if (
+    const isMainHost =
         (GITBOOK_URL && request.nextUrl.host === new URL(GITBOOK_URL).host) ||
-        (process.env.VERCEL_URL && request.nextUrl.host === new URL(process.env.VERCEL_URL).host) ||
-        (GITBOOK_ASSETS_URL && request.nextUrl.host === new URL(GITBOOK_ASSETS_URL).host)
-    ) {
+        (process.env.VERCEL_URL && request.nextUrl.host === new URL(process.env.VERCEL_URL).host);
+    const isAssetsHost =
+        GITBOOK_ASSETS_URL && request.nextUrl.host === new URL(GITBOOK_ASSETS_URL).host;
+
+    // /url/:url requests on the main host
+    const prefix = '/url/';
+    if (isMainHost && request.nextUrl.pathname.startsWith(prefix)) {
+        return {
+            url: appendQueryParams(
+                new URL(`https://${request.nextUrl.pathname.slice(prefix.length)}`),
+                request.nextUrl.searchParams
+            ),
+            mode: 'url',
+        };
+    }
+
+    // Skip other requests to main hosts
+    if (isMainHost || isAssetsHost) {
         return null;
     }
 
@@ -197,17 +211,6 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
                 request.nextUrl.searchParams
             ),
             mode: 'url-host',
-        };
-    }
-
-    const prefix = '/url/';
-    if (request.nextUrl.pathname.startsWith(prefix)) {
-        return {
-            url: appendQueryParams(
-                new URL(`https://${request.nextUrl.pathname.slice(prefix.length)}`),
-                request.nextUrl.searchParams
-            ),
-            mode: 'url',
         };
     }
 
