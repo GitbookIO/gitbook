@@ -174,7 +174,7 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
 
     const isMainHost =
         (GITBOOK_URL && request.nextUrl.host === new URL(GITBOOK_URL).host) ||
-        (process.env.VERCEL_URL && request.nextUrl.host === new URL(process.env.VERCEL_URL).host);
+        (process.env.VERCEL_URL && request.nextUrl.host === process.env.VERCEL_URL);
     const isAssetsHost =
         GITBOOK_ASSETS_URL && request.nextUrl.host === new URL(GITBOOK_ASSETS_URL).host;
 
