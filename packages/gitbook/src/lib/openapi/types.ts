@@ -1,6 +1,5 @@
 import type { DocumentBlockOpenAPI, DocumentBlockOpenAPIOperation } from '@gitbook/api';
 import type { Filesystem, OpenAPIParseError, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
-import type { OpenAPIModelsData, OpenAPIOperationData } from '@gitbook/react-openapi';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
 //!!TODO: Add DocumentBlockOpenAPIModels when available in @gitbook/api
@@ -35,17 +34,10 @@ type FetchOpenAPIFilesystemError = {
 };
 
 /**
- * Resolved OpenAPI models block result.
+ * Resolved OpenAPI block result.
  */
-export type ResolveOpenAPIModelsBlockResult =
-    | { error?: undefined; data: OpenAPIModelsData | null; specUrl: string | null }
-    | ResolveOpenAPIBlockError;
-
-/**
- * Resolved OpenAPI operation block result.
- */
-export type ResolveOpenAPIOperationBlockResult =
-    | { error?: undefined; data: OpenAPIOperationData | null; specUrl: string | null }
+export type ResolveOpenAPIBlockResult<T> =
+    | { error?: undefined; data: T | null; specUrl: string | null }
     | ResolveOpenAPIBlockError;
 
 /**

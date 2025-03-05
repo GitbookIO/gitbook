@@ -1,11 +1,9 @@
 import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
-import { resolveOpenAPIOperation } from '@gitbook/react-openapi';
-import type {
-    AnyOpenAPIBlock,
-    ResolveOpenAPIBlockArgs,
-    ResolveOpenAPIOperationBlockResult,
-} from './types';
+import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
+import type { AnyOpenAPIBlock, ResolveOpenAPIBlockArgs, ResolveOpenAPIBlockResult } from './types';
+
+type ResolveOpenAPIOperationBlockResult = ResolveOpenAPIBlockResult<OpenAPIOperationData>;
 
 const weakmap = new WeakMap<AnyOpenAPIBlock, Promise<ResolveOpenAPIOperationBlockResult>>();
 

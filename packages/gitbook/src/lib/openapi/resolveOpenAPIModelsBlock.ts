@@ -1,8 +1,10 @@
 import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
-import type { ResolveOpenAPIModelsBlockResult } from '@/lib/openapi/types';
+import type { ResolveOpenAPIBlockResult } from '@/lib/openapi/types';
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
-import { resolveOpenAPIModels } from '@gitbook/react-openapi';
+import { type OpenAPIModelsData, resolveOpenAPIModels } from '@gitbook/react-openapi';
 import type { AnyOpenAPIBlock, ResolveOpenAPIBlockArgs } from './types';
+
+type ResolveOpenAPIModelsBlockResult = ResolveOpenAPIBlockResult<OpenAPIModelsData>;
 
 const weakmap = new WeakMap<AnyOpenAPIBlock, Promise<ResolveOpenAPIModelsBlockResult>>();
 
