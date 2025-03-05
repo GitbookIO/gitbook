@@ -13,7 +13,7 @@ import { type RenderedInline, getInlines, highlight } from './highlight';
  * Render a code block, can be client-side or server-side.
  */
 export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
-    const { block, document, style, context } = props;
+    const { block, document, style, isEstimatedOffscreen, context } = props;
     const inlines = getInlines(block);
     const richInlines: RenderedInline[] = inlines.map((inline, index) => {
         const body = (() => {
@@ -36,7 +36,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
         return { inline, body };
     });
 
-    if (isV2()) {
+    if (isV2() && !isEstimatedOffscreen) {
         // In v2, we render the code block server-side
         const lines = await highlight(block, richInlines);
         return <CodeBlockRenderer block={block} style={style} lines={lines} />;
