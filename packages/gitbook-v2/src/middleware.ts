@@ -74,9 +74,8 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
-    // `contextId` is provided when the authentication has specific visitor claims
-    // In the future, we might want to use a more explicit properties.
-    let routeType = data.contextId ? 'dynamic' : 'static';
+    // When visitor has authentication (adaptive content or VA), we serve dynamic routes.
+    let routeType = visitorToken ? 'dynamic' : 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
