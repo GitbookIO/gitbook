@@ -8,6 +8,7 @@ import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
+import { GITBOOK_URL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
@@ -172,7 +173,9 @@ function extractURL(request: NextRequest): URLWithMode | null {
     }
 
     const xForwardedHost = request.headers.get('x-forwarded-host');
-    if (xForwardedHost) {
+    // The x-forwarded-host is set by Vercel for all requests
+    // so we ignore it if the hostname is the same as the instance one.
+    if (xForwardedHost && GITBOOK_URL && new URL(GITBOOK_URL).host !== xForwardedHost) {
         return {
             url: appendQueryParams(
                 new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
