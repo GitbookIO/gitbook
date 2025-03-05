@@ -17,10 +17,13 @@ describe('#createFileSystem', () => {
                 '/root/spec.yaml': await serveFixture('/remote-ref/root/spec.yaml'),
                 '/root/user.yaml': await serveFixture('/remote-ref/root/user.yaml'),
                 '/root/pet.yaml': await serveFixture('/remote-ref/root/pet.yaml'),
+                '/root/invalid.yaml': await serveFixture('/remote-ref/root/invalid.txt'),
                 '/tag.yaml': await serveFixture('/remote-ref/tag.yaml'),
             },
             fetch() {
-                return new Response('404!');
+                return new Response('<404>', {
+                    status: 404,
+                });
             },
             port: 3020,
         });
