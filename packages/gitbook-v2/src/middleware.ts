@@ -1,15 +1,18 @@
-import { GitBookAPIError } from '@gitbook/api';
+import { CustomizationThemeMode, GitBookAPIError } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
+import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
+import { GITBOOK_URL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
-    matcher: ['/((?!_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
+    matcher: ['/((?!_next/static|_next/image).*)'],
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
@@ -48,12 +51,18 @@ export async function middleware(request: NextRequest) {
  */
 async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     const { url, mode } = urlWithMode;
-    const dynamicHeaders = getDynamicHeaders(url, request);
+
+    // Visitor authentication
+    // @ts-ignore - request typing
+    const visitorToken = getVisitorToken(request, url);
 
     const result = await getPublishedContentByURL({
         url: url.toString(),
-        visitorAuthToken: null,
-        redirectOnError: false,
+        visitorAuthToken: visitorToken?.token ?? null,
+        // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+        // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+        // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+        redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
     });
 
     if (result.error) {
@@ -66,17 +75,31 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         return NextResponse.redirect(data.redirect);
     }
 
-    const routeType = dynamicHeaders ? 'dynamic' : 'static';
+    // When visitor has authentication (adaptive content or VA), we serve dynamic routes.
+    let routeType = visitorToken ? 'dynamic' : 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
     requestHeaders.set(MiddlewareHeaders.SiteURL, `${url.origin}${data.basePath}`);
     requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
-    if (dynamicHeaders) {
-        for (const [key, value] of Object.entries(dynamicHeaders)) {
-            requestHeaders.set(key, value);
-        }
+
+    // Preview of customization/theme
+    const customization = url.searchParams.get('customization');
+    if (customization && validateSerializedCustomization(customization)) {
+        routeType = 'dynamic';
+        requestHeaders.set(MiddlewareHeaders.Customization, customization);
+    }
+    const theme = url.searchParams.get('theme');
+    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
+        routeType = 'dynamic';
+        requestHeaders.set(MiddlewareHeaders.Theme, theme);
+    }
+
+    // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
+    // This is useful for testing dynamic routes.
+    if (request.cookies.has('gitbook-dynamic-route')) {
+        routeType = 'dynamic';
     }
 
     // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
@@ -102,6 +125,17 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
     // Add Content Security Policy header
     response.headers.set('content-security-policy', getContentSecurityPolicy());
+    // Basic security headers
+    response.headers.set('strict-transport-security', 'max-age=31536000');
+    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+    response.headers.set('x-content-type-options', 'nosniff');
+
+    if (visitorToken) {
+        const cookies = getResponseCookiesForVisitorAuth(data.basePath, visitorToken);
+        for (const [key, value] of Object.entries(cookies)) {
+            response.cookies.set(key, value.value, value.options);
+        }
+    }
 
     return response;
 }
@@ -121,15 +155,32 @@ function serveErrorResponse(error: Error) {
 }
 
 /**
- * The URL of the GitBook content can be passed in 3 different ways:
- * - The request URL is in the `X-GitBook-URL` header.
- * - The request URL is matching `/url/:url`
+ * The URL of the GitBook content can be passed in 3 different ways (in order of priority):
+ * - The request has a `X-GitBook-URL` header:
+ *      URL is taken from the header.
+ * - The request has a `X-Forwarded-Host` header:
+ *      Host is taken from the header, pathname is taken from the request URL.
+ * - The request URL is matching `/url/:url`:
+ *      URL is taken from the pathname.
  */
 function extractURL(request: NextRequest): URLWithMode | null {
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
             url: appendQueryParams(new URL(xGitbookUrl), request.nextUrl.searchParams),
+            mode: 'url-host',
+        };
+    }
+
+    const xForwardedHost = request.headers.get('x-forwarded-host');
+    // The x-forwarded-host is set by Vercel for all requests
+    // so we ignore it if the hostname is the same as the instance one.
+    if (xForwardedHost && GITBOOK_URL && new URL(GITBOOK_URL).host !== xForwardedHost) {
+        return {
+            url: appendQueryParams(
+                new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
+                request.nextUrl.searchParams
+            ),
             mode: 'url-host',
         };
     }
@@ -145,17 +196,6 @@ function extractURL(request: NextRequest): URLWithMode | null {
         };
     }
 
-    return null;
-}
-
-/**
- * Evaluate if a request is dynamic or static.
- */
-function getDynamicHeaders(_url: URL, _request: NextRequest): null | Record<string, string> {
-    // TODO:
-    // - check token in query string
-    // - check token in cookies
-    // - check special headers or query string
     return null;
 }
 
