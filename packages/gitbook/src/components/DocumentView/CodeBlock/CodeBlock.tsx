@@ -1,16 +1,18 @@
 import type { DocumentBlockCode } from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
+import { isV2 } from '@/lib/v2';
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
-import { type RenderedInline, getInlines } from './highlight';
+import { CodeBlockRenderer } from './CodeBlockRenderer';
+import { type RenderedInline, getInlines, highlight } from './highlight';
 
 /**
  * Render a code block, can be client-side or server-side.
  */
-export function CodeBlock(props: BlockProps<DocumentBlockCode>) {
+export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     const { block, document, style, context } = props;
     const inlines = getInlines(block);
     const richInlines: RenderedInline[] = inlines.map((inline, index) => {
@@ -33,6 +35,12 @@ export function CodeBlock(props: BlockProps<DocumentBlockCode>) {
 
         return { inline, body };
     });
+
+    if (isV2()) {
+        // In v2, we render the code block server-side
+        const lines = await highlight(block, richInlines);
+        return <CodeBlockRenderer block={block} style={style} lines={lines} />;
+    }
 
     return <ClientCodeBlock block={block} style={style} inlines={richInlines} />;
 }
