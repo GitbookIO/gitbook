@@ -23,18 +23,15 @@ describe('getSchemaAlternatives', () => {
                 ],
             })
         ).toEqual([
-            [
-                {
-                    type: 'number',
-                },
-                {
-                    type: 'boolean',
-                },
-                {
-                    type: 'string',
-                },
-            ],
-            undefined,
+            {
+                type: 'number',
+            },
+            {
+                type: 'boolean',
+            },
+            {
+                type: 'string',
+            },
         ]);
     });
 
@@ -58,22 +55,19 @@ describe('getSchemaAlternatives', () => {
                 ],
             })
         ).toEqual([
-            [
-                {
-                    allOf: [
-                        {
-                            type: 'number',
-                        },
-                        {
-                            type: 'boolean',
-                        },
-                    ],
-                },
-                {
-                    type: 'string',
-                },
-            ],
-            undefined,
+            {
+                allOf: [
+                    {
+                        type: 'number',
+                    },
+                    {
+                        type: 'boolean',
+                    },
+                ],
+            },
+            {
+                type: 'string',
+            },
         ]);
     });
 
@@ -89,13 +83,10 @@ describe('getSchemaAlternatives', () => {
         a.anyOf?.push(a);
 
         expect(getSchemaAlternatives(a)).toEqual([
-            [
-                {
-                    type: 'string',
-                },
-                a,
-            ],
-            undefined,
+            {
+                type: 'string',
+            },
+            a,
         ]);
     });
 });
