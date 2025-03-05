@@ -8,7 +8,7 @@ import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
-import { GITBOOK_URL } from '@v2/lib/env';
+import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
@@ -20,7 +20,7 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 export async function middleware(request: NextRequest) {
     try {
         // Route all requests to a site
-        const extracted = extractURL(request);
+        const extracted = getSiteURLFromRequest(request);
         if (extracted) {
             /**
              * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -114,7 +114,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         encodePathInSiteContent(data.pathname),
     ].join('/');
 
-    console.log(`rewriting to ${route}`);
+    console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
 
     const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
     const response = NextResponse.rewrite(rewrittenURL, {
@@ -163,7 +163,7 @@ function serveErrorResponse(error: Error) {
  * - The request URL is matching `/url/:url`:
  *      URL is taken from the pathname.
  */
-function extractURL(request: NextRequest): URLWithMode | null {
+function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
@@ -172,13 +172,25 @@ function extractURL(request: NextRequest): URLWithMode | null {
         };
     }
 
+    // Skip requests to main host
+    if (
+        (GITBOOK_URL && request.nextUrl.host === new URL(GITBOOK_URL).host) ||
+        (process.env.VERCEL_URL && request.nextUrl.host === new URL(process.env.VERCEL_URL).host) ||
+        (GITBOOK_ASSETS_URL && request.nextUrl.host === new URL(GITBOOK_ASSETS_URL).host)
+    ) {
+        return null;
+    }
+
     const xForwardedHost = request.headers.get('x-forwarded-host');
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
-    if (xForwardedHost && GITBOOK_URL && new URL(GITBOOK_URL).host !== xForwardedHost) {
-        console.log('xForwardedHost', xForwardedHost, GITBOOK_URL, new URL(GITBOOK_URL).host);
-        console.log('process.env.VERCEL_URL', process.env.VERCEL_URL);
-        console.log('process.env.GITBOOK_URL', process.env.GITBOOK_URL);
+    if (xForwardedHost) {
+        console.log('xForwardedHost', xForwardedHost, request.nextUrl.host);
+        console.log('env', {
+            VERCEL_URL: process.env.VERCEL_URL,
+            GITBOOK_URL: GITBOOK_URL,
+            GITBOOK_ASSETS_URL: GITBOOK_ASSETS_URL,
+        });
         return {
             url: appendQueryParams(
                 new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
