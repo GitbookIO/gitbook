@@ -57,9 +57,9 @@ const weakmap = new WeakMap<AnyOpenAPIOperationBlock, Promise<ResolveOpenAPIBloc
 export function resolveOpenAPIBlock<T extends OpenAPIBlockType = 'operation'>(
     args: ResolveOpenAPIBlockArgs<T>
 ): Promise<ResolveOpenAPIBlockResult<T>> {
-    // if (weakmap.has(args.block)) {
-    //     return weakmap.get(args.block) as Promise<ResolveOpenAPIBlockResult<T>>;
-    // }
+    if (weakmap.has(args.block)) {
+        return weakmap.get(args.block) as Promise<ResolveOpenAPIBlockResult<T>>;
+    }
 
     const result = baseResolveOpenAPIBlock(args);
     weakmap.set(args.block, result as Promise<ResolveOpenAPIBlockResult<T>>);
