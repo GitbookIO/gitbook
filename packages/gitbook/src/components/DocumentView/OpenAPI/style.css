@@ -142,7 +142,7 @@
     @apply py-2.5 flex flex-col gap-2;
 }
 
-.openapi-section .openapi-schema-properties {
+.openapi-section-body .openapi-schema-properties {
     @apply divide-y divide-tint-subtle;
 }
 
