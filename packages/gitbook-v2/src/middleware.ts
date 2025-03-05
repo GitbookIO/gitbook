@@ -33,12 +33,12 @@ export async function middleware(request: NextRequest) {
              * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
              */
             if (extracted.url.pathname.endsWith('/~gitbook/image')) {
-                return serveResizedImage(request, {
+                return await serveResizedImage(request, {
                     host: extracted.url.host,
                 });
             }
 
-            return serveSiteByURL(request, extracted);
+            return await serveSiteByURL(request, extracted);
         }
 
         // Handle the rest with the router default logic
@@ -147,10 +147,10 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
  */
 function serveErrorResponse(error: Error) {
     if (error instanceof GitBookAPIError) {
-        return NextResponse.json(
-            { error: error.message },
-            { status: 500, headers: { 'content-type': 'application/json' } }
-        );
+        return new Response(error.errorMessage, {
+            status: error.code,
+            headers: { 'content-type': 'text/plain' },
+        });
     }
 
     throw error;
