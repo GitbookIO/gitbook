@@ -63,11 +63,12 @@ export function resolveOpenAPIBlock<T extends OpenAPIBlockType = 'operation'>(
     args: ResolveOpenAPIBlockArgs<T>
 ): Promise<OpenAPIBlockResult<T>> {
     if (weakmap.has(args.block)) {
-        return weakmap.get(args.block);
+        // We enforce the type here cause weakmap doesn't know the type of the value
+        return weakmap.get<AnyOpenAPIOperationBlock, Promise<OpenAPIBlockResult<T>>>(args.block);
     }
 
     const result = baseResolveOpenAPIBlock(args);
-    weakmap.set(args.block, result as Promise<OpenAPIBlockResult>);
+    weakmap.set(args.block, result);
     return result;
 }
 
