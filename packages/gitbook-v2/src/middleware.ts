@@ -95,6 +95,12 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
         requestHeaders.set(MiddlewareHeaders.Theme, theme);
     }
 
+    // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
+    // This is useful for testing dynamic routes.
+    if (request.cookies.has('gitbook-dynamic-route')) {
+        routeType = 'dynamic';
+    }
+
     // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
     requestHeaders.set('x-forwarded-host', request.nextUrl.host);
     requestHeaders.set('origin', request.nextUrl.origin);
@@ -148,15 +154,30 @@ function serveErrorResponse(error: Error) {
 }
 
 /**
- * The URL of the GitBook content can be passed in 3 different ways:
- * - The request URL is in the `X-GitBook-URL` header.
- * - The request URL is matching `/url/:url`
+ * The URL of the GitBook content can be passed in 3 different ways (in order of priority):
+ * - The request has a `X-GitBook-URL` header:
+ *      URL is taken from the header.
+ * - The request has a `X-Forwarded-Host` header:
+ *      Host is taken from the header, pathname is taken from the request URL.
+ * - The request URL is matching `/url/:url`:
+ *      URL is taken from the pathname.
  */
 function extractURL(request: NextRequest): URLWithMode | null {
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
             url: appendQueryParams(new URL(xGitbookUrl), request.nextUrl.searchParams),
+            mode: 'url-host',
+        };
+    }
+
+    const xForwardedHost = request.headers.get('x-forwarded-host');
+    if (xForwardedHost) {
+        return {
+            url: appendQueryParams(
+                new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
+                request.nextUrl.searchParams
+            ),
             mode: 'url-host',
         };
     }
