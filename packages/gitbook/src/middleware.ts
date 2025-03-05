@@ -269,8 +269,8 @@ export async function middleware(request: NextRequest) {
 
         // When the request is authenticated, we don't want to cache the response on the server.
         // Allow storing so that revalidation still happens with server.
-        if (!resolved.visitorToken) {
-            return 'no-cache';
+        if (resolved.visitorToken) {
+            return 'no-cache, no-store';
         }
 
         if (typeof resolved.cacheMaxAge === 'number') {
