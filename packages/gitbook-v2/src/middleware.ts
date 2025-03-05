@@ -11,7 +11,7 @@ import { getPublishedContentByURL } from '@v2/lib/data';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
-    matcher: ['/((?!_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
+    matcher: ['/((?!_next/static|_next/image).*)'],
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
