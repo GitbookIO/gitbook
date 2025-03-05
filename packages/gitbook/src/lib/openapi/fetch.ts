@@ -19,25 +19,29 @@ export type AnyOpenAPIOperationBlock = DocumentBlockOpenAPI | DocumentBlockOpenA
 
 export type OpenAPIBlockType = 'operation' | 'models';
 
-export type ResolveOpenAPIOperationBlockResult = {
-    error: undefined;
+export type OpenAPIOperationResult = {
     data: OpenAPIOperationData | null;
-    specUrl: string | null;
-};
-
-export type ResolveOpenAPIModelsBlockResult = {
     error: undefined;
-    data: OpenAPIModelsData | null;
     specUrl: string | null;
 };
 
-export type ResolveOpenAPIBlockResult<T extends OpenAPIBlockType = OpenAPIBlockType> =
-    | (T extends 'operation' ? ResolveOpenAPIOperationBlockResult : ResolveOpenAPIModelsBlockResult)
-    | ResolveOpenAPIBlockError;
+export type OpenAPIModelsResult = {
+    data: OpenAPIModelsData | null;
+    error: undefined;
+    specUrl: string | null;
+};
 
-type ResolveOpenAPIBlockError = { error: OpenAPIParseError; data?: undefined; specUrl?: undefined };
+export type OpenAPIErrorResult = {
+    data?: undefined;
+    specUrl?: undefined;
+    error: OpenAPIParseError;
+};
 
-type ResolveOpenAPIBlockArgs<T extends OpenAPIBlockType = OpenAPIBlockType> = {
+export type OpenAPIBlockResult<T extends OpenAPIBlockType = 'operation'> =
+    | (T extends 'operation' ? OpenAPIOperationResult : OpenAPIModelsResult)
+    | OpenAPIErrorResult;
+
+type ResolveOpenAPIBlockArgs<T = OpenAPIBlockType> = {
     block: AnyOpenAPIOperationBlock;
     context: GitBookAnyContext;
     /**
@@ -48,7 +52,7 @@ type ResolveOpenAPIBlockArgs<T extends OpenAPIBlockType = OpenAPIBlockType> = {
     type?: T | OpenAPIBlockType;
 };
 
-const weakmap = new WeakMap<AnyOpenAPIOperationBlock, Promise<ResolveOpenAPIBlockResult>>();
+const weakmap = new WeakMap<AnyOpenAPIOperationBlock, Promise<OpenAPIBlockResult>>();
 
 /**
  * Cache the result of resolving an OpenAPI block.
@@ -56,13 +60,13 @@ const weakmap = new WeakMap<AnyOpenAPIOperationBlock, Promise<ResolveOpenAPIBloc
  */
 export function resolveOpenAPIBlock<T extends OpenAPIBlockType = 'operation'>(
     args: ResolveOpenAPIBlockArgs<T>
-): Promise<ResolveOpenAPIBlockResult<T>> {
+): Promise<OpenAPIBlockResult<T>> {
     if (weakmap.has(args.block)) {
-        return weakmap.get(args.block) as Promise<ResolveOpenAPIBlockResult<T>>;
+        return weakmap.get(args.block);
     }
 
     const result = baseResolveOpenAPIBlock(args);
-    weakmap.set(args.block, result as Promise<ResolveOpenAPIBlockResult<T>>);
+    weakmap.set(args.block, result as Promise<OpenAPIBlockResult>);
     return result;
 }
 
@@ -71,17 +75,17 @@ export function resolveOpenAPIBlock<T extends OpenAPIBlockType = 'operation'>(
  */
 async function baseResolveOpenAPIBlock<T extends OpenAPIBlockType = 'operation'>(
     args: ResolveOpenAPIBlockArgs<T>
-): Promise<ResolveOpenAPIBlockResult<T>> {
+): Promise<OpenAPIBlockResult<T>> {
     const { context, block, type = 'operation' } = args;
     if (!block.data.path || !block.data.method) {
-        return { data: null, specUrl: null } as ResolveOpenAPIBlockResult<T>;
+        return createResults(null);
     }
 
     const ref = block.data.ref;
     const resolved = ref ? await resolveContentRef(ref, context) : null;
 
     if (!resolved) {
-        return { data: null, specUrl: null } as ResolveOpenAPIBlockResult<T>;
+        return createResults(null);
     }
 
     try {
@@ -93,17 +97,17 @@ async function baseResolveOpenAPIBlock<T extends OpenAPIBlockType = 'operation'>
             return fetchFilesystem(resolved.href);
         })();
 
+        let data: OpenAPIOperationData | OpenAPIModelsData | null = null;
         if (type === 'models') {
-            const data = await resolveOpenAPIModels(filesystem);
-            return { data: data, specUrl: resolved.href } as ResolveOpenAPIBlockResult<T>;
+            data = await resolveOpenAPIModels(filesystem);
+        } else {
+            data = await resolveOpenAPIOperation(filesystem, {
+                path: block.data.path,
+                method: block.data.method,
+            });
         }
 
-        const data = await resolveOpenAPIOperation(filesystem, {
-            path: block.data.path,
-            method: block.data.method,
-        });
-
-        return { data, specUrl: resolved.href } as ResolveOpenAPIBlockResult<T>;
+        return createResults(data, resolved.href);
     } catch (error) {
         if (error instanceof OpenAPIParseError) {
             return { error };
@@ -174,4 +178,18 @@ async function fetchFilesystemUncached(
     const richFilesystem = await enrichFilesystem(filesystem);
 
     return richFilesystem;
+}
+
+/**
+ * Create a result for OpenAPI based on the type.
+ */
+function createResults<T extends OpenAPIOperationData | OpenAPIModelsData>(
+    data: T | null,
+    specUrl?: string
+): OpenAPIBlockResult<T> {
+    return {
+        error: undefined,
+        data,
+        specUrl,
+    };
 }

@@ -11,6 +11,9 @@ export function createStateKey(key: string, scope?: string) {
     return scope ? `${scope}_${key}` : key;
 }
 
+/**
+ * Check if an object has a description. Either at the root level or in items.
+ */
 function hasDescription(object: AnyObject) {
     if (Array.isArray(object)) {
         return object.some(hasDescription);
@@ -23,6 +26,7 @@ function hasDescription(object: AnyObject) {
  * Resolve the description of an object.
  */
 export function resolveDescription(object: OpenAPIV3.SchemaObject | AnyObject) {
+    // If the object has items and has a description, we resolve the description from items
     if ('items' in object && typeof object.items === 'object' && hasDescription(object.items)) {
         if (Array.isArray(object.items)) {
             return resolveDescription(object.items[0]);
@@ -69,7 +73,7 @@ export function resolveFirstExample(object: AnyObject) {
         return formatExample(object.example);
     }
 
-    // Resolve example from items if any
+    // Resolve example from items if it exists
     if (object.items && typeof object.items === 'object') {
         if (Array.isArray(object.items)) {
             return formatExample(object.items[0].example);
@@ -139,6 +143,9 @@ function formatExample(example: unknown): string {
     return stringifyOpenAPI(example);
 }
 
+/**
+ * Check if an example should be displayed.
+ */
 function shouldDisplayExample(schema: OpenAPIV3.SchemaObject): boolean {
     return (
         (typeof schema.example === 'string' && !!schema.example) ||
