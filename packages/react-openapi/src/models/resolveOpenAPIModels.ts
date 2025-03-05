@@ -1,5 +1,3 @@
-import { fromJSON, toJSON } from 'flatted';
-
 import {
     type Filesystem,
     type OpenAPIV3,
@@ -10,7 +8,7 @@ import {
 import { memoDereferenceFilesystem } from '../resolveOpenAPIOperation';
 import type { OpenAPIModelsData } from '../types';
 
-export { fromJSON, toJSON };
+//!!TODO: We should return only the models that are used in the block. Still a WIP awaiting future work.
 
 /**
  * Resolve an OpenAPI models from a file and compile it to a more usable format.
@@ -18,25 +16,10 @@ export { fromJSON, toJSON };
  */
 export async function resolveOpenAPIModels(
     filesystem: Filesystem<OpenAPIV3xDocument>
-    // operationDescriptor: {
-    //     path: string;
-    //     method: string;
-    // }
 ): Promise<OpenAPIModelsData | null> {
-    // const { path, method } = operationDescriptor;
     const schema = await memoDereferenceFilesystem(filesystem);
 
-    if (
-        !schema.components ||
-        !schema.components.schemas ||
-        !Object.keys(schema.components.schemas).length
-    ) {
-        return null;
-    }
-
-    let models: OpenAPIModelsData['models'] = [];
-
-    models = getOpenAPIComponents(schema);
+    const models = getOpenAPIComponents(schema);
 
     return { models };
 }
