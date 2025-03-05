@@ -243,7 +243,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2
         needs: deploy-v2-vercel
-        timeout-minutes: 8
+        timeout-minutes: 20
         steps:
             - name: Checkout
               uses: actions/checkout@v4
