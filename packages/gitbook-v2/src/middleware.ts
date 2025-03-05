@@ -176,6 +176,9 @@ function extractURL(request: NextRequest): URLWithMode | null {
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
     if (xForwardedHost && GITBOOK_URL && new URL(GITBOOK_URL).host !== xForwardedHost) {
+        console.log('xForwardedHost', xForwardedHost, GITBOOK_URL, new URL(GITBOOK_URL).host);
+        console.log('process.env.VERCEL_URL', process.env.VERCEL_URL);
+        console.log('process.env.GITBOOK_URL', process.env.GITBOOK_URL);
         return {
             url: appendQueryParams(
                 new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
