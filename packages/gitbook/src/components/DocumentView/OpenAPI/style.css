@@ -142,7 +142,7 @@
     @apply py-2.5 flex flex-col gap-2;
 }
 
-.openapi-section-body .openapi-schema-properties {
+.openapi-section .openapi-schema-properties {
     @apply divide-y divide-tint-subtle;
 }
 
@@ -620,14 +620,10 @@
     @apply space-y-2.5;
 }
 
-.openapi-models-properties {
+.openapi-section-models {
     @apply border border-tint-subtle rounded-lg;
 }
 
-.openapi-models-properties .openapi-schema-properties > .openapi-schema {
+.openapi-section-models > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
     @apply p-2.5;
-}
-
-.openapi-models .openapi-disclosure-group-panel > .openapi-section {
-    @apply py-0;
 }

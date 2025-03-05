@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
+import { OpenAPIRootSchema } from '../OpenAPISchema';
+import { Section, SectionBody } from '../StaticSection';
 import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIModelsData } from '../types';
-import { OpenAPIModelSchema } from './OpenAPIModelSchema';
 
 /**
  * Display OpenAPI Models.
@@ -34,7 +35,13 @@ export function OpenAPIModels(props: {
                                 <span className="openapi-response-statuscode">{name}</span>
                             </div>
                         ),
-                        body: <OpenAPIModelSchema schema={schema} context={clientContext} />,
+                        body: (
+                            <Section className="openapi-section-models">
+                                <SectionBody>
+                                    <OpenAPIRootSchema schema={schema} context={clientContext} />
+                                </SectionBody>
+                            </Section>
+                        ),
                     }))}
                 />
             ) : null}
