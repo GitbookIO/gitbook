@@ -15,6 +15,7 @@ import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
 
+//!!TODO: Add DocumentBlockOpenAPIModels when available in @gitbook/api
 export type AnyOpenAPIOperationBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
 
 export type OpenAPIBlockType = 'operation' | 'models';
