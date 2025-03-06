@@ -158,6 +158,10 @@ jobs:
               env:
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
                   GITBOOK_URL: https://gitbook-v2.gitbook.workers.dev/
+                  GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ secrets.PREVIEW_GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
+                  GITBOOK_IMAGE_RESIZE_URL: ${{ env.GITBOOK_IMAGE_RESIZE_URL }}
+                  GITBOOK_ICONS_URL: ${{ env.GITBOOK_ICONS_URL }}
+                  GITBOOK_ICONS_TOKEN: ${{ env.GITBOOK_ICONS_TOKEN }}
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.14.0
