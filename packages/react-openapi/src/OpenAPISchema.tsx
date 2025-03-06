@@ -57,7 +57,7 @@ function OpenAPISchemaProperty(props: {
                             <OpenAPISchemaAlternative
                                 key={index}
                                 schema={schema}
-                                circularRefs={new Map(circularRefs)}
+                                circularRefs={circularRefs}
                                 context={context}
                             />
                         ))}
