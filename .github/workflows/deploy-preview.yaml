@@ -106,11 +106,11 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  GITBOOK_URL: ${{ github.ref == 'refs/heads/main' && env.PRODUCTION_2C_GITBOOK_URL || env.PREVIEW_2C_GITBOOK_URL }}
+                  GITBOOK_URL: ${{ github.ref == 'refs/heads/main' && vars.PRODUCTION_2C_GITBOOK_URL || vars.PREVIEW_2C_GITBOOK_URL }}
                   GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ secrets.PREVIEW_GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
-                  GITBOOK_IMAGE_RESIZE_URL: ${{ env.GITBOOK_IMAGE_RESIZE_URL }}
-                  GITBOOK_ICONS_URL: ${{ env.GITBOOK_ICONS_URL }}
-                  GITBOOK_ICONS_TOKEN: ${{ env.GITBOOK_ICONS_TOKEN }}
+                  GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
+                  GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
+                  GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
