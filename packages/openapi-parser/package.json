@@ -12,8 +12,8 @@
     "version": "2.0.2",
     "sideEffects": false,
     "dependencies": {
-        "@scalar/openapi-parser": "^0.10.4",
-        "@scalar/openapi-types": "^0.1.6"
+        "@scalar/openapi-parser": "^0.10.9",
+        "@scalar/openapi-types": "^0.1.9"
     },
     "devDependencies": {
         "@tsconfig/strictest": "^2.0.5",
