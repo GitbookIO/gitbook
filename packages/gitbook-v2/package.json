@@ -3,7 +3,7 @@
     "version": "0.1.2",
     "private": true,
     "dependencies": {
-        "next": "^15.2.0",
+        "next": "^15.2.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "@gitbook/api": "0.96.1",
