@@ -1,5 +1,14 @@
 import { GitBookAPIError } from '@gitbook/api';
-import type { DataFetcherResponse } from './types';
+import type { DataFetcherErrorData, DataFetcherResponse } from './types';
+
+export class DataFetcherError extends Error {
+    constructor(
+        message: string,
+        public readonly code: number
+    ) {
+        super(message);
+    }
+}
 
 /**
  * Throw an error if the response contains an error.
@@ -14,27 +23,47 @@ export function throwIfError<T>(
     }
 
     if (response.error) {
-        throw new Error(response.error.message);
+        throw new DataFetcherError(response.error.message, response.error.code);
     }
     return response.data;
 }
 
 /**
- * Get the data from the response or null if there is an error.
+ * Get the data from the response or null if there is an "Not found" error.
  */
-export function getDataOrNull<T>(response: DataFetcherResponse<T>): T | null;
-export function getDataOrNull<T>(response: Promise<DataFetcherResponse<T>>): Promise<T | null>;
 export function getDataOrNull<T>(
-    response: DataFetcherResponse<T> | Promise<DataFetcherResponse<T>>
+    response: DataFetcherResponse<T>,
+    ignoreErrors?: number[]
+): T | null;
+export function getDataOrNull<T>(
+    response: Promise<DataFetcherResponse<T>>,
+    ignoreErrors?: number[]
+): Promise<T | null>;
+export function getDataOrNull<T>(
+    response: DataFetcherResponse<T> | Promise<DataFetcherResponse<T>>,
+    ignoreErrors: number[] = [404]
 ): T | null | Promise<T | null> {
     if (response instanceof Promise) {
-        return response.then((result) => getDataOrNull(result));
+        return response.then((result) => getDataOrNull(result, ignoreErrors));
     }
 
     if (response.error) {
-        return null;
+        if (ignoreErrors.includes(response.error.code)) return null;
+        throw new DataFetcherError(response.error.message, response.error.code);
     }
     return response.data;
+}
+
+/**
+ * Ignore error for an API or data call.
+ */
+export async function ignoreDataThrownError<T>(promise: Promise<T>): Promise<T | null> {
+    try {
+        return await promise;
+    } catch (error) {
+        getExposableError(error as Error);
+        return null;
+    }
 }
 
 /**
@@ -46,15 +75,26 @@ export async function wrapDataFetcherError<T>(
     try {
         return { data: await fn() };
     } catch (error) {
-        if (error instanceof GitBookAPIError) {
-            return {
-                error: {
-                    code: error.code,
-                    message: error.errorMessage,
-                },
-            };
-        }
-
-        throw error;
+        return {
+            error: getExposableError(error as Error),
+        };
     }
+}
+
+function getExposableError(error: Error): DataFetcherErrorData {
+    if (error instanceof GitBookAPIError) {
+        return {
+            code: error.code,
+            message: error.errorMessage,
+        };
+    }
+
+    if (error instanceof DataFetcherError) {
+        return {
+            code: error.code,
+            message: error.message,
+        };
+    }
+
+    throw error;
 }

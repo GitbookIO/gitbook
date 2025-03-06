@@ -1,6 +1,6 @@
 import type * as api from '@gitbook/api';
 
-export type DataFetcherError = {
+export type DataFetcherErrorData = {
     code: number;
     message: string;
 };
@@ -11,7 +11,7 @@ export type DataFetcherResponse<T> =
           error?: undefined;
       }
     | {
-          error: DataFetcherError;
+          error: DataFetcherErrorData;
           data?: undefined;
       };
 

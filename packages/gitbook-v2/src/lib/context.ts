@@ -13,7 +13,7 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
-import { type GitBookDataFetcher, createDataFetcher } from '@v2/lib/data';
+import { type GitBookDataFetcher, createDataFetcher, throwIfError } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
@@ -164,11 +164,13 @@ export async function fetchSiteContextByURL(
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
-    const data = await dataFetcher.getPublishedContentByUrl({
-        url: input.url,
-        visitorAuthToken: input.visitorAuthToken,
-        redirectOnError: input.redirectOnError,
-    });
+    const data = await throwIfError(
+        dataFetcher.getPublishedContentByUrl({
+            url: input.url,
+            visitorAuthToken: input.visitorAuthToken,
+            redirectOnError: input.redirectOnError,
+        })
+    );
 
     return fetchSiteContextByURLLookup(baseContext, data);
 }
@@ -225,11 +227,13 @@ export async function fetchSiteContextByIds(
 
     const [{ site: orgSite, structure: siteStructure, customizations, scripts }, spaceContext] =
         await Promise.all([
-            dataFetcher.getPublishedContentSite({
-                organizationId: ids.organization,
-                siteId: ids.site,
-                siteShareKey: ids.shareKey,
-            }),
+            throwIfError(
+                dataFetcher.getPublishedContentSite({
+                    organizationId: ids.organization,
+                    siteId: ids.site,
+                    siteShareKey: ids.shareKey,
+                })
+            ),
             fetchSpaceContextByIds(baseContext, ids),
         ]);
 
@@ -302,27 +306,33 @@ export async function fetchSpaceContextByIds(
     const { dataFetcher } = baseContext;
 
     const [space, changeRequest] = await Promise.all([
-        dataFetcher.getSpace({
-            spaceId: ids.space,
-            shareKey: ids.shareKey,
-        }),
+        throwIfError(
+            dataFetcher.getSpace({
+                spaceId: ids.space,
+                shareKey: ids.shareKey,
+            })
+        ),
         ids.changeRequest
-            ? dataFetcher.getChangeRequest({
-                  spaceId: ids.space,
-                  changeRequestId: ids.changeRequest,
-              })
+            ? throwIfError(
+                  dataFetcher.getChangeRequest({
+                      spaceId: ids.space,
+                      changeRequestId: ids.changeRequest,
+                  })
+              )
             : null,
     ]);
 
     const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
 
-    const pages = await dataFetcher.getRevisionPages({
-        spaceId: ids.space,
-        revisionId,
-        // We only care about the Git metadata when the Git sync is enabled,
-        // otherwise we can optimize performance by not fetching it
-        metadata: !!space.gitSync,
-    });
+    const pages = await throwIfError(
+        dataFetcher.getRevisionPages({
+            spaceId: ids.space,
+            revisionId,
+            // We only care about the Git metadata when the Git sync is enabled,
+            // otherwise we can optimize performance by not fetching it
+            metadata: !!space.gitSync,
+        })
+    );
 
     return {
         ...baseContext,

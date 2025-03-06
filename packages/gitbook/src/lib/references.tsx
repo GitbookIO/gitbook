@@ -7,7 +7,7 @@ import type {
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { type GitBookAnyContext, fetchSpaceContextByIds } from '@v2/lib/context';
-import { getDataOrNull, getPageDocument } from '@v2/lib/data';
+import { getDataOrNull, getPageDocument, ignoreDataThrownError } from '@v2/lib/data';
 import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import type React from 'react';
@@ -300,8 +300,7 @@ async function resolveContentRefInSpace(
     contentRef: ContentRef
 ) {
     const [spaceContext, bestTargetSpace] = await Promise.all([
-        // TODO: remove ignoreAPIError and replace by normal call
-        ignoreAPIError(
+        ignoreDataThrownError(
             fetchSpaceContextByIds(context, {
                 space: spaceId,
                 shareKey: context?.shareKey,
