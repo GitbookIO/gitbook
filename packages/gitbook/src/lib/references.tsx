@@ -7,7 +7,7 @@ import type {
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { type GitBookAnyContext, fetchSpaceContextByIds } from '@v2/lib/context';
-import { getPageDocument } from '@v2/lib/data';
+import { getDataOrNull, getPageDocument } from '@v2/lib/data';
 import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import type React from 'react';
@@ -84,11 +84,13 @@ export async function resolveContentRef(
         }
 
         case 'file': {
-            const file = await dataFetcher.getRevisionFile({
-                spaceId: space.id,
-                revisionId,
-                fileId: contentRef.file,
-            });
+            const file = await getDataOrNull(
+                dataFetcher.getRevisionFile({
+                    spaceId: space.id,
+                    revisionId,
+                    fileId: contentRef.file,
+                })
+            );
             if (file) {
                 return {
                     href: file.downloadURL,
@@ -189,7 +191,7 @@ export async function resolveContentRef(
         }
 
         case 'user': {
-            const user = await dataFetcher.getUserById(contentRef.user);
+            const user = await getDataOrNull(dataFetcher.getUserById(contentRef.user));
             if (user) {
                 return {
                     href: `mailto:${user.email}`,
@@ -209,11 +211,13 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
-            const reusableContent = await dataFetcher.getReusableContent({
-                spaceId: space.id,
-                revisionId,
-                reusableContentId: contentRef.reusableContent,
-            });
+            const reusableContent = await getDataOrNull(
+                dataFetcher.getReusableContent({
+                    spaceId: space.id,
+                    revisionId,
+                    reusableContentId: contentRef.reusableContent,
+                })
+            );
             if (!reusableContent) {
                 return null;
             }
@@ -226,10 +230,12 @@ export async function resolveContentRef(
         }
 
         case 'openapi': {
-            const openAPISpecVersionContent = await dataFetcher.getLatestOpenAPISpecVersionContent({
-                organizationId: context.organizationId,
-                slug: contentRef.spec,
-            });
+            const openAPISpecVersionContent = await getDataOrNull(
+                dataFetcher.getLatestOpenAPISpecVersionContent({
+                    organizationId: context.organizationId,
+                    slug: contentRef.spec,
+                })
+            );
 
             if (!openAPISpecVersionContent) {
                 return null;
@@ -258,14 +264,14 @@ async function getBestTargetSpace(
     const { dataFetcher } = context;
 
     const [fetchedSpace, publishedContentSite] = await Promise.all([
-        ignoreAPIError(
+        getDataOrNull(
             dataFetcher.getSpace({
                 spaceId,
                 shareKey: context?.shareKey,
             })
         ),
         'site' in context
-            ? ignoreAPIError(
+            ? getDataOrNull(
                   dataFetcher.getPublishedContentSite({
                       organizationId: context.organizationId,
                       siteId: context.site.id,
@@ -294,6 +300,7 @@ async function resolveContentRefInSpace(
     contentRef: ContentRef
 ) {
     const [spaceContext, bestTargetSpace] = await Promise.all([
+        // TODO: remove ignoreAPIError and replace by normal call
         ignoreAPIError(
             fetchSpaceContextByIds(context, {
                 space: spaceId,

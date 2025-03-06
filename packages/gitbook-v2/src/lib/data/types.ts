@@ -1,5 +1,20 @@
 import type * as api from '@gitbook/api';
 
+export type DataFetcherError = {
+    code: number;
+    message: string;
+};
+
+export type DataFetcherResponse<T> =
+    | {
+          data: T;
+          error?: undefined;
+      }
+    | {
+          error: DataFetcherError;
+          data?: undefined;
+      };
+
 /**
  * Generic fetcher for GitBook data.
  * It is used between v1 and v2.
@@ -25,7 +40,7 @@ export interface GitBookDataFetcher {
     /**
      * Get a user by its ID.
      */
-    getUserById(userId: string): Promise<api.User | null>;
+    getUserById(userId: string): Promise<DataFetcherResponse<api.User>>;
 
     /**
      * Get a published content by its URL.
@@ -34,7 +49,7 @@ export interface GitBookDataFetcher {
         url: string;
         visitorAuthToken: string | null;
         redirectOnError: boolean;
-    }): Promise<api.PublishedSiteContentLookup>;
+    }): Promise<DataFetcherResponse<api.PublishedSiteContentLookup>>;
 
     /**
      * Get a published content site by its organization ID and site ID.
@@ -43,12 +58,14 @@ export interface GitBookDataFetcher {
         organizationId: string;
         siteId: string;
         siteShareKey: string | undefined;
-    }): Promise<api.PublishedContentSite>;
+    }): Promise<DataFetcherResponse<api.PublishedContentSite>>;
 
     /**
      * Get a space by its ID.
      */
-    getSpace(params: { spaceId: string; shareKey: string | undefined }): Promise<api.Space>;
+    getSpace(params: { spaceId: string; shareKey: string | undefined }): Promise<
+        DataFetcherResponse<api.Space>
+    >;
 
     /**
      * Get a change request by its space ID and change request ID.
@@ -56,7 +73,7 @@ export interface GitBookDataFetcher {
     getChangeRequest(params: {
         spaceId: string;
         changeRequestId: string;
-    }): Promise<api.ChangeRequest | null>;
+    }): Promise<DataFetcherResponse<api.ChangeRequest>>;
 
     /**
      * Get the revision by its space ID and revision ID.
@@ -65,7 +82,7 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         metadata: boolean;
-    }): Promise<api.Revision>;
+    }): Promise<DataFetcherResponse<api.Revision>>;
 
     /**
      * Get the revision pages by its space ID and revision ID.
@@ -74,7 +91,7 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         metadata: boolean;
-    }): Promise<api.RevisionPage[]>;
+    }): Promise<DataFetcherResponse<api.RevisionPage[]>>;
 
     /**
      * Get a revision file by its space ID, revision ID and file ID.
@@ -83,7 +100,7 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         fileId: string;
-    }): Promise<api.RevisionFile | null>;
+    }): Promise<DataFetcherResponse<api.RevisionFile>>;
 
     /**
      * Get a revision page by its path.
@@ -92,12 +109,14 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         path: string;
-    }): Promise<api.RevisionPageDocument | api.RevisionPageGroup | null>;
+    }): Promise<DataFetcherResponse<api.RevisionPageDocument | api.RevisionPageGroup>>;
 
     /**
      * Get a document by its space ID and document ID.
      */
-    getDocument(params: { spaceId: string; documentId: string }): Promise<api.JSONDocument>;
+    getDocument(params: { spaceId: string; documentId: string }): Promise<
+        DataFetcherResponse<api.JSONDocument>
+    >;
 
     /**
      * Get a computed document by its space ID and computed source.
@@ -106,7 +125,7 @@ export interface GitBookDataFetcher {
         organizationId: string;
         spaceId: string;
         source: api.ComputedContentSource;
-    }): Promise<api.JSONDocument>;
+    }): Promise<DataFetcherResponse<api.JSONDocument>>;
 
     /**
      * Get a reusable content by its space ID, revision ID and reusable content ID.
@@ -115,7 +134,7 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         reusableContentId: string;
-    }): Promise<api.RevisionReusableContent | null>;
+    }): Promise<DataFetcherResponse<api.RevisionReusableContent>>;
 
     /**
      * Get the latest OpenAPI spec version content by its organization ID and slug.
@@ -123,7 +142,7 @@ export interface GitBookDataFetcher {
     getLatestOpenAPISpecVersionContent(params: {
         organizationId: string;
         slug: string;
-    }): Promise<api.OpenAPISpecContent | null>;
+    }): Promise<DataFetcherResponse<api.OpenAPISpecContent>>;
 
     /**
      * Get a site redirect by its source path.
@@ -133,12 +152,14 @@ export interface GitBookDataFetcher {
         siteId: string;
         siteShareKey: string | undefined;
         source: string;
-    }): Promise<{ redirect: api.SiteRedirect | null; target: string } | null>;
+    }): Promise<DataFetcherResponse<{ redirect: api.SiteRedirect | null; target: string }>>;
 
     /**
      * Get an embed by its URL.
      */
-    getEmbedByUrl(params: { url: string; spaceId: string }): Promise<api.Embed>;
+    getEmbedByUrl(params: { url: string; spaceId: string }): Promise<
+        DataFetcherResponse<api.Embed>
+    >;
 
     /**
      * Search content in a site.
@@ -153,5 +174,5 @@ export interface GitBookDataFetcher {
             | { mode: 'specific'; siteSpaceIds: string[] };
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
-    }): Promise<api.SearchSpaceResult[]>;
+    }): Promise<DataFetcherResponse<api.SearchSpaceResult[]>>;
 }
