@@ -14,7 +14,7 @@ import { GITBOOK_INTEGRATIONS_HOST } from '@v2/lib/env';
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import './contentkit.css';
-import { ignoreAllThrownError, ignoreDataThrownError } from '@v2/lib/data';
+import { ignoreAllThrownError } from '@v2/lib/data';
 
 const outputContext: ContentKitServerContext = {
     icons: {

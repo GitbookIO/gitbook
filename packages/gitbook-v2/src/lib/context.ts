@@ -13,7 +13,7 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
-import { type GitBookDataFetcher, createDataFetcher, throwIfError } from '@v2/lib/data';
+import { type GitBookDataFetcher, createDataFetcher, throwIfDataError } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
@@ -164,7 +164,7 @@ export async function fetchSiteContextByURL(
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
-    const data = await throwIfError(
+    const data = await throwIfDataError(
         dataFetcher.getPublishedContentByUrl({
             url: input.url,
             visitorAuthToken: input.visitorAuthToken,
@@ -227,7 +227,7 @@ export async function fetchSiteContextByIds(
 
     const [{ site: orgSite, structure: siteStructure, customizations, scripts }, spaceContext] =
         await Promise.all([
-            throwIfError(
+            throwIfDataError(
                 dataFetcher.getPublishedContentSite({
                     organizationId: ids.organization,
                     siteId: ids.site,
@@ -306,14 +306,14 @@ export async function fetchSpaceContextByIds(
     const { dataFetcher } = baseContext;
 
     const [space, changeRequest] = await Promise.all([
-        throwIfError(
+        throwIfDataError(
             dataFetcher.getSpace({
                 spaceId: ids.space,
                 shareKey: ids.shareKey,
             })
         ),
         ids.changeRequest
-            ? throwIfError(
+            ? throwIfDataError(
                   dataFetcher.getChangeRequest({
                       spaceId: ids.space,
                       changeRequestId: ids.changeRequest,
@@ -324,7 +324,7 @@ export async function fetchSpaceContextByIds(
 
     const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
 
-    const pages = await throwIfError(
+    const pages = await throwIfDataError(
         dataFetcher.getRevisionPages({
             spaceId: ids.space,
             revisionId,

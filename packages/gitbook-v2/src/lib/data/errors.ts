@@ -13,13 +13,13 @@ export class DataFetcherError extends Error {
 /**
  * Throw an error if the response contains an error.
  */
-export function throwIfError<T>(response: DataFetcherResponse<T>): T;
-export function throwIfError<T>(response: Promise<DataFetcherResponse<T>>): Promise<T>;
-export function throwIfError<T>(
+export function throwIfDataError<T>(response: DataFetcherResponse<T>): T;
+export function throwIfDataError<T>(response: Promise<DataFetcherResponse<T>>): Promise<T>;
+export function throwIfDataError<T>(
     response: DataFetcherResponse<T> | Promise<DataFetcherResponse<T>>
 ): T | Promise<T> {
     if (response instanceof Promise) {
-        return response.then((result) => throwIfError(result));
+        return response.then((result) => throwIfDataError(result));
     }
 
     if (response.error) {

@@ -14,7 +14,6 @@ import {
     type RevisionFile,
     type RevisionReusableContent,
 } from '@gitbook/api';
-import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { headers } from 'next/headers';
 
 import { batch } from './async';
