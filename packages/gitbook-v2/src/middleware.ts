@@ -176,8 +176,8 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         };
     }
 
-    const isMainHost = isGitBookHostURL(request.nextUrl);
-    const isAssetsHost = isGitBookAssetsHostURL(request.nextUrl);
+    const isMainHost = isGitBookHostURL(request.url);
+    const isAssetsHost = isGitBookAssetsHostURL(request.url);
 
     // /url/:url requests on the main host
     const prefix = '/url/';
