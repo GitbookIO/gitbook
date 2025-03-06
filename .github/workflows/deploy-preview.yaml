@@ -1,6 +1,9 @@
 name: Preview
 on:
     pull_request:
+    push:
+      branches:
+        - main
 env:
     NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
@@ -26,7 +29,13 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Sets env vars for production
+              if: github.ref == 'refs/heads/main'
+              run: |
+                echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+                echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
             - name: Sets env vars for preview
+              if: github.ref != 'refs/heads/main'
               run: |
                   echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
             - name: Build Next.js with next-on-pages
@@ -46,13 +55,13 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: ./
                   wranglerVersion: '3.112.0'
-                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ format('pr{0}', github.event.pull_request.number) }}
+                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
                   echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
     deploy-v2-vercel:
-        name: Deploy v2 to Vercel
+        name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
         permissions:
             contents: read
@@ -75,7 +84,7 @@ jobs:
                   vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
                   vercel-token: ${{ secrets.VERCEL_TOKEN }}
     deploy-v2-cloudflare:
-        name: Deploy v2 to Cloudflare Worker
+        name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
         permissions:
             contents: read
@@ -107,7 +116,7 @@ jobs:
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
     comment-deployments:
         runs-on: ubuntu-latest
-        name: Comment Deployments
+        name: Comment Deployments (preview)
         if: always()
         needs:
             - deploy-v1-cloudflare
