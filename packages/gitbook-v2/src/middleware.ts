@@ -166,8 +166,6 @@ function serveErrorResponse(error: Error) {
  *      URL is taken from the pathname.
  */
 function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
-    console.log('getSiteURLFromRequest', request.nextUrl.toString());
-
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
