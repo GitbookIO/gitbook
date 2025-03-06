@@ -108,7 +108,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments
-        if: always() && !startsWith(github.ref, 'refs/heads/main')
+        if: always()
         needs:
             - deploy-v1-cloudflare
             - deploy-v2-vercel
@@ -153,7 +153,7 @@ jobs:
                   edit-mode: replace
     visual-testing-v1:
         runs-on: ubuntu-latest
-        name: Visual Testing
+        name: Visual Testing v1
         needs: deploy-v1-cloudflare
         timeout-minutes: 8
         steps:
