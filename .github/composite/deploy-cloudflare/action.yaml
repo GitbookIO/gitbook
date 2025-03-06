@@ -47,6 +47,7 @@ runs:
               PUPPETEER_SKIP_DOWNLOAD: 1
         - name: Build worker
           run: bun run turbo build:v2:cloudflare
+          shell: bash
           env:
             NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
             GITBOOK_URL: ${{ inputs.GITBOOK_URL }}
