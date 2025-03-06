@@ -2,6 +2,7 @@ import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -156,16 +157,10 @@ async function getUserById(input: DataFetcherInput, userId: string) {
 
     cacheLife('days');
 
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).users.getUserById(userId);
         return res.data;
-    } catch (error) {
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getSpace(
@@ -185,10 +180,12 @@ async function getSpace(
         })
     );
 
-    const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
-        shareKey: params.shareKey,
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
+            shareKey: params.shareKey,
+        });
+        return res.data;
     });
-    return res.data;
 }
 
 async function getChangeRequest(
@@ -202,7 +199,7 @@ async function getChangeRequest(
 
     cacheLife('minutes');
 
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.getChangeRequestById(
             params.spaceId,
             params.changeRequestId
@@ -215,13 +212,7 @@ async function getChangeRequest(
             })
         );
         return res.data;
-    } catch (error) {
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getRevision(
@@ -236,10 +227,12 @@ async function getRevision(
 
     cacheLife('max');
 
-    const res = await getAPI(input).spaces.getRevisionById(params.spaceId, params.revisionId, {
-        metadata: params.metadata,
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).spaces.getRevisionById(params.spaceId, params.revisionId, {
+            metadata: params.metadata,
+        });
+        return res.data;
     });
-    return res.data;
 }
 
 async function getRevisionPages(
@@ -254,14 +247,16 @@ async function getRevisionPages(
 
     cacheLife('max');
 
-    const res = await getAPI(input).spaces.listPagesInRevisionById(
-        params.spaceId,
-        params.revisionId,
-        {
-            metadata: params.metadata,
-        }
-    );
-    return res.data.pages;
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).spaces.listPagesInRevisionById(
+            params.spaceId,
+            params.revisionId,
+            {
+                metadata: params.metadata,
+            }
+        );
+        return res.data.pages;
+    });
 }
 
 async function getRevisionFile(
@@ -276,20 +271,14 @@ async function getRevisionFile(
 
     cacheLife('max');
 
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.getFileInRevisionById(
             params.spaceId,
             params.revisionId,
             params.fileId
         );
         return res.data;
-    } catch (error) {
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getRevisionPageByPath(
@@ -305,7 +294,7 @@ async function getRevisionPageByPath(
     cacheLife('max');
 
     const encodedPath = encodeURIComponent(params.path);
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.getPageInRevisionByPath(
             params.spaceId,
             params.revisionId,
@@ -313,13 +302,7 @@ async function getRevisionPageByPath(
         );
 
         return res.data;
-    } catch (error) {
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getDocument(
@@ -333,8 +316,10 @@ async function getDocument(
 
     cacheLife('max');
 
-    const res = await getAPI(input).spaces.getDocumentById(params.spaceId, params.documentId);
-    return res.data;
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).spaces.getDocumentById(params.spaceId, params.documentId);
+        return res.data;
+    });
 }
 
 async function getComputedDocument(
@@ -359,10 +344,12 @@ async function getComputedDocument(
         )
     );
 
-    const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
-        source: params.source,
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
+            source: params.source,
+        });
+        return res.data;
     });
-    return res.data;
 }
 
 async function getReusableContent(
@@ -377,20 +364,14 @@ async function getReusableContent(
 
     cacheLife('max');
 
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.getReusableContentInRevisionById(
             params.spaceId,
             params.revisionId,
             params.reusableContentId
         );
         return res.data;
-    } catch (error) {
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getLatestOpenAPISpecVersionContent(
@@ -411,19 +392,13 @@ async function getLatestOpenAPISpecVersionContent(
     );
     cacheLife('days');
 
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).orgs.getLatestOpenApiSpecVersionContent(
             params.organizationId,
             params.slug
         );
         return res.data;
-    } catch (error) {
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getPublishedContentByUrl(
@@ -447,22 +422,24 @@ async function getPublishedContentByUrl(
     );
     cacheLife('days');
 
-    const res = await getAPI(input).urls.getPublishedContentByUrl({
-        url,
-        visitorAuthToken: visitorAuthToken ?? undefined,
-        redirectOnError,
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).urls.getPublishedContentByUrl({
+            url,
+            visitorAuthToken: visitorAuthToken ?? undefined,
+            redirectOnError,
+        });
+
+        if ('site' in res.data) {
+            cacheTag(
+                getCacheTag({
+                    tag: 'site',
+                    site: res.data.site,
+                })
+            );
+        }
+
+        return res.data;
     });
-
-    if ('site' in res.data) {
-        cacheTag(
-            getCacheTag({
-                tag: 'site',
-                site: res.data.site,
-            })
-        );
-    }
-
-    return res.data;
 }
 
 async function getPublishedContentSite(
@@ -483,14 +460,16 @@ async function getPublishedContentSite(
     );
     cacheLife('days');
 
-    const res = await getAPI(input).orgs.getPublishedContentSite(
-        params.organizationId,
-        params.siteId,
-        {
-            shareKey: params.siteShareKey,
-        }
-    );
-    return res.data;
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).orgs.getPublishedContentSite(
+            params.organizationId,
+            params.siteId,
+            {
+                shareKey: params.siteShareKey,
+            }
+        );
+        return res.data;
+    });
 }
 
 async function getSiteRedirectBySource(
@@ -512,7 +491,7 @@ async function getSiteRedirectBySource(
     );
     cacheLife('days');
 
-    try {
+    return wrapDataFetcherError(async () => {
         const res = await getAPI(input).orgs.getSiteRedirectBySource(
             params.organizationId,
             params.siteId,
@@ -523,19 +502,7 @@ async function getSiteRedirectBySource(
         );
 
         return res.data;
-    } catch (error) {
-        // 422 is returned when the source is invalid
-        // we don't want to throw but just return null
-        if (checkHasErrorCode(error, 422)) {
-            return null;
-        }
-
-        if (checkHasErrorCode(error, 404)) {
-            return null;
-        }
-
-        throw error;
-    }
+    });
 }
 
 async function getEmbedByUrl(
@@ -549,9 +516,11 @@ async function getEmbedByUrl(
 
     cacheLife('weeks');
 
-    const api = getAPI(input);
-    const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
-    return res.data;
+    return wrapDataFetcherError(async () => {
+        const api = getAPI(input);
+        const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
+        return res.data;
+    });
 }
 
 async function searchSiteContent(
@@ -564,11 +533,13 @@ async function searchSiteContent(
 
     cacheLife('days');
 
-    const res = await getAPI(input).orgs.searchSiteContent(organizationId, siteId, {
-        query,
-        ...scope,
+    return wrapDataFetcherError(async () => {
+        const res = await getAPI(input).orgs.searchSiteContent(organizationId, siteId, {
+            query,
+            ...scope,
+        });
+        return res.data.items;
     });
-    return res.data.items;
 }
 
 function getAPI(input: DataFetcherInput) {
@@ -580,8 +551,4 @@ function getAPI(input: DataFetcherInput) {
     });
 
     return api;
-}
-
-function checkHasErrorCode(error: unknown, code: number) {
-    return error instanceof Error && 'code' in error && error.code === code;
 }

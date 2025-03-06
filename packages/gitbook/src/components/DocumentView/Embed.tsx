@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { Card } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
+import { getDataOrNull } from '@v2/lib/data';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { IntegrationBlock } from './Integration';
@@ -18,10 +19,16 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
 
     ReactDOM.preload('https://cdn.iframe.ly/embed.js', { as: 'script' });
 
-    const embed = await context.contentContext.dataFetcher.getEmbedByUrl({
-        url: block.data.url,
-        spaceId: context.contentContext.space?.id,
-    });
+    const embed = await getDataOrNull(
+        context.contentContext.dataFetcher.getEmbedByUrl({
+            url: block.data.url,
+            spaceId: context.contentContext.space?.id,
+        })
+    );
+
+    if (!embed) {
+        return null;
+    }
 
     return (
         <Caption {...props} withBorder>

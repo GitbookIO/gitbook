@@ -8,6 +8,7 @@ import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
+import { throwIfDataError } from '@v2/lib/data';
 
 /**
  * Generate a llms.txt file for the site.
@@ -106,11 +107,13 @@ async function getNodesFromSiteSpaces(
             if (!siteSpaceUrl) {
                 return [];
             }
-            const rootPages = await dataFetcher.getRevisionPages({
-                spaceId: siteSpace.space.id,
-                revisionId: siteSpace.space.revision,
-                metadata: false,
-            });
+            const rootPages = await throwIfDataError(
+                dataFetcher.getRevisionPages({
+                    spaceId: siteSpace.space.id,
+                    revisionId: siteSpace.space.revision,
+                    metadata: false,
+                })
+            );
             const pages = getIndexablePages(rootPages);
             const listChildren = await Promise.all(
                 pages.map(async ({ page }): Promise<ListItem> => {

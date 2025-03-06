@@ -2,6 +2,7 @@ import type { DocumentBlockReusableContent } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
 
+import { getDataOrNull } from '@v2/lib/data';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
 
@@ -17,10 +18,12 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         return null;
     }
 
-    const document = await context.contentContext.dataFetcher.getDocument({
-        spaceId: context.contentContext.space.id,
-        documentId: resolved.reusableContent.document,
-    });
+    const document = await getDataOrNull(
+        context.contentContext.dataFetcher.getDocument({
+            spaceId: context.contentContext.space.id,
+            documentId: resolved.reusableContent.document,
+        })
+    );
 
     if (!document) {
         return null;

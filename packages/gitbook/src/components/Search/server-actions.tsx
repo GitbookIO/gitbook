@@ -20,6 +20,7 @@ import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 
 import { isV2 } from '@/lib/v2';
+import { throwIfDataError } from '@v2/lib/data';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { DocumentView } from '../DocumentView';
 
@@ -133,11 +134,13 @@ export async function streamAskQuestion({
                     if (!spacePromises.has(source.space)) {
                         spacePromises.set(
                             source.space,
-                            context.dataFetcher.getRevisionPages({
-                                spaceId: source.space,
-                                revisionId: source.revision,
-                                metadata: false,
-                            })
+                            throwIfDataError(
+                                context.dataFetcher.getRevisionPages({
+                                    spaceId: source.space,
+                                    revisionId: source.revision,
+                                    metadata: false,
+                                })
+                            )
                         );
                     }
 
@@ -229,17 +232,21 @@ async function searchSiteContent(
     }
 
     const [searchResults, { structure }] = await Promise.all([
-        dataFetcher.searchSiteContent({
-            organizationId: siteURLData.organization,
-            siteId: siteURLData.site,
-            query,
-            scope,
-        }),
-        dataFetcher.getPublishedContentSite({
-            organizationId: siteURLData.organization,
-            siteId: siteURLData.site,
-            siteShareKey: siteURLData.shareKey,
-        }),
+        throwIfDataError(
+            dataFetcher.searchSiteContent({
+                organizationId: siteURLData.organization,
+                siteId: siteURLData.site,
+                query,
+                scope,
+            })
+        ),
+        throwIfDataError(
+            dataFetcher.getPublishedContentSite({
+                organizationId: siteURLData.organization,
+                siteId: siteURLData.site,
+                siteShareKey: siteURLData.shareKey,
+            })
+        ),
     ]);
 
     return (

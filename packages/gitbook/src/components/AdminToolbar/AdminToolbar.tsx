@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { throwIfDataError } from '@v2/lib/data';
 
 import { DateRelative } from '../primitives';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
@@ -107,11 +108,13 @@ async function RevisionToolbar(props: { context: GitBookSiteContext }) {
     const { context } = props;
     const { space, revisionId } = context;
 
-    const revision = await context.dataFetcher.getRevision({
-        spaceId: space.id,
-        revisionId,
-        metadata: true,
-    });
+    const revision = await throwIfDataError(
+        context.dataFetcher.getRevision({
+            spaceId: space.id,
+            revisionId,
+            metadata: true,
+        })
+    );
 
     return (
         <ToolbarLayout>

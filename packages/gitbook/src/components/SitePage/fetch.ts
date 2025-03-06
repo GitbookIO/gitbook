@@ -2,6 +2,7 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 import { redirect } from 'next/navigation';
 
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
+import { getDataOrNull } from '@v2/lib/data';
 
 export interface PagePathParams {
     pathname?: string | string[];
@@ -54,22 +55,26 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         // If page can't be found, we try with the API, in case we have a redirect at space level.
         // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
         // The page rendering will take care of redirecting to a normalized pathname.
-        const resolved = await context.dataFetcher.getRevisionPageByPath({
-            spaceId: space.id,
-            revisionId,
-            path: rawPathname,
-        });
+        const resolved = await getDataOrNull(
+            context.dataFetcher.getRevisionPageByPath({
+                spaceId: space.id,
+                revisionId,
+                path: rawPathname,
+            })
+        );
         if (resolved) {
             return resolvePageId(pages, resolved.id);
         }
 
         // If a page still can't be found, we try with the API, in case we have a redirect at site level.
-        const resolvedSiteRedirect = await context.dataFetcher.getSiteRedirectBySource({
-            organizationId,
-            siteId: site.id,
-            source: rawPathname.startsWith('/') ? rawPathname : `/${rawPathname}`,
-            siteShareKey: shareKey,
-        });
+        const resolvedSiteRedirect = await getDataOrNull(
+            context.dataFetcher.getSiteRedirectBySource({
+                organizationId,
+                siteId: site.id,
+                source: rawPathname.startsWith('/') ? rawPathname : `/${rawPathname}`,
+                siteShareKey: shareKey,
+            })
+        );
         if (resolvedSiteRedirect) {
             return redirect(resolvedSiteRedirect.target);
         }
