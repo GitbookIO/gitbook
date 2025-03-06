@@ -8,7 +8,7 @@ import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getPublishedContentByURL } from '@v2/lib/data';
-import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@v2/lib/env';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
@@ -176,11 +176,8 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         };
     }
 
-    const isMainHost =
-        (GITBOOK_URL && request.nextUrl.host === new URL(GITBOOK_URL).host) ||
-        (process.env.VERCEL_URL && request.nextUrl.host === process.env.VERCEL_URL);
-    const isAssetsHost =
-        GITBOOK_ASSETS_URL && request.nextUrl.host === new URL(GITBOOK_ASSETS_URL).host;
+    const isMainHost = isGitBookHostURL(request.nextUrl);
+    const isAssetsHost = isGitBookAssetsHostURL(request.nextUrl);
 
     // /url/:url requests on the main host
     const prefix = '/url/';

@@ -62,28 +62,27 @@ export function createImageResizer({
                     url: urlInput,
                 });
 
-                const url = new URL(
-                    linker.toAbsoluteURL(linker.toPathInContent('/~gitbook/image'))
-                );
-                url.searchParams.set('url', getImageAPIUrl(urlInput));
+                const url = linker.toAbsoluteURL(linker.toPathInContent('/~gitbook/image'));
+                const searchParams = new URLSearchParams();
+                searchParams.set('url', getImageAPIUrl(urlInput));
 
                 if (options.width) {
-                    url.searchParams.set('width', options.width.toString());
+                    searchParams.set('width', options.width.toString());
                 }
                 if (options.height) {
-                    url.searchParams.set('height', options.height.toString());
+                    searchParams.set('height', options.height.toString());
                 }
                 if (options.dpr) {
-                    url.searchParams.set('dpr', options.dpr.toString());
+                    searchParams.set('dpr', options.dpr.toString());
                 }
                 if (options.quality) {
-                    url.searchParams.set('quality', options.quality.toString());
+                    searchParams.set('quality', options.quality.toString());
                 }
 
-                url.searchParams.set('sign', cachedSignature.signature);
-                url.searchParams.set('sv', cachedSignature.version);
+                searchParams.set('sign', cachedSignature.signature);
+                searchParams.set('sv', cachedSignature.version);
 
-                return url.toString();
+                return `${url}?${searchParams.toString()}`;
             };
         },
 

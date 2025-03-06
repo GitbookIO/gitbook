@@ -156,12 +156,8 @@ jobs:
             - name: Build worker
               run: bun run turbo build:v2:cloudflare
               env:
-                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-                  SENTRY_RELEASE: ${{ github.sha }}
+                  GITBOOK_URL: https://gitbook-v2.gitbook.workers.dev/
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.14.0

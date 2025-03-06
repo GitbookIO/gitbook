@@ -1,5 +1,6 @@
 import { getPagePath } from '@/lib/pages';
 import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
+import warnOnce from 'warn-once';
 
 /**
  * Generic interface to generate links based on a given context.
@@ -46,13 +47,11 @@ export function createLinker(
     /** Where the top of the space is served on */
     servedOn: {
         protocol?: string;
-        host: string;
+        host?: string;
         pathname: string;
     }
 ): GitBookSpaceLinker {
-    if (servedOn.host.includes('/')) {
-        throw new Error('Host cannot include a slash');
-    }
+    warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
 
     const linker: GitBookSpaceLinker = {
         toPathInContent(relativePath: string): string {
@@ -60,6 +59,10 @@ export function createLinker(
         },
 
         toAbsoluteURL(absolutePath: string): string {
+            if (!servedOn.host) {
+                return absolutePath;
+            }
+
             return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
         },
 
