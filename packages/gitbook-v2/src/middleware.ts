@@ -166,6 +166,8 @@ function serveErrorResponse(error: Error) {
  *      URL is taken from the pathname.
  */
 function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
+    console.log('getSiteURLFromRequest', request.nextUrl.toString());
+
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
@@ -201,12 +203,6 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
     if (xForwardedHost) {
-        console.log('xForwardedHost', xForwardedHost, request.nextUrl.host);
-        console.log('env', {
-            VERCEL_URL: process.env.VERCEL_URL,
-            GITBOOK_URL: GITBOOK_URL,
-            GITBOOK_ASSETS_URL: GITBOOK_ASSETS_URL,
-        });
         return {
             url: appendQueryParams(
                 new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
