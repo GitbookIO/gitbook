@@ -1,3 +1,4 @@
+import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
@@ -82,6 +83,18 @@ export function getResponseCookiesForVisitorAuth(
     basePath: string,
     visitorTokenLookup: VisitorTokenLookup
 ): ResponseCookies {
+    if (!visitorTokenLookup) {
+        return {};
+    }
+
+    let decoded: JwtPayload;
+    try {
+        decoded = jwtDecode(visitorTokenLookup.token);
+    } catch (error) {
+        console.error('Error decoding visitor token', error);
+        return {};
+    }
+
     return {
         /**
          * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
@@ -99,7 +112,7 @@ export function getResponseCookiesForVisitorAuth(
                           httpOnly: true,
                           sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
                           secure: process.env.NODE_ENV === 'production',
-                          maxAge: 7 * 24 * 60 * 60,
+                          maxAge: getVisitorAuthCookieMaxAge(decoded),
                       },
                   },
               }
@@ -211,4 +224,22 @@ function findVisitorAuthCookieForBasePath(
         },
         undefined
     );
+}
+
+/**
+ * Get the max age to store a visitor auth token in a cookie.
+ * We want to store the token for as long as it's valid, but at least 1 minute.
+ * If an invalid token is passed to the API, the API will return a redirect to the auth flow.
+ */
+function getVisitorAuthCookieMaxAge(decoded: JwtPayload): number {
+    const defaultMaxAge = 7 * 24 * 60 * 60; // 7 days
+    const minMaxAge = 60; // 1 min
+    const exp = decoded.exp;
+
+    if (typeof exp === 'number') {
+        const now = new Date().getTime();
+        return Math.max(exp - now, minMaxAge);
+    }
+
+    return defaultMaxAge;
 }
