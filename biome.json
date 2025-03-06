@@ -67,7 +67,12 @@
                 "useThrowOnlyError": "error"
             },
             "suspicious": {
-                "noConsole": "warn",
+                "noConsole": {
+                    "level": "warn",
+                    "options": {
+                        "allow": ["assert", "error", "warn"]
+                    }
+                },
                 "noExplicitAny": "warn",
                 "noImplicitAnyLet": "warn",
                 "noConfusingVoidType": "warn",

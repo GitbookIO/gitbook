@@ -14,7 +14,6 @@ import {
     type RevisionFile,
     type RevisionReusableContent,
 } from '@gitbook/api';
-import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { headers } from 'next/headers';
 
 import { batch } from './async';
@@ -866,50 +865,6 @@ export const getPublishedContentSite = cache({
 });
 
 /**
- * Fetch all the content data about a space at once.
- * This function executes the requests in parallel and should be used as early as possible
- * instead of calling the individual functions.
- *
- * @deprecated - use 'fetchSpaceContextByIds' from v2
- */
-export async function getSpaceContentData(
-    dataFetcher: GitBookDataFetcher,
-    pointer: SpaceContentPointer,
-    shareKey: string | undefined
-) {
-    const [space, changeRequest] = await Promise.all([
-        dataFetcher.getSpace({
-            spaceId: pointer.spaceId,
-            shareKey,
-        }),
-        pointer.changeRequestId
-            ? dataFetcher.getChangeRequest({
-                  spaceId: pointer.spaceId,
-                  changeRequestId: pointer.changeRequestId,
-              })
-            : null,
-    ]);
-
-    const contentTarget: ContentTarget = {
-        spaceId: pointer.spaceId,
-        revisionId: changeRequest?.revision ?? pointer.revisionId ?? space.revision,
-    };
-    const pages = await dataFetcher.getRevisionPages({
-        spaceId: pointer.spaceId,
-        revisionId: contentTarget.revisionId,
-        // We only care about the Git metadata when the Git sync is enabled,
-        // otherwise we can optimize performance by not fetching it
-        metadata: !!space.gitSync,
-    });
-
-    return {
-        space,
-        pages,
-        contentTarget,
-    };
-}
-
-/**
  * Search content in a Site or specific SiteSpaces.
  */
 export const searchSiteContent = cache({
@@ -1007,22 +962,6 @@ export function userAgent(): string {
     }
 
     return result;
-}
-
-/**
- * Ignore error for an API call.
- */
-export async function ignoreAPIError<T>(promise: Promise<T>, ignoreAll = false): Promise<T | null> {
-    try {
-        return await promise;
-    } catch (error) {
-        const code = (error as GitBookAPIError).code;
-        if (ignoreAll || (code >= 400 && code < 500)) {
-            return null;
-        }
-
-        throw error;
-    }
 }
 
 /**
