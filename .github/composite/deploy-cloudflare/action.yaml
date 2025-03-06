@@ -1,0 +1,86 @@
+name: 'Deploy cloudflare'
+description: 'Deploy GitBook to Cloudflare'
+inputs:
+  apiToken:
+    description: 'Cloudflare API token'
+    required: true
+  accountId:
+    description: 'Cloudflare account ID'
+    required: true
+  environment:
+    description: 'Environment to deploy to'
+    required: true
+  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
+    description: 'Next server actions encryption key'
+    required: true
+  GITBOOK_URL:
+    description: 'GitBook URL'
+    required: true
+  GITBOOK_APP_URL:
+    description: 'GitBook app URL'
+    required: false
+  GITBOOK_API_URL:
+    description: 'GitBook API URL'
+    required: false
+  GITBOOK_INTEGRATIONS_HOST:
+    description: 'GitBook integrations host'
+    required: false
+  GITBOOK_IMAGE_RESIZE_SIGNING_KEY:
+    description: 'GitBook image resize signing key'
+    required: true
+  GITBOOK_IMAGE_RESIZE_URL:
+    description: 'GitBook image resize URL'
+    required: true
+  GITBOOK_ICONS_URL:
+    description: 'GitBook icons URL'
+    required: true
+  GITBOOK_ICONS_TOKEN:
+    description: 'GitBook icons token'
+    required: true
+  GITBOOK_ASSETS_PREFIX:
+    description: 'GitBook assets prefix'
+    required: false
+outputs:
+    deployment-url: 
+      description: "Deployment URL"
+      value: ${{ steps.deploy.outputs.deployment-url }}
+runs:
+    using: 'composite'
+    steps:
+        - name: Setup Bun
+          uses: ./.github/composite/setup-bun
+        - name: Install dependencies
+          run: bun install --frozen-lockfile
+          shell: bash
+          env:
+              PUPPETEER_SKIP_DOWNLOAD: 1
+        - name: Build worker
+          run: bun run turbo build:v2:cloudflare
+          shell: bash
+          env:
+            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+            GITBOOK_URL: ${{ inputs.GITBOOK_URL }}
+            GITBOOK_APP_URL: ${{ inputs.GITBOOK_APP_URL }}
+            GITBOOK_API_URL: ${{ inputs.GITBOOK_API_URL }}
+            GITBOOK_INTEGRATIONS_HOST: ${{ inputs.GITBOOK_INTEGRATIONS_HOST }}
+            GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
+            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.GITBOOK_IMAGE_RESIZE_URL }}
+            GITBOOK_ICONS_URL: ${{ inputs.GITBOOK_ICONS_URL }}
+            GITBOOK_ICONS_TOKEN: ${{ inputs.GITBOOK_ICONS_TOKEN }}
+            GITBOOK_ASSETS_PREFIX: ${{ inputs.GITBOOK_ASSETS_PREFIX }}
+        - id: deploy
+          name: Deploy to Cloudflare
+          uses: cloudflare/wrangler-action@v3.14.0
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              workingDirectory: ./
+              wranglerVersion: '3.112.0'
+              environment: ${{ inputs.environment }}
+              command: ${{ inputs.environment == 'production' && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+        - name: Outputs
+          shell: bash
+          env:
+            DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          run: |
+              echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

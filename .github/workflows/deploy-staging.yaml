@@ -1,0 +1,52 @@
+name: Staging
+on:
+    push:
+        branches:
+            - main
+env:
+    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
+jobs:
+    deploy-v2-vercel:
+        name: Deploy v2 to Vercel (staging)
+        runs-on: ubuntu-latest
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Deploy staging
+              id: deploy
+              uses: ./.github/composite/deploy-vercel
+              with:
+                  environment: staging
+                  vercel-org: ${{ secrets.VERCEL_ORG_ID }}
+                  vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+    deploy-v2-cloudflare:
+        name: Deploy v2 to Cloudflare Worker (staging)
+        runs-on: ubuntu-latest
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Deploy
+              id: deploy
+              uses: ./.github/composite/deploy-cloudflare
+              with:
+                  environment: staging
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  GITBOOK_URL: ${{ vars.STAGING_2C_GITBOOK_URL }}
+                  GITBOOK_APP_URL: https://app.gitbook-staging.com
+                  GITBOOK_API_URL: https://api.gitbook-staging.com
+                  GITBOOK_INTEGRATIONS_HOST: https://integrations.gitbook-staging.com
+                  GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ secrets.STAGING_GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
+                  GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
+                  GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
+                  GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
+                  GITBOOK_ASSETS_PREFIX: ${{ vars.STAGING_2C_GITBOOK_ASSETS_PREFIX }}
+            - name: Outputs
+              run: |
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

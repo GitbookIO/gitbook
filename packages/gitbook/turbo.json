@@ -3,6 +3,9 @@
     "tasks": {
         "generate": {
             "outputs": ["public/~gitbook/static/icons/**/*", "public/~gitbook/static/math/**/*"]
+        },
+        "typecheck": {
+            "dependsOn": ["^typecheck"]
         }
     }
 }

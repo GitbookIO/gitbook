@@ -116,7 +116,7 @@ export function getBaseContext(input: {
         apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
         apiEndpoint: GITBOOK_API_URL,
     });
-    const gitbookURL = new URL(GITBOOK_URL);
+    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
 
     const linker =
         urlMode === 'url-host'
@@ -125,8 +125,8 @@ export function getBaseContext(input: {
                   pathname: url.pathname,
               })
             : createLinker({
-                  protocol: gitbookURL.protocol,
-                  host: gitbookURL.host,
+                  protocol: gitbookURL?.protocol,
+                  host: gitbookURL?.host,
                   pathname: `/url/${url.host}${url.pathname}`,
               });
 
