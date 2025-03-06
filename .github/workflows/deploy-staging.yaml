@@ -1,10 +1,10 @@
-name: Deploy Staging
+name: Staging
 on:
     push:
         branches:
             - main
 jobs:
-    deploy-vercel:
+    deploy-v2-vercel:
         name: Deploy v2 to Vercel
         runs-on: ubuntu-latest
         permissions:
@@ -27,7 +27,7 @@ jobs:
                   vercel-org: ${{ secrets.VERCEL_ORG_ID }}
                   vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
                   vercel-token: ${{ secrets.VERCEL_TOKEN }}
-    deploy-cloudflare:
+    deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker
         runs-on: ubuntu-latest
         permissions:
