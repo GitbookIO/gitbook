@@ -93,7 +93,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             />
                             <HeaderLogo context={context} />
                             {isMultiVariants && (
-                                <div className='mr-auto ml-2 page-no-toc:flex hidden'>
+                                <div className="mr-auto ml-2 page-no-toc:flex hidden">
                                     <SpacesDropdown
                                         context={context}
                                         siteSpace={siteSpace}
