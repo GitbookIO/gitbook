@@ -12,8 +12,8 @@
     "sideEffects": false,
     "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
-        "@scalar/api-client-react": "1.0.87",
-        "@scalar/oas-utils": "^0.2.101",
+        "@scalar/api-client-react": "^1.1.36",
+        "@scalar/oas-utils": "^0.2.110",
         "clsx": "^2.1.1",
         "flatted": "^3.2.9",
         "json-xml-parse": "^1.3.0",
