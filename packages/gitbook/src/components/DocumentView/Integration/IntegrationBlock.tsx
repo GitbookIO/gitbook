@@ -6,7 +6,7 @@ import {
     type ContentKitServerContext,
 } from '@gitbook/react-contentkit';
 
-import { ignoreAPIError, renderIntegrationUi } from '@/lib/api';
+import { renderIntegrationUi } from '@/lib/api';
 import { parseMarkdown } from '@/lib/markdown';
 import { tcls } from '@/lib/tailwind';
 import { GITBOOK_INTEGRATIONS_HOST } from '@v2/lib/env';
@@ -14,6 +14,7 @@ import { GITBOOK_INTEGRATIONS_HOST } from '@v2/lib/env';
 import type { BlockProps } from '../Block';
 import { PlainCodeBlock } from '../CodeBlock';
 import './contentkit.css';
+import { ignoreAllThrownError, ignoreDataThrownError } from '@v2/lib/data';
 
 const outputContext: ContentKitServerContext = {
     icons: {
@@ -63,9 +64,8 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         context: contentKitContext,
     };
 
-    const initialOutput = await ignoreAPIError(
-        renderIntegrationUi(block.data.integration, initialInput),
-        true
+    const initialOutput = await ignoreAllThrownError(
+        renderIntegrationUi(block.data.integration, initialInput)
     );
     if (!initialOutput || initialOutput.type === 'complete') {
         return null;

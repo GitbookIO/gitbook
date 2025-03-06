@@ -14,7 +14,6 @@ import type React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
-import { ignoreAPIError } from './api';
 import { getBlockById, getBlockTitle } from './document';
 import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
@@ -268,7 +267,8 @@ async function getBestTargetSpace(
             dataFetcher.getSpace({
                 spaceId,
                 shareKey: context?.shareKey,
-            })
+            }),
+            [404, 403]
         ),
         'site' in context
             ? getDataOrNull(
@@ -276,7 +276,8 @@ async function getBestTargetSpace(
                       organizationId: context.organizationId,
                       siteId: context.site.id,
                       siteShareKey: context.shareKey,
-                  })
+                  }),
+                  [404, 403]
               )
             : null,
     ]);

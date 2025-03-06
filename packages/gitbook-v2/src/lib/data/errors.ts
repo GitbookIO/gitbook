@@ -67,6 +67,18 @@ export async function ignoreDataThrownError<T>(promise: Promise<T>): Promise<T |
 }
 
 /**
+ * Ignore all errors for an API or data call.
+ */
+export async function ignoreAllThrownError<T>(promise: Promise<T>): Promise<T | null> {
+    try {
+        return await promise;
+    } catch (error) {
+        console.warn('Ignoring error', error);
+        return null;
+    }
+}
+
+/**
  * Wrap an async execution to handle errors and return a DataFetcherResponse.
  */
 export async function wrapDataFetcherError<T>(
