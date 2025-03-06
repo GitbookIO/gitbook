@@ -3,6 +3,8 @@ on:
     push:
         branches:
             - main
+env:
+    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (production)
