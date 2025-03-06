@@ -7,10 +7,15 @@ observability = { enabled = true }
 
 [env.preview]
 kv_namespaces = [
-  { binding = "NEXT_CACHE_WORKERS_KV", id = "gitbook-open-v2-cache-preview" }
+  { binding = "NEXT_CACHE_WORKERS_KV", id = "72379746280d4e79acf24440eea950dc" }
+]
+
+[env.staging]
+kv_namespaces = [
+  { binding = "NEXT_CACHE_WORKERS_KV", id = "a446e25f12b741afb185f1e5b4474f0a" }
 ]
 
 [env.production]
 kv_namespaces = [
-  { binding = "NEXT_CACHE_WORKERS_KV", id = "gitbook-open-v2-cache" }
+  { binding = "NEXT_CACHE_WORKERS_KV", id = "72379746280d4e79acf24440eea950dc" }
 ]
