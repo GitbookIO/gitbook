@@ -9,13 +9,6 @@ jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (staging)
         runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            deployments: write
-            issues: write
-            pull-requests: write
-            checks: write
-            statuses: write
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -32,13 +25,6 @@ jobs:
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (staging)
         runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            deployments: write
-            issues: write
-            pull-requests: write
-            checks: write
-            statuses: write
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
