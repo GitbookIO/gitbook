@@ -170,6 +170,7 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: ./
                   wranglerVersion: '3.112.0'
+                  environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
                   command: versions upload --config ./packages/gitbook-v2/wrangler.toml
             - name: Outputs
               run: |
