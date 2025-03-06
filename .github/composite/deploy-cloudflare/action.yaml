@@ -66,3 +66,9 @@ runs:
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
               command: ${{ inputs.environment == 'production' && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+        - name: Outputs
+          shell: bash
+          env:
+            DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          run: |
+              echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
