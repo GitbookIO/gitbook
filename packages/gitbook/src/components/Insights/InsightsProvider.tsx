@@ -185,7 +185,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
      * Get the visitor ID and store it in a ref.
      */
     React.useEffect(() => {
-        getVisitorId().then((visitorId) => {
+        getVisitorId(appURL).then((visitorId) => {
             visitorIdRef.current = visitorId;
             // When the page is unloaded, flush all events, but only if the visitor ID is set
             window.addEventListener('beforeunload', flushEventsSync);
@@ -193,7 +193,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync]);
+    }, [flushEventsSync, appURL]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
