@@ -38,7 +38,7 @@ export const GITBOOK_API_URL = process.env.GITBOOK_API_URL || 'https://api.gitbo
  * Default GitBook API token.
  * It can be use to avoid rate-limiting.
  */
-export const GITBOOK_API_TOKEN = process.env.GITBOOK_API_TOKEN ?? null;
+export const GITBOOK_API_TOKEN = process.env.GITBOOK_API_TOKEN || null;
 
 /**
  * User agent to use for API requests.
