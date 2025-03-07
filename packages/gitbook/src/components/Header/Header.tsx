@@ -147,7 +147,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'shrink-0',
                                 'md:basis-56',
                                 'justify-self-end',
-                                true
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
                                     ? [
                                           'md:grow-[0.8]',
                                           'lg:basis-40',
