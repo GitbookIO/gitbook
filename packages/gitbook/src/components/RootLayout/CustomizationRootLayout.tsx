@@ -31,6 +31,7 @@ import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
+import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -127,8 +128,8 @@ export async function CustomizationRootLayout(props: {
                 )}
             >
                 <IconsProvider
-                    assetsURL={process.env.GITBOOK_ICONS_URL ?? getAssetURL('icons')}
-                    assetsURLToken={process.env.GITBOOK_ICONS_TOKEN}
+                    assetsURL={GITBOOK_ICONS_URL}
+                    assetsURLToken={GITBOOK_ICONS_TOKEN}
                     assetsByStyles={{
                         'custom-icons': {
                             assetsURL: getAssetURL('icons'),

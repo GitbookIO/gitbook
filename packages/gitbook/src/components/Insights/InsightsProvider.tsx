@@ -63,6 +63,7 @@ const InsightsContext = React.createContext<TrackEventCallback>(() => {});
 
 interface InsightsProviderProps extends InsightsEventContext {
     enabled: boolean;
+    appURL: string;
     apiHost: string;
     visitorAuthToken: string | null;
     children: React.ReactNode;
@@ -72,7 +73,7 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, apiHost, visitorAuthToken, children, ...context } = props;
+    const { enabled, appURL, apiHost, visitorAuthToken, children, ...context } = props;
 
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
@@ -140,7 +141,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
     });
 
     const flushBatchedEvents = useDebounceCallback(async () => {
-        const visitorId = visitorIdRef.current ?? (await getVisitorId());
+        const visitorId = visitorIdRef.current ?? (await getVisitorId(appURL));
         visitorIdRef.current = visitorId;
 
         flushEventsSync();

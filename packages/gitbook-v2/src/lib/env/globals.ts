@@ -1,3 +1,11 @@
+import 'server-only';
+
+/*
+ * Support both Cloudflare and Vercel, environment variables can be bundled.
+ * To avoid leaking them on the client-side, they should be accessed from this file
+ * and not from the `process.env` object.
+ */
+
 /**
  * Main host on which GitBook is running.
  */
@@ -19,7 +27,7 @@ export const GITBOOK_ASSETS_URL =
 /**
  * GitBook app URL.
  */
-export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL || 'https://app.gitbook.com';
+export const GITBOOK_APP_URL = process.env.GITBOOK_APP_URL || 'https://app.gitbook.com';
 
 /**
  * Default GitBook API URL endpoint.
@@ -58,6 +66,17 @@ export const GITBOOK_INTEGRATIONS_HOST =
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+
+/**
+ * Endpoint where icons are served.
+ */
+export const GITBOOK_ICONS_URL =
+    process.env.GITBOOK_ICONS_URL || `${GITBOOK_ASSETS_URL}/~gitbook/static/icons`;
+
+/**
+ * Token passed to the icons endpoint.
+ */
+export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
 
 /**
  * Secret used to validate requests from the GitBook app.
