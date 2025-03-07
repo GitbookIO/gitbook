@@ -22,7 +22,7 @@ export const GITBOOK_URL =
 export const GITBOOK_ASSETS_URL =
     process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : process.env.GITBOOK_ASSETS_PREFIX || GITBOOK_URL;
+        : process.env.GITBOOK_ASSETS_PREFIX;
 
 /**
  * GitBook app URL.
@@ -38,7 +38,7 @@ export const GITBOOK_API_URL = process.env.GITBOOK_API_URL || 'https://api.gitbo
  * Default GitBook API token.
  * It can be use to avoid rate-limiting.
  */
-export const GITBOOK_API_TOKEN = process.env.GITBOOK_API_TOKEN ?? null;
+export const GITBOOK_API_TOKEN = process.env.GITBOOK_API_TOKEN || null;
 
 /**
  * User agent to use for API requests.
@@ -71,7 +71,7 @@ export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
  * Endpoint where icons are served.
  */
 export const GITBOOK_ICONS_URL =
-    process.env.GITBOOK_ICONS_URL || `${GITBOOK_ASSETS_URL}/~gitbook/static/icons`;
+    process.env.GITBOOK_ICONS_URL || `${GITBOOK_ASSETS_URL || ''}/~gitbook/static/icons`;
 
 /**
  * Token passed to the icons endpoint.

@@ -9,6 +9,9 @@ jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (staging)
         runs-on: ubuntu-latest
+        environment: 
+            name: 2v-staging
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -18,13 +21,18 @@ jobs:
               id: deploy
               uses: ./.github/composite/deploy-vercel
               with:
-                  environment: staging
-                  vercel-org: ${{ secrets.VERCEL_ORG_ID }}
-                  vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
-                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+                environment: staging
+                vercelOrg: ${{ secrets.VERCEL_ORG_ID }}
+                vercelProject: ${{ secrets.VERCEL_PROJECT_ID }}
+                vercelToken: ${{ secrets.VERCEL_TOKEN }}
+                opItem: op://gitbook-open/2v-staging
+                opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (staging)
         runs-on: ubuntu-latest
+        environment: 
+            name: 2c-staging
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -38,17 +46,8 @@ jobs:
                   deploy: true
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  GITBOOK_URL: ${{ vars.STAGING_2C_GITBOOK_URL }}
-                  GITBOOK_SECRET: ${{ secrets.STAGING_GITBOOK_SECRET }}
-                  GITBOOK_APP_URL: https://app.gitbook-staging.com
-                  GITBOOK_API_URL: https://api.gitbook-staging.com
-                  GITBOOK_INTEGRATIONS_HOST: https://integrations.gitbook-staging.com
-                  GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ secrets.STAGING_GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
-                  GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
-                  GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
-                  GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
-                  GITBOOK_ASSETS_PREFIX: ${{ vars.STAGING_2C_GITBOOK_ASSETS_PREFIX }}
+                  opItem: op://gitbook-open/2c-staging
+                  opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

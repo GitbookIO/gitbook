@@ -1,12 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import {
+    GITBOOK_API_TOKEN,
     GITBOOK_API_URL,
     GITBOOK_APP_URL,
     GITBOOK_ASSETS_URL,
     GITBOOK_DISABLE_TRACKING,
     GITBOOK_ICONS_URL,
+    GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
     GITBOOK_INTEGRATIONS_HOST,
+    GITBOOK_SECRET,
     GITBOOK_URL,
     GITBOOK_USER_AGENT,
 } from '@v2/lib/env';
@@ -24,5 +27,10 @@ export async function GET(_req: NextRequest) {
         GITBOOK_USER_AGENT,
         GITBOOK_INTEGRATIONS_HOST,
         GITBOOK_DISABLE_TRACKING,
+
+        // Secret envs
+        GITBOOK_SECRET: !!GITBOOK_SECRET,
+        GITBOOK_API_TOKEN: !!GITBOOK_API_TOKEN,
+        GITBOOK_IMAGE_RESIZE_SIGNING_KEY: !!GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
     });
 }

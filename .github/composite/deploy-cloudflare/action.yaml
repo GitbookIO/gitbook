@@ -1,6 +1,12 @@
 name: 'Deploy cloudflare'
 description: 'Deploy GitBook to Cloudflare'
 inputs:
+  opItem:
+    description: '1Password item to load secrets from'
+    required: true
+  opServiceAccount:
+    description: '1Password service account token'
+    required: true
   apiToken:
     description: 'Cloudflare API token'
     required: true
@@ -8,44 +14,11 @@ inputs:
     description: 'Cloudflare account ID'
     required: true
   environment:
-    description: 'Environment to deploy to'
+    description: 'Cloudflare environment to deploy to (staging, production, preview)'
     required: true
   deploy:
     description: 'Deploy as main version for all traffic instead of uploading versions'
     required: true
-  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
-    description: 'Next server actions encryption key'
-    required: true
-  GITBOOK_URL:
-    description: 'GitBook URL'
-    required: true
-  GITBOOK_SECRET:
-    description: 'GitBook secret'
-    required: true
-  GITBOOK_APP_URL:
-    description: 'GitBook app URL'
-    required: false
-  GITBOOK_API_URL:
-    description: 'GitBook API URL'
-    required: false
-  GITBOOK_INTEGRATIONS_HOST:
-    description: 'GitBook integrations host'
-    required: false
-  GITBOOK_IMAGE_RESIZE_SIGNING_KEY:
-    description: 'GitBook image resize signing key'
-    required: true
-  GITBOOK_IMAGE_RESIZE_URL:
-    description: 'GitBook image resize URL'
-    required: true
-  GITBOOK_ICONS_URL:
-    description: 'GitBook icons URL'
-    required: true
-  GITBOOK_ICONS_TOKEN:
-    description: 'GitBook icons token'
-    required: true
-  GITBOOK_ASSETS_PREFIX:
-    description: 'GitBook assets prefix'
-    required: false
 outputs:
     deployment-url: 
       description: "Deployment URL"
@@ -60,21 +33,25 @@ runs:
           shell: bash
           env:
               PUPPETEER_SKIP_DOWNLOAD: 1
+        - name: Load secret
+          uses: 1password/load-secrets-action@v2
+          env:
+            OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
+            GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
+            GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
+            GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
+            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.opItem }}/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+            GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
+            GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
+            GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
+            GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
+            GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
+            GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
+            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
+            GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
         - name: Build worker
           run: bun run turbo build:v2:cloudflare
           shell: bash
-          env:
-            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-            GITBOOK_URL: ${{ inputs.GITBOOK_URL }}
-            GITBOOK_SECRET: ${{ inputs.GITBOOK_SECRET }}
-            GITBOOK_APP_URL: ${{ inputs.GITBOOK_APP_URL }}
-            GITBOOK_API_URL: ${{ inputs.GITBOOK_API_URL }}
-            GITBOOK_INTEGRATIONS_HOST: ${{ inputs.GITBOOK_INTEGRATIONS_HOST }}
-            GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
-            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.GITBOOK_IMAGE_RESIZE_URL }}
-            GITBOOK_ICONS_URL: ${{ inputs.GITBOOK_ICONS_URL }}
-            GITBOOK_ICONS_TOKEN: ${{ inputs.GITBOOK_ICONS_TOKEN }}
-            GITBOOK_ASSETS_PREFIX: ${{ inputs.GITBOOK_ASSETS_PREFIX }}
         - id: deploy
           name: Deploy to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0
@@ -84,7 +61,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
-              command: ${{ inputs.deploy && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+              command: ${{ fromJSON(inputs.deploy) == true && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
         - name: Outputs
           shell: bash
           env:
