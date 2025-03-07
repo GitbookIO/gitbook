@@ -56,7 +56,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
         >
             <div
                 ref={scrollableViewRef}
-                className='hide-scroll -mb-4 -mx-3 w-full overflow-y-hidden overflow-x-scroll pb-4' /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
+                className="hide-scroll -mb-4 -mx-3 w-full overflow-y-hidden overflow-x-scroll pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
             >
                 <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent">
                     {sectionsAndGroups.map((sectionOrGroup) => {

@@ -34,7 +34,7 @@ export async function HeaderLink(props: {
     if (link.links && link.links.length > 0) {
         return (
             <Dropdown
-                className='right-0 left-auto shrink'
+                className="right-0 left-auto shrink"
                 button={(buttonProps) => {
                     if (!target || !link.to) {
                         return (
