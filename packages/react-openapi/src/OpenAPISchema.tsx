@@ -217,7 +217,7 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
                 propertyName={propertyName}
                 required={required}
             />
-            {schema['x-deprecated-sunset'] ? (
+            {typeof schema['x-deprecated-sunset'] === 'string' ? (
                 <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
                     Sunset date:{' '}
                     <span className="openapi-deprecated-sunset-date">
@@ -228,7 +228,7 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
             {description ? (
                 <Markdown source={description} className="openapi-schema-description" />
             ) : null}
-            {example ? (
+            {typeof example === 'string' ? (
                 <div className="openapi-schema-example">
                     Example: <code>{example}</code>
                 </div>

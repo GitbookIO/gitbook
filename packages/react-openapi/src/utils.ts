@@ -51,12 +51,12 @@ export function extractDescriptions(object: AnyObject) {
 /**
  * Resolve the first example from an object.
  */
-export function resolveFirstExample(object: AnyObject) {
+export function resolveFirstExample(object: AnyObject): string | undefined {
     if ('examples' in object && typeof object.examples === 'object' && object.examples) {
         const keys = Object.keys(object.examples);
         const firstKey = keys[0];
         if (firstKey && object.examples[firstKey]) {
-            return object.examples[firstKey];
+            return formatExample(object.examples[firstKey]);
         }
     }
 
