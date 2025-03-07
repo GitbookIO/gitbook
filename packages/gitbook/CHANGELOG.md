@@ -1,5 +1,12 @@
 # gitbook
 
+## 0.7.1
+
+### Patch Changes
+
+-   Updated dependencies [f574858]
+    -   @gitbook/react-openapi@1.1.1
+
 ## 0.7.0
 
 ### Minor Changes
