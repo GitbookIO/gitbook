@@ -117,7 +117,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always()
+        if: always() && !startsWith(github.ref, 'refs/heads/main')
         needs:
             - deploy-v1-cloudflare
             - deploy-v2-vercel
