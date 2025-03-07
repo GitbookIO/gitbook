@@ -111,7 +111,7 @@ export function TableOfContents(props: {
                             'page-no-toc:hidden',
                             'sidebar-list-line:border-l',
                             'border-tint-subtle',
-                            'mb-6',
+                            'mb-6'
                         )}
                     />
                     {customization.trademark.enabled ? (
