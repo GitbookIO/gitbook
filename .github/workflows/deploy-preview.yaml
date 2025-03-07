@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: 
           name: ${{ github.ref == 'refs/heads/main' && '1c-production' || '1c-preview' }}
-          url: ${{ github.ref == 'refs/heads/main' && 'https://open.gitbook.com' || steps.deploy.outputs.deployment-url }}
+          url: ${{ steps.deploy.outputs.deployment-url }}
         permissions:
             contents: read
             deployments: write
