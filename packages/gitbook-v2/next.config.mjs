@@ -1,5 +1,29 @@
 // @ts-check
 
+const gitbookEnvs = {
+    GITBOOK_URL: process.env.GITBOOK_URL,
+    GITBOOK_SECRET: process.env.GITBOOK_SECRET,
+    GITBOOK_API_URL: process.env.GITBOOK_API_URL,
+    GITBOOK_API_TOKEN: process.env.GITBOOK_API_TOKEN,
+    GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
+    GITBOOK_INTEGRATIONS_HOST: process.env.GITBOOK_INTEGRATIONS_HOST,
+    GITBOOK_IMAGE_RESIZE_SIGNING_KEY: process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+    GITBOOK_IMAGE_RESIZE_URL: process.env.GITBOOK_IMAGE_RESIZE_URL,
+    GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
+    GITBOOK_ICONS_URL: process.env.GITBOOK_ICONS_URL,
+    GITBOOK_ICONS_TOKEN: process.env.GITBOOK_ICONS_TOKEN,
+};
+
+if (process.env.NODE_ENV === 'production') {
+    Object.entries(gitbookEnvs).forEach(([key, value]) => {
+        if (value === undefined) {
+            throw new Error(
+                `Environment variable ${key} is not defined while building in production mode. Please check the GitHub Actions pipeline to ensure all required ens are available.`
+            );
+        }
+    });
+}
+
 /**
  * @type {import('next').NextConfig}
  */
