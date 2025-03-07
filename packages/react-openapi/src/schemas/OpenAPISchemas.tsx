@@ -2,18 +2,18 @@ import clsx from 'clsx';
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
 import { OpenAPIRootSchema } from '../OpenAPISchema';
 import { Section, SectionBody } from '../StaticSection';
-import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIModelsData } from '../types';
+import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPISchemasData } from '../types';
 
 /**
- * Display OpenAPI Models.
+ * Display OpenAPI Schemas.
  */
-export function OpenAPIModels(props: {
+export function OpenAPISchemas(props: {
     className?: string;
-    data: OpenAPIModelsData;
+    data: OpenAPISchemasData;
     context: OpenAPIContextProps;
 }) {
     const { className, data, context } = props;
-    const { models } = data;
+    const { schemas } = data;
 
     const clientContext: OpenAPIClientContext = {
         defaultInteractiveOpened: context.defaultInteractiveOpened,
@@ -21,30 +21,30 @@ export function OpenAPIModels(props: {
         blockKey: context.blockKey,
     };
 
-    if (!models.length) {
+    if (!schemas.length) {
         return null;
     }
 
     return (
-        <div className={clsx('openapi-models', className)}>
-            <OpenAPIRootModelsSchema models={models} context={clientContext} />
+        <div className={clsx('openapi-schemas', className)}>
+            <OpenAPIRootSchemasSchema schemas={schemas} context={clientContext} />
         </div>
     );
 }
 
 /**
- * Root schema for OpenAPI models.
- * It displays a single model or a disclosure group for multiple models.
+ * Root schema for OpenAPI schemas.
+ * It displays a single model or a disclosure group for multiple schemas.
  */
-function OpenAPIRootModelsSchema(props: {
-    models: OpenAPIModelsData['models'];
+function OpenAPIRootSchemasSchema(props: {
+    schemas: OpenAPISchemasData['schemas'];
     context: OpenAPIClientContext;
 }) {
-    const { models, context } = props;
+    const { schemas, context } = props;
 
     // If there is only one model, we show it directly.
-    if (models.length === 1) {
-        const schema = models?.[0]?.schema;
+    if (schemas.length === 1) {
+        const schema = schemas?.[0]?.schema;
 
         if (!schema) {
             return null;
@@ -59,12 +59,12 @@ function OpenAPIRootModelsSchema(props: {
         );
     }
 
-    // If there are multiple models, we use a disclosure group to show them all.
+    // If there are multiple schemas, we use a disclosure group to show them all.
     return (
         <OpenAPIDisclosureGroup
             allowsMultipleExpanded
             icon={context.icons.chevronRight}
-            groups={models.map(({ name, schema }) => ({
+            groups={schemas.map(({ name, schema }) => ({
                 id: name,
                 label: (
                     <div className="openapi-response-tab-content" key={`model-${name}`}>
@@ -75,7 +75,7 @@ function OpenAPIRootModelsSchema(props: {
                     {
                         id: 'model',
                         body: (
-                            <Section className="openapi-section-models">
+                            <Section className="openapi-section-schemas">
                                 <SectionBody>
                                     <OpenAPIRootSchema schema={schema} context={context} />
                                 </SectionBody>

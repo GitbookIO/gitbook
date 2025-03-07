@@ -1,5 +1,5 @@
-export * from './models';
+export * from './schemas';
 export * from './OpenAPIOperation';
 export * from './OpenAPIOperationContext';
 export * from './resolveOpenAPIOperation';
-export type { OpenAPIModelsData, OpenAPIOperationData } from './types';
+export type { OpenAPISchemasData, OpenAPIOperationData } from './types';

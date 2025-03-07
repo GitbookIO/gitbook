@@ -2,7 +2,7 @@ import type { DocumentBlockOpenAPI, DocumentBlockOpenAPIOperation } from '@gitbo
 import type { Filesystem, OpenAPIParseError, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
-//!!TODO: Add DocumentBlockOpenAPIModels when available in @gitbook/api
+//!!TODO: Add DocumentBlockOpenAPISchemas when available in @gitbook/api
 export type AnyOpenAPIBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
 
 /**

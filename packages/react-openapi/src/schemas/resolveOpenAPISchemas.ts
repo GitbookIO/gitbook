@@ -6,28 +6,28 @@ import {
     shouldIgnoreEntity,
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from '../dereference';
-import type { OpenAPIModel, OpenAPIModelsData } from '../types';
+import type { OpenAPISchema, OpenAPISchemasData } from '../types';
 
-//!!TODO: We should return only the models that are used in the block. Still a WIP awaiting future work.
+//!!TODO: We should return only the schemas that are used in the block. Still a WIP awaiting future work.
 
 /**
- * Resolve an OpenAPI models from a file and compile it to a more usable format.
- * Models are extracted from the OpenAPI components.schemas
+ * Resolve an OpenAPI schemas from a file and compile it to a more usable format.
+ * Schemas are extracted from the OpenAPI components.schemas
  */
-export async function resolveOpenAPIModels(
+export async function resolveOpenAPISchemas(
     filesystem: Filesystem<OpenAPIV3xDocument>
-): Promise<OpenAPIModelsData | null> {
+): Promise<OpenAPISchemasData | null> {
     const schema = await dereferenceFilesystem(filesystem);
 
-    const models = getOpenAPIComponents(schema);
+    const schemas = getOpenAPIComponents(schema);
 
-    return { models };
+    return { schemas };
 }
 
 /**
  * Get OpenAPI components.schemas that are not ignored.
  */
-function getOpenAPIComponents(schema: OpenAPIV3.Document | OpenAPIV3_1.Document): OpenAPIModel[] {
+function getOpenAPIComponents(schema: OpenAPIV3.Document | OpenAPIV3_1.Document): OpenAPISchema[] {
     const schemas = schema.components?.schemas ?? {};
     return Object.entries(schemas)
         .filter(([, schema]) => !shouldIgnoreEntity(schema))
