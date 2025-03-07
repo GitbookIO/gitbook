@@ -71,7 +71,7 @@ export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
  * Endpoint where icons are served.
  */
 export const GITBOOK_ICONS_URL =
-    process.env.GITBOOK_ICONS_URL || `${GITBOOK_ASSETS_URL}/~gitbook/static/icons`;
+    process.env.GITBOOK_ICONS_URL || `${GITBOOK_ASSETS_URL || ''}/~gitbook/static/icons`;
 
 /**
  * Token passed to the icons endpoint.
