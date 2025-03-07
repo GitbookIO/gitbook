@@ -1,5 +1,20 @@
 # @gitbook/react-openapi
 
+## 1.1.0
+
+### Minor Changes
+
+-   bb3ca9c: Implement OpenAPI models blocks
+
+### Patch Changes
+
+-   0278a14: Upgrade Scalar dependencies
+-   3173d8e: Remove top level circular refs in alternatives
+-   Updated dependencies [0278a14]
+-   Updated dependencies [bb3ca9c]
+-   Updated dependencies [052e07a]
+    -   @gitbook/openapi-parser@2.1.0
+
 ## 1.0.5
 
 ### Patch Changes
