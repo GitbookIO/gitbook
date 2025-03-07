@@ -25,11 +25,11 @@ export function TableOfContents(props: {
 
                 'grow-0',
                 'shrink-0',
-                'w-full',
-                'page-no-toc:lg:w-40',
-                'page-no-toc:xl:w-56',
-                customization.header.preset === 'none' && 'page-no-toc:lg:w-56',
-                'lg:w-72',
+                'basis-full',
+                'page-no-toc:lg:basis-40',
+                'page-no-toc:xl:basis-56',
+                customization.header.preset === 'none' && 'page-no-toc:lg:basis-56',
+                'lg:basis-72',
 
                 'relative',
                 'z-10',
