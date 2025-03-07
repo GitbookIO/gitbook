@@ -38,6 +38,7 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   opItem: op://gitbook-open/2c-production
+                  opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

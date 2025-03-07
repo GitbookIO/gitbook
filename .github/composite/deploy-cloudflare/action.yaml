@@ -4,6 +4,9 @@ inputs:
   opItem:
     description: '1Password item to load secrets from'
     required: true
+  opServiceAccount:
+    description: '1Password service account token'
+    required: true
   apiToken:
     description: 'Cloudflare API token'
     required: true
@@ -33,6 +36,7 @@ runs:
         - name: Load secret
           uses: 1password/load-secrets-action@v2
           env:
+            OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
             GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
             GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
             GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
