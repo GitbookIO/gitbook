@@ -1,14 +1,20 @@
 name: 'Deploy vercel'
 description: 'Deploy GitBook to Vercel'
 inputs:
-  vercel-org:
+  vercelOrg:
     description: 'Vercel organization'
     required: true
-  vercel-project:
+  vercelProject:
     description: 'Vercel project'
     required: true
-  vercel-token:
+  vercelToken:
     description: 'Vercel token'
+    required: true
+  opItem:
+    description: '1Password item to load secrets from'
+    required: true
+  opServiceAccount:
+    description: '1Password service account token'
     required: true
   environment:
     description: 'Environment to deploy to'
@@ -27,31 +33,42 @@ runs:
           shell: bash
           env:
               PUPPETEER_SKIP_DOWNLOAD: 1
-        - name: Sets env vars for environment
-          shell: bash
-          run: |
-              echo "VERCEL_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
         - name: Pull Vercel Environment Information
-          run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }}
+          run: bun run vercel pull --yes --environment=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
-            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
-            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
+            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+        - name: Load secret
+          uses: 1password/load-secrets-action@v2
+          env:
+            OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.opServiceAccount }}
+            GITBOOK_URL: ${{ inputs.opItem }}/GITBOOK_URL
+            GITBOOK_ICONS_URL: ${{ inputs.opItem }}/GITBOOK_ICONS_URL
+            GITBOOK_ICONS_TOKEN: ${{ inputs.opItem }}/GITBOOK_ICONS_TOKEN
+            GITBOOK_SECRET: ${{ inputs.opItem }}/GITBOOK_SECRET
+            GITBOOK_APP_URL: ${{ inputs.opItem }}/GITBOOK_APP_URL
+            GITBOOK_API_URL: ${{ inputs.opItem }}/GITBOOK_API_URL
+            GITBOOK_API_TOKEN: ${{ inputs.opItem }}/GITBOOK_API_TOKEN
+            GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
+            GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
+            GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
+            GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
         - name: Build Project Artifacts
-          run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }}
+          run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
-            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
-            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
+            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash
           run: |
-              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercel-token }})
+              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }})
               echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           env:
-            VERCEL_ORG_ID: ${{ inputs.vercel-org }}
-            VERCEL_PROJECT_ID: ${{ inputs.vercel-project }}
+            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
         - name: Outputs
           shell: bash
           run: |
