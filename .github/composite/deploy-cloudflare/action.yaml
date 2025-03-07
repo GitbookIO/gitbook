@@ -14,7 +14,7 @@ inputs:
     description: 'Cloudflare account ID'
     required: true
   environment:
-    description: 'Environment to deploy to'
+    description: 'Cloudflare environment to deploy to (staging, production, preview)'
     required: true
   deploy:
     description: 'Deploy as main version for all traffic instead of uploading versions'
@@ -48,7 +48,6 @@ runs:
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
             GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
-            
         - name: Build worker
           run: bun run turbo build:v2:cloudflare
           shell: bash

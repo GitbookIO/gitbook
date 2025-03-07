@@ -9,6 +9,9 @@ jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (staging)
         runs-on: ubuntu-latest
+        environment: 
+            name: 2v-staging
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
@@ -18,13 +21,18 @@ jobs:
               id: deploy
               uses: ./.github/composite/deploy-vercel
               with:
-                  environment: staging
-                  vercel-org: ${{ secrets.VERCEL_ORG_ID }}
-                  vercel-project: ${{ secrets.VERCEL_PROJECT_ID }}
-                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+                environment: staging
+                vercelOrg: ${{ secrets.VERCEL_ORG_ID }}
+                vercelProject: ${{ secrets.VERCEL_PROJECT_ID }}
+                vercelToken: ${{ secrets.VERCEL_TOKEN }}
+                opItem: op://gitbook-open/2v-staging
+                opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (staging)
         runs-on: ubuntu-latest
+        environment: 
+            name: 2c-staging
+            url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
