@@ -19,7 +19,7 @@ type TDisclosureGroup = {
     label: string | React.ReactNode;
     tabs?: {
         id: string;
-        label: string | React.ReactNode;
+        label?: string | React.ReactNode;
         body?: React.ReactNode;
     }[];
 };
@@ -121,7 +121,7 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
                                     </option>
                                 ))}
                             </select>
-                        ) : group.tabs[0] ? (
+                        ) : group.tabs[0]?.label ? (
                             <span>{group.tabs[0].label}</span>
                         ) : null}
                     </div>

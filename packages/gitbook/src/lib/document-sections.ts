@@ -2,7 +2,7 @@ import type { JSONDocument } from '@gitbook/api';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { getNodeText } from './document';
-import { resolveOpenAPIBlock } from './openapi/fetch';
+import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
 
 export interface DocumentSection {
     id: string;
@@ -38,7 +38,7 @@ export async function getDocumentSections(
         }
 
         if ((block.type === 'swagger' || block.type === 'openapi-operation') && block.meta?.id) {
-            const { data: operation } = await resolveOpenAPIBlock({
+            const { data: operation } = await resolveOpenAPIOperationBlock({
                 block,
                 context,
             });

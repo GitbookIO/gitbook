@@ -55,3 +55,13 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     /** Securities that should be used for this operation */
     securities: [string, OpenAPIV3.SecuritySchemeObject][];
 }
+
+export type OpenAPIModel = {
+    name: string;
+    schema: OpenAPIV3.SchemaObject;
+};
+
+export interface OpenAPIModelsData {
+    /** Components schemas to be used for models */
+    models: OpenAPIModel[];
+}

@@ -5,9 +5,8 @@ import clsx from 'clsx';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIClientContext } from './types';
-import { checkIsReference, resolveDescription } from './utils';
+import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -181,7 +180,7 @@ function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaO
 /**
  * Render the enum value for a schema.
  */
-export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
+function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     const { enumValues } = props;
 
     return (
@@ -199,24 +198,16 @@ export function OpenAPISchemaEnum(props: { enumValues: any[] }) {
     );
 }
 
-export function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry }) {
+/**
+ * Render the top row of a schema. e.g: name, type, and required status.
+ */
+function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry }) {
     const {
         property: { schema, propertyName, required },
     } = props;
 
-    const shouldDisplayExample = (schema: OpenAPIV3.SchemaObject): boolean => {
-        return (
-            (typeof schema.example === 'string' && !!schema.example) ||
-            typeof schema.example === 'number' ||
-            typeof schema.example === 'boolean' ||
-            (Array.isArray(schema.example) && schema.example.length > 0) ||
-            (typeof schema.example === 'object' &&
-                schema.example !== null &&
-                Object.keys(schema.example).length > 0)
-        );
-    };
-
     const description = resolveDescription(schema);
+    const example = resolveFirstExample(schema);
 
     return (
         <div className="openapi-schema-presentation">
@@ -237,9 +228,9 @@ export function OpenAPISchemaPresentation(props: { property: OpenAPISchemaProper
             {description ? (
                 <Markdown source={description} className="openapi-schema-description" />
             ) : null}
-            {shouldDisplayExample(schema) ? (
+            {example ? (
                 <div className="openapi-schema-example">
-                    Example: <code>{formatExample(schema.example)}</code>
+                    Example: <code>{example}</code>
                 </div>
             ) : null}
             {schema.pattern ? (
@@ -370,7 +361,7 @@ function flattenAlternatives(
     }, []);
 }
 
-export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
+function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     // Otherwise try to infer a nice title
     let type = 'any';
 
@@ -417,17 +408,4 @@ function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string {
     }
 
     return schema.title || 'child attributes';
-}
-
-function formatExample(example: any): string {
-    if (typeof example === 'string') {
-        return example
-            .replace(/\n/g, ' ') // Replace newlines with spaces
-            .replace(/\s+/g, ' ') // Collapse multiple spaces/newlines into a single space
-            .replace(/([\{\}:,])\s+/g, '$1 ') // Ensure a space after {, }, :, and ,
-            .replace(/\s+([\{\}:,])/g, ' $1') // Ensure a space before {, }, :, and ,
-            .trim();
-    }
-
-    return stringifyOpenAPI(example);
 }

@@ -1,4 +1,5 @@
-export * from './resolveOpenAPIOperation';
+export * from './models';
 export * from './OpenAPIOperation';
 export * from './OpenAPIOperationContext';
-export type { OpenAPIOperationData } from './types';
+export * from './resolveOpenAPIOperation';
+export type { OpenAPIModelsData, OpenAPIOperationData } from './types';

@@ -1,82 +1,40 @@
-import type { DocumentBlockOpenAPI, DocumentBlockOpenAPIOperation } from '@gitbook/api';
-import { OpenAPIParseError, parseOpenAPI } from '@gitbook/openapi-parser';
-import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
-import type { GitBookAnyContext } from '@v2/lib/context';
+import { parseOpenAPI } from '@gitbook/openapi-parser';
 
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
-
+import type { ResolveOpenAPIBlockArgs } from '@/lib/openapi/types';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
-
-export type AnyOpenAPIOperationBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
-
-const weakmap = new WeakMap<AnyOpenAPIOperationBlock, Promise<ResolveOpenAPIBlockResult>>();
+import type { FetchOpenAPIFilesystemResult } from './types';
 
 /**
- * Cache the result of resolving an OpenAPI block.
- * It is important because the resolve is called in sections and in the block itself.
+ * Fetch OpenAPI block.
  */
-export function resolveOpenAPIBlock(
+export async function fetchOpenAPIFilesystem(
     args: ResolveOpenAPIBlockArgs
-): Promise<ResolveOpenAPIBlockResult> {
-    if (weakmap.has(args.block)) {
-        return weakmap.get(args.block)!;
-    }
-
-    const result = baseResolveOpenAPIBlock(args);
-    weakmap.set(args.block, result);
-    return result;
-}
-
-type ResolveOpenAPIBlockArgs = {
-    block: AnyOpenAPIOperationBlock;
-    context: GitBookAnyContext;
-};
-export type ResolveOpenAPIBlockResult =
-    | { error?: undefined; data: OpenAPIOperationData | null; specUrl: string | null }
-    | { error: OpenAPIParseError; data?: undefined; specUrl?: undefined };
-/**
- * Resolve OpenAPI block.
- */
-async function baseResolveOpenAPIBlock(
-    args: ResolveOpenAPIBlockArgs
-): Promise<ResolveOpenAPIBlockResult> {
+): Promise<FetchOpenAPIFilesystemResult> {
     const { context, block } = args;
-    if (!block.data.path || !block.data.method) {
-        return { data: null, specUrl: null };
-    }
 
     const ref = block.data.ref;
     const resolved = ref ? await resolveContentRef(ref, context) : null;
 
     if (!resolved) {
-        return { data: null, specUrl: null };
+        return { filesystem: null, specUrl: null };
     }
 
-    try {
-        const filesystem = await (() => {
-            if (ref.kind === 'openapi') {
-                assert(resolved.openAPIFilesystem);
-                return resolved.openAPIFilesystem;
-            }
-            return fetchFilesystem(resolved.href);
-        })();
-
-        const data = await resolveOpenAPIOperation(filesystem, {
-            path: block.data.path,
-            method: block.data.method,
-        });
-
-        return { data, specUrl: resolved.href };
-    } catch (error) {
-        if (error instanceof OpenAPIParseError) {
-            return { error };
+    const filesystem = await (() => {
+        if (ref.kind === 'openapi') {
+            assert(resolved.openAPIFilesystem);
+            return resolved.openAPIFilesystem;
         }
+        return fetchFilesystem(resolved.href);
+    })();
 
-        throw error;
-    }
+    return {
+        filesystem,
+        specUrl: resolved.href,
+    };
 }
 
 function fetchFilesystem(url: string) {
