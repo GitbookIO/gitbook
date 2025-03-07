@@ -33,16 +33,12 @@ runs:
           shell: bash
           env:
               PUPPETEER_SKIP_DOWNLOAD: 1
-        - name: Sets env vars for environment
+        - name: Pull Vercel Environment Information
+          run: bun run vercel pull --yes --environment=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
-          run: |
-              echo "VERCEL_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
-        # - name: Pull Vercel Environment Information
-        #   run: bun run vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=${{ inputs.vercelToken }}
-        #   shell: bash
-        #   env:
-        #     VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
-        #     VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+          env:
+            VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
+            VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
         - name: Load secret
           uses: 1password/load-secrets-action@v2
           env:
@@ -58,7 +54,7 @@ runs:
             GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
         - name: Build Project Artifacts
-          run: bun run vercel build --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercelToken }}
+          run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
@@ -67,7 +63,7 @@ runs:
           id: deploy
           shell: bash
           run: |
-              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=$VERCEL_ENVIRONMENT --token=${{ inputs.vercelToken }})
+              DEPLOYMENT_URL=$(bun run vercel deploy --prebuilt --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }})
               echo "deployment-url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           env:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
