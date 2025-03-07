@@ -1,5 +1,16 @@
 # @gitbook/openapi-parser
 
+## 2.1.0
+
+### Minor Changes
+
+-   bb3ca9c: Implement OpenAPI models blocks
+
+### Patch Changes
+
+-   0278a14: Upgrade Scalar dependencies
+-   052e07a: Support references pointing to invalid files
+
 ## 2.0.2
 
 ### Patch Changes
