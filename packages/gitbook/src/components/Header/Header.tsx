@@ -29,7 +29,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
-                'z-10',
+                'z-40',
                 'w-full',
                 'flex-none',
                 'shadow-[0px_1px_0px]',
