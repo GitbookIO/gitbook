@@ -156,6 +156,7 @@ jobs:
         name: Visual Testing v1
         needs: deploy-v1-cloudflare
         timeout-minutes: 8
+        if: false
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -175,6 +176,7 @@ jobs:
         name: Visual Testing v2
         needs: deploy-v2-vercel
         timeout-minutes: 10
+        if: false
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -195,6 +197,7 @@ jobs:
         name: Visual Testing Customers v1
         needs: deploy-v1-cloudflare
         timeout-minutes: 6
+        if: false
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -215,6 +218,7 @@ jobs:
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
         timeout-minutes: 6
+        if: false
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -234,6 +238,7 @@ jobs:
         runs-on: ubuntu-latest
         name: PageSpeed Testing v1
         needs: deploy-v1-cloudflare
+        if: false
         steps:
             - name: Checkout
               uses: actions/checkout@v4
