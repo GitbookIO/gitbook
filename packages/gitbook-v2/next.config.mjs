@@ -5,7 +5,6 @@
  * In local development, these can be skipped.
  */
 const gitbookRequiredEnvs = {
-    GITBOOK_SECRET: process.env.GITBOOK_SECRET,
     GITBOOK_API_URL: process.env.GITBOOK_API_URL,
     GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
     GITBOOK_INTEGRATIONS_HOST: process.env.GITBOOK_INTEGRATIONS_HOST,
@@ -23,6 +22,7 @@ const gitbookOptionalEnvs = {
     GITBOOK_URL: process.env.GITBOOK_URL,
     GITBOOK_API_TOKEN: process.env.GITBOOK_API_TOKEN,
     GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
+    GITBOOK_SECRET: process.env.GITBOOK_SECRET,
 };
 
 if (process.env.NODE_ENV === 'production') {
