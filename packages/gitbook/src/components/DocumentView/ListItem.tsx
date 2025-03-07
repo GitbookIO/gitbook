@@ -41,7 +41,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                 // Override the "mx-auto" class from UnwrappedBlocks
                 'mx-0'
             )}
-            style="flex flex-1 flex-col space-y-2"
+            style="flex min-w-0 flex-1 flex-col space-y-2"
         />
     );
 
