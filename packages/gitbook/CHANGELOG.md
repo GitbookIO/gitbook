@@ -1,5 +1,13 @@
 # gitbook
 
+## 0.7.2
+
+### Patch Changes
+
+-   f127d28: Rename OpenAPIModels to OpenAPISchemas
+-   Updated dependencies [f127d28]
+    -   @gitbook/react-openapi@1.1.2
+
 ## 0.7.1
 
 ### Patch Changes
