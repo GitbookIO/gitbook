@@ -29,7 +29,7 @@ export function TableOfContents(props: {
                 'lg:w-72',
 
                 'relative',
-                'z-[1]',
+                'z-10',
                 'lg:sticky',
                 // Without header
                 'lg:top-0',

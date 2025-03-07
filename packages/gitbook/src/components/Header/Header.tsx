@@ -18,7 +18,7 @@ import { HeaderMobileMenu } from './HeaderMobileMenu';
  */
 export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
     const { context, withTopHeader } = props;
-    const { sections, customization } = context;
+    const { siteSpaces, sections, customization } = context;
 
     return (
         <header
@@ -82,7 +82,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'text-tint-strong',
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'theme-bold:hover:bg-header-link/3'
+                                    'theme-bold:hover:bg-header-link/3',
+                                    siteSpaces.length < 2 && 'page-no-toc:hidden' // If there is ONLY a trademark to show, we won't show the menu button.
                                 )}
                             />
                             <HeaderLogo context={context} />
