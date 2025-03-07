@@ -43,8 +43,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'justify-center',
                 'items-center',
                 'w-full',
-                'p-2',
-                'pl-3',
+                'py-2',
+                'px-3',
                 'gap-2',
 
                 'bg-tint-base',
@@ -121,6 +121,7 @@ const Shortcut = () => {
                 'hidden',
                 'md:flex',
                 'gap-0.5',
+                '-mr-1',
                 'justify-end',
                 'text-xs',
                 'text-tint',
