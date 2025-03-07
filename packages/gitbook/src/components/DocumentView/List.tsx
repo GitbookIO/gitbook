@@ -21,7 +21,7 @@ export function List(
             tag={getListTag(block.type)}
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
-            style={['space-y-2 min-w-0', style]}
+            style={['min-w-0 space-y-2', style]}
         />
     );
 }
