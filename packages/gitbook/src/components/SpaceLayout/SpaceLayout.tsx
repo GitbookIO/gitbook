@@ -81,7 +81,8 @@ export function SpaceLayout(props: {
                                     'lg:flex',
                                     'grow-0',
                                     'flex-wrap',
-                                    'dark:shadow-light/1'
+                                    'dark:shadow-light/1',
+                                    'lg:!text-base/tight'
                                 )}
                             >
                                 <HeaderLogo context={context} />

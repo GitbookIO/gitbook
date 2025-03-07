@@ -50,7 +50,7 @@ export function PageAside(props: {
                 'page-no-toc:lg:flex',
                 'flex-col',
                 'basis-56',
-                'page-no-toc:basis-32',
+                'page-no-toc:basis-40',
                 'page-no-toc:xl:basis-56',
                 'grow-0',
                 'shrink-0',

@@ -84,7 +84,7 @@ function LogoFallback(props: HeaderLogoProps) {
             <div
                 className={tcls(
                     'text-pretty',
-                    'line-clamp-3',
+                    'line-clamp-2',
                     'tracking-tight',
                     'max-w-[18ch]',
                     'lg:max-w-[24ch]',
@@ -92,6 +92,8 @@ function LogoFallback(props: HeaderLogoProps) {
                     'ms-3',
                     'text-base/tight',
                     'lg:text-lg/tight',
+                    'page-no-toc:lg:text-base/tight',
+                    'site-header:lg:text-lg/tight',
                     'text-tint-strong',
                     'theme-bold:text-header-link'
                 )}

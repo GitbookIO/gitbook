@@ -21,11 +21,14 @@ export function TableOfContents(props: {
             data-testid="table-of-contents"
             className={tcls(
                 'group',
+                'text-sm',
 
                 'grow-0',
                 'shrink-0',
                 'w-full',
-                'page-no-toc:lg:w-56',
+                'page-no-toc:lg:w-40',
+                'page-no-toc:xl:w-56',
+                customization.header.preset === 'none' && 'page-no-toc:lg:w-56',
                 'lg:w-72',
 
                 'relative',
@@ -46,6 +49,7 @@ export function TableOfContents(props: {
                 'pt-6',
                 'pb-4',
                 'sidebar-filled:lg:pr-6',
+                'sidebar-filled:page-no-toc:lg:pr-0',
 
                 'hidden',
                 'navigation-open:!flex',
@@ -62,6 +66,7 @@ export function TableOfContents(props: {
                 className={tcls(
                     'lg:-ms-5',
                     'overflow-hidden',
+                    'page-no-toc:overflow-visible',
                     'relative',
 
                     'flex',
@@ -106,7 +111,7 @@ export function TableOfContents(props: {
                             'page-no-toc:hidden',
                             'sidebar-list-line:border-l',
                             'border-tint-subtle',
-                            'mb-6'
+                            'mb-6',
                         )}
                     />
                     {customization.trademark.enabled ? (

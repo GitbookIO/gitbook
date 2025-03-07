@@ -87,7 +87,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
                         {/* Mode Switcher */}
                         {customization.themes.toggeable ? (
-                            <div className="order-2 ml-auto flex items-center justify-end xl:hidden">
+                            <div className='order-2 ml-auto flex items-center justify-end page-no-toc:lg:hidden xl:hidden'>
                                 <React.Suspense fallback={null}>
                                     <ThemeToggler />
                                 </React.Suspense>
