@@ -83,7 +83,8 @@ export function SpaceLayout(props: {
                                     'lg:flex',
                                     'grow-0',
                                     'flex-wrap',
-                                    'dark:shadow-light/1'
+                                    'dark:shadow-light/1',
+                                    'text-base/tight'
                                 )}
                             >
                                 <HeaderLogo context={context} />
@@ -104,6 +105,7 @@ export function SpaceLayout(props: {
                                                         ? 'search_or_ask'
                                                         : 'search'
                                                 )}
+                                                ...
                                             </span>
                                         </SearchButton>
                                     </React.Suspense>

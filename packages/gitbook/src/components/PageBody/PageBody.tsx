@@ -47,9 +47,7 @@ export function PageBody(props: {
                         'page-api-block:xl:max-2xl:pr-0',
                         // Max size to ensure one column in api is aligned with rest of content (2 x 3xl) + (gap-3 + 2) * px-12
                         'page-api-block:max-w-[1654px]',
-                        'page-api-block:mx-auto',
-
-                        page.layout.tableOfContents ? null : 'xl:ml-56'
+                        'page-api-block:mx-auto'
                     ) +
                     (asFullWidth ? ' page-full-width' : '') +
                     (!page.layout.tableOfContents ? ' page-no-toc' : '')
