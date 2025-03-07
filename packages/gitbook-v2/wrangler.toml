@@ -14,6 +14,10 @@ d1_databases = [
 ]
 
 [env.staging]
+routes = [
+  { pattern = "open-2c.gitbook-staging.com/*", zone_name = "gitbook-staging.com" },
+  { pattern = "static-2c.gitbook-staging.com/*", zone_name = "gitbook-staging.com" }
+]
 kv_namespaces = [
   { binding = "NEXT_CACHE_WORKERS_KV", id = "a446e25f12b741afb185f1e5b4474f0a" } # gitbook-open-v2-cache-staging
 ]
@@ -22,6 +26,10 @@ d1_databases = [
 ]
 
 [env.production]
+routes = [
+  { pattern = "open-2c.gitbook.com/*", zone_name = "gitbook.com" },
+  { pattern = "static-2c.gitbook.com/*", zone_name = "gitbook.com" }
+]
 kv_namespaces = [
   { binding = "NEXT_CACHE_WORKERS_KV", id = "72379746280d4e79acf24440eea950dc" } # gitbook-open-v2-cache-production
 ]
