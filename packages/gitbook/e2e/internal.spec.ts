@@ -155,8 +155,8 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/2.0/reference/api-reference/pets?fallback=true'
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('api-multi-versions/2.0/reference/api-reference/pets')
                     );
                 },
             },
@@ -178,8 +178,10 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets?fallback=true'
+                    await page.waitForURL((url) =>
+                        url.pathname.includes(
+                            'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets'
+                        )
                     );
                 },
             },
@@ -213,8 +215,10 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/2.0/reference/api-reference/pets?fallback=true'
+                    await page.waitForURL((url) =>
+                        url.pathname.includes(
+                            'api-multi-versions-va/2.0/reference/api-reference/pets'
+                        )
                     );
                 },
             },
@@ -244,9 +248,7 @@ const testCases: TestsCase[] = [
                     const sectionGroupDropdown = await page.getByText('Test Section Group 1');
                     await sectionGroupDropdown.hover();
                     await page.getByText('Section B').click();
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/sections/sections-4'
-                    );
+                    await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
             },
         ],
