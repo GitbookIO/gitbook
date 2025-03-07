@@ -22,7 +22,7 @@ export const GITBOOK_URL =
 export const GITBOOK_ASSETS_URL =
     process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : process.env.GITBOOK_ASSETS_PREFIX || GITBOOK_URL;
+        : process.env.GITBOOK_ASSETS_PREFIX;
 
 /**
  * GitBook app URL.

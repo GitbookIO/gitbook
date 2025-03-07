@@ -34,16 +34,10 @@ jobs:
               id: deploy
               uses: ./.github/composite/deploy-cloudflare
               with:
-                  environment: staging
+                  environment: production
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  GITBOOK_URL: ${{ vars.STAGING_2C_GITBOOK_URL }}
-                  GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ secrets.STAGING_GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
-                  GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
-                  GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
-                  GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
-                  GITBOOK_ASSETS_PREFIX: ${{ vars.STAGING_2C_GITBOOK_ASSETS_PREFIX }}
+                  opItem: op://gitbook-open/2c-production
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

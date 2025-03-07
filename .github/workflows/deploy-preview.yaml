@@ -102,17 +102,11 @@ jobs:
               id: deploy
               uses: ./.github/composite/deploy-cloudflare
               with:
-                  environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+                  environment: preview
                   deploy: ${{ github.ref == 'refs/heads/main' }}
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  GITBOOK_URL: ${{ github.ref == 'refs/heads/main' && vars.PRODUCTION_2C_GITBOOK_URL || vars.PREVIEW_2C_GITBOOK_URL }}
-                  GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ secrets.PREVIEW_GITBOOK_IMAGE_RESIZE_SIGNING_KEY }}
-                  GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
-                  GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
-                  GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
-                  GITBOOK_SECRET: ${{ github.ref == 'refs/heads/main' && secrets.PRODUCTION_GITBOOK_SECRET|| '' }}
+                  opItem: op://gitbook-open/2c-preview
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
