@@ -35,6 +35,7 @@ jobs:
               uses: ./.github/composite/deploy-cloudflare
               with:
                   environment: staging
+                  deploy: true
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}

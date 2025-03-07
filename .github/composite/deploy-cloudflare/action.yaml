@@ -10,6 +10,9 @@ inputs:
   environment:
     description: 'Environment to deploy to'
     required: true
+  deploy:
+    description: 'Deploy as main version for all traffic instead of uploading versions'
+    required: true
   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
     description: 'Next server actions encryption key'
     required: true
@@ -77,7 +80,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
-              command: ${{ inputs.environment == 'production' && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+              command: ${{ inputs.deploy && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
         - name: Outputs
           shell: bash
           env:
