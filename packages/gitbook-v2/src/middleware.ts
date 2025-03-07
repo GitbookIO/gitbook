@@ -108,13 +108,13 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     requestHeaders.set('x-forwarded-host', request.nextUrl.host);
     requestHeaders.set('origin', request.nextUrl.origin);
 
-    const siteURL = `${url.host}${data.basePath}`;
+    const siteURLWithoutProtocol = `${url.host}${data.basePath}`;
 
     const route = [
         'sites',
         routeType,
         mode,
-        encodeURIComponent(siteURL),
+        encodeURIComponent(siteURLWithoutProtocol),
         encodePathInSiteContent(data.pathname),
     ].join('/');
 
@@ -135,7 +135,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     response.headers.set('x-content-type-options', 'nosniff');
     // Debug header
     response.headers.set('x-gitbook-route-type', routeType);
-    response.headers.set('x-gitbook-site-url', siteURL);
+    response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
     if (visitorToken) {
         const cookies = getResponseCookiesForVisitorAuth(data.basePath, visitorToken);
