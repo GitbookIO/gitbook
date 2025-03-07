@@ -60,7 +60,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
-              command: ${{ inputs.deploy && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+              command: ${{ fromJSON(inputs.deploy) == true && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
         - name: Outputs
           shell: bash
           env:
