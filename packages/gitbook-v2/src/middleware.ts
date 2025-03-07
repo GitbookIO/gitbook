@@ -7,6 +7,7 @@ import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
+import { getLinkerForSiteURL } from '@v2/lib/context';
 import { getPublishedContentByURL } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
@@ -74,6 +75,21 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     const { data } = result;
 
     if ('redirect' in data) {
+        // biome-ignore lint/suspicious/noConsole: we want to log the redirect
+        console.log('redirect', data.redirect);
+        if (data.target === 'content') {
+            // For content redirects, we use the linker to redirect the optimal URL
+            // during development and testing in 'url' mode.
+            const linker = getLinkerForSiteURL({
+                siteURL: url,
+                urlMode: mode,
+            });
+
+            return NextResponse.redirect(
+                new URL(linker.toLinkForContent(data.redirect), request.url)
+            );
+        }
+
         return NextResponse.redirect(data.redirect);
     }
 
