@@ -16,25 +16,20 @@ export function Footer(props: { context: GitBookSiteContext }) {
     const { customization } = context;
 
     return (
-        <>
-            <hr className="border-tint-subtle border-t" />
+        <footer
+            className={tcls(
+                'border-tint-subtle border-t',
+                // If the footer only contains a mode toggle, we only show it on smaller screens
+                customization.themes.toggeable &&
+                    !customization.footer.copyright &&
+                    !customization.footer.logo &&
+                    customization.footer.groups?.length === 0
+                    ? 'xl:hidden'
+                    : null
+            )}
+        >
             <div className="scroll-nojump">
-                <footer
-                    className={tcls(
-                        CONTAINER_STYLE,
-                        'px-4',
-                        'mx-auto',
-                        'flex',
-                        'gap-12',
-                        // If the footer only contains a mode toggle, we only show it on smaller screens
-                        customization.themes.toggeable &&
-                            !customization.footer.copyright &&
-                            !customization.footer.logo &&
-                            customization.footer.groups?.length === 0
-                            ? 'xl:hidden'
-                            : null
-                    )}
-                >
+                <div className={tcls(CONTAINER_STYLE, 'px-4', 'mx-auto', 'flex', 'gap-12')}>
                     <div className="hidden page-no-toc:hidden basis-72 lg:block" />
                     <div
                         className={tcls(
@@ -137,8 +132,8 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         </div>
                     </div>
                     <div className="hidden page-no-toc:hidden lg:block xl:basis-56" />
-                </footer>
+                </div>
             </div>
-        </>
+        </footer>
     );
 }

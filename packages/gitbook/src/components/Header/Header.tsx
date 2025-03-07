@@ -57,7 +57,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className={tcls('scroll-nojump')}>
+                <div className="scroll-nojump">
                     <div
                         className={tcls(
                             'gap-6',
@@ -149,13 +149,13 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'justify-self-end',
                                 searchStyle === 'prominent'
                                     ? [
-                                          'md:grow',
+                                          'md:grow-[0.75]',
                                           'lg:min-w-40',
                                           'max-w-lg',
                                           'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - margin (3rem)
                                           'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'lg:mr-auto',
                                           'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),0rem)]',
+                                          'lg:mr-auto',
                                           'order-last',
                                           'md:order-[unset]',
                                       ]
@@ -219,7 +219,9 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                 </div>
             </div>
             {sections ? (
-                <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+                <div className="scroll-nojump">
+                    <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+                </div>
             ) : null}
         </header>
     );
