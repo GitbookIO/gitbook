@@ -11,6 +11,11 @@ const nextConfig = {
     env: {
         BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
         GITBOOK_URL: process.env.GITBOOK_URL,
+        GITBOOK_API_URL: process.env.GITBOOK_API_URL,
+        GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
+        GITBOOK_INTEGRATIONS_HOST: process.env.GITBOOK_INTEGRATIONS_HOST,
+        GITBOOK_IMAGE_RESIZE_SIGNING_KEY: process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+        GITBOOK_IMAGE_RESIZE_URL: process.env.GITBOOK_IMAGE_RESIZE_URL,
         GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
         GITBOOK_ICONS_URL: process.env.GITBOOK_ICONS_URL,
         GITBOOK_ICONS_TOKEN: process.env.GITBOOK_ICONS_TOKEN,
