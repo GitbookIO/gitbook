@@ -35,10 +35,12 @@ jobs:
               uses: ./.github/composite/deploy-cloudflare
               with:
                   environment: staging
+                  deploy: true
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
                   GITBOOK_URL: ${{ vars.STAGING_2C_GITBOOK_URL }}
+                  GITBOOK_SECRET: ${{ secrets.STAGING_GITBOOK_SECRET }}
                   GITBOOK_APP_URL: https://app.gitbook-staging.com
                   GITBOOK_API_URL: https://api.gitbook-staging.com
                   GITBOOK_INTEGRATIONS_HOST: https://integrations.gitbook-staging.com

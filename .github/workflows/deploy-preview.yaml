@@ -103,6 +103,7 @@ jobs:
               uses: ./.github/composite/deploy-cloudflare
               with:
                   environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+                  deploy: ${{ github.ref == 'refs/heads/main' }}
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
@@ -111,13 +112,14 @@ jobs:
                   GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
                   GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
                   GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
+                  GITBOOK_SECRET: ${{ github.ref == 'refs/heads/main' && secrets.PRODUCTION_GITBOOK_SECRET|| '' }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always()
+        if: always() && !startsWith(github.ref, 'refs/heads/main')
         needs:
             - deploy-v1-cloudflare
             - deploy-v2-vercel

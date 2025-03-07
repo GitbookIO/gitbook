@@ -10,11 +10,17 @@ inputs:
   environment:
     description: 'Environment to deploy to'
     required: true
+  deploy:
+    description: 'Deploy as main version for all traffic instead of uploading versions'
+    required: true
   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
     description: 'Next server actions encryption key'
     required: true
   GITBOOK_URL:
     description: 'GitBook URL'
+    required: true
+  GITBOOK_SECRET:
+    description: 'GitBook secret'
     required: true
   GITBOOK_APP_URL:
     description: 'GitBook app URL'
@@ -60,6 +66,7 @@ runs:
           env:
             NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
             GITBOOK_URL: ${{ inputs.GITBOOK_URL }}
+            GITBOOK_SECRET: ${{ inputs.GITBOOK_SECRET }}
             GITBOOK_APP_URL: ${{ inputs.GITBOOK_APP_URL }}
             GITBOOK_API_URL: ${{ inputs.GITBOOK_API_URL }}
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.GITBOOK_INTEGRATIONS_HOST }}
@@ -77,7 +84,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
-              command: ${{ inputs.environment == 'production' && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+              command: ${{ inputs.deploy && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
         - name: Outputs
           shell: bash
           env:
