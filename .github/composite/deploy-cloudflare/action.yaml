@@ -19,6 +19,9 @@ inputs:
   GITBOOK_URL:
     description: 'GitBook URL'
     required: true
+  GITBOOK_SECRET:
+    description: 'GitBook secret'
+    required: true
   GITBOOK_APP_URL:
     description: 'GitBook app URL'
     required: false
@@ -63,6 +66,7 @@ runs:
           env:
             NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
             GITBOOK_URL: ${{ inputs.GITBOOK_URL }}
+            GITBOOK_SECRET: ${{ inputs.GITBOOK_SECRET }}
             GITBOOK_APP_URL: ${{ inputs.GITBOOK_APP_URL }}
             GITBOOK_API_URL: ${{ inputs.GITBOOK_API_URL }}
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.GITBOOK_INTEGRATIONS_HOST }}

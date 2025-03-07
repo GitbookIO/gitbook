@@ -112,6 +112,7 @@ jobs:
                   GITBOOK_IMAGE_RESIZE_URL: ${{ vars.GITBOOK_IMAGE_RESIZE_URL }}
                   GITBOOK_ICONS_URL: ${{ vars.GITBOOK_ICONS_URL }}
                   GITBOOK_ICONS_TOKEN: ${{ vars.GITBOOK_ICONS_TOKEN }}
+                  GITBOOK_SECRET: ${{ github.ref == 'refs/heads/main' && secrets.PRODUCTION_GITBOOK_SECRET|| '' }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

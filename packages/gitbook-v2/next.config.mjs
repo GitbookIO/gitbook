@@ -11,6 +11,7 @@ const nextConfig = {
     env: {
         BUILD_VERSION: (process.env.GITHUB_SHA ?? '').slice(0, 7),
         GITBOOK_URL: process.env.GITBOOK_URL,
+        GITBOOK_SECRET: process.env.GITBOOK_SECRET,
         GITBOOK_API_URL: process.env.GITBOOK_API_URL,
         GITBOOK_APP_URL: process.env.GITBOOK_APP_URL,
         GITBOOK_INTEGRATIONS_HOST: process.env.GITBOOK_INTEGRATIONS_HOST,
