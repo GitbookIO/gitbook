@@ -108,11 +108,13 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     requestHeaders.set('x-forwarded-host', request.nextUrl.host);
     requestHeaders.set('origin', request.nextUrl.origin);
 
+    const siteURL = `${url.host}${data.basePath}`;
+
     const route = [
         'sites',
         routeType,
         mode,
-        encodeURIComponent(url.host + data.basePath),
+        encodeURIComponent(siteURL),
         encodePathInSiteContent(data.pathname),
     ].join('/');
 
@@ -131,6 +133,9 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     response.headers.set('strict-transport-security', 'max-age=31536000');
     response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
     response.headers.set('x-content-type-options', 'nosniff');
+    // Debug header
+    response.headers.set('x-gitbook-route-type', routeType);
+    response.headers.set('x-gitbook-site-url', siteURL);
 
     if (visitorToken) {
         const cookies = getResponseCookiesForVisitorAuth(data.basePath, visitorToken);
