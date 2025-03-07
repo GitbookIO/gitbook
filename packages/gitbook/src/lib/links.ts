@@ -8,6 +8,7 @@ import {
 } from '@gitbook/api';
 import { headers } from 'next/headers';
 
+import { GITBOOK_APP_URL } from '@v2/lib/env';
 import { getPagePath } from './pages';
 import { assertIsNotV2 } from './v2';
 
@@ -100,7 +101,7 @@ export async function getAbsoluteHref(href: string, withHost = false): Promise<s
  * Create an absolute href in the GitBook application.
  */
 export function getGitbookAppHref(pathname: string): string {
-    const appUrl = new URL(process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? 'https://app.gitbook.com');
+    const appUrl = new URL(GITBOOK_APP_URL);
     appUrl.pathname = pathname;
 
     return appUrl.toString();
