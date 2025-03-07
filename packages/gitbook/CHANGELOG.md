@@ -1,5 +1,22 @@
 # gitbook
 
+## 0.7.0
+
+### Minor Changes
+
+-   bb3ca9c: Implement OpenAPI models blocks
+
+### Patch Changes
+
+-   5907bd9: Adjust hint block spacing
+-   9ffc3b6: Fix content overflowing out of its container in tabs
+-   Updated dependencies [0278a14]
+-   Updated dependencies [bb3ca9c]
+-   Updated dependencies [3173d8e]
+-   Updated dependencies [052e07a]
+    -   @gitbook/openapi-parser@2.1.0
+    -   @gitbook/react-openapi@1.1.0
+
 ## 0.6.5
 
 ### Patch Changes
