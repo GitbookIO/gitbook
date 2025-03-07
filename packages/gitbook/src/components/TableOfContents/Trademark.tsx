@@ -25,7 +25,6 @@ export function Trademark(props: {
                 'relative',
                 'z-[2]',
                 'lg:absolute',
-                'mt-6',
 
                 'left-0',
                 'right-2',
@@ -40,6 +39,7 @@ export function Trademark(props: {
                 'theme-muted:bg-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                'page-no-toc:!bg-transparent',
 
                 'before:hidden',
                 'lg:before:block',
@@ -55,7 +55,8 @@ export function Trademark(props: {
                 'theme-muted:before:to-tint-subtle',
                 'theme-bold-tint:before:to-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base'
+                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
+                'page-no-toc:before:!to-transparent'
             )}
         >
             <TrademarkLink {...props} />
@@ -114,8 +115,8 @@ export function TrademarkLink(props: {
                 placement,
             }}
         >
-            <Icon icon="gitbook" className={tcls('size-5', 'mr-3')} />
-            {t(language, 'powered_by_gitbook')}
+            <Icon icon="gitbook" className={tcls('size-5', 'shrink-0')} />
+            <span className="ml-3">{t(language, 'powered_by_gitbook')}</span>
         </Link>
     );
 }

@@ -12,15 +12,13 @@ import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
-import { SpacesDropdown } from './SpacesDropdown';
 
 /**
  * Render the header for the space.
  */
 export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
     const { context, withTopHeader } = props;
-    const { siteSpace, siteSpaces, sections, customization } = context;
-    const isMultiVariants = siteSpaces.length > 1;
+    const { sections, customization } = context;
 
     return (
         <header
@@ -68,14 +66,12 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE
                         )}
                     >
                         <div
                             className={tcls(
                                 'flex max-w-full',
-                                isMultiVariants && 'page-no-toc:max-[400px]:w-full',
                                 'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                             )}
                         >
@@ -91,19 +87,6 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             />
                             <HeaderLogo context={context} />
                         </div>
-
-                        {isMultiVariants && (
-                            <div className="mr-auto page-no-toc:flex hidden">
-                                <SpacesDropdown
-                                    context={context}
-                                    siteSpace={siteSpace}
-                                    siteSpaces={siteSpaces}
-                                    className={
-                                        'theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4 theme-bold:group-focus-within/dropdown:bg-header-link/3 theme-bold:group-focus-within/dropdown:text-header-link theme-bold:group-focus-within/dropdown:ring-header-link/6 theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6 theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:group-hover/dropdown:text-header-link theme-bold:contrast-more:group-hover/dropdown:ring-header-link theme-bold:contrast-more:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 theme-bold:dark:group-hover/dropdown:bg-header-link/3 theme-bold:dark:group-hover/dropdown:text-header-link theme-bold:dark:group-hover/dropdown:ring-header-link/6 theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link theme-bold:dark:group-focus-within/dropdown:bg-header-link/3 theme-bold:dark:group-focus-within/dropdown:text-header-link theme-bold:dark:group-focus-within/dropdown:ring-header-link/6 theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link'
-                                    }
-                                />
-                            </div>
-                        )}
 
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>
