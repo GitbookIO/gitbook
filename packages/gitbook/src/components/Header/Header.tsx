@@ -59,7 +59,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                 <div className="scroll-nojump">
                     <div
                         className={tcls(
-                            'gap-6',
+                            'gap-4',
+                            'lg:gap-6',
                             'flex',
                             'items-center',
                             'justify-between',
@@ -92,7 +93,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             />
                             <HeaderLogo context={context} />
                             {isMultiVariants && (
-                                <div className="mr-auto ml-2 page-no-toc:flex hidden">
+                                <div className="ml-2 page-no-toc:flex hidden">
                                     <SpacesDropdown
                                         context={context}
                                         siteSpace={siteSpace}
@@ -146,8 +147,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'shrink-0',
                                 'md:basis-56',
                                 'justify-self-end',
-                                'search' in customization.styling &&
-                                    customization.styling.search === 'prominent'
+                                true
                                     ? [
                                           'md:grow-[0.8]',
                                           'lg:basis-40',
