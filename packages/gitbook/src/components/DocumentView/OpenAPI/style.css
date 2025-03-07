@@ -3,7 +3,7 @@
     @apply flex-1 flex flex-col gap-4 mb-14;
 }
 
-.openapi-models {
+.openapi-schemas {
     @apply flex flex-col mb-14 flex-1;
 }
 
@@ -620,10 +620,10 @@
     @apply space-y-2.5;
 }
 
-.openapi-section-models {
+.openapi-section-schemas {
     @apply border border-tint-subtle rounded-lg;
 }
 
-.openapi-section-models > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
     @apply p-2.5;
 }
