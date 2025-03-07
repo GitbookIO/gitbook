@@ -43,8 +43,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'justify-center',
                 'items-center',
                 'w-full',
-                'px-3',
-                'py-2',
+                'p-2',
+                'pl-3',
                 'gap-2',
 
                 'bg-tint-base',
@@ -81,7 +81,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'contrast-more:focus:ring-tint-12',
 
                 'active:shadow-sm',
-                'active:scale-98',
+                'active:scale-100',
 
                 'md:justify-start',
                 'md:w-full',
@@ -119,7 +119,8 @@ const Shortcut = () => {
             className={tcls(
                 'shortcut',
                 'hidden',
-                'md:inline',
+                'md:flex',
+                'gap-0.5',
                 'justify-end',
                 'text-xs',
                 'text-tint',
@@ -128,7 +129,14 @@ const Shortcut = () => {
                 `[font-feature-settings:"calt",_"case"]`
             )}
         >
-            {operatingSystem === 'mac' ? '⌘' : 'Ctrl +'} K
+            <kbd
+                className={`flex h-5 min-w-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
+            >
+                {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
+            </kbd>
+            <kbd className="flex size-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background">
+                K
+            </kbd>
         </div>
     );
 };

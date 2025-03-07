@@ -1,6 +1,8 @@
-.containerHeaderlinks {
-    container-type: inline-size;
-    container-name: headerlinks;
+@media (max-width: 80rem) {
+    .containerHeaderlinks {
+        container-type: inline-size;
+        container-name: headerlinks;
+    }
 }
 
 .linkEllipsis {

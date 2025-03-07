@@ -34,7 +34,7 @@ export async function HeaderLink(props: {
     if (link.links && link.links.length > 0) {
         return (
             <Dropdown
-                className="shrink"
+                className='right-0 left-auto shrink'
                 button={(buttonProps) => {
                     if (!target || !link.to) {
                         return (
@@ -151,10 +151,10 @@ function HeaderItemButton(
 
 function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPreset }) {
     return tcls(
-        'flex items-center shrink',
-        'min-w-0',
+        'flex items-center',
+        'shrink',
         'contrast-more:underline',
-        'truncate',
+        'line-clamp-1',
 
         'text-tint',
         'links-default:hover:text-primary',

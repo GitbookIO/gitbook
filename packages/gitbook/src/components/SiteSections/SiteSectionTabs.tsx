@@ -7,6 +7,7 @@ import React from 'react';
 import { Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
+import { CONTAINER_STYLE } from '../layout';
 import { SectionIcon } from './SectionIcon';
 import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
 
@@ -51,13 +52,13 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
         <NavigationMenu.Root
             aria-label="Sections"
             onValueChange={setValue}
-            className="relative z-10 mx-auto flex w-full max-w-screen-2xl page-full-width:max-w-full flex-nowrap items-center"
+            className={tcls('relative z-10 flex w-full flex-nowrap items-center', CONTAINER_STYLE)}
         >
             <div
                 ref={scrollableViewRef}
-                className="hide-scroll -mb-4 w-full overflow-y-hidden overflow-x-scroll pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
+                className='hide-scroll -mb-4 -mx-3 w-full overflow-y-hidden overflow-x-scroll pb-4' /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
             >
-                <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent px-1 sm:px-3 md:px-5">
+                <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent">
                     {sectionsAndGroups.map((sectionOrGroup) => {
                         const { id, title, icon } = sectionOrGroup;
                         const isGroup = sectionOrGroup.object === 'site-section-group';

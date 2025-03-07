@@ -21,7 +21,6 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
     const { context, withTopHeader } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
     const isMultiVariants = siteSpaces.length > 1;
-    const searchStyle = 'prominent'; //customization.header.links.length <= 4 ? 'prominent' : 'subtle'; // customization.styling.search
 
     return (
         <header
@@ -143,18 +142,20 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         <div
                             className={tcls(
                                 'flex',
-                                'basis-0',
                                 'grow-0',
-                                'md:min-w-56',
+                                'shrink-0',
+                                'md:basis-56',
                                 'justify-self-end',
-                                searchStyle === 'prominent'
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
                                     ? [
-                                          'md:grow-[0.75]',
-                                          'lg:min-w-40',
+                                          'md:grow-[0.8]',
+                                          'lg:basis-40',
                                           'max-w-lg',
                                           'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - margin (3rem)
                                           'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
                                           'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),0rem)]',
+                                          'page-full-width:lg:ml-6',
                                           'lg:mr-auto',
                                           'order-last',
                                           'md:order-[unset]',
