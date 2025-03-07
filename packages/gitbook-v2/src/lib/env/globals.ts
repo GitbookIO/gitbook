@@ -14,17 +14,17 @@ export const GITBOOK_URL =
 export const GITBOOK_ASSETS_URL =
     process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : (process.env.GITBOOK_ASSETS_PREFIX ?? GITBOOK_URL);
+        : process.env.GITBOOK_ASSETS_PREFIX || GITBOOK_URL;
 
 /**
  * GitBook app URL.
  */
-export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL ?? 'https://app.gitbook.com';
+export const GITBOOK_APP_URL = process.env.NEXT_PUBLIC_GITBOOK_APP_URL || 'https://app.gitbook.com';
 
 /**
  * Default GitBook API URL endpoint.
  */
-export const GITBOOK_API_URL = process.env.GITBOOK_API_URL ?? 'https://api.gitbook.com';
+export const GITBOOK_API_URL = process.env.GITBOOK_API_URL || 'https://api.gitbook.com';
 
 /**
  * Default GitBook API token.
@@ -35,7 +35,7 @@ export const GITBOOK_API_TOKEN = process.env.GITBOOK_API_TOKEN ?? null;
 /**
  * User agent to use for API requests.
  */
-export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT ?? 'GitBook-Open/2.0.0';
+export const GITBOOK_USER_AGENT = process.env.GITBOOK_USER_AGENT || 'GitBook-Open/2.0.0';
 
 /**
  * Whether to disable tracking of events into site insights.
@@ -49,7 +49,7 @@ export const GITBOOK_DISABLE_TRACKING = Boolean(
  * Hostname serving the integrations.
  */
 export const GITBOOK_INTEGRATIONS_HOST =
-    process.env.GITBOOK_INTEGRATIONS_HOST ?? 'integrations.gitbook.com';
+    process.env.GITBOOK_INTEGRATIONS_HOST || 'integrations.gitbook.com';
 
 /**
  * Endpoint to use for resizing images.
