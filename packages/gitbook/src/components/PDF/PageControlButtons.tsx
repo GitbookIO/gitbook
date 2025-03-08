@@ -7,7 +7,7 @@ import { useScrollActiveId } from '@/components/hooks';
 import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { getPDFUrl } from '@/lib/urls';
+import { getPDFUrl } from './urls';
 
 const limitExtend = 50;
 

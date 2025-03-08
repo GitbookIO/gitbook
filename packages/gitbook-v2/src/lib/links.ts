@@ -41,6 +41,26 @@ export interface GitBookSpaceLinker {
 }
 
 /**
+ * Create a noop linker.
+ */
+export function createNoopLinker(): GitBookSpaceLinker {
+    return {
+        toPathInContent() {
+            throw new Error('Not implemented');
+        },
+        toPathForPage() {
+            throw new Error('Not implemented');
+        },
+        toAbsoluteURL() {
+            throw new Error('Not implemented');
+        },
+        toLinkForContent() {
+            throw new Error('Not implemented');
+        },
+    };
+}
+
+/**
  * Create a linker to resolve links in a context being served on a specific URL.
  */
 export function createLinker(
