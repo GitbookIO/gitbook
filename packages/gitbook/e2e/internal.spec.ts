@@ -318,6 +318,9 @@ const testCases: TestsCase[] = [
                 screenshot: {
                     waitForTOCScrolling: false,
                 },
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
+                },
             },
         ],
     },
