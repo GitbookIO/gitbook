@@ -102,9 +102,13 @@ async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode
                 urlMode: mode,
             });
 
-            return NextResponse.redirect(
-                new URL(linker.toLinkForContent(data.redirect), request.url)
-            );
+            const contentRedirect = new URL(linker.toLinkForContent(data.redirect), request.url);
+
+            // Keep the same search params as the original request
+            // as it might contain a VA token
+            contentRedirect.search = request.nextUrl.search;
+
+            return NextResponse.redirect(contentRedirect);
         }
 
         return NextResponse.redirect(data.redirect);

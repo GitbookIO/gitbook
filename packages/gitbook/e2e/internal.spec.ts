@@ -822,6 +822,9 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         }
                     );
+
+                    // Test that when accessing the non-canonical URL, we are redirected to the canonical URL
+                    // with the jwt token in the query string
                     return `spacea?jwt_token=${token}`;
                 })(),
                 run: waitForCookiesDialog,
