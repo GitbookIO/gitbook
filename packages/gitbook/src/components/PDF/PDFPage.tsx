@@ -21,7 +21,7 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import type { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import { getAbsoluteHref, getPagePDFContainerId } from '@/lib/links';
+import { getPagePDFContainerId } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { type PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
@@ -52,15 +52,15 @@ export async function PDFPage(props: {
     context: GitBookSpaceContext | GitBookSiteContext;
     searchParams: { [key: string]: string };
 }) {
+    const baseContext = props.context;
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
     // Build current PDF URL and preserve all search params
-    let currentPDFUrl = await getAbsoluteHref('~gitbook/pdf', true);
+    let currentPDFUrl = baseContext.linker.toAbsoluteURL(
+        baseContext.linker.toPathInContent('~gitbook/pdf')
+    );
     currentPDFUrl += `?${searchParams.toString()}`;
-
-    // Fetch the context
-    const baseContext = props.context;
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();

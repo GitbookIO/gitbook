@@ -167,13 +167,15 @@ async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode
     requestHeaders.set('origin', request.nextUrl.origin);
 
     const siteURLWithoutProtocol = `${url.host}${data.basePath}`;
+    const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(data.pathname);
+    routeType = routeTypeFromPathname ?? routeType;
 
     const route = [
         'sites',
         routeType,
         mode,
         encodeURIComponent(siteURLWithoutProtocol),
-        encodePathInSiteContent(data.pathname),
+        pathname,
     ].join('/');
 
     console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
@@ -270,22 +272,27 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
  */
-function encodePathInSiteContent(rawPathname: string) {
+function encodePathInSiteContent(rawPathname: string): {
+    pathname: string;
+    routeType?: 'static' | 'dynamic';
+} {
     const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
-        return pathname;
+        return { pathname };
     }
 
     switch (pathname) {
         case '~gitbook/icon':
-        case '~gitbook/image':
         case 'llms.txt':
         case 'sitemap.xml':
         case 'robots.txt':
-            return pathname;
+            return { pathname };
+        case '~gitbook/pdf':
+            // PDF routes are always dynamic as they depend on the search params.
+            return { pathname, routeType: 'dynamic' };
         default:
-            return encodeURIComponent(pathname || '/');
+            return { pathname: encodeURIComponent(pathname || '/') };
     }
 }
 
