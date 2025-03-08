@@ -48,7 +48,7 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
  */
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
-    const mode = await headers().get('x-gitbook-mode');
+    const mode = (await headers()).get('x-gitbook-mode');
 
     if (mode === 'multi-id') {
         // We don't show the admin toolbar in multi-id mode, as it's used for previewing in the dashboard.

@@ -15,6 +15,7 @@ import { GITBOOK_APP_URL } from '@v2/lib/env';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
+import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 
 /**
  * Render the entire layout of the space (header, table of contents, footer).
@@ -46,98 +47,100 @@ export function SpaceLayout(props: {
         customization.footer.groups?.length;
 
     return (
-        <InsightsProvider
-            enabled={withTracking}
-            appURL={GITBOOK_APP_URL}
-            apiHost={context.dataFetcher.apiEndpoint}
-            visitorAuthToken={visitorAuthToken}
-            organizationId={context.organizationId}
-            siteId={context.site.id}
-            siteSectionId={context.sections?.current?.id ?? null}
-            siteSpaceId={context.siteSpace.id}
-            siteShareKey={context.shareKey ?? null}
-            revisionId={context.revisionId}
-            spaceId={context.space.id}
-        >
-            <Header withTopHeader={withTopHeader} context={context} />
-            <div
-                className={tcls(
-                    'flex',
-                    'flex-col',
-                    'lg:flex-row',
-                    CONTAINER_STYLE,
-
-                    // Ensure the footer is display below the viewport even if the content is not enough
-                    withFooter && 'min-h-[calc(100vh-64px)]',
-                    withTopHeader ? null : 'lg:min-h-screen'
-                )}
+        <SpaceLayoutContextProvider basePath={context.linker.toPathInContent('')}>
+            <InsightsProvider
+                enabled={withTracking}
+                appURL={GITBOOK_APP_URL}
+                apiHost={context.dataFetcher.apiEndpoint}
+                visitorAuthToken={visitorAuthToken}
+                organizationId={context.organizationId}
+                siteId={context.site.id}
+                siteSectionId={context.sections?.current?.id ?? null}
+                siteSpaceId={context.siteSpace.id}
+                siteShareKey={context.shareKey ?? null}
+                revisionId={context.revisionId}
+                spaceId={context.space.id}
             >
-                <TableOfContents
-                    context={context}
-                    header={
-                        withTopHeader ? null : (
-                            <div
-                                className={tcls(
-                                    'hidden',
-                                    'pr-4',
-                                    'lg:flex',
-                                    'grow-0',
-                                    'flex-wrap',
-                                    'dark:shadow-light/1'
-                                )}
-                            >
-                                <HeaderLogo context={context} />
-                            </div>
-                        )
-                    }
-                    innerHeader={
-                        // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                        <>
-                            {!withTopHeader && (
-                                <div className={tcls('hidden', 'lg:block')}>
-                                    <React.Suspense fallback={null}>
-                                        <SearchButton>
-                                            <span className={tcls('flex-1')}>
-                                                {t(
-                                                    getSpaceLanguage(customization),
-                                                    customization.aiSearch.enabled
-                                                        ? 'search_or_ask'
-                                                        : 'search'
-                                                )}
-                                            </span>
-                                        </SearchButton>
-                                    </React.Suspense>
+                <Header withTopHeader={withTopHeader} context={context} />
+                <div
+                    className={tcls(
+                        'flex',
+                        'flex-col',
+                        'lg:flex-row',
+                        CONTAINER_STYLE,
+
+                        // Ensure the footer is display below the viewport even if the content is not enough
+                        withFooter && 'min-h-[calc(100vh-64px)]',
+                        withTopHeader ? null : 'lg:min-h-screen'
+                    )}
+                >
+                    <TableOfContents
+                        context={context}
+                        header={
+                            withTopHeader ? null : (
+                                <div
+                                    className={tcls(
+                                        'hidden',
+                                        'pr-4',
+                                        'lg:flex',
+                                        'grow-0',
+                                        'flex-wrap',
+                                        'dark:shadow-light/1'
+                                    )}
+                                >
+                                    <HeaderLogo context={context} />
                                 </div>
-                            )}
-                            {!withTopHeader && withSections && sections && (
-                                <SiteSectionList
-                                    className={tcls('hidden', 'lg:block')}
-                                    sections={encodeClientSiteSections(context, sections)}
-                                />
-                            )}
-                            {isMultiVariants && (
-                                <SpacesDropdown
-                                    context={context}
-                                    siteSpace={siteSpace}
-                                    siteSpaces={siteSpaces}
-                                    className={tcls('w-full')}
-                                />
-                            )}
-                        </>
-                    }
-                />
-                <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
-            </div>
+                            )
+                        }
+                        innerHeader={
+                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                            <>
+                                {!withTopHeader && (
+                                    <div className={tcls('hidden', 'lg:block')}>
+                                        <React.Suspense fallback={null}>
+                                            <SearchButton>
+                                                <span className={tcls('flex-1')}>
+                                                    {t(
+                                                        getSpaceLanguage(customization),
+                                                        customization.aiSearch.enabled
+                                                            ? 'search_or_ask'
+                                                            : 'search'
+                                                    )}
+                                                </span>
+                                            </SearchButton>
+                                        </React.Suspense>
+                                    </div>
+                                )}
+                                {!withTopHeader && withSections && sections && (
+                                    <SiteSectionList
+                                        className={tcls('hidden', 'lg:block')}
+                                        sections={encodeClientSiteSections(context, sections)}
+                                    />
+                                )}
+                                {isMultiVariants && (
+                                    <SpacesDropdown
+                                        context={context}
+                                        siteSpace={siteSpace}
+                                        siteSpaces={siteSpaces}
+                                        className={tcls('w-full')}
+                                    />
+                                )}
+                            </>
+                        }
+                    />
+                    <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
+                </div>
 
-            {withFooter ? <Footer context={context} /> : null}
+                {withFooter ? <Footer context={context} /> : null}
 
-            <React.Suspense fallback={null}>
-                <SearchModal
-                    spaceTitle={siteSpace.title}
-                    withAsk={customization.aiSearch.enabled}
-                    isMultiVariants={isMultiVariants}
-                />
-            </React.Suspense>
-        </InsightsProvider>
+                <React.Suspense fallback={null}>
+                    <SearchModal
+                        spaceTitle={siteSpace.title}
+                        withAsk={customization.aiSearch.enabled}
+                        isMultiVariants={isMultiVariants}
+                    />
+                </React.Suspense>
+            </InsightsProvider>
+        </SpaceLayoutContextProvider>
     );
 }

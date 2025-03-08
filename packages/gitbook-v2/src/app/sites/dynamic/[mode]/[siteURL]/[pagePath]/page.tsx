@@ -16,7 +16,7 @@ export default async function Page(props: PageProps) {
     const context = await getDynamicSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
-    return <SitePage context={context} pageParams={{ pathname }} redirectOnFallback={true} />;
+    return <SitePage context={context} pageParams={{ pathname }} />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
@@ -25,14 +25,12 @@ export async function generateViewport(props: PageProps): Promise<Viewport> {
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-    const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
+    const params = await props.params;
     const context = await getDynamicSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
     return generateSitePageMetadata({
         context,
         pageParams: { pathname },
-        redirectOnFallback: true,
-        fallback: !!searchParams.fallback,
     });
 }
