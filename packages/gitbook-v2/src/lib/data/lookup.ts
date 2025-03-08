@@ -27,6 +27,7 @@ export async function getPublishedContentByURL(input: {
             userAgent: GITBOOK_USER_AGENT,
         });
 
+        const startTime = performance.now();
         const callResult = await tryCatch(
             api.urls.getPublishedContentByUrl(
                 {
@@ -42,6 +43,12 @@ export async function getPublishedContentByURL(input: {
                     },
                 }
             )
+        );
+        const endTime = performance.now();
+
+        // biome-ignore lint/suspicious/noConsole: we want to log performance data
+        console.log(
+            `getPublishedContentByURL(${alternative.url}) Time taken: ${endTime - startTime}ms`
         );
 
         if (callResult.error) {
