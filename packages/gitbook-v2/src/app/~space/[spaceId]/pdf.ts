@@ -41,4 +41,3 @@ export async function getSpacePDFContext(
         revision: undefined,
     });
 }
-}
