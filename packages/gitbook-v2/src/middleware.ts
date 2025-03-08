@@ -5,10 +5,15 @@ import { NextResponse } from 'next/server';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
-import { getResponseCookiesForVisitorAuth, getVisitorToken } from '@/lib/visitor-token';
+import {
+    type ResponseCookies,
+    getResponseCookiesForVisitorAuth,
+    getVisitorToken,
+    normalizeVisitorAuthURL,
+} from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getLinkerForSiteURL } from '@v2/lib/context';
-import { getPublishedContentByURL } from '@v2/lib/data';
+import { getPublishedContentByURL, normalizeURL } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
@@ -22,6 +27,14 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {
+        const requestURL = new URL(request.url);
+
+        // Redirect to normalize the URL
+        const normalized = normalizeURL(requestURL);
+        if (normalized.toString() !== requestURL.toString()) {
+            return NextResponse.redirect(normalized.toString());
+        }
+
         // Route all requests to a site
         const extracted = getSiteURLFromRequest(request);
         if (extracted) {
@@ -39,7 +52,7 @@ export async function middleware(request: NextRequest) {
                 });
             }
 
-            return await serveSiteByURL(request, extracted);
+            return await serveSiteByURL(requestURL, request, extracted);
         }
 
         // Handle the rest with the router default logic
@@ -52,7 +65,7 @@ export async function middleware(request: NextRequest) {
 /**
  * Serve site by URL.
  */
-async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
+async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode: URLWithMode) {
     const { url, mode } = urlWithMode;
 
     // Visitor authentication
@@ -73,7 +86,11 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     }
 
     const { data } = result;
+    let cookies: ResponseCookies = {};
 
+    //
+    // Handle redirects
+    //
     if ('redirect' in data) {
         // biome-ignore lint/suspicious/noConsole: we want to log the redirect
         console.log('redirect', data.redirect);
@@ -92,6 +109,27 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
 
         return NextResponse.redirect(data.redirect);
     }
+
+    cookies = {
+        ...cookies,
+        ...getResponseCookiesForVisitorAuth(data.basePath, visitorToken),
+    };
+
+    //
+    // Make sure the URL is clean of any va token after a successful lookup
+    // The token is stored in a cookie that is set on the redirect response
+    //
+    const requestURLWithoutToken = normalizeVisitorAuthURL(requestURL);
+    if (requestURLWithoutToken.toString() !== requestURL.toString()) {
+        return writeResponseCookies(
+            NextResponse.redirect(requestURLWithoutToken.toString()),
+            cookies
+        );
+    }
+
+    //
+    // Render and serve the content
+    //
 
     // When visitor has authentication (adaptive content or VA), we serve dynamic routes.
     let routeType = visitorToken ? 'dynamic' : 'static';
@@ -153,14 +191,7 @@ async function serveSiteByURL(request: NextRequest, urlWithMode: URLWithMode) {
     response.headers.set('x-gitbook-route-type', routeType);
     response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
-    if (visitorToken) {
-        const cookies = getResponseCookiesForVisitorAuth(data.basePath, visitorToken);
-        for (const [key, value] of Object.entries(cookies)) {
-            response.cookies.set(key, value.value, value.options);
-        }
-    }
-
-    return response;
+    return writeResponseCookies(response, cookies);
 }
 
 /**
@@ -263,4 +294,15 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
     }
 
     return url;
+}
+
+/**
+ * Write the cookies to a response.
+ */
+function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
+    Object.entries(cookies).forEach(([key, { value, options }]) => {
+        response.cookies.set(key, value, options);
+    });
+
+    return response;
 }
