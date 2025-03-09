@@ -24,8 +24,8 @@ import { tString } from '@/intl/translate';
 import { getPagePDFContainerId } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { type PDFSearchParams, getPDFSearchParams } from '@/lib/urls';
 import { defaultCustomizationForSpace } from '@/lib/utils';
+import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
@@ -55,12 +55,6 @@ export async function PDFPage(props: {
     const baseContext = props.context;
     const searchParams = new URLSearchParams(props.searchParams);
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
-
-    // Build current PDF URL and preserve all search params
-    let currentPDFUrl = baseContext.linker.toAbsoluteURL(
-        baseContext.linker.toPathInContent('~gitbook/pdf')
-    );
-    currentPDFUrl += `?${searchParams.toString()}`;
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
@@ -147,11 +141,9 @@ export async function PDFPage(props: {
             </div>
 
             <PageControlButtons
+                params={pdfParams}
                 pageIds={pageIds}
-                pdfHref={currentPDFUrl}
-                singlePageMode={!!pdfParams.only}
                 total={total}
-                limit={pdfParams.limit ?? DEFAULT_LIMIT}
                 trademark={
                     customization.trademark.enabled ? (
                         <TrademarkLink

@@ -7,7 +7,7 @@ import { useScrollActiveId } from '@/components/hooks';
 import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { getPDFUrl } from './urls';
+import { type PDFSearchParams, getPDFUrlSearchParams } from './urls';
 
 const limitExtend = 50;
 
@@ -15,18 +15,15 @@ const limitExtend = 50;
  * Dynamic controls to show active page and to let the user select between modes.
  */
 export function PageControlButtons(props: {
-    pdfHref: string;
-    singlePageMode: boolean;
+    params: PDFSearchParams;
     /** Array of the [pageId, divId] */
     pageIds: Array<[string, string]>;
-    /** Current limit */
-    limit: number;
     /** Total number of pages targetted by the generation */
     total: number;
     /** Trademark to display */
     trademark?: React.ReactNode;
 }) {
-    const { pdfHref, singlePageMode, pageIds, limit, total, trademark } = props;
+    const { params, pageIds, total, trademark } = props;
 
     const language = useLanguage();
 
@@ -53,19 +50,24 @@ export function PageControlButtons(props: {
                     'z-50'
                 )}
             >
-                {singlePageMode ? null : (
+                {params.only ? null : (
                     <Button
-                        href={getPDFUrl(new URL(pdfHref), {
+                        href={`?${getPDFUrlSearchParams({
+                            ...params,
                             page: activePageId,
                             only: true,
-                        }).toString()}
+                        }).toString()}`}
                         variant="secondary"
                     >
                         {t(language, 'pdf_mode_only_page')}
                     </Button>
                 )}
                 <Button
-                    href={getPDFUrl(new URL(pdfHref), { page: undefined, only: false }).toString()}
+                    href={`?${getPDFUrlSearchParams({
+                        ...params,
+                        page: undefined,
+                        only: false,
+                    }).toString()}`}
                     variant="secondary"
                 >
                     {t(language, 'pdf_mode_all')}
@@ -113,11 +115,12 @@ export function PageControlButtons(props: {
                             <div>{t(language, 'pdf_limit_reached', total, pageIds.length)}</div>
                             <div>
                                 <a
-                                    href={getPDFUrl(new URL(pdfHref), {
+                                    href={`?${getPDFUrlSearchParams({
+                                        ...params,
                                         page: undefined,
                                         only: false,
-                                        limit: limit + limitExtend,
-                                    }).toString()}
+                                        limit: params.limit + limitExtend,
+                                    }).toString()}`}
                                     className={tcls('underline')}
                                 >
                                     {t(language, 'pdf_limit_reached_continue', limitExtend)}

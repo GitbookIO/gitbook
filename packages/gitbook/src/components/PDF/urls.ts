@@ -1,10 +1,12 @@
+const DEFAULT_LIMIT = 100;
+
 export interface PDFSearchParams {
     /** Page to export. If none is passed, all pages are exported. */
     page?: string;
     /** If true, only the `page` is exported, and not its descendant */
     only?: boolean;
     /** Limit the number of pages */
-    limit?: number;
+    limit: number;
     /** URL to redirect back to */
     back?: string;
 }
@@ -13,7 +15,9 @@ export interface PDFSearchParams {
  * Get the PDF export params from the URL serch params.
  */
 export function getPDFSearchParams(searchParams: URLSearchParams): PDFSearchParams {
-    const params: PDFSearchParams = {};
+    const params: PDFSearchParams = {
+        limit: DEFAULT_LIMIT,
+    };
 
     if (searchParams.has('page')) {
         params.page = searchParams.get('page') ?? '';

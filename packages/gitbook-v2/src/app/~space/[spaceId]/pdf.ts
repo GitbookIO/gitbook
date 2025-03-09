@@ -5,7 +5,7 @@ import {
 } from '@v2/lib/context';
 import { createDataFetcher } from '@v2/lib/data';
 import { GITBOOK_API_URL } from '@v2/lib/env';
-import { createNoopLinker } from '@v2/lib/links';
+import { createLinker } from '@v2/lib/links';
 import { getAPITokenFromMiddleware } from '@v2/lib/middleware';
 
 export type SpacePDFRouteParams = {
@@ -21,7 +21,9 @@ export async function getSpacePDFContext(
 
     const apiToken = await getAPITokenFromMiddleware();
 
-    const linker = createNoopLinker();
+    const linker = createLinker({
+        pathname: getPDFRoutePath(params),
+    });
     const dataFetcher = createDataFetcher({
         apiToken: apiToken,
         apiEndpoint: GITBOOK_API_URL,
@@ -38,4 +40,20 @@ export async function getSpacePDFContext(
         changeRequest: params.changeRequestId,
         revision: params.revisionId,
     });
+}
+
+function getPDFRoutePath(params: SpacePDFRouteParams) {
+    let path = `/~space/${params.spaceId}`;
+
+    if (params.changeRequestId) {
+        path += `/~/changes/${params.changeRequestId}`;
+    }
+
+    if (params.revisionId) {
+        path += `/~/revisions/${params.revisionId}`;
+    }
+
+    path += '~gitbook/pdf';
+
+    return path;
 }
