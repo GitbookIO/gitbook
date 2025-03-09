@@ -1,5 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
+import {
+    getCacheTag,
+    getCacheTagForURL,
+    getComputedContentSourceCacheTags,
+} from '@gitbook/cache-tags';
 import 'server-only';
 
 import {
@@ -238,11 +242,7 @@ export const getLatestOpenAPISpecVersionContent = cache({
  */
 export const getPublishedContentByUrl = cache({
     name: 'api.getPublishedContentByUrl.v4',
-    tag: (url) =>
-        getCacheTag({
-            tag: 'url',
-            hostname: new URL(url).hostname,
-        }),
+    tag: (url) => getCacheTagForURL(url),
     get: async (
         url: string,
         visitorAuthToken: string | undefined,

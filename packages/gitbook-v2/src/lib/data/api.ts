@@ -1,5 +1,9 @@
 import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
-import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
+import {
+    getCacheTag,
+    getCacheTagForURL,
+    getComputedContentSourceCacheTags,
+} from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { wrapDataFetcherError } from './errors';
@@ -413,13 +417,7 @@ async function getPublishedContentByUrl(
 
     const { url, visitorAuthToken, redirectOnError } = params;
 
-    const hostname = new URL(url).hostname;
-    cacheTag(
-        getCacheTag({
-            tag: 'url',
-            hostname,
-        })
-    );
+    cacheTag(getCacheTagForURL(url));
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {

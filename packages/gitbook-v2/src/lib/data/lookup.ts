@@ -1,6 +1,7 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath } from '@/lib/paths';
 import { GitBookAPI, type PublishedSiteContentLookup } from '@gitbook/api';
+import { getCacheTagForURL } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
@@ -37,8 +38,17 @@ export async function getPublishedContentByURL(input: {
                 },
                 {
                     signal,
+
+                    // Optimization to have the API worker cache the response
                     headers: {
                         'x-gitbook-force-cache': 'true',
+                    },
+
+                    // Optimization for when running on Cloudflare, where we hit directly the API server
+                    // We cache this API response.
+                    cf: {
+                        cacheEverything: true,
+                        cacheTags: [getCacheTagForURL(alternative.url)],
                     },
                 }
             )
