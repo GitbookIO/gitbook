@@ -34,10 +34,8 @@ export async function getSpacePDFContext(
 
     return await fetchSpaceContextByIds(baseContext, {
         space: spaceId,
-
-        // TODO:
         shareKey: undefined,
-        changeRequest: undefined,
-        revision: undefined,
+        changeRequest: params.changeRequestId,
+        revision: params.revisionId,
     });
 }
