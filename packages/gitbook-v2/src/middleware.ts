@@ -1,4 +1,4 @@
-import { CustomizationThemeMode, GitBookAPIError } from '@gitbook/api';
+import { CustomizationThemeMode } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -264,8 +264,8 @@ async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
  * Serve an error response.
  */
 function serveErrorResponse(error: Error) {
-    if (error instanceof GitBookAPIError) {
-        return new Response(error.errorMessage, {
+    if (error instanceof DataFetcherError) {
+        return new Response(error.message, {
             status: error.code,
             headers: { 'content-type': 'text/plain' },
         });
