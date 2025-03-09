@@ -40,13 +40,8 @@ export function getContentTestURL(input: string): string {
 /**
  * Get the URL to load on the deployment being tested.
  */
-export function getTestURL(input: string): string {
-    const url = new URL(getBaseURL());
-    const contentUrl = new URL(input);
-
-    url.pathname = `${url.pathname.replace(/\/$/, '')}/${contentUrl.host}${contentUrl.pathname}`;
-    url.search = contentUrl.search;
-
+export function getTestURL(urlRest: string): string {
+    const url = new URL(urlRest, getBaseURL());
     return url.toString();
 }
 
