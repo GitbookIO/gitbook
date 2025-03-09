@@ -143,13 +143,13 @@ export function runTestCases(testCases: TestsCase[]) {
             for (const testEntry of testCase.tests) {
                 const testFn = testEntry.only ? test.only : test;
                 testFn(testEntry.name, async ({ page, context }) => {
-                    const testEntryURL = new URL(
-                        typeof testEntry.url === 'function' ? await testEntry.url() : testEntry.url,
-                        testCase.contentBaseURL
-                    );
+                    const testEntryPathname =
+                        typeof testEntry.url === 'function' ? await testEntry.url() : testEntry.url;
                     const url = testCase.contentBaseURL
-                        ? getContentTestURL(testEntryURL.toString())
-                        : getTestURL(testEntryURL.toString());
+                        ? getContentTestURL(
+                              new URL(testEntryPathname, testCase.contentBaseURL).toString()
+                          )
+                        : getTestURL(testEntryPathname);
                     if (testEntry.cookies) {
                         await context.addCookies(
                             testEntry.cookies.map((cookie) => ({
