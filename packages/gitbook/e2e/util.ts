@@ -20,7 +20,7 @@ import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
 
-import { getContentTestURL } from '../tests/utils';
+import { getContentTestURL, getTestURL } from '../tests/utils';
 
 export interface Test {
     name: string;
@@ -60,11 +60,11 @@ export interface Test {
     only?: boolean;
 }
 
-export interface TestsCase {
+export type TestsCase = {
     name: string;
-    baseUrl: string;
     tests: Array<Test>;
-}
+    contentBaseURL?: string;
+};
 
 export const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Fr,
@@ -143,11 +143,13 @@ export function runTestCases(testCases: TestsCase[]) {
             for (const testEntry of testCase.tests) {
                 const testFn = testEntry.only ? test.only : test;
                 testFn(testEntry.name, async ({ page, context }) => {
-                    const contentUrl = new URL(
+                    const testEntryURL = new URL(
                         typeof testEntry.url === 'function' ? await testEntry.url() : testEntry.url,
-                        testCase.baseUrl
+                        testCase.contentBaseURL
                     );
-                    const url = getContentTestURL(contentUrl.toString());
+                    const url = testCase.contentBaseURL
+                        ? getContentTestURL(testEntryURL.toString())
+                        : getTestURL(testEntryURL.toString());
                     if (testEntry.cookies) {
                         await context.addCookies(
                             testEntry.cookies.map((cookie) => ({

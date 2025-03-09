@@ -1,7 +1,9 @@
+import { GitBookAPI } from '@gitbook/api';
+
 /**
  * Get the base URL of the deployment to test.
  */
-export function getBaseURL() {
+function getBaseURL() {
     const baseUrl = process.env.BASE_URL;
     if (!baseUrl) {
         throw new Error('BASE_URL is not set');
@@ -13,7 +15,7 @@ export function getBaseURL() {
 /**
  * Get the site base URL of the deployment to test.
  */
-export function getSiteBaseURL() {
+function getSiteBaseURL() {
     const siteBaseUrl = process.env.SITE_BASE_URL;
     if (!siteBaseUrl) {
         return getBaseURL();
@@ -22,13 +24,8 @@ export function getSiteBaseURL() {
     return siteBaseUrl;
 }
 
-export function getContentPathName(input: string): string {
-    const contentUrl = new URL(input);
-    return `${contentUrl.host}${contentUrl.pathname}`;
-}
-
 /**
- * Get the URL to load for a content
+ * Get the URL to load for a site
  */
 export function getContentTestURL(input: string): string {
     const url = new URL(getSiteBaseURL());
@@ -38,4 +35,41 @@ export function getContentTestURL(input: string): string {
     url.search = contentUrl.search;
 
     return url.toString();
+}
+
+/**
+ * Get the URL to load on the deployment being tested.
+ */
+export function getTestURL(input: string): string {
+    const url = new URL(getBaseURL());
+    const contentUrl = new URL(input);
+
+    url.pathname = `${url.pathname.replace(/\/$/, '')}/${contentUrl.host}${contentUrl.pathname}`;
+    url.search = contentUrl.search;
+
+    return url.toString();
+}
+
+/**
+ * Get an API token for a site by its URL.
+ */
+export async function getSiteAPIToken(url: string) {
+    const api = new GitBookAPI();
+    const { data } = await api.urls.getPublishedContentByUrl(
+        {
+            url,
+            cache: true,
+        },
+        {
+            headers: {
+                'x-gitbook-force-cache': 'true',
+            },
+        }
+    );
+
+    if ('redirect' in data) {
+        throw new Error(`Invalid site URL, it resulted in a redirect: ${data.redirect}`);
+    }
+
+    return data;
 }
