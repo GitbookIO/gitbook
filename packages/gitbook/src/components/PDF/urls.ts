@@ -36,15 +36,9 @@ export function getPDFSearchParams(searchParams: URLSearchParams): PDFSearchPara
 }
 
 /**
- * Update the URL with the PDF export params.
+ * Get the URL search params to use for a PDF export.
  */
-export function getPDFUrl(url: URL, params: PDFSearchParams): URL {
-    const copy = new URL(url);
-    getPDFUrlSearchParams(params, copy.searchParams);
-    return copy;
-}
-
-export function getPDFUrlSearchParams(
+export function getPDFURLSearchParams(
     params: PDFSearchParams,
     searchParams = new URLSearchParams({})
 ): URLSearchParams {

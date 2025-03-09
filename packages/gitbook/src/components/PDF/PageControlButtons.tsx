@@ -7,7 +7,7 @@ import { useScrollActiveId } from '@/components/hooks';
 import { Button } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { type PDFSearchParams, getPDFUrlSearchParams } from './urls';
+import { type PDFSearchParams, getPDFURLSearchParams } from './urls';
 
 const limitExtend = 50;
 
@@ -52,7 +52,7 @@ export function PageControlButtons(props: {
             >
                 {params.only ? null : (
                     <Button
-                        href={`?${getPDFUrlSearchParams({
+                        href={`?${getPDFURLSearchParams({
                             ...params,
                             page: activePageId,
                             only: true,
@@ -63,7 +63,7 @@ export function PageControlButtons(props: {
                     </Button>
                 )}
                 <Button
-                    href={`?${getPDFUrlSearchParams({
+                    href={`?${getPDFURLSearchParams({
                         ...params,
                         page: undefined,
                         only: false,
@@ -115,7 +115,7 @@ export function PageControlButtons(props: {
                             <div>{t(language, 'pdf_limit_reached', total, pageIds.length)}</div>
                             <div>
                                 <a
-                                    href={`?${getPDFUrlSearchParams({
+                                    href={`?${getPDFURLSearchParams({
                                         ...params,
                                         page: undefined,
                                         only: false,
