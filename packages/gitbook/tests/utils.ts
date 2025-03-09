@@ -1,13 +1,25 @@
 /**
- * Get the target URL from the command line arguments.
+ * Get the base URL of the deployment to test.
  */
-export function getTargetURL() {
-    const targetUrl = Bun.argv[2];
-    if (!targetUrl) {
-        process.exit(1);
+export function getBaseURL() {
+    const baseUrl = process.env.BASE_URL;
+    if (!baseUrl) {
+        throw new Error('BASE_URL is not set');
     }
 
-    return targetUrl;
+    return baseUrl;
+}
+
+/**
+ * Get the site base URL of the deployment to test.
+ */
+export function getSiteBaseURL() {
+    const siteBaseUrl = process.env.SITE_BASE_URL;
+    if (!siteBaseUrl) {
+        return getBaseURL();
+    }
+
+    return siteBaseUrl;
 }
 
 export function getContentPathName(input: string): string {
@@ -18,8 +30,8 @@ export function getContentPathName(input: string): string {
 /**
  * Get the URL to load for a content
  */
-export function getContentTestURL(input: string, baseUrl: string = getTargetURL()): string {
-    const url = new URL(baseUrl);
+export function getContentTestURL(input: string): string {
+    const url = new URL(getSiteBaseURL());
     const contentUrl = new URL(input);
 
     url.pathname = `${url.pathname.replace(/\/$/, '')}/${contentUrl.host}${contentUrl.pathname}`;

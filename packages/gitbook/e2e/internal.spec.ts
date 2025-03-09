@@ -188,7 +188,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Keep navigation path/route when switching variant (VA)',
                 screenshot: false,
-                url: (() => {
+                url: () => {
                     const privateKey = 'c26190fc-74b2-4b54-9fc7-df9941104953';
                     const token = jwt.sign(
                         {
@@ -200,7 +200,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const spaceDrowpdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
@@ -747,7 +747,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'First',
-                url: (() => {
+                url: () => {
                     const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
                     const token = jwt.sign(
                         {
@@ -759,7 +759,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `first?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'first' })
@@ -769,7 +769,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Second',
-                url: (() => {
+                url: () => {
                     const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
                     const token = jwt.sign(
                         {
@@ -781,7 +781,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `second?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'second' })
@@ -797,7 +797,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'Root',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -809,12 +809,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Primary (Space A)',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -829,12 +829,12 @@ const testCases: TestsCase[] = [
                     // Test that when accessing the non-canonical URL, we are redirected to the canonical URL
                     // with the jwt token in the query string
                     return `spacea?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Space B',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -846,12 +846,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `spaceb?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Space C',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -863,7 +863,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `spacec?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
         ],
@@ -874,7 +874,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'Root',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -886,12 +886,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'First',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -903,7 +903,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `first?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'first' })
@@ -913,7 +913,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Custom page',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -925,12 +925,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `custom-page?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Inner page',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -942,7 +942,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `custom-page/inner-page?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
         ],
@@ -981,7 +981,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Show error message when invalid token is passed to url',
                 screenshot: false,
-                url: (() => {
+                url: () => {
                     const token = jwt.sign(
                         {
                             name: 'gitbook-open-tests',
@@ -992,7 +992,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(page.locator('pre')).toContainText(
                         'Error while validating the JWT token. Reason: The token signature is invalid.'
@@ -1074,7 +1074,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'isAlphaUser',
-                url: (() => {
+                url: () => {
                     const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
                     const token = jwt.sign(
                         {
@@ -1087,7 +1087,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const alphaUserPage = page
                         .locator('a[class*="group\\/toclink"]')
@@ -1101,7 +1101,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'isBetaUser',
-                url: (() => {
+                url: () => {
                     const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
                     const token = jwt.sign(
                         {
@@ -1114,7 +1114,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const alphaUserPage = page
                         .locator('a[class*="group\\/toclink"]')
@@ -1128,7 +1128,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'isAlphaUser & isBetaUser',
-                url: (() => {
+                url: () => {
                     const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
                     const token = jwt.sign(
                         {
@@ -1142,7 +1142,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const alphaUserPage = page
                         .locator('a[class*="group\\/toclink"]')

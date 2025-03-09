@@ -27,7 +27,7 @@ export interface Test {
     /**
      * URL to visit for testing.
      */
-    url: string;
+    url: string | (() => string | Promise<string>);
     cookies?: Parameters<BrowserContext['addCookies']>[0];
     /**
      * Test to run
@@ -142,9 +142,12 @@ export function runTestCases(testCases: TestsCase[]) {
         test.describe(testCase.name, () => {
             for (const testEntry of testCase.tests) {
                 const testFn = testEntry.only ? test.only : test;
-                testFn(testEntry.name, async ({ page, baseURL, context }) => {
-                    const contentUrl = new URL(testEntry.url, testCase.baseUrl);
-                    const url = getContentTestURL(contentUrl.toString(), baseURL);
+                testFn(testEntry.name, async ({ page, context }) => {
+                    const contentUrl = new URL(
+                        typeof testEntry.url === 'function' ? await testEntry.url() : testEntry.url,
+                        testCase.baseUrl
+                    );
+                    const url = getContentTestURL(contentUrl.toString());
                     if (testEntry.cookies) {
                         await context.addCookies(
                             testEntry.cookies.map((cookie) => ({

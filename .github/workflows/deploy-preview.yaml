@@ -190,7 +190,8 @@ jobs:
             - name: Run Playwright tests
               run: bun e2e
               env:
-                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'v2-vercel'
     visual-testing-customers-v1:
@@ -230,7 +231,8 @@ jobs:
             - name: Run Playwright tests
               run: bun e2e-customers
               env:
-                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
     pagespeed-testing-v1:
@@ -247,7 +249,7 @@ jobs:
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Run pagespeed tests
-              run: bun ./packages/gitbook/tests/pagespeed-testing.ts $DEPLOYMENT_URL
+              run: bun ./packages/gitbook/tests/pagespeed-testing.ts
               env:
-                  DEPLOYMENT_URL: ${{needs.deploy-v1-cloudflare.outputs.deployment-url}}
+                  BASE_URL: ${{needs.deploy-v1-cloudflare.outputs.deployment-url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
