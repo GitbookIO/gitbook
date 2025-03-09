@@ -245,6 +245,9 @@ async function PDFPageDocument(props: {
                         },
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
+                    // We consider all pages as offscreen in PDF mode
+                    // to ensure we can efficiently render as many pages as possible
+                    isOffscreen={true}
                 />
             ) : null}
         </PrintPage>
