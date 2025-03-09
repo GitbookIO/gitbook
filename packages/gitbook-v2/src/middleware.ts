@@ -7,13 +7,19 @@ import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
+    getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorToken,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getLinkerForSiteURL } from '@v2/lib/context';
-import { getPublishedContentByURL, normalizeURL, throwIfDataError } from '@v2/lib/data';
+import {
+    DataFetcherError,
+    getPublishedContentByURL,
+    normalizeURL,
+    throwIfDataError,
+} from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
@@ -22,8 +28,6 @@ export const config = {
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
     ],
 };
-
-const API_TOKEN_COOKIE_NAME = 'gitbook-api-token';
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
@@ -37,13 +41,14 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(normalized.toString());
         }
 
-        // First try to serve a request aimed at the site routes group
-        const result = await serveSiteRoutes(requestURL, request);
-        if (result) {
-            return result;
+        for (const handler of [serveSiteRoutes, servePreviewRoutes]) {
+            const result = await handler(requestURL, request);
+            if (result) {
+                return result;
+            }
         }
 
-        return await serveOtherRoutes(requestURL, request);
+        return NextResponse.next();
     } catch (error) {
         return serveErrorResponse(error as Error);
     }
@@ -205,20 +210,32 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 }
 
 /**
- * Serve routes that are targetting the other routes.
+ * Serve routes for previewing unpublished content.
  * Routes are:
- *   - Revalidation: /~gitbook/revalidate
  *   - PDF export for a space: /~space/:spaceId/~gitbook/pdf
  *   - Preview of an unpublished site: /~site/:siteId/
  */
-async function serveOtherRoutes(requestURL: URL, request: NextRequest) {
+async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
+    const pathnameParts = requestURL.pathname.slice(1).split('/');
+
+    if (pathnameParts[0] !== '~space' && pathnameParts[0] !== '~site') {
+        return null;
+    }
+
+    // We store the API token in a cookie that is scoped to the specific preview route
+    // to avoid errors when multiple previews are opened in different tabs.
+    const cookieName = getPathScopedCookieName(
+        'gitbook-api-token',
+        pathnameParts.slice(0, 2).join('/')
+    );
+
     // Extract a potential GitBook API token passed in the request
-    // If found, we redirect to the same URL but with the token in a cookie
+    // If found, we redirect to the same URL but with the token in the cookie
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
         requestURL.searchParams.delete('token');
         return writeResponseCookies(NextResponse.redirect(requestURL.toString()), {
-            [API_TOKEN_COOKIE_NAME]: {
+            [cookieName]: {
                 value: queryAPIToken,
                 options: {
                     httpOnly: true,
@@ -229,12 +246,16 @@ async function serveOtherRoutes(requestURL: URL, request: NextRequest) {
             },
         });
     }
-    const apiToken = request.cookies.get(API_TOKEN_COOKIE_NAME)?.value;
+
+    const apiToken = request.cookies.get(cookieName)?.value;
+    if (!apiToken) {
+        throw new DataFetcherError('Missing API token', 400);
+    }
 
     // Handle the rest with the router default logic
     return NextResponse.next({
         headers: {
-            ...(apiToken ? { [MiddlewareHeaders.APIToken]: apiToken } : {}),
+            [MiddlewareHeaders.APIToken]: apiToken,
         },
     });
 }
