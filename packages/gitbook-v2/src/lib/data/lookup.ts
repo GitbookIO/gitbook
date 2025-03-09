@@ -1,7 +1,9 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath } from '@/lib/paths';
-import { GitBookAPI, type GitBookAPIError, type PublishedSiteContentLookup } from '@gitbook/api';
+import { GitBookAPI, type PublishedSiteContentLookup } from '@gitbook/api';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { getExposableError } from './errors';
+import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
 
 /**
@@ -12,10 +14,7 @@ export async function getPublishedContentByURL(input: {
     url: string;
     visitorAuthToken: string | null;
     redirectOnError: boolean;
-}): Promise<
-    | { data: PublishedSiteContentLookup; error?: undefined }
-    | { data?: undefined; error: Error | GitBookAPIError }
-> {
+}): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
@@ -27,6 +26,7 @@ export async function getPublishedContentByURL(input: {
             userAgent: GITBOOK_USER_AGENT,
         });
 
+        const startTime = performance.now();
         const callResult = await tryCatch(
             api.urls.getPublishedContentByUrl(
                 {
@@ -42,6 +42,12 @@ export async function getPublishedContentByURL(input: {
                     },
                 }
             )
+        );
+        const endTime = performance.now();
+
+        // biome-ignore lint/suspicious/noConsole: we want to log performance data
+        console.log(
+            `getPublishedContentByURL(${alternative.url}) Time taken: ${endTime - startTime}ms`
         );
 
         if (callResult.error) {
@@ -110,9 +116,20 @@ export async function getPublishedContentByURL(input: {
 
     if (!result) {
         return {
-            error: new Error('No content found'),
+            error: {
+                code: 404,
+                message: 'No content found',
+            },
         };
     }
 
-    return result;
+    if (result.error) {
+        return {
+            error: getExposableError(result.error),
+        };
+    }
+
+    return {
+        data: result.data,
+    };
 }

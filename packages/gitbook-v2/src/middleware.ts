@@ -1,4 +1,4 @@
-import { CustomizationThemeMode, GitBookAPIError } from '@gitbook/api';
+import { CustomizationThemeMode } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -7,13 +7,19 @@ import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
+    getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorToken,
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
 import { getLinkerForSiteURL } from '@v2/lib/context';
-import { getPublishedContentByURL, normalizeURL } from '@v2/lib/data';
+import {
+    DataFetcherError,
+    getPublishedContentByURL,
+    normalizeURL,
+    throwIfDataError,
+} from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
@@ -35,27 +41,13 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(normalized.toString());
         }
 
-        // Route all requests to a site
-        const extracted = getSiteURLFromRequest(request);
-        if (extracted) {
-            /**
-             * Serve image resizing requests (all requests containing `/~gitbook/image`).
-             * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
-             * and serve from a single route handler.
-             *
-             * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
-             * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
-             */
-            if (extracted.url.pathname.endsWith('/~gitbook/image')) {
-                return await serveResizedImage(request, {
-                    host: extracted.url.host,
-                });
+        for (const handler of [serveSiteRoutes, servePreviewRoutes]) {
+            const result = await handler(requestURL, request);
+            if (result) {
+                return result;
             }
-
-            return await serveSiteByURL(requestURL, request, extracted);
         }
 
-        // Handle the rest with the router default logic
         return NextResponse.next();
     } catch (error) {
         return serveErrorResponse(error as Error);
@@ -63,29 +55,46 @@ export async function middleware(request: NextRequest) {
 }
 
 /**
- * Serve site by URL.
+ * Handle request that are targetting the site routes group.
  */
-async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode: URLWithMode) {
-    const { url, mode } = urlWithMode;
-
-    // Visitor authentication
-    // @ts-ignore - request typing
-    const visitorToken = getVisitorToken(request, url);
-
-    const result = await getPublishedContentByURL({
-        url: url.toString(),
-        visitorAuthToken: visitorToken?.token ?? null,
-        // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
-        // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-        // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-        redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
-    });
-
-    if (result.error) {
-        throw result.error;
+async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
+    const match = getSiteURLFromRequest(request);
+    if (!match) {
+        return null;
     }
 
-    const { data } = result;
+    const { url: siteURL, mode } = match;
+
+    /**
+     * Serve image resizing requests (all requests containing `/~gitbook/image`).
+     * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
+     * and serve from a single route handler.
+     *
+     * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
+     * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
+     */
+    if (siteURL.pathname.endsWith('/~gitbook/image')) {
+        return await serveResizedImage(request, {
+            host: siteURL.host,
+        });
+    }
+
+    //
+    // Detect and extract the visitor authentication token from the request
+    //
+    // @ts-ignore - request typing
+    const visitorToken = getVisitorToken(request, siteURL);
+
+    const data = await throwIfDataError(
+        getPublishedContentByURL({
+            url: siteURL.toString(),
+            visitorAuthToken: visitorToken?.token ?? null,
+            // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+            // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+            // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+            redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+        })
+    );
     let cookies: ResponseCookies = {};
 
     //
@@ -98,7 +107,7 @@ async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode
             // For content redirects, we use the linker to redirect the optimal URL
             // during development and testing in 'url' mode.
             const linker = getLinkerForSiteURL({
-                siteURL: url,
+                siteURL,
                 urlMode: mode,
             });
 
@@ -141,16 +150,16 @@ async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
     requestHeaders.set(MiddlewareHeaders.URLMode, mode);
-    requestHeaders.set(MiddlewareHeaders.SiteURL, `${url.origin}${data.basePath}`);
+    requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${data.basePath}`);
     requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
 
     // Preview of customization/theme
-    const customization = url.searchParams.get('customization');
+    const customization = siteURL.searchParams.get('customization');
     if (customization && validateSerializedCustomization(customization)) {
         routeType = 'dynamic';
         requestHeaders.set(MiddlewareHeaders.Customization, customization);
     }
-    const theme = url.searchParams.get('theme');
+    const theme = siteURL.searchParams.get('theme');
     if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
         routeType = 'dynamic';
         requestHeaders.set(MiddlewareHeaders.Theme, theme);
@@ -166,14 +175,16 @@ async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode
     requestHeaders.set('x-forwarded-host', request.nextUrl.host);
     requestHeaders.set('origin', request.nextUrl.origin);
 
-    const siteURLWithoutProtocol = `${url.host}${data.basePath}`;
+    const siteURLWithoutProtocol = `${siteURL.host}${data.basePath}`;
+    const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(data.pathname);
+    routeType = routeTypeFromPathname ?? routeType;
 
     const route = [
         'sites',
         routeType,
         mode,
         encodeURIComponent(siteURLWithoutProtocol),
-        encodePathInSiteContent(data.pathname),
+        pathname,
     ].join('/');
 
     console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
@@ -199,11 +210,62 @@ async function serveSiteByURL(requestURL: URL, request: NextRequest, urlWithMode
 }
 
 /**
+ * Serve routes for previewing unpublished content.
+ * Routes are:
+ *   - PDF export for a space: /~space/:spaceId/~gitbook/pdf
+ *   - Preview of an unpublished site: /~site/:siteId/
+ */
+async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
+    const pathnameParts = requestURL.pathname.slice(1).split('/');
+
+    if (pathnameParts[0] !== '~space' && pathnameParts[0] !== '~site') {
+        return null;
+    }
+
+    // We store the API token in a cookie that is scoped to the specific preview route
+    // to avoid errors when multiple previews are opened in different tabs.
+    const cookieName = getPathScopedCookieName(
+        'gitbook-api-token',
+        pathnameParts.slice(0, 2).join('/')
+    );
+
+    // Extract a potential GitBook API token passed in the request
+    // If found, we redirect to the same URL but with the token in the cookie
+    const queryAPIToken = requestURL.searchParams.get('token');
+    if (queryAPIToken) {
+        requestURL.searchParams.delete('token');
+        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), {
+            [cookieName]: {
+                value: queryAPIToken,
+                options: {
+                    httpOnly: true,
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: 60 * 60, // 1 hour
+                },
+            },
+        });
+    }
+
+    const apiToken = request.cookies.get(cookieName)?.value;
+    if (!apiToken) {
+        throw new DataFetcherError('Missing API token', 400);
+    }
+
+    // Handle the rest with the router default logic
+    return NextResponse.next({
+        headers: {
+            [MiddlewareHeaders.APIToken]: apiToken,
+        },
+    });
+}
+
+/**
  * Serve an error response.
  */
 function serveErrorResponse(error: Error) {
-    if (error instanceof GitBookAPIError) {
-        return new Response(error.errorMessage, {
+    if (error instanceof DataFetcherError) {
+        return new Response(error.message, {
             status: error.code,
             headers: { 'content-type': 'text/plain' },
         });
@@ -270,22 +332,27 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
  */
-function encodePathInSiteContent(rawPathname: string) {
+function encodePathInSiteContent(rawPathname: string): {
+    pathname: string;
+    routeType?: 'static' | 'dynamic';
+} {
     const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
-        return pathname;
+        return { pathname };
     }
 
     switch (pathname) {
         case '~gitbook/icon':
-        case '~gitbook/image':
         case 'llms.txt':
         case 'sitemap.xml':
         case 'robots.txt':
-            return pathname;
+            return { pathname };
+        case '~gitbook/pdf':
+            // PDF routes are always dynamic as they depend on the search params.
+            return { pathname, routeType: 'dynamic' };
         default:
-            return encodeURIComponent(pathname || '/');
+            return { pathname: encodeURIComponent(pathname || '/') };
     }
 }
 

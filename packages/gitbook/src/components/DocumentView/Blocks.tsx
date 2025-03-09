@@ -42,16 +42,18 @@ type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps &
 
     /** Style passed to all blocks */
     blockStyle?: ClassValue;
+
+    /** True if all blocks should be considered offscreen */
+    isOffscreen?: boolean;
 };
 
 /**
  * Renders a list of blocks without a wrapper element.
  */
 export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBlocksProps<TBlock>) {
-    const { nodes, blockStyle, ...contextProps } = props;
+    const { nodes, blockStyle, isOffscreen: defaultIsOffscreen = false, ...contextProps } = props;
 
-    let isOffscreen = false;
-
+    let isOffscreen = defaultIsOffscreen;
     return nodes.map((node) => {
         isOffscreen =
             isOffscreen ||

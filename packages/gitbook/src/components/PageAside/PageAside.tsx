@@ -13,9 +13,9 @@ import urlJoin from 'url-join';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
-import { getPDFUrlSearchParams } from '@/lib/urls';
 
 import { Ad } from '../Ads';
+import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
 import { ScrollSectionsList } from './ScrollSectionsList';
@@ -36,9 +36,10 @@ export function PageAside(props: {
     const language = getSpaceLanguage(customization);
 
     const pdfHref = context.linker.toPathInContent(
-        `~gitbook/pdf?${getPDFUrlSearchParams({
+        `~gitbook/pdf?${getPDFURLSearchParams({
             page: page.id,
             only: true,
+            limit: 100,
         }).toString()}`
     );
     return (
