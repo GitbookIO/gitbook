@@ -339,7 +339,7 @@ const testCases: TestsCase[] = [
                     searchParams.set('limit', '10');
                     searchParams.set('token', data.apiToken);
 
-                    return `~space/TTP0yGzzc0gLR37hd6yw/~gitbook/pdf?${searchParams.toString()}`;
+                    return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
                 },
                 screenshot: {
                     waitForTOCScrolling: false,
