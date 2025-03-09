@@ -329,7 +329,7 @@ const testCases: TestsCase[] = [
         name: 'Space PDF',
         tests: [
             {
-                name: 'PDF',
+                name: 'Main content',
                 url: async () => {
                     const data = await getSiteAPIToken(
                         'https://gitbook.gitbook.io/test-gitbook-open/'
@@ -341,9 +341,25 @@ const testCases: TestsCase[] = [
 
                     return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
                 },
-                screenshot: {
-                    waitForTOCScrolling: false,
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
                 },
+            },
+            {
+                name: 'Change request',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+                    searchParams.set('token', data.apiToken);
+
+                    return `~space/${data.space}/~/changes/HrtgUd5MlFusCMv1elA7/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
                 run: async (page) => {
                     await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
                 },
