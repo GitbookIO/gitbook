@@ -1,4 +1,4 @@
-import { CustomizationFont } from '@gitbook/api';
+import { CustomizationDefaultFont } from '@gitbook/api';
 import {
     Fira_Sans_Extra_Condensed,
     IBM_Plex_Mono,
@@ -188,20 +188,20 @@ const abcFavorit = localFont({
 /**
  * Font definitions.
  */
-export const fonts: { [fontName in CustomizationFont]: { variable: string } } = {
-    [CustomizationFont.Inter]: inter,
-    [CustomizationFont.FiraSans]: firaSans,
-    [CustomizationFont.IBMPlexSerif]: ibmPlexSerif,
-    [CustomizationFont.Lato]: lato,
-    [CustomizationFont.Merriweather]: merriweather,
-    [CustomizationFont.NotoSans]: notoSans,
-    [CustomizationFont.OpenSans]: openSans,
-    [CustomizationFont.Overpass]: overpass,
-    [CustomizationFont.Poppins]: poppins,
-    [CustomizationFont.Raleway]: raleway,
-    [CustomizationFont.Roboto]: roboto,
-    [CustomizationFont.RobotoSlab]: robotoSlab,
-    [CustomizationFont.SourceSansPro]: sourceSansPro,
-    [CustomizationFont.Ubuntu]: ubuntu,
-    [CustomizationFont.ABCFavorit]: abcFavorit,
+export const fonts: { [fontName in CustomizationDefaultFont]: { variable: string } } = {
+    [CustomizationDefaultFont.Inter]: inter,
+    [CustomizationDefaultFont.FiraSans]: firaSans,
+    [CustomizationDefaultFont.IBMPlexSerif]: ibmPlexSerif,
+    [CustomizationDefaultFont.Lato]: lato,
+    [CustomizationDefaultFont.Merriweather]: merriweather,
+    [CustomizationDefaultFont.NotoSans]: notoSans,
+    [CustomizationDefaultFont.OpenSans]: openSans,
+    [CustomizationDefaultFont.Overpass]: overpass,
+    [CustomizationDefaultFont.Poppins]: poppins,
+    [CustomizationDefaultFont.Raleway]: raleway,
+    [CustomizationDefaultFont.Roboto]: roboto,
+    [CustomizationDefaultFont.RobotoSlab]: robotoSlab,
+    [CustomizationDefaultFont.SourceSansPro]: sourceSansPro,
+    [CustomizationDefaultFont.Ubuntu]: ubuntu,
+    [CustomizationDefaultFont.ABCFavorit]: abcFavorit,
 };

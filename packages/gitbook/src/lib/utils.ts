@@ -15,7 +15,7 @@ export function defaultCustomizationForSpace(): api.CustomizationSettings {
                 light: '#346DDB',
             },
             corners: api.CustomizationCorners.Rounded,
-            font: api.CustomizationFont.Inter,
+            font: api.CustomizationDefaultFont.Inter,
             background: api.CustomizationBackground.Plain,
         },
         favicon: {},
