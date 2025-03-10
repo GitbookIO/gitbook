@@ -115,6 +115,7 @@ export function getBaseContext(input: {
     const dataFetcher = createDataFetcher({
         apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
         apiEndpoint: GITBOOK_API_URL,
+        contextId: undefined,
     });
 
     const linker = getLinkerForSiteURL({
@@ -209,6 +210,7 @@ export async function fetchSiteContextByURLLookup(
             ...baseContext,
             dataFetcher: dataFetcher.withToken({
                 apiToken: data.apiToken,
+                contextId: data.contextId,
             }),
         },
         {

@@ -27,6 +27,7 @@ export async function getSpacePDFContext(
     const dataFetcher = createDataFetcher({
         apiToken: apiToken,
         apiEndpoint: GITBOOK_API_URL,
+        contextId: undefined,
     });
 
     const baseContext: GitBookBaseContext = {

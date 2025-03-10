@@ -1,7 +1,10 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath } from '@/lib/paths';
+import { trace } from '@/lib/tracing';
 import { GitBookAPI, type PublishedSiteContentLookup } from '@gitbook/api';
+import { getCacheTagForURL } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { getCloudflareRequestCache } from './cloudflare';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
@@ -26,28 +29,43 @@ export async function getPublishedContentByURL(input: {
             userAgent: GITBOOK_USER_AGENT,
         });
 
-        const startTime = performance.now();
-        const callResult = await tryCatch(
-            api.urls.getPublishedContentByUrl(
-                {
-                    url: alternative.url,
-                    visitorAuthToken: input.visitorAuthToken ?? undefined,
-                    redirectOnError: input.redirectOnError,
-                    cache: true,
-                },
-                {
-                    signal,
-                    headers: {
-                        'x-gitbook-force-cache': 'true',
-                    },
-                }
-            )
-        );
-        const endTime = performance.now();
+        const callResult = await trace(
+            {
+                operation: 'getPublishedContentByURL',
+                name: alternative.url,
+            },
+            () =>
+                tryCatch(
+                    api.urls.getPublishedContentByUrl(
+                        {
+                            url: alternative.url,
+                            visitorAuthToken: input.visitorAuthToken ?? undefined,
+                            redirectOnError: input.redirectOnError,
+                            cache: true,
+                        },
+                        {
+                            signal,
 
-        // biome-ignore lint/suspicious/noConsole: we want to log performance data
-        console.log(
-            `getPublishedContentByURL(${alternative.url}) Time taken: ${endTime - startTime}ms`
+                            // Optimization to have the API worker cache the response
+                            headers: {
+                                'x-gitbook-force-cache': 'true',
+                            },
+
+                            // Optimization for when running on Cloudflare, where we hit directly the API server
+                            // We cache this API response.
+                            cf: getCloudflareRequestCache({
+                                operationId: 'getPublishedContentByUrl',
+                                contextId: undefined,
+                                cacheInput: {
+                                    url: alternative.url,
+                                    visitorAuthToken: input.visitorAuthToken ?? undefined,
+                                    redirectOnError: input.redirectOnError,
+                                },
+                                cacheTags: [getCacheTagForURL(alternative.url)],
+                            }),
+                        }
+                    )
+                )
         );
 
         if (callResult.error) {
