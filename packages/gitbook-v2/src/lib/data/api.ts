@@ -47,7 +47,7 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         apiEndpoint: input.apiEndpoint,
 
         async api() {
-            return getAPI(input);
+            return apiClient(input);
         },
 
         withToken({ apiToken, contextId }) {
@@ -203,7 +203,8 @@ async function getUserById(input: DataFetcherInput, params: { userId: string }) 
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).users.getUserById(params.userId);
+        const api = await apiClient(input);
+        const res = await api.users.getUserById(params.userId);
         return res.data;
     });
 }
