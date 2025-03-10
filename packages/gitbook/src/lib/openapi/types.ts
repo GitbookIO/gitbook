@@ -1,15 +1,26 @@
-import type { DocumentBlockOpenAPI, DocumentBlockOpenAPIOperation } from '@gitbook/api';
+import type {
+    DocumentBlockOpenAPI,
+    DocumentBlockOpenAPIOperation,
+    DocumentBlockOpenAPISchemas,
+} from '@gitbook/api';
 import type { Filesystem, OpenAPIParseError, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
-//!!TODO: Add DocumentBlockOpenAPISchemas when available in @gitbook/api
+/**
+ * Type for both OpenAPI & OpenAPIOperation block
+ */
 export type AnyOpenAPIBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
+
+/**
+ * Type for OpenAPI Schemas block
+ */
+export type OpenAPISchemasBlock = DocumentBlockOpenAPISchemas;
 
 /**
  * Arguments for resolving OpenAPI block.
  */
-export type ResolveOpenAPIBlockArgs = {
-    block: AnyOpenAPIBlock;
+export type ResolveOpenAPIBlockArgs<T> = {
+    block: T;
     context: GitBookAnyContext;
 };
 

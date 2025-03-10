@@ -4,13 +4,18 @@ import { OpenAPIRootSchema } from '../OpenAPISchema';
 import { Section, SectionBody } from '../StaticSection';
 import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPISchemasData } from '../types';
 
+type OpenAPISchemasContextProps = Omit<
+    OpenAPIContextProps,
+    'renderCodeBlock' | 'renderHeading' | 'renderDocument'
+>;
+
 /**
  * Display OpenAPI Schemas.
  */
 export function OpenAPISchemas(props: {
     className?: string;
     data: OpenAPISchemasData;
-    context: OpenAPIContextProps;
+    context: OpenAPISchemasContextProps;
 }) {
     const { className, data, context } = props;
     const { schemas } = data;

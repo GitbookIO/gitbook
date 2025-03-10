@@ -12,7 +12,7 @@ const weakmap = new WeakMap<AnyOpenAPIBlock, Promise<ResolveOpenAPIOperationBloc
  * It is important because the resolve is called in sections and in the block itself.
  */
 export function resolveOpenAPIOperationBlock(
-    args: ResolveOpenAPIBlockArgs
+    args: ResolveOpenAPIBlockArgs<AnyOpenAPIBlock>
 ): Promise<ResolveOpenAPIOperationBlockResult> {
     if (weakmap.has(args.block)) {
         return weakmap.get(args.block)!;
@@ -27,7 +27,7 @@ export function resolveOpenAPIOperationBlock(
  * Resolve OpenAPI operation block.
  */
 async function baseResolveOpenAPIOperationBlock(
-    args: ResolveOpenAPIBlockArgs
+    args: ResolveOpenAPIBlockArgs<AnyOpenAPIBlock>
 ): Promise<ResolveOpenAPIOperationBlockResult> {
     const { context, block } = args;
     if (!block.data.path || !block.data.method) {
