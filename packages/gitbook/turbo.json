@@ -4,8 +4,8 @@
         "generate": {
             "outputs": ["public/~gitbook/static/icons/**/*", "public/~gitbook/static/math/**/*"]
         },
-        "typecheck": {
-            "dependsOn": ["^typecheck", "gitbook-v2#generate:types"]
+        "generate:types": {
+            "dependsOn": ["gitbook-v2#generate:types"]
         }
     }
 }

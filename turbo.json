@@ -13,11 +13,11 @@
     "tasks": {
         // Prepare the package for all other tasks
         "generate": {
-            "dependsOn": ["^generate"],
+            "dependsOn": ["^generate", "generate:types"],
             "outputs": ["dist"]
         },
         "generate:types": {
-            "dependsOn": ["^generate:types", "generate"]
+            "dependsOn": []
         },
         // Build the package for publishing
         "build": {

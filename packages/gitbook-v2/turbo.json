@@ -5,7 +5,7 @@
             "outputs": ["public"]
         },
         "generate:types": {
-            "dependsOn": ["^generate:types"],
+            "dependsOn": [],
             "outputs": ["cloudflare-env.d.ts"]
         },
         "typecheck": {
