@@ -598,6 +598,7 @@ function getAPI(input: DataFetcherInput) {
         // IGNORE
     }
 
+    console.log(`api: ${apiEndpoint} (serviceBinding=${!!serviceBinding})`);
     const api = new GitBookAPI({
         authToken: apiToken ?? undefined,
         endpoint: apiEndpoint,
