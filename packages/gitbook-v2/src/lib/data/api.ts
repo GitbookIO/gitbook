@@ -580,7 +580,6 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
 
     try {
         const { env } = await getCloudflareContext({ async: true });
-        // @ts-expect-error
         serviceBinding = env.GITBOOK_API;
     } catch (error) {
         // IGNORE

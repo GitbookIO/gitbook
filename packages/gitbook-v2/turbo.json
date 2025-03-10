@@ -2,7 +2,7 @@
     "extends": ["//"],
     "tasks": {
         "generate": {
-            "outputs": ["public"]
+            "outputs": ["public", "cloudflare-env.d.ts"]
         },
         "typecheck": {
             "dependsOn": ["^typecheck"]
