@@ -26,7 +26,7 @@
       "name": "@gitbook/cache-tags",
       "version": "0.1.0",
       "dependencies": {
-        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
+        "@gitbook/api": "*",
         "assert-never": "^1.2.1",
       },
       "devDependencies": {
@@ -51,7 +51,7 @@
       "name": "gitbook",
       "version": "0.7.2",
       "dependencies": {
-        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
+        "@gitbook/api": "*",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
@@ -134,7 +134,7 @@
       "name": "gitbook-v2",
       "version": "0.2.0",
       "dependencies": {
-        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
+        "@gitbook/api": "*",
         "@gitbook/cache-tags": "workspace:*",
         "@sindresorhus/fnv1a": "^3.1.0",
         "next": "^15.2.1",
@@ -197,7 +197,7 @@
       "name": "@gitbook/react-contentkit",
       "version": "0.6.1",
       "dependencies": {
-        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
+        "@gitbook/api": "*",
         "@gitbook/icons": "workspace:*",
         "assert-never": "^1.2.1",
         "classnames": "^2.5.1",
@@ -256,6 +256,7 @@
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
+    "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
     "react": "18.3.1",
     "react-dom": "18.3.1",
   },
@@ -628,7 +629,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@0.96.1", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-E1hpaFNFoEyc8E4rIQyC6UD3kErGXAI0lKt04zYQQYOBLjRIQ57D4oNIIJBjWn4hHeSxRxWvW3NcxzvOGMmIqQ=="],
+    "@gitbook/api": ["@gitbook/api@https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 

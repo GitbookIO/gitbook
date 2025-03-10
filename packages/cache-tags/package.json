@@ -10,7 +10,7 @@
     },
     "version": "0.1.0",
     "dependencies": {
-        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
+        "@gitbook/api": "*",
         "assert-never": "^1.2.1"
     },
     "devDependencies": {

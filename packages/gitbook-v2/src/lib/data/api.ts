@@ -5,6 +5,7 @@ import {
     getCacheTagForURL,
     getComputedContentSourceCacheTags,
 } from '@gitbook/cache-tags';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { getCloudflareRequestCache } from './cloudflare';
@@ -675,10 +676,13 @@ async function searchSiteContent(
 
 function getAPI(input: DataFetcherInput) {
     const { apiEndpoint, apiToken } = input;
+    const serviceBinding = getCloudflareContext().env.GITBOOK_API;
+
     const api = new GitBookAPI({
         authToken: apiToken ?? undefined,
         endpoint: apiEndpoint,
         userAgent: GITBOOK_USER_AGENT,
+        serviceBinding,
     });
 
     return api;
