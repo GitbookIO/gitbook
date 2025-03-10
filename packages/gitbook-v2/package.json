@@ -14,7 +14,7 @@
     },
     "devDependencies": {
         "gitbook": "*",
-        "@opennextjs/cloudflare": "https://pkg.pr.new/opennextjs/opennextjs-cloudflare/@opennextjs/cloudflare@40fec7d",
+        "@opennextjs/cloudflare": "https://pkg.pr.new/opennextjs/opennextjs-cloudflare/@opennextjs/cloudflare@236c84d",
         "tailwindcss": "^3.4.0",
         "postcss": "^8"
     },

@@ -46,9 +46,12 @@ export function DocumentView(
 
         /** Style passed to all blocks */
         blockStyle?: ClassValue;
+
+        /** True if the document should be considered offscreen */
+        isOffscreen?: boolean;
     }
 ) {
-    const { document, style, blockStyle = [], context } = props;
+    const { document, style, blockStyle = [], context, isOffscreen = false } = props;
 
     return (
         <Blocks
@@ -62,6 +65,7 @@ export function DocumentView(
                 'whitespace-pre-wrap',
             ]}
             context={context}
+            isOffscreen={isOffscreen}
         />
     );
 }

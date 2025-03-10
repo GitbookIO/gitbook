@@ -28,7 +28,7 @@ export default async function Page(props: PageProps) {
         })
     );
 
-    return <SitePage context={context} pageParams={{ pathname }} redirectOnFallback={true} />;
+    return <SitePage context={context} pageParams={{ pathname }} />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
@@ -44,6 +44,5 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     return generateSitePageMetadata({
         context,
         pageParams: { pathname },
-        redirectOnFallback: true,
     });
 }

@@ -15,6 +15,7 @@ import { GITBOOK_APP_URL } from '@v2/lib/env';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
+import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 
 /**
  * Render the entire layout of the space (header, table of contents, footer).
@@ -46,21 +47,21 @@ export function SpaceLayout(props: {
         customization.footer.groups?.length;
 
     return (
-        <InsightsProvider
-            enabled={withTracking}
-            appURL={GITBOOK_APP_URL}
-            apiHost={context.dataFetcher.apiEndpoint}
-            visitorAuthToken={visitorAuthToken}
-            organizationId={context.organizationId}
-            siteId={context.site.id}
-            siteSectionId={context.sections?.current?.id ?? null}
-            siteSpaceId={context.siteSpace.id}
-            siteShareKey={context.shareKey ?? null}
-            revisionId={context.revisionId}
-            spaceId={context.space.id}
-        >
-            <Header withTopHeader={withTopHeader} context={context} />
-            <div className="scroll-nojump">
+        <SpaceLayoutContextProvider basePath={context.linker.toPathInContent('')}>
+            <InsightsProvider
+                enabled={withTracking}
+                appURL={GITBOOK_APP_URL}
+                apiHost={context.dataFetcher.apiEndpoint}
+                visitorAuthToken={visitorAuthToken}
+                organizationId={context.organizationId}
+                siteId={context.site.id}
+                siteSectionId={context.sections?.current?.id ?? null}
+                siteSpaceId={context.siteSpace.id}
+                siteShareKey={context.shareKey ?? null}
+                revisionId={context.revisionId}
+                spaceId={context.space.id}
+            >
+                <Header withTopHeader={withTopHeader} context={context} />
                 <div
                     className={tcls(
                         'flex',
@@ -129,17 +130,17 @@ export function SpaceLayout(props: {
                     />
                     <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
                 </div>
-            </div>
 
-            {withFooter ? <Footer context={context} /> : null}
+                {withFooter ? <Footer context={context} /> : null}
 
-            <React.Suspense fallback={null}>
-                <SearchModal
-                    spaceTitle={siteSpace.title}
-                    withAsk={customization.aiSearch.enabled}
-                    isMultiVariants={isMultiVariants}
-                />
-            </React.Suspense>
-        </InsightsProvider>
+                <React.Suspense fallback={null}>
+                    <SearchModal
+                        spaceTitle={siteSpace.title}
+                        withAsk={customization.aiSearch.enabled}
+                        isMultiVariants={isMultiVariants}
+                    />
+                </React.Suspense>
+            </InsightsProvider>
+        </SpaceLayoutContextProvider>
     );
 }

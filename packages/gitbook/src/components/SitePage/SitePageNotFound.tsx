@@ -3,12 +3,26 @@
 import { TrackPageViewEvent } from '@/components/Insights';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
 
 /**
  * Component that displays a "page not found" message.
  */
 export function SitePageNotFound() {
+    const basePath = useSpaceBasePath();
     const language = useLanguage();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // If ?fallback=true, redirect to the root page.
+    const fallback = searchParams.get('fallback');
+    useEffect(() => {
+        if (fallback) {
+            router.replace(basePath);
+        }
+    }, [basePath, fallback, router]);
 
     return (
         <div

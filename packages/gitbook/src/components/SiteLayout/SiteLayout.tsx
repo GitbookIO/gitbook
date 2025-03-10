@@ -101,7 +101,6 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
     return {
         title: site.title,
         generator: `GitBook (${buildVersion()})`,
-        // metadataBase: new URL(await getBaseUrl()),
         icons: {
             icon: [
                 {

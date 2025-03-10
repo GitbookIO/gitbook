@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.7.0",
+    "version": "0.7.2",
     "private": true,
     "scripts": {
         "dev": "env-cmd --silent -f ../../.env.local next dev",
