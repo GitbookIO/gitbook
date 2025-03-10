@@ -1,8 +1,8 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath } from '@/lib/paths';
 import { trace } from '@/lib/tracing';
-import { GitBookAPI, type PublishedSiteContentLookup } from '@gitbook/api';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import type { PublishedSiteContentLookup } from '@gitbook/api';
+import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
@@ -21,11 +21,7 @@ export async function getPublishedContentByURL(input: {
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = new GitBookAPI({
-            authToken: GITBOOK_API_TOKEN ?? undefined,
-            endpoint: GITBOOK_API_URL,
-            userAgent: GITBOOK_USER_AGENT,
-        });
+        const api = await apiClient();
 
         const callResult = await trace(
             {

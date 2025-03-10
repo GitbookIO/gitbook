@@ -17,44 +17,26 @@ import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
     /**
-     * API host to use.
-     */
-    apiEndpoint: string;
-
-    /**
      * API token.
      */
     apiToken: string | null;
-
-    /**
-     * Context ID to use for the cache.
-     */
-    contextId: string | undefined;
 }
-
-const commonInput: DataFetcherInput = {
-    apiEndpoint: GITBOOK_API_URL,
-    apiToken: GITBOOK_API_TOKEN,
-    contextId: undefined,
-};
 
 /**
  * Create a data fetcher using an API token.
  * The data are being cached by Next.js built-in cache.
  */
-export function createDataFetcher(input: DataFetcherInput = commonInput): GitBookDataFetcher {
+export function createDataFetcher(
+    input: DataFetcherInput = { apiToken: null }
+): GitBookDataFetcher {
     return {
-        apiEndpoint: input.apiEndpoint,
-
         async api() {
             return apiClient(input);
         },
 
-        withToken({ apiToken, contextId }) {
+        withToken({ apiToken }) {
             return createDataFetcher({
-                ...input,
                 apiToken,
-                contextId,
             });
         },
 
@@ -183,15 +165,18 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         // where the data is the same for all users
         //
         getUserById(userId) {
-            return trace('getUserById', () => getUserById(commonInput, { userId }));
+            return trace('getUserById', () => getUserById({ apiToken: null }, { userId }));
         },
         getPublishedContentByUrl(params) {
             return trace('getPublishedContentByUrl', () =>
-                getPublishedContentByUrl(commonInput, {
-                    url: params.url,
-                    visitorAuthToken: params.visitorAuthToken,
-                    redirectOnError: params.redirectOnError,
-                })
+                getPublishedContentByUrl(
+                    { apiToken: null },
+                    {
+                        url: params.url,
+                        visitorAuthToken: params.visitorAuthToken,
+                        redirectOnError: params.redirectOnError,
+                    }
+                )
             );
         },
     };
@@ -583,8 +568,14 @@ async function searchSiteContent(
     });
 }
 
-async function apiClient(input: DataFetcherInput) {
-    const { apiEndpoint, apiToken } = input;
+/**
+ * Create a new API client.
+ *
+ * @param input - The input data fetcher.
+ * @returns A new API client.
+ */
+export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
+    const { apiToken } = input;
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
     try {
@@ -595,10 +586,10 @@ async function apiClient(input: DataFetcherInput) {
         // IGNORE
     }
 
-    console.log(`api: ${apiEndpoint} (serviceBinding=${!!serviceBinding})`);
+    console.log(`api: ${GITBOOK_API_URL} (serviceBinding=${!!serviceBinding})`);
     const api = new GitBookAPI({
-        authToken: apiToken ?? undefined,
-        endpoint: apiEndpoint,
+        authToken: apiToken || GITBOOK_API_TOKEN || undefined,
+        endpoint: GITBOOK_API_URL,
         userAgent: GITBOOK_USER_AGENT,
         serviceBinding,
     });

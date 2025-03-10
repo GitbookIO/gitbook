@@ -4,7 +4,6 @@ import {
     fetchSpaceContextByIds,
 } from '@v2/lib/context';
 import { createDataFetcher } from '@v2/lib/data';
-import { GITBOOK_API_URL } from '@v2/lib/env';
 import { createLinker } from '@v2/lib/links';
 import { getAPITokenFromMiddleware } from '@v2/lib/middleware';
 
@@ -26,8 +25,6 @@ export async function getSpacePDFContext(
     });
     const dataFetcher = createDataFetcher({
         apiToken: apiToken,
-        apiEndpoint: GITBOOK_API_URL,
-        contextId: undefined,
     });
 
     const baseContext: GitBookBaseContext = {

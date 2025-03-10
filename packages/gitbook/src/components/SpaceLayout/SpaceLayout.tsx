@@ -11,7 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
-import { GITBOOK_APP_URL } from '@v2/lib/env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
@@ -51,7 +51,7 @@ export function SpaceLayout(props: {
             <InsightsProvider
                 enabled={withTracking}
                 appURL={GITBOOK_APP_URL}
-                apiHost={context.dataFetcher.apiEndpoint}
+                apiHost={GITBOOK_API_PUBLIC_URL}
                 visitorAuthToken={visitorAuthToken}
                 organizationId={context.organizationId}
                 siteId={context.site.id}

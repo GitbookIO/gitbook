@@ -35,6 +35,11 @@ export const GITBOOK_APP_URL = process.env.GITBOOK_APP_URL || 'https://app.gitbo
 export const GITBOOK_API_URL = process.env.GITBOOK_API_URL || 'https://api.gitbook.com';
 
 /**
+ * Default GitBook API URL endpoint, to be shared with the client.
+ */
+export const GITBOOK_API_PUBLIC_URL = process.env.GITBOOK_API_PUBLIC_URL || GITBOOK_API_URL;
+
+/**
  * Default GitBook API token.
  * It can be use to avoid rate-limiting.
  */

@@ -16,7 +16,7 @@ import type {
 import { type GitBookDataFetcher, createDataFetcher, throwIfDataError } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
+import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookSpaceLinker, createLinker } from './links';
 
@@ -113,9 +113,7 @@ export function getBaseContext(input: {
     const urlMode = input.urlMode;
 
     const dataFetcher = createDataFetcher({
-        apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
-        apiEndpoint: GITBOOK_API_URL,
-        contextId: undefined,
+        apiToken: input.apiToken ?? null,
     });
 
     const linker = getLinkerForSiteURL({
