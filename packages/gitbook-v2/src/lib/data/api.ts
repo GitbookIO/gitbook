@@ -592,6 +592,7 @@ function getAPI(input: DataFetcherInput) {
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
     try {
+        // @ts-expect-error
         serviceBinding = getCloudflareContext().env.GITBOOK_API;
     } catch {
         // IGNORE
