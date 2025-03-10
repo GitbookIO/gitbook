@@ -12,6 +12,9 @@ kv_namespaces = [
 d1_databases = [
   { binding = "NEXT_CACHE_D1", database_id = "f59ddb40-ad72-4312-9395-0ac6a129af8e", database_name = "gitbook-open-v2-tags-preview" }
 ]
+services = [
+  { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-preview" }
+]
 
 [env.staging]
 routes = [
@@ -24,6 +27,9 @@ kv_namespaces = [
 d1_databases = [
   { binding = "NEXT_CACHE_D1", database_id = "9df62e39-1f35-4066-83aa-e9b8ed3ac8d5", database_name = "gitbook-open-v2-tags-staging" }
 ]
+services = [
+  { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-staging" }
+]
 
 [env.production]
 routes = [
@@ -35,4 +41,7 @@ kv_namespaces = [
 ]
 d1_databases = [
   { binding = "NEXT_CACHE_D1", database_id = "a6f16fce-5f45-43a9-89a4-7b83ddf25b77", database_name = "gitbook-open-v2-tags-production" }
+]
+services = [
+  { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-production" }
 ]
