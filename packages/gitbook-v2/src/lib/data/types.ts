@@ -35,6 +35,7 @@ export interface GitBookDataFetcher {
      */
     withToken(input: {
         apiToken: string;
+        contextId: string | undefined;
     }): GitBookDataFetcher;
 
     /**

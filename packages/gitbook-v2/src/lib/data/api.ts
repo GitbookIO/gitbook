@@ -1,3 +1,4 @@
+import { trace } from '@/lib/tracing';
 import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
 import {
     getCacheTag,
@@ -6,6 +7,7 @@ import {
 } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { getCloudflareRequestCache } from './cloudflare';
 import { wrapDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
@@ -19,11 +21,17 @@ interface DataFetcherInput {
      * API token.
      */
     apiToken: string | null;
+
+    /**
+     * Context ID to use for the cache.
+     */
+    contextId: string | undefined;
 }
 
 const commonInput: DataFetcherInput = {
     apiEndpoint: GITBOOK_API_URL,
     apiToken: GITBOOK_API_TOKEN,
+    contextId: undefined,
 };
 
 /**
@@ -38,10 +46,11 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
             return getAPI(input);
         },
 
-        withToken({ apiToken }) {
+        withToken({ apiToken, contextId }) {
             return createDataFetcher({
                 ...input,
                 apiToken,
+                contextId,
             });
         },
 
@@ -49,94 +58,120 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         // API that are tied to the token
         //
         getPublishedContentSite(params) {
-            return getPublishedContentSite(input, {
-                organizationId: params.organizationId,
-                siteId: params.siteId,
-                siteShareKey: params.siteShareKey,
-            });
+            return trace('getPublishedContentSite', () =>
+                getPublishedContentSite(input, {
+                    organizationId: params.organizationId,
+                    siteId: params.siteId,
+                    siteShareKey: params.siteShareKey,
+                })
+            );
         },
         getSiteRedirectBySource(params) {
-            return getSiteRedirectBySource(input, {
-                organizationId: params.organizationId,
-                siteId: params.siteId,
-                siteShareKey: params.siteShareKey,
-                source: params.source,
-            });
+            return trace('getSiteRedirectBySource', () =>
+                getSiteRedirectBySource(input, {
+                    organizationId: params.organizationId,
+                    siteId: params.siteId,
+                    siteShareKey: params.siteShareKey,
+                    source: params.source,
+                })
+            );
         },
         getRevision(params) {
-            return getRevision(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                metadata: params.metadata,
-            });
+            return trace('getRevision', () =>
+                getRevision(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    metadata: params.metadata,
+                })
+            );
         },
         getRevisionPages(params) {
-            return getRevisionPages(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                metadata: params.metadata,
-            });
+            return trace('getRevisionPages', () =>
+                getRevisionPages(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    metadata: params.metadata,
+                })
+            );
         },
         getRevisionFile(params) {
-            return getRevisionFile(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                fileId: params.fileId,
-            });
+            return trace('getRevisionFile', () =>
+                getRevisionFile(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    fileId: params.fileId,
+                })
+            );
         },
         getRevisionPageByPath(params) {
-            return getRevisionPageByPath(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                path: params.path,
-            });
+            return trace('getRevisionPageByPath', () =>
+                getRevisionPageByPath(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    path: params.path,
+                })
+            );
         },
         getReusableContent(params) {
-            return getReusableContent(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                reusableContentId: params.reusableContentId,
-            });
+            return trace('getReusableContent', () =>
+                getReusableContent(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    reusableContentId: params.reusableContentId,
+                })
+            );
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return getLatestOpenAPISpecVersionContent(input, {
-                organizationId: params.organizationId,
-                slug: params.slug,
-            });
+            return trace('getLatestOpenAPISpecVersionContent', () =>
+                getLatestOpenAPISpecVersionContent(input, {
+                    organizationId: params.organizationId,
+                    slug: params.slug,
+                })
+            );
         },
         getSpace(params) {
-            return getSpace(input, {
-                spaceId: params.spaceId,
-                shareKey: params.shareKey,
-            });
+            return trace('getSpace', () =>
+                getSpace(input, {
+                    spaceId: params.spaceId,
+                    shareKey: params.shareKey,
+                })
+            );
         },
         getChangeRequest(params) {
-            return getChangeRequest(input, {
-                spaceId: params.spaceId,
-                changeRequestId: params.changeRequestId,
-            });
+            return trace('getChangeRequest', () =>
+                getChangeRequest(input, {
+                    spaceId: params.spaceId,
+                    changeRequestId: params.changeRequestId,
+                })
+            );
         },
         getDocument(params) {
-            return getDocument(input, {
-                spaceId: params.spaceId,
-                documentId: params.documentId,
-            });
+            return trace('getDocument', () =>
+                getDocument(input, {
+                    spaceId: params.spaceId,
+                    documentId: params.documentId,
+                })
+            );
         },
         getComputedDocument(params) {
-            return getComputedDocument(input, {
-                organizationId: params.organizationId,
-                spaceId: params.spaceId,
-                source: params.source,
-            });
+            return trace('getComputedDocument', () =>
+                getComputedDocument(input, {
+                    organizationId: params.organizationId,
+                    spaceId: params.spaceId,
+                    source: params.source,
+                })
+            );
         },
         getEmbedByUrl(params) {
-            return getEmbedByUrl(input, {
-                url: params.url,
-                spaceId: params.spaceId,
-            });
+            return trace('getEmbedByUrl', () =>
+                getEmbedByUrl(input, {
+                    url: params.url,
+                    spaceId: params.spaceId,
+                })
+            );
         },
         searchSiteContent(params) {
-            return searchSiteContent(input, params);
+            return trace('searchSiteContent', () => searchSiteContent(input, params));
         },
 
         //
@@ -144,25 +179,35 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         // where the data is the same for all users
         //
         getUserById(userId) {
-            return getUserById(commonInput, userId);
+            return trace('getUserById', () => getUserById(commonInput, { userId }));
         },
         getPublishedContentByUrl(params) {
-            return getPublishedContentByUrl(commonInput, {
-                url: params.url,
-                visitorAuthToken: params.visitorAuthToken,
-                redirectOnError: params.redirectOnError,
-            });
+            return trace('getPublishedContentByUrl', () =>
+                getPublishedContentByUrl(commonInput, {
+                    url: params.url,
+                    visitorAuthToken: params.visitorAuthToken,
+                    redirectOnError: params.redirectOnError,
+                })
+            );
         },
     };
 }
 
-async function getUserById(input: DataFetcherInput, userId: string) {
+async function getUserById(input: DataFetcherInput, params: { userId: string }) {
     'use cache';
 
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).users.getUserById(userId);
+        const res = await getAPI(input).users.getUserById(params.userId, {
+            cf: getCloudflareRequestCache({
+                operationId: 'getUserById',
+                contextId: input.contextId,
+                cacheInput: params,
+                cacheTags: [],
+                cacheProfile: 'days',
+            }),
+        });
         return res.data;
     });
 }
@@ -176,18 +221,33 @@ async function getSpace(
 ) {
     'use cache';
 
-    cacheLife('days');
-    cacheTag(
+    const cacheProfile = 'days';
+    const cacheTags = [
         getCacheTag({
             tag: 'space',
             space: params.spaceId,
-        })
-    );
+        }),
+    ];
+
+    cacheLife(cacheProfile);
+    cacheTag(...cacheTags);
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
-            shareKey: params.shareKey,
-        });
+        const res = await getAPI(input).spaces.getSpaceById(
+            params.spaceId,
+            {
+                shareKey: params.shareKey,
+            },
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'getSpaceById',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags,
+                    cacheProfile,
+                }),
+            }
+        );
         return res.data;
     });
 }
@@ -229,12 +289,26 @@ async function getRevision(
 ) {
     'use cache';
 
-    cacheLife('max');
+    const cacheProfile = 'max';
+    cacheLife(cacheProfile);
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getRevisionById(params.spaceId, params.revisionId, {
-            metadata: params.metadata,
-        });
+        const res = await getAPI(input).spaces.getRevisionById(
+            params.spaceId,
+            params.revisionId,
+            {
+                metadata: params.metadata,
+            },
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'getRevisionById',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags: [],
+                    cacheProfile,
+                }),
+            }
+        );
         return res.data;
     });
 }
@@ -249,7 +323,8 @@ async function getRevisionPages(
 ) {
     'use cache';
 
-    cacheLife('max');
+    const cacheProfile = 'max';
+    cacheLife(cacheProfile);
 
     return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.listPagesInRevisionById(
@@ -257,6 +332,15 @@ async function getRevisionPages(
             params.revisionId,
             {
                 metadata: params.metadata,
+            },
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'listPagesInRevisionById',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags: [],
+                    cacheProfile,
+                }),
             }
         );
         return res.data.pages;
@@ -273,13 +357,24 @@ async function getRevisionFile(
 ) {
     'use cache';
 
-    cacheLife('max');
+    const cacheProfile = 'max';
+    cacheLife(cacheProfile);
 
     return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.getFileInRevisionById(
             params.spaceId,
             params.revisionId,
-            params.fileId
+            params.fileId,
+            {},
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'getFileInRevisionById',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags: [],
+                    cacheProfile,
+                }),
+            }
         );
         return res.data;
     });
@@ -295,14 +390,25 @@ async function getRevisionPageByPath(
 ) {
     'use cache';
 
-    cacheLife('max');
+    const cacheProfile = 'max';
+    cacheLife(cacheProfile);
 
     const encodedPath = encodeURIComponent(params.path);
     return wrapDataFetcherError(async () => {
         const res = await getAPI(input).spaces.getPageInRevisionByPath(
             params.spaceId,
             params.revisionId,
-            encodedPath
+            encodedPath,
+            {},
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'getPageInRevisionByPath',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags: [],
+                    cacheProfile,
+                }),
+            }
         );
 
         return res.data;
@@ -318,10 +424,24 @@ async function getDocument(
 ) {
     'use cache';
 
-    cacheLife('max');
+    const cacheProfile = 'max';
+    cacheLife(cacheProfile);
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getDocumentById(params.spaceId, params.documentId);
+        const res = await getAPI(input).spaces.getDocumentById(
+            params.spaceId,
+            params.documentId,
+            {},
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'getDocumentById',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags: [],
+                    cacheProfile,
+                }),
+            }
+        );
         return res.data;
     });
 }
@@ -450,12 +570,16 @@ async function getPublishedContentSite(
 ) {
     'use cache';
 
-    cacheTag(
+    const cacheProfile = 'days';
+    const cacheTags = [
         getCacheTag({
             tag: 'site',
             site: params.siteId,
-        })
-    );
+        }),
+    ];
+
+    cacheLife(cacheProfile);
+    cacheTag(...cacheTags);
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
@@ -464,6 +588,15 @@ async function getPublishedContentSite(
             params.siteId,
             {
                 shareKey: params.siteShareKey,
+            },
+            {
+                cf: getCloudflareRequestCache({
+                    operationId: 'getPublishedContentSite',
+                    contextId: input.contextId,
+                    cacheInput: params,
+                    cacheTags,
+                    cacheProfile,
+                }),
             }
         );
         return res.data;
