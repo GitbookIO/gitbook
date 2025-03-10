@@ -26,7 +26,7 @@
       "name": "@gitbook/cache-tags",
       "version": "0.1.0",
       "dependencies": {
-        "@gitbook/api": "0.96.1",
+        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
         "assert-never": "^1.2.1",
       },
       "devDependencies": {
@@ -51,7 +51,7 @@
       "name": "gitbook",
       "version": "0.7.2",
       "dependencies": {
-        "@gitbook/api": "0.96.1",
+        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
@@ -134,7 +134,7 @@
       "name": "gitbook-v2",
       "version": "0.2.0",
       "dependencies": {
-        "@gitbook/api": "0.96.1",
+        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
         "@gitbook/cache-tags": "workspace:*",
         "@sindresorhus/fnv1a": "^3.1.0",
         "next": "^15.2.1",
@@ -197,7 +197,7 @@
       "name": "@gitbook/react-contentkit",
       "version": "0.6.1",
       "dependencies": {
-        "@gitbook/api": "0.96.1",
+        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
         "@gitbook/icons": "workspace:*",
         "assert-never": "^1.2.1",
         "classnames": "^2.5.1",
