@@ -579,7 +579,7 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
     try {
-        const { env } = await getCloudflareContext({ async: true });
+        const { env } = getCloudflareContext();
         serviceBinding = env.GITBOOK_API;
     } catch (error) {
         // IGNORE
