@@ -582,8 +582,11 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
         const { env } = await getCloudflareContext({ async: true });
         // @ts-expect-error
         serviceBinding = env.GITBOOK_API;
-    } catch {
+    } catch (error) {
         // IGNORE
+        if (process.env.NODE_ENV !== 'development') {
+            console.warn('Failed to get service binding', error);
+        }
     }
 
     console.log(`api: ${GITBOOK_API_URL} (serviceBinding=${!!serviceBinding})`);
