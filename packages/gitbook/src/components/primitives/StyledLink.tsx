@@ -13,13 +13,13 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { style?: ClassValu
             {...rest}
             className={tcls(
                 'underline',
-                'decoration-from-font',
+                'decoration-1',
                 'underline-offset-2',
                 'links-accent:underline-offset-4',
 
                 'links-default:decoration-primary/6',
                 'links-default:text-primary-subtle',
-                'links-default:hover:text-primary',
+                'links-default:hover:text-primary-strong',
                 'links-default:contrast-more:text-primary',
                 'links-default:contrast-more:hover:text-primary-strong',
 
