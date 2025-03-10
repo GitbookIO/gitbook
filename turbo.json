@@ -16,6 +16,9 @@
             "dependsOn": ["^generate"],
             "outputs": ["dist"]
         },
+        "generate:types": {
+            "dependsOn": ["^generate:types", "generate"]
+        },
         // Build the package for publishing
         "build": {
             "dependsOn": ["^build", "generate"],
@@ -37,7 +40,7 @@
         },
         // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "build", "generate"]
+            "dependsOn": ["^typecheck", "build", "generate:types"]
         },
         // Lint the package for style errors
         "lint": {
