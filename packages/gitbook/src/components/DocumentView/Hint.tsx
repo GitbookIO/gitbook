@@ -103,7 +103,8 @@ const HINT_STYLES: {
             '[&_.can-override-bg]:bg-neutral-active',
             '[&_.can-override-text]:text-neutral-strong',
         ],
-        container: 'bg-info border-info',
+        container:
+            'bg-info border-info theme-muted-tint:bg-info-solid/2 theme-bold-tint:bg-info-solid/2',
         containerWithHeader: 'border-info-solid bg-info-subtle',
     },
     warning: {

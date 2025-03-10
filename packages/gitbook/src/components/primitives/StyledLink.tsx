@@ -13,7 +13,7 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { style?: ClassValu
             {...rest}
             className={tcls(
                 'underline',
-                'decoration-1',
+                'decoration-[max(0.07em,1px)]', // Set the underline to be proportional to the font size, with a minimum. The default is too thin.
                 'underline-offset-2',
                 'links-accent:underline-offset-4',
 
