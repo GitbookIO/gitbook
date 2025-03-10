@@ -46,7 +46,7 @@ export async function getDocumentSections(
                 sections.push({
                     id: block.meta.id,
                     tag: operation.method.toUpperCase(),
-                    title: operation.operation.summary ?? operation.path,
+                    title: operation.operation.summary || operation.path,
                     depth: 1,
                     deprecated: operation.operation.deprecated,
                 });
