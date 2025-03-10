@@ -18,7 +18,10 @@
             "**/.vercel/**/*",
             "**/.cache/**/*",
             "**/.wrangler/**/*",
-            "packages/openapi-parser/src/fixtures/**/*"
+            "packages/openapi-parser/src/fixtures/**/*",
+            "packages/gitbook-v2/cloudflare-env.d.ts",
+            "packages/emoji-codepoints/index.ts",
+            "packages/icons/src/data/*.json"
         ]
     },
     "formatter": {
