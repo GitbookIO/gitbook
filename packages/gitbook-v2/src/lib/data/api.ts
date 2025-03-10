@@ -579,12 +579,17 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
     try {
-        const { env } = getCloudflareContext();
+        const { env } = await getCloudflareContext({ async: true });
         serviceBinding = env.GITBOOK_API;
-    } catch (error) {
-        // IGNORE
-        if (process.env.NODE_ENV !== 'development') {
-            console.warn('Failed to get service binding', error);
+    } catch {
+        try {
+            const { env } = getCloudflareContext();
+            serviceBinding = env.GITBOOK_API;
+        } catch (error) {
+            // IGNORE
+            if (process.env.NODE_ENV !== 'development') {
+                console.warn('Failed to get service binding', error);
+            }
         }
     }
 
