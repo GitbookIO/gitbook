@@ -593,7 +593,10 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
         }
     }
 
-    console.log(`api: ${GITBOOK_API_URL} (serviceBinding=${!!serviceBinding})`);
+    console.log(
+        // @ts-ignore
+        `api: ${GITBOOK_API_URL} (serviceBinding=${!!serviceBinding}) (ctx=${!!globalThis[Symbol.for('__cloudflare-context__')]})`
+    );
     const api = new GitBookAPI({
         authToken: apiToken || GITBOOK_API_TOKEN || undefined,
         endpoint: GITBOOK_API_URL,
