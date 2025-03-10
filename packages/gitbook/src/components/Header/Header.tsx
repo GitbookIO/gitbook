@@ -56,11 +56,11 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className={tcls('scroll-nojump')}>
+                <div className="scroll-nojump">
                     <div
                         className={tcls(
                             'gap-4',
-                            'lg:gap-8',
+                            'lg:gap-6',
                             'flex',
                             'items-center',
                             'justify-between',
@@ -76,7 +76,9 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             className={tcls(
                                 'flex max-w-full',
                                 isMultiVariants && 'page-no-toc:max-[400px]:w-full',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
+                                'min-w-0 shrink items-center justify-start gap-2',
+                                'lg:basis-72',
+                                'order-first'
                             )}
                         >
                             <HeaderMobileMenu
@@ -90,40 +92,76 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 )}
                             />
                             <HeaderLogo context={context} />
+                            {isMultiVariants && (
+                                <div className="ml-2 page-no-toc:flex hidden">
+                                    <SpacesDropdown
+                                        context={context}
+                                        siteSpace={siteSpace}
+                                        siteSpaces={siteSpaces}
+                                        className={tcls(
+                                            'theme-bold:bg-header-link/2',
+                                            'theme-bold:text-header-link',
+                                            'theme-bold:ring-header-link/4',
+
+                                            'theme-bold:group-focus-within/dropdown:bg-header-link/3',
+                                            'theme-bold:group-focus-within/dropdown:text-header-link',
+                                            'theme-bold:group-focus-within/dropdown:ring-header-link/6',
+                                            'theme-bold:group-hover/dropdown:bg-header-link/3',
+                                            'theme-bold:group-hover/dropdown:text-header-link',
+                                            'theme-bold:group-hover/dropdown:ring-header-link/6',
+
+                                            'theme-bold:contrast-more:bg-header-background',
+                                            'theme-bold:contrast-more:text-header-link',
+                                            'theme-bold:contrast-more:ring-header-link',
+
+                                            'theme-bold:contrast-more:group-hover/dropdown:text-header-link',
+                                            'theme-bold:contrast-more:group-hover/dropdown:ring-header-link',
+                                            'theme-bold:contrast-more:group-focus-within/dropdown:text-header-link',
+                                            'theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link',
+
+                                            'theme-bold:dark:bg-header-link/2',
+                                            'theme-bold:dark:text-header-link',
+                                            'theme-bold:dark:ring-header-link/4',
+
+                                            'theme-bold:dark:group-hover/dropdown:bg-header-link/3',
+                                            'theme-bold:dark:group-hover/dropdown:text-header-link',
+                                            'theme-bold:dark:group-hover/dropdown:ring-header-link/6',
+
+                                            'theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link',
+                                            'theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link',
+                                            'theme-bold:dark:group-focus-within/dropdown:bg-header-link/3',
+                                            'theme-bold:dark:group-focus-within/dropdown:text-header-link',
+                                            'theme-bold:dark:group-focus-within/dropdown:ring-header-link/6',
+                                            'theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link',
+                                            'theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link'
+                                        )}
+                                    />
+                                </div>
+                            )}
                         </div>
 
-                        {isMultiVariants && (
-                            <div className="mr-auto page-no-toc:flex hidden">
-                                <SpacesDropdown
-                                    context={context}
-                                    siteSpace={siteSpace}
-                                    siteSpaces={siteSpaces}
-                                    className={
-                                        'theme-bold:bg-header-link/2 theme-bold:text-header-link theme-bold:ring-header-link/4 theme-bold:group-focus-within/dropdown:bg-header-link/3 theme-bold:group-focus-within/dropdown:text-header-link theme-bold:group-focus-within/dropdown:ring-header-link/6 theme-bold:group-hover/dropdown:bg-header-link/3 theme-bold:group-hover/dropdown:text-header-link theme-bold:group-hover/dropdown:ring-header-link/6 theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:group-hover/dropdown:text-header-link theme-bold:contrast-more:group-hover/dropdown:ring-header-link theme-bold:contrast-more:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link theme-bold:dark:bg-header-link/2 theme-bold:dark:text-header-link theme-bold:dark:ring-header-link/4 theme-bold:dark:group-hover/dropdown:bg-header-link/3 theme-bold:dark:group-hover/dropdown:text-header-link theme-bold:dark:group-hover/dropdown:ring-header-link/6 theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link theme-bold:dark:group-focus-within/dropdown:bg-header-link/3 theme-bold:dark:group-focus-within/dropdown:text-header-link theme-bold:dark:group-focus-within/dropdown:ring-header-link/6 theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link'
-                                    }
-                                />
-                            </div>
-                        )}
-
-                        {customization.header.links.length > 0 && (
-                            <HeaderLinks>
-                                {customization.header.links.map((link, index) => {
-                                    return <HeaderLink key={index} link={link} context={context} />;
-                                })}
-                                <HeaderLinkMore
-                                    label={t(getSpaceLanguage(customization), 'more')}
-                                    links={customization.header.links}
-                                    context={context}
-                                />
-                            </HeaderLinks>
-                        )}
                         <div
                             className={tcls(
                                 'flex',
-                                'md:min-w-56',
                                 'grow-0',
                                 'shrink-0',
-                                'justify-self-end'
+                                'md:basis-56',
+                                'justify-self-end',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? [
+                                          'md:grow-[0.8]',
+                                          'lg:basis-40',
+                                          'max-w-lg',
+                                          'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - margin (3rem)
+                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),0rem)]',
+                                          'page-full-width:lg:ml-6',
+                                          'lg:mr-auto',
+                                          'order-last',
+                                          'md:order-[unset]',
+                                      ]
+                                    : ['order-last']
                             )}
                         >
                             <Suspense fallback={null}>
@@ -166,11 +204,26 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 </SearchButton>
                             </Suspense>
                         </div>
+
+                        {customization.header.links.length > 0 && (
+                            <HeaderLinks style="">
+                                {customization.header.links.map((link, index) => {
+                                    return <HeaderLink key={index} link={link} context={context} />;
+                                })}
+                                <HeaderLinkMore
+                                    label={t(getSpaceLanguage(customization), 'more')}
+                                    links={customization.header.links}
+                                    context={context}
+                                />
+                            </HeaderLinks>
+                        )}
                     </div>
                 </div>
             </div>
             {sections ? (
-                <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+                <div className="scroll-nojump">
+                    <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+                </div>
             ) : null}
         </header>
     );
