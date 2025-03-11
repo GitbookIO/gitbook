@@ -87,11 +87,9 @@ export function TrademarkLink(props: {
             href={url.toString()}
             className={tcls(
                 'text-sm',
-                customization.header.preset !== 'none' && [
-                    'page-no-toc:lg:max-xl:text-xs',
-                    'page-no-toc:lg:max-xl:px-3',
-                    'page-no-toc:lg:max-xl:py-3',
-                ],
+                // 'page-no-toc:lg:max-xl:text-xs',
+                // 'page-no-toc:lg:max-xl:px-3',
+                // 'page-no-toc:lg:max-xl:py-3',
                 'font-semibold',
                 'text-tint',
 
@@ -102,7 +100,7 @@ export function TrademarkLink(props: {
                 'py-4',
 
                 'sidebar-filled:px-3',
-                'sidebar-filled:page-no-toc:px-5',
+                'sidebar-filled:page-no-toc:lg:px-5',
 
                 'rounded-lg',
                 'straight-corners:rounded-none',
@@ -127,14 +125,14 @@ export function TrademarkLink(props: {
                 icon="gitbook"
                 className={tcls(
                     'size-5',
-                    customization.header.preset !== 'none' && 'page-no-toc:lg:max-xl:size-4',
+                    // 'page-no-toc:lg:max-xl:size-4',
                     'shrink-0'
                 )}
             />
             <span
                 className={tcls(
                     'ml-3',
-                    customization.header.preset !== 'none' && 'page-no-toc:lg:max-xl:ml-2'
+                    // 'page-no-toc:lg:max-xl:ml-2'
                 )}
             >
                 {t(language, 'powered_by_gitbook')}

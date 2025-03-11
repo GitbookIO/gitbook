@@ -456,8 +456,12 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
+            addVariant('site-header-none', 'html.site-header-none &');
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
-            addVariant('site-header-sections', 'body:has(#site-header:not(.mobile-only) #sections) &');
+            addVariant('site-header-sections', [
+                'body:has(#site-header:not(.mobile-only) #sections) &',
+                'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
+            ]);
 
             const customisationVariants = {
                 // Sidebar styles
@@ -502,6 +506,7 @@ const config: Config = {
              * Variant when the page contains a block that will be rendered in full-width mode.
              */
             addVariant('page-full-width', 'body:has(.page-full-width) &');
+            addVariant('page-default-width', 'body:has(.page-default-width) &');
 
             /**
              * Variant when the page is configured to hide the table of content.

@@ -49,9 +49,9 @@ export function PageBody(props: {
                         'page-api-block:max-w-[1654px]',
                         'page-api-block:mx-auto',
 
-                        page.layout.tableOfContents ? null : 'xl:ml-56'
+                        // page.layout.tableOfContents ? null : 'xl:ml-56'
                     ) +
-                    (asFullWidth ? ' page-full-width' : '') +
+                    (asFullWidth ? ' page-full-width' : ' page-default-width') +
                     (!page.layout.tableOfContents ? ' page-no-toc' : ' page-has-toc')
                 }
             >

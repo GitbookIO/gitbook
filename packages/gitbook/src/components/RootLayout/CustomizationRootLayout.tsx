@@ -55,7 +55,7 @@ export async function CustomizationRootLayout(props: {
             lang={customization.internationalization.locale}
             className={tcls(
                 customization.header.preset === CustomizationHeaderPreset.None
-                    ? null
+                    ? 'site-header-none'
                     : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'

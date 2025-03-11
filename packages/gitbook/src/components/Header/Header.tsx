@@ -84,7 +84,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
                                     'theme-bold:hover:bg-header-link/3',
-                                    siteSpaces.length < 2 && 'page-no-toc:hidden' // If there is ONLY a trademark to show, we won't show the menu button.
+                                    'page-no-toc:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />
@@ -154,6 +154,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     </div>
                 </div>
             </div>
+
             {sections || siteSpaces.length > 1 ? (
                 <div
                     className={tcls(
@@ -176,7 +177,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         )}
                     >
                         {siteSpaces.length > 1 && (
-                            <div className="my-2 mr-5 page-no-toc:flex hidden grow border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64">
+                            <div id="variants" className="my-2 mr-5 page-no-toc:flex hidden grow border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64">
                                 <SpacesDropdown
                                     context={context}
                                     siteSpace={siteSpace}
