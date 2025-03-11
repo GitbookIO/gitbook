@@ -49,7 +49,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.7.2",
+      "version": "0.7.3",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/cache-do": "workspace:*",
@@ -153,7 +153,7 @@
     },
     "packages/icons": {
       "name": "@gitbook/icons",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js",
       },
@@ -195,7 +195,7 @@
     },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
-      "version": "0.6.1",
+      "version": "0.6.2",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/icons": "workspace:*",
@@ -227,7 +227,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.1.36",
@@ -255,7 +255,7 @@
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
-    "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743",
+    "@gitbook/api": "0.97.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
   },
@@ -628,7 +628,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@743", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }],
+    "@gitbook/api": ["@gitbook/api@0.97.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-bBTy7nprwlwTW/v8S6A9wGFWatU+F33232xF5Tt4GmSBTZSrAKha5wD205Hr+618va+/zipA8o4hdAGPyUNj0A=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 
