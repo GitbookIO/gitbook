@@ -1,7 +1,7 @@
 main = ".open-next/worker.js"
 name = "gitbook-open-v2"
-compatibility_date = "2025-02-04"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2025-03-11"
+compatibility_flags = ["nodejs_compat", "allow_importable_env"]
 assets = { directory = ".open-next/assets", binding = "ASSETS" }
 observability = { enabled = true }
 
