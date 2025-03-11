@@ -30,6 +30,7 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
                     <span className="openapi-schema-type">{additionalItems}</span>
                 ) : null}
             </span>
+            {schema?.readOnly ? <span className="openapi-schema-readonly">read-only</span> : null}
             {required ? <span className="openapi-schema-required">required</span> : null}
             {schema?.deprecated ? <span className="openapi-deprecated">Deprecated</span> : null}
         </div>
