@@ -591,9 +591,10 @@ export async function apiClient(input: DataFetcherInput, purpose: string) {
     try {
         // @ts-ignore
         const r = await import(
-            /* webpackIgnore: true */ `${'__cloudflare:env'.replaceAll('_', '')}`
+            /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
         );
         console.log('r', r);
+        console.log('r.env', r.env);
     } catch (error) {
         console.log('error', error);
     }
