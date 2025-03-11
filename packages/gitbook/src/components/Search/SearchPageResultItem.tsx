@@ -77,7 +77,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                             <>
                                 {index !== 0 ? (
                                     <Icon
-                                        key={index + '-icon'}
+                                        key={`${index}-icon`}
                                         icon="chevron-right"
                                         className="size-3"
                                     />
