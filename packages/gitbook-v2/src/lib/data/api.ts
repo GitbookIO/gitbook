@@ -590,12 +590,17 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }, pu
 
     console.log(
         // @ts-ignore
-        `api: ${GITBOOK_API_URL} (serviceBinding=${!!serviceBinding}) (ctx=${!!globalThis[Symbol.for('__cloudflare-context__')]})`
+        `api: ${GITBOOK_API_URL} ${purpose} (serviceBinding=${!!serviceBinding}) (ctx=${!!globalThis[Symbol.for('__cloudflare-context__')]})`
+    );
+    console.log(
+        `__cloudflare-context__${purpose}`,
+        // @ts-ignore
+        globalThis[Symbol.for('__cloudflare-context__')],
+        // @ts-ignore
+        globalThis?.global?.[Symbol.for('__cloudflare-context__')]
     );
     // @ts-ignore
-    console.log(globalThis[Symbol.for('__cloudflare-context__')]);
-    // @ts-ignore
-    console.log(Object.keys(globalThis));
+    console.log(`Object.keys(globalThis)${purpose}`, Object.keys(globalThis));
     const api = new GitBookAPI({
         authToken: apiToken || GITBOOK_API_TOKEN || undefined,
         endpoint: GITBOOK_API_URL,
