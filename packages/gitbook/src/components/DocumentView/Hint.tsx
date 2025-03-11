@@ -118,7 +118,6 @@ const HINT_STYLES: {
             'links-default:[&_a]:decoration-warning/6',
             'links-accent:[&_a]:decoration-warning',
             'decoration-warning/6',
-            '[&_a:hover]:!text-warning-strong',
             '[&_.can-override-bg]:bg-warning-active',
             '[&_.can-override-text]:text-warning-strong',
         ],
