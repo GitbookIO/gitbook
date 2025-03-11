@@ -32,7 +32,6 @@ export async function resolveOpenAPISchemas(
 
     return { schemas };
 }
-
 /**
  * Get OpenAPI components.schemas that are not ignored.
  */
@@ -40,9 +39,19 @@ function getOpenAPIComponents(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     selectedSchemas: string[]
 ): OpenAPISchema[] {
-    const schemas = schema.components?.schemas ?? {};
-    return Object.entries(schemas)
-        .filter(([key]) => selectedSchemas.includes(key))
-        .filter(([, schema]) => !shouldIgnoreEntity(schema))
-        .map(([key, schema]) => ({ name: key, schema }));
+    const componentsSchemas = schema.components?.schemas ?? {};
+
+    // Preserve the order of the selected schemas
+    return selectedSchemas
+        .map((name) => {
+            const schema = componentsSchemas[name];
+            if (schema && !shouldIgnoreEntity(schema)) {
+                return {
+                    name,
+                    schema,
+                };
+            }
+            return null;
+        })
+        .filter((schema): schema is OpenAPISchema => !!schema);
 }

@@ -21,7 +21,7 @@ describe('#resolveOpenAPISchemas', () => {
         const filesystem = await fetchFilesystem(
             'https://petstore3.swagger.io/api/v3/openapi.json'
         );
-        const resolved = await resolveOpenAPISchemas(filesystem, { schemas: ['Pet'] });
+        const resolved = await resolveOpenAPISchemas(filesystem, { schemas: ['Pet', 'Tag'] });
 
         expect(resolved).toMatchObject({
             schemas: [
@@ -44,6 +44,24 @@ describe('#resolveOpenAPISchemas', () => {
                                     },
                                 },
                             },
+                        },
+                    },
+                },
+                {
+                    name: 'Tag',
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'integer',
+                                format: 'int64',
+                            },
+                            name: {
+                                type: 'string',
+                            },
+                        },
+                        xml: {
+                            name: 'tag',
                         },
                     },
                 },
