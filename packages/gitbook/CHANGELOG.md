@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.7.3
+
+### Patch Changes
+
+-   eaf2d68: OpenAPI operation title fallback in sections
+-   Updated dependencies [844059f]
+-   Updated dependencies [88f64b0]
+    -   @gitbook/react-openapi@1.1.3
+    -   @gitbook/icons@0.2.0
+    -   @gitbook/react-contentkit@0.6.2
+
 ## 0.7.2
 
 ### Patch Changes
