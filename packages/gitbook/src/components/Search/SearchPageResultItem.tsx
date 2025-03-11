@@ -17,7 +17,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     const { query, item, active } = props;
 
     const breadcrumbs = item.ancestors.map((ancestor) => ancestor.title);
-    if (breadcrumbs.length > 0 && item.spaceTitle) {
+    if (item.spaceTitle) {
         breadcrumbs.unshift(item.spaceTitle);
     }
 
