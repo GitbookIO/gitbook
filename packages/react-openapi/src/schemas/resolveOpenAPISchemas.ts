@@ -24,7 +24,7 @@ export async function resolveOpenAPISchemas(
 
     const schema = await dereferenceFilesystem(filesystem);
 
-    const schemas = getOpenAPIComponents(schema, selectedSchemas);
+    const schemas = filterSelectedOpenAPISchemas(schema, selectedSchemas);
 
     if (schemas.length === 0) {
         return null;
@@ -33,9 +33,9 @@ export async function resolveOpenAPISchemas(
     return { schemas };
 }
 /**
- * Get OpenAPI components.schemas that are not ignored.
+ * Extract selected schemas from the OpenAPI document.
  */
-function getOpenAPIComponents(
+export function filterSelectedOpenAPISchemas(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     selectedSchemas: string[]
 ): OpenAPISchema[] {
