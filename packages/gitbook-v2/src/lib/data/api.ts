@@ -583,13 +583,19 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
             /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
         );
         serviceBinding = env.GITBOOK_API;
-        if (serviceBinding && !loggedServiceBinding) {
-            // biome-ignore lint/suspicious/noConsole: we want to log here
-            console.log(`using service binding for the API (${GITBOOK_API_URL})`);
+        if (!loggedServiceBinding) {
             loggedServiceBinding = true;
+            if (serviceBinding) {
+                // biome-ignore lint/suspicious/noConsole: we want to log here
+                console.log(`using service binding for the API (${GITBOOK_API_URL})`);
+            } else {
+                // biome-ignore lint/suspicious/noConsole: we want to log here
+                console.warn(`no service binding for the API (${GITBOOK_API_URL})`);
+            }
         }
-    } catch {
+    } catch (error) {
         // IGNORE: this is not cloudflare
+        console.error('error loading service binding', error);
     }
 
     const api = new GitBookAPI({
