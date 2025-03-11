@@ -594,8 +594,9 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
             }
         }
     } catch (error) {
-        // IGNORE: this is not cloudflare
-        console.error('error loading service binding', error);
+        if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+            throw error;
+        }
     }
 
     const api = new GitBookAPI({
