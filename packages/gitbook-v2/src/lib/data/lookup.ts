@@ -21,7 +21,7 @@ export async function getPublishedContentByURL(input: {
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = await apiClient();
+        const api = await apiClient({ apiToken: null }, 'middleware:getPublishedContentByURL');
 
         const callResult = await trace(
             {

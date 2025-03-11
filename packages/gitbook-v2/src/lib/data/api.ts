@@ -574,7 +574,7 @@ async function searchSiteContent(
  * @param input - The input data fetcher.
  * @returns A new API client.
  */
-export async function apiClient(input: DataFetcherInput = { apiToken: null }, purpose?: string) {
+export async function apiClient(input: DataFetcherInput, purpose: string) {
     const { apiToken } = input;
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
