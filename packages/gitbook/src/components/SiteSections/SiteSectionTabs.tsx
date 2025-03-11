@@ -52,7 +52,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
             aria-label="Sections"
             id="sections"
             onValueChange={setValue}
-            className='z-10 flex w-full flex-nowrap items-center'
+            className="z-10 flex w-full flex-nowrap items-center"
         >
             <div
                 ref={scrollableViewRef}

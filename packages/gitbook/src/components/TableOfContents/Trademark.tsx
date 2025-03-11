@@ -131,7 +131,7 @@ export function TrademarkLink(props: {
             />
             <span
                 className={tcls(
-                    'ml-3',
+                    'ml-3'
                     // 'page-no-toc:lg:max-xl:ml-2'
                 )}
             >

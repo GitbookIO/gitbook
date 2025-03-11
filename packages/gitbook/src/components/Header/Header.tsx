@@ -177,7 +177,10 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         )}
                     >
                         {siteSpaces.length > 1 && (
-                            <div id="variants" className="my-2 mr-5 page-no-toc:flex hidden grow border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64">
+                            <div
+                                id="variants"
+                                className="my-2 mr-5 page-no-toc:flex hidden grow border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
+                            >
                                 <SpacesDropdown
                                     context={context}
                                     siteSpace={siteSpace}
