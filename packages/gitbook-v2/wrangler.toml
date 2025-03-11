@@ -14,7 +14,7 @@ d1_databases = [
 ]
 services = [
   { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-preview" },
-  { binding = "GITBOOK_API", service = "gitbook-x-staging-api-cache" }
+  { binding = "GITBOOK_API", service = "gitbook-x-prod-api-cache" }
 ]
 
 [env.staging]
