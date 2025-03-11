@@ -21,7 +21,6 @@
     },
     "scripts": {
         "generate": "rm -rf ./public && cp -r ../gitbook/public ./public",
-        "generate:types": "wrangler types --env=preview --env-interface CloudflareEnv cloudflare-env.d.ts",
         "dev:v2": "env-cmd --silent -f ../../.env.local next --turbopack",
         "build": "next build",
         "build:v2": "next build",

@@ -4,12 +4,8 @@
         "generate": {
             "outputs": ["public"]
         },
-        "generate:types": {
-            "dependsOn": [],
-            "outputs": ["cloudflare-env.d.ts"]
-        },
         "typecheck": {
-            "dependsOn": ["^typecheck", "generate:types"]
+            "dependsOn": ["^typecheck"]
         }
     }
 }

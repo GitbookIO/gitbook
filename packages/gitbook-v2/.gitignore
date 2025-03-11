@@ -6,7 +6,6 @@
 
 # cloudflare
 .open-next
-cloudflare-env.d.ts
 
 # Symbolic links
 public

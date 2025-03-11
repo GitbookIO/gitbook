@@ -13,11 +13,8 @@
     "tasks": {
         // Prepare the package for all other tasks
         "generate": {
-            "dependsOn": ["^generate", "generate:types"],
+            "dependsOn": ["^generate"],
             "outputs": ["dist"]
-        },
-        "generate:types": {
-            "dependsOn": []
         },
         // Build the package for publishing
         "build": {
@@ -40,7 +37,7 @@
         },
         // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "build", "generate:types"]
+            "dependsOn": ["^typecheck", "build"]
         },
         // Lint the package for style errors
         "lint": {
