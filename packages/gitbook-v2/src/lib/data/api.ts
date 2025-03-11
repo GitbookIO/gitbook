@@ -588,6 +588,14 @@ export async function apiClient(input: DataFetcherInput, purpose: string) {
         }
     }
 
+    try {
+        // @ts-ignore
+        const r = await import('cloudflare:env');
+        console.log('r', r);
+    } catch (error) {
+        console.log('error', error);
+    }
+
     console.log(
         // @ts-ignore
         `api: ${GITBOOK_API_URL} ${purpose} (serviceBinding=${!!serviceBinding}) (ctx=${!!globalThis[Symbol.for('__cloudflare-context__')]})`
