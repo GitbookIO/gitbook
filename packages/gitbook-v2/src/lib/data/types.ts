@@ -21,11 +21,6 @@ export type DataFetcherResponse<T> =
  */
 export interface GitBookDataFetcher {
     /**
-     * Endpoint of the API.
-     */
-    apiEndpoint: string;
-
-    /**
      * Get an API client for the current context.
      */
     api(): Promise<api.GitBookAPI>;

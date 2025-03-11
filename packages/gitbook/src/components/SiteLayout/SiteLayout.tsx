@@ -12,7 +12,7 @@ import { SpaceLayout } from '@/components/SpaceLayout';
 import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
-import { GITBOOK_API_URL, GITBOOK_ASSETS_URL } from '@v2/lib/env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
@@ -31,7 +31,8 @@ export async function SiteLayout(props: {
 
     const { scripts, customization } = context;
 
-    ReactDOM.preconnect(GITBOOK_API_URL);
+    ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
+    ReactDOM.preconnect(GITBOOK_ICONS_URL);
     if (GITBOOK_ASSETS_URL) {
         ReactDOM.preconnect(GITBOOK_ASSETS_URL);
     }

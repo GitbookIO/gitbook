@@ -2,7 +2,7 @@ import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationBackground,
     CustomizationCorners,
-    CustomizationFont,
+    CustomizationDefaultFont,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
@@ -249,7 +249,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             dangerColor: { light: '#FB2C36', dark: '#FB2C36' },
             successColor: { light: '#00C950', dark: '#00C950' },
             corners: CustomizationCorners.Rounded,
-            font: CustomizationFont.Inter,
+            font: CustomizationDefaultFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,

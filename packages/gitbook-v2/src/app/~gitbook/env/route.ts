@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import {
+    GITBOOK_API_PUBLIC_URL,
     GITBOOK_API_TOKEN,
     GITBOOK_API_URL,
     GITBOOK_APP_URL,
@@ -22,6 +23,7 @@ export async function GET(_req: NextRequest) {
         GITBOOK_URL,
         GITBOOK_APP_URL,
         GITBOOK_API_URL,
+        GITBOOK_API_PUBLIC_URL,
         GITBOOK_ASSETS_URL,
         GITBOOK_ICONS_URL,
         GITBOOK_USER_AGENT,

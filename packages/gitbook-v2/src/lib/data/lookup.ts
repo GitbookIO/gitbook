@@ -1,7 +1,8 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath } from '@/lib/paths';
-import { GitBookAPI, type PublishedSiteContentLookup } from '@gitbook/api';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { trace } from '@/lib/tracing';
+import type { PublishedSiteContentLookup } from '@gitbook/api';
+import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
@@ -20,34 +21,26 @@ export async function getPublishedContentByURL(input: {
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = new GitBookAPI({
-            authToken: GITBOOK_API_TOKEN ?? undefined,
-            endpoint: GITBOOK_API_URL,
-            userAgent: GITBOOK_USER_AGENT,
-        });
+        const api = await apiClient();
 
-        const startTime = performance.now();
-        const callResult = await tryCatch(
-            api.urls.getPublishedContentByUrl(
-                {
-                    url: alternative.url,
-                    visitorAuthToken: input.visitorAuthToken ?? undefined,
-                    redirectOnError: input.redirectOnError,
-                    cache: true,
-                },
-                {
-                    signal,
-                    headers: {
-                        'x-gitbook-force-cache': 'true',
-                    },
-                }
-            )
-        );
-        const endTime = performance.now();
-
-        // biome-ignore lint/suspicious/noConsole: we want to log performance data
-        console.log(
-            `getPublishedContentByURL(${alternative.url}) Time taken: ${endTime - startTime}ms`
+        const callResult = await trace(
+            {
+                operation: 'getPublishedContentByURL',
+                name: alternative.url,
+            },
+            () =>
+                tryCatch(
+                    api.urls.getPublishedContentByUrl(
+                        {
+                            url: alternative.url,
+                            visitorAuthToken: input.visitorAuthToken ?? undefined,
+                            redirectOnError: input.redirectOnError,
+                        },
+                        {
+                            signal,
+                        }
+                    )
+                )
         );
 
         if (callResult.error) {
