@@ -42,8 +42,6 @@ const nextConfig = {
             },
         ],
     },
-
-    serverExternalPackages: ['cloudflare:workers'],
 };
 
 export default nextConfig;
