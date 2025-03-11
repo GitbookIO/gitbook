@@ -202,7 +202,7 @@
 }
 
 .openapi-schema-readonly {
-    @apply text-primary-subtle text-[0.813rem];
+    @apply text-primary-subtle/9 text-[0.813rem];
 }
 
 .openapi-schema-type {
