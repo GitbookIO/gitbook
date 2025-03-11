@@ -198,7 +198,11 @@
 }
 
 .openapi-schema-required {
-    @apply text-amber-600 text-[0.813rem];
+    @apply text-warning-subtle text-[0.813rem];
+}
+
+.openapi-schema-readonly {
+    @apply text-primary-subtle/9 text-[0.813rem];
 }
 
 .openapi-schema-type {
