@@ -21,6 +21,7 @@ export function TableOfContents(props: {
             data-testid="table-of-contents"
             className={tcls(
                 'group',
+                'text-sm',
 
                 'grow-0',
                 'shrink-0',
@@ -106,11 +107,7 @@ export function TableOfContents(props: {
                         rootPages={pages}
                         pages={pages}
                         context={context}
-                        style={tcls(
-                            'page-no-toc:hidden',
-                            'sidebar-list-line:border-l',
-                            'border-tint-subtle'
-                        )}
+                        style={tcls('page-no-toc:hidden', 'sidebar-list-line:border-l', 'border-tint-subtle')}
                     />
                     {customization.trademark.enabled ? (
                         <Trademark

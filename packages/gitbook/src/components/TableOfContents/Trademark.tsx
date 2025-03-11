@@ -40,7 +40,6 @@ export function Trademark(props: {
                 'theme-muted:bg-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                'page-no-toc:!bg-transparent',
 
                 'before:hidden',
                 'lg:before:block',
