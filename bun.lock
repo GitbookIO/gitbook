@@ -199,7 +199,6 @@
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/icons": "workspace:*",
-        "assert-never": "^1.2.1",
         "classnames": "^2.5.1",
       },
       "devDependencies": {

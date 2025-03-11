@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.1.3
+
+### Patch Changes
+
+-   844059f: Fix spacing in OpenAPISecurities
+
 ## 1.1.2
 
 ### Patch Changes

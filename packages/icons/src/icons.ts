@@ -1,4 +1,4 @@
-import rawIcons from './data/icons.json';
+import rawIcons from './data/icons.json' with { type: 'json' };
 import type { IconName, IconStyle } from './types';
 
 export interface IconStyleDefinition {

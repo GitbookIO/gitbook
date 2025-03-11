@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.2.0
+
+### Minor Changes
+
+-   88f64b0: Fix the build to support Node.js v20
+
 ## 0.1.0
 
 ### Minor Changes
