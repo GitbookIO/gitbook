@@ -580,9 +580,7 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     try {
         // HACK: This is a workaround to avoid webpack trying to bundle this cloudflare only module
         // @ts-ignore
-        const { env } = await import(
-            /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
-        );
+        const { env } = await import('cloudflare:workers');
         serviceBinding = env.GITBOOK_API;
     } catch {
         // IGNORE: this is not cloudflare
