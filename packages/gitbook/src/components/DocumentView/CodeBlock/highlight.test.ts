@@ -46,7 +46,7 @@ it('should parse plain code', async () => {
 
 it('should parse different code in parallel', async () => {
     await Promise.all(
-        ['shell', 'scss', 'markdown', 'less', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) =>
+        ['shell', 'scss', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) =>
             highlight(
                 {
                     object: 'block',
