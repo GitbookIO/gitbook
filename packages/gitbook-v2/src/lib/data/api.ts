@@ -9,7 +9,6 @@ import {
     getCacheTagForURL,
     getComputedContentSourceCacheTags,
 } from '@gitbook/cache-tags';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { wrapDataFetcherError } from './errors';
@@ -31,7 +30,7 @@ export function createDataFetcher(
 ): GitBookDataFetcher {
     return {
         async api() {
-            return apiClient(input, 'createDataFetcher');
+            return apiClient(input);
         },
 
         withToken({ apiToken }) {
@@ -188,7 +187,7 @@ async function getUserById(input: DataFetcherInput, params: { userId: string }) 
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getUserById');
+        const api = await apiClient(input);
         const res = await api.users.getUserById(params.userId);
         return res.data;
     });
@@ -212,7 +211,7 @@ async function getSpace(
     );
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getSpace');
+        const api = await apiClient(input);
         const res = await api.spaces.getSpaceById(params.spaceId, {
             shareKey: params.shareKey,
         });
@@ -232,7 +231,7 @@ async function getChangeRequest(
     cacheLife('minutes');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getChangeRequest');
+        const api = await apiClient(input);
         const res = await api.spaces.getChangeRequestById(params.spaceId, params.changeRequestId);
         cacheTag(
             getCacheTag({
@@ -258,7 +257,7 @@ async function getRevision(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getRevision');
+        const api = await apiClient(input);
         const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
             metadata: params.metadata,
         });
@@ -279,7 +278,7 @@ async function getRevisionPages(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getRevisionPages');
+        const api = await apiClient(input);
         const res = await api.spaces.listPagesInRevisionById(params.spaceId, params.revisionId, {
             metadata: params.metadata,
         });
@@ -300,7 +299,7 @@ async function getRevisionFile(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getRevisionFile');
+        const api = await apiClient(input);
         const res = await api.spaces.getFileInRevisionById(
             params.spaceId,
             params.revisionId,
@@ -325,7 +324,7 @@ async function getRevisionPageByPath(
 
     const encodedPath = encodeURIComponent(params.path);
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getRevisionPageByPath');
+        const api = await apiClient(input);
         const res = await api.spaces.getPageInRevisionByPath(
             params.spaceId,
             params.revisionId,
@@ -349,7 +348,7 @@ async function getDocument(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getDocument');
+        const api = await apiClient(input);
         const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
         return res.data;
     });
@@ -378,7 +377,7 @@ async function getComputedDocument(
     );
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getComputedDocument');
+        const api = await apiClient(input);
         const res = await api.spaces.getComputedDocument(params.spaceId, {
             source: params.source,
         });
@@ -399,7 +398,7 @@ async function getReusableContent(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getReusableContent');
+        const api = await apiClient(input);
         const res = await api.spaces.getReusableContentInRevisionById(
             params.spaceId,
             params.revisionId,
@@ -428,7 +427,7 @@ async function getLatestOpenAPISpecVersionContent(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getLatestOpenAPISpecVersionContent');
+        const api = await apiClient(input);
         const res = await api.orgs.getLatestOpenApiSpecVersionContent(
             params.organizationId,
             params.slug
@@ -453,7 +452,7 @@ async function getPublishedContentByUrl(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getPublishedContentByUrl');
+        const api = await apiClient(input);
         const res = await api.urls.getPublishedContentByUrl({
             url,
             visitorAuthToken: visitorAuthToken ?? undefined,
@@ -492,7 +491,7 @@ async function getPublishedContentSite(
     );
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getPublishedContentSite');
+        const api = await apiClient(input);
         const res = await api.orgs.getPublishedContentSite(params.organizationId, params.siteId, {
             shareKey: params.siteShareKey,
         });
@@ -520,7 +519,7 @@ async function getSiteRedirectBySource(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getSiteRedirectBySource');
+        const api = await apiClient(input);
         const res = await api.orgs.getSiteRedirectBySource(params.organizationId, params.siteId, {
             shareKey: params.siteShareKey,
             source: params.source,
@@ -542,7 +541,7 @@ async function getEmbedByUrl(
     cacheLife('weeks');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'getEmbedByUrl');
+        const api = await apiClient(input);
         const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
         return res.data;
     });
@@ -559,7 +558,7 @@ async function searchSiteContent(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const api = await apiClient(input, 'searchSiteContent');
+        const api = await apiClient(input);
         const res = await api.orgs.searchSiteContent(organizationId, siteId, {
             query,
             ...scope,
@@ -574,44 +573,21 @@ async function searchSiteContent(
  * @param input - The input data fetcher.
  * @returns A new API client.
  */
-export async function apiClient(input: DataFetcherInput, purpose: string) {
+export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
     try {
-        const { env } = getCloudflareContext();
-        serviceBinding = env.GITBOOK_API;
-    } catch (error) {
-        // IGNORE
-        if (process.env.NODE_ENV !== 'development') {
-            console.warn('Failed to get service binding', purpose, error);
-        }
-    }
-
-    try {
+        // HACK: This is a workaround to avoid webpack trying to bundle this cloudflare only module
         // @ts-ignore
-        const r = await import(
+        const { env } = await import(
             /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
         );
-        console.log('r', r);
-        console.log('r.env', r.env);
-    } catch (error) {
-        console.log('error', error);
+        serviceBinding = env.GITBOOK_API;
+    } catch {
+        // IGNORE: this is not cloudflare
     }
 
-    console.log(
-        // @ts-ignore
-        `api: ${GITBOOK_API_URL} ${purpose} (serviceBinding=${!!serviceBinding}) (ctx=${!!globalThis[Symbol.for('__cloudflare-context__')]})`
-    );
-    console.log(
-        `__cloudflare-context__${purpose}`,
-        // @ts-ignore
-        globalThis[Symbol.for('__cloudflare-context__')],
-        // @ts-ignore
-        globalThis?.global?.[Symbol.for('__cloudflare-context__')]
-    );
-    // @ts-ignore
-    console.log(`Object.keys(globalThis)${purpose}`, Object.keys(globalThis));
     const api = new GitBookAPI({
         authToken: apiToken || GITBOOK_API_TOKEN || undefined,
         endpoint: GITBOOK_API_URL,
