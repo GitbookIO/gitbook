@@ -21,18 +21,15 @@ export function TableOfContents(props: {
             data-testid="table-of-contents"
             className={tcls(
                 'group',
-                'text-sm',
+                'page-no-toc:hidden',
 
                 'grow-0',
                 'shrink-0',
                 'basis-full',
-                'page-no-toc:lg:basis-40',
-                'page-no-toc:xl:basis-56',
-                customization.header.preset === 'none' && 'page-no-toc:lg:basis-56',
                 'lg:basis-72',
 
                 'relative',
-                'z-10',
+                'z-[1]',
                 'lg:sticky',
                 // Without header
                 'lg:top-0',
@@ -49,10 +46,9 @@ export function TableOfContents(props: {
                 'pt-6',
                 'pb-4',
                 'sidebar-filled:lg:pr-6',
-                'sidebar-filled:page-no-toc:lg:pr-0',
 
                 'hidden',
-                'navigation-open:!flex',
+                'navigation-open:flex',
                 'lg:flex',
                 'flex-col',
                 'gap-4',
@@ -66,7 +62,6 @@ export function TableOfContents(props: {
                 className={tcls(
                     'lg:-ms-5',
                     'overflow-hidden',
-                    'page-no-toc:overflow-visible',
                     'relative',
 
                     'flex',
@@ -78,7 +73,6 @@ export function TableOfContents(props: {
                     'theme-bold-tint:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    'page-no-toc:!bg-transparent',
 
                     'sidebar-filled:rounded-xl',
                     'straight-corners:rounded-none'
@@ -107,12 +101,7 @@ export function TableOfContents(props: {
                         rootPages={pages}
                         pages={pages}
                         context={context}
-                        style={tcls(
-                            'page-no-toc:hidden',
-                            'sidebar-list-line:border-l',
-                            'border-tint-subtle',
-                            'mb-6'
-                        )}
+                        style={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}
                     />
                     {customization.trademark.enabled ? (
                         <Trademark

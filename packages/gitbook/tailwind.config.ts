@@ -457,7 +457,7 @@ const config: Config = {
              * Variant when a header is displayed.
              */
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
-            addVariant('site-header-sections', 'body:has(#site-header:not(.mobile-only) > nav) &');
+            addVariant('site-header-sections', 'body:has(#site-header:not(.mobile-only) #sections) &');
 
             const customisationVariants = {
                 // Sidebar styles
@@ -508,6 +508,7 @@ const config: Config = {
              * `page.layout.tableOfContents` is set to false.
              */
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
+            addVariant('page-has-toc', 'body:has(.page-has-toc) &');
 
             /**
              * Variant when the page contains an OpenAPI block.

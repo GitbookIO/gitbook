@@ -50,14 +50,16 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
             aria-label="Sections"
+            id="sections"
             onValueChange={setValue}
-            className="relative z-10 mx-auto flex w-full max-w-screen-2xl page-full-width:max-w-full flex-nowrap items-center"
+            className='z-10 flex w-full flex-nowrap items-center'
         >
             <div
                 ref={scrollableViewRef}
-                className="hide-scroll -mb-4 w-full overflow-y-hidden overflow-x-scroll pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
+                className="-mx-3"
+                // className="-mb-4 pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
             >
-                <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent px-1 sm:px-3 md:px-5">
+                <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent">
                     {sectionsAndGroups.map((sectionOrGroup) => {
                         const { id, title, icon } = sectionOrGroup;
                         const isGroup = sectionOrGroup.object === 'site-section-group';

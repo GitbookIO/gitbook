@@ -25,7 +25,7 @@ export function Dropdown<E extends HTMLElement>(props: {
     const dropdownId = useId();
 
     return (
-        <div className={tcls('group/dropdown', 'relative flex min-w-0 shrink')}>
+        <div className={tcls('group/dropdown', 'relative flex')}>
             {button({
                 id: dropdownId,
                 tabIndex: 0,

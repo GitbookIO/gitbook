@@ -63,7 +63,7 @@ export function SpacesDropdown(props: {
                         className
                     )}
                 >
-                    <span className={tcls('line-clamp-2', 'grow')}>{siteSpace.title}</span>
+                    <span className={tcls('line-clamp-1', 'grow')}>{siteSpace.title}</span>
                     <DropdownChevron />
                 </div>
             )}

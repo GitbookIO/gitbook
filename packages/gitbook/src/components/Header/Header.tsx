@@ -12,13 +12,14 @@ import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+import { SpacesDropdown } from './SpacesDropdown';
 
 /**
  * Render the header for the space.
  */
 export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
     const { context, withTopHeader } = props;
-    const { siteSpaces, sections, customization } = context;
+    const { siteSpace, siteSpaces, sections, customization } = context;
 
     return (
         <header
@@ -153,8 +154,44 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     </div>
                 </div>
             </div>
-            {sections ? (
-                <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+            {sections || siteSpaces.length > 1 ? (
+                <div
+                    className={tcls(
+                        'w-full',
+                        'overflow-x-scroll',
+                        'overflow-y-hidden',
+                        'hide-scroll',
+                        !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
+                        // page-no-toc:mr-[max(calc((100%-14rem-48rem-14rem-6rem)/2),.5rem)] w-64 *:shrink-0 *:grow max-md:only:w-full xl:mr-[max(calc((100%-18rem-48rem-14rem)/2+2rem),5rem)]
+                    )}
+                >
+                    <div
+                        className={tcls(
+                            CONTAINER_STYLE,
+                            'max-w-[unset]',
+                            'grow',
+                            'flex',
+                            'items-end',
+                            '2xl:px-[calc((100%-1536px+4rem)/2)]'
+                        )}
+                    >
+                        {siteSpaces.length > 1 && (
+                            <div className="my-2 mr-5 page-no-toc:flex hidden grow border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64">
+                                <SpacesDropdown
+                                    context={context}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
+                                    className="grow py-1"
+                                />
+                            </div>
+                        )}
+                        {sections && (
+                            <SiteSectionTabs
+                                sections={encodeClientSiteSections(context, sections)}
+                            />
+                        )}
+                    </div>
+                </div>
             ) : null}
         </header>
     );
