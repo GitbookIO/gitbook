@@ -49,18 +49,12 @@ export function getTestURL(urlRest: string): string {
  * Get an API token for a site by its URL.
  */
 export async function getSiteAPIToken(url: string) {
-    const api = new GitBookAPI();
-    const { data } = await api.urls.getPublishedContentByUrl(
-        {
-            url,
-            cache: true,
-        },
-        {
-            headers: {
-                'x-gitbook-force-cache': 'true',
-            },
-        }
-    );
+    const api = new GitBookAPI({
+        endpoint: 'https://api.gitbook.com/cache',
+    });
+    const { data } = await api.urls.getPublishedContentByUrl({
+        url,
+    });
 
     if ('redirect' in data) {
         throw new Error(`Invalid site URL, it resulted in a redirect: ${data.redirect}`);
