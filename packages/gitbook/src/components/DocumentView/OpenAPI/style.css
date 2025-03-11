@@ -393,7 +393,7 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-tint-base text-sm gap-2 p-2 border rounded-md border-tint-subtle;
+    @apply flex items-center bg-transparent text-sm gap-2 p-2 border rounded-md border-tint-subtle;
 }
 
 .openapi-path .openapi-method {
