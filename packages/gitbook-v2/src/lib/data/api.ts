@@ -567,11 +567,10 @@ async function searchSiteContent(
     });
 }
 
+let loggedServiceBinding = false;
+
 /**
  * Create a new API client.
- *
- * @param input - The input data fetcher.
- * @returns A new API client.
  */
 export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
@@ -584,6 +583,11 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
             /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
         );
         serviceBinding = env.GITBOOK_API;
+        if (serviceBinding && !loggedServiceBinding) {
+            // biome-ignore lint/suspicious/noConsole: we want to log here
+            console.log(`using service binding for the API (${GITBOOK_API_URL})`);
+            loggedServiceBinding = true;
+        }
     } catch {
         // IGNORE: this is not cloudflare
     }

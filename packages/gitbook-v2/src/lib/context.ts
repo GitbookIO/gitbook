@@ -208,7 +208,6 @@ export async function fetchSiteContextByURLLookup(
             ...baseContext,
             dataFetcher: dataFetcher.withToken({
                 apiToken: data.apiToken,
-                contextId: data.contextId,
             }),
         },
         {
