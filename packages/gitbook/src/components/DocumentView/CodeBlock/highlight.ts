@@ -39,7 +39,7 @@ const { getSingletonHighlighter } = createSingletonShorthands(
     createdBundledHighlighter<any, any>({
         langs: bundledLanguages,
         themes: {},
-        engine: () => createJavaScriptRegexEngine({ forgiving: true, target: 'ES2024' }),
+        engine: () => createJavaScriptRegexEngine({ forgiving: true, target: 'ES2018' }),
     })
 );
 
