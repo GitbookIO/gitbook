@@ -114,7 +114,7 @@ const HINT_STYLES: {
         body: [
             'text-neutral-strong',
             'links-default:[&_a]:text-warning',
-            'links-default:[&_a]:hover:text-warning-strong',
+            'links-default:[&_a:hover]:text-warning-strong',
             'links-default:[&_a]:decoration-warning/6',
             'links-accent:[&_a]:decoration-warning',
             'decoration-warning/6',
@@ -131,7 +131,7 @@ const HINT_STYLES: {
         body: [
             'text-neutral-strong',
             'links-default:[&_a]:text-danger',
-            'links-default:[&_a]:hover:text-danger-strong',
+            'links-default:[&_a:hover]:text-danger-strong',
             'links-default:[&_a]:decoration-danger/6',
             'links-accent:[&_a]:decoration-danger',
             'decoration-danger/6',
@@ -148,7 +148,7 @@ const HINT_STYLES: {
         body: [
             'text-neutral-strong',
             'links-default:[&_a]:text-success',
-            'links-default:[&_a]:hover:text-success-strong',
+            'links-default:[&_a:hover]:text-success-strong',
             'links-default:[&_a]:decoration-success/6',
             'links-accent:[&_a]:decoration-success',
             'decoration-success/6',
