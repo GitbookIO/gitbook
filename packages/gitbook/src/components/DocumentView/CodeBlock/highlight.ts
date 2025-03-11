@@ -35,14 +35,11 @@ export type RenderedInline = {
 
 const theme = createCssVariablesTheme();
 
-const highlighter = createSingletonShorthands(
+const { getSingletonHighlighter } = createSingletonShorthands(
     createdBundledHighlighter<any, any>({
         langs: bundledLanguages,
         themes: {},
-        engine: () =>
-            createJavaScriptRegexEngine({
-                forgiving: true,
-            }),
+        engine: () => createJavaScriptRegexEngine({ forgiving: true, target: 'ES2024' }),
     })
 );
 
@@ -52,7 +49,7 @@ const highlighter = createSingletonShorthands(
 export async function preloadHighlight(block: DocumentBlockCode) {
     const langName = getBlockLang(block);
     if (langName) {
-        await highlighter.getSingletonHighlighter({
+        await getSingletonHighlighter({
             langs: [langName],
             themes: [theme],
         });
@@ -74,7 +71,12 @@ export async function highlight(
 
     const code = getPlainCodeBlock(block);
 
-    const lines = await highlighter.codeToTokensBase(code, {
+    const highlighter = await getSingletonHighlighter({
+        langs: [langName],
+        themes: [theme],
+    });
+
+    const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
         theme,
         tokenizeMaxLineLength: 400,
@@ -131,12 +133,6 @@ function checkIsBundledLanguage(lang: string): lang is BundledLanguage {
 function getLanguageForSyntax(syntax: string): BundledLanguage | null {
     // Normalize the syntax to lowercase.
     syntax = syntax.toLowerCase();
-
-    // Temporary disable highlighting for C/C++ code blocks
-    // @see https://github.com/shikijs/shiki/issues/893
-    if (syntax === 'cpp' || syntax === 'c') {
-        return null;
-    }
 
     // Check if the syntax is a bundled language.
     if (checkIsBundledLanguage(syntax)) {
