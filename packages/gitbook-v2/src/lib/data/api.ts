@@ -590,7 +590,9 @@ export async function apiClient(input: DataFetcherInput, purpose: string) {
 
     try {
         // @ts-ignore
-        const r = await import('cloudflare:env');
+        const r = await import(
+            /* webpackIgnore: true */ `${'__cloudflare:env'.replaceAll('_', '')}`
+        );
         console.log('r', r);
     } catch (error) {
         console.log('error', error);
