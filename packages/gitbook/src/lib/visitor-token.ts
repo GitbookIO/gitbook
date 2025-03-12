@@ -238,13 +238,13 @@ function findVisitorAuthCookieForBasePath(
  * We want to store the token for as long as it's valid, but at least 1 minute.
  * If an invalid token is passed to the API, the API will return a redirect to the auth flow.
  */
-function getVisitorAuthCookieMaxAge(decoded: JwtPayload): number {
+export function getVisitorAuthCookieMaxAge(decoded: JwtPayload): number {
     const defaultMaxAge = 7 * 24 * 60 * 60; // 7 days
     const minMaxAge = 60; // 1 min
     const exp = decoded.exp;
 
     if (typeof exp === 'number') {
-        const now = new Date().getTime();
+        const now = Math.floor(new Date().getTime() / 1000);
         return Math.max(exp - now, minMaxAge);
     }
 
