@@ -93,8 +93,6 @@ function LogoFallback(props: HeaderLogoProps) {
                     'ms-3',
                     'text-base/tight',
                     'lg:text-lg/tight',
-                    'page-no-toc:lg:text-base/tight',
-                    'site-header:lg:text-lg/tight',
                     'text-tint-strong',
                     'theme-bold:text-header-link'
                 )}
