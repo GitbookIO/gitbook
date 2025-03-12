@@ -33,7 +33,7 @@ import {
 import { joinPath, normalizePathname } from '@/lib/paths';
 import { getProxyModeBasePath } from '@/lib/proxy';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
-import { addResponseCacheTag } from './lib/cache';
+import { addResponseCacheTag } from './lib/cache/response';
 
 export const config = {
     matcher:
