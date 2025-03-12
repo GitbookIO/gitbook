@@ -1,7 +1,7 @@
 // @ts-ignore
 import nextOnPagesHandler from '@cloudflare/next-on-pages/fetch-handler';
 
-import { withResponseCacheTags } from './lib/cache';
+import { withResponseCacheTags } from './lib/cache/response';
 import { withMiddlewareHeadersStorage } from './lib/middleware';
 
 /**
