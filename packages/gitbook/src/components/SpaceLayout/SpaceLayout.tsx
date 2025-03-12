@@ -124,7 +124,11 @@ export function SpaceLayout(props: {
                                         context={context}
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
-                                        className={tcls('w-full', 'page-no-toc:hidden')}
+                                        className={tcls(
+                                            'w-full',
+                                            'page-no-toc:hidden',
+                                            'site-header-none:page-no-toc:flex'
+                                        )}
                                     />
                                 )}
                             </>
