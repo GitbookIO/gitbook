@@ -162,8 +162,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         'overflow-x-scroll',
                         'overflow-y-hidden',
                         'hide-scroll',
+                        '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
                         !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
-                        // page-no-toc:mr-[max(calc((100%-14rem-48rem-14rem-6rem)/2),.5rem)] w-64 *:shrink-0 *:grow max-md:only:w-full xl:mr-[max(calc((100%-18rem-48rem-14rem)/2+2rem),5rem)]
                     )}
                 >
                     <div
@@ -179,7 +179,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         {siteSpaces.length > 1 && (
                             <div
                                 id="variants"
-                                className='my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64'
+                                className="my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
                             >
                                 <SpacesDropdown
                                     context={context}
