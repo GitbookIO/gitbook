@@ -37,7 +37,7 @@
         },
         // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "build", "generate"]
+            "dependsOn": ["^typecheck", "build"]
         },
         // Lint the package for style errors
         "lint": {
@@ -50,12 +50,12 @@
         // Run end-to-end tests
         "e2e": {
             "dependsOn": ["^e2e"],
-            "env": ["BASE_URL"]
+            "env": ["BASE_URL", "SITE_BASE_URL"]
         },
         // Run end-to-end tests for customers
         "e2e-customers": {
             "dependsOn": ["^e2e-customers"],
-            "env": ["BASE_URL"]
+            "env": ["BASE_URL", "SITE_BASE_URL"]
         },
         // Start the package in development mode
         "dev": {

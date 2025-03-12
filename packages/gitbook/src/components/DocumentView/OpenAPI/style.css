@@ -3,7 +3,7 @@
     @apply flex-1 flex flex-col gap-4 mb-14;
 }
 
-.openapi-models {
+.openapi-schemas {
     @apply flex flex-col mb-14 flex-1;
 }
 
@@ -198,7 +198,11 @@
 }
 
 .openapi-schema-required {
-    @apply text-amber-600 text-[0.813rem];
+    @apply text-warning-subtle text-[0.813rem];
+}
+
+.openapi-schema-readonly {
+    @apply text-primary-subtle/9 text-[0.813rem];
 }
 
 .openapi-schema-type {
@@ -389,7 +393,7 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-tint-base text-sm gap-2 p-2 border rounded-md border-tint-subtle;
+    @apply flex items-center bg-transparent text-sm gap-2 p-2 border rounded-md border-tint-subtle;
 }
 
 .openapi-path .openapi-method {
@@ -620,10 +624,10 @@
     @apply space-y-2.5;
 }
 
-.openapi-section-models {
+.openapi-section-schemas {
     @apply border border-tint-subtle rounded-lg;
 }
 
-.openapi-section-models > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
     @apply p-2.5;
 }

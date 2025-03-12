@@ -12,7 +12,7 @@ export function PrintButton(props: PolymorphicComponentProp<'button'>) {
     }, []);
 
     return (
-        <button {...rest} onClick={onClick} className={className}>
+        <button {...rest} data-testid="print-button" onClick={onClick} className={className}>
             {children}
         </button>
     );

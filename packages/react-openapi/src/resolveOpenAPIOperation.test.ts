@@ -80,8 +80,8 @@ describe('#resolveOpenAPIOperation', () => {
     it('should resolve circular refs', async () => {
         const filesystem = await fetchFilesystem('https://api.gitbook.com/openapi.json');
         const resolved = await resolveOpenAPIOperation(filesystem, {
-            method: 'post',
-            path: '/search/ask',
+            method: 'get',
+            path: '/spaces/{spaceId}/content/page/{pageId}',
         });
 
         expect(resolved).toMatchObject({
@@ -91,7 +91,7 @@ describe('#resolveOpenAPIOperation', () => {
                 },
             ],
             operation: {
-                operationId: 'askQuery',
+                operationId: 'getPageById',
             },
         });
     });

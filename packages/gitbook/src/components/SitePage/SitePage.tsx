@@ -7,7 +7,7 @@ import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
-import { getPagePath, resolveFirstDocument } from '@/lib/pages';
+import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { PageClientLayout } from './PageClientLayout';
@@ -19,8 +19,6 @@ export const dynamic = 'force-dynamic';
 export type SitePageProps = {
     context: GitBookSiteContext;
     pageParams: PagePathParams;
-    redirectOnFallback: boolean;
-    fallback?: boolean;
 };
 
 /**
@@ -30,8 +28,6 @@ export async function SitePage(props: SitePageProps) {
     const { context, pageTarget } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
-        fallback: props.fallback,
-        redirectOnFallback: props.redirectOnFallback,
     });
 
     const rawPathname = getPathnameParam(props.pageParams);
@@ -115,7 +111,6 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     const { context, pageTarget } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
-        fallback: props.fallback,
     });
 
     if (!pageTarget) {
@@ -153,28 +148,9 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 async function getPageDataWithFallback(args: {
     context: GitBookSiteContext;
     pagePathParams: PagePathParams;
-    fallback?: boolean;
-    redirectOnFallback?: boolean;
 }) {
-    const { context: baseContext, pagePathParams, fallback, redirectOnFallback = false } = args;
-
-    let { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
-
-    const canFallback = !!fallback;
-    if (!pageTarget && canFallback) {
-        const rootPage = resolveFirstDocument(context.pages, []);
-
-        if (redirectOnFallback && rootPage?.page) {
-            redirect(
-                context.linker.toPathForPage({
-                    pages: context.pages,
-                    page: rootPage?.page,
-                })
-            );
-        }
-
-        pageTarget = rootPage;
-    }
+    const { context: baseContext, pagePathParams } = args;
+    const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
 
     return {
         context: {

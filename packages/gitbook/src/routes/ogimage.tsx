@@ -1,4 +1,4 @@
-import { CustomizationFont, CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationDefaultFont, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
@@ -8,22 +8,22 @@ import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
 
-const googleFontsMap: { [fontName in CustomizationFont]: string } = {
-    [CustomizationFont.Inter]: 'Inter',
-    [CustomizationFont.FiraSans]: 'Fira Sans Extra Condensed',
-    [CustomizationFont.IBMPlexSerif]: 'IBM Plex Serif',
-    [CustomizationFont.Lato]: 'Lato',
-    [CustomizationFont.Merriweather]: 'Merriweather',
-    [CustomizationFont.NotoSans]: 'Noto Sans',
-    [CustomizationFont.OpenSans]: 'Open Sans',
-    [CustomizationFont.Overpass]: 'Overpass',
-    [CustomizationFont.Poppins]: 'Poppins',
-    [CustomizationFont.Raleway]: 'Raleway',
-    [CustomizationFont.Roboto]: 'Roboto',
-    [CustomizationFont.RobotoSlab]: 'Roboto Slab',
-    [CustomizationFont.SourceSansPro]: 'Source Sans 3',
-    [CustomizationFont.Ubuntu]: 'Ubuntu',
-    [CustomizationFont.ABCFavorit]: 'Inter',
+const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
+    [CustomizationDefaultFont.Inter]: 'Inter',
+    [CustomizationDefaultFont.FiraSans]: 'Fira Sans Extra Condensed',
+    [CustomizationDefaultFont.IBMPlexSerif]: 'IBM Plex Serif',
+    [CustomizationDefaultFont.Lato]: 'Lato',
+    [CustomizationDefaultFont.Merriweather]: 'Merriweather',
+    [CustomizationDefaultFont.NotoSans]: 'Noto Sans',
+    [CustomizationDefaultFont.OpenSans]: 'Open Sans',
+    [CustomizationDefaultFont.Overpass]: 'Overpass',
+    [CustomizationDefaultFont.Poppins]: 'Poppins',
+    [CustomizationDefaultFont.Raleway]: 'Raleway',
+    [CustomizationDefaultFont.Roboto]: 'Roboto',
+    [CustomizationDefaultFont.RobotoSlab]: 'Roboto Slab',
+    [CustomizationDefaultFont.SourceSansPro]: 'Source Sans 3',
+    [CustomizationDefaultFont.Ubuntu]: 'Ubuntu',
+    [CustomizationDefaultFont.ABCFavorit]: 'Inter',
 };
 
 /**

@@ -1,5 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
+import {
+    getCacheTag,
+    getCacheTagForURL,
+    getComputedContentSourceCacheTags,
+} from '@gitbook/cache-tags';
 import 'server-only';
 
 import {
@@ -174,6 +178,7 @@ export const getUserById = cache({
             tag: 'user',
             user: userId,
         }),
+    tagImmutable: true,
     get: async (userId: string, options: CacheFunctionOptions) => {
         try {
             const apiCtx = await api();
@@ -238,11 +243,7 @@ export const getLatestOpenAPISpecVersionContent = cache({
  */
 export const getPublishedContentByUrl = cache({
     name: 'api.getPublishedContentByUrl.v4',
-    tag: (url) =>
-        getCacheTag({
-            tag: 'url',
-            hostname: new URL(url).hostname,
-        }),
+    tag: (url) => getCacheTagForURL(url),
     get: async (
         url: string,
         visitorAuthToken: string | undefined,
@@ -379,6 +380,7 @@ export const getRevision = cache({
     name: 'api.getRevision.v2',
     tag: (spaceId, revisionId) =>
         getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -411,6 +413,7 @@ export const getRevisionPages = cache({
     name: 'api.getRevisionPages.v4',
     tag: (spaceId, revisionId) =>
         getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -446,6 +449,7 @@ export const getRevisionPageByPath = cache({
     name: 'api.getRevisionPageByPath.v3',
     tag: (spaceId, revisionId) =>
         getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -492,6 +496,7 @@ const getRevisionFileById = cache({
     name: 'api.getRevisionFile.v3',
     tag: (spaceId, revisionId) =>
         getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
     get: async (
         spaceId: string,
         revisionId: string,
@@ -528,6 +533,7 @@ const getRevisionReusableContentById = cache({
     name: 'api.getRevisionReusableContentById.v1',
     tag: (spaceId, revisionId) =>
         getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (
         spaceId: string,
@@ -569,6 +575,7 @@ const getRevisionAllFiles = cache({
     name: 'api.getRevisionAllFiles.v2',
     tag: (spaceId, revisionId) =>
         getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
     get: async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
         const response = await getAll(
             async (params) => {
@@ -684,6 +691,7 @@ export const getDocument = cache({
     name: 'api.getDocument.v2',
     tag: (spaceId, documentId) =>
         getCacheTag({ tag: 'document', space: spaceId, document: documentId }),
+    tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (spaceId: string, documentId: string, options: CacheFunctionOptions) => {
         const apiCtx = await api();

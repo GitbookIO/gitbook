@@ -2,7 +2,7 @@ import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationBackground,
     CustomizationCorners,
-    CustomizationFont,
+    CustomizationDefaultFont,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
@@ -20,14 +20,14 @@ import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
 
-import { getContentTestURL } from '../tests/utils';
+import { getContentTestURL, getTestURL } from '../tests/utils';
 
 export interface Test {
     name: string;
     /**
      * URL to visit for testing.
      */
-    url: string;
+    url: string | (() => string | Promise<string>);
     cookies?: Parameters<BrowserContext['addCookies']>[0];
     /**
      * Test to run
@@ -60,11 +60,11 @@ export interface Test {
     only?: boolean;
 }
 
-export interface TestsCase {
+export type TestsCase = {
     name: string;
-    baseUrl: string;
     tests: Array<Test>;
-}
+    contentBaseURL?: string;
+};
 
 export const allLocales: CustomizationLocale[] = [
     CustomizationLocale.Fr,
@@ -142,9 +142,14 @@ export function runTestCases(testCases: TestsCase[]) {
         test.describe(testCase.name, () => {
             for (const testEntry of testCase.tests) {
                 const testFn = testEntry.only ? test.only : test;
-                testFn(testEntry.name, async ({ page, baseURL, context }) => {
-                    const contentUrl = new URL(testEntry.url, testCase.baseUrl);
-                    const url = getContentTestURL(contentUrl.toString(), baseURL);
+                testFn(testEntry.name, async ({ page, context }) => {
+                    const testEntryPathname =
+                        typeof testEntry.url === 'function' ? await testEntry.url() : testEntry.url;
+                    const url = testCase.contentBaseURL
+                        ? getContentTestURL(
+                              new URL(testEntryPathname, testCase.contentBaseURL).toString()
+                          )
+                        : getTestURL(testEntryPathname);
                     if (testEntry.cookies) {
                         await context.addCookies(
                             testEntry.cookies.map((cookie) => ({
@@ -244,7 +249,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             dangerColor: { light: '#FB2C36', dark: '#FB2C36' },
             successColor: { light: '#00C950', dark: '#00C950' },
             corners: CustomizationCorners.Rounded,
-            font: CustomizationFont.Inter,
+            font: CustomizationDefaultFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,

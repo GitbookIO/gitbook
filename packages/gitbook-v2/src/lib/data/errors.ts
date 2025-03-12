@@ -93,7 +93,10 @@ export async function wrapDataFetcherError<T>(
     }
 }
 
-function getExposableError(error: Error): DataFetcherErrorData {
+/**
+ * Get a data fetcher exposable error from a JS error.
+ */
+export function getExposableError(error: Error): DataFetcherErrorData {
     if (error instanceof GitBookAPIError) {
         return {
             code: error.code,

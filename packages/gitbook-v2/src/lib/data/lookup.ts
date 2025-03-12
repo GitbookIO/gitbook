@@ -1,7 +1,10 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath } from '@/lib/paths';
-import { GitBookAPI, type GitBookAPIError, type PublishedSiteContentLookup } from '@gitbook/api';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import { trace } from '@/lib/tracing';
+import type { PublishedSiteContentLookup } from '@gitbook/api';
+import { apiClient } from './api';
+import { getExposableError } from './errors';
+import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
 
 /**
@@ -12,36 +15,32 @@ export async function getPublishedContentByURL(input: {
     url: string;
     visitorAuthToken: string | null;
     redirectOnError: boolean;
-}): Promise<
-    | { data: PublishedSiteContentLookup; error?: undefined }
-    | { data?: undefined; error: Error | GitBookAPIError }
-> {
+}): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = new GitBookAPI({
-            authToken: GITBOOK_API_TOKEN ?? undefined,
-            endpoint: GITBOOK_API_URL,
-            userAgent: GITBOOK_USER_AGENT,
-        });
+        const api = await apiClient();
 
-        const callResult = await tryCatch(
-            api.urls.getPublishedContentByUrl(
-                {
-                    url: alternative.url,
-                    visitorAuthToken: input.visitorAuthToken ?? undefined,
-                    redirectOnError: input.redirectOnError,
-                    cache: true,
-                },
-                {
-                    signal,
-                    headers: {
-                        'x-gitbook-force-cache': 'true',
-                    },
-                }
-            )
+        const callResult = await trace(
+            {
+                operation: 'getPublishedContentByURL',
+                name: alternative.url,
+            },
+            () =>
+                tryCatch(
+                    api.urls.getPublishedContentByUrl(
+                        {
+                            url: alternative.url,
+                            visitorAuthToken: input.visitorAuthToken ?? undefined,
+                            redirectOnError: input.redirectOnError,
+                        },
+                        {
+                            signal,
+                        }
+                    )
+                )
         );
 
         if (callResult.error) {
@@ -110,9 +109,20 @@ export async function getPublishedContentByURL(input: {
 
     if (!result) {
         return {
-            error: new Error('No content found'),
+            error: {
+                code: 404,
+                message: 'No content found',
+            },
         };
     }
 
-    return result;
+    if (result.error) {
+        return {
+            error: getExposableError(result.error),
+        };
+    }
+
+    return {
+        data: result.data,
+    };
 }

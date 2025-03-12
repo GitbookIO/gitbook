@@ -14,6 +14,7 @@ import {
     getVisitorAuthCookieValue,
 } from '@/lib/visitor-token';
 
+import { getSiteAPIToken } from '../tests/utils';
 import {
     type TestsCase,
     allDeprecatedThemePresets,
@@ -31,7 +32,7 @@ import {
 const testCases: TestsCase[] = [
     {
         name: 'GitBook Site (Single Variant)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
             {
                 name: 'Home',
@@ -84,7 +85,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'GitBook Site (Multi Variants)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/multi-variants/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/multi-variants/',
         tests: [
             {
                 name: 'Variants dropdown',
@@ -135,7 +136,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'GitBook Site (Navigation when switching variant)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/',
         tests: [
             {
                 name: 'Keep navigation path/route when switching variant (Public)',
@@ -155,8 +156,8 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions/2.0/reference/api-reference/pets?fallback=true'
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('api-multi-versions/2.0/reference/api-reference/pets')
                     );
                 },
             },
@@ -178,15 +179,17 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets?fallback=true'
+                    await page.waitForURL((url) =>
+                        url.pathname.includes(
+                            'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/2.0/reference/api-reference/pets'
+                        )
                     );
                 },
             },
             {
                 name: 'Keep navigation path/route when switching variant (VA)',
                 screenshot: false,
-                url: (() => {
+                url: () => {
                     const privateKey = 'c26190fc-74b2-4b54-9fc7-df9941104953';
                     const token = jwt.sign(
                         {
@@ -198,7 +201,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const spaceDrowpdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
@@ -213,8 +216,10 @@ const testCases: TestsCase[] = [
                         .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-va/2.0/reference/api-reference/pets?fallback=true'
+                    await page.waitForURL((url) =>
+                        url.pathname.includes(
+                            'api-multi-versions-va/2.0/reference/api-reference/pets'
+                        )
                     );
                 },
             },
@@ -222,7 +227,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'GitBook Site (Sections and Section Groups)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
         tests: [
             {
                 name: 'Site with sections and section groups',
@@ -244,16 +249,14 @@ const testCases: TestsCase[] = [
                     const sectionGroupDropdown = await page.getByText('Test Section Group 1');
                     await sectionGroupDropdown.hover();
                     await page.getByText('Section B').click();
-                    await page.waitForURL(
-                        'https://gitbook-open-e2e-sites.gitbook.io/sections/sections-4'
-                    );
+                    await page.waitForURL((url) => url.pathname.includes('/sections/sections-4'));
                 },
             },
         ],
     },
     {
         name: 'GitBook',
-        baseUrl: 'https://docs.gitbook.com',
+        contentBaseURL: 'https://docs.gitbook.com',
         tests: [
             {
                 name: 'Home',
@@ -297,7 +300,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Versioning',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Revision',
@@ -308,7 +311,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'PDF',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'PDF',
@@ -316,12 +319,56 @@ const testCases: TestsCase[] = [
                 screenshot: {
                     waitForTOCScrolling: false,
                 },
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
+        name: 'Space PDF',
+        tests: [
+            {
+                name: 'Main content',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+                    searchParams.set('token', data.apiToken);
+
+                    return `~space/${data.space}/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
+                },
+            },
+            {
+                name: 'Change request',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('limit', '10');
+                    searchParams.set('token', data.apiToken);
+
+                    return `~space/${data.space}/~/changes/HrtgUd5MlFusCMv1elA7/~gitbook/pdf?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="print-button"]')).toBeVisible();
+                },
             },
         ],
     },
     {
         name: 'Content tests',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Text',
@@ -484,7 +531,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Page options',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Hidden',
@@ -518,7 +565,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Customization',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: allThemeModes.flatMap((themeMode) => [
             {
                 name: `Without header - Theme mode ${themeMode}`,
@@ -652,7 +699,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Ads',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Without previewed ads',
@@ -663,7 +710,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Shared space navigation (first site)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/shared-space-uno/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/shared-space-uno/',
         tests: [
             {
                 name: 'Navigation to shared space',
@@ -684,7 +731,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Shared space navigation (second site)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/shared-space-dos/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/shared-space-dos/',
         tests: [
             {
                 name: 'Navigation to shared space',
@@ -704,7 +751,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Site Redirects',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
         tests: [
             {
                 name: 'Redirect to SSO page',
@@ -718,7 +765,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Share links',
-        baseUrl: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
+        contentBaseURL: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
         tests: [
             {
                 name: 'Valid link',
@@ -738,11 +785,11 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Visitor Auth - Space',
-        baseUrl: 'https://gitbook.gitbook.io/gbo-va-space/',
+        contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
         tests: [
             {
                 name: 'First',
-                url: (() => {
+                url: () => {
                     const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
                     const token = jwt.sign(
                         {
@@ -754,7 +801,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `first?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'first' })
@@ -764,7 +811,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Second',
-                url: (() => {
+                url: () => {
                     const privateKey = '70b844d0-c519-4532-8586-5970ce48c537';
                     const token = jwt.sign(
                         {
@@ -776,7 +823,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `second?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'second' })
@@ -788,11 +835,11 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Visitor Auth - Collection',
-        baseUrl: 'https://gitbook.gitbook.io/gbo-va-collection/',
+        contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-collection/',
         tests: [
             {
                 name: 'Root',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -804,12 +851,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Primary (Space A)',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -820,13 +867,16 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         }
                     );
+
+                    // Test that when accessing the non-canonical URL, we are redirected to the canonical URL
+                    // with the jwt token in the query string
                     return `spacea?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Space B',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -838,12 +888,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `spaceb?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Space C',
-                url: (() => {
+                url: () => {
                     const privateKey = 'af5688dc-f0b6-4146-9b1d-6d834c62c980';
                     const token = jwt.sign(
                         {
@@ -855,18 +905,18 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `spacec?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
         ],
     },
     {
         name: 'Visitor Auth - Space (custom domain)',
-        baseUrl: 'https://test.gitbook.community/',
+        contentBaseURL: 'https://test.gitbook.community/',
         tests: [
             {
                 name: 'Root',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -878,12 +928,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'First',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -895,7 +945,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `first?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'first' })
@@ -905,7 +955,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'Custom page',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -917,12 +967,12 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `custom-page?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
             {
                 name: 'Inner page',
-                url: (() => {
+                url: () => {
                     const privateKey = '19c8166f-c436-4ed1-a24e-60954b804021';
                     const token = jwt.sign(
                         {
@@ -934,14 +984,14 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `custom-page/inner-page?jwt_token=${token}`;
-                })(),
+                },
                 run: waitForCookiesDialog,
             },
         ],
     },
     {
         name: 'Visitor Auth - Site (redirects to fallback/auth URL)',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/va-site-redirects-fallback/',
         tests: [
             {
                 name: 'Redirect to fallback on invalid token pulled from cookie',
@@ -973,7 +1023,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'Show error message when invalid token is passed to url',
                 screenshot: false,
-                url: (() => {
+                url: () => {
                     const token = jwt.sign(
                         {
                             name: 'gitbook-open-tests',
@@ -984,7 +1034,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     await expect(page.locator('pre')).toContainText(
                         'Error while validating the JWT token. Reason: The token signature is invalid.'
@@ -995,7 +1045,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Languages',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: allLocales.map((locale) => ({
             name: locale,
             url: getCustomizationURL({
@@ -1011,7 +1061,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'SEO',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Index by default',
@@ -1062,11 +1112,11 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Adaptive Content - VA',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/adaptive-content-va/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/adaptive-content-va/',
         tests: [
             {
                 name: 'isAlphaUser',
-                url: (() => {
+                url: () => {
                     const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
                     const token = jwt.sign(
                         {
@@ -1079,7 +1129,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const alphaUserPage = page
                         .locator('a[class*="group\\/toclink"]')
@@ -1093,7 +1143,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'isBetaUser',
-                url: (() => {
+                url: () => {
                     const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
                     const token = jwt.sign(
                         {
@@ -1106,7 +1156,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const alphaUserPage = page
                         .locator('a[class*="group\\/toclink"]')
@@ -1120,7 +1170,7 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'isAlphaUser & isBetaUser',
-                url: (() => {
+                url: () => {
                     const privateKey = 'afe09cdf-0f43-480a-b54c-8b1f62f174f9';
                     const token = jwt.sign(
                         {
@@ -1134,7 +1184,7 @@ const testCases: TestsCase[] = [
                         }
                     );
                     return `?jwt_token=${token}`;
-                })(),
+                },
                 run: async (page) => {
                     const alphaUserPage = page
                         .locator('a[class*="group\\/toclink"]')
@@ -1150,7 +1200,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Adaptive Content - Public',
-        baseUrl: 'https://gitbook-open-e2e-sites.gitbook.io/adaptive-content-public/',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/adaptive-content-public/',
         tests: [
             {
                 name: 'No custom cookie',
@@ -1293,7 +1343,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Tables',
-        baseUrl: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
                 name: 'Default table',

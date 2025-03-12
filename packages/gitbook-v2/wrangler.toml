@@ -1,7 +1,7 @@
 main = ".open-next/worker.js"
 name = "gitbook-open-v2"
-compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2025-03-11"
+compatibility_flags = ["nodejs_compat", "allow_importable_env"]
 assets = { directory = ".open-next/assets", binding = "ASSETS" }
 observability = { enabled = true }
 
@@ -11,6 +11,10 @@ kv_namespaces = [
 ]
 d1_databases = [
   { binding = "NEXT_CACHE_D1", database_id = "f59ddb40-ad72-4312-9395-0ac6a129af8e", database_name = "gitbook-open-v2-tags-preview" }
+]
+services = [
+  { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-preview" },
+  { binding = "GITBOOK_API", service = "gitbook-x-prod-api-cache" }
 ]
 
 [env.staging]
@@ -24,6 +28,10 @@ kv_namespaces = [
 d1_databases = [
   { binding = "NEXT_CACHE_D1", database_id = "9df62e39-1f35-4066-83aa-e9b8ed3ac8d5", database_name = "gitbook-open-v2-tags-staging" }
 ]
+services = [
+  { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-staging" },
+  { binding = "GITBOOK_API", service = "gitbook-x-staging-api-cache" }
+]
 
 [env.production]
 routes = [
@@ -35,4 +43,8 @@ kv_namespaces = [
 ]
 d1_databases = [
   { binding = "NEXT_CACHE_D1", database_id = "a6f16fce-5f45-43a9-89a4-7b83ddf25b77", database_name = "gitbook-open-v2-tags-production" }
+]
+services = [
+  { binding = "NEXT_CACHE_REVALIDATION_WORKER", service = "gitbook-open-v2-production" },
+  { binding = "GITBOOK_API", service = "gitbook-x-prod-api-cache" }
 ]

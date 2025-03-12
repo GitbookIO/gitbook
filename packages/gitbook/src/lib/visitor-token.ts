@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
-const VISITOR_AUTH_COOKIE_ROOT = 'gitbook-visitor-token~';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 
 export type ResponseCookie = {
@@ -127,7 +126,7 @@ export function getResponseCookiesForVisitorAuth(
  * different content hosted on the same subdomain.
  */
 export function getVisitorAuthCookieName(basePath: string): string {
-    return `${VISITOR_AUTH_COOKIE_ROOT}${hash(basePath)}`;
+    return getPathScopedCookieName(VISITOR_TOKEN_COOKIE, basePath);
 }
 
 /**
@@ -145,6 +144,14 @@ export function normalizeVisitorAuthURL(url: URL): URL {
     const withoutVAParam = new URL(url);
     withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
     return withoutVAParam;
+}
+
+/**
+ * Get the name of a cookie to be scoped to a given path.
+ * It is used to avoid conflict between used of similar cookies under a same domain.
+ */
+export function getPathScopedCookieName(prefix: string, path: string): string {
+    return `${prefix}~${hash(path)}`;
 }
 
 /**

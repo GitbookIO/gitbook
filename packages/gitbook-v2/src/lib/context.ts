@@ -16,7 +16,7 @@ import type {
 import { type GitBookDataFetcher, createDataFetcher, throwIfDataError } from '@v2/lib/data';
 import { redirect } from 'next/navigation';
 import { assert } from 'ts-essentials';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
+import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookSpaceLinker, createLinker } from './links';
 
@@ -113,30 +113,13 @@ export function getBaseContext(input: {
     const urlMode = input.urlMode;
 
     const dataFetcher = createDataFetcher({
-        apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
-        apiEndpoint: GITBOOK_API_URL,
+        apiToken: input.apiToken ?? null,
     });
-    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
 
-    const linker =
-        urlMode === 'url-host'
-            ? createLinker({
-                  host: url.host,
-                  pathname: url.pathname,
-              })
-            : createLinker({
-                  protocol: gitbookURL?.protocol,
-                  host: gitbookURL?.host,
-                  pathname: `/url/${url.host}${url.pathname}`,
-              });
-
-    if (urlMode === 'url') {
-        // Create link in the same format for links to other sites/sections.
-        linker.toLinkForContent = (rawURL: string) => {
-            const urlObject = new URL(rawURL);
-            return `/url/${urlObject.host}${urlObject.pathname}`;
-        };
-    }
+    const linker = getLinkerForSiteURL({
+        siteURL: url,
+        urlMode,
+    });
 
     const imageResizer = createImageResizer({
         host: url.host,
@@ -150,6 +133,39 @@ export function getBaseContext(input: {
         linker,
         imageResizer,
     };
+}
+
+/**
+ * Get the linker for a given site URL.
+ */
+export function getLinkerForSiteURL(input: {
+    siteURL: URL;
+    urlMode: 'url' | 'url-host';
+}) {
+    const { siteURL, urlMode } = input;
+
+    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
+    const linker =
+        urlMode === 'url-host'
+            ? createLinker({
+                  host: siteURL.host,
+                  pathname: siteURL.pathname,
+              })
+            : createLinker({
+                  protocol: gitbookURL?.protocol,
+                  host: gitbookURL?.host,
+                  pathname: `/url/${siteURL.host}${siteURL.pathname}`,
+              });
+
+    if (urlMode === 'url') {
+        // Create link in the same format for links to other sites/sections.
+        linker.toLinkForContent = (rawURL: string) => {
+            const urlObject = new URL(rawURL);
+            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`;
+        };
+    }
+
+    return linker;
 }
 
 /**

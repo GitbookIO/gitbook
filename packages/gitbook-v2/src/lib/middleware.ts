@@ -36,6 +36,12 @@ export enum MiddlewareHeaders {
      * The visitor token used to access this content
      */
     VisitorAuthToken = 'x-gitbook-visitor-token',
+
+    /**
+     * The API token used to fetch the content.
+     * This should only be passed for non-site dynamic routes.
+     */
+    APIToken = 'x-gitbook-api-token',
 }
 
 /**
@@ -111,4 +117,18 @@ export async function getVisitorAuthTokenFromMiddleware(): Promise<string | null
     }
 
     return visitorAuthToken;
+}
+
+/**
+ * Get the API token from the middleware headers.
+ * This function should only be called in a dynamic route.
+ */
+export async function getAPITokenFromMiddleware(): Promise<string> {
+    const headersList = await headers();
+    const apiToken = headersList.get(MiddlewareHeaders.APIToken);
+    if (!apiToken) {
+        throw new Error('API token is not set by the middleware');
+    }
+
+    return apiToken;
 }
