@@ -43,7 +43,6 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'absolute',
                     'top-full',
                     'left-0',
-                    'mt-2',
                     'origin-top-left',
                     'invisible',
                     'transition-opacity',
@@ -53,9 +52,10 @@ export function Dropdown<E extends HTMLElement>(props: {
                     className
                 )}
             >
-                <div className="fixed z-50 w-52">
+                <div className='fixed z-50 w-52'>
                     <div
                         className={tcls(
+                            'mt-2',
                             'w-full',
                             'bg-tint-base',
                             'rounded-lg',
