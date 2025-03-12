@@ -52,7 +52,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                     className
                 )}
             >
-                <div className='fixed z-50 w-52'>
+                <div className="fixed z-50 w-52">
                     <div
                         className={tcls(
                             'mt-2',
