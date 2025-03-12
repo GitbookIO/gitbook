@@ -7,6 +7,7 @@ import { assertIsNotV2 } from '../v2';
 import { waitUntil } from '../waitUntil';
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
+import { addResponseCacheTag } from './response';
 import type { CacheBackend, CacheEntry } from './types';
 
 export type CacheFunctionOptions = {
@@ -133,6 +134,11 @@ export function cache<Args extends any[], Result>(
 
             let result: readonly [CacheEntry, string] | null = null;
             const tag = cacheDef.tag?.(...args);
+
+            // Add the cache tag to the HTTP response
+            if (tag) {
+                addResponseCacheTag(tag);
+            }
 
             // Try the memory backend, independently of the other backends as it doesn't have a network cost
             const memoryEntry = await memoryCache.get({ key, tag });
