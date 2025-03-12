@@ -33,6 +33,7 @@ import {
 import { joinPath, normalizePathname } from '@/lib/paths';
 import { getProxyModeBasePath } from '@/lib/proxy';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
+import { addResponseCacheTag } from './lib/cache/response';
 
 export const config = {
     matcher:
@@ -287,10 +288,8 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    if (resolved.cacheTags && resolved.cacheTags.length > 0) {
-        const headerCacheTag = resolved.cacheTags.join(',');
-        setMiddlewareHeader(response, 'cache-tag', headerCacheTag);
-        setMiddlewareHeader(response, 'x-gitbook-cache-tag', headerCacheTag);
+    if (resolved.cacheTags) {
+        addResponseCacheTag(...resolved.cacheTags);
     }
 
     return response;
