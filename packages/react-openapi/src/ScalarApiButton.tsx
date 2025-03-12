@@ -27,14 +27,14 @@ export function ScalarApiButton(props: {
                     setIsOpen(true);
                 }}
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
+                Test it
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" fill="currentColor">
                     <path
                         stroke="currentColor"
                         strokeWidth="1.5"
                         d="M1 10.05V1.43c0-.2.2-.31.37-.22l7.26 4.08c.17.1.17.33.01.43l-7.26 4.54a.25.25 0 0 1-.38-.21Z"
                     />
                 </svg>
-                Test it
             </button>
 
             {isOpen &&

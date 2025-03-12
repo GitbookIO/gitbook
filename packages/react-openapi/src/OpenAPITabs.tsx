@@ -3,14 +3,13 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
 import { useEventCallback } from 'usehooks-ts';
-import { Markdown } from './Markdown';
 import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
 
 export type TabItem = {
     key: Key;
     label: string;
     body: React.ReactNode;
-    description?: string;
+    footer?: React.ReactNode;
 };
 
 type OpenAPITabsContextData = {
@@ -140,9 +139,19 @@ export function OpenAPITabsPanels() {
     return (
         <TabPanel key={key} id={key} className="openapi-tabs-panel">
             {selectedTab.body}
-            {selectedTab.description ? (
-                <Markdown source={selectedTab.description} className="openapi-tabs-footer" />
+            {selectedTab.footer ? (
+                <OpenAPITabsPanelFooter>{selectedTab.footer}</OpenAPITabsPanelFooter>
             ) : null}
         </TabPanel>
     );
+}
+
+/**
+ * The OpenAPI Tabs panel footer component.
+ * This component should be used as a child of the OpenAPITabs component.
+ */
+function OpenAPITabsPanelFooter(props: { children: React.ReactNode }) {
+    const { children } = props;
+
+    return <div className="openapi-tabs-footer">{children}</div>;
 }

@@ -1,4 +1,6 @@
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { ScalarApiButton } from './ScalarApiButton';
 import { StaticSection } from './StaticSection';
 import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
@@ -79,6 +81,7 @@ export function OpenAPICodeSample(props: {
             code: generator.generate(input),
             syntax: generator.syntax,
         }),
+        footer: <OpenAPICodeSampleFooter data={data} context={context} />,
     }));
 
     // Use custom samples if defined
@@ -105,6 +108,7 @@ export function OpenAPICodeSample(props: {
                         code: sample.source,
                         syntax: sample.lang,
                     }),
+                    footer: <OpenAPICodeSampleFooter data={data} context={context} />,
                 }));
         }
     });
@@ -125,6 +129,30 @@ export function OpenAPICodeSample(props: {
                 <OpenAPITabsPanels />
             </StaticSection>
         </OpenAPITabs>
+    );
+}
+
+function OpenAPICodeSampleFooter(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContextProps;
+}) {
+    const { data, context } = props;
+    const { method, path } = data;
+    const { specUrl } = context;
+    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
+
+    if (hideTryItPanel) {
+        return null;
+    }
+
+    if (!validateHttpMethod(method)) {
+        return null;
+    }
+
+    return (
+        <div className="openapi-codesample-footer">
+            <ScalarApiButton method={method} path={path} specUrl={specUrl} />
+        </div>
     );
 }
 
@@ -168,4 +196,8 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
             return {};
         }
     }
+}
+
+function validateHttpMethod(method: string): method is OpenAPIV3.HttpMethods {
+    return ['get', 'post', 'put', 'delete', 'patch', 'head', 'options', 'trace'].includes(method);
 }
