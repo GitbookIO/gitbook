@@ -185,7 +185,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     context={context}
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
-                                    className='w-full grow py-1'
+                                    className="w-full grow py-1"
                                 />
                             </div>
                         )}
