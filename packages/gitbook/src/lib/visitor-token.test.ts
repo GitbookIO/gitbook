@@ -88,7 +88,7 @@ describe('getVisitorAuthCookieMaxAge', () => {
         expect(getVisitorAuthCookieMaxAge(decoded)).toBe(SEVEN_DAYS_IN_SECONDS);
     });
 
-    it('returns the max age of 30 days if token expires in 7 days', () => {
+    it('returns the max age of 30 days if token expires in 30 days', () => {
         const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
         const now = Math.floor(Date.now() / 1000);
         const decoded: JwtPayload = { exp: now + THIRTY_DAYS_IN_SECONDS };
