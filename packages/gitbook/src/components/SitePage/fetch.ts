@@ -66,8 +66,21 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
             return resolvePageId(pages, resolved.id);
         }
 
-        // If a page still can't be found, we try with the API, in case we have a redirect at site level.
-        const resolvedSiteRedirect = await getDataOrNull(
+        // We first try to resovle a site redirect with the full path
+        const resolvedSiteRedirectFull = await getDataOrNull(
+            context.dataFetcher.getSiteRedirectBySource({
+                organizationId,
+                siteId: site.id,
+                source: context.linker.toPathInContent(rawPathname),
+                siteShareKey: shareKey,
+            })
+        );
+        if (resolvedSiteRedirectFull) {
+            return redirect(resolvedSiteRedirectFull.target);
+        }
+
+        // If a page still can't be found, we try to resolve a site redirect with the partial path
+        const resolvedSiteRedirectPartial = await getDataOrNull(
             context.dataFetcher.getSiteRedirectBySource({
                 organizationId,
                 siteId: site.id,
@@ -75,8 +88,8 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                 siteShareKey: shareKey,
             })
         );
-        if (resolvedSiteRedirect) {
-            return redirect(resolvedSiteRedirect.target);
+        if (resolvedSiteRedirectPartial) {
+            return redirect(resolvedSiteRedirectPartial.target);
         }
     }
 
