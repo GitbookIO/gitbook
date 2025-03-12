@@ -55,6 +55,9 @@ export interface CacheDefinition<Args extends any[], Result> {
     /** Tag to associate to the entry */
     tag?: (...args: Args) => string;
 
+    /** If true, the tag will not be sent to the HTTP response, as we consider it immutable */
+    tagImmutable?: boolean;
+
     /** Filter the arguments that should be taken into consideration for the cache key */
     getKeyArgs?: (args: Args) => any[];
 
@@ -136,7 +139,7 @@ export function cache<Args extends any[], Result>(
             const tag = cacheDef.tag?.(...args);
 
             // Add the cache tag to the HTTP response
-            if (tag) {
+            if (tag && !cacheDef.tagImmutable) {
                 addResponseCacheTag(tag);
             }
 
