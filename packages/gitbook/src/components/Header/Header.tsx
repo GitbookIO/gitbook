@@ -169,11 +169,11 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     <div
                         className={tcls(
                             CONTAINER_STYLE,
-                            'max-w-[unset]',
+                            'page-default-width:max-w-[unset]',
                             'grow',
                             'flex',
                             'items-end',
-                            '2xl:px-[calc((100%-1536px+4rem)/2)]'
+                            'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
                         )}
                     >
                         {siteSpaces.length > 1 && (
@@ -185,7 +185,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     context={context}
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
-                                    className="grow py-1"
+                                    className='w-full grow py-1'
                                 />
                             </div>
                         )}
