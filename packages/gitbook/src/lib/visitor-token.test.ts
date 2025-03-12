@@ -77,7 +77,6 @@ describe('getVisitorAuthToken', () => {
 });
 
 describe('getVisitorAuthCookieMaxAge', () => {
-    
     const ONE_MINUTE_IN_SECONDS = 60;
 
     it('returns the max age of 7 days if token expires in 7 days', () => {
