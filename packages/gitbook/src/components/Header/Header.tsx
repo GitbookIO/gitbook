@@ -72,7 +72,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     >
                         <div
                             className={tcls(
-                                'flex max-w-full',
+                                'flex max-w-full lg:basis-72',
                                 'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                             )}
                         >
