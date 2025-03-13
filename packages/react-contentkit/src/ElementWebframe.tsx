@@ -176,15 +176,9 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             allow="clipboard-write"
             className="contentkit-webframe"
             style={{
-                // If given an aspect ratio, use width as auto dimension and let height take precedence.
-                ...(aspectRatio
-                    ? {
-                          width: 'auto',
-                          aspectRatio,
-                      }
-                    : { width: '100%' }),
-
+                width: '100%',
                 maxWidth: '100%',
+                aspectRatio,
                 height: size.height ? Math.max(size.height, 32) : '100%',
                 border: 'none',
             }}
