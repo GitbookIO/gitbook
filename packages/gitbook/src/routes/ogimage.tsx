@@ -7,6 +7,7 @@ import { type PageParams, fetchPageData } from '@/components/SitePage';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { getResizedImageURL } from '@v2/lib/images';
 
 const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
     [CustomizationDefaultFont.Inter]: 'Inter',
@@ -31,12 +32,17 @@ const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
  */
 export async function serveOGImage(baseContext: GitBookSiteContext, params: PageParams) {
     const { context, pageTarget } = await fetchPageData(baseContext, params);
-    const { customization, site, linker } = context;
+    const { customization, site, linker, imageResizer } = context;
     const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
     if (customization.socialPreview.url) {
-        redirect(customization.socialPreview.url);
+        redirect(
+            await getResizedImageURL(imageResizer, customization.socialPreview.url, {
+                width: 1200,
+                height: 630,
+            })
+        );
     }
 
     // Compute all text to load only the necessary fonts

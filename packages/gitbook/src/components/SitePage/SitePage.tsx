@@ -10,6 +10,7 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
+import { getResizedImageURL } from '@v2/lib/images';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from './fetch';
 
@@ -118,7 +119,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, pages, linker } = context;
+    const { site, customization, pages, linker, imageResizer } = context;
 
     return {
         title: [page.title, site.title].filter(Boolean).join(' | '),
@@ -131,8 +132,12 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         },
         openGraph: {
             images: [
-                customization.socialPreview.url ??
-                    linker.toAbsoluteURL(linker.toPathInContent(`~gitbook/ogimage/${page.id}`)),
+                customization.socialPreview.url
+                    ? await getResizedImageURL(imageResizer, customization.socialPreview.url, {
+                          width: 1200,
+                          height: 630,
+                      })
+                    : linker.toAbsoluteURL(linker.toPathInContent(`~gitbook/ogimage/${page.id}`)),
             ],
         },
         robots:
