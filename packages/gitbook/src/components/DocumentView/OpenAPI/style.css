@@ -405,7 +405,7 @@
 }
 
 .openapi-path-server {
-    @apply text-tint;
+    @apply text-tint hidden md:inline;
 }
 
 .openapi-path .openapi-method {
