@@ -185,7 +185,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                     : { width: '100%' }),
 
                 maxWidth: '100%',
-                height: Math.max(size.height || 0, 32),
+                height: size.height ? Math.max(size.height, 32) : '100%',
                 border: 'none',
             }}
         />
