@@ -6,8 +6,6 @@ import React from 'react';
 
 import { Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
-
-import { CONTAINER_STYLE } from '../layout';
 import { SectionIcon } from './SectionIcon';
 import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
 
@@ -22,26 +20,27 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
     } = props;
     const [value, setValue] = React.useState<string | null>();
     const [offset, setOffset] = React.useState<number | null>(null);
-    const scrollableViewRef = React.useRef<HTMLDivElement>(null);
+    const menuContainerRef = React.useRef<HTMLDivElement>(null);
 
     const onNodeUpdate = (trigger: HTMLButtonElement | null, itemValue: string, size = 0) => {
+        const padding = 16;
+        const margin = -12; // Offsetting the menu container's negative margin
         const windowWidth = document.documentElement.clientWidth;
+        const windowBuffer = 16; // constrain to within the window with some buffer on the left and right we don't want the menu to enter
+        const viewportWidth =
+            size < MIN_ITEMS_FOR_COLS
+                ? VIEWPORT_ITEM_WIDTH + padding
+                : VIEWPORT_ITEM_WIDTH * 2 + padding;
+        const minOffset = 0 - (menuContainerRef.current?.offsetLeft ?? 0) + margin;
+        const maxOffset = minOffset + windowWidth - viewportWidth;
+
         if (windowWidth < 768) {
             // if the screen is small don't offset the menu
-            setOffset(0);
+            setOffset(minOffset + windowBuffer);
         } else if (trigger && value === itemValue) {
-            const padding = 16;
-            const viewportWidth =
-                size < MIN_ITEMS_FOR_COLS
-                    ? VIEWPORT_ITEM_WIDTH + padding
-                    : VIEWPORT_ITEM_WIDTH * 2 + padding;
-            const scrollLeft = scrollableViewRef.current?.scrollLeft ?? 0;
-            const triggerOffset = trigger.offsetLeft - scrollLeft; // offset of the trigger from the left edge including scrolling
-            const bufferLeft = 2; // offset the menu viewport should not pass on the left side of window
-            const bufferRight = windowWidth - (16 + viewportWidth); // offset the menu viewport should not pass on the right side of the window
+            const position = minOffset + trigger?.getBoundingClientRect().left;
             setOffset(
-                // constrain to within the window with some buffer on the left and right we don't want the menu to enter
-                Math.min(bufferRight, Math.max(bufferLeft, Math.round(triggerOffset)))
+                Math.min(maxOffset - windowBuffer, Math.max(minOffset + windowBuffer, position))
             );
         } else if (!value) {
             setOffset(null);
@@ -51,12 +50,14 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
             aria-label="Sections"
+            id="sections"
             onValueChange={setValue}
-            className={tcls('relative z-10 flex w-full flex-nowrap items-center', CONTAINER_STYLE)}
+            className="z-10 flex w-full flex-nowrap items-center"
         >
             <div
-                ref={scrollableViewRef}
-                className="hide-scroll -mb-4 -mx-3 w-full overflow-y-hidden overflow-x-scroll pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
+                ref={menuContainerRef}
+                className="-mx-3"
+                // className="-mb-4 pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
             >
                 <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent">
                     {sectionsAndGroups.map((sectionOrGroup) => {
@@ -122,11 +123,11 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                 className="absolute top-full flex transition-transform duration-200 ease-in-out"
                 style={{
                     display: offset === null ? 'none' : undefined,
-                    transform: offset ? `translateX(${offset}px)` : undefined,
+                    transform: offset ? `translateX(${offset}px) translateZ(0)` : 'translateZ(0)', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
                 }}
             >
                 <NavigationMenu.Viewport
-                    className="relative mt-3 ml-4 h-[var(--radix-navigation-menu-viewport-height)] w-[calc(100vw_-_2rem)] origin-[top_center] overflow-hidden rounded straight-corners:rounded-none bg-tint shadow-1xs shadow-dark/1 duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,_height,_transform] data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn md:mx-0 md:w-[var(--radix-navigation-menu-viewport-width)] dark:shadow-dark/4"
+                    className="relative mt-3 h-[var(--radix-navigation-menu-viewport-height)] w-[calc(100vw_-_2rem)] origin-[top_center] overflow-hidden rounded straight-corners:rounded-none bg-tint shadow-1xs shadow-dark/1 duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,_height,_transform] data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn md:mx-0 md:w-[var(--radix-navigation-menu-viewport-width)] dark:shadow-dark/4"
                     style={{
                         translate:
                             undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,

@@ -1,6 +1,6 @@
 {
     "name": "@gitbook/react-contentkit",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -10,8 +10,7 @@
     },
     "dependencies": {
         "classnames": "^2.5.1",
-        "@gitbook/api": "0.96.1",
-        "assert-never": "^1.2.1",
+        "@gitbook/api": "*",
         "@gitbook/icons": "workspace:*"
     },
     "peerDependencies": {

@@ -16,7 +16,7 @@
             "default": "./src/style.css"
         }
     },
-    "version": "0.1.0",
+    "version": "0.2.0",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.6.0",
         "@fortawesome/fontawesome-free": "^6.6.0"
@@ -41,5 +41,8 @@
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
     },
-    "files": ["dist", "src", "bin", "data", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "src", "bin", "data", "README.md", "CHANGELOG.md"],
+    "engines": {
+        "node": ">=20.0.0"
+    }
 }

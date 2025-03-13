@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 import type { NextRequest } from 'next/server';
 
+import type { JwtPayload } from 'jwt-decode';
 import {
+    getVisitorAuthCookieMaxAge,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
@@ -71,6 +73,47 @@ describe('getVisitorAuthToken', () => {
         const visitorAuth = getVisitorToken(request, request.nextUrl);
         assertVisitorAuthCookieValue(visitorAuth);
         expect(visitorAuth.token).toEqual('gotcha');
+    });
+});
+
+describe('getVisitorAuthCookieMaxAge', () => {
+    const ONE_MINUTE_IN_SECONDS = 60;
+
+    it('returns the max age of 7 days if token expires in 7 days', () => {
+        const SEVEN_DAYS_IN_SECONDS = 7 * 24 * 60 * 60;
+        const now = Math.floor(Date.now() / 1000);
+        const decoded: JwtPayload = { exp: now + SEVEN_DAYS_IN_SECONDS };
+
+        expect(getVisitorAuthCookieMaxAge(decoded)).toBe(SEVEN_DAYS_IN_SECONDS);
+    });
+
+    it('returns the max age of 30 days if token expires in 30 days', () => {
+        const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
+        const now = Math.floor(Date.now() / 1000);
+        const decoded: JwtPayload = { exp: now + THIRTY_DAYS_IN_SECONDS };
+
+        expect(getVisitorAuthCookieMaxAge(decoded)).toBe(THIRTY_DAYS_IN_SECONDS);
+    });
+
+    it('returns the minimum max age of 60 seconds if token has already expired', () => {
+        const now = Math.floor(Date.now() / 1000);
+        const decoded: JwtPayload = { exp: now - 1000 };
+
+        expect(getVisitorAuthCookieMaxAge(decoded)).toBe(ONE_MINUTE_IN_SECONDS);
+    });
+
+    it('returns the minimum max age of 60 seconds if token expires in less than 60 seconds', () => {
+        const now = Math.floor(Date.now() / 1000);
+        const decoded: JwtPayload = { exp: now + 30 }; // Expires in 30 seconds
+
+        expect(getVisitorAuthCookieMaxAge(decoded)).toBe(ONE_MINUTE_IN_SECONDS);
+    });
+
+    it('returns the correct value if expiry is in the future but more than 60 seconds', () => {
+        const now = Math.floor(Date.now() / 1000);
+        const decoded: JwtPayload = { exp: now + 300 }; // Expires in 5 minutes
+
+        expect(getVisitorAuthCookieMaxAge(decoded)).toBe(300);
     });
 });
 

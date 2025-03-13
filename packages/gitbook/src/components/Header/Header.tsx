@@ -20,7 +20,6 @@ import { SpacesDropdown } from './SpacesDropdown';
 export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
     const { context, withTopHeader } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
-    const isMultiVariants = siteSpaces.length > 1;
 
     return (
         <header
@@ -31,7 +30,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
-                'z-10',
+                'z-30',
                 'w-full',
                 'flex-none',
                 'shadow-[0px_1px_0px]',
@@ -68,17 +67,13 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            isMultiVariants && 'page-no-toc:max-[400px]:flex-wrap',
                             CONTAINER_STYLE
                         )}
                     >
                         <div
                             className={tcls(
                                 'flex max-w-full',
-                                isMultiVariants && 'page-no-toc:max-[400px]:w-full',
-                                'min-w-0 shrink items-center justify-start gap-2',
-                                'lg:basis-72',
-                                'order-first'
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                             )}
                         >
                             <HeaderMobileMenu
@@ -88,56 +83,11 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'text-tint-strong',
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'theme-bold:hover:bg-header-link/3'
+                                    'theme-bold:hover:bg-header-link/3',
+                                    'page-no-toc:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />
-                            {isMultiVariants && (
-                                <div className="ml-2 page-no-toc:flex hidden">
-                                    <SpacesDropdown
-                                        context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
-                                        className={tcls(
-                                            'theme-bold:bg-header-link/2',
-                                            'theme-bold:text-header-link',
-                                            'theme-bold:ring-header-link/4',
-
-                                            'theme-bold:group-focus-within/dropdown:bg-header-link/3',
-                                            'theme-bold:group-focus-within/dropdown:text-header-link',
-                                            'theme-bold:group-focus-within/dropdown:ring-header-link/6',
-                                            'theme-bold:group-hover/dropdown:bg-header-link/3',
-                                            'theme-bold:group-hover/dropdown:text-header-link',
-                                            'theme-bold:group-hover/dropdown:ring-header-link/6',
-
-                                            'theme-bold:contrast-more:bg-header-background',
-                                            'theme-bold:contrast-more:text-header-link',
-                                            'theme-bold:contrast-more:ring-header-link',
-
-                                            'theme-bold:contrast-more:group-hover/dropdown:text-header-link',
-                                            'theme-bold:contrast-more:group-hover/dropdown:ring-header-link',
-                                            'theme-bold:contrast-more:group-focus-within/dropdown:text-header-link',
-                                            'theme-bold:contrast-more:group-focus-within/dropdown:ring-header-link',
-
-                                            'theme-bold:dark:bg-header-link/2',
-                                            'theme-bold:dark:text-header-link',
-                                            'theme-bold:dark:ring-header-link/4',
-
-                                            'theme-bold:dark:group-hover/dropdown:bg-header-link/3',
-                                            'theme-bold:dark:group-hover/dropdown:text-header-link',
-                                            'theme-bold:dark:group-hover/dropdown:ring-header-link/6',
-
-                                            'theme-bold:contrast-more:dark:group-hover/dropdown:text-header-link',
-                                            'theme-bold:contrast-more:dark:group-hover/dropdown:ring-header-link',
-                                            'theme-bold:dark:group-focus-within/dropdown:bg-header-link/3',
-                                            'theme-bold:dark:group-focus-within/dropdown:text-header-link',
-                                            'theme-bold:dark:group-focus-within/dropdown:ring-header-link/6',
-                                            'theme-bold:contrast-more:dark:group-focus-within/dropdown:text-header-link',
-                                            'theme-bold:contrast-more:dark:group-focus-within/dropdown:ring-header-link'
-                                        )}
-                                    />
-                                </div>
-                            )}
                         </div>
 
                         <div
@@ -220,9 +170,47 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     </div>
                 </div>
             </div>
-            {sections ? (
-                <div className="scroll-nojump">
-                    <SiteSectionTabs sections={encodeClientSiteSections(context, sections)} />
+
+            {sections || siteSpaces.length > 1 ? (
+                <div
+                    className={tcls(
+                        'w-full',
+                        'overflow-x-scroll',
+                        'overflow-y-hidden',
+                        'hide-scroll',
+                        '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
+                        !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
+                    )}
+                >
+                    <div
+                        className={tcls(
+                            CONTAINER_STYLE,
+                            'page-default-width:max-w-[unset]',
+                            'grow',
+                            'flex',
+                            'items-end',
+                            'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
+                        )}
+                    >
+                        {siteSpaces.length > 1 && (
+                            <div
+                                id="variants"
+                                className="my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
+                            >
+                                <SpacesDropdown
+                                    context={context}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
+                                    className="w-full grow py-1"
+                                />
+                            </div>
+                        )}
+                        {sections && (
+                            <SiteSectionTabs
+                                sections={encodeClientSiteSections(context, sections)}
+                            />
+                        )}
+                    </div>
                 </div>
             ) : null}
         </header>

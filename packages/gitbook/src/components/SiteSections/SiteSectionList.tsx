@@ -137,12 +137,13 @@ export function SiteSectionGroupItem(props: {
     return (
         <>
             <button
+                type="button"
                 onClick={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     setIsVisible((prev) => !prev);
                 }}
-                className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
+                className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 text-left transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
                     isActiveGroup
                         ? 'font-semibold text-primary hover:bg-primary-hover hover:text-primary-strong contrast-more:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
                         : null

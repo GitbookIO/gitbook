@@ -1,5 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+/*
+ * This code is ONLY for v1.
+ */
+
 /**
  * Set a header on the middleware response.
  * We do this because of https://github.com/opennextjs/opennextjs-cloudflare/issues/92

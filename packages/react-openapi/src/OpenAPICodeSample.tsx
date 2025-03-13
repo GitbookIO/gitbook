@@ -26,13 +26,17 @@ export function OpenAPICodeSample(props: {
         }
 
         if (param.in === 'header' && param.required) {
-            const example = param.schema ? generateSchemaExample(param.schema) : undefined;
+            const example = param.schema
+                ? generateSchemaExample(param.schema, { mode: 'write' })
+                : undefined;
             if (example !== undefined && param.name) {
                 headersObject[param.name] =
                     typeof example !== 'string' ? stringifyOpenAPI(example) : example;
             }
         } else if (param.in === 'query' && param.required) {
-            const example = param.schema ? generateSchemaExample(param.schema) : undefined;
+            const example = param.schema
+                ? generateSchemaExample(param.schema, { mode: 'write' })
+                : undefined;
             if (example !== undefined && param.name) {
                 searchParams.append(
                     param.name,

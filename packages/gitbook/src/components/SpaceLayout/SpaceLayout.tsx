@@ -11,7 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
-import { GITBOOK_APP_URL } from '@v2/lib/env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
@@ -51,7 +51,7 @@ export function SpaceLayout(props: {
             <InsightsProvider
                 enabled={withTracking}
                 appURL={GITBOOK_APP_URL}
-                apiHost={context.dataFetcher.apiEndpoint}
+                apiHost={GITBOOK_API_PUBLIC_URL}
                 visitorAuthToken={visitorAuthToken}
                 organizationId={context.organizationId}
                 siteId={context.site.id}
@@ -85,7 +85,8 @@ export function SpaceLayout(props: {
                                         'lg:flex',
                                         'grow-0',
                                         'flex-wrap',
-                                        'dark:shadow-light/1'
+                                        'dark:shadow-light/1',
+                                        'text-base/tight'
                                     )}
                                 >
                                     <HeaderLogo context={context} />
@@ -106,6 +107,7 @@ export function SpaceLayout(props: {
                                                             ? 'search_or_ask'
                                                             : 'search'
                                                     )}
+                                                    ...
                                                 </span>
                                             </SearchButton>
                                         </React.Suspense>
@@ -122,7 +124,11 @@ export function SpaceLayout(props: {
                                         context={context}
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
-                                        className={tcls('w-full')}
+                                        className={tcls(
+                                            'w-full',
+                                            'page-no-toc:hidden',
+                                            'site-header-none:page-no-toc:flex'
+                                        )}
                                     />
                                 )}
                             </>

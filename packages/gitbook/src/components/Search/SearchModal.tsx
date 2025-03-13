@@ -84,7 +84,7 @@ export function SearchModal(props: SearchModalProps) {
                             'bg-tint-12/4',
                             'dark:bg-tint-1/6',
                             'backdrop-blur-2xl',
-                            'z-30',
+                            'z-50',
                             'px-4',
                             'pt-4',
                             'md:pt-[min(8vh,6rem)]'

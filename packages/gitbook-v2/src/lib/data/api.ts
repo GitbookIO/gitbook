@@ -1,5 +1,14 @@
-import { type ComputedContentSource, GitBookAPI } from '@gitbook/api';
-import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
+import { trace } from '@/lib/tracing';
+import {
+    type ComputedContentSource,
+    GitBookAPI,
+    type GitBookAPIServiceBinding,
+} from '@gitbook/api';
+import {
+    getCacheTag,
+    getCacheTagForURL,
+    getComputedContentSourceCacheTags,
+} from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { wrapDataFetcherError } from './errors';
@@ -7,36 +16,25 @@ import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
     /**
-     * API host to use.
-     */
-    apiEndpoint: string;
-
-    /**
      * API token.
      */
     apiToken: string | null;
 }
 
-const commonInput: DataFetcherInput = {
-    apiEndpoint: GITBOOK_API_URL,
-    apiToken: GITBOOK_API_TOKEN,
-};
-
 /**
  * Create a data fetcher using an API token.
  * The data are being cached by Next.js built-in cache.
  */
-export function createDataFetcher(input: DataFetcherInput = commonInput): GitBookDataFetcher {
+export function createDataFetcher(
+    input: DataFetcherInput = { apiToken: null }
+): GitBookDataFetcher {
     return {
-        apiEndpoint: input.apiEndpoint,
-
         async api() {
-            return getAPI(input);
+            return apiClient(input);
         },
 
         withToken({ apiToken }) {
             return createDataFetcher({
-                ...input,
                 apiToken,
             });
         },
@@ -45,94 +43,120 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         // API that are tied to the token
         //
         getPublishedContentSite(params) {
-            return getPublishedContentSite(input, {
-                organizationId: params.organizationId,
-                siteId: params.siteId,
-                siteShareKey: params.siteShareKey,
-            });
+            return trace('getPublishedContentSite', () =>
+                getPublishedContentSite(input, {
+                    organizationId: params.organizationId,
+                    siteId: params.siteId,
+                    siteShareKey: params.siteShareKey,
+                })
+            );
         },
         getSiteRedirectBySource(params) {
-            return getSiteRedirectBySource(input, {
-                organizationId: params.organizationId,
-                siteId: params.siteId,
-                siteShareKey: params.siteShareKey,
-                source: params.source,
-            });
+            return trace('getSiteRedirectBySource', () =>
+                getSiteRedirectBySource(input, {
+                    organizationId: params.organizationId,
+                    siteId: params.siteId,
+                    siteShareKey: params.siteShareKey,
+                    source: params.source,
+                })
+            );
         },
         getRevision(params) {
-            return getRevision(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                metadata: params.metadata,
-            });
+            return trace('getRevision', () =>
+                getRevision(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    metadata: params.metadata,
+                })
+            );
         },
         getRevisionPages(params) {
-            return getRevisionPages(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                metadata: params.metadata,
-            });
+            return trace('getRevisionPages', () =>
+                getRevisionPages(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    metadata: params.metadata,
+                })
+            );
         },
         getRevisionFile(params) {
-            return getRevisionFile(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                fileId: params.fileId,
-            });
+            return trace('getRevisionFile', () =>
+                getRevisionFile(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    fileId: params.fileId,
+                })
+            );
         },
         getRevisionPageByPath(params) {
-            return getRevisionPageByPath(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                path: params.path,
-            });
+            return trace('getRevisionPageByPath', () =>
+                getRevisionPageByPath(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    path: params.path,
+                })
+            );
         },
         getReusableContent(params) {
-            return getReusableContent(input, {
-                spaceId: params.spaceId,
-                revisionId: params.revisionId,
-                reusableContentId: params.reusableContentId,
-            });
+            return trace('getReusableContent', () =>
+                getReusableContent(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    reusableContentId: params.reusableContentId,
+                })
+            );
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return getLatestOpenAPISpecVersionContent(input, {
-                organizationId: params.organizationId,
-                slug: params.slug,
-            });
+            return trace('getLatestOpenAPISpecVersionContent', () =>
+                getLatestOpenAPISpecVersionContent(input, {
+                    organizationId: params.organizationId,
+                    slug: params.slug,
+                })
+            );
         },
         getSpace(params) {
-            return getSpace(input, {
-                spaceId: params.spaceId,
-                shareKey: params.shareKey,
-            });
+            return trace('getSpace', () =>
+                getSpace(input, {
+                    spaceId: params.spaceId,
+                    shareKey: params.shareKey,
+                })
+            );
         },
         getChangeRequest(params) {
-            return getChangeRequest(input, {
-                spaceId: params.spaceId,
-                changeRequestId: params.changeRequestId,
-            });
+            return trace('getChangeRequest', () =>
+                getChangeRequest(input, {
+                    spaceId: params.spaceId,
+                    changeRequestId: params.changeRequestId,
+                })
+            );
         },
         getDocument(params) {
-            return getDocument(input, {
-                spaceId: params.spaceId,
-                documentId: params.documentId,
-            });
+            return trace('getDocument', () =>
+                getDocument(input, {
+                    spaceId: params.spaceId,
+                    documentId: params.documentId,
+                })
+            );
         },
         getComputedDocument(params) {
-            return getComputedDocument(input, {
-                organizationId: params.organizationId,
-                spaceId: params.spaceId,
-                source: params.source,
-            });
+            return trace('getComputedDocument', () =>
+                getComputedDocument(input, {
+                    organizationId: params.organizationId,
+                    spaceId: params.spaceId,
+                    source: params.source,
+                })
+            );
         },
         getEmbedByUrl(params) {
-            return getEmbedByUrl(input, {
-                url: params.url,
-                spaceId: params.spaceId,
-            });
+            return trace('getEmbedByUrl', () =>
+                getEmbedByUrl(input, {
+                    url: params.url,
+                    spaceId: params.spaceId,
+                })
+            );
         },
         searchSiteContent(params) {
-            return searchSiteContent(input, params);
+            return trace('searchSiteContent', () => searchSiteContent(input, params));
         },
 
         //
@@ -140,25 +164,31 @@ export function createDataFetcher(input: DataFetcherInput = commonInput): GitBoo
         // where the data is the same for all users
         //
         getUserById(userId) {
-            return getUserById(commonInput, userId);
+            return trace('getUserById', () => getUserById({ apiToken: null }, { userId }));
         },
         getPublishedContentByUrl(params) {
-            return getPublishedContentByUrl(commonInput, {
-                url: params.url,
-                visitorAuthToken: params.visitorAuthToken,
-                redirectOnError: params.redirectOnError,
-            });
+            return trace('getPublishedContentByUrl', () =>
+                getPublishedContentByUrl(
+                    { apiToken: null },
+                    {
+                        url: params.url,
+                        visitorAuthToken: params.visitorAuthToken,
+                        redirectOnError: params.redirectOnError,
+                    }
+                )
+            );
         },
     };
 }
 
-async function getUserById(input: DataFetcherInput, userId: string) {
+async function getUserById(input: DataFetcherInput, params: { userId: string }) {
     'use cache';
 
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).users.getUserById(userId);
+        const api = await apiClient(input);
+        const res = await api.users.getUserById(params.userId);
         return res.data;
     });
 }
@@ -181,7 +211,8 @@ async function getSpace(
     );
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getSpaceById(params.spaceId, {
+        const api = await apiClient(input);
+        const res = await api.spaces.getSpaceById(params.spaceId, {
             shareKey: params.shareKey,
         });
         return res.data;
@@ -200,10 +231,8 @@ async function getChangeRequest(
     cacheLife('minutes');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getChangeRequestById(
-            params.spaceId,
-            params.changeRequestId
-        );
+        const api = await apiClient(input);
+        const res = await api.spaces.getChangeRequestById(params.spaceId, params.changeRequestId);
         cacheTag(
             getCacheTag({
                 tag: 'change-request',
@@ -228,7 +257,8 @@ async function getRevision(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getRevisionById(params.spaceId, params.revisionId, {
+        const api = await apiClient(input);
+        const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
             metadata: params.metadata,
         });
         return res.data;
@@ -248,13 +278,10 @@ async function getRevisionPages(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.listPagesInRevisionById(
-            params.spaceId,
-            params.revisionId,
-            {
-                metadata: params.metadata,
-            }
-        );
+        const api = await apiClient(input);
+        const res = await api.spaces.listPagesInRevisionById(params.spaceId, params.revisionId, {
+            metadata: params.metadata,
+        });
         return res.data.pages;
     });
 }
@@ -272,10 +299,12 @@ async function getRevisionFile(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getFileInRevisionById(
+        const api = await apiClient(input);
+        const res = await api.spaces.getFileInRevisionById(
             params.spaceId,
             params.revisionId,
-            params.fileId
+            params.fileId,
+            {}
         );
         return res.data;
     });
@@ -295,10 +324,12 @@ async function getRevisionPageByPath(
 
     const encodedPath = encodeURIComponent(params.path);
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getPageInRevisionByPath(
+        const api = await apiClient(input);
+        const res = await api.spaces.getPageInRevisionByPath(
             params.spaceId,
             params.revisionId,
-            encodedPath
+            encodedPath,
+            {}
         );
 
         return res.data;
@@ -317,7 +348,8 @@ async function getDocument(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getDocumentById(params.spaceId, params.documentId);
+        const api = await apiClient(input);
+        const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
         return res.data;
     });
 }
@@ -345,7 +377,8 @@ async function getComputedDocument(
     );
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getComputedDocument(params.spaceId, {
+        const api = await apiClient(input);
+        const res = await api.spaces.getComputedDocument(params.spaceId, {
             source: params.source,
         });
         return res.data;
@@ -365,7 +398,8 @@ async function getReusableContent(
     cacheLife('max');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).spaces.getReusableContentInRevisionById(
+        const api = await apiClient(input);
+        const res = await api.spaces.getReusableContentInRevisionById(
             params.spaceId,
             params.revisionId,
             params.reusableContentId
@@ -393,7 +427,8 @@ async function getLatestOpenAPISpecVersionContent(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).orgs.getLatestOpenApiSpecVersionContent(
+        const api = await apiClient(input);
+        const res = await api.orgs.getLatestOpenApiSpecVersionContent(
             params.organizationId,
             params.slug
         );
@@ -413,17 +448,12 @@ async function getPublishedContentByUrl(
 
     const { url, visitorAuthToken, redirectOnError } = params;
 
-    const hostname = new URL(url).hostname;
-    cacheTag(
-        getCacheTag({
-            tag: 'url',
-            hostname,
-        })
-    );
+    cacheTag(getCacheTagForURL(url));
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).urls.getPublishedContentByUrl({
+        const api = await apiClient(input);
+        const res = await api.urls.getPublishedContentByUrl({
             url,
             visitorAuthToken: visitorAuthToken ?? undefined,
             redirectOnError,
@@ -452,22 +482,19 @@ async function getPublishedContentSite(
 ) {
     'use cache';
 
+    cacheLife('days');
     cacheTag(
         getCacheTag({
             tag: 'site',
             site: params.siteId,
         })
     );
-    cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).orgs.getPublishedContentSite(
-            params.organizationId,
-            params.siteId,
-            {
-                shareKey: params.siteShareKey,
-            }
-        );
+        const api = await apiClient(input);
+        const res = await api.orgs.getPublishedContentSite(params.organizationId, params.siteId, {
+            shareKey: params.siteShareKey,
+        });
         return res.data;
     });
 }
@@ -492,14 +519,11 @@ async function getSiteRedirectBySource(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).orgs.getSiteRedirectBySource(
-            params.organizationId,
-            params.siteId,
-            {
-                shareKey: params.siteShareKey,
-                source: params.source,
-            }
-        );
+        const api = await apiClient(input);
+        const res = await api.orgs.getSiteRedirectBySource(params.organizationId, params.siteId, {
+            shareKey: params.siteShareKey,
+            source: params.source,
+        });
 
         return res.data;
     });
@@ -517,7 +541,7 @@ async function getEmbedByUrl(
     cacheLife('weeks');
 
     return wrapDataFetcherError(async () => {
-        const api = getAPI(input);
+        const api = await apiClient(input);
         const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
         return res.data;
     });
@@ -534,7 +558,8 @@ async function searchSiteContent(
     cacheLife('days');
 
     return wrapDataFetcherError(async () => {
-        const res = await getAPI(input).orgs.searchSiteContent(organizationId, siteId, {
+        const api = await apiClient(input);
+        const res = await api.orgs.searchSiteContent(organizationId, siteId, {
             query,
             ...scope,
         });
@@ -542,12 +567,43 @@ async function searchSiteContent(
     });
 }
 
-function getAPI(input: DataFetcherInput) {
-    const { apiEndpoint, apiToken } = input;
+let loggedServiceBinding = false;
+
+/**
+ * Create a new API client.
+ */
+export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
+    const { apiToken } = input;
+    let serviceBinding: GitBookAPIServiceBinding | undefined;
+
+    try {
+        // HACK: This is a workaround to avoid webpack trying to bundle this cloudflare only module
+        // @ts-ignore
+        const { env } = await import(
+            /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
+        );
+        serviceBinding = env.GITBOOK_API;
+        if (!loggedServiceBinding) {
+            loggedServiceBinding = true;
+            if (serviceBinding) {
+                // biome-ignore lint/suspicious/noConsole: we want to log here
+                console.log(`using service binding for the API (${GITBOOK_API_URL})`);
+            } else {
+                // biome-ignore lint/suspicious/noConsole: we want to log here
+                console.warn(`no service binding for the API (${GITBOOK_API_URL})`);
+            }
+        }
+    } catch (error) {
+        if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+            throw error;
+        }
+    }
+
     const api = new GitBookAPI({
-        authToken: apiToken ?? undefined,
-        endpoint: apiEndpoint,
+        authToken: apiToken || GITBOOK_API_TOKEN || undefined,
+        endpoint: GITBOOK_API_URL,
         userAgent: GITBOOK_USER_AGENT,
+        serviceBinding,
     });
 
     return api;
