@@ -45,7 +45,7 @@ export function HeaderLinkMore(props: {
 
     return (
         <div className={`${styles.linkEllipsis} z-20 items-center`}>
-            <Dropdown button={renderButton} className="right-0 left-auto">
+            <Dropdown button={renderButton} className={tcls('max-md:right-0 max-md:left-auto', context.customization.styling.search === 'prominent' && 'right-0 left-auto')}>
                 <DropdownMenu>
                     {links.map((link, index) => (
                         <MoreMenuLink key={index} link={link} context={context} />

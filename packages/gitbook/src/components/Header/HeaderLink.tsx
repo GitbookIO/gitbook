@@ -34,7 +34,7 @@ export async function HeaderLink(props: {
     if (link.links && link.links.length > 0) {
         return (
             <Dropdown
-                className="right-0 left-auto shrink"
+                className={`shrink ${customization.styling.search === 'prominent' ? 'right-0 left-auto' : null}`}
                 button={(buttonProps) => {
                     if (!target || !link.to) {
                         return (
@@ -154,7 +154,7 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
         'flex items-center',
         'shrink',
         'contrast-more:underline',
-        'line-clamp-1',
+        'truncate',
 
         'text-tint',
         'links-default:hover:text-primary',
