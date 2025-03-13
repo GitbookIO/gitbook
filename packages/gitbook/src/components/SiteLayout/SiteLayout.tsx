@@ -100,12 +100,13 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
     const { site, customization, linker, imageResizer } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
+    const faviconSize = 48;
     const icons = [
         {
             url: customIcon?.light
                 ? await getResizedImageURL(imageResizer, customIcon.light, {
-                      width: 32,
-                      height: 32,
+                      width: faviconSize,
+                      height: faviconSize,
                   })
                 : linker.toAbsoluteURL(
                       linker.toPathInContent('~gitbook/icon?size=small&theme=light')
@@ -116,8 +117,8 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
         {
             url: customIcon?.dark
                 ? await getResizedImageURL(imageResizer, customIcon.dark, {
-                      width: 32,
-                      height: 32,
+                      width: faviconSize,
+                      height: faviconSize,
                   })
                 : linker.toAbsoluteURL(
                       linker.toPathInContent('~gitbook/icon?size=small&theme=dark')
