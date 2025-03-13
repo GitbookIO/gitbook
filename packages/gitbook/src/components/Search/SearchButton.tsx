@@ -85,6 +85,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
                 'md:justify-start',
                 'md:w-full',
+                'text-sm',
                 style
             )}
         >
@@ -99,7 +100,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 }
 
 const Shortcut = () => {
-    const [operatingSystem, setOperatingSystem] = useState('win');
+    const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
 
     useEffect(() => {
         function getOperatingSystem() {
@@ -114,7 +115,7 @@ const Shortcut = () => {
         setOperatingSystem(getOperatingSystem());
     }, []);
 
-    return (
+    return operatingSystem ? (
         <div
             className={tcls(
                 'shortcut',
@@ -127,7 +128,8 @@ const Shortcut = () => {
                 'text-tint',
                 'contrast-more:text-tint-strong',
                 'whitespace-nowrap',
-                `[font-feature-settings:"calt",_"case"]`
+                `[font-feature-settings:"calt",_"case"]`,
+                'animate-fadeIn'
             )}
         >
             <kbd
@@ -139,5 +141,5 @@ const Shortcut = () => {
                 K
             </kbd>
         </div>
-    );
+    ) : null;
 };
