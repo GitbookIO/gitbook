@@ -1,5 +1,10 @@
 'use server';
 
+import { getAbsoluteHref } from '@/lib/links';
+import { type AncestorRevisionPage, resolvePageId } from '@/lib/pages';
+import { findSiteSpaceById } from '@/lib/sites';
+import { filterOutNullable } from '@/lib/typescript';
+import { getV1BaseContext } from '@/lib/v1';
 import type {
     RevisionPage,
     SearchAIAnswer,
@@ -12,12 +17,6 @@ import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
-
-import { getAbsoluteHref } from '@/lib/links';
-import { resolvePageId } from '@/lib/pages';
-import { findSiteSpaceById } from '@/lib/sites';
-import { filterOutNullable } from '@/lib/typescript';
-import { getV1BaseContext } from '@/lib/v1';
 
 import { isV2 } from '@/lib/v2';
 import { throwIfDataError } from '@v2/lib/data';
@@ -42,6 +41,8 @@ export interface ComputedPageResult {
 
     /** When part of a multi-spaces search, the title of the space */
     spaceTitle?: string;
+
+    ancestors: AncestorRevisionPage[];
 }
 
 export interface AskAnswerSource {
@@ -353,6 +354,7 @@ async function transformSectionsAndPage(args: {
         title: item.title,
         href: await getURLWithSections(item.path, spaceURL),
         spaceTitle: space?.title,
+        ancestors: [], // @TODO: Empty for now, let's populate
     };
 
     return [page, sections];
