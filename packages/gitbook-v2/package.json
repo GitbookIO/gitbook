@@ -1,6 +1,6 @@
 {
     "name": "gitbook-v2",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "private": true,
     "dependencies": {
         "next": "^15.2.1",
