@@ -1,6 +1,6 @@
 import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { OpenAPIOperation } from '@gitbook/react-openapi';
+import { OpenAPIOperation as BaseOpenAPIOperation } from '@gitbook/react-openapi';
 
 import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
 import { tcls } from '@/lib/tailwind';
@@ -12,21 +12,21 @@ import { Heading } from '../Heading';
 
 import './scalar.css';
 import './style.css';
-import type { AnyOpenAPIBlock } from '@/lib/openapi/types';
+import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 
 /**
  * Render an openapi block or an openapi-operation block.
  */
-export async function OpenAPI(props: BlockProps<AnyOpenAPIBlock>) {
+export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlock>) {
     const { style } = props;
     return (
         <div className={tcls('flex w-full', style, 'max-w-full')}>
-            <OpenAPIBody {...props} />
+            <OpenAPIOperationBody {...props} />
         </div>
     );
 }
 
-async function OpenAPIBody(props: BlockProps<AnyOpenAPIBlock>) {
+async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>) {
     const { block, context } = props;
 
     if (!context.contentContext) {
@@ -53,7 +53,7 @@ async function OpenAPIBody(props: BlockProps<AnyOpenAPIBlock>) {
     }
 
     return (
-        <OpenAPIOperation
+        <BaseOpenAPIOperation
             data={data}
             context={{
                 specUrl,

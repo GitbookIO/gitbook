@@ -25,7 +25,7 @@ import { IntegrationBlock } from './Integration';
 import { List } from './List';
 import { ListItem } from './ListItem';
 import { BlockMath } from './Math';
-import { OpenAPI } from './OpenAPI';
+import { OpenAPIOperation, OpenAPISchemas } from './OpenAPI';
 import { Paragraph } from './Paragraph';
 import { Quote } from './Quote';
 import { ReusableContent } from './ReusableContent';
@@ -82,9 +82,9 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Table {...props} block={block} />;
             case 'swagger':
             case 'openapi-operation':
-                return <OpenAPI {...props} block={block} />;
+                return <OpenAPIOperation {...props} block={block} />;
             case 'openapi-schemas':
-                return <></>;
+                return <OpenAPISchemas {...props} block={block} />;
             case 'embed':
                 return <Embed {...props} block={block} />;
             case 'blockquote':

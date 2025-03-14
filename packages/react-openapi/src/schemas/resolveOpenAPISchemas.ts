@@ -15,21 +15,43 @@ import type { OpenAPISchema, OpenAPISchemasData } from '../types';
  * Schemas are extracted from the OpenAPI components.schemas
  */
 export async function resolveOpenAPISchemas(
-    filesystem: Filesystem<OpenAPIV3xDocument>
+    filesystem: Filesystem<OpenAPIV3xDocument>,
+    options: {
+        schemas: string[];
+    }
 ): Promise<OpenAPISchemasData | null> {
+    const { schemas: selectedSchemas } = options;
+
     const schema = await dereferenceFilesystem(filesystem);
 
-    const schemas = getOpenAPIComponents(schema);
+    const schemas = filterSelectedOpenAPISchemas(schema, selectedSchemas);
+
+    if (schemas.length === 0) {
+        return null;
+    }
 
     return { schemas };
 }
-
 /**
- * Get OpenAPI components.schemas that are not ignored.
+ * Extract selected schemas from the OpenAPI document.
  */
-function getOpenAPIComponents(schema: OpenAPIV3.Document | OpenAPIV3_1.Document): OpenAPISchema[] {
-    const schemas = schema.components?.schemas ?? {};
-    return Object.entries(schemas)
-        .filter(([, schema]) => !shouldIgnoreEntity(schema))
-        .map(([key, schema]) => ({ name: key, schema }));
+export function filterSelectedOpenAPISchemas(
+    schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
+    selectedSchemas: string[]
+): OpenAPISchema[] {
+    const componentsSchemas = schema.components?.schemas ?? {};
+
+    // Preserve the order of the selected schemas
+    return selectedSchemas
+        .map((name) => {
+            const schema = componentsSchemas[name];
+            if (schema && !shouldIgnoreEntity(schema)) {
+                return {
+                    name,
+                    schema,
+                };
+            }
+            return null;
+        })
+        .filter((schema): schema is OpenAPISchema => !!schema);
 }

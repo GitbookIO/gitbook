@@ -1,18 +1,24 @@
 import { parseOpenAPI } from '@gitbook/openapi-parser';
 
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
-import type { ResolveOpenAPIBlockArgs } from '@/lib/openapi/types';
+import type {
+    AnyOpenAPIOperationsBlock,
+    OpenAPISchemasBlock,
+    ResolveOpenAPIBlockArgs,
+} from '@/lib/openapi/types';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
 import type { FetchOpenAPIFilesystemResult } from './types';
 
+type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock;
+
 /**
  * Fetch OpenAPI block.
  */
 export async function fetchOpenAPIFilesystem(
-    args: ResolveOpenAPIBlockArgs
+    args: ResolveOpenAPIBlockArgs<AnyOpenAPIBlock>
 ): Promise<FetchOpenAPIFilesystemResult> {
     const { context, block } = args;
 
