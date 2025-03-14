@@ -1,18 +1,25 @@
 import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
 import { OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
-import type { AnyOpenAPIBlock, ResolveOpenAPIBlockArgs, ResolveOpenAPIBlockResult } from './types';
+import type {
+    AnyOpenAPIOperationsBlock,
+    ResolveOpenAPIBlockArgs,
+    ResolveOpenAPIBlockResult,
+} from './types';
 
 type ResolveOpenAPIOperationBlockResult = ResolveOpenAPIBlockResult<OpenAPIOperationData>;
 
-const weakmap = new WeakMap<AnyOpenAPIBlock, Promise<ResolveOpenAPIOperationBlockResult>>();
+const weakmap = new WeakMap<
+    AnyOpenAPIOperationsBlock,
+    Promise<ResolveOpenAPIOperationBlockResult>
+>();
 
 /**
  * Cache the result of resolving an OpenAPI block.
  * It is important because the resolve is called in sections and in the block itself.
  */
 export function resolveOpenAPIOperationBlock(
-    args: ResolveOpenAPIBlockArgs<AnyOpenAPIBlock>
+    args: ResolveOpenAPIBlockArgs<AnyOpenAPIOperationsBlock>
 ): Promise<ResolveOpenAPIOperationBlockResult> {
     if (weakmap.has(args.block)) {
         return weakmap.get(args.block)!;
@@ -27,7 +34,7 @@ export function resolveOpenAPIOperationBlock(
  * Resolve OpenAPI operation block.
  */
 async function baseResolveOpenAPIOperationBlock(
-    args: ResolveOpenAPIBlockArgs<AnyOpenAPIBlock>
+    args: ResolveOpenAPIBlockArgs<AnyOpenAPIOperationsBlock>
 ): Promise<ResolveOpenAPIOperationBlockResult> {
     const { context, block } = args;
     if (!block.data.path || !block.data.method) {

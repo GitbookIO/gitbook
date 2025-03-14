@@ -12,12 +12,12 @@ import { Heading } from '../Heading';
 
 import './scalar.css';
 import './style.css';
-import type { AnyOpenAPIBlock } from '@/lib/openapi/types';
+import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 
 /**
  * Render an openapi block or an openapi-operation block.
  */
-export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIBlock>) {
+export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlock>) {
     const { style } = props;
     return (
         <div className={tcls('flex w-full', style, 'max-w-full')}>
@@ -26,7 +26,7 @@ export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIBlock>) {
     );
 }
 
-async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIBlock>) {
+async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>) {
     const { block, context } = props;
 
     if (!context.contentContext) {

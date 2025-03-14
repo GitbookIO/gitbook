@@ -9,7 +9,7 @@ import type { GitBookAnyContext } from '@v2/lib/context';
 /**
  * Type for both OpenAPI & OpenAPIOperation block
  */
-export type AnyOpenAPIBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
+export type AnyOpenAPIOperationsBlock = DocumentBlockOpenAPI | DocumentBlockOpenAPIOperation;
 
 /**
  * Type for OpenAPI Schemas block
