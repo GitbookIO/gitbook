@@ -1,10 +1,10 @@
-import { describe, test, expect } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
+import stylelint from 'stylelint';
 import {
     type CustomizationFontDefinition,
     generateFontFacesCSS,
-    getCustomFontSources,
+    getFontSourcesToPreload,
 } from './customFonts';
-import stylelint from 'stylelint';
 
 const TEST_FONTS = {
     basic: {
@@ -281,14 +281,14 @@ describe('getCustomFontPreloadLinks', () => {
 
     preloadTestCases.forEach(({ name, font, expectedCount }) => {
         test(`extracts ${expectedCount} URLs from ${name}`, () => {
-            const result = getCustomFontSources(font);
+            const result = getFontSourcesToPreload(font);
             expect(result).toBeArray();
             expect(result.length).toBe(expectedCount);
         });
     });
 
     test('handles different URL types correctly', () => {
-        const result = getCustomFontSources(TEST_FONTS.variousURLs);
+        const result = getFontSourcesToPreload(TEST_FONTS.variousURLs);
 
         expect(result).toBeArray();
         expect(result.length).toBe(3);

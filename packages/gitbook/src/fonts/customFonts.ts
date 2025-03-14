@@ -18,7 +18,7 @@ export type FontWeight = number;
 /** A font file referenced within a font-face declaration, specifying the file's location and format. */
 export interface FontSource {
     /** The absolute or relative URL pointing to the font file. */
-    url: URL;
+    url: string;
     /** The format of the font file. Prefer 'woff2' for modern browsers. */
     format?: 'woff2' | 'woff';
 }
@@ -67,7 +67,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
         .map((face) => {
             const srcAttr = face.sources
                 .map((source) => {
-                    let srcDefinition = `url(${source.url.href})`;
+                    let srcDefinition = `url(${source.url})`;
 
                     if (source.format) {
                         srcDefinition += ` format('${source.format}')`;
@@ -98,21 +98,39 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
 }
 
 /**
- * Get the list of font URLs to preload
+ * Get the list of font sources to preload
  */
-export function getCustomFontSources(customFont: CustomizationFontDefinition): FontSource[] {
-    return customFont.fontFaces.flatMap((face) => face.sources);
+export function getFontSourcesToPreload(customFont: CustomizationFontDefinition): FontSource[] {
+    const allSources = customFont.fontFaces.flatMap((face) => face.sources);
+
+    const uniqueSources = new Map<string, FontSource>();
+
+    // Add each source to the map, using URL as the key
+    allSources.forEach((source) => {
+        const url = source.url.toString();
+        if (!uniqueSources.has(url)) {
+            uniqueSources.set(url, source);
+        }
+    });
+
+    return Array.from(uniqueSources.values());
 }
 
+/**
+ * The font data for a custom font
+ * fontCSS is the @font-face CSS definitions
+ * preloadSources is the list of font files to preload
+ */
 type CustomFontData = {
-    isCustom: true;
-    fontCSS: string;
-    fontSources: FontSource[];
+    cssClass: 'font-content';
+    cssDefinitions: string;
+    preloadSources: FontSource[];
 };
 
 type DefaultFontData = {
-    isCustom: false;
-    fontVariable: string;
+    cssClass: string;
+    cssDefinitons: undefined;
+    preloadSources: undefined;
 };
 
 /**
@@ -121,18 +139,19 @@ type DefaultFontData = {
  * For custom fonts it returns the CSS for the @font-face definitions and font URLs to preload
  */
 export function getFontData(font: CustomizationFont): CustomFontData | DefaultFontData {
-    const isCustomFont = typeof font !== 'string';
-
-    if (isCustomFont) {
+    if (typeof font === 'string') {
         return {
-            isCustom: true,
-            fontCSS: generateFontFacesCSS(font as CustomizationFontDefinition),
-            fontSources: getCustomFontSources(font as CustomizationFontDefinition),
+            // next/font variable name
+            cssClass: fonts[font].variable,
+            cssDefinitons: undefined,
+            preloadSources: undefined,
         };
     }
 
     return {
-        isCustom: false,
-        fontVariable: fonts[font].variable,
+        // custom font variable name defined in tailwind.config.js
+        cssClass: 'font-content',
+        cssDefinitions: generateFontFacesCSS(font),
+        preloadSources: getFontSourcesToPreload(font),
     };
 }
