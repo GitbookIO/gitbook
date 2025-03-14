@@ -83,6 +83,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'swagger':
             case 'openapi-operation':
                 return <OpenAPI {...props} block={block} />;
+            case 'openapi-schemas':
+                return <></>;
             case 'embed':
                 return <Embed {...props} block={block} />;
             case 'blockquote':
@@ -156,6 +158,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'table':
         case 'swagger':
         case 'openapi-operation':
+        case 'openapi-schemas':
         case 'math':
         case 'divider':
         case 'content-ref':
