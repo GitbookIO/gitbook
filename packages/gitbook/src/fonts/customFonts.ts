@@ -18,7 +18,7 @@ export type FontWeight = number;
 /** A font file referenced within a font-face declaration, specifying the file's location and format. */
 export interface FontSource {
     /** The absolute or relative URL pointing to the font file. */
-    url: URL;
+    url: string;
     /** The format of the font file. Prefer 'woff2' for modern browsers. */
     format?: 'woff2' | 'woff';
 }
@@ -67,7 +67,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
         .map((face) => {
             const srcAttr = face.sources
                 .map((source) => {
-                    let srcDefinition = `url(${source.url.href})`;
+                    let srcDefinition = `url(${source.url})`;
 
                     if (source.format) {
                         srcDefinition += ` format('${source.format}')`;
@@ -92,47 +92,69 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
     return `
         ${fontFaceDeclarations}
         :root {
-            --font-content: ${fontFamily};
+            --font-custom: ${fontFamily};
         }
     `;
 }
 
 /**
- * Get the list of font URLs to preload
+ * Get the list of font sources to preload
  */
-export function getCustomFontSources(customFont: CustomizationFontDefinition): FontSource[] {
-    return customFont.fontFaces.flatMap((face) => face.sources);
+export function getFontSourcesToPreload(customFont: CustomizationFontDefinition): FontSource[] {
+    const allSources = customFont.fontFaces.flatMap((face) => face.sources);
+
+    const uniqueSources = new Map<string, FontSource>();
+
+    // Add each source to the map, using URL as the key
+    allSources.forEach((source) => {
+        const url = source.url.toString();
+        if (!uniqueSources.has(url)) {
+            uniqueSources.set(url, source);
+        }
+    });
+
+    return Array.from(uniqueSources.values());
 }
 
-type CustomFontData = {
-    isCustom: true;
-    fontCSS: string;
-    fontSources: FontSource[];
-};
-
-type DefaultFontData = {
-    isCustom: false;
-    fontVariable: string;
-};
+/**
+ * Represents font data for either a default font or a custom font
+ */
+type FontData = DefaultFontData | CustomFontData;
 
 /**
- * Get the font data for a given font
- * For default fonts it returns a next/font variable name.
- * For custom fonts it returns the CSS for the @font-face definitions and font URLs to preload
+ * Font data for a default font from next/font
  */
-export function getFontData(font: CustomizationFont): CustomFontData | DefaultFontData {
-    const isCustomFont = typeof font !== 'string';
+interface DefaultFontData {
+    type: 'default';
+    cssClassName: string;
+}
 
-    if (isCustomFont) {
+/**
+ * Font data for a custom font with @font-face definitions
+ */
+interface CustomFontData {
+    type: 'custom';
+    cssDefinitions: string;
+    preloadSources: FontSource[];
+}
+
+/**
+ * Get the appropriate font data for a given font configuration
+ * @param font Either a predefined font name or a custom font configuration
+ */
+export function getFontData(font: CustomizationFont): FontData {
+    if (typeof font === 'string') {
+        // Default font from next/font
         return {
-            isCustom: true,
-            fontCSS: generateFontFacesCSS(font as CustomizationFontDefinition),
-            fontSources: getCustomFontSources(font as CustomizationFontDefinition),
+            type: 'default',
+            cssClassName: fonts[font].variable,
         };
     }
 
+    // Custom font with @font-face definitions
     return {
-        isCustom: false,
-        fontVariable: fonts[font].variable,
+        type: 'custom',
+        cssDefinitions: generateFontFacesCSS(font),
+        preloadSources: getFontSourcesToPreload(font),
     };
 }

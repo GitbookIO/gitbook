@@ -22,15 +22,7 @@ import {
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
 
-import {
-    type CustomizationFont,
-    fontNotoColorEmoji,
-    fonts,
-    generateFontFacesCSS,
-    getCustomFontSources,
-    getFontData,
-    ibmPlexMono,
-} from '@/fonts';
+import { fontNotoColorEmoji, getFontData, renderFontPreloads, renderFontStyles } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -77,8 +69,7 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                !fontData.isCustom ? fontData.fontVariable : '', // Only use fontVariable for default fonts
-                ibmPlexMono.variable
+                fontData.type === 'default' ? fontData.cssClassName : 'font-custom'
             )}
         >
             <head>
@@ -87,22 +78,23 @@ export async function CustomizationRootLayout(props: {
                 ) : null}
 
                 {/* Font preloading for custom fonts */}
-                {fontData.isCustom &&
-                    fontData.fontSources.map(({ url, format }) => (
-                        <link
-                            key={url.href}
-                            rel="preload"
-                            href={url.href}
-                            as="font"
-                            type={format ? `font/${format}` : undefined}
-                            crossOrigin="anonymous"
-                        />
-                    ))}
+                {fontData.type === 'custom'
+                    ? fontData.preloadSources.map(({ url, format }) => (
+                          <link
+                              key={url}
+                              rel="preload"
+                              href={url}
+                              as="font"
+                              type={format ? `font/${format}` : undefined}
+                              crossOrigin="anonymous"
+                          />
+                      ))
+                    : null}
 
                 {/* Custom font CSS */}
-                {fontData.isCustom && fontData.fontCSS && (
-                    <style id="custom-font-styles">{fontData.fontCSS}</style>
-                )}
+                {fontData.type === 'custom' ? (
+                    <style id="custom-font-styles">{fontData.cssDefinitions}</style>
+                ) : null}
 
                 <style
                     nonce={
@@ -149,9 +141,6 @@ export async function CustomizationRootLayout(props: {
             </head>
             <body
                 className={tcls(
-                    fontNotoColorEmoji.className,
-                    hasCustomFont ? 'font-sans' : fonts[customization.styling.font].className,
-                    `${ibmPlexMono.variable}`,
                     'bg-tint-base',
                     'theme-muted:bg-tint-subtle',
                     'theme-bold-tint:bg-tint-subtle',
@@ -286,58 +275,7 @@ function getSemanticColors(
         },
     };
 }
-/**
- * Define the custom font faces and set the --font-content to the custom font name
- */
-// function generateCustomFontFaces(customFont: CustomizationFontDefinition): string {
-//     const { fontFamily, faces } = customFont;
-//
-//     const regularFont = faces.find((face) => face.weight === 400);
-//     const boldFont = faces.find((face) => face.weight === 700);
-//
-//     if (!regularFont || !boldFont) {
-//         throw new Error('Custom font must have a regular and a bold face');
-//     }
-//
-//     const regular = `
-//         @font-face {
-//             font-family: ${fontFamily};
-//             font-style: normal;
-//             font-weight: ${regularFont.weight};
-//             font-display: swap;
-//             src: url(${regularFont.url});
-//         }
-// `;
-//
-//     // const semiBold = `
-//     //        @font-face {
-//     //            font-family: ${fontFamily};
-//     //            font-style: normal;
-//     //            font-weight: 600;
-//     //            font-display: swap;
-//     //            src: url(${boldFont.url});
-//     //        }
-//     //    `
-//     // 	: "";
-//
-//     const bold = `
-//         @font-face {
-//             font-family: ${fontFamily};
-//             font-style: normal;
-//             font-weight: ${boldFont.weight};
-//             font-display: swap;
-//             src: url(${boldFont.url});
-//         }
-//     `;
-//
-//     return `
-//         ${regular}
-//         ${bold}
-//         :root {
-//             --font-content: ${fontFamily};
-//         }
-//     `;
-// }
+
 type ColorInput = string;
 function generateColorVariable(
     name: string,

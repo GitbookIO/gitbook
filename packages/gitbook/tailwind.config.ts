@@ -72,7 +72,7 @@ const config: Config = {
                 'current-page': 'current="page"',
             },
             fontFamily: {
-                sans: ['var(--font-content)', 'arial', 'sans-serif'],
+                sans: ['var(--font-content)'],
                 mono: ['var(--font-mono)'],
                 emoji: [
                     'Apple Color Emoji',
@@ -80,6 +80,7 @@ const config: Config = {
                     'var(--font-noto-color-emoji)',
                     'sans-serif',
                 ],
+                custom: ['var(--font-custom)'],
                 var: ['var(--font-family)'],
             },
             colors: {
