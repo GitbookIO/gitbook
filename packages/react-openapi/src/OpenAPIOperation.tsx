@@ -35,6 +35,7 @@ export function OpenAPIOperation(props: {
                           title: operation.summary,
                       })
                     : null}
+                <OpenAPIPath data={data} context={context} />
                 {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
             </div>
             <div className="openapi-columns">
@@ -49,7 +50,6 @@ export function OpenAPIOperation(props: {
                         </div>
                     ) : null}
                     <OpenAPIOperationDescription operation={operation} context={context} />
-                    <OpenAPIPath data={data} context={context} />
                     <OpenAPISpec data={data} context={clientContext} />
                 </div>
                 <div className="openapi-column-preview">

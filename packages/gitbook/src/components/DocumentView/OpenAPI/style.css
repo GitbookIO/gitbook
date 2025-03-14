@@ -1,6 +1,6 @@
 /* Layout Components */
 .openapi-operation {
-    @apply flex-1 flex flex-col gap-4 mb-14;
+    @apply flex-1 flex flex-col gap-8 mb-14;
 }
 
 .openapi-schemas {
@@ -17,7 +17,7 @@
 }
 
 .openapi-summary {
-    @apply flex flex-col items-start justify-start gap-2;
+    @apply flex flex-col items-start justify-start gap-3;
 }
 
 .openapi-deprecated {
@@ -391,17 +391,30 @@
     @apply flex flex-row items-center h-fit;
 }
 
+.openapi-codesample-footer {
+    @apply flex w-full justify-end;
+}
+
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-transparent text-sm gap-2 p-2 border rounded-md border-tint-subtle;
+    @apply flex items-center text-sm gap-2 h-fit;
+}
+
+.openapi-path-variable {
+    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-none before:!content-none after:!content-none;
+}
+
+.openapi-path-server {
+    @apply text-tint hidden md:inline;
 }
 
 .openapi-path .openapi-method {
-    @apply text-[0.813rem] m-0 px-1;
+    @apply text-[0.813rem] m-0 h-full items-center flex px-2;
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-tint-strong;
+    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-tint-strong/10;
+    @apply py-0.5 px-1 rounded hover:bg-tint cursor-pointer transition-colors;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -520,6 +533,10 @@
     @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
 }
 
+.openapi-tabs-footer .openapi-markdown {
+    @apply text-[0.813rem] text-tint;
+}
+
 /* Disclosure group */
 .openapi-disclosure-group {
     @apply border-b border-tint-subtle relative;
@@ -630,4 +647,38 @@
 
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
     @apply p-2.5;
+}
+
+.openapi-tooltip {
+    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+}
+
+.openapi-tooltip svg {
+    @apply size-3 text-tint-strong;
+}
+
+.openapi-tooltip[data-entering] {
+    animation: tooltip-enter 0.2s ease-in-out forwards;
+}
+
+.openapi-tooltip[data-exiting] {
+    animation: tooltip-leave 0.2s ease-in-out forwards;
+}
+
+@keyframes tooltip-enter {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes tooltip-leave {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
