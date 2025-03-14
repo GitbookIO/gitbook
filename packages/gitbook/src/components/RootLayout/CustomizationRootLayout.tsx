@@ -27,6 +27,8 @@ import {
     fontNotoColorEmoji,
     fonts,
     generateFontFacesCSS,
+    getCustomFontSources,
+    getFontData,
     ibmPlexMono,
 } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
@@ -54,19 +56,7 @@ export async function CustomizationRootLayout(props: {
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
-
-    const font = customization.styling.font as CustomizationFont;
-
-    const hasCustomFont = typeof font !== 'string';
-
-    // Add custom font handling
-    const customFontCSS = hasCustomFont ? generateFontFacesCSS(font) : '';
-
-    const customFontLinks = hasCustomFont
-        ? customization.styling.font.faces.map((face) => face.url)
-        : [];
-
-    console.log('customFontLinks', customFontLinks, customization.styling.font);
+    const fontData = getFontData(customization.styling.font);
 
     // TODO: also add preconnect
 
@@ -87,7 +77,7 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                fonts[customization.styling.font].variable,
+                !fontData.isCustom ? fontData.fontVariable : '', // Only use fontVariable for default fonts
                 ibmPlexMono.variable
             )}
         >
@@ -95,12 +85,25 @@ export async function CustomizationRootLayout(props: {
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
-                {hasCustomFont && customFontLinks.length > 0
-                    ? customFontLinks.map((link) => (
-                          <link rel="preload" href={link} as="font" crossOrigin="anonymous" />
-                      ))
-                    : null}
-                {hasCustomFont ? <style>{customFontCSS}</style> : null}
+
+                {/* Font preloading for custom fonts */}
+                {fontData.isCustom &&
+                    fontData.fontSources.map(({ url, format }) => (
+                        <link
+                            key={url.href}
+                            rel="preload"
+                            href={url.href}
+                            as="font"
+                            type={format ? `font/${format}` : undefined}
+                            crossOrigin="anonymous"
+                        />
+                    ))}
+
+                {/* Custom font CSS */}
+                {fontData.isCustom && fontData.fontCSS && (
+                    <style id="custom-font-styles">{fontData.fontCSS}</style>
+                )}
+
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
