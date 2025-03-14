@@ -627,30 +627,44 @@ const testCases: TestsCase[] = [
             ...allThemes.flatMap((theme) => [
                 ...allTintColors.flatMap((tint) => [
                     ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                        ...allSearchStyles.flatMap((searchStyle) => ({
-                            name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
-                            url: getCustomizationURL({
-                                styling: {
-                                    theme,
-                                    ...(tint.value ? { tint: { color: tint.value } } : {}),
-                                    sidebar: {
-                                        background: sidebarStyle,
-                                        list: CustomizationSidebarListStyle.Default,
-                                    },
-                                    search: searchStyle,
+                        name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
+                        url: getCustomizationURL({
+                            styling: {
+                                theme,
+                                ...(tint.value ? { tint: { color: tint.value } } : {}),
+                                sidebar: {
+                                    background: sidebarStyle,
+                                    list: CustomizationSidebarListStyle.Default,
                                 },
-                                header: {
-                                    links: headerLinks,
-                                },
-                                themes: {
-                                    default: themeMode,
-                                    toggeable: false,
-                                },
-                            }),
-                            run: waitForCookiesDialog,
-                        })),
+                            },
+                            header: {
+                                links: headerLinks,
+                            },
+                            themes: {
+                                default: themeMode,
+                                toggeable: false,
+                            },
+                        }),
+                        run: waitForCookiesDialog,
                     })),
                 ]),
+                ...allSearchStyles.flatMap((searchStyle) => ({
+                    name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
+                    url: getCustomizationURL({
+                        styling: {
+                            theme,
+                            search: searchStyle,
+                        },
+                        header: {
+                            links: headerLinks,
+                        },
+                        themes: {
+                            default: themeMode,
+                            toggeable: false,
+                        },
+                    }),
+                    run: waitForCookiesDialog,
+                })),
             ]),
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [

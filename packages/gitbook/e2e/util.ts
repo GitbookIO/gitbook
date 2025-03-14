@@ -263,7 +263,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,
             },
-            search: CustomizationSearchStyle.Prominent,
+            search: CustomizationSearchStyle.Subtle,
         },
         internationalization: {
             locale: CustomizationLocale.En,
