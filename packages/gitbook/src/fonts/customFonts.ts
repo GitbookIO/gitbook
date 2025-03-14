@@ -1,4 +1,5 @@
-import { CustomizationDefaultFont } from '@gitbook/api';
+import type { CustomizationDefaultFont } from '@gitbook/api';
+import { fonts } from './index';
 
 /**
  * The human-readable font-family name used in CSS (e.g., "Open Sans", "Playfair Display").
@@ -97,54 +98,41 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
 }
 
 /**
- * Define the custom font faces and set the --font-content to the custom font name
+ * Get the list of font URLs to preload
  */
-// function generateCustomFontFaces(customFont: CustomizationFontDefinition): string {
-//     const { fontFamily, faces } = customFont;
-//
-//     const regularFont = faces.find((face) => face.weight === 400);
-//     const boldFont = faces.find((face) => face.weight === 700);
-//
-//     if (!regularFont || !boldFont) {
-//         throw new Error('Custom font must have a regular and a bold face');
-//     }
-//
-//     const regular = `
-//         @font-face {
-//             font-family: ${fontFamily};
-//             font-style: normal;
-//             font-weight: ${regularFont.weight};
-//             font-display: swap;
-//             src: url(${regularFont.url});
-//         }
-// `;
-//
-//     // const semiBold = `
-//     //        @font-face {
-//     //            font-family: ${fontFamily};
-//     //            font-style: normal;
-//     //            font-weight: 600;
-//     //            font-display: swap;
-//     //            src: url(${boldFont.url});
-//     //        }
-//     //    `
-//     // 	: "";
-//
-//     const bold = `
-//         @font-face {
-//             font-family: ${fontFamily};
-//             font-style: normal;
-//             font-weight: ${boldFont.weight};
-//             font-display: swap;
-//             src: url(${boldFont.url});
-//         }
-//     `;
-//
-//     return `
-//         ${regular}
-//         ${bold}
-//         :root {
-//             --font-content: ${fontFamily};
-//         }
-//     `;
-// }
+export function getCustomFontSources(customFont: CustomizationFontDefinition): FontSource[] {
+    return customFont.fontFaces.flatMap((face) => face.sources);
+}
+
+type CustomFontData = {
+    isCustom: true;
+    fontCSS: string;
+    fontSources: FontSource[];
+};
+
+type DefaultFontData = {
+    isCustom: false;
+    fontVariable: string;
+};
+
+/**
+ * Get the font data for a given font
+ * For default fonts it returns a next/font variable name.
+ * For custom fonts it returns the CSS for the @font-face definitions and font URLs to preload
+ */
+export function getFontData(font: CustomizationFont): CustomFontData | DefaultFontData {
+    const isCustomFont = typeof font !== 'string';
+
+    if (isCustomFont) {
+        return {
+            isCustom: true,
+            fontCSS: generateFontFacesCSS(font as CustomizationFontDefinition),
+            fontSources: getCustomFontSources(font as CustomizationFontDefinition),
+        };
+    }
+
+    return {
+        isCustom: false,
+        fontVariable: fonts[font].variable,
+    };
+}

@@ -1,6 +1,178 @@
 import { describe, test, expect } from 'bun:test';
-import { type CustomizationFontDefinition, generateFontFacesCSS } from './customFonts';
+import {
+    type CustomizationFontDefinition,
+    generateFontFacesCSS,
+    getCustomFontSources,
+} from './customFonts';
 import stylelint from 'stylelint';
+
+const TEST_FONTS = {
+    basic: {
+        id: 'open-sans',
+        fontFamily: 'Open Sans',
+        fontFaces: [
+            {
+                weight: 400,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/opensans-regular.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+            {
+                weight: 700,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/opensans-bold.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+
+    multiWeight: {
+        id: 'roboto',
+        fontFamily: 'Roboto',
+        fontFaces: [
+            {
+                weight: 300,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/roboto-light.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+            {
+                weight: 400,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/roboto-regular.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+            {
+                weight: 500,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/roboto-medium.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+            {
+                weight: 700,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/roboto-bold.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+            {
+                weight: 900,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/roboto-black.woff2'),
+                        format: 'woff2',
+                    },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+
+    multiSource: {
+        id: 'lato',
+        fontFamily: 'Lato',
+        fontFaces: [
+            {
+                weight: 400,
+                sources: [
+                    {
+                        url: new URL('https://example.com/fonts/lato-regular.woff2'),
+                        format: 'woff2',
+                    },
+                    { url: new URL('https://example.com/fonts/lato-regular.woff'), format: 'woff' },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+
+    missingFormat: {
+        id: 'source-sans',
+        fontFamily: 'Source Sans Pro',
+        fontFaces: [
+            {
+                weight: 400,
+                sources: [
+                    { url: new URL('https://example.com/fonts/sourcesans-regular.woff2') },
+                    {
+                        url: new URL('https://example.com/fonts/sourcesans-regular.woff'),
+                        format: 'woff',
+                    },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+
+    empty: {
+        id: 'empty-font',
+        fontFamily: 'Empty Font',
+        fontFaces: [],
+    } as CustomizationFontDefinition,
+
+    specialChars: {
+        id: 'special-font',
+        fontFamily: 'Special Font & Co.',
+        fontFaces: [
+            {
+                weight: 400,
+                sources: [
+                    { url: new URL('https://example.com/fonts/special.woff2'), format: 'woff2' },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+
+    complex: {
+        id: 'complex-font',
+        fontFamily: 'Complex Font',
+        fontFaces: [
+            {
+                weight: 400,
+                sources: [
+                    { url: new URL('https://example.com/fonts/regular.woff2') },
+                    { url: new URL('https://example.com/fonts/regular.woff') },
+                ],
+            },
+            {
+                weight: 700,
+                sources: [
+                    { url: new URL('https://example.com/fonts/bold.woff2') },
+                    { url: new URL('https://example.com/fonts/bold.woff') },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+
+    variousURLs: {
+        id: 'various-urls',
+        fontFamily: 'Various URLs Font',
+        fontFaces: [
+            {
+                weight: 400,
+                sources: [
+                    { url: new URL('https://example.com/fonts/absolute.woff2') },
+                    { url: new URL('/fonts/relative.woff2', 'https://example.com') },
+                    { url: new URL('./fonts/path-relative.woff2', 'https://example.com') },
+                ],
+            },
+        ],
+    } as CustomizationFontDefinition,
+};
 
 // Helper function to validate CSS with stylelint
 async function isCSSValid(css: string): Promise<boolean> {
@@ -30,34 +202,8 @@ async function isCSSValid(css: string): Promise<boolean> {
 
 describe('generateFontFacesCSS', () => {
     test('basic case with regular and bold weights', async () => {
-        const fontDef: CustomizationFontDefinition = {
-            id: 'open-sans',
-            fontFamily: 'Open Sans',
-            fontFaces: [
-                {
-                    weight: 400,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/opensans-regular.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-                {
-                    weight: 700,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/opensans-bold.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-            ],
-        };
+        const css = generateFontFacesCSS(TEST_FONTS.basic);
 
-        const css = generateFontFacesCSS(fontDef);
-
-        // Validate CSS syntax
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
 
@@ -70,78 +216,9 @@ describe('generateFontFacesCSS', () => {
         expect(css).toContain('--font-content: Open Sans');
     });
 
-    test('should fail validation on broken CSS', async () => {
-        // Create a broken CSS string
-        const brokenCss = `
-      @font-face {
-        font-family: "Broken Font"
-        /* Missing semicolon above */
-        font-weight: 400;
-        src: url(broken);
-      }
-    `;
-
-        // This should fail syntax validation
-        const isValid = await isCSSValid(brokenCss);
-        expect(isValid).toBe(false);
-    });
-
     test('multiple font weights', async () => {
-        const fontDef: CustomizationFontDefinition = {
-            id: 'roboto',
-            fontFamily: 'Roboto',
-            fontFaces: [
-                {
-                    weight: 300,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/roboto-light.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-                {
-                    weight: 400,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/roboto-regular.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-                {
-                    weight: 500,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/roboto-medium.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-                {
-                    weight: 700,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/roboto-bold.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-                {
-                    weight: 900,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/roboto-black.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-            ],
-        };
+        const css = generateFontFacesCSS(TEST_FONTS.multiWeight);
 
-        const css = generateFontFacesCSS(fontDef);
-
-        // Validate CSS syntax
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
 
@@ -151,29 +228,8 @@ describe('generateFontFacesCSS', () => {
     });
 
     test('multiple sources for a single weight', async () => {
-        const fontDef: CustomizationFontDefinition = {
-            id: 'lato',
-            fontFamily: 'Lato',
-            fontFaces: [
-                {
-                    weight: 400,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/lato-regular.woff2'),
-                            format: 'woff2',
-                        },
-                        {
-                            url: new URL('https://example.com/fonts/lato-regular.woff'),
-                            format: 'woff',
-                        },
-                    ],
-                },
-            ],
-        };
+        const css = generateFontFacesCSS(TEST_FONTS.multiSource);
 
-        const css = generateFontFacesCSS(fontDef);
-
-        // Validate CSS syntax
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
 
@@ -183,26 +239,8 @@ describe('generateFontFacesCSS', () => {
     });
 
     test('missing format property', async () => {
-        const fontDef: CustomizationFontDefinition = {
-            id: 'source-sans',
-            fontFamily: 'Source Sans Pro',
-            fontFaces: [
-                {
-                    weight: 400,
-                    sources: [
-                        { url: new URL('https://example.com/fonts/sourcesans-regular.woff2') },
-                        {
-                            url: new URL('https://example.com/fonts/sourcesans-regular.woff'),
-                            format: 'woff',
-                        },
-                    ],
-                },
-            ],
-        };
+        const css = generateFontFacesCSS(TEST_FONTS.missingFormat);
 
-        const css = generateFontFacesCSS(fontDef);
-
-        // Validate CSS syntax
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
 
@@ -212,44 +250,50 @@ describe('generateFontFacesCSS', () => {
     });
 
     test('empty font faces array', async () => {
-        const fontDef: CustomizationFontDefinition = {
-            id: 'empty-font',
-            fontFamily: 'Empty Font',
-            fontFaces: [],
-        };
+        const css = generateFontFacesCSS(TEST_FONTS.empty);
 
-        const css = generateFontFacesCSS(fontDef);
-
-        // Validate CSS syntax
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
 
-        // Should only contain the CSS variable, no @font-face declarations
         expect(css).not.toContain('@font-face');
         expect(css).toContain('--font-content: Empty Font');
     });
 
     test('font with special characters in name', async () => {
-        const fontDef: CustomizationFontDefinition = {
-            id: 'special-font',
-            fontFamily: 'Special Font & Co.',
-            fontFaces: [
-                {
-                    weight: 400,
-                    sources: [
-                        {
-                            url: new URL('https://example.com/fonts/special.woff2'),
-                            format: 'woff2',
-                        },
-                    ],
-                },
-            ],
-        };
-
-        const css = generateFontFacesCSS(fontDef);
+        const css = generateFontFacesCSS(TEST_FONTS.specialChars);
 
         // Validate CSS syntax
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
+    });
+});
+
+describe('getCustomFontPreloadLinks', () => {
+    const preloadTestCases = [
+        { name: 'basic case', font: TEST_FONTS.basic, expectedCount: 2 },
+        { name: 'multiple weights', font: TEST_FONTS.multiWeight, expectedCount: 5 },
+        { name: 'multiple sources', font: TEST_FONTS.multiSource, expectedCount: 2 },
+        { name: 'missing format', font: TEST_FONTS.missingFormat, expectedCount: 2 },
+        { name: 'empty font faces', font: TEST_FONTS.empty, expectedCount: 0 },
+        { name: 'special characters', font: TEST_FONTS.specialChars, expectedCount: 1 },
+        { name: 'complex case', font: TEST_FONTS.complex, expectedCount: 4 },
+    ];
+
+    preloadTestCases.forEach(({ name, font, expectedCount }) => {
+        test(`extracts ${expectedCount} URLs from ${name}`, () => {
+            const result = getCustomFontSources(font);
+            expect(result).toBeArray();
+            expect(result.length).toBe(expectedCount);
+        });
+    });
+
+    test('handles different URL types correctly', () => {
+        const result = getCustomFontSources(TEST_FONTS.variousURLs);
+
+        expect(result).toBeArray();
+        expect(result.length).toBe(3);
+        expect(result).toContain('https://example.com/fonts/absolute.woff2');
+        expect(result).toContain('https://example.com/fonts/relative.woff2');
+        expect(result).toContain('https://example.com/fonts/path-relative.woff2');
     });
 });
