@@ -158,7 +158,13 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                         {customization.header.links.length > 0 && (
                             <HeaderLinks>
                                 {customization.header.links.map((link) => {
-                                    return <HeaderLink key={link.title} link={link} context={context} />;
+                                    return (
+                                        <HeaderLink
+                                            key={link.title}
+                                            link={link}
+                                            context={context}
+                                        />
+                                    );
                                 })}
                                 <HeaderLinkMore
                                     label={t(getSpaceLanguage(customization), 'more')}
