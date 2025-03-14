@@ -366,7 +366,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/x-www-form-urlencoded"},\n    data={"key":"value"}\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/x-www-form-urlencoded"},\n    json={"key":"value"}\n)\n\ndata = response.json()'
         );
     });
 
@@ -385,7 +385,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data={"key":"value"}\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    json={"key":"value"}\n)\n\ndata = response.json()'
         );
     });
 
@@ -402,7 +402,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/xml"},\n    data="<key>value</key>"\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/xml"},\n    json="<key>value</key>"\n)\n\ndata = response.json()'
         );
     });
 
@@ -419,7 +419,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/graphql"},\n    data="{ key }"\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/graphql"},\n    json="{ key }"\n)\n\ndata = response.json()'
         );
     });
 
@@ -436,7 +436,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"text/csv"},\n    data="key,value"\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"text/csv"},\n    json="key,value"\n)\n\ndata = response.json()'
         );
     });
 
@@ -470,7 +470,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"text/plain"},\n    data="value"\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"text/plain"},\n    json="value"\n)\n\ndata = response.json()'
         );
     });
 

@@ -130,7 +130,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
                 } else {
-                    code += indent(`data=${stringifyOpenAPI(body)}\n`, 4);
+                    code += indent(`json=${stringifyOpenAPI(body)}\n`, 4);
                 }
             }
 
