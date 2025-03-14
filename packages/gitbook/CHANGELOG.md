@@ -1,5 +1,12 @@
 # gitbook
 
+## 0.8.1
+
+### Patch Changes
+
+- Updated dependencies [4f0a772]
+  - @gitbook/colors@0.3.0
+
 ## 0.8.0
 
 ### Minor Changes
