@@ -204,7 +204,7 @@ export function colorScale(
         // At the edges of the scale, the subtle lightness changes stop being perceptible. We need to amp up our mapping to still stand out.
         const amplifier = 1;
         mapping = mapping.map((step, index) =>
-            index < 9 ? step + (step * amplifier * difference) : step
+            index < 9 ? step + step * amplifier * difference : step
         );
     }
 
