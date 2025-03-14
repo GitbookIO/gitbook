@@ -8,6 +8,7 @@ import {
     CustomizationIconsStyle,
     CustomizationLinksStyle,
     CustomizationLocale,
+    CustomizationSearchStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     CustomizationTheme,
@@ -107,6 +108,11 @@ export const allDeprecatedThemePresets: CustomizationHeaderPreset[] = [
 export const allSidebarBackgroundStyles: CustomizationSidebarBackgroundStyle[] = [
     CustomizationSidebarBackgroundStyle.Default,
     CustomizationSidebarBackgroundStyle.Filled,
+];
+
+export const allSearchStyles: CustomizationSearchStyle[] = [
+    CustomizationSearchStyle.Prominent,
+    CustomizationSearchStyle.Subtle,
 ];
 
 // Common customization settings
@@ -257,6 +263,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,
             },
+            search: CustomizationSearchStyle.Prominent,
         },
         internationalization: {
             locale: CustomizationLocale.En,

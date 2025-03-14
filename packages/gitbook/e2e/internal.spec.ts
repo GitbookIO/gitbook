@@ -19,10 +19,11 @@ import {
     type TestsCase,
     allDeprecatedThemePresets,
     allLocales,
-    allSidebarBackgroundStyles,
-    allThemeModes,
-    allThemes,
-    allTintColors,
+    allSearchStyles,
+    allSearchStyles,
+    allSearchStyles,
+    allSearchStyles,
+    allSearchStyl
     getCustomizationURL,
     headerLinks,
     runTestCases,
@@ -626,25 +627,28 @@ const testCases: TestsCase[] = [
             ...allThemes.flatMap((theme) => [
                 ...allTintColors.flatMap((tint) => [
                     ...allSidebarBackgroundStyles.flatMap((sidebarStyle) => ({
-                        name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
-                        url: getCustomizationURL({
-                            styling: {
-                                theme,
-                                ...(tint.value ? { tint: { color: tint.value } } : {}),
-                                sidebar: {
-                                    background: sidebarStyle,
-                                    list: CustomizationSidebarListStyle.Default,
+                        ...allSearchStyles.flatMap((searchStyle) => ({
+                            name: `Theme ${theme} - Tint ${tint.label} - Sidebar ${sidebarStyle} - Mode ${themeMode}`,
+                            url: getCustomizationURL({
+                                styling: {
+                                    theme,
+                                    ...(tint.value ? { tint: { color: tint.value } } : {}),
+                                    sidebar: {
+                                        background: sidebarStyle,
+                                        list: CustomizationSidebarListStyle.Default,
+                                    },
+                                    search: searchStyle,
                                 },
-                            },
-                            header: {
-                                links: headerLinks,
-                            },
-                            themes: {
-                                default: themeMode,
-                                toggeable: false,
-                            },
-                        }),
-                        run: waitForCookiesDialog,
+                                header: {
+                                    links: headerLinks,
+                                },
+                                themes: {
+                                    default: themeMode,
+                                    toggeable: false,
+                                },
+                            }),
+                            run: waitForCookiesDialog,
+                        })),
                     })),
                 ]),
             ]),
