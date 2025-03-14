@@ -6,7 +6,6 @@ import React from 'react';
 
 import { Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
-
 import { SectionIcon } from './SectionIcon';
 import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
 

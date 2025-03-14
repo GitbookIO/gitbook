@@ -19,6 +19,7 @@ import {
     type TestsCase,
     allDeprecatedThemePresets,
     allLocales,
+    allSearchStyles,
     allSidebarBackgroundStyles,
     allThemeModes,
     allThemes,
@@ -647,6 +648,23 @@ const testCases: TestsCase[] = [
                         run: waitForCookiesDialog,
                     })),
                 ]),
+                ...allSearchStyles.flatMap((searchStyle) => ({
+                    name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
+                    url: getCustomizationURL({
+                        styling: {
+                            theme,
+                            search: searchStyle,
+                        },
+                        header: {
+                            links: headerLinks,
+                        },
+                        themes: {
+                            default: themeMode,
+                            toggeable: false,
+                        },
+                    }),
+                    run: waitForCookiesDialog,
+                })),
             ]),
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [

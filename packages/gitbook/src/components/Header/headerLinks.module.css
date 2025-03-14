@@ -1,6 +1,8 @@
-.containerHeaderlinks {
-    container-type: inline-size;
-    container-name: headerlinks;
+@media (max-width: 1279px) {
+    .containerHeaderlinks {
+        container-type: inline-size;
+        container-name: headerlinks;
+    }
 }
 
 .linkEllipsis {
@@ -43,7 +45,7 @@
         }
     }
 }
-@container headerlinks (width < 600px) {
+@container headerlinks (width < 550px) {
     .containerHeaderlinks > :nth-child(n + 4) {
         display: none;
     }
@@ -54,7 +56,7 @@
         }
     }
 }
-@container headerlinks (width < 750px) {
+@container headerlinks (width < 650px) {
     .containerHeaderlinks > :nth-child(n + 5) {
         display: none;
     }
@@ -65,7 +67,7 @@
         }
     }
 }
-@container headerlinks (width < 850px) {
+@container headerlinks (width < 750px) {
     .containerHeaderlinks > :nth-child(n + 6) {
         display: none;
     }
