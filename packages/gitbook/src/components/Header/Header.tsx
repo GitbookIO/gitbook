@@ -140,6 +140,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
 
                                         'theme-bold:shadow-none',
                                         'theme-bold:hover:shadow-none',
+                                        'whitespace-nowrap'
                                     ]}
                                 >
                                     <span className={tcls('flex-1')}>

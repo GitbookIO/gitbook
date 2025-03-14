@@ -648,23 +648,25 @@ const testCases: TestsCase[] = [
                         run: waitForCookiesDialog,
                     })),
                 ]),
-                ...allSearchStyles.flatMap((searchStyle) => ({
-                    name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
-                    url: getCustomizationURL({
-                        styling: {
-                            theme,
-                            search: searchStyle,
-                        },
-                        header: {
-                            links: headerLinks,
-                        },
-                        themes: {
-                            default: themeMode,
-                            toggeable: false,
-                        },
-                    }),
-                    run: waitForCookiesDialog,
-                })),
+                ...allSearchStyles.flatMap((searchStyle) => [
+                    ...allLocales.map((locale) => ({
+                        name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode} – Locale ${locale}`,
+                        url: getCustomizationURL({
+                            styling: {
+                                theme,
+                                search: searchStyle,
+                            },
+                            header: {
+                                links: headerLinks,
+                            },
+                            themes: {
+                                default: themeMode,
+                                toggeable: false,
+                            },
+                        }),
+                        run: waitForCookiesDialog,
+                    })),
+                ]),
             ]),
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [
