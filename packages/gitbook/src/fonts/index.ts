@@ -19,6 +19,8 @@ import {
 } from 'next/font/google';
 import localFont from 'next/font/local';
 
+export * from './customFonts';
+
 export const fontNotoColorEmoji = Noto_Color_Emoji({
     variable: '--font-noto-color-emoji',
     weight: ['400'],

@@ -22,7 +22,13 @@ import {
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
 
-import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
+import {
+    type CustomizationFont,
+    fontNotoColorEmoji,
+    fonts,
+    generateFontFacesCSS,
+    ibmPlexMono,
+} from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -32,37 +38,6 @@ import { ClientContexts } from './ClientContexts';
 import '@gitbook/icons/style.css';
 import './globals.css';
 import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
-
-const CUSTTOM_FONTS_WORKER_URL = 'https://public-valentino.gitbook.space/';
-
-interface FontFace {
-    weight: number;
-    url: string;
-}
-
-interface CustomFont {
-    fontFamily: string;
-    faces: FontFace[];
-}
-
-const regularFontWorkerUrl =
-    'https://public-valentino.gitbook.space/valentino/fonts/3ey8MCM8uEpKWRFnaFp2/nvidia_regular.woff2';
-const boldFontWorkerUrl =
-    'https://public-valentino.gitbook.space/valentino/fonts/3ey8MCM8uEpKWRFnaFp2/nvidia_bold.woff2';
-
-// // This would come from props/API
-// const nvidiaFont: CustomFont = {
-//     id: 'custom-font',
-//     name: 'CustomFont',
-//     links: {
-//         regular: regularFontWorkerUrl,
-//         bold: boldFontWorkerUrl,
-//     },
-//     display: 'swap',
-//     fallback: ['system-ui', 'arial'],
-// };
-//
-// const customFont = nvidiaFont;
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -80,17 +55,20 @@ export async function CustomizationRootLayout(props: {
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
 
-    const hasCustomFont = typeof customization.styling.font !== 'string';
+    const font = customization.styling.font as CustomizationFont;
+
+    const hasCustomFont = typeof font !== 'string';
+
     // Add custom font handling
-    const customFontCSS = hasCustomFont
-        ? generateCustomFontFaces(customization.styling.font as CustomFont)
-        : '';
+    const customFontCSS = hasCustomFont ? generateFontFacesCSS(font) : '';
 
     const customFontLinks = hasCustomFont
         ? customization.styling.font.faces.map((face) => face.url)
         : [];
 
     console.log('customFontLinks', customFontLinks, customization.styling.font);
+
+    // TODO: also add preconnect
 
     return (
         <html
@@ -305,59 +283,58 @@ function getSemanticColors(
         },
     };
 }
-
 /**
  * Define the custom font faces and set the --font-content to the custom font name
  */
-function generateCustomFontFaces(customFont: CustomFont): string {
-    const { fontFamily, faces } = customFont;
-
-    const regularFont = faces.find((face) => face.weight === 400);
-    const boldFont = faces.find((face) => face.weight === 700);
-
-    if (!regularFont || !boldFont) {
-        throw new Error('Custom font must have a regular and a bold face');
-    }
-
-    const regular = `
-        @font-face {
-            font-family: ${fontFamily};
-            font-style: normal;
-            font-weight: ${regularFont.weight};
-            font-display: swap;
-            src: url(${regularFont.url});
-        }
-`;
-
-    // const semiBold = `
-    //        @font-face {
-    //            font-family: ${fontFamily};
-    //            font-style: normal;
-    //            font-weight: 600;
-    //            font-display: swap;
-    //            src: url(${boldFont.url});
-    //        }
-    //    `
-    // 	: "";
-
-    const bold = `
-        @font-face {
-            font-family: ${fontFamily};
-            font-style: normal;
-            font-weight: ${boldFont.weight};
-            font-display: swap;
-            src: url(${boldFont.url});
-        }
-    `;
-
-    return `
-        ${regular}
-        ${bold}
-        :root {
-            --font-content: ${fontFamily};
-        }
-    `;
-}
+// function generateCustomFontFaces(customFont: CustomizationFontDefinition): string {
+//     const { fontFamily, faces } = customFont;
+//
+//     const regularFont = faces.find((face) => face.weight === 400);
+//     const boldFont = faces.find((face) => face.weight === 700);
+//
+//     if (!regularFont || !boldFont) {
+//         throw new Error('Custom font must have a regular and a bold face');
+//     }
+//
+//     const regular = `
+//         @font-face {
+//             font-family: ${fontFamily};
+//             font-style: normal;
+//             font-weight: ${regularFont.weight};
+//             font-display: swap;
+//             src: url(${regularFont.url});
+//         }
+// `;
+//
+//     // const semiBold = `
+//     //        @font-face {
+//     //            font-family: ${fontFamily};
+//     //            font-style: normal;
+//     //            font-weight: 600;
+//     //            font-display: swap;
+//     //            src: url(${boldFont.url});
+//     //        }
+//     //    `
+//     // 	: "";
+//
+//     const bold = `
+//         @font-face {
+//             font-family: ${fontFamily};
+//             font-style: normal;
+//             font-weight: ${boldFont.weight};
+//             font-display: swap;
+//             src: url(${boldFont.url});
+//         }
+//     `;
+//
+//     return `
+//         ${regular}
+//         ${bold}
+//         :root {
+//             --font-content: ${fontFamily};
+//         }
+//     `;
+// }
 type ColorInput = string;
 function generateColorVariable(
     name: string,
