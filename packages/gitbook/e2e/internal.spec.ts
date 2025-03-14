@@ -663,6 +663,9 @@ const testCases: TestsCase[] = [
                                 default: themeMode,
                                 toggeable: false,
                             },
+                            internationalization: {
+                                locale,
+                            },
                         }),
                         run: waitForCookiesDialog,
                     })),
