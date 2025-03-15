@@ -22,7 +22,7 @@ import {
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
 
-import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
+import { fontNotoColorEmoji, getFontData } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -48,6 +48,9 @@ export async function CustomizationRootLayout(props: {
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
+    const fontData = getFontData(customization.styling.font);
+
+    // TODO: also add preconnect
 
     return (
         <html
@@ -66,14 +69,33 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                fonts[customization.styling.font].variable,
-                ibmPlexMono.variable
+                fontData.cssClass
             )}
         >
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+
+                {/* Font preloading for custom fonts */}
+                {fontData.preloadSources
+                    ? fontData.preloadSources.map(({ url, format }) => (
+                          <link
+                              key={url}
+                              rel="preload"
+                              href={url}
+                              as="font"
+                              type={format ? `font/${format}` : undefined}
+                              crossOrigin="anonymous"
+                          />
+                      ))
+                    : null}
+
+                {/* Custom font CSS */}
+                {fontData.cssDefinitions ? (
+                    <style id="custom-font-styles">{fontData.cssDefinitions}</style>
+                ) : null}
+
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
