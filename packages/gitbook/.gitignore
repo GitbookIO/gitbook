@@ -23,9 +23,6 @@ next-env.d.ts
 # visual tests
 screenshots/
 
-# Sentry Config File
-.sentryclirc
-
 /test-results/
 /playwright-report/
 /blob-report/

@@ -1,6 +1,5 @@
 'use client';
 
-import { captureException } from '@sentry/nextjs';
 import { readStreamableValue } from 'ai/rsc';
 import assertNever from 'assert-never';
 import React from 'react';
@@ -132,12 +131,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }
 
             if (!results) {
-                captureException(
-                    new Error(
-                        `corrupt-cache: ${global ? 'searchAllSiteContent' : 'searchSiteSpaceContent'} is ${results}`
-                    ),
-                    { extra: { results } }
-                );
                 setResultsState({ results: [], fetching: false });
                 return;
             }

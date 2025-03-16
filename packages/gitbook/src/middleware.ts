@@ -1,5 +1,4 @@
 import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
-import { setContext, setTag } from '@sentry/nextjs';
 import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
@@ -96,14 +95,6 @@ export async function middleware(request: NextRequest) {
     const { url, mode } = getInputURL(request);
     const isServerAction = request.headers.has('Next-Action');
 
-    setTag('url', url.toString());
-    setContext('request', {
-        method: request.method,
-        url: url.toString(),
-        rawRequestURL: request.url,
-        userAgent: userAgent(),
-    });
-
     // Redirect to normalize the URL
     const normalized = normalizeURL(url);
     if (normalized.toString() !== url.toString()) {
@@ -147,14 +138,6 @@ export async function middleware(request: NextRequest) {
     if (normalizedVA.toString() !== normalized.toString()) {
         return writeCookies(NextResponse.redirect(normalizedVA.toString()), resolved.cookies);
     }
-
-    setTag('space', resolved.space);
-    setContext('content', {
-        space: resolved.space,
-        changeRequest: resolved.changeRequest,
-        revision: resolved.revision,
-        ...('site' in resolved ? { site: resolved.site, siteSpace: resolved.siteSpace } : {}),
-    });
 
     // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
     const rewritePathname = normalizePathname(encodePathname(resolved.pathname));
