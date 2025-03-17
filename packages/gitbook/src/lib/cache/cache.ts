@@ -1,6 +1,5 @@
 import hash from 'object-hash';
 
-import { captureException } from '../../sentry';
 import { race, singletonMap } from '../async';
 import { type TraceSpan, trace } from '../tracing';
 import { assertIsNotV2 } from '../v2';
@@ -159,17 +158,11 @@ export function cache<Args extends any[], Result>(
                         }
 
                         // Detect empty cache entries to avoid returning them.
-                        // Also log in Sentry to investigate what cache is returning empty entries.
                         if (
                             entry.data &&
                             typeof entry.data === 'object' &&
                             Object.keys(entry.data).length === 0
                         ) {
-                            captureException(
-                                new Error(
-                                    `Cache entry ${key} from ${backendName} is an empty object`
-                                )
-                            );
                             return null;
                         }
 

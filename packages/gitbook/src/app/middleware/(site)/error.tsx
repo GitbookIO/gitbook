@@ -1,8 +1,5 @@
 'use client';
 
-import { captureException, withScope } from '@sentry/nextjs';
-import React from 'react';
-
 import { Button } from '@/components/primitives/Button';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
@@ -11,17 +8,8 @@ export default function ErrorPage(props: {
     error: Error & { digest?: string };
     reset: () => void;
 }) {
-    const { error, reset } = props;
+    const { reset } = props;
     const language = useLanguage();
-
-    React.useEffect(() => {
-        withScope((scope) => {
-            if ('_componentStack' in error && error._componentStack) {
-                scope.setExtra('componentStack', error._componentStack);
-            }
-            captureException(error);
-        });
-    }, [error]);
 
     return (
         <div
