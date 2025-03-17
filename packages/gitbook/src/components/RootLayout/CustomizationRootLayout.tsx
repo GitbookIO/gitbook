@@ -31,7 +31,7 @@ import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
-import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
+import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -49,8 +49,6 @@ export async function CustomizationRootLayout(props: {
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font);
-
-    // TODO: also add preconnect
 
     return (
         <html
@@ -77,24 +75,28 @@ export async function CustomizationRootLayout(props: {
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
 
-                {/* Font preloading for custom fonts */}
-                {fontData.type === 'custom'
-                    ? fontData.preloadSources.map(({ url, format }) => (
-                          <link
-                              key={url}
-                              rel="preload"
-                              href={url}
-                              as="font"
-                              type={format ? `font/${format}` : undefined}
-                              crossOrigin="anonymous"
-                          />
-                      ))
-                    : null}
+                {/* Custom font resources */}
+                {fontData.type === 'custom' && (
+                    <>
+                        {/* Font host preconnect */}
+                        <link rel="preconnect" href={GITBOOK_FONTS_URL} />
 
-                {/* Custom font CSS */}
-                {fontData.type === 'custom' ? (
-                    <style id="custom-font-styles">{fontData.cssDefinitions}</style>
-                ) : null}
+                        {/* Font preloading */}
+                        {fontData.preloadSources.map(({ url, format }) => (
+                            <link
+                                key={url}
+                                rel="preload"
+                                href={url}
+                                as="font"
+                                type={format ? `font/${format}` : undefined}
+                                crossOrigin="anonymous"
+                            />
+                        ))}
+
+                        {/* Custom font CSS */}
+                        <style id="custom-font-styles">{fontData.cssDefinitions}</style>
+                    </>
+                )}
 
                 <style
                     nonce={

@@ -99,6 +99,9 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
 
 /**
  * Get the list of font sources to preload
+ *
+ * Currently we're preloading all sources but we could optimize this in the future by only preloading the important ones
+ * to avoid blocking the page load.
  */
 export function getFontSourcesToPreload(customFont: CustomizationFontDefinition): FontSource[] {
     const allSources = customFont.fontFaces.flatMap((face) => face.sources);
