@@ -3,17 +3,80 @@ import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { ScalarApiButton } from './ScalarApiButton';
 import { StaticSection } from './StaticSection';
 import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
+import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 import { checkIsReference, createStateKey } from './utils';
+
+const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
 
 /**
  * Display code samples to execute the operation.
  * It supports the Redocly custom syntax as well (https://redocly.com/docs/api-reference-docs/specification-extensions/x-code-samples/)
  */
 export function OpenAPICodeSample(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContextProps;
+}) {
+    const { data } = props;
+
+    // If code samples are disabled at operation level, we don't display the code samples.
+    if (data.operation['x-codeSamples'] === false) {
+        return null;
+    }
+
+    const customCodeSamples = getCustomCodeSamples(props);
+
+    // If code samples are disabled at the top-level and not custom code samples are defined,
+    // we don't display the code samples.
+    if (data['x-codeSamples'] === false && !customCodeSamples) {
+        return null;
+    }
+
+    const samples = customCodeSamples ?? generateCodeSamples(props);
+
+    if (samples.length === 0) {
+        return null;
+    }
+
+    return (
+        <OpenAPITabs stateKey={createStateKey('codesample')} items={samples}>
+            <StaticSection header={<OpenAPITabsList />} className="openapi-codesample">
+                <OpenAPITabsPanels />
+            </StaticSection>
+        </OpenAPITabs>
+    );
+}
+
+function OpenAPICodeSampleFooter(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContextProps;
+}) {
+    const { data, context } = props;
+    const { method, path } = data;
+    const { specUrl } = context;
+    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
+
+    if (hideTryItPanel) {
+        return null;
+    }
+
+    if (!validateHttpMethod(method)) {
+        return null;
+    }
+
+    return (
+        <div className="openapi-codesample-footer">
+            <ScalarApiButton method={method} path={path} specUrl={specUrl} />
+        </div>
+    );
+}
+
+/**
+ * Generate code samples for the operation.
+ */
+function generateCodeSamples(props: {
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;
 }) {
@@ -56,13 +119,17 @@ export function OpenAPICodeSample(props: {
         : undefined;
     const requestBodyContent = requestBodyContentEntries?.[0];
 
+    const requestBodyExamples = requestBodyContent
+        ? generateMediaTypeExamples(requestBodyContent[1])
+        : [];
+
     const input: CodeSampleInput = {
         url:
             getDefaultServerURL(data.servers) +
             data.path +
             (searchParams.size ? `?${searchParams.toString()}` : ''),
         method: data.method,
-        body: requestBodyContent ? generateMediaTypeExample(requestBodyContent[1]) : undefined,
+        body: requestBodyExamples[0]?.value,
         headers: {
             ...getSecurityHeaders(data.securities),
             ...headersObject,
@@ -74,7 +141,7 @@ export function OpenAPICodeSample(props: {
         },
     };
 
-    const autoCodeSamples = codeSampleGenerators.map((generator) => ({
+    return codeSampleGenerators.map((generator) => ({
         key: `default-${generator.id}`,
         label: generator.label,
         body: context.renderCodeBlock({
@@ -83,14 +150,24 @@ export function OpenAPICodeSample(props: {
         }),
         footer: <OpenAPICodeSampleFooter data={data} context={context} />,
     }));
+}
 
-    // Use custom samples if defined
+/**
+ * Get custom code samples for the operation.
+ */
+function getCustomCodeSamples(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContextProps;
+}) {
+    const { data, context } = props;
+
     let customCodeSamples: null | Array<{
         key: string;
         label: string;
         body: React.ReactNode;
     }> = null;
-    (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
+
+    CUSTOM_CODE_SAMPLES_KEYS.forEach((key) => {
         const customSamples = data.operation[key];
         if (customSamples && Array.isArray(customSamples)) {
             customCodeSamples = customSamples
@@ -102,7 +179,7 @@ export function OpenAPICodeSample(props: {
                     );
                 })
                 .map((sample, index) => ({
-                    key: `redocly-${sample.lang}-${index}`,
+                    key: `custom-sample-${sample.lang}-${index}`,
                     label: sample.label,
                     body: context.renderCodeBlock({
                         code: sample.source,
@@ -113,47 +190,7 @@ export function OpenAPICodeSample(props: {
         }
     });
 
-    // Code samples can be disabled at the top-level or at the operation level
-    // If code samples are defined at the operation level, it will override the top-level setting
-    const codeSamplesDisabled =
-        data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
-    const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
-
-    if (samples.length === 0) {
-        return null;
-    }
-
-    return (
-        <OpenAPITabs stateKey={createStateKey('codesample')} items={samples}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-codesample">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
-    );
-}
-
-function OpenAPICodeSampleFooter(props: {
-    data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
-}) {
-    const { data, context } = props;
-    const { method, path } = data;
-    const { specUrl } = context;
-    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
-
-    if (hideTryItPanel) {
-        return null;
-    }
-
-    if (!validateHttpMethod(method)) {
-        return null;
-    }
-
-    return (
-        <div className="openapi-codesample-footer">
-            <ScalarApiButton method={method} path={path} specUrl={specUrl} />
-        </div>
-    );
+    return customCodeSamples;
 }
 
 function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {

@@ -1,4 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { checkIsReference } from './utils';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 
@@ -28,29 +29,37 @@ export function generateSchemaExample(
 /**
  * Generate an example for a media type.
  */
-export function generateMediaTypeExample(
+export function generateMediaTypeExamples(
     mediaType: OpenAPIV3.MediaTypeObject,
     options?: GenerateSchemaExampleOptions
-): JSONValue | undefined {
+): OpenAPIV3.ExampleObject[] {
     if (mediaType.example) {
-        return mediaType.example;
+        return [{ summary: 'default', value: mediaType.example }];
     }
 
     if (mediaType.examples) {
-        const key = Object.keys(mediaType.examples)[0];
-        if (key) {
-            const example = mediaType.examples[key];
-            if (example) {
-                return example.value;
-            }
+        const { examples } = mediaType;
+        const keys = Object.keys(examples);
+        if (keys.length > 0) {
+            return keys.reduce<OpenAPIV3.ExampleObject[]>((result, key) => {
+                const example = examples[key];
+                if (!example || checkIsReference(example)) {
+                    return result;
+                }
+                result.push({
+                    summary: example.summary || key,
+                    value: example.value,
+                });
+                return result;
+            }, []);
         }
     }
 
     if (mediaType.schema) {
-        return generateSchemaExample(mediaType.schema, options);
+        return [{ summary: 'default', value: generateSchemaExample(mediaType.schema, options) }];
     }
 
-    return undefined;
+    return [];
 }
 
 /** Hard limit for rendering circular references */
