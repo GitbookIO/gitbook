@@ -77,7 +77,7 @@ const config: Config = {
                 emoji: [
                     'Apple Color Emoji',
                     'Noto Color Emoji',
-                    '--font-noto-color-emoji',
+                    'var(--font-noto-color-emoji)',
                     'sans-serif',
                 ],
                 var: ['var(--font-family)'],
