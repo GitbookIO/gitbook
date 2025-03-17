@@ -112,10 +112,10 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                         );
                     })}
                     <NavigationMenu.Indicator
-                        className="top-full z-0 flex h-3 items-end justify-center duration-150 motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
+                        className="fixed top-full z-50 flex h-3 items-end justify-center duration-150 motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
                         aria-hidden
                     >
-                        <div className="relative top-[70%] size-3 rotate-[225deg] rounded-tl-sm bg-tint shadow-1xs shadow-dark/1 dark:shadow-dark/4" />
+                        <div className="relative top-1/2 size-3 rotate-45 rounded-tl-sm border-tint-subtle border-t border-l bg-tint-base" />
                     </NavigationMenu.Indicator>
                 </NavigationMenu.List>
             </div>
@@ -127,7 +127,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                 }}
             >
                 <NavigationMenu.Viewport
-                    className="relative mt-3 h-[var(--radix-navigation-menu-viewport-height)] w-[calc(100vw_-_2rem)] origin-[top_center] overflow-hidden rounded straight-corners:rounded-none bg-tint shadow-1xs shadow-dark/1 duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,_height,_transform] data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn md:mx-0 md:w-[var(--radix-navigation-menu-viewport-width)] dark:shadow-dark/4"
+                    className="relative mt-3 h-[var(--radix-navigation-menu-viewport-height)] w-[calc(100vw_-_2rem)] origin-[top_center] overflow-hidden rounded-lg straight-corners:rounded-sm bg-tint-base shadow-lg shadow-tint-10/6 ring-1 ring-tint-subtle duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,_height,_transform] data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn md:mx-0 md:w-[var(--radix-navigation-menu-viewport-width)] dark:shadow-tint-1/6"
                     style={{
                         translate:
                             undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,
@@ -220,7 +220,7 @@ function SectionGroupTileList(props: {
     return (
         <ul
             className={tcls(
-                'grid w-full p-2 sm:grid-cols-1 md:w-max',
+                'grid w-full gap-1 p-2 sm:grid-cols-1 md:w-max',
                 sections.length < MIN_ITEMS_FOR_COLS ? 'md:grid-cols-1' : 'md:grid-cols-2'
             )}
         >
@@ -246,17 +246,23 @@ function SectionGroupTile(props: { section: ClientSiteSection; isActive: boolean
             <Link
                 href={url}
                 className={tcls(
-                    'flex min-h-12 w-full select-none flex-col gap-2 rounded p-3 transition-colors hover:bg-tint-hover',
-                    isActive
-                        ? 'text-primary hover:text-primary-strong focus:text-primary-strong'
-                        : 'text-tint hover:text-tint-strong focus:text-tint-strong'
+                    'flex w-full select-none flex-col gap-1 rounded straight-corners:rounded-none px-3 py-2 transition-colors hover:bg-tint-hover',
+                    isActive ? 'text-primary' : 'text-tint-strong'
                 )}
             >
-                <div className="flex w-full items-center gap-2 font-medium light:text-dark dark:text-light">
-                    {icon ? <SectionIcon isActive={false} icon={icon as IconName} /> : null}
-                    <span className="min-w-0 truncate">{title}</span>
+                <div className="flex w-full gap-2">
+                    {icon ? (
+                        <SectionIcon
+                            className="mt-[3px]"
+                            isActive={false}
+                            icon={icon as IconName}
+                        />
+                    ) : null}
+                    {title}
                 </div>
-                <p className="text-tint-subtle">{section.description}</p>
+                {section.description ? (
+                    <p className="text-tint-subtle">{section.description}</p>
+                ) : null}
             </Link>
         </li>
     );
