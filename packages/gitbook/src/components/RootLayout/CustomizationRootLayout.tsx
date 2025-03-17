@@ -22,7 +22,7 @@ import {
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
 
-import { fontNotoColorEmoji, getFontData, renderFontPreloads, renderFontStyles } from '@/fonts';
+import { fontNotoColorEmoji, getFontData } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -69,7 +69,7 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                fontData.type === 'default' ? fontData.cssClassName : 'font-custom'
+                fontData.type === 'default' ? fontData.variable : 'font-custom'
             )}
         >
             <head>

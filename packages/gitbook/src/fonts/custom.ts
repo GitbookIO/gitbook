@@ -1,5 +1,5 @@
 import type { CustomizationDefaultFont } from '@gitbook/api';
-import { fonts } from './index';
+import { fonts } from './default';
 
 /**
  * The human-readable font-family name used in CSS (e.g., "Open Sans", "Playfair Display").
@@ -60,7 +60,7 @@ export type CustomizationFont = CustomizationDefaultFont | CustomizationFontDefi
  * Define the custom font faces and set the --font-content to the custom font name
  */
 export function generateFontFacesCSS(customFont: CustomizationFontDefinition): string {
-    const { fontFamily, fontFaces } = customFont;
+    const { fontFaces } = customFont;
 
     // Generate font face declarations for all weights
     const fontFaceDeclarations = fontFaces
@@ -77,9 +77,10 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
                 })
                 .join(', ');
 
+            // We could use the font-family name here, but to avoid extra normalization we're using CustomFont
             return `
         @font-face {
-            font-family: ${fontFamily};
+            font-family: CustomFont; 
             font-style: normal;
             font-weight: ${face.weight};
             font-display: swap;
@@ -92,7 +93,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
     return `
         ${fontFaceDeclarations}
         :root {
-            --font-custom: ${fontFamily};
+            --font-custom: CustomFont;
         }
     `;
 }
@@ -126,7 +127,7 @@ type FontData = DefaultFontData | CustomFontData;
  */
 interface DefaultFontData {
     type: 'default';
-    cssClassName: string;
+    variable: string;
 }
 
 /**
@@ -140,14 +141,13 @@ interface CustomFontData {
 
 /**
  * Get the appropriate font data for a given font configuration
- * @param font Either a predefined font name or a custom font configuration
  */
 export function getFontData(font: CustomizationFont): FontData {
     if (typeof font === 'string') {
         // Default font from next/font
         return {
             type: 'default',
-            cssClassName: fonts[font].variable,
+            variable: fonts[font].variable,
         };
     }
 

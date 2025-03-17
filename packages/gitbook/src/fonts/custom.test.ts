@@ -4,7 +4,7 @@ import {
     type CustomizationFontDefinition,
     generateFontFacesCSS,
     getFontSourcesToPreload,
-} from './customFonts';
+} from './custom';
 
 const TEST_FONTS = {
     basic: {
@@ -15,7 +15,7 @@ const TEST_FONTS = {
                 weight: 400,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/opensans-regular.woff2'),
+                        url: 'https://example.com/fonts/opensans-regular.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -24,7 +24,7 @@ const TEST_FONTS = {
                 weight: 700,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/opensans-bold.woff2'),
+                        url: 'https://example.com/fonts/opensans-bold.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -40,7 +40,7 @@ const TEST_FONTS = {
                 weight: 300,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/roboto-light.woff2'),
+                        url: 'https://example.com/fonts/roboto-light.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -49,7 +49,7 @@ const TEST_FONTS = {
                 weight: 400,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/roboto-regular.woff2'),
+                        url: 'https://example.com/fonts/roboto-regular.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -58,7 +58,7 @@ const TEST_FONTS = {
                 weight: 500,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/roboto-medium.woff2'),
+                        url: 'https://example.com/fonts/roboto-medium.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -67,7 +67,7 @@ const TEST_FONTS = {
                 weight: 700,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/roboto-bold.woff2'),
+                        url: 'https://example.com/fonts/roboto-bold.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -76,7 +76,7 @@ const TEST_FONTS = {
                 weight: 900,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/roboto-black.woff2'),
+                        url: 'https://example.com/fonts/roboto-black.woff2',
                         format: 'woff2',
                     },
                 ],
@@ -92,10 +92,10 @@ const TEST_FONTS = {
                 weight: 400,
                 sources: [
                     {
-                        url: new URL('https://example.com/fonts/lato-regular.woff2'),
+                        url: 'https://example.com/fonts/lato-regular.woff2',
                         format: 'woff2',
                     },
-                    { url: new URL('https://example.com/fonts/lato-regular.woff'), format: 'woff' },
+                    { url: 'https://example.com/fonts/lato-regular.woff', format: 'woff' },
                 ],
             },
         ],
@@ -108,9 +108,9 @@ const TEST_FONTS = {
             {
                 weight: 400,
                 sources: [
-                    { url: new URL('https://example.com/fonts/sourcesans-regular.woff2') },
+                    { url: 'https://example.com/fonts/sourcesans-regular.woff2' },
                     {
-                        url: new URL('https://example.com/fonts/sourcesans-regular.woff'),
+                        url: 'https://example.com/fonts/sourcesans-regular.woff',
                         format: 'woff',
                     },
                 ],
@@ -130,9 +130,7 @@ const TEST_FONTS = {
         fontFaces: [
             {
                 weight: 400,
-                sources: [
-                    { url: new URL('https://example.com/fonts/special.woff2'), format: 'woff2' },
-                ],
+                sources: [{ url: 'https://example.com/fonts/special.woff2', format: 'woff2' }],
             },
         ],
     } as CustomizationFontDefinition,
@@ -144,15 +142,15 @@ const TEST_FONTS = {
             {
                 weight: 400,
                 sources: [
-                    { url: new URL('https://example.com/fonts/regular.woff2') },
-                    { url: new URL('https://example.com/fonts/regular.woff') },
+                    { url: 'https://example.com/fonts/regular.woff2' },
+                    { url: 'https://example.com/fonts/regular.woff' },
                 ],
             },
             {
                 weight: 700,
                 sources: [
-                    { url: new URL('https://example.com/fonts/bold.woff2') },
-                    { url: new URL('https://example.com/fonts/bold.woff') },
+                    { url: 'https://example.com/fonts/bold.woff2' },
+                    { url: 'https://example.com/fonts/bold.woff' },
                 ],
             },
         ],
@@ -165,9 +163,9 @@ const TEST_FONTS = {
             {
                 weight: 400,
                 sources: [
-                    { url: new URL('https://example.com/fonts/absolute.woff2') },
-                    { url: new URL('/fonts/relative.woff2', 'https://example.com') },
-                    { url: new URL('./fonts/path-relative.woff2', 'https://example.com') },
+                    { url: 'https://example.com/fonts/1.woff2' },
+                    { url: 'https://example.com/fonts/2.woff2' },
+                    { url: 'https://example.com/fonts/3.woff2' },
                 ],
             },
         ],
@@ -292,8 +290,8 @@ describe('getCustomFontPreloadLinks', () => {
 
         expect(result).toBeArray();
         expect(result.length).toBe(3);
-        expect(result).toContain('https://example.com/fonts/absolute.woff2');
-        expect(result).toContain('https://example.com/fonts/relative.woff2');
-        expect(result).toContain('https://example.com/fonts/path-relative.woff2');
+        expect(result).toContain('https://example.com/fonts/1.woff2');
+        expect(result).toContain('https://example.com/fonts/2.woff2');
+        expect(result).toContain('https://example.com/fonts/3.woff2');
     });
 });
