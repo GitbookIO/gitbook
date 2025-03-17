@@ -21,6 +21,7 @@ import {
     hexToRgb,
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
+import * as ReactDOM from 'react-dom';
 
 import { fontNotoColorEmoji, getFontData } from '@/fonts';
 import { getSpaceLanguage } from '@/intl/server';
@@ -50,6 +51,14 @@ export async function CustomizationRootLayout(props: {
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font);
 
+    // Preconnect and preload custom fonts if needed
+    if (fontData.type === 'custom') {
+        ReactDOM.preconnect(GITBOOK_FONTS_URL);
+        fontData.preloadSources.forEach(({ url }) => {
+            ReactDOM.preload(url, { as: 'font', crossOrigin: 'anonymous', fetchPriority: 'high' });
+        });
+    }
+
     return (
         <html
             suppressHydrationWarning
@@ -75,28 +84,8 @@ export async function CustomizationRootLayout(props: {
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
 
-                {/* Custom font resources */}
-                {fontData.type === 'custom' && (
-                    <>
-                        {/* Font host preconnect */}
-                        <link rel="preconnect" href={GITBOOK_FONTS_URL} />
-
-                        {/* Font preloading */}
-                        {fontData.preloadSources.map(({ url, format }) => (
-                            <link
-                                key={url}
-                                rel="preload"
-                                href={url}
-                                as="font"
-                                type={format ? `font/${format}` : undefined}
-                                crossOrigin="anonymous"
-                            />
-                        ))}
-
-                        {/* Custom font CSS */}
-                        <style id="custom-font-styles">{fontData.cssDefinitions}</style>
-                    </>
-                )}
+                {/* Inject custom font @font-face rules */}
+                {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
 
                 <style
                     nonce={

@@ -77,7 +77,7 @@ interface DefaultFontData {
  */
 interface CustomFontData {
     type: 'custom';
-    cssDefinitions: string;
+    fontFaceRules: string;
     preloadSources: FontSource[];
 }
 
@@ -93,10 +93,10 @@ export function getFontData(font: CustomizationFont): FontData {
         };
     }
 
-    // Custom font with @font-face definitions
+    // Custom font with @font-face rules
     return {
         type: 'custom',
-        cssDefinitions: generateFontFacesCSS(font),
+        fontFaceRules: generateFontFacesCSS(font),
         preloadSources: getFontSourcesToPreload(font),
     };
 }
