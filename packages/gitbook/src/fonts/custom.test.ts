@@ -163,9 +163,9 @@ const TEST_FONTS = {
             {
                 weight: 400,
                 sources: [
-                    { url: 'https://example.com/fonts/1.woff2' },
-                    { url: 'https://example.com/fonts/2.woff2' },
-                    { url: 'https://example.com/fonts/3.woff2' },
+                    { url: 'https://example.com/fonts.woff2' },
+                    { url: 'https://example.com/fonts.woff' },
+                    { url: 'https://example.com/fonts.woff2' },
                 ],
             },
         ],
@@ -211,7 +211,7 @@ describe('generateFontFacesCSS', () => {
             "url(https://example.com/fonts/opensans-regular.woff2) format('woff2')"
         );
         expect(css).toContain("url(https://example.com/fonts/opensans-bold.woff2) format('woff2')");
-        expect(css).toContain('--font-content: Open Sans');
+        expect(css).toContain('--font-custom: CustomFont');
     });
 
     test('multiple font weights', async () => {
@@ -250,11 +250,7 @@ describe('generateFontFacesCSS', () => {
     test('empty font faces array', async () => {
         const css = generateFontFacesCSS(TEST_FONTS.empty);
 
-        const isValid = await isCSSValid(css);
-        expect(isValid).toBe(true);
-
-        expect(css).not.toContain('@font-face');
-        expect(css).toContain('--font-content: Empty Font');
+        expect(css).toBe('');
     });
 
     test('font with special characters in name', async () => {
@@ -289,9 +285,10 @@ describe('getCustomFontPreloadLinks', () => {
         const result = getFontSourcesToPreload(TEST_FONTS.variousURLs);
 
         expect(result).toBeArray();
-        expect(result.length).toBe(3);
-        expect(result).toContain('https://example.com/fonts/1.woff2');
-        expect(result).toContain('https://example.com/fonts/2.woff2');
-        expect(result).toContain('https://example.com/fonts/3.woff2');
+        expect(result.length).toBe(2);
+        expect(result).toMatchObject([
+            { url: 'https://example.com/fonts.woff2' },
+            { url: 'https://example.com/fonts.woff' },
+        ]);
     });
 });

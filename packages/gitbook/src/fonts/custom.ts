@@ -1,5 +1,4 @@
 import type { CustomizationDefaultFont } from '@gitbook/api';
-import { fonts } from './default';
 
 /**
  * The human-readable font-family name used in CSS (e.g., "Open Sans", "Playfair Display").
@@ -90,12 +89,12 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
         })
         .join('\n');
 
-    return `
-        ${fontFaceDeclarations}
+    return fontFaceDeclarations
+        ? `${fontFaceDeclarations}
         :root {
             --font-custom: CustomFont;
-        }
-    `;
+        }`
+        : '';
 }
 
 /**
@@ -115,46 +114,4 @@ export function getFontSourcesToPreload(customFont: CustomizationFontDefinition)
     });
 
     return Array.from(uniqueSources.values());
-}
-
-/**
- * Represents font data for either a default font or a custom font
- */
-type FontData = DefaultFontData | CustomFontData;
-
-/**
- * Font data for a default font from next/font
- */
-interface DefaultFontData {
-    type: 'default';
-    variable: string;
-}
-
-/**
- * Font data for a custom font with @font-face definitions
- */
-interface CustomFontData {
-    type: 'custom';
-    cssDefinitions: string;
-    preloadSources: FontSource[];
-}
-
-/**
- * Get the appropriate font data for a given font configuration
- */
-export function getFontData(font: CustomizationFont): FontData {
-    if (typeof font === 'string') {
-        // Default font from next/font
-        return {
-            type: 'default',
-            variable: fonts[font].variable,
-        };
-    }
-
-    // Custom font with @font-face definitions
-    return {
-        type: 'custom',
-        cssDefinitions: generateFontFacesCSS(font),
-        preloadSources: getFontSourcesToPreload(font),
-    };
 }
