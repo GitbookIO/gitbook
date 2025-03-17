@@ -1,4 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { Markdown } from './Markdown';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { StaticSection } from './StaticSection';
 import { generateSchemaExample } from './generateSchemaExample';
@@ -39,44 +40,40 @@ export function OpenAPIResponseExample(props: {
         return Number(a) - Number(b);
     });
 
-    const tabs = responses
-        .map(([key, responseObject]) => {
-            const description = resolveDescription(responseObject);
+    const tabs = responses.map(([key, responseObject]) => {
+        const description = resolveDescription(responseObject);
 
-            if (checkIsReference(responseObject)) {
-                return {
-                    key: key,
-                    label: key,
-                    description,
-                    body: (
-                        <OpenAPIExample
-                            example={getExampleFromReference(responseObject)}
-                            context={context}
-                            syntax="json"
-                        />
-                    ),
-                };
-            }
-
-            if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
-                return {
-                    key: key,
-                    label: key,
-                    description,
-                    body: <OpenAPIEmptyResponseExample />,
-                };
-            }
-
+        if (checkIsReference(responseObject)) {
             return {
                 key: key,
                 label: key,
-                description: resolveDescription(responseObject),
-                body: <OpenAPIResponse context={context} content={responseObject.content} />,
+                body: (
+                    <OpenAPIExample
+                        example={getExampleFromReference(responseObject)}
+                        context={context}
+                        syntax="json"
+                    />
+                ),
+                footer: description ? <Markdown source={description} /> : undefined,
             };
-        })
-        .filter((val): val is { key: string; label: string; body: any; description: string } =>
-            Boolean(val)
-        );
+        }
+
+        if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
+            return {
+                key: key,
+                label: key,
+                body: <OpenAPIEmptyResponseExample />,
+                footer: description ? <Markdown source={description} /> : undefined,
+            };
+        }
+
+        return {
+            key: key,
+            label: key,
+            body: <OpenAPIResponse context={context} content={responseObject.content} />,
+            footer: description ? <Markdown source={description} /> : undefined,
+        };
+    });
 
     if (tabs.length === 0) {
         return null;
