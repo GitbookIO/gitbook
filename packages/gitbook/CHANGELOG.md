@@ -1,5 +1,15 @@
 # gitbook
 
+## 0.8.1
+
+### Patch Changes
+
+- 886e204: Update OpenAPI operation path design
+- Updated dependencies [886e204]
+- Updated dependencies [4f0a772]
+  - @gitbook/react-openapi@1.1.5
+  - @gitbook/colors@0.3.0
+
 ## 0.8.0
 
 ### Minor Changes

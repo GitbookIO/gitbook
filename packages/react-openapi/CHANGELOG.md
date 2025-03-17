@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.1.5
+
+### Patch Changes
+
+- 886e204: Update OpenAPI operation path design
+
 ## 1.1.4
 
 ### Patch Changes
