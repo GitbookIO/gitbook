@@ -72,7 +72,7 @@ export function PageBody(props: {
                     >
                         <DocumentView
                             document={document}
-                            style={['[&>*+*]:mt-5', '[&>*:is(ul,ol)]:mt-1.5', 'grid']}
+                            style={['[&>*+*]:mt-5', '[&>*:is(ul,ol)]:mt-2', 'grid']}
                             blockStyle={['page-api-block:ml-0']}
                             context={{
                                 mode: 'default',
