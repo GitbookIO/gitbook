@@ -1,12 +1,9 @@
 import { describe, expect, test } from 'bun:test';
+import type { CustomizationFontDefinition } from '@gitbook/api';
 import stylelint from 'stylelint';
-import {
-    type CustomizationFontDefinition,
-    generateFontFacesCSS,
-    getFontSourcesToPreload,
-} from './custom';
+import { generateFontFacesCSS, getFontSourcesToPreload } from './custom';
 
-const TEST_FONTS = {
+const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
     basic: {
         id: 'open-sans',
         fontFamily: 'Open Sans',
@@ -30,7 +27,7 @@ const TEST_FONTS = {
                 ],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 
     multiWeight: {
         id: 'roboto',
@@ -82,7 +79,7 @@ const TEST_FONTS = {
                 ],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 
     multiSource: {
         id: 'lato',
@@ -99,7 +96,7 @@ const TEST_FONTS = {
                 ],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 
     missingFormat: {
         id: 'source-sans',
@@ -116,13 +113,13 @@ const TEST_FONTS = {
                 ],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 
     empty: {
         id: 'empty-font',
         fontFamily: 'Empty Font',
         fontFaces: [],
-    } as CustomizationFontDefinition,
+    },
 
     specialChars: {
         id: 'special-font',
@@ -133,7 +130,7 @@ const TEST_FONTS = {
                 sources: [{ url: 'https://example.com/fonts/special.woff2', format: 'woff2' }],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 
     complex: {
         id: 'complex-font',
@@ -154,7 +151,7 @@ const TEST_FONTS = {
                 ],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 
     variousURLs: {
         id: 'various-urls',
@@ -169,7 +166,7 @@ const TEST_FONTS = {
                 ],
             },
         ],
-    } as CustomizationFontDefinition,
+    },
 };
 
 // Helper function to validate CSS with stylelint

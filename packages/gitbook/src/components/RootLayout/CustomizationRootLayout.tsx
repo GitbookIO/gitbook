@@ -23,7 +23,8 @@ import {
 import { IconStyle, IconsProvider } from '@gitbook/icons';
 import * as ReactDOM from 'react-dom';
 
-import { fontNotoColorEmoji, getFontData } from '@/fonts';
+import { getFontData } from '@/fonts';
+import { fontNotoColorEmoji, ibmPlexMono } from '@/fonts/default';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -76,6 +77,7 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
+                ibmPlexMono.variable,
                 fontData.type === 'default' ? fontData.variable : 'font-custom'
             )}
         >
