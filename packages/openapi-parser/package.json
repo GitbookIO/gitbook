@@ -12,7 +12,7 @@
     "version": "2.1.0",
     "sideEffects": false,
     "dependencies": {
-        "@scalar/openapi-parser": "^0.10.9",
+        "@scalar/openapi-parser": "^0.10.10",
         "@scalar/openapi-types": "^0.1.9"
     },
     "devDependencies": {
