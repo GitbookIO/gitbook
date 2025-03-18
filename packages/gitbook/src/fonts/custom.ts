@@ -21,7 +21,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
                 })
                 .join(', ');
 
-            // We could use the font-family name here, but to avoid extra normalization we're using 'CustomFont'
+            // We could use the customFont.fontFamily name here, but to avoid extra normalization we're using 'CustomFont'
             return `
         @font-face {
             font-family: CustomFont; 
@@ -43,10 +43,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
 }
 
 /**
- * Get the list of font sources to preload
- *
- * Currently we're preloading all sources but we could optimize this in the future by only preloading the important ones
- * to avoid blocking the page load.
+ * Get a list of font sources to preload (only 400 and 700 weights)
  */
 export function getFontSourcesToPreload(customFont: CustomizationFontDefinition) {
     return customFont.fontFaces.filter(
