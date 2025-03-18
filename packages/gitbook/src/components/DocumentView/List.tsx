@@ -22,7 +22,7 @@ export function List(
             nodes={block.nodes}
             ancestorBlocks={[...ancestorBlocks, block]}
             // `-mt-4` because we apply a `mt-5` to all blocks but we only want a margin top of 6px for lists
-            style={['min-w-0 space-y-2 -mt-4', style]}
+            style={[style, 'min-w-0 space-y-2 -mt-4']}
         />
     );
 }
