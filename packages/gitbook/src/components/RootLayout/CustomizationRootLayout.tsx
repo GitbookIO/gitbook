@@ -55,9 +55,16 @@ export async function CustomizationRootLayout(props: {
     // Preconnect and preload custom fonts if needed
     if (fontData.type === 'custom') {
         ReactDOM.preconnect(GITBOOK_FONTS_URL);
-        fontData.preloadSources.forEach(({ url }) => {
-            ReactDOM.preload(url, { as: 'font', crossOrigin: 'anonymous', fetchPriority: 'high' });
-        });
+        fontData.preloadSources
+            .flatMap((face) => face.sources)
+            .forEach(({ url, format }) => {
+                ReactDOM.preload(url, {
+                    as: 'font',
+                    crossOrigin: 'anonymous',
+                    fetchPriority: 'high',
+                    type: format ? `font/${format}` : undefined,
+                });
+            });
     }
 
     return (

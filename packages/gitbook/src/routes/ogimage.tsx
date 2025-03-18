@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { type PageParams, fetchPageData } from '@/components/SitePage';
+import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
@@ -79,27 +80,19 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
         }
 
         // custom fonts
-        const primaryFontSources = customization.styling.font.fontFaces
-            .filter((face): face is typeof face & { weight: 400 | 700 } => {
-                return face.weight === 400 || face.weight === 700;
-            })
-            .map((face) => {
-                if (face.sources.length === 0) {
-                    return null;
-                }
-
-                return {
-                    weight: face.weight,
-                    // just load the first source, fromat is not that important here
-                    url: face.sources[0].url,
-                } as const;
-            })
-            .filter(filterOutNullable);
+        // We only load the primary font weights for now
+        const primaryFontWeights = getFontSourcesToPreload(customization.styling.font);
 
         const fonts = (
             await Promise.all(
-                primaryFontSources.map((source) => {
-                    return loadCustomFont({ url: source.url, weight: source.weight });
+                primaryFontWeights.map((face) => {
+                    const { weight, sources } = face;
+                    if (sources.length === 0) {
+                        return null;
+                    }
+                    const url = sources[0].url;
+
+                    return loadCustomFont({ url, weight });
                 })
             )
         ).filter(filterOutNullable);

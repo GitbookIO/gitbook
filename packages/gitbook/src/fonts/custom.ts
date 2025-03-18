@@ -1,7 +1,7 @@
-import type { CustomizationFontDefinition, FontSource } from '@gitbook/api';
+import type { CustomizationFontDefinition } from '@gitbook/api';
 
 /**
- * Define the custom font faces and set the --font-content to the custom font name
+ * Define the custom font faces and set the --font-custom to the custom font name
  */
 export function generateFontFacesCSS(customFont: CustomizationFontDefinition): string {
     const { fontFaces } = customFont;
@@ -21,7 +21,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
                 })
                 .join(', ');
 
-            // We could use the font-family name here, but to avoid extra normalization we're using CustomFont
+            // We could use the font-family name here, but to avoid extra normalization we're using 'CustomFont'
             return `
         @font-face {
             font-family: CustomFont; 
@@ -48,18 +48,9 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
  * Currently we're preloading all sources but we could optimize this in the future by only preloading the important ones
  * to avoid blocking the page load.
  */
-export function getFontSourcesToPreload(customFont: CustomizationFontDefinition): FontSource[] {
-    const allSources = customFont.fontFaces.flatMap((face) => face.sources);
-
-    const uniqueSources = new Map<string, FontSource>();
-
-    // Add each source to the map, using URL as the key
-    allSources.forEach((source) => {
-        const url = source.url.toString();
-        if (!uniqueSources.has(url)) {
-            uniqueSources.set(url, source);
-        }
-    });
-
-    return Array.from(uniqueSources.values());
+export function getFontSourcesToPreload(customFont: CustomizationFontDefinition) {
+    return customFont.fontFaces.filter(
+        (face): face is typeof face & { weight: 400 | 700 } =>
+            face.weight === 400 || face.weight === 700
+    );
 }

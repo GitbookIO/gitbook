@@ -259,10 +259,10 @@ describe('generateFontFacesCSS', () => {
     });
 });
 
-describe('getCustomFontPreloadLinks', () => {
+describe('getFontSourcesToPreload', () => {
     const preloadTestCases = [
         { name: 'basic case', font: TEST_FONTS.basic, expectedCount: 2 },
-        { name: 'multiple weights', font: TEST_FONTS.multiWeight, expectedCount: 5 },
+        { name: 'multiple weights', font: TEST_FONTS.multiWeight, expectedCount: 2 },
         { name: 'multiple sources', font: TEST_FONTS.multiSource, expectedCount: 2 },
         { name: 'missing format', font: TEST_FONTS.missingFormat, expectedCount: 2 },
         { name: 'empty font faces', font: TEST_FONTS.empty, expectedCount: 0 },
@@ -272,20 +272,9 @@ describe('getCustomFontPreloadLinks', () => {
 
     preloadTestCases.forEach(({ name, font, expectedCount }) => {
         test(`extracts ${expectedCount} URLs from ${name}`, () => {
-            const result = getFontSourcesToPreload(font);
+            const result = getFontSourcesToPreload(font).flatMap((face) => face.sources);
             expect(result).toBeArray();
             expect(result.length).toBe(expectedCount);
         });
-    });
-
-    test('handles different URL types correctly', () => {
-        const result = getFontSourcesToPreload(TEST_FONTS.variousURLs);
-
-        expect(result).toBeArray();
-        expect(result.length).toBe(2);
-        expect(result).toMatchObject([
-            { url: 'https://example.com/fonts.woff2' },
-            { url: 'https://example.com/fonts.woff' },
-        ]);
     });
 });

@@ -1,4 +1,4 @@
-import type { CustomizationFont, FontSource } from '@gitbook/api';
+import type { CustomizationFont, CustomizationFontDefinition } from '@gitbook/api';
 import { generateFontFacesCSS, getFontSourcesToPreload } from './custom';
 import { fonts } from './default';
 
@@ -21,7 +21,7 @@ interface DefaultFontData {
 interface CustomFontData {
     type: 'custom';
     fontFaceRules: string;
-    preloadSources: FontSource[];
+    preloadSources: CustomizationFontDefinition['fontFaces'];
 }
 
 /**
