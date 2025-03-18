@@ -56,7 +56,7 @@ const fetchFilesystemV1 = cache({
     get: async (url: string, options: CacheFunctionOptions) => {
         const richFilesystem = await fetchFilesystemUncached(url, options);
         return {
-            // Cache for 4 hours
+            // Cache for 24 hours
             ttl: 24 * 60 * 60,
             // Revalidate every 2 hours
             revalidateBefore: 22 * 60 * 60,
