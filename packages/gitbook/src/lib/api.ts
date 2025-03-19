@@ -732,12 +732,17 @@ export const getComputedDocument = cache({
         _organizationId: string,
         spaceId: string,
         source: ComputedContentSource,
+        seed: string,
         options: CacheFunctionOptions
     ) => {
         const apiCtx = await api();
         const response = await apiCtx.client.spaces.getComputedDocument(
             spaceId,
-            { source },
+            {
+                source,
+                // @ts-expect-error - seed is not typed yet, but will be in the next version of the API
+                seed,
+            },
             {},
             {
                 signal: options.signal,
