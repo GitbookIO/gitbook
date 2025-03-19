@@ -1,6 +1,6 @@
 'use client';
 
-import * as cookies from '@/lib/cookies';
+import { getBrowserCookie } from '@/lib/browser-cookies';
 
 import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';
@@ -37,7 +37,7 @@ async function fetchVisitorID(appURL: string): Promise<string> {
         return generateRandomId();
     }
 
-    const existingTrackingCookie = cookies.get(VISITORID_COOKIE);
+    const existingTrackingCookie = getBrowserCookie(VISITORID_COOKIE);
 
     if (existingTrackingCookie) {
         // If the cookie already exists, we'll just use that. Avoids a server request.

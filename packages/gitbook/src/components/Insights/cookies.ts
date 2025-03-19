@@ -1,6 +1,6 @@
 'use client';
 
-import * as cookies from '@/lib/cookies';
+import { getBrowserCookie, setBrowserCookie } from '@/lib/browser-cookies';
 
 const GRANTED_COOKIE = '__gitbook_cookie_granted';
 
@@ -8,7 +8,7 @@ const GRANTED_COOKIE = '__gitbook_cookie_granted';
  * Accept or reject cookies.
  */
 export function setCookiesTracking(enabled: boolean) {
-    cookies.set(GRANTED_COOKIE, enabled ? 'yes' : 'no', {
+    setBrowserCookie(GRANTED_COOKIE, enabled ? 'yes' : 'no', {
         expires: 365,
         sameSite: 'none',
         secure: true,
@@ -20,7 +20,7 @@ export function setCookiesTracking(enabled: boolean) {
  * Return `undefined` if state is not known.
  */
 export function isCookiesTrackingDisabled() {
-    const state = cookies.get(GRANTED_COOKIE);
+    const state = getBrowserCookie(GRANTED_COOKIE);
 
     if (state === 'yes') {
         return false;

@@ -26,13 +26,10 @@ export function SpaceLayout(props: {
     /** Whether to enable tracking of events into site insights. */
     withTracking: boolean;
 
-    /** The visitor token used to access this content */
-    visitorAuthToken: string | null;
-
     /** The children of the layout. */
     children: React.ReactNode;
 }) {
-    const { context, withTracking, visitorAuthToken, children } = props;
+    const { context, withTracking, children } = props;
     const { siteSpace, customization, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -52,7 +49,6 @@ export function SpaceLayout(props: {
                 enabled={withTracking}
                 appURL={GITBOOK_APP_URL}
                 apiHost={GITBOOK_API_PUBLIC_URL}
-                visitorAuthToken={visitorAuthToken}
                 organizationId={context.organizationId}
                 siteId={context.site.id}
                 siteSectionId={context.sections?.current?.id ?? null}

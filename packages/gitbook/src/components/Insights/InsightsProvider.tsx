@@ -5,8 +5,9 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import * as cookies from '@/lib/cookies';
+import * as cookies from '@/lib/browser-cookies';
 
+import { useVisitorAuthToken } from '../hooks/useVisitorAuthToken';
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
 
@@ -65,7 +66,6 @@ interface InsightsProviderProps extends InsightsEventContext {
     enabled: boolean;
     appURL: string;
     apiHost: string;
-    visitorAuthToken: string | null;
     children: React.ReactNode;
 }
 
@@ -73,8 +73,9 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, visitorAuthToken, children, ...context } = props;
+    const { enabled, appURL, apiHost, children, ...context } = props;
 
+    const visitorAuthToken = useVisitorAuthToken();
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
         [pathname: string]:

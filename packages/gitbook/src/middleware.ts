@@ -2,7 +2,6 @@ import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from 
 import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import jwt from 'jsonwebtoken';
-import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { type NextRequest, NextResponse } from 'next/server';
 import hash from 'object-hash';
 
@@ -395,7 +394,10 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
  * When serving multi spaces based on the current URL.
  */
 async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const visitorAuthToken = getVisitorToken(request, url);
+    const visitorAuthToken = getVisitorToken({
+        cookies: request.cookies.getAll(),
+        url,
+    });
     const lookup = await lookupSiteByAPI(url, visitorAuthToken);
     return {
         ...lookup,
@@ -525,8 +527,9 @@ async function lookupSiteOrSpaceInMultiIdMode(
         );
     }
 
-    const cookies: ResponseCookies = {
-        [cookieName]: {
+    const cookies: ResponseCookies = [
+        {
+            name: cookieName,
             value: encodeGitBookTokenCookie(source.id, apiToken, apiEndpoint),
             options: {
                 httpOnly: true,
@@ -535,7 +538,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
             },
         },
-    };
+    ];
 
     // Get rid of the token from the URL
     if (url.searchParams.has(AUTH_TOKEN_QUERY) || url.searchParams.has(API_ENDPOINT_QUERY)) {
@@ -607,7 +610,10 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
     const target = new URL(targetStr);
     target.search = url.search;
 
-    const visitorAuthToken = getVisitorToken(request, target);
+    const visitorAuthToken = getVisitorToken({
+        cookies: request.cookies.getAll(),
+        url: target,
+    });
 
     const lookup = await lookupSiteByAPI(target, visitorAuthToken);
     if ('error' in lookup) {
@@ -859,18 +865,9 @@ function encodeGitBookTokenCookie(
     return JSON.stringify({ s: spaceId, t: token, e: apiEndpoint });
 }
 
-function writeCookies<R extends NextResponse>(
-    response: R,
-    cookies: Record<
-        string,
-        {
-            value: string;
-            options?: Partial<ResponseCookie>;
-        }
-    > = {}
-): R {
-    Object.entries(cookies).forEach(([key, { value, options }]) => {
-        response.cookies.set(key, value, options);
+function writeCookies<R extends NextResponse>(response: R, cookies: ResponseCookies = []): R {
+    cookies.forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value, cookie.options);
     });
 
     return response;

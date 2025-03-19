@@ -30,11 +30,7 @@ export default async function SiteStaticLayout({
 
     return (
         <CustomizationRootLayout customization={context.customization}>
-            <SiteLayout
-                context={context}
-                withTracking={!GITBOOK_DISABLE_TRACKING}
-                visitorAuthToken={null}
-            >
+            <SiteLayout context={context} withTracking={!GITBOOK_DISABLE_TRACKING}>
                 {children}
             </SiteLayout>
         </CustomizationRootLayout>
