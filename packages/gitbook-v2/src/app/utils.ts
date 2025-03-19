@@ -1,9 +1,6 @@
-import {
-    fetchSiteContextByURL,
-    fetchSiteContextByURLLookup,
-    getBaseContext,
-} from '@v2/lib/context';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
+import type { PublishedSiteContent } from '@gitbook/api';
+import { fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
+import rison from 'rison';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -12,6 +9,9 @@ export type RouteLayoutParams = {
 
     /** URL encoded site URL */
     siteURL: string;
+
+    /** URL and Rison encoded site data from getPublishedContentByUrl */
+    siteData: string;
 };
 
 export type RouteParams = RouteLayoutParams & {
@@ -23,16 +23,14 @@ export type RouteParams = RouteLayoutParams & {
  */
 export function getStaticSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
-    return fetchSiteContextByURL(
+    const siteURLData = getSiteURLDataFromParams(params);
+
+    return fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
             urlMode: getModeFromParams(params.mode),
         }),
-        {
-            url: siteURL.toString(),
-            visitorAuthToken: null,
-            redirectOnError: false,
-        }
+        siteURLData
     );
 }
 
@@ -40,9 +38,9 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
  * Get the site context when rendering dynamically.
  * The context will depend on the request.
  */
-export async function getDynamicSiteContext(params: RouteLayoutParams) {
+export function getDynamicSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
-    const siteURLData = await getSiteURLDataFromMiddleware();
+    const siteURLData = getSiteURLDataFromParams(params);
 
     return fetchSiteContextByURLLookup(
         getBaseContext({
@@ -73,4 +71,12 @@ function getModeFromParams(mode: string): RouteParamMode {
     }
 
     return 'url';
+}
+
+/**
+ * Get the decoded site data from the params.
+ */
+function getSiteURLDataFromParams(params: RouteLayoutParams): PublishedSiteContent {
+    const decoded = decodeURIComponent(params.siteData);
+    return rison.decode(decoded);
 }

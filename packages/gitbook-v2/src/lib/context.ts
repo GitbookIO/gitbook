@@ -169,29 +169,6 @@ export function getLinkerForSiteURL(input: {
 }
 
 /**
- * Fetch the context of a site for a given URL and a base context.
- */
-export async function fetchSiteContextByURL(
-    baseContext: GitBookBaseContext,
-    input: {
-        url: string;
-        visitorAuthToken: string | null;
-        redirectOnError: boolean;
-    }
-): Promise<GitBookSiteContext> {
-    const { dataFetcher } = baseContext;
-    const data = await throwIfDataError(
-        dataFetcher.getPublishedContentByUrl({
-            url: input.url,
-            visitorAuthToken: input.visitorAuthToken,
-            redirectOnError: input.redirectOnError,
-        })
-    );
-
-    return fetchSiteContextByURLLookup(baseContext, data);
-}
-
-/**
  * Fetch the context of a site using the resolution of a URL
  */
 export async function fetchSiteContextByURLLookup(

@@ -10,11 +10,13 @@
         "@gitbook/cache-tags": "workspace:*",
         "@sindresorhus/fnv1a": "^3.1.0",
         "server-only": "^0.0.1",
-        "warn-once": "^0.1.1"
+        "warn-once": "^0.1.1",
+        "rison": "^0.1.1"
     },
     "devDependencies": {
         "gitbook": "*",
         "@opennextjs/cloudflare": "^0.5.10",
+        "@types/rison": "^0.0.9",
         "tailwindcss": "^3.4.0",
         "postcss": "^8"
     },
