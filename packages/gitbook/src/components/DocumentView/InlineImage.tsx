@@ -32,6 +32,10 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
             className={tcls(
                 size !== 'line' ? ['inline-flex', 'max-w-[300px]', 'align-middle'] : null
             )}
+            style={{
+                // Stabilize the height of the image.
+                height: 'calc-size(auto,round(down,size,1px))',
+            }}
         >
             <Image
                 alt={inline.data.caption ?? ''}
