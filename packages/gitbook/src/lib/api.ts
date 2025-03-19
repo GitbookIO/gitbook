@@ -740,7 +740,6 @@ export const getComputedDocument = cache({
             spaceId,
             {
                 source,
-                // @ts-expect-error - seed is not typed yet, but will be in the next version of the API
                 seed,
             },
             {},

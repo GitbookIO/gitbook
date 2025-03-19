@@ -66,7 +66,9 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                fonts[customization.styling.font].variable,
+                typeof customization.styling.font === 'string'
+                    ? fonts[customization.styling.font].variable
+                    : '',
                 ibmPlexMono.variable
             )}
         >
