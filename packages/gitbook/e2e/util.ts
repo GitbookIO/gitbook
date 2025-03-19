@@ -202,6 +202,9 @@ export function runTestCases(testCases: TestsCase[]) {
                                     await waitForTOCScrolling(page);
                                 }
                             },
+                            afterScreenshot: async () => {
+                                await restoreImages(page);
+                            },
                         });
                     }
                 });
@@ -353,22 +356,51 @@ async function stabilizeImages(page: Page) {
         await Promise.all(
             images.map(async (img) => {
                 return new Promise<void>((resolve) => {
-                    if (img.complete) {
-                        img.style.width = `${Math.round(img.width)}px`;
-                        img.style.height = `${Math.round(img.height)}px`;
+                    const setDimensions = () => {
+                        img.dataset.stabilized = 'true';
+                        if (img.style.width) {
+                            img.dataset.originalWidth = img.style.width;
+                        }
+                        if (img.style.height) {
+                            img.dataset.originalHeight = img.style.height;
+                        }
+                        img.style.width = `${Math.round(img.clientWidth)}px`;
+                        img.style.height = `${Math.round(img.clientHeight)}px`;
+                        img.removeEventListener('load', setDimensions);
                         resolve();
+                    };
+                    if (img.complete) {
+                        setDimensions();
                     } else {
-                        img.onload = () => {
-                            img.style.width = `${Math.round(img.width)}px`;
-                            img.style.height = `${Math.round(img.height)}px`;
+                        const handleError = () => {
+                            img.removeEventListener('error', handleError);
                             resolve();
                         };
-                        img.onerror = () => resolve(); // Skip failed images
+                        img.addEventListener('load', setDimensions);
+                        img.addEventListener('error', handleError); // Skip failed images
                     }
                 });
             })
         );
         return true;
+    });
+}
+
+/**
+ * Restore images to their original size.
+ */
+async function restoreImages(page: Page) {
+    await page.evaluate(() => {
+        const images = Array.from(document.querySelectorAll('img'));
+        images.forEach((img) => {
+            if (img.dataset.stabilized) {
+                img.style.width = img.dataset.originalWidth ?? '';
+                img.style.height = img.dataset.originalHeight ?? '';
+                img.dataset.originalHeight = undefined;
+                img.dataset.originalWidth = undefined;
+                img.dataset.stabilized = undefined;
+            }
+        });
     });
 }
 
