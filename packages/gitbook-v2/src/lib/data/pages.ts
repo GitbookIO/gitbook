@@ -15,12 +15,13 @@ export async function getPageDocument(
             dataFetcher.getDocument({ spaceId: space.id, documentId: page.documentId })
         );
     }
-    if (page.computed) {
+    if ('computed' in page && page.computed) {
         return getDataOrNull(
             dataFetcher.getComputedDocument({
                 organizationId: space.organization,
                 spaceId: space.id,
                 source: page.computed,
+                seed: page.computedSeed,
             })
         );
     }

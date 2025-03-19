@@ -140,6 +140,7 @@ export function createDataFetcher(
                     organizationId: params.organizationId,
                     spaceId: params.spaceId,
                     source: params.source,
+                    seed: params.seed,
                 })
             );
         },
@@ -344,6 +345,7 @@ async function getComputedDocument(
         spaceId: string;
         organizationId: string;
         source: ComputedContentSource;
+        seed: string;
     }
 ) {
     'use cache';
@@ -364,6 +366,7 @@ async function getComputedDocument(
         const api = await apiClient(input);
         const res = await api.spaces.getComputedDocument(params.spaceId, {
             source: params.source,
+            seed: params.seed,
         });
         return res.data;
     });

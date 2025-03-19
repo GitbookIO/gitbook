@@ -157,7 +157,12 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getComputedDocument(params) {
             return wrapDataFetcherError(() => {
-                return getComputedDocument(params.organizationId, params.spaceId, params.source);
+                return getComputedDocument(
+                    params.organizationId,
+                    params.spaceId,
+                    params.source,
+                    params.seed
+                );
             });
         },
 

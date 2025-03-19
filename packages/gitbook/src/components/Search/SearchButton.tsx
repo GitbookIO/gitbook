@@ -99,7 +99,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     );
 }
 
-const Shortcut = () => {
+function Shortcut() {
     const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
 
     useEffect(() => {
@@ -117,20 +117,7 @@ const Shortcut = () => {
 
     return operatingSystem ? (
         <div
-            className={tcls(
-                'shortcut',
-                'hidden',
-                'md:flex',
-                'gap-0.5',
-                '-mr-1',
-                'justify-end',
-                'text-xs',
-                'text-tint',
-                'contrast-more:text-tint-strong',
-                'whitespace-nowrap',
-                `[font-feature-settings:"calt",_"case"]`,
-                'animate-fadeIn'
-            )}
+            className={`shortcut -mr-1 hidden animate-fadeIn justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`}
         >
             <kbd
                 className={`flex h-5 min-w-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
@@ -141,5 +128,7 @@ const Shortcut = () => {
                 K
             </kbd>
         </div>
-    ) : null;
-};
+    ) : (
+        <span aria-busy />
+    );
+}

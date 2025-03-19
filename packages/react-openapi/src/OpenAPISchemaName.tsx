@@ -1,5 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type React from 'react';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
@@ -40,17 +41,17 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
 function getAdditionalItems(schema: OpenAPIV3.SchemaObject): string {
     let additionalItems = '';
 
-    if (schema.minimum || schema.minLength) {
-        additionalItems += ` · min: ${schema.minimum || schema.minLength}`;
+    if (schema.minimum || schema.minLength || schema.minItems) {
+        additionalItems += ` · min: ${schema.minimum || schema.minLength || schema.minItems}`;
     }
 
-    if (schema.maximum || schema.maxLength) {
-        additionalItems += ` · max: ${schema.maximum || schema.maxLength}`;
+    if (schema.maximum || schema.maxLength || schema.maxItems) {
+        additionalItems += ` · max: ${schema.maximum || schema.maxLength || schema.maxItems}`;
     }
 
     // If the schema has a default value, we display it
     if (typeof schema.default !== 'undefined') {
-        additionalItems += ` · default: ${schema.default}`;
+        additionalItems += ` · default: ${stringifyOpenAPI(schema.default)}`;
     }
 
     if (schema.nullable) {

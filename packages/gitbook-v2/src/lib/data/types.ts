@@ -111,6 +111,7 @@ export interface GitBookDataFetcher {
         organizationId: string;
         spaceId: string;
         source: api.ComputedContentSource;
+        seed: string;
     }): Promise<DataFetcherResponse<api.JSONDocument>>;
 
     /**
