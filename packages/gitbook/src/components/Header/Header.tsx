@@ -102,13 +102,14 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     ? [
                                           'md:grow-[0.8]',
                                           'lg:basis-40',
-                                          'max-w-lg',
+                                          'md:max-w-[40%]',
+                                          'lg:max-w-lg',
                                           'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - margin (3rem)
                                           'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
                                           'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),0rem)]',
                                           'page-full-width:lg:ml-[max(calc((100%-18rem-103rem-3rem)/2),1.5rem)]',
                                           'page-full-width:2xl:ml-[max(calc((100%-18rem-96rem-14rem+3rem)/2),1.5rem)]',
-                                          'lg:mr-auto',
+                                          'md:mr-auto',
                                           'order-last',
                                           'md:order-[unset]',
                                       ]
