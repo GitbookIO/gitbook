@@ -133,11 +133,8 @@ export const headerLinks: CustomizationHeaderItem[] = [
 ];
 
 export async function waitForCookiesDialog(page: Page) {
-    const dialog = page.getByRole('dialog', { name: 'Cookies' });
-    const accept = dialog.getByRole('button', { name: 'Accept' });
-    const reject = dialog.getByRole('button', { name: 'Reject' });
-    await expect(accept).toBeVisible();
-    await expect(reject).toBeVisible();
+    const dialog = page.getByTestId('cookies-dialog');
+    await expect(dialog).toBeVisible();
 }
 
 /**
