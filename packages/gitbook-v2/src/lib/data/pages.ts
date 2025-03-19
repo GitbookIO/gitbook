@@ -21,6 +21,8 @@ export async function getPageDocument(
                 organizationId: space.organization,
                 spaceId: space.id,
                 source: page.computed,
+                // @ts-expect-error - computedSeed is not typed yet, but will be in the next version of the API
+                seed: page.computedSeed,
             })
         );
     }
