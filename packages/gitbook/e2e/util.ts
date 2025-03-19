@@ -188,7 +188,7 @@ export function runTestCases(testCases: TestsCase[]) {
                     const screenshotOptions = testEntry.screenshot;
                     if (screenshotOptions !== false) {
                         await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
-                            animations: "disabled",
+                            animations: 'disabled',
                             viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                             argosCSS: `
                         /* Hide Intercom */
