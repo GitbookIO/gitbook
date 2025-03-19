@@ -133,11 +133,8 @@ export const headerLinks: CustomizationHeaderItem[] = [
 ];
 
 export async function waitForCookiesDialog(page: Page) {
-    const dialog = page.getByRole('dialog', { name: 'Cookies' });
-    const accept = dialog.getByRole('button', { name: 'Accept' });
-    const reject = dialog.getByRole('button', { name: 'Reject' });
-    await expect(accept).toBeVisible();
-    await expect(reject).toBeVisible();
+    const dialog = page.getByTestId('cookies-dialog');
+    await expect(dialog).toBeVisible();
 }
 
 /**
@@ -190,14 +187,20 @@ export function runTestCases(testCases: TestsCase[]) {
                         await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                             viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                             argosCSS: `
-                        /* Hide Intercom */
-                        .intercom-lightweight-app {
-                            display: none !important;
+                            /* Hide Intercom */
+                            .intercom-lightweight-app {
+                                display: none !important;
+                            }
+
+                            /* Switch image rendering to pixelated */
+                            img {
+                                image-rendering: pixelated;
                             }
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
-                            beforeScreenshot: async () => {
+                            beforeScreenshot: async ({ runStabilization }) => {
+                                await runStabilization();
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
