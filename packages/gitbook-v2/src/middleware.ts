@@ -127,7 +127,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return NextResponse.redirect(data.redirect);
     }
 
-    cookies.push(...getResponseCookiesForVisitorAuth(data.basePath, visitorToken));
+    cookies.push(...getResponseCookiesForVisitorAuth(data.siteBasePath, visitorToken));
 
     //
     // Make sure the URL is clean of any va token after a successful lookup

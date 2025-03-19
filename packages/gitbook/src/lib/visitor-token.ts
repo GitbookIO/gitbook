@@ -83,8 +83,7 @@ export function getVisitorToken({
 }
 
 /**
- * Return the lookup result for content served with visitor auth. It basically disables caching
- * and sets a cookie with the visitor auth token.
+ * Return the lookup result for content served with visitor auth.
  */
 export function getResponseCookiesForVisitorAuth(
     basePath: string,
