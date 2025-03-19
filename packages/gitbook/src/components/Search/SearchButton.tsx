@@ -99,7 +99,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     );
 }
 
-const Shortcut = () => {
+function Shortcut() {
     const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
 
     useEffect(() => {
@@ -141,5 +141,7 @@ const Shortcut = () => {
                 K
             </kbd>
         </div>
-    ) : null;
-};
+    ) : (
+        <span aria-busy />
+    );
+}
