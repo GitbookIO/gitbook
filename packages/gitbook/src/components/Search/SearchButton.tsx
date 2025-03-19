@@ -119,8 +119,10 @@ function Shortcut() {
         <div
             aria-busy={operatingSystem === null ? 'true' : undefined}
             className={tcls(
-                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs opacity-0 [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
-                operatingSystem && 'animate-fadeIn'
+                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
+                operatingSystem
+                    ? 'motion-safe:animate-fadeIn motion-reduce:opacity-100'
+                    : 'opacity-0'
             )}
         >
             <kbd
