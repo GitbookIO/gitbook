@@ -484,6 +484,17 @@ const testCases: TestsCase[] = [
                 name: 'Cards',
                 url: 'blocks/cards',
                 fullPage: true,
+                run: async (page) => {
+                    // Resize the image to avoid the flakiness in rendering
+                    // "vertical-align: middle" is unstable
+                    await page
+                        .locator('img[width=22]')
+                        .first()
+                        .evaluate((img) => {
+                            img.style.width = '40px';
+                            img.style.height = '40px';
+                        });
+                },
             },
             {
                 name: 'Math',
