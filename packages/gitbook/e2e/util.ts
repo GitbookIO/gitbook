@@ -191,11 +191,6 @@ export function runTestCases(testCases: TestsCase[]) {
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
-
-                            /* Switch image rendering to pixelated */
-                            img {
-                                image-rendering: pixelated;
-                            }
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
