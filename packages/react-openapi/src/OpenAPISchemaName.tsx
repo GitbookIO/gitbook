@@ -1,5 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type React from 'react';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
@@ -50,7 +51,7 @@ function getAdditionalItems(schema: OpenAPIV3.SchemaObject): string {
 
     // If the schema has a default value, we display it
     if (typeof schema.default !== 'undefined') {
-        additionalItems += ` · default: ${schema.default}`;
+        additionalItems += ` · default: ${stringifyOpenAPI(schema.default)}`;
     }
 
     if (schema.nullable) {
