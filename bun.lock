@@ -136,6 +136,7 @@
         "@gitbook/api": "*",
         "@gitbook/cache-tags": "workspace:*",
         "@sindresorhus/fnv1a": "^3.1.0",
+        "jwt-decode": "^4.0.0",
         "next": "^15.2.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
