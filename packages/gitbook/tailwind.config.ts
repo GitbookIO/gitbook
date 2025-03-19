@@ -80,6 +80,7 @@ const config: Config = {
                     'var(--font-noto-color-emoji)',
                     'sans-serif',
                 ],
+                custom: ['var(--font-custom)'],
                 var: ['var(--font-family)'],
             },
             colors: {
