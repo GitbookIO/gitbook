@@ -364,8 +364,9 @@ async function stabilizeImages(page: Page) {
                         if (img.style.height) {
                             img.dataset.originalHeight = img.style.height;
                         }
-                        img.style.width = `${Math.round(img.clientWidth)}px`;
-                        img.style.height = `${Math.round(img.clientHeight)}px`;
+                        const rect = img.getBoundingClientRect();
+                        img.style.width = `${Math.round(rect.width)}px`;
+                        img.style.height = `${Math.round(rect.height)}px`;
                         img.removeEventListener('load', setDimensions);
                         resolve();
                     };
