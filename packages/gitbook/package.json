@@ -67,11 +67,11 @@
         "jwt-decode": "^4.0.0"
     },
     "devDependencies": {
-        "@argos-ci/playwright": "^3.10.0",
+        "@argos-ci/playwright": "^4.1.0",
         "@cloudflare/next-on-pages": "1.13.7",
         "vercel": "^39.3.0",
         "@cloudflare/workers-types": "^4.20241230.0",
-        "@playwright/test": "^1.49.1",
+        "@playwright/test": "^1.51.1",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
         "@types/jsonwebtoken": "^9.0.6",

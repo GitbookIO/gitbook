@@ -190,14 +190,20 @@ export function runTestCases(testCases: TestsCase[]) {
                         await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                             viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                             argosCSS: `
-                        /* Hide Intercom */
-                        .intercom-lightweight-app {
-                            display: none !important;
+                            /* Hide Intercom */
+                            .intercom-lightweight-app {
+                                display: none !important;
+                            }
+
+                            /* Switch image rendering to pixelated */
+                            img {
+                                image-rendering: pixelated;
                             }
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
-                            beforeScreenshot: async () => {
+                            beforeScreenshot: async ({ runStabilization }) => {
+                                await runStabilization();
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
