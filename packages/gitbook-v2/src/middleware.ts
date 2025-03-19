@@ -1,6 +1,7 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import rison from 'rison';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -144,8 +145,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Render and serve the content
     //
 
-    // When visitor has authentication (adaptive content or VA), we serve dynamic routes.
-    let routeType = visitorToken ? 'dynamic' : 'static';
+    // The route is static, except when using dynamic parameters from query params
+    // (customization override, theme, etc)
+    let routeType: 'dynamic' | 'static' = 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
@@ -184,6 +186,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         routeType,
         mode,
         encodeURIComponent(siteURLWithoutProtocol),
+        encodeURIComponent(rison.encode(data)),
         pathname,
     ].join('/');
 

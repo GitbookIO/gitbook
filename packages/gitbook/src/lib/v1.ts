@@ -18,7 +18,6 @@ import {
     getDocument,
     getEmbedByUrlInSpace,
     getLatestOpenAPISpecVersionContent,
-    getPublishedContentByUrl,
     getPublishedContentSite,
     getReusableContent,
     getRevision,
@@ -73,11 +72,7 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
  * This data fetcher should only be used at the top of the tree.
  */
 async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
-    const apiClient = await api();
-
     const dataFetcher: GitBookDataFetcher = {
-        apiEndpoint: apiClient.client.endpoint,
-
         async api() {
             const result = await api();
             return result.client;
@@ -97,17 +92,6 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                 }
 
                 return user;
-            });
-        },
-
-        // @ts-ignore - types are compatible enough, and this will not be called in v1 this way
-        getPublishedContentByUrl(params) {
-            return wrapDataFetcherError(async () => {
-                return getPublishedContentByUrl(
-                    params.url,
-                    params.visitorAuthToken ?? undefined,
-                    params.redirectOnError ? true : undefined
-                );
             });
         },
 
