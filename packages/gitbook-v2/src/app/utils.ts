@@ -1,5 +1,7 @@
 import type { PublishedSiteContent } from '@gitbook/api';
 import { fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
+import { jwtDecode } from 'jwt-decode';
+import { forbidden } from 'next/navigation';
 import rison from 'rison';
 
 export type RouteParamMode = 'url-host' | 'url';
@@ -24,6 +26,13 @@ export type RouteParams = RouteLayoutParams & {
 export function getStaticSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
+
+    // For static routes, we check the expiration of the JWT token
+    // as the route might be revalidated after expiration
+    const decoded = jwtDecode(siteURLData.apiToken);
+    if (decoded.exp && decoded.exp < Date.now() / 1000 + 120) {
+        forbidden();
+    }
 
     return fetchSiteContextByURLLookup(
         getBaseContext({
