@@ -145,7 +145,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Render and serve the content
     //
 
-    // When visitor has authentication (adaptive content or VA), we serve dynamic routes.
+    // The route is static, except when using dynamic parameters from query params
+    // (customization override, theme, etc)
     let routeType: 'dynamic' | 'static' = 'static';
 
     const requestHeaders = new Headers(request.headers);
@@ -180,7 +181,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(data.pathname);
     routeType = routeTypeFromPathname ?? routeType;
 
-    console.log(data);
     const route = [
         'sites',
         routeType,
