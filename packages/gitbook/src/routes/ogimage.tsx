@@ -59,7 +59,10 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 : page.description
             : '';
 
-    const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
+    const fontFamily =
+        (typeof customization.styling.font === 'string'
+            ? googleFontsMap[customization.styling.font]
+            : null) ?? 'Inter';
 
     const regularText = pageDescription;
     const boldText = `${contentTitle}${pageTitle}`;

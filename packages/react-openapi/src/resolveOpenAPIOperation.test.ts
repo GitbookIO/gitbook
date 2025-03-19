@@ -31,8 +31,8 @@ describe('#resolveOpenAPIOperation', () => {
             ],
             operation: {
                 tags: ['pet'],
-                summary: 'Update an existing pet',
-                description: 'Update an existing pet by Id',
+                summary: 'Update an existing pet.',
+                description: 'Update an existing pet by Id.',
                 requestBody: {
                     content: {
                         'application/json': {
@@ -61,8 +61,8 @@ describe('#resolveOpenAPIOperation', () => {
             ],
             operation: {
                 tags: ['pet'],
-                summary: 'Update an existing pet',
-                description: 'Update an existing pet by Id',
+                summary: 'Update an existing pet.',
+                description: 'Update an existing pet by Id.',
                 requestBody: {
                     content: {
                         'application/json': {
@@ -159,8 +159,8 @@ describe('#resolveOpenAPIOperation', () => {
             ],
             operation: {
                 tags: ['pet'],
-                summary: 'Update an existing pet',
-                description: 'Update an existing pet by Id',
+                summary: 'Update an existing pet.',
+                description: 'Update an existing pet by Id.',
                 requestBody: {
                     content: {
                         'application/json': {

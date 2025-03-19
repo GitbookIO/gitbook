@@ -550,12 +550,14 @@ async function lookupSiteOrSpaceInMultiIdMode(
         };
     }
 
+    const basePath = normalizePathname(basePathParts.join('/'));
     return {
         // In multi-id mode, complete is always considered true because there is no URL to resolve
         ...(decoded.kind === 'site' ? { ...decoded, complete: true } : decoded),
         changeRequest: changeRequestId,
         revision: revisionId,
-        basePath: normalizePathname(basePathParts.join('/')),
+        siteBasePath: basePath,
+        basePath,
         pathname: normalizePathname(pathSegments.join('/')),
         apiToken,
         apiEndpoint,

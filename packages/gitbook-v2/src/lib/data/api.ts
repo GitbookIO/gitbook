@@ -366,7 +366,6 @@ async function getComputedDocument(
         const api = await apiClient(input);
         const res = await api.spaces.getComputedDocument(params.spaceId, {
             source: params.source,
-            // @ts-expect-error - seed is not typed yet, but will be in the next version of the API
             seed: params.seed,
         });
         return res.data;
