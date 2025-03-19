@@ -15,13 +15,12 @@ export async function getPageDocument(
             dataFetcher.getDocument({ spaceId: space.id, documentId: page.documentId })
         );
     }
-    if (page.computed) {
+    if ('computed' in page && page.computed) {
         return getDataOrNull(
             dataFetcher.getComputedDocument({
                 organizationId: space.organization,
                 spaceId: space.id,
                 source: page.computed,
-                // @ts-expect-error - computedSeed is not typed yet, but will be in the next version of the API
                 seed: page.computedSeed,
             })
         );
