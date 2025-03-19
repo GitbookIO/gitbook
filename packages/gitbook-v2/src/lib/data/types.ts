@@ -38,15 +38,6 @@ export interface GitBookDataFetcher {
     getUserById(userId: string): Promise<DataFetcherResponse<api.User>>;
 
     /**
-     * Get a published content by its URL.
-     */
-    getPublishedContentByUrl(params: {
-        url: string;
-        visitorAuthToken: string | null;
-        redirectOnError: boolean;
-    }): Promise<DataFetcherResponse<api.PublishedSiteContentLookup>>;
-
-    /**
      * Get a published content site by its organization ID and site ID.
      */
     getPublishedContentSite(params: {
