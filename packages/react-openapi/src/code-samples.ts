@@ -126,11 +126,16 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
 
+            const contentType = headers?.['Content-Type'] || '';
+
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
-                } else {
+                } else if (contentType === 'application/json') {
+                    // If the content type is JSON, we use json={}
                     code += indent(`json=${stringifyOpenAPI(body)}\n`, 4);
+                } else {
+                    code += indent(`data=${stringifyOpenAPI(body)}\n`, 4);
                 }
             }
 
@@ -326,7 +331,9 @@ const BodyGenerators = {
     getPythonBody: (body: any, headers?: Record<string, string>) => {
         if (!body || !headers) return;
         let code = '';
-        const contentType: string = headers['Content-Type'] || '';
+        // Copy headers to avoid mutating the original object
+        const headersCopy = { ...headers };
+        const contentType: string = headersCopy['Content-Type'] || '';
 
         if (isFormData(contentType)) {
             code += 'files = {\n';
@@ -346,7 +353,12 @@ const BodyGenerators = {
             body = 'files';
         }
 
-        return { body, code, headers };
+        if (isGraphQL(contentType)) {
+            // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
+            headersCopy['Content-Type'] = 'application/json';
+        }
+
+        return { body, code, headers: headersCopy };
     },
     getHTTPBody: (body: any, headers?: Record<string, string>) => {
         if (!body || !headers) return undefined;
