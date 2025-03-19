@@ -197,6 +197,7 @@ export function runTestCases(testCases: TestsCase[]) {
                             beforeScreenshot: async ({ runStabilization }) => {
                                 await runStabilization();
                                 await waitForIcons(page);
+                                await stabilizeImages(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
@@ -340,6 +341,34 @@ async function waitForIcons(page: Page) {
                 await loadImage(url);
             })
         );
+    });
+}
+
+/**
+ * Take all images, measure them and set their width and height to rounded values.
+ */
+async function stabilizeImages(page: Page) {
+    await page.waitForFunction(async () => {
+        const images = Array.from(document.querySelectorAll('img'));
+        await Promise.all(
+            images.map(async (img) => {
+                return new Promise<void>((resolve) => {
+                    if (img.complete) {
+                        img.style.width = `${Math.round(img.width)}px`;
+                        img.style.height = `${Math.round(img.height)}px`;
+                        resolve();
+                    } else {
+                        img.onload = () => {
+                            img.style.width = `${Math.round(img.width)}px`;
+                            img.style.height = `${Math.round(img.height)}px`;
+                            resolve();
+                        };
+                        img.onerror = () => resolve(); // Skip failed images
+                    }
+                });
+            })
+        );
+        return true;
     });
 }
 

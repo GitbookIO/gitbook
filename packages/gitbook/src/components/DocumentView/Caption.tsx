@@ -56,17 +56,7 @@ export function Caption(
         captionParagraph.type !== 'paragraph' ||
         isNodeEmpty(captionParagraph)
     ) {
-        return (
-            <div
-                className={tcls(style, wrapperStyle)}
-                style={{
-                    // Trick to stabilize the height of the image.
-                    height: 'calc-size(auto,round(down,size,1px))',
-                }}
-            >
-                {children}
-            </div>
-        );
+        return <div className={tcls(style, wrapperStyle)}>{children}</div>;
     }
 
     return (
