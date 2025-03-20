@@ -141,7 +141,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response
         //
-        const requestURLWithoutToken = normalizeVisitorAuthURL(requestURL);
+        const requestURLWithoutToken = normalizeVisitorAuthURL(
+            mode === 'url' ? requestURL : siteURL
+        );
         if (requestURLWithoutToken.toString() !== requestURL.toString()) {
             return writeResponseCookies(
                 NextResponse.redirect(requestURLWithoutToken.toString()),
