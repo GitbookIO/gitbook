@@ -341,6 +341,10 @@ async function waitForIcons(page: Page) {
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
         await Promise.all(
             icons.map(async (icon) => {
+                // Only load the icon if it's visible.
+                if (!icon.checkVisibility()) {
+                    return;
+                }
                 // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
                 const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
                 const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
