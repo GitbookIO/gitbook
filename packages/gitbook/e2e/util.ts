@@ -325,22 +325,18 @@ async function waitForIcons(page: Page) {
         function loadImage(src: string) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.onload = () => {
-                    // Wait two frames to ensure the image has been rendered
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            resolve(true);
-                        });
-                    });
-                };
-                img.onerror = (_error) => reject(new Error(`Failed to load image: ${src}`));
                 img.src = src;
+                img.decode().then(resolve, reject);
             });
         }
 
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
         await Promise.all(
             icons.map(async (icon) => {
+                // Only load the icon if it's visible.
+                if (!icon.checkVisibility()) {
+                    return;
+                }
                 // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
                 const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
                 const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
@@ -349,6 +345,14 @@ async function waitForIcons(page: Page) {
                     throw new Error('No mask-image');
                 }
                 await loadImage(url);
+                // Wait for two frames to make sure the icon is loaded.
+                await new Promise((resolve) => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            resolve(true);
+                        });
+                    });
+                });
             })
         );
     });
@@ -366,14 +370,28 @@ async function roundImageSizes(page: Page) {
                     const setDimensions = () => {
                         // Mark it as stabilized
                         img.dataset.stabilized = 'true';
+
                         // Preserve the original width and height
                         img.dataset.originalWidth = img.style.width ?? '';
                         img.dataset.originalHeight = img.style.height ?? '';
+
+                        // Set the width and height to the rounded values
                         const rect = img.getBoundingClientRect();
                         img.style.width = `${Math.round(rect.width)}px`;
                         img.style.height = `${Math.round(rect.height)}px`;
+
                         resolve();
                     };
+
+                    // Force the re-rendering of the image by removing the src and srcset attributes
+                    // and then restoring them.
+                    // This will recalculate the dimensions of the image and make it right.
+                    const originalSrcSet = img.srcset;
+                    const originalSrc = img.src;
+                    img.srcset = '';
+                    img.src = '';
+                    img.srcset = originalSrcSet;
+                    img.src = originalSrc;
 
                     if (img.complete) {
                         setDimensions();
