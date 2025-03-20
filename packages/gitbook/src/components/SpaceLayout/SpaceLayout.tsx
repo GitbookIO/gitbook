@@ -12,6 +12,7 @@ import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
+import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
@@ -61,6 +62,7 @@ export function SpaceLayout(props: {
                 revisionId={context.revisionId}
                 spaceId={context.space.id}
             >
+                {customization.announcement?.enabled ? <Announcement context={context} /> : null}
                 <Header withTopHeader={withTopHeader} context={context} />
                 <div className="scroll-nojump">
                     <div
