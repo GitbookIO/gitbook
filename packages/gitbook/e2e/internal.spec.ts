@@ -369,6 +369,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Site Preview',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
                 name: 'Main content',
