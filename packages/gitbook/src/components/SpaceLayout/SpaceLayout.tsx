@@ -13,6 +13,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
+import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
@@ -62,6 +63,7 @@ export function SpaceLayout(props: {
                 spaceId={context.space.id}
                 visitorAuthClaims={visitorAuthClaims}
             >
+                {customization.announcement?.enabled ? <Announcement context={context} /> : null}
                 <Header withTopHeader={withTopHeader} context={context} />
                 <div className="scroll-nojump">
                     <div
