@@ -191,20 +191,19 @@ export function runTestCases(testCases: TestsCase[]) {
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
-
-                            /* Switch image rendering to pixelated */
-                            img {
-                                image-rendering: pixelated;
-                            }
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
                             beforeScreenshot: async ({ runStabilization }) => {
                                 await runStabilization();
                                 await waitForIcons(page);
+                                await roundImageSizes(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
+                            },
+                            afterScreenshot: async () => {
+                                await restoreImageSizes(page);
                             },
                         });
                     }
@@ -326,7 +325,14 @@ async function waitForIcons(page: Page) {
         function loadImage(src: string) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.onload = () => resolve(img);
+                img.onload = () => {
+                    // Wait two frames to ensure the image has been rendered
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            resolve(true);
+                        });
+                    });
+                };
                 img.onerror = (_error) => reject(new Error(`Failed to load image: ${src}`));
                 img.src = src;
             });
@@ -345,6 +351,70 @@ async function waitForIcons(page: Page) {
                 await loadImage(url);
             })
         );
+    });
+}
+
+/**
+ * Take all images, measure them and set their width and height to rounded values.
+ */
+async function roundImageSizes(page: Page) {
+    await page.waitForFunction(async () => {
+        const images = Array.from(document.querySelectorAll('img'));
+        await Promise.all(
+            images.map(async (img) => {
+                return new Promise<void>((resolve) => {
+                    const setDimensions = () => {
+                        // Mark it as stabilized
+                        img.dataset.stabilized = 'true';
+                        // Preserve the original width and height
+                        img.dataset.originalWidth = img.style.width ?? '';
+                        img.dataset.originalHeight = img.style.height ?? '';
+                        const rect = img.getBoundingClientRect();
+                        img.style.width = `${Math.round(rect.width)}px`;
+                        img.style.height = `${Math.round(rect.height)}px`;
+                        resolve();
+                    };
+
+                    if (img.complete) {
+                        setDimensions();
+                    } else {
+                        const cleanup = () => {
+                            img.removeEventListener('load', handleLoad);
+                            img.removeEventListener('error', handleError);
+                        };
+                        const handleError = () => {
+                            cleanup();
+                            resolve();
+                        };
+                        const handleLoad = () => {
+                            cleanup();
+                            setDimensions();
+                        };
+                        img.addEventListener('load', handleLoad);
+                        img.addEventListener('error', handleError);
+                    }
+                });
+            })
+        );
+        return true;
+    });
+}
+
+/**
+ * Restore images to their original size.
+ */
+async function restoreImageSizes(page: Page) {
+    await page.evaluate(() => {
+        const images = Array.from(document.querySelectorAll('img[data-stabilized]'));
+        images.forEach((img) => {
+            if (img instanceof HTMLImageElement) {
+                img.style.width = img.dataset.originalWidth ?? '';
+                img.style.height = img.dataset.originalHeight ?? '';
+                delete img.dataset.originalWidth;
+                delete img.dataset.originalHeight;
+                delete img.dataset.stabilized;
+            }
+        });
     });
 }
 
