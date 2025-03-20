@@ -102,7 +102,7 @@
         "usehooks-ts": "^3.1.0",
       },
       "devDependencies": {
-        "@argos-ci/playwright": "^4.1.0",
+        "@argos-ci/playwright": "^4.2.3",
         "@cloudflare/next-on-pages": "1.13.7",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.51.1",
@@ -273,11 +273,11 @@
 
     "@argos-ci/api-client": ["@argos-ci/api-client@0.8.0", "", { "dependencies": { "debug": "^4.4.0", "openapi-fetch": "0.13.4" } }, "sha512-UHa1vAf8gwHVpkqM/RaSryrFe1juqWH6dHpPeMtT4e/ZMB9hNYwYFinaGq/KRWe88JEi2WeAu776YdoeUSZQkQ=="],
 
-    "@argos-ci/browser": ["@argos-ci/browser@3.0.1", "", {}, "sha512-dqRXWCllulbKlqzwNE2bjbCtNqxVnUUrYpI1iIJQCMvyStmPdGHOYD7BoQQQ2uNPT2pCHeDyysrxc5T3mDyScg=="],
+    "@argos-ci/browser": ["@argos-ci/browser@3.1.3", "", {}, "sha512-GkaxQ/qT4Vr1MBhqHtha/bLRGVl/fZAdvKWBcvoULn2wHngQFRu7FDpsW1q6+XOMXYiKz47z22j4HmxTeGKX6Q=="],
 
     "@argos-ci/core": ["@argos-ci/core@3.1.0", "", { "dependencies": { "@argos-ci/api-client": "0.8.0", "@argos-ci/util": "2.3.0", "axios": "^1.7.9", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-bo/pNKk6P0pz4NRdymgU1letwQrRbMPTeFyMsUEW8fhKNdesSFnFIWZBFGsGkkh05uw75PBjl2ZN4PvQ2TxSog=="],
 
-    "@argos-ci/playwright": ["@argos-ci/playwright@4.1.0", "", { "dependencies": { "@argos-ci/browser": "3.0.1", "@argos-ci/core": "3.1.0", "@argos-ci/util": "2.3.0", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-7/6/fRQvs/ZObZG76qNVHRyv5nK21oBLxzzd8T1OmJMC/+UmV9omiuOO3x75H5kc5e3vlKsCc0hClFCqtbye7A=="],
+    "@argos-ci/playwright": ["@argos-ci/playwright@4.2.3", "", { "dependencies": { "@argos-ci/browser": "3.1.3", "@argos-ci/core": "3.1.0", "@argos-ci/util": "2.3.0", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-lRsB4m9MKAPnTkLZ683le7A+TP3t7xixSpea2SrSOh+hY7rvEZtHNrBoTVjbRX2zzBwllefND8GoHJfTZJsC+g=="],
 
     "@argos-ci/util": ["@argos-ci/util@2.3.0", "", {}, "sha512-tkxnCpaj7yN9nCFzo9MX0FJ5YjUepEOGYfdvF8COQqp+EdY1qubOPpc4Z0l1B60BlC8YtjQv/oRxHSh1XzxWFg=="],
 
