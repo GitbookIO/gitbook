@@ -191,20 +191,19 @@ export function runTestCases(testCases: TestsCase[]) {
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
-
-                            /* Switch image rendering to pixelated */
-                            img {
-                                image-rendering: pixelated;
-                            }
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
                             beforeScreenshot: async ({ runStabilization }) => {
                                 await runStabilization();
                                 await waitForIcons(page);
+                                await roundImageSizes(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
+                            },
+                            afterScreenshot: async () => {
+                                await restoreImageSizes(page);
                             },
                         });
                     }
@@ -326,15 +325,18 @@ async function waitForIcons(page: Page) {
         function loadImage(src: string) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = (_error) => reject(new Error(`Failed to load image: ${src}`));
                 img.src = src;
+                img.decode().then(resolve, reject);
             });
         }
 
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
         await Promise.all(
             icons.map(async (icon) => {
+                // Only load the icon if it's visible.
+                if (!icon.checkVisibility()) {
+                    return;
+                }
                 // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
                 const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
                 const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
@@ -343,8 +345,94 @@ async function waitForIcons(page: Page) {
                     throw new Error('No mask-image');
                 }
                 await loadImage(url);
+                // Wait for two frames to make sure the icon is loaded.
+                await new Promise((resolve) => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            resolve(true);
+                        });
+                    });
+                });
             })
         );
+    });
+}
+
+/**
+ * Take all images, measure them and set their width and height to rounded values.
+ */
+async function roundImageSizes(page: Page) {
+    await page.waitForFunction(async () => {
+        const images = Array.from(document.querySelectorAll('img'));
+        await Promise.all(
+            images.map(async (img) => {
+                return new Promise<void>((resolve) => {
+                    const setDimensions = () => {
+                        // Mark it as stabilized
+                        img.dataset.stabilized = 'true';
+
+                        // Preserve the original width and height
+                        img.dataset.originalWidth = img.style.width ?? '';
+                        img.dataset.originalHeight = img.style.height ?? '';
+
+                        // Set the width and height to the rounded values
+                        const rect = img.getBoundingClientRect();
+                        img.style.width = `${Math.round(rect.width)}px`;
+                        img.style.height = `${Math.round(rect.height)}px`;
+
+                        resolve();
+                    };
+
+                    // Force the re-rendering of the image by removing the src and srcset attributes
+                    // and then restoring them.
+                    // This will recalculate the dimensions of the image and make it right.
+                    const originalSrcSet = img.srcset;
+                    const originalSrc = img.src;
+                    img.srcset = '';
+                    img.src = '';
+                    img.srcset = originalSrcSet;
+                    img.src = originalSrc;
+
+                    if (img.complete) {
+                        setDimensions();
+                    } else {
+                        const cleanup = () => {
+                            img.removeEventListener('load', handleLoad);
+                            img.removeEventListener('error', handleError);
+                        };
+                        const handleError = () => {
+                            cleanup();
+                            resolve();
+                        };
+                        const handleLoad = () => {
+                            cleanup();
+                            setDimensions();
+                        };
+                        img.addEventListener('load', handleLoad);
+                        img.addEventListener('error', handleError);
+                    }
+                });
+            })
+        );
+        return true;
+    });
+}
+
+/**
+ * Restore images to their original size.
+ */
+async function restoreImageSizes(page: Page) {
+    await page.evaluate(() => {
+        const images = Array.from(document.querySelectorAll('img[data-stabilized]'));
+        images.forEach((img) => {
+            if (img instanceof HTMLImageElement) {
+                img.style.width = img.dataset.originalWidth ?? '';
+                img.style.height = img.dataset.originalHeight ?? '';
+                delete img.dataset.originalWidth;
+                delete img.dataset.originalHeight;
+                delete img.dataset.stabilized;
+            }
+        });
     });
 }
 

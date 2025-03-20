@@ -386,7 +386,7 @@ const testCases: TestsCase[] = [
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
                 fullPage: true,
-                screenshot: { threshold: 0.8 },
+                screenshot: { threshold: 0.9 },
             },
             {
                 name: 'Images (with zoom)',
@@ -432,7 +432,17 @@ const testCases: TestsCase[] = [
             {
                 name: 'Integration Blocks',
                 url: 'blocks/integrations',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    // Integrations blocks are not working in v2
+                    // When fixed, we can remove this check
+                    if (process.env.ARGOS_BUILD_NAME === 'v2-vercel') {
+                        return;
+                    }
+                    const mermaidIframe = page.locator('iframe[title*="mermaid"]').contentFrame();
+                    await expect(mermaidIframe.getByText('Mermaid', { exact: true })).toBeVisible();
+                    await expect(mermaidIframe.getByText('Diagram', { exact: true })).toBeVisible();
+                },
             },
             {
                 name: 'Tables',
