@@ -27,6 +27,7 @@ import {
     getSiteRedirectBySource,
     getSpace,
     getUserById,
+    renderIntegrationUi,
     searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
@@ -237,7 +238,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             });
         },
 
-        async searchSiteContent(params) {
+        searchSiteContent(params) {
             return wrapDataFetcherError(async () => {
                 const { organizationId, siteId, query, cacheBust, scope } = params;
                 const result = await searchSiteContent(
@@ -248,6 +249,13 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                     cacheBust
                 );
                 return result.items;
+            });
+        },
+
+        renderIntegrationUi(params) {
+            return wrapDataFetcherError(async () => {
+                const result = await renderIntegrationUi(params.integrationName, params.request);
+                return result;
             });
         },
     };

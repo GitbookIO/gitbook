@@ -3,6 +3,7 @@ import {
     type ComputedContentSource,
     GitBookAPI,
     type GitBookAPIServiceBinding,
+    type RenderIntegrationUI,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
@@ -156,6 +157,14 @@ export function createDataFetcher(
             return trace('searchSiteContent', () => searchSiteContent(input, params));
         },
 
+        renderIntegrationUi(params) {
+            return trace('renderIntegrationUi', () =>
+                renderIntegrationUi(input, {
+                    integrationName: params.integrationName,
+                    request: params.request,
+                })
+            );
+        },
         //
         // API that are not tied to the token
         // where the data is the same for all users
@@ -515,6 +524,28 @@ async function searchSiteContent(
             ...scope,
         });
         return res.data.items;
+    });
+}
+
+async function renderIntegrationUi(
+    input: DataFetcherInput,
+    params: {
+        integrationName: string;
+        request: RenderIntegrationUI;
+    }
+) {
+    'use cache';
+
+    cacheTag(getCacheTag({ tag: 'integration', integration: params.integrationName }));
+    cacheLife('days');
+
+    return wrapDataFetcherError(async () => {
+        const api = await apiClient(input);
+        const res = await api.integrations.renderIntegrationUiWithPost(
+            params.integrationName,
+            params.request
+        );
+        return res.data;
     });
 }
 
