@@ -56,7 +56,12 @@ export function SpaceLayout(props: {
             to: { kind: 'url', url: 'https://gitbook.com' },
             title: 'Review our version upgrade guide.',
         },
-        style: 'info',
+        // Pick a random style every time for now
+        style: ['info', 'warning', 'danger', 'success'][Math.floor(Math.random() * 4)] as
+            | 'info'
+            | 'warning'
+            | 'danger'
+            | 'success',
     };
 
     return (

@@ -15,7 +15,7 @@ export function AnnouncementBanner(props: {
     contentRef: ResolvedContentRef | null;
 }) {
     const { announcement, contentRef } = props;
-    const [show, setShow] = React.useState(false);
+    const [show, setShow] = React.useState(true);
     const { visible, at, setVisible } = announcementStore.getState();
 
     React.useEffect(() => {
