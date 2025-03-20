@@ -330,11 +330,6 @@ async function waitForIcons(page: Page) {
                 throw new Error('Icon is not an SVGElement');
             }
 
-            // If not visible, we don't care about loading state
-            if (!icon.checkVisibility()) {
-                return true;
-            }
-
             // If loaded, good it passes the test.
             if (icon.dataset.loadingState === 'loaded') {
                 return true;
@@ -370,7 +365,12 @@ async function waitForIcons(page: Page) {
             const img = new Image();
             img.src = url;
             img.decode().then(() => {
-                icon.dataset.loadingState = 'loaded';
+                // Wait two frames to let the time to the icon to repaint.
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        icon.dataset.loadingState = 'loaded';
+                    });
+                });
             });
 
             return false;
