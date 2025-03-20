@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(normalized.toString());
         }
 
-        for (const handler of [serveSiteRoutes, servePreviewRoutes]) {
+        for (const handler of [serveSiteRoutes, serveSpacePDFRoutes]) {
             const result = await handler(requestURL, request);
             if (result) {
                 return result;
@@ -89,136 +89,180 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         url: siteURL,
     });
 
-    const data = await throwIfDataError(
-        getPublishedContentByURL({
-            url: siteURL.toString(),
-            visitorAuthToken: visitorToken?.token ?? null,
-            // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
-            // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-            // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-            redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
-        })
-    );
-    const cookies: ResponseCookies = [];
+    return serveWithQueryAPIToken(requestURL, request, async (apiToken) => {
+        const data = await throwIfDataError(
+            getPublishedContentByURL({
+                url: siteURL.toString(),
+                visitorAuthToken: visitorToken?.token ?? null,
+                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
 
-    //
-    // Handle redirects
-    //
-    if ('redirect' in data) {
-        // biome-ignore lint/suspicious/noConsole: we want to log the redirect
-        console.log('redirect', data.redirect);
-        if (data.target === 'content') {
-            // For content redirects, we use the linker to redirect the optimal URL
-            // during development and testing in 'url' mode.
-            const linker = getLinkerForSiteURL({
-                siteURL,
-                urlMode: mode,
-            });
+                // Use the API token passed in the request, if any
+                // as it could be used for .preview hostnames
+                apiToken,
+            })
+        );
+        const cookies: ResponseCookies = [];
 
-            const contentRedirect = new URL(linker.toLinkForContent(data.redirect), request.url);
+        //
+        // Handle redirects
+        //
+        if ('redirect' in data) {
+            // biome-ignore lint/suspicious/noConsole: we want to log the redirect
+            console.log('redirect', data.redirect);
+            if (data.target === 'content') {
+                // For content redirects, we use the linker to redirect the optimal URL
+                // during development and testing in 'url' mode.
+                const linker = getLinkerForSiteURL({
+                    siteURL,
+                    urlMode: mode,
+                });
 
-            // Keep the same search params as the original request
-            // as it might contain a VA token
-            contentRedirect.search = request.nextUrl.search;
+                const contentRedirect = new URL(
+                    linker.toLinkForContent(data.redirect),
+                    request.url
+                );
 
-            return NextResponse.redirect(contentRedirect);
+                // Keep the same search params as the original request
+                // as it might contain a VA token
+                contentRedirect.search = request.nextUrl.search;
+
+                return NextResponse.redirect(contentRedirect);
+            }
+
+            return NextResponse.redirect(data.redirect);
         }
 
-        return NextResponse.redirect(data.redirect);
-    }
+        cookies.push(...getResponseCookiesForVisitorAuth(data.siteBasePath, visitorToken));
 
-    cookies.push(...getResponseCookiesForVisitorAuth(data.siteBasePath, visitorToken));
+        //
+        // Make sure the URL is clean of any va token after a successful lookup
+        // The token is stored in a cookie that is set on the redirect response
+        //
+        const requestURLWithoutToken = normalizeVisitorAuthURL(requestURL);
+        if (requestURLWithoutToken.toString() !== requestURL.toString()) {
+            return writeResponseCookies(
+                NextResponse.redirect(requestURLWithoutToken.toString()),
+                cookies
+            );
+        }
 
-    //
-    // Make sure the URL is clean of any va token after a successful lookup
-    // The token is stored in a cookie that is set on the redirect response
-    //
-    const requestURLWithoutToken = normalizeVisitorAuthURL(requestURL);
-    if (requestURLWithoutToken.toString() !== requestURL.toString()) {
-        return writeResponseCookies(
-            NextResponse.redirect(requestURLWithoutToken.toString()),
-            cookies
+        //
+        // Render and serve the content
+        //
+
+        // The route is static, except when using dynamic parameters from query params
+        // (customization override, theme, etc)
+        let routeType: 'dynamic' | 'static' = 'static';
+
+        const requestHeaders = new Headers(request.headers);
+        requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
+        requestHeaders.set(MiddlewareHeaders.URLMode, mode);
+        requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${data.basePath}`);
+        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
+
+        // Preview of customization/theme
+        const customization = siteURL.searchParams.get('customization');
+        if (customization && validateSerializedCustomization(customization)) {
+            routeType = 'dynamic';
+            requestHeaders.set(MiddlewareHeaders.Customization, customization);
+        }
+        const theme = siteURL.searchParams.get('theme');
+        if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
+            routeType = 'dynamic';
+            requestHeaders.set(MiddlewareHeaders.Theme, theme);
+        }
+
+        // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
+        // This is useful for testing dynamic routes.
+        if (request.cookies.has('gitbook-dynamic-route')) {
+            routeType = 'dynamic';
+        }
+
+        // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
+        requestHeaders.set('x-forwarded-host', request.nextUrl.host);
+        requestHeaders.set('origin', request.nextUrl.origin);
+
+        const siteURLWithoutProtocol = `${siteURL.host}${data.basePath}`;
+        const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
+            data.pathname
         );
-    }
+        routeType = routeTypeFromPathname ?? routeType;
 
-    //
-    // Render and serve the content
-    //
+        const route = [
+            'sites',
+            routeType,
+            mode,
+            encodeURIComponent(siteURLWithoutProtocol),
+            encodeURIComponent(rison.encode(data)),
+            pathname,
+        ].join('/');
 
-    // The route is static, except when using dynamic parameters from query params
-    // (customization override, theme, etc)
-    let routeType: 'dynamic' | 'static' = 'static';
+        console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
 
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
-    requestHeaders.set(MiddlewareHeaders.URLMode, mode);
-    requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${data.basePath}`);
-    requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
+        const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
+        const response = NextResponse.rewrite(rewrittenURL, {
+            request: {
+                headers: requestHeaders,
+            },
+        });
 
-    // Preview of customization/theme
-    const customization = siteURL.searchParams.get('customization');
-    if (customization && validateSerializedCustomization(customization)) {
-        routeType = 'dynamic';
-        requestHeaders.set(MiddlewareHeaders.Customization, customization);
-    }
-    const theme = siteURL.searchParams.get('theme');
-    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
-        routeType = 'dynamic';
-        requestHeaders.set(MiddlewareHeaders.Theme, theme);
-    }
+        // Add Content Security Policy header
+        response.headers.set('content-security-policy', getContentSecurityPolicy());
+        // Basic security headers
+        response.headers.set('strict-transport-security', 'max-age=31536000');
+        response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+        response.headers.set('x-content-type-options', 'nosniff');
+        // Debug header
+        response.headers.set('x-gitbook-route-type', routeType);
+        response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
-    // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
-    // This is useful for testing dynamic routes.
-    if (request.cookies.has('gitbook-dynamic-route')) {
-        routeType = 'dynamic';
-    }
-
-    // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
-    requestHeaders.set('x-forwarded-host', request.nextUrl.host);
-    requestHeaders.set('origin', request.nextUrl.origin);
-
-    const siteURLWithoutProtocol = `${siteURL.host}${data.basePath}`;
-    const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(data.pathname);
-    routeType = routeTypeFromPathname ?? routeType;
-
-    const route = [
-        'sites',
-        routeType,
-        mode,
-        encodeURIComponent(siteURLWithoutProtocol),
-        encodeURIComponent(rison.encode(data)),
-        pathname,
-    ].join('/');
-
-    console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
-
-    const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
-    const response = NextResponse.rewrite(rewrittenURL, {
-        request: {
-            headers: requestHeaders,
-        },
+        return writeResponseCookies(response, cookies);
     });
-
-    // Add Content Security Policy header
-    response.headers.set('content-security-policy', getContentSecurityPolicy());
-    // Basic security headers
-    response.headers.set('strict-transport-security', 'max-age=31536000');
-    response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
-    response.headers.set('x-content-type-options', 'nosniff');
-    // Debug header
-    response.headers.set('x-gitbook-route-type', routeType);
-    response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
-
-    return writeResponseCookies(response, cookies);
 }
 
 /**
- * Serve routes for previewing unpublished content.
- * Routes are:
- *   - PDF export for a space: /~space/:spaceId/~gitbook/pdf
- *   - Preview of an unpublished site: /~site/:siteId/
+ * Serve routes for PDF export for a space: /~space/:spaceId/~gitbook/pdf
  */
-async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
+async function serveSpacePDFRoutes(requestURL: URL, request: NextRequest) {
+    return serveWithQueryAPIToken(requestURL, request, async (apiToken) => {
+        if (!apiToken) {
+            throw new DataFetcherError('Missing API token', 400);
+        }
+
+        // Handle the rest with the router default logic
+        return NextResponse.next({
+            headers: {
+                [MiddlewareHeaders.APIToken]: apiToken,
+            },
+        });
+    });
+}
+
+/**
+ * Serve an error response.
+ */
+function serveErrorResponse(error: Error) {
+    if (error instanceof DataFetcherError) {
+        return new Response(error.message, {
+            status: error.code,
+            headers: { 'content-type': 'text/plain' },
+        });
+    }
+
+    throw error;
+}
+
+/**
+ * Server a response with an API token obtained from the query params.
+ */
+async function serveWithQueryAPIToken(
+    requestURL: URL,
+    request: NextRequest,
+    serve: (apiToken: string | null) => Promise<NextResponse>
+) {
     const pathnameParts = requestURL.pathname.slice(1).split('/');
 
     if (pathnameParts[0] !== '~space' && pathnameParts[0] !== '~site') {
@@ -252,30 +296,7 @@ async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const apiToken = request.cookies.get(cookieName)?.value;
-    if (!apiToken) {
-        throw new DataFetcherError('Missing API token', 400);
-    }
-
-    // Handle the rest with the router default logic
-    return NextResponse.next({
-        headers: {
-            [MiddlewareHeaders.APIToken]: apiToken,
-        },
-    });
-}
-
-/**
- * Serve an error response.
- */
-function serveErrorResponse(error: Error) {
-    if (error instanceof DataFetcherError) {
-        return new Response(error.message, {
-            status: error.code,
-            headers: { 'content-type': 'text/plain' },
-        });
-    }
-
-    throw error;
+    return serve(apiToken ?? null);
 }
 
 /**
