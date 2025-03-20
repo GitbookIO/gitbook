@@ -8,20 +8,27 @@ import Link from 'next/link';
 import React from 'react';
 import { CONTAINER_STYLE } from '../layout';
 import { linkStyles } from '../primitives';
+import { announcementStore } from './useAnnouncementGlobalState';
 
 export function AnnouncementBanner(props: {
     announcement: CustomizationAnnouncement;
     contentRef: ResolvedContentRef | null;
 }) {
     const { announcement, contentRef } = props;
-    const [visible, setVisible] = React.useState(true);
+    const [show, setShow] = React.useState(false);
+    const { visible, at, setVisible } = announcementStore.getState();
+
+    React.useEffect(() => {
+        const daysSinceLastInteraction = Math.floor((Date.now() - at) / (1000 * 60 * 60 * 24));
+        setShow(visible || daysSinceLastInteraction > 7);
+    }, [visible, at]);
 
     const hasLink = announcement.link && contentRef?.href;
 
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
-    return visible === true ? (
+    return show === true ? (
         <div className="theme-bold:bg-header-background pt-4 pb-2">
             <div className={tcls('relative', CONTAINER_STYLE)}>
                 <Tag
@@ -60,7 +67,10 @@ export function AnnouncementBanner(props: {
                     <button
                         className={`absolute top-0 right-4 mt-2 mr-2 rounded straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
                         type="button"
-                        onClick={() => setVisible(false)}
+                        onClick={() => {
+                            setVisible(false);
+                            setShow(false);
+                        }}
                     >
                         <Icon icon="close" className="size-4" />
                     </button>
