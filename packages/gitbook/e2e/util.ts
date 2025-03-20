@@ -325,16 +325,8 @@ async function waitForIcons(page: Page) {
         function loadImage(src: string) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.onload = () => {
-                    // Wait two frames to ensure the image has been rendered
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            resolve(true);
-                        });
-                    });
-                };
-                img.onerror = (_error) => reject(new Error(`Failed to load image: ${src}`));
                 img.src = src;
+                img.decode().then(resolve, reject);
             });
         }
 
@@ -353,6 +345,14 @@ async function waitForIcons(page: Page) {
                     throw new Error('No mask-image');
                 }
                 await loadImage(url);
+                // Wait for two frames to make sure the icon is loaded.
+                await new Promise((resolve) => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            resolve(true);
+                        });
+                    });
+                });
             })
         );
     });
