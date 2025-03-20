@@ -380,14 +380,18 @@ async function roundImageSizes(page: Page) {
                         img.style.width = `${Math.round(rect.width)}px`;
                         img.style.height = `${Math.round(rect.height)}px`;
 
-                        // Wait two frames to ensure the image has been rendered
-                        // before resolving the promise.
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                resolve();
-                            });
-                        });
+                        resolve();
                     };
+
+                    // Force the re-rendering of the image by removing the src and srcset attributes
+                    // and then restoring them.
+                    // This will recalculate the dimensions of the image and make it right.
+                    const originalSrcSet = img.srcset;
+                    const originalSrc = img.src;
+                    img.srcset = '';
+                    img.src = '';
+                    img.srcset = originalSrcSet;
+                    img.src = originalSrc;
 
                     if (img.complete) {
                         setDimensions();
