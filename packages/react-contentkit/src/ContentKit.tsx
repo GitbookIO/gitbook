@@ -23,7 +23,10 @@ type ContentKitLifecycleMode = ContentKitRenderOutputElement['element']['type'];
  * The approach is optimized to work well with server components and
  * allow rendering the components in the server with the lifecycle managed on the client side.
  */
-export function ContentKit(props: {
+export function ContentKit<RenderContext>(props: {
+    /** Context to be passed to the render function. This is designed to properly integration with using a server action as `render`. */
+    renderContext: RenderContext;
+    /** Security configuration */
     security: ContentKitSecurity;
     /** Initial input being displayed */
     initialInput: RequestRenderIntegrationUI;
@@ -32,7 +35,10 @@ export function ContentKit(props: {
     /** Initial state to display */
     children?: React.ReactNode;
     /** Render a new state */
-    render: (request: RequestRenderIntegrationUI) => Promise<{
+    render: (input: {
+        renderContext: RenderContext;
+        request: RequestRenderIntegrationUI;
+    }) => Promise<{
         children: React.ReactNode;
         output: ContentKitRenderOutput;
     }>;
@@ -42,6 +48,7 @@ export function ContentKit(props: {
     onComplete?: (returnValue: any) => void;
 }) {
     const {
+        renderContext,
         security,
         initialInput,
         initialOutput,
@@ -86,7 +93,10 @@ export function ContentKit(props: {
                     ...update.state,
                 },
             };
-            const result = await render(newInput);
+            const result = await render({
+                renderContext,
+                request: newInput,
+            });
             const output = result.output;
 
             if (output.type === 'complete') {
@@ -133,7 +143,10 @@ export function ContentKit(props: {
                         };
 
                         // Prefetch the modal content to show a loading in the button opening the button
-                        const result = await render(modalInput);
+                        const result = await render({
+                            renderContext,
+                            request: modalInput,
+                        });
 
                         if (result.output.type === 'element' || !result.output.type) {
                             setSubView({
@@ -182,6 +195,7 @@ export function ContentKit(props: {
             </ContentKitClientContext.Provider>
             {subView ? (
                 <ContentKit
+                    renderContext={renderContext}
                     security={security}
                     initialInput={subView.initialInput}
                     initialOutput={subView.initialOutput}

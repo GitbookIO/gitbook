@@ -162,4 +162,12 @@ export interface GitBookDataFetcher {
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
     }): Promise<DataFetcherResponse<api.SearchSpaceResult[]>>;
+
+    /**
+     * Render an integration UI.
+     */
+    renderIntegrationUi(params: {
+        integrationName: string;
+        request: api.RenderIntegrationUI;
+    }): Promise<DataFetcherResponse<api.ContentKitRenderOutput>>;
 }
