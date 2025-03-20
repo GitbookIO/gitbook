@@ -386,7 +386,7 @@ const testCases: TestsCase[] = [
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
                 fullPage: true,
-                screenshot: { threshold: 0.8 },
+                screenshot: { threshold: 0.9 },
             },
             {
                 name: 'Images (with zoom)',
