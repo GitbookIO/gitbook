@@ -24,6 +24,14 @@ export function getAllBrowserCookies(): Array<{
 }
 
 /**
+ * Get a map of cookie names to their values.
+ * @returns A map of cookie names to their values.
+ */
+export function getAllBrowserCookiesMap(): Record<string, string> {
+    return Object.fromEntries(getAllBrowserCookies().map(({ name, value }) => [name, value]));
+}
+
+/**
  * Get a cookie by name.
  * @param name - The name of the cookie to get.
  * @returns The value of the cookie or undefined if the cookie does not exist.

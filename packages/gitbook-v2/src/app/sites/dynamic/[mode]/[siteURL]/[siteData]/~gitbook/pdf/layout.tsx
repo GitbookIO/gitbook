@@ -6,7 +6,7 @@ export default async function RootLayout(props: {
     children: React.ReactNode;
 }) {
     const { params, children } = props;
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
 
     return <PDFRootLayout context={context}>{children}</PDFRootLayout>;
 }

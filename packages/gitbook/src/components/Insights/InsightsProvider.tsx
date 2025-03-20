@@ -5,9 +5,8 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import { getAllBrowserCookies } from '@/lib/browser-cookies';
-
-import { getVisitorToken } from '@/lib/visitor-token';
+import type { VisitorAuthClaims } from '@/lib/adaptive';
+import { getAllBrowserCookiesMap } from '@/lib/browser-cookies';
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
 
@@ -24,6 +23,7 @@ type InsightsEventContext = {
     siteShareKey: string | null;
     spaceId: string;
     revisionId: string;
+    visitorAuthClaims: VisitorAuthClaims;
 };
 
 /**
@@ -75,8 +75,6 @@ interface InsightsProviderProps extends InsightsEventContext {
 export function InsightsProvider(props: InsightsProviderProps) {
     const { enabled, appURL, apiHost, children, ...context } = props;
 
-    const cookiesRef = React.useRef<Record<string, string> | undefined>();
-    const visitorAuthTokenRef = React.useRef<string | null>(null);
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
         [pathname: string]:
@@ -99,25 +97,6 @@ export function InsightsProvider(props: InsightsProviderProps) {
             throw new Error('Visitor ID should be set before flushing events');
         }
 
-        let cookies: Record<string, string> = {};
-        let visitorAuthToken: string | null = null;
-
-        if (typeof cookiesRef.current === 'undefined') {
-            const cookiesArray = getAllBrowserCookies();
-            cookies = Object.fromEntries(cookiesArray.map((cookie) => [cookie.name, cookie.value]));
-            visitorAuthToken =
-                getVisitorToken({
-                    cookies: cookiesArray,
-                    url: new URL(window.location.href),
-                })?.token ?? null;
-
-            cookiesRef.current = cookies;
-            visitorAuthTokenRef.current = visitorAuthToken;
-        } else {
-            cookies = cookiesRef.current;
-            visitorAuthToken = visitorAuthTokenRef.current;
-        }
-
         const allEvents: api.SiteInsightsEvent[] = [];
 
         for (const pathname in eventsRef.current) {
@@ -137,8 +116,6 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     pageContext: eventsForPathname.pageContext,
                     visitorId,
                     sessionId: session.id,
-                    cookies,
-                    visitorAuthToken,
                 })
             );
 
@@ -275,17 +252,15 @@ function transformEvents(input: {
     pageContext: InsightsEventPageContext;
     visitorId: string;
     sessionId: string;
-    cookies: Record<string, string>;
-    visitorAuthToken: string | null;
 }): api.SiteInsightsEvent[] {
     const session: api.SiteInsightsEventSession = {
         sessionId: input.sessionId,
         visitorId: input.visitorId,
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
-        cookies: input.cookies,
+        cookies: getAllBrowserCookiesMap(),
         referrer: document.referrer || null,
-        visitorAuthToken: input.visitorAuthToken,
+        visitorAuthClaims: input.context.visitorAuthClaims,
     };
 
     const location: api.SiteInsightsEventLocation = {

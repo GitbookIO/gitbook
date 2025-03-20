@@ -11,6 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
+import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -26,10 +27,13 @@ export function SpaceLayout(props: {
     /** Whether to enable tracking of events into site insights. */
     withTracking: boolean;
 
+    /** The visitor auth claims. */
+    visitorAuthClaims: VisitorAuthClaims;
+
     /** The children of the layout. */
     children: React.ReactNode;
 }) {
-    const { context, withTracking, children } = props;
+    const { context, withTracking, visitorAuthClaims, children } = props;
     const { siteSpace, customization, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -56,6 +60,7 @@ export function SpaceLayout(props: {
                 siteShareKey={context.shareKey ?? null}
                 revisionId={context.revisionId}
                 spaceId={context.space.id}
+                visitorAuthClaims={visitorAuthClaims}
             >
                 <Header withTopHeader={withTopHeader} context={context} />
                 <div className="scroll-nojump">

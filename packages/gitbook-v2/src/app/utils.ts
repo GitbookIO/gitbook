@@ -1,4 +1,5 @@
-import type { PublishedSiteContent } from '@gitbook/api';
+import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import type { PublishedSiteContent, SiteAPIToken } from '@gitbook/api';
 import { fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
 import { jwtDecode } from 'jwt-decode';
 import { forbidden } from 'next/navigation';
@@ -23,41 +24,51 @@ export type RouteParams = RouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
     // For static routes, we check the expiration of the JWT token
     // as the route might be revalidated after expiration
-    const decoded = jwtDecode(siteURLData.apiToken);
+    const decoded = jwtDecode<SiteAPIToken & { exp: number }>(siteURLData.apiToken);
     if (decoded.exp && decoded.exp < Date.now() / 1000 + 120) {
         forbidden();
     }
 
-    return fetchSiteContextByURLLookup(
+    const context = await fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
             urlMode: getModeFromParams(params.mode),
         }),
         siteURLData
     );
+
+    return {
+        context,
+        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+    };
 }
 
 /**
  * Get the site context when rendering dynamically.
  * The context will depend on the request.
  */
-export function getDynamicSiteContext(params: RouteLayoutParams) {
+export async function getDynamicSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
     const siteURLData = getSiteURLDataFromParams(params);
 
-    return fetchSiteContextByURLLookup(
+    const context = await fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
             urlMode: getModeFromParams(params.mode),
         }),
         siteURLData
     );
+
+    return {
+        context,
+        visitorAuthClaims: getVisitorAuthClaims(siteURLData),
+    };
 }
 
 /**

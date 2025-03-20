@@ -16,7 +16,7 @@ export default async function SiteDynamicLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteDynamicLayoutProps>) {
-    const context = await getDynamicSiteContext(await params);
+    const { context, visitorAuthClaims } = await getDynamicSiteContext(await params);
     const forcedTheme = await getThemeFromMiddleware();
 
     return (
@@ -25,6 +25,7 @@ export default async function SiteDynamicLayout({
                 context={context}
                 forcedTheme={forcedTheme}
                 withTracking={!GITBOOK_DISABLE_TRACKING}
+                visitorAuthClaims={visitorAuthClaims}
             >
                 {children}
             </SiteLayout>
@@ -33,11 +34,11 @@ export default async function SiteDynamicLayout({
 }
 
 export async function generateViewport({ params }: SiteDynamicLayoutProps) {
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SiteDynamicLayoutProps) {
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
     return generateSiteLayoutMetadata(context);
 }
