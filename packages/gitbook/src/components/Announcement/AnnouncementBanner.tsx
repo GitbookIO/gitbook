@@ -50,7 +50,7 @@ export function AnnouncementBanner(props: {
                         {hasLink ? (
                             <div className={tcls(linkStyles, style.link, 'ml-1 inline')}>
                                 {contentRef?.icon ? (
-                                    <span className='mr-1 ml-2 *:inline'>{contentRef?.icon}</span>
+                                    <span className="mr-1 ml-2 *:inline">{contentRef?.icon}</span>
                                 ) : null}
                                 {announcement.link?.title && (
                                     <span className="mr-1">{announcement.link?.title}</span>
