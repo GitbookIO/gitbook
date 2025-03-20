@@ -12,6 +12,7 @@ import { SpaceLayout } from '@/components/SpaceLayout';
 import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
+import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
 import { getResizedImageURL } from '@v2/lib/images';
 import { ClientContexts } from './ClientContexts';
@@ -25,10 +26,10 @@ export async function SiteLayout(props: {
     context: GitBookSiteContext;
     forcedTheme?: CustomizationThemeMode | null;
     withTracking: boolean;
-    visitorAuthToken: string | null;
+    visitorAuthClaims: VisitorAuthClaims;
     children: React.ReactNode;
 }) {
-    const { context, nonce, forcedTheme, withTracking, visitorAuthToken, children } = props;
+    const { context, nonce, forcedTheme, withTracking, visitorAuthClaims, children } = props;
 
     const { scripts, customization } = context;
 
@@ -57,7 +58,7 @@ export async function SiteLayout(props: {
                 <SpaceLayout
                     context={context}
                     withTracking={withTracking}
-                    visitorAuthToken={visitorAuthToken}
+                    visitorAuthClaims={visitorAuthClaims}
                 >
                     {children}
                 </SpaceLayout>

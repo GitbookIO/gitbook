@@ -8,6 +8,6 @@ export async function GET(
     _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams & PageIdParams> }
 ) {
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
     return serveOGImage(context, await params);
 }

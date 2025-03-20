@@ -9,6 +9,6 @@ export async function GET(
     _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
-    const context = await getStaticSiteContext(await params);
+    const { context } = await getStaticSiteContext(await params);
     return serveRootSitemap(context);
 }

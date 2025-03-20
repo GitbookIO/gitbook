@@ -84,7 +84,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Detect and extract the visitor authentication token from the request
     //
     // @ts-ignore - request typing
-    const visitorToken = getVisitorToken(request, siteURL);
+    const visitorToken = getVisitorToken({
+        cookies: request.cookies.getAll(),
+        url: siteURL,
+    });
 
     const data = await throwIfDataError(
         getPublishedContentByURL({
@@ -96,7 +99,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
         })
     );
-    let cookies: ResponseCookies = {};
+    const cookies: ResponseCookies = [];
 
     //
     // Handle redirects
@@ -124,10 +127,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return NextResponse.redirect(data.redirect);
     }
 
-    cookies = {
-        ...cookies,
-        ...getResponseCookiesForVisitorAuth(data.basePath, visitorToken),
-    };
+    cookies.push(...getResponseCookiesForVisitorAuth(data.siteBasePath, visitorToken));
 
     //
     // Make sure the URL is clean of any va token after a successful lookup
@@ -237,8 +237,9 @@ async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
         requestURL.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), {
-            [cookieName]: {
+        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
+            {
+                name: cookieName,
                 value: queryAPIToken,
                 options: {
                     httpOnly: true,
@@ -247,7 +248,7 @@ async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
                     maxAge: 60 * 60, // 1 hour
                 },
             },
-        });
+        ]);
     }
 
     const apiToken = request.cookies.get(cookieName)?.value;
@@ -374,8 +375,8 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
  * Write the cookies to a response.
  */
 function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
-    Object.entries(cookies).forEach(([key, { value, options }]) => {
-        response.cookies.set(key, value, options);
+    cookies.forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value, cookie.options);
     });
 
     return response;

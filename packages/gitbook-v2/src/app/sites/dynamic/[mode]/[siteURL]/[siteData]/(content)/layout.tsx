@@ -6,7 +6,7 @@ import {
 } from '@/components/SiteLayout';
 import { type RouteLayoutParams, getDynamicSiteContext } from '@v2/app/utils';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
-import { getThemeFromMiddleware, getVisitorAuthTokenFromMiddleware } from '@v2/lib/middleware';
+import { getThemeFromMiddleware } from '@v2/lib/middleware';
 
 interface SiteDynamicLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -16,9 +16,8 @@ export default async function SiteDynamicLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteDynamicLayoutProps>) {
-    const context = await getDynamicSiteContext(await params);
+    const { context, visitorAuthClaims } = await getDynamicSiteContext(await params);
     const forcedTheme = await getThemeFromMiddleware();
-    const visitorAuthToken = await getVisitorAuthTokenFromMiddleware();
 
     return (
         <CustomizationRootLayout customization={context.customization}>
@@ -26,7 +25,7 @@ export default async function SiteDynamicLayout({
                 context={context}
                 forcedTheme={forcedTheme}
                 withTracking={!GITBOOK_DISABLE_TRACKING}
-                visitorAuthToken={visitorAuthToken}
+                visitorAuthClaims={visitorAuthClaims}
             >
                 {children}
             </SiteLayout>
@@ -35,11 +34,11 @@ export default async function SiteDynamicLayout({
 }
 
 export async function generateViewport({ params }: SiteDynamicLayoutProps) {
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SiteDynamicLayoutProps) {
-    const context = await getDynamicSiteContext(await params);
+    const { context } = await getDynamicSiteContext(await params);
     return generateSiteLayoutMetadata(context);
 }

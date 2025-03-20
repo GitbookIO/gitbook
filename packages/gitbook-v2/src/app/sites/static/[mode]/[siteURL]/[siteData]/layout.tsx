@@ -19,7 +19,7 @@ export default async function SiteStaticLayout({
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
     'use cache';
 
-    const context = await getStaticSiteContext(await params);
+    const { context, visitorAuthClaims } = await getStaticSiteContext(await params);
 
     cacheTag(
         getCacheTag({
@@ -33,7 +33,7 @@ export default async function SiteStaticLayout({
             <SiteLayout
                 context={context}
                 withTracking={!GITBOOK_DISABLE_TRACKING}
-                visitorAuthToken={null}
+                visitorAuthClaims={visitorAuthClaims}
             >
                 {children}
             </SiteLayout>
@@ -42,11 +42,11 @@ export default async function SiteStaticLayout({
 }
 
 export async function generateViewport({ params }: SiteStaticLayoutProps) {
-    const context = await getStaticSiteContext(await params);
+    const { context } = await getStaticSiteContext(await params);
     return generateSiteLayoutViewport(context);
 }
 
 export async function generateMetadata({ params }: SiteStaticLayoutProps) {
-    const context = await getStaticSiteContext(await params);
+    const { context } = await getStaticSiteContext(await params);
     return generateSiteLayoutMetadata(context);
 }

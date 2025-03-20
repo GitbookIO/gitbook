@@ -5,7 +5,11 @@ import hash from 'object-hash';
 const VISITOR_AUTH_PARAM = 'jwt_token';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 
+/**
+ * Typing for a cookie, matching the internal type of Next.js.
+ */
 export type ResponseCookie = {
+    name: string;
     value: string;
     options?: Partial<{
         httpOnly: boolean;
@@ -15,7 +19,8 @@ export type ResponseCookie = {
     }>;
 };
 
-export type ResponseCookies = Record<string, ResponseCookie>;
+export type ResponseCookies = ResponseCookie[];
+export type RequestCookies = ResponseCookies;
 
 /**
  * The contents of the visitor authentication cookie.
@@ -52,10 +57,13 @@ export type VisitorTokenLookup =
  * Get the visitor token for the request. This token can either be in the
  * query parameters or stored as a cookie.
  */
-export function getVisitorToken(
-    request: NextRequest,
-    url: URL | NextRequest['nextUrl']
-): VisitorTokenLookup {
+export function getVisitorToken({
+    cookies,
+    url,
+}: {
+    cookies: RequestCookies;
+    url: URL | NextRequest['nextUrl'];
+}): VisitorTokenLookup {
     const fromUrl = url.searchParams.get(VISITOR_AUTH_PARAM);
 
     // Allow the empty string to come through
@@ -63,27 +71,26 @@ export function getVisitorToken(
         return { source: 'url', token: fromUrl };
     }
 
-    const visitorAuthToken = getVisitorAuthTokenFromCookies(request, url);
+    const visitorAuthToken = getVisitorAuthTokenFromCookies(cookies, url);
     if (visitorAuthToken) {
         return { source: 'visitor-auth-cookie', ...visitorAuthToken };
     }
 
-    const visitorCustomToken = getVisitorCustomTokenFromCookies(request);
+    const visitorCustomToken = getVisitorCustomTokenFromCookies(cookies);
     if (visitorCustomToken) {
         return { source: 'gitbook-visitor-cookie', token: visitorCustomToken };
     }
 }
 
 /**
- * Return the lookup result for content served with visitor auth. It basically disables caching
- * and sets a cookie with the visitor auth token.
+ * Return the lookup result for content served with visitor auth.
  */
 export function getResponseCookiesForVisitorAuth(
     basePath: string,
     visitorTokenLookup: VisitorTokenLookup
 ): ResponseCookies {
     if (!visitorTokenLookup) {
-        return {};
+        return [];
     }
 
     let decoded: JwtPayload;
@@ -91,32 +98,35 @@ export function getResponseCookiesForVisitorAuth(
         decoded = jwtDecode(visitorTokenLookup.token);
     } catch (error) {
         console.error('Error decoding visitor token', error);
-        return {};
+        return [];
     }
 
-    return {
-        /**
-         * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
-         * as a cookie on the response.
-         *
-         * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
-         */
-        ...(visitorTokenLookup?.source === 'url' ||
+    /**
+     * If the visitor token has been retrieve from the URL, or if its a VA cookie and the basePath is the same, set it
+     * as a cookie on the response.
+     *
+     * Note that we do not re-store the gitbook-visitor-cookie in another cookie, to maintain a single source of truth.
+     */
+    if (
+        visitorTokenLookup?.source === 'url' ||
         (visitorTokenLookup?.source === 'visitor-auth-cookie' &&
             visitorTokenLookup.basePath === basePath)
-            ? {
-                  [getVisitorAuthCookieName(basePath)]: {
-                      value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
-                      options: {
-                          httpOnly: true,
-                          sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-                          secure: process.env.NODE_ENV === 'production',
-                          maxAge: getVisitorAuthCookieMaxAge(decoded),
-                      },
-                  },
-              }
-            : {}),
-    };
+    ) {
+        return [
+            {
+                name: getVisitorAuthCookieName(basePath),
+                value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
+                options: {
+                    httpOnly: true,
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: getVisitorAuthCookieMaxAge(decoded),
+                },
+            },
+        ];
+    }
+
+    return [];
 }
 
 /**
@@ -180,7 +190,7 @@ function getUrlBasePathCombinations(url: URL | NextRequest['nextUrl']): string[]
  * best possible match for the current URL.
  */
 function getVisitorAuthTokenFromCookies(
-    request: NextRequest,
+    cookies: RequestCookies,
     url: URL | NextRequest['nextUrl']
 ): VisitorAuthCookieValue | undefined {
     const urlBasePaths = getUrlBasePathCombinations(url);
@@ -188,7 +198,7 @@ function getVisitorAuthTokenFromCookies(
     // for the content could be hosted on a base path like `/foo/v/bar` or `/foo` or just `/`
     // We keep trying to find with each of these base paths until we find a token.
     for (const basePath of urlBasePaths) {
-        const found = findVisitorAuthCookieForBasePath(request, basePath);
+        const found = findVisitorAuthCookieForBasePath(cookies, basePath);
         if (found) {
             return found;
         }
@@ -205,32 +215,27 @@ function getVisitorAuthTokenFromCookies(
  *
  * The cookie should contain as value a JWT encoded token that contains the claims of the visitor.
  */
-function getVisitorCustomTokenFromCookies(request: NextRequest): string | undefined {
-    const visitorCustomCookie = Array.from(request.cookies).find(
-        ([, cookie]) => cookie.name === VISITOR_TOKEN_COOKIE
-    );
-    return visitorCustomCookie ? visitorCustomCookie[1].value : undefined;
+function getVisitorCustomTokenFromCookies(cookies: RequestCookies): string | undefined {
+    const visitorCustomCookie = cookies.find((cookie) => cookie.name === VISITOR_TOKEN_COOKIE);
+    return visitorCustomCookie ? visitorCustomCookie.value : undefined;
 }
 
 /**
  * Loop through all cookies and find the visitor authentication token for a given base path.
  */
 function findVisitorAuthCookieForBasePath(
-    request: NextRequest,
+    cookies: RequestCookies,
     basePath: string
 ): VisitorAuthCookieValue | undefined {
-    return Array.from(request.cookies).reduce<VisitorAuthCookieValue | undefined>(
-        (acc, [name, cookie]) => {
-            if (name === getVisitorAuthCookieName(basePath)) {
-                const value = JSON.parse(cookie.value) as VisitorAuthCookieValue;
-                if (value.basePath === basePath) {
-                    acc = value;
-                }
+    return cookies.reduce<VisitorAuthCookieValue | undefined>((acc, cookie) => {
+        if (cookie.name === getVisitorAuthCookieName(basePath)) {
+            const value = JSON.parse(cookie.value) as VisitorAuthCookieValue;
+            if (value.basePath === basePath) {
+                acc = value;
             }
-            return acc;
-        },
-        undefined
-    );
+        }
+        return acc;
+    }, undefined);
 }
 
 /**

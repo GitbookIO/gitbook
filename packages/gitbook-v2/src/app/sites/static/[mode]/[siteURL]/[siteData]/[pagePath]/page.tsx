@@ -18,7 +18,7 @@ export default async function Page(props: PageProps) {
     'use cache';
 
     const params = await props.params;
-    const context = await getStaticSiteContext(params);
+    const { context } = await getStaticSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
     cacheTag(
@@ -32,13 +32,13 @@ export default async function Page(props: PageProps) {
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
-    const context = await getStaticSiteContext(await props.params);
+    const { context } = await getStaticSiteContext(await props.params);
     return generateSitePageViewport(context);
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
-    const context = await getStaticSiteContext(params);
+    const { context } = await getStaticSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
     return generateSitePageMetadata({
