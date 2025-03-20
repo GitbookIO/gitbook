@@ -318,24 +318,24 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        function loadImage(src: string) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.src = src;
-                img.decode().then(resolve, reject);
-            });
-        }
-
+        const urls = new Set<string>();
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
-        return icons.every((icon) => {
+        const results = icons.map((icon) => {
             if (!(icon instanceof SVGElement)) {
                 throw new Error('Icon is not an SVGElement');
             }
 
+            // If not visible, we don't care about loading state
+            if (!icon.checkVisibility()) {
+                return true;
+            }
+
+            // If loaded, good it passes the test.
             if (icon.dataset.loadingState === 'loaded') {
                 return true;
             }
 
+            // If not loaded yet, we need to load it.
             if (icon.dataset.loadingState === 'pending') {
                 return false;
             }
@@ -344,15 +344,34 @@ async function waitForIcons(page: Page) {
             const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
             const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
             const url = urlMatch ? urlMatch[1] : null;
+
+            // If URL is invalid we throw an error.
             if (!url) {
                 throw new Error('No mask-image');
             }
+
+            // If the URL is already loaded, we just mark it as loaded.
+            if (urls.has(url)) {
+                icon.dataset.loadingState = 'loaded';
+                return true;
+            }
+
+            // Mark the icon as pending and load the image.
             icon.dataset.loadingState = 'pending';
-            loadImage(url).then(() => {
+
+            // Mark the URL as seen.
+            urls.add(url);
+
+            const img = new Image();
+            img.src = url;
+            img.decode().then(() => {
                 icon.dataset.loadingState = 'loaded';
             });
+
             return false;
         });
+
+        return results.every((x) => x);
     });
 }
 
