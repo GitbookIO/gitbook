@@ -4,11 +4,7 @@ import {
     GitBookAPI,
     type GitBookAPIServiceBinding,
 } from '@gitbook/api';
-import {
-    getCacheTag,
-    getCacheTagForURL,
-    getComputedContentSourceCacheTags,
-} from '@gitbook/cache-tags';
+import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { wrapDataFetcherError } from './errors';
@@ -166,18 +162,6 @@ export function createDataFetcher(
         //
         getUserById(userId) {
             return trace('getUserById', () => getUserById({ apiToken: null }, { userId }));
-        },
-        getPublishedContentByUrl(params) {
-            return trace('getPublishedContentByUrl', () =>
-                getPublishedContentByUrl(
-                    { apiToken: null },
-                    {
-                        url: params.url,
-                        visitorAuthToken: params.visitorAuthToken,
-                        redirectOnError: params.redirectOnError,
-                    }
-                )
-            );
         },
     };
 }
@@ -435,42 +419,6 @@ async function getLatestOpenAPISpecVersionContent(
             params.organizationId,
             params.slug
         );
-        return res.data;
-    });
-}
-
-async function getPublishedContentByUrl(
-    input: DataFetcherInput,
-    params: {
-        url: string;
-        visitorAuthToken: string | null;
-        redirectOnError: boolean;
-    }
-) {
-    'use cache';
-
-    const { url, visitorAuthToken, redirectOnError } = params;
-
-    cacheTag(getCacheTagForURL(url));
-    cacheLife('days');
-
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.urls.getPublishedContentByUrl({
-            url,
-            visitorAuthToken: visitorAuthToken ?? undefined,
-            redirectOnError,
-        });
-
-        if ('site' in res.data) {
-            cacheTag(
-                getCacheTag({
-                    tag: 'site',
-                    site: res.data.site,
-                })
-            );
-        }
-
         return res.data;
     });
 }

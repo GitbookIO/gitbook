@@ -1,4 +1,4 @@
-import { getThemeFromMiddleware, getVisitorAuthTokenFromMiddleware } from '@v2/lib/middleware';
+import { getSiteURLDataFromMiddleware, getThemeFromMiddleware } from '@v2/lib/middleware';
 import type { Metadata, Viewport } from 'next';
 import type React from 'react';
 
@@ -7,6 +7,7 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
+import { getVisitorAuthClaims } from '@/lib/adaptive';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { shouldTrackEvents } from '@/lib/tracking';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
@@ -22,14 +23,14 @@ export default async function ContentLayout(props: { children: React.ReactNode }
 
     const context = await fetchLayoutData();
     const queryStringTheme = await getThemeFromMiddleware();
-    const visitorAuthToken = await getVisitorAuthTokenFromMiddleware();
+    const siteData = await getSiteURLDataFromMiddleware();
 
     return (
         <SiteLayout
             context={context}
             forcedTheme={queryStringTheme}
             withTracking={await shouldTrackEvents()}
-            visitorAuthToken={visitorAuthToken}
+            visitorAuthClaims={getVisitorAuthClaims(siteData)}
         >
             {children}
         </SiteLayout>

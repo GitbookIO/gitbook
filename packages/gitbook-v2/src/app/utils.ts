@@ -1,9 +1,9 @@
-import {
-    fetchSiteContextByURL,
-    fetchSiteContextByURLLookup,
-    getBaseContext,
-} from '@v2/lib/context';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
+import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import type { PublishedSiteContent, SiteAPIToken } from '@gitbook/api';
+import { fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
+import { jwtDecode } from 'jwt-decode';
+import { forbidden } from 'next/navigation';
+import rison from 'rison';
 
 export type RouteParamMode = 'url-host' | 'url';
 
@@ -12,6 +12,9 @@ export type RouteLayoutParams = {
 
     /** URL encoded site URL */
     siteURL: string;
+
+    /** URL and Rison encoded site data from getPublishedContentByUrl */
+    siteData: string;
 };
 
 export type RouteParams = RouteLayoutParams & {
@@ -21,19 +24,29 @@ export type RouteParams = RouteLayoutParams & {
 /**
  * Get the static context when rendering statically a site.
  */
-export function getStaticSiteContext(params: RouteLayoutParams) {
+export async function getStaticSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
-    return fetchSiteContextByURL(
+    const siteURLData = getSiteURLDataFromParams(params);
+
+    // For static routes, we check the expiration of the JWT token
+    // as the route might be revalidated after expiration
+    const decoded = jwtDecode<SiteAPIToken & { exp: number }>(siteURLData.apiToken);
+    if (decoded.exp && decoded.exp < Date.now() / 1000 + 120) {
+        forbidden();
+    }
+
+    const context = await fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
             urlMode: getModeFromParams(params.mode),
         }),
-        {
-            url: siteURL.toString(),
-            visitorAuthToken: null,
-            redirectOnError: false,
-        }
+        siteURLData
     );
+
+    return {
+        context,
+        visitorAuthClaims: getVisitorAuthClaimsFromToken(decoded),
+    };
 }
 
 /**
@@ -42,15 +55,20 @@ export function getStaticSiteContext(params: RouteLayoutParams) {
  */
 export async function getDynamicSiteContext(params: RouteLayoutParams) {
     const siteURL = getSiteURLFromParams(params);
-    const siteURLData = await getSiteURLDataFromMiddleware();
+    const siteURLData = getSiteURLDataFromParams(params);
 
-    return fetchSiteContextByURLLookup(
+    const context = await fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
             urlMode: getModeFromParams(params.mode),
         }),
         siteURLData
     );
+
+    return {
+        context,
+        visitorAuthClaims: getVisitorAuthClaims(siteURLData),
+    };
 }
 
 /**
@@ -73,4 +91,12 @@ function getModeFromParams(mode: string): RouteParamMode {
     }
 
     return 'url';
+}
+
+/**
+ * Get the decoded site data from the params.
+ */
+function getSiteURLDataFromParams(params: RouteLayoutParams): PublishedSiteContent {
+    const decoded = decodeURIComponent(params.siteData);
+    return rison.decode(decoded);
 }

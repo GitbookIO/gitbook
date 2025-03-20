@@ -1,6 +1,7 @@
 import { CustomizationThemeMode } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import rison from 'rison';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
@@ -83,7 +84,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Detect and extract the visitor authentication token from the request
     //
     // @ts-ignore - request typing
-    const visitorToken = getVisitorToken(request, siteURL);
+    const visitorToken = getVisitorToken({
+        cookies: request.cookies.getAll(),
+        url: siteURL,
+    });
 
     const data = await throwIfDataError(
         getPublishedContentByURL({
@@ -95,7 +99,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
         })
     );
-    let cookies: ResponseCookies = {};
+    const cookies: ResponseCookies = [];
 
     //
     // Handle redirects
@@ -123,10 +127,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return NextResponse.redirect(data.redirect);
     }
 
-    cookies = {
-        ...cookies,
-        ...getResponseCookiesForVisitorAuth(data.basePath, visitorToken),
-    };
+    cookies.push(...getResponseCookiesForVisitorAuth(data.siteBasePath, visitorToken));
 
     //
     // Make sure the URL is clean of any va token after a successful lookup
@@ -144,8 +145,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // Render and serve the content
     //
 
-    // When visitor has authentication (adaptive content or VA), we serve dynamic routes.
-    let routeType = visitorToken ? 'dynamic' : 'static';
+    // The route is static, except when using dynamic parameters from query params
+    // (customization override, theme, etc)
+    let routeType: 'dynamic' | 'static' = 'static';
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
@@ -184,6 +186,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         routeType,
         mode,
         encodeURIComponent(siteURLWithoutProtocol),
+        encodeURIComponent(rison.encode(data)),
         pathname,
     ].join('/');
 
@@ -234,8 +237,9 @@ async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
     const queryAPIToken = requestURL.searchParams.get('token');
     if (queryAPIToken) {
         requestURL.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), {
-            [cookieName]: {
+        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
+            {
+                name: cookieName,
                 value: queryAPIToken,
                 options: {
                     httpOnly: true,
@@ -244,7 +248,7 @@ async function servePreviewRoutes(requestURL: URL, request: NextRequest) {
                     maxAge: 60 * 60, // 1 hour
                 },
             },
-        });
+        ]);
     }
 
     const apiToken = request.cookies.get(cookieName)?.value;
@@ -371,8 +375,8 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
  * Write the cookies to a response.
  */
 function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
-    Object.entries(cookies).forEach(([key, { value, options }]) => {
-        response.cookies.set(key, value, options);
+    cookies.forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value, cookie.options);
     });
 
     return response;

@@ -94,12 +94,15 @@ export async function getPublishedContentByURL(input: {
          * In both cases, the idea is to use the deepest/longest/most inclusive path to resolve the content.
          */
         if (alternative.primary || ('site' in data && data.complete)) {
+            const changeRequest = data.changeRequest ?? lookup.changeRequest;
+            const revision = data.revision ?? lookup.revision;
+
             const siteResult: PublishedSiteContentLookup = {
                 ...data,
-                changeRequest: data.changeRequest ?? lookup.changeRequest,
-                revision: data.revision ?? lookup.revision,
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
                 pathname: joinPath(data.pathname, alternative.extraPath),
+                ...(changeRequest ? { changeRequest } : {}),
+                ...(revision ? { revision } : {}),
             };
             return { data: siteResult };
         }
