@@ -151,9 +151,13 @@ export function getVisitorAuthCookieValue(basePath: string, token: string): stri
  * Normalize the URL by removing the visitor authentication token from the query parameters (if present).
  */
 export function normalizeVisitorAuthURL(url: URL): URL {
-    const withoutVAParam = new URL(url);
-    withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
-    return withoutVAParam;
+    if (url.searchParams.has(VISITOR_AUTH_PARAM)) {
+        const withoutVAParam = new URL(url);
+        withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
+        return withoutVAParam;
+    }
+
+    return url;
 }
 
 /**
