@@ -10,8 +10,8 @@ runs:
           with:
               path: ~/.bun/install/cache
               key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('**/bun.lock') }}
-              restore-keys: |
-                  ${{ runner.os }}-bun-
+          env:
+              SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
         - name: Setup bun
           uses: oven-sh/setup-bun@v2
           with:
