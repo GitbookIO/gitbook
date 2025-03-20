@@ -370,13 +370,23 @@ async function roundImageSizes(page: Page) {
                     const setDimensions = () => {
                         // Mark it as stabilized
                         img.dataset.stabilized = 'true';
+
                         // Preserve the original width and height
                         img.dataset.originalWidth = img.style.width ?? '';
                         img.dataset.originalHeight = img.style.height ?? '';
+
+                        // Set the width and height to the rounded values
                         const rect = img.getBoundingClientRect();
                         img.style.width = `${Math.round(rect.width)}px`;
                         img.style.height = `${Math.round(rect.height)}px`;
-                        resolve();
+
+                        // Wait two frames to ensure the image has been rendered
+                        // before resolving the promise.
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                resolve();
+                            });
+                        });
                     };
 
                     if (img.complete) {
