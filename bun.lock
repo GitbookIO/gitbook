@@ -272,9 +272,9 @@
 
     "@argos-ci/browser": ["@argos-ci/browser@3.0.2-alpha.3", "", {}, "sha512-LrzSW3BuV7S1JbDspAL3/xpgj1rJEp+VDQZR3RX8jlxKFzAmPh4/YJOwNyahW5uwsFMeWEdrk2ds65HCCw1lKQ=="],
 
-    "@argos-ci/core": ["@argos-ci/core@3.1.1-alpha.3", "", { "dependencies": { "@argos-ci/api-client": "0.8.1-alpha.3+d98d368", "@argos-ci/util": "2.3.1-alpha.3+d98d368", "axios": "^1.7.9", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-D6Zg1qEsZoXfsJ0cIe8qOuFzsv2gcQq7/nAf2r0tqz9j0Q7JZ7v7yMAWMVWc0EBg9PwFM3jUiy1vc1JsnTWRZw=="],
+    "@argos-ci/core": ["@argos-ci/core@3.1.1-alpha.3", "", { "dependencies": { "@argos-ci/api-client": "0.8.1-alpha.3+f55ad81", "@argos-ci/util": "2.3.1-alpha.3+f55ad81", "axios": "^1.7.9", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-D6Zg1qEsZoXfsJ0cIe8qOuFzsv2gcQq7/nAf2r0tqz9j0Q7JZ7v7yMAWMVWc0EBg9PwFM3jUiy1vc1JsnTWRZw=="],
 
-    "@argos-ci/playwright": ["@argos-ci/playwright@4.1.1-alpha.3", "", { "dependencies": { "@argos-ci/browser": "3.0.2-alpha.3+d98d368", "@argos-ci/core": "3.1.1-alpha.3+d98d368", "@argos-ci/util": "2.3.1-alpha.3+d98d368", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-za+yeZOVqEhIy1la6xDXkzCwCPZ4O4w6ODhi+BWygK4An0tr0hEvvwxuPsE+Ub0XHyj/tc1VD4uyIPIbF5wIUg=="],
+    "@argos-ci/playwright": ["@argos-ci/playwright@4.1.1-alpha.3", "", { "dependencies": { "@argos-ci/browser": "3.0.2-alpha.3+f55ad81", "@argos-ci/core": "3.1.1-alpha.3+f55ad81", "@argos-ci/util": "2.3.1-alpha.3+f55ad81", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-za+yeZOVqEhIy1la6xDXkzCwCPZ4O4w6ODhi+BWygK4An0tr0hEvvwxuPsE+Ub0XHyj/tc1VD4uyIPIbF5wIUg=="],
 
     "@argos-ci/util": ["@argos-ci/util@2.3.1-alpha.3", "", {}, "sha512-2NQqsnX6ts52ZOHpdxQdlUCW39D5wTHwWmXFD208d6exICMJZooJx/Xpf/i+dYc+c4YRSmmgbiD4PShi4U/M2Q=="],
 
