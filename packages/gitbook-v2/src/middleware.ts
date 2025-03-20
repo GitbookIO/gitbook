@@ -89,7 +89,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         url: siteURL,
     });
 
-    return serveWithQueryAPIToken(requestURL, request, async (apiToken) => {
+    const withAPIToken = async (apiToken: string | null) => {
         const data = await throwIfDataError(
             getPublishedContentByURL({
                 url: siteURL.toString(),
@@ -220,25 +220,42 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
         return writeResponseCookies(response, cookies);
-    });
+    };
+
+    // For https://preview/<siteURL> requests,
+    if (siteURL.hostname === 'preview') {
+        return serveWithQueryAPIToken(
+            // We scope the API token to the site ID.
+            `${siteURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
+            request,
+            withAPIToken
+        );
+    }
+
+    return withAPIToken(null);
 }
 
 /**
  * Serve routes for PDF export for a space: /~space/:spaceId/~gitbook/pdf
  */
 async function serveSpacePDFRoutes(requestURL: URL, request: NextRequest) {
-    return serveWithQueryAPIToken(requestURL, request, async (apiToken) => {
-        if (!apiToken) {
-            throw new DataFetcherError('Missing API token', 400);
-        }
+    const pathnameParts = requestURL.pathname.slice(1).split('/');
+    if (pathnameParts[0] !== '~space' && pathnameParts[0] !== '~site') {
+        return null;
+    }
 
-        // Handle the rest with the router default logic
-        return NextResponse.next({
-            headers: {
-                [MiddlewareHeaders.APIToken]: apiToken,
-            },
-        });
-    });
+    return serveWithQueryAPIToken(
+        pathnameParts.slice(0, 2).join('/'),
+        request,
+        async (apiToken) => {
+            // Handle the rest with the router default logic
+            return NextResponse.next({
+                headers: {
+                    [MiddlewareHeaders.APIToken]: apiToken,
+                },
+            });
+        }
+    );
 }
 
 /**
@@ -259,29 +276,20 @@ function serveErrorResponse(error: Error) {
  * Server a response with an API token obtained from the query params.
  */
 async function serveWithQueryAPIToken(
-    requestURL: URL,
+    scopePath: string,
     request: NextRequest,
-    serve: (apiToken: string | null) => Promise<NextResponse>
+    serve: (apiToken: string) => Promise<NextResponse>
 ) {
-    const pathnameParts = requestURL.pathname.slice(1).split('/');
-
-    if (pathnameParts[0] !== '~space' && pathnameParts[0] !== '~site') {
-        return null;
-    }
-
-    // We store the API token in a cookie that is scoped to the specific preview route
+    // We store the API token in a cookie that is scoped to the specific route
     // to avoid errors when multiple previews are opened in different tabs.
-    const cookieName = getPathScopedCookieName(
-        'gitbook-api-token',
-        pathnameParts.slice(0, 2).join('/')
-    );
+    const cookieName = getPathScopedCookieName('gitbook-api-token', scopePath);
 
     // Extract a potential GitBook API token passed in the request
     // If found, we redirect to the same URL but with the token in the cookie
-    const queryAPIToken = requestURL.searchParams.get('token');
+    const queryAPIToken = request.nextUrl.searchParams.get('token');
     if (queryAPIToken) {
-        requestURL.searchParams.delete('token');
-        return writeResponseCookies(NextResponse.redirect(requestURL.toString()), [
+        request.nextUrl.searchParams.delete('token');
+        return writeResponseCookies(NextResponse.redirect(request.nextUrl.toString()), [
             {
                 name: cookieName,
                 value: queryAPIToken,
@@ -296,7 +304,11 @@ async function serveWithQueryAPIToken(
     }
 
     const apiToken = request.cookies.get(cookieName)?.value;
-    return serve(apiToken ?? null);
+    if (!apiToken) {
+        throw new DataFetcherError('Missing API token', 400);
+    }
+
+    return serve(apiToken);
 }
 
 /**

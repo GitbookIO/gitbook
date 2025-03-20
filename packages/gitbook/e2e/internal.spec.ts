@@ -368,6 +368,28 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Site Preview',
+        tests: [
+            {
+                name: 'Main content',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/preview/${data.site}/`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
         name: 'Content tests',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
