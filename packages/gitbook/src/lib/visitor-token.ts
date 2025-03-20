@@ -117,7 +117,7 @@ export function getResponseCookiesForVisitorAuth(
                 name: getVisitorAuthCookieName(basePath),
                 value: getVisitorAuthCookieValue(basePath, visitorTokenLookup.token),
                 options: {
-                    httpOnly: false,
+                    httpOnly: true,
                     sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
                     secure: process.env.NODE_ENV === 'production',
                     maxAge: getVisitorAuthCookieMaxAge(decoded),
