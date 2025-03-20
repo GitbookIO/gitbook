@@ -383,7 +383,7 @@ const testCases: TestsCase[] = [
 
                     return `url/preview/${data.site}/?${searchParams.toString()}`;
                 },
-                // screenshot: false,
+                screenshot: false,
                 run: async (page) => {
                     await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
                 },
