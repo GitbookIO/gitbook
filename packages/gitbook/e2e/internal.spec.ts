@@ -432,7 +432,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Integration Blocks',
                 url: 'blocks/integrations',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await expect(page.getByText('Mermaid')).toBeVisible();
+                    await expect(page.getByText('Diagram')).toBeVisible();
+                },
             },
             {
                 name: 'Tables',
