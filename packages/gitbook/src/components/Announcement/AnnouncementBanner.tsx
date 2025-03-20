@@ -28,7 +28,7 @@ export function AnnouncementBanner(props: {
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
-    return show === true ? (
+    return announcement.style === 'danger' || show === true ? (
         <div className="theme-bold:bg-header-background pt-4 pb-2">
             <div className={tcls('relative', CONTAINER_STYLE)}>
                 <Tag
