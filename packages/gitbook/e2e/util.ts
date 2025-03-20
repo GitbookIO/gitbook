@@ -325,7 +325,14 @@ async function waitForIcons(page: Page) {
         function loadImage(src: string) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.onload = () => resolve(img);
+                img.onload = () => {
+                    // Wait two frames to ensure the image has been rendered
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            resolve(true);
+                        });
+                    });
+                };
                 img.onerror = (_error) => reject(new Error(`Failed to load image: ${src}`));
                 img.src = src;
             });
