@@ -434,11 +434,6 @@ const testCases: TestsCase[] = [
                 url: 'blocks/integrations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    // Integrations blocks are not working in v2
-                    // When fixed, we can remove this check
-                    if (process.env.ARGOS_BUILD_NAME === 'v2-vercel') {
-                        return;
-                    }
                     const mermaidIframe = page.locator('iframe[title*="mermaid"]').contentFrame();
                     await expect(mermaidIframe.getByText('Mermaid', { exact: true })).toBeVisible();
                     await expect(mermaidIframe.getByText('Diagram', { exact: true })).toBeVisible();
