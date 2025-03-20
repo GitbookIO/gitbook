@@ -102,7 +102,7 @@
         "usehooks-ts": "^3.1.0",
       },
       "devDependencies": {
-        "@argos-ci/playwright": "4.1.1-alpha.3+d98d368",
+        "@argos-ci/playwright": "4.1.1-alpha.3+f55ad81",
         "@cloudflare/next-on-pages": "1.13.7",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.51.1",
