@@ -15,13 +15,14 @@ export async function getPublishedContentByURL(input: {
     url: string;
     visitorAuthToken: string | null;
     redirectOnError: boolean;
+    apiToken: string | null;
 }): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = await apiClient();
+        const api = await apiClient({ apiToken: input.apiToken });
 
         const callResult = await trace(
             {

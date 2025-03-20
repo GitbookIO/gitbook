@@ -63,6 +63,7 @@ export interface Test {
 
 export type TestsCase = {
     name: string;
+    skip?: boolean;
     tests: Array<Test>;
     contentBaseURL?: string;
 };
@@ -142,6 +143,10 @@ export async function waitForCookiesDialog(page: Page) {
  */
 export function runTestCases(testCases: TestsCase[]) {
     for (const testCase of testCases) {
+        if (testCase.skip) {
+            continue;
+        }
+
         test.describe(testCase.name, () => {
             for (const testEntry of testCase.tests) {
                 const testFn = testEntry.only ? test.only : test;
