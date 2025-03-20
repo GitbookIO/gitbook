@@ -24,46 +24,50 @@ export function AnnouncementBanner(props: {
     }, [visible, at]);
 
     const hasLink = announcement.link && contentRef?.href;
+    const closeable = announcement.style !== 'danger';
 
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
-    return announcement.style === 'danger' || show === true ? (
-        <div className="theme-bold:bg-header-background pt-4 pb-2">
+    return !closeable || show === true ? (
+        <div className="scroll-nojump theme-bold:bg-header-background pt-4 pb-2">
             <div className={tcls('relative', CONTAINER_STYLE)}>
                 <Tag
                     href={contentRef?.href ?? ''}
                     className={tcls(
-                        'flex w-full items-start justify-center gap-3 overflow-hidden rounded-md straight-corners:rounded-none py-3 pr-12 pl-4 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
+                        'flex w-full items-start justify-center overflow-hidden rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
                         style.container,
+                        closeable && 'pr-12',
                         hasLink && style.hover
                     )}
                 >
                     <Icon
                         icon={style.icon as IconName}
-                        className={`mt-0.5 size-4 shrink-0 ${style.iconColor}`}
+                        className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
                     />
                     <div>
                         {announcement.message}
                         {hasLink ? (
-                            announcement.link?.title ? (
-                                // When there's a link, the whole banner is always clickable.
-                                // Since we can't nest links inside links, we make this span *look* like a link.
-                                <span className={tcls(linkStyles, style.link, 'ml-1')}>
-                                    {announcement.link.title}
-                                    {contentRef?.icon ?? (
-                                        <Icon icon="chevron-right" className="ml-1 inline size-2" />
-                                    )}
-                                </span>
-                            ) : (
-                                (contentRef?.icon ?? (
-                                    <Icon icon="chevron-right" className="size-3" />
-                                ))
-                            )
+                            <div className={tcls(linkStyles, style.link, 'ml-1 inline')}>
+                                {contentRef?.icon ? (
+                                    <span className='mr-1 ml-2 *:inline'>{contentRef?.icon}</span>
+                                ) : null}
+                                {announcement.link?.title && (
+                                    <span className="mr-1">{announcement.link?.title}</span>
+                                )}
+                                <Icon
+                                    icon={
+                                        announcement.link?.to.kind === 'url'
+                                            ? 'arrow-up-right'
+                                            : 'chevron-right'
+                                    }
+                                    className={tcls('mb-0.5 inline size-3')}
+                                />
+                            </div>
                         ) : null}
                     </div>
                 </Tag>
-                {announcement.style !== 'danger' ? (
+                {closeable ? (
                     <button
                         className={`absolute top-0 right-4 mt-2 mr-2 rounded straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
                         type="button"
