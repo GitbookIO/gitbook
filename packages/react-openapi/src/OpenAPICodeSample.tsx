@@ -1,8 +1,12 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import {
+    OpenAPIMediaTypeExamplesBody,
+    OpenAPIMediaTypeExamplesSelector,
+} from './OpenAPICodeSampleInteractive';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { ScalarApiButton } from './ScalarApiButton';
 import { StaticSection } from './StaticSection';
-import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
+import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
@@ -49,30 +53,6 @@ export function OpenAPICodeSample(props: {
     );
 }
 
-function OpenAPICodeSampleFooter(props: {
-    data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
-}) {
-    const { data, context } = props;
-    const { method, path } = data;
-    const { specUrl } = context;
-    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
-
-    if (hideTryItPanel) {
-        return null;
-    }
-
-    if (!validateHttpMethod(method)) {
-        return null;
-    }
-
-    return (
-        <div className="openapi-codesample-footer">
-            <ScalarApiButton method={method} path={path} specUrl={specUrl} />
-        </div>
-    );
-}
-
 /**
  * Generate code samples for the operation.
  */
@@ -114,42 +94,119 @@ function generateCodeSamples(props: {
     const requestBody = !checkIsReference(data.operation.requestBody)
         ? data.operation.requestBody
         : undefined;
-    const requestBodyContentEntries = requestBody?.content
-        ? Object.entries(requestBody.content)
-        : undefined;
-    const requestBodyContent = requestBodyContentEntries?.[0];
 
-    const requestBodyExamples = requestBodyContent
-        ? generateMediaTypeExamples(requestBodyContent[1])
-        : [];
+    const url =
+        getDefaultServerURL(data.servers) +
+        data.path +
+        (searchParams.size ? `?${searchParams.toString()}` : '');
 
-    const input: CodeSampleInput = {
-        url:
-            getDefaultServerURL(data.servers) +
-            data.path +
-            (searchParams.size ? `?${searchParams.toString()}` : ''),
-        method: data.method,
-        body: requestBodyExamples[0]?.value,
-        headers: {
-            ...getSecurityHeaders(data.securities),
-            ...headersObject,
-            ...(requestBodyContent
-                ? {
-                      'Content-Type': requestBodyContent[0],
-                  }
-                : undefined),
-        },
+    const genericHeaders = {
+        ...getSecurityHeaders(data.securities),
+        ...headersObject,
     };
 
-    return codeSampleGenerators.map((generator) => ({
-        key: `default-${generator.id}`,
-        label: generator.label,
-        body: context.renderCodeBlock({
-            code: generator.generate(input),
-            syntax: generator.syntax,
-        }),
-        footer: <OpenAPICodeSampleFooter data={data} context={context} />,
-    }));
+    const mediaTypeRendererFactories = Object.entries(requestBody?.content ?? {}).map(
+        ([mediaType, mediaTypeObject]) => {
+            return (generator: CodeSampleGenerator) => {
+                const mediaTypeHeaders = {
+                    ...genericHeaders,
+                    'Content-Type': mediaType,
+                };
+                return {
+                    mediaType,
+                    element: context.renderCodeBlock({
+                        code: generator.generate({
+                            url,
+                            method: data.method,
+                            body: undefined,
+                            headers: mediaTypeHeaders,
+                        }),
+                        syntax: generator.syntax,
+                    }),
+                    examples: generateMediaTypeExamples(mediaTypeObject).map((example) => ({
+                        example,
+                        element: context.renderCodeBlock({
+                            code: generator.generate({
+                                url,
+                                method: data.method,
+                                body: example.value,
+                                headers: mediaTypeHeaders,
+                            }),
+                            syntax: generator.syntax,
+                        }),
+                    })),
+                } satisfies MediaTypeRenderer;
+            };
+        }
+    );
+
+    return codeSampleGenerators.map((generator) => {
+        if (mediaTypeRendererFactories.length > 0) {
+            const renderers = mediaTypeRendererFactories.map((generate) => generate(generator));
+            return {
+                key: `default-${generator.id}`,
+                label: generator.label,
+                body: <OpenAPIMediaTypeExamplesBody data={data} renderers={renderers} />,
+                footer: (
+                    <OpenAPICodeSampleFooter renderers={renderers} data={data} context={context} />
+                ),
+            };
+        }
+        return {
+            key: `default-${generator.id}`,
+            label: generator.label,
+            body: context.renderCodeBlock({
+                code: generator.generate({
+                    url,
+                    method: data.method,
+                    body: undefined,
+                    headers: genericHeaders,
+                }),
+                syntax: generator.syntax,
+            }),
+            footer: <OpenAPICodeSampleFooter data={data} renderers={[]} context={context} />,
+        };
+    });
+}
+
+export interface MediaTypeRenderer {
+    mediaType: string;
+    element: React.ReactNode;
+    examples: Array<{
+        example: OpenAPIV3.ExampleObject;
+        element: React.ReactNode;
+    }>;
+}
+
+function OpenAPICodeSampleFooter(props: {
+    data: OpenAPIOperationData;
+    renderers: MediaTypeRenderer[];
+    context: OpenAPIContextProps;
+}) {
+    const { data, context, renderers } = props;
+    const { method, path } = data;
+    const { specUrl } = context;
+    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
+    const hasMediaTypes = renderers.length > 0;
+
+    if (hideTryItPanel && !hasMediaTypes) {
+        return null;
+    }
+
+    if (!validateHttpMethod(method)) {
+        return null;
+    }
+
+    return (
+        <div className="openapi-codesample-footer">
+            {hasMediaTypes ? (
+                <OpenAPIMediaTypeExamplesSelector data={data} renderers={renderers} />
+            ) : (
+                <span />
+            )}
+            {!hideTryItPanel && <ScalarApiButton method={method} path={path} specUrl={specUrl} />}
+        </div>
+    );
 }
 
 /**
@@ -185,7 +242,9 @@ function getCustomCodeSamples(props: {
                         code: sample.source,
                         syntax: sample.lang,
                     }),
-                    footer: <OpenAPICodeSampleFooter data={data} context={context} />,
+                    footer: (
+                        <OpenAPICodeSampleFooter renderers={[]} data={data} context={context} />
+                    ),
                 }));
         }
     });

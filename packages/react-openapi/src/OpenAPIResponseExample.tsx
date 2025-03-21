@@ -145,7 +145,6 @@ function OpenAPIResponseMediaType(props: {
 }) {
     const { mediaTypeObject, mediaType } = props;
     const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType });
-    console.log(examples, mediaType);
     const syntax = getSyntaxFromMediaType(mediaType);
     const firstExample = examples[0];
 

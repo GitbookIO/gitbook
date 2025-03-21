@@ -49,6 +49,8 @@ export function generateMediaTypeExamples(
                 result.push({
                     summary: example.summary || key,
                     value: example.value,
+                    description: example.description,
+                    externalValue: example.externalValue,
                 });
                 return result;
             }, []);
