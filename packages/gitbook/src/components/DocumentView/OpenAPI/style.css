@@ -392,11 +392,11 @@
 }
 
 .openapi-codesample-footer {
-    @apply flex gap-4 w-full justify-between;
+    @apply flex gap-3 w-full justify-between flex-wrap;
 }
 
 .openapi-codesample-selectors {
-    @apply flex flex-row items-center gap-2.5;
+    @apply flex flex-row items-center gap-3 flex-wrap;
 }
 
 /* Path */
