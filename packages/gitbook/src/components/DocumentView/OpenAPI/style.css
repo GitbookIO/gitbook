@@ -397,7 +397,9 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-start text-sm gap-2 h-fit min-w-0 max-w-full;
+    @apply flex items-start text-sm gap-2 h-fit overflow-x-auto min-w-0 max-w-full;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .openapi-path-variable {
@@ -415,6 +417,7 @@
 .openapi-path-title {
     @apply flex-1 relative font-normal text-left font-mono text-tint-strong/10;
     @apply py-0.5 px-1 rounded hover:bg-tint cursor-pointer transition-colors;
+    @apply whitespace-nowrap md:whitespace-normal;
 }
 
 .openapi-path-title[data-deprecated="true"] {
