@@ -9,7 +9,7 @@ import warnOnce from 'warn-once';
  *
  * https://docs.company.com/section/variant/page
  *
- * toPathInContent('some/path') => /section/variant/some/path
+ * toPathInSpace('some/path') => /section/variant/some/path
  * toPathForPage({ pages, page }) => /section/variant/some/path
  * toAbsoluteURL('some/path') => https://docs.company.com/some/path
  */
@@ -17,7 +17,7 @@ export interface GitBookSpaceLinker {
     /**
      * Generate an absolute path for a relative path to the current content.
      */
-    toPathInContent(relativePath: string): string;
+    toPathInSpace(relativePath: string): string;
 
     /**
      * Generate an absolute path for a page in the current content.
@@ -54,7 +54,7 @@ export function createLinker(
     warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
 
     const linker: GitBookSpaceLinker = {
-        toPathInContent(relativePath: string): string {
+        toPathInSpace(relativePath: string): string {
             return joinPaths(servedOn.pathname, relativePath);
         },
 
@@ -67,7 +67,7 @@ export function createLinker(
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linker.toPathInContent(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
 
         toLinkForContent(url: string): string {
@@ -86,8 +86,8 @@ export function appendBasePathToLinker(
     basePath: string
 ): GitBookSpaceLinker {
     const linkerWithPrefix: GitBookSpaceLinker = {
-        toPathInContent(relativePath: string): string {
-            return linker.toPathInContent(joinPaths(basePath, relativePath));
+        toPathInSpace(relativePath: string): string {
+            return linker.toPathInSpace(joinPaths(basePath, relativePath));
         },
 
         toAbsoluteURL(absolutePath: string): string {
@@ -96,7 +96,7 @@ export function appendBasePathToLinker(
 
         toPathForPage({ pages, page, anchor }) {
             return (
-                linkerWithPrefix.toPathInContent(getPagePath(pages, page)) +
+                linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) +
                 (anchor ? `#${anchor}` : '')
             );
         },

@@ -13,13 +13,13 @@ const variantInSection = createLinker({
 
 describe('toPathInContent', () => {
     it('should return the correct path', () => {
-        expect(root.toPathInContent('some/path')).toBe('/some/path');
-        expect(variantInSection.toPathInContent('some/path')).toBe('/section/variant/some/path');
+        expect(root.toPathInSpace('some/path')).toBe('/some/path');
+        expect(variantInSection.toPathInSpace('some/path')).toBe('/section/variant/some/path');
     });
 
     it('should handle leading slash', () => {
-        expect(root.toPathInContent('/some/path')).toBe('/some/path');
-        expect(variantInSection.toPathInContent('/some/path')).toBe('/section/variant/some/path');
+        expect(root.toPathInSpace('/some/path')).toBe('/some/path');
+        expect(variantInSection.toPathInSpace('/some/path')).toBe('/section/variant/some/path');
     });
 });
 
@@ -38,8 +38,8 @@ describe('appendBasePathToLinker', () => {
 
     describe('toPathInContent', () => {
         it('should return the correct path', () => {
-            expect(prefixedRoot.toPathInContent('some/path')).toBe('/section/variant/some/path');
-            expect(prefixedVariantInSection.toPathInContent('some/path')).toBe(
+            expect(prefixedRoot.toPathInSpace('some/path')).toBe('/section/variant/some/path');
+            expect(prefixedVariantInSection.toPathInSpace('some/path')).toBe(
                 '/section/variant/base/some/path'
             );
         });

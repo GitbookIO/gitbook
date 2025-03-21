@@ -14,7 +14,7 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
         ...((await isSiteIndexable(context))
             ? [
                   'Allow: /',
-                  `Sitemap: ${linker.toAbsoluteURL(linker.toPathInContent(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml'))}`,
+                  `Sitemap: ${linker.toAbsoluteURL(linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml'))}`,
               ]
             : ['Disallow: /']),
     ];

@@ -48,7 +48,7 @@ export function SpaceLayout(props: {
         customization.footer.groups?.length;
 
     return (
-        <SpaceLayoutContextProvider basePath={context.linker.toPathInContent('')}>
+        <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <InsightsProvider
                 enabled={withTracking}
                 appURL={GITBOOK_APP_URL}

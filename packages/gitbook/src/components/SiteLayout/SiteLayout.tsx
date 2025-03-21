@@ -110,7 +110,7 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
                       height: faviconSize,
                   })
                 : linker.toAbsoluteURL(
-                      linker.toPathInContent('~gitbook/icon?size=small&theme=light')
+                      linker.toPathInSpace('~gitbook/icon?size=small&theme=light')
                   ),
             type: 'image/png',
             media: '(prefers-color-scheme: light)',
@@ -121,9 +121,7 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
                       width: faviconSize,
                       height: faviconSize,
                   })
-                : linker.toAbsoluteURL(
-                      linker.toPathInContent('~gitbook/icon?size=small&theme=dark')
-                  ),
+                : linker.toAbsoluteURL(linker.toPathInSpace('~gitbook/icon?size=small&theme=dark')),
             type: 'image/png',
             media: '(prefers-color-scheme: dark)',
         },

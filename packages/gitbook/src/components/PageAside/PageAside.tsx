@@ -35,7 +35,7 @@ export function PageAside(props: {
     const { customization, site, space } = context;
     const language = getSpaceLanguage(customization);
 
-    const pdfHref = context.linker.toPathInContent(
+    const pdfHref = context.linker.toPathInSpace(
         `~gitbook/pdf?${getPDFURLSearchParams({
             page: page.id,
             only: true,

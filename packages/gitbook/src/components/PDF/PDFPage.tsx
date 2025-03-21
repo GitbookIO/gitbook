@@ -93,7 +93,7 @@ export async function PDFPage(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInContent(''))}
+                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInSpace(''))}
                         className={tcls(
                             'flex',
                             'flex-row',
