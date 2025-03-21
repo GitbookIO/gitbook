@@ -16,8 +16,8 @@ export async function getServerActionBaseContext() {
 
     return getBaseContext({
         siteURL,
+        siteURLData,
         urlMode,
-        apiToken: siteURLData.apiToken,
     });
 }
 

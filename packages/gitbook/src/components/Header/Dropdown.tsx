@@ -123,7 +123,6 @@ export function DropdownMenuItem(
         return (
             <Link
                 href={href}
-                prefetch={false}
                 insights={insights}
                 className={tcls(
                     'rounded straight-corners:rounded-sm px-3 py-1 text-sm',

@@ -20,8 +20,10 @@ export async function getSpacePDFContext(
 
     const apiToken = await getAPITokenFromMiddleware();
 
+    const basePath = getPDFRoutePath(params);
     const linker = createLinker({
-        pathname: getPDFRoutePath(params),
+        spaceBasePath: basePath,
+        siteBasePath: basePath,
     });
     const dataFetcher = createDataFetcher({
         apiToken: apiToken,

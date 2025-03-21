@@ -1,25 +1,40 @@
 import { describe, expect, it } from 'bun:test';
-import { appendBasePathToLinker, createLinker } from './links';
+import { createLinker } from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
-    pathname: '/',
+    spaceBasePath: '/',
+    siteBasePath: '/',
 });
 
 const variantInSection = createLinker({
     host: 'docs.company.com',
-    pathname: '/section/variant',
+    spaceBasePath: '/section/variant',
+    siteBasePath: '/',
+});
+
+const siteGitBookIO = createLinker({
+    host: 'org.gitbook.io',
+    spaceBasePath: '/sitename/variant/',
+    siteBasePath: '/sitename/',
 });
 
 describe('toPathInContent', () => {
     it('should return the correct path', () => {
-        expect(root.toPathInContent('some/path')).toBe('/some/path');
-        expect(variantInSection.toPathInContent('some/path')).toBe('/section/variant/some/path');
+        expect(root.toPathInSpace('some/path')).toBe('/some/path');
+        expect(variantInSection.toPathInSpace('some/path')).toBe('/section/variant/some/path');
     });
 
     it('should handle leading slash', () => {
-        expect(root.toPathInContent('/some/path')).toBe('/some/path');
-        expect(variantInSection.toPathInContent('/some/path')).toBe('/section/variant/some/path');
+        expect(root.toPathInSpace('/some/path')).toBe('/some/path');
+        expect(variantInSection.toPathInSpace('/some/path')).toBe('/section/variant/some/path');
+    });
+});
+
+describe('toPathInSite', () => {
+    it('should return the correct path', () => {
+        expect(root.toPathInSite('some/path')).toBe('/some/path');
+        expect(siteGitBookIO.toPathInSite('some/path')).toBe('/sitename/some/path');
     });
 });
 
@@ -32,27 +47,17 @@ describe('toAbsoluteURL', () => {
     });
 });
 
-describe('appendBasePathToLinker', () => {
-    const prefixedRoot = appendBasePathToLinker(root, '/section/variant');
-    const prefixedVariantInSection = appendBasePathToLinker(variantInSection, '/base');
-
-    describe('toPathInContent', () => {
-        it('should return the correct path', () => {
-            expect(prefixedRoot.toPathInContent('some/path')).toBe('/section/variant/some/path');
-            expect(prefixedVariantInSection.toPathInContent('some/path')).toBe(
-                '/section/variant/base/some/path'
-            );
-        });
+describe('toLinkForContent', () => {
+    it('should return the correct path', () => {
+        expect(root.toLinkForContent('https://docs.company.com/some/path')).toBe('/some/path');
+        expect(siteGitBookIO.toLinkForContent('https://org.gitbook.io/sitename/some/path')).toBe(
+            '/sitename/some/path'
+        );
     });
 
-    describe('toAbsoluteURL', () => {
-        it('should return the correct path', () => {
-            expect(prefixedRoot.toAbsoluteURL('some/path')).toBe(
-                'https://docs.company.com/some/path'
-            );
-            expect(prefixedVariantInSection.toAbsoluteURL('some/path')).toBe(
-                'https://docs.company.com/some/path'
-            );
-        });
+    it('should preserve an absolute URL if the site is not the same', () => {
+        expect(siteGitBookIO.toLinkForContent('https://org.gitbook.io/anothersite/some/path')).toBe(
+            'https://org.gitbook.io/anothersite/some/path'
+        );
     });
 });

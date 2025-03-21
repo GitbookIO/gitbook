@@ -37,7 +37,7 @@ export async function SitePage(props: SitePageProps) {
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(context.linker.toPathInContent(pathname));
+            redirect(context.linker.toPathInSpace(pathname));
         } else {
             notFound();
         }
@@ -137,7 +137,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
                           width: 1200,
                           height: 630,
                       })
-                    : linker.toAbsoluteURL(linker.toPathInContent(`~gitbook/ogimage/${page.id}`)),
+                    : linker.toAbsoluteURL(linker.toPathInSpace(`~gitbook/ogimage/${page.id}`)),
             ],
         },
         robots:

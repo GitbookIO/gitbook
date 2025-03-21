@@ -38,6 +38,7 @@ export async function getStaticSiteContext(params: RouteLayoutParams) {
     const context = await fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
+            siteURLData,
             urlMode: getModeFromParams(params.mode),
         }),
         siteURLData
@@ -60,6 +61,7 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
     const context = await fetchSiteContextByURLLookup(
         getBaseContext({
             siteURL,
+            siteURLData,
             urlMode: getModeFromParams(params.mode),
         }),
         siteURLData

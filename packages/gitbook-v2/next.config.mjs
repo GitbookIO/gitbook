@@ -5,8 +5,17 @@
  */
 const nextConfig = {
     experimental: {
+        // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
+
+        // This is needed to use 'use cache'
         useCache: true,
+
+        // Content is fully static, we can cache it in the session memory cache for a long time
+        staleTimes: {
+            dynamic: 3600, // 1 hour
+            static: 3600, // 1 hour
+        },
     },
 
     env: {
