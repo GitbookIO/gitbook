@@ -67,7 +67,7 @@ function ExamplesSelector(props: {
 }) {
     const { data, renderer } = props;
     const state = useMediaTypeSampleIndexState(data, renderer.mediaType);
-    if (renderer.examples.length === 0) {
+    if (renderer.examples.length < 2) {
         return null;
     }
 
