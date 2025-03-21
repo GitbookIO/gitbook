@@ -164,6 +164,7 @@ export async function middleware(request: NextRequest) {
             ? getProxyModeBasePath(inputURL, resolved)
             : joinPath(originBasePath, resolved.basePath)
     );
+    headers.set('x-gitbook-site-basepath', joinPath(originBasePath, resolved.siteBasePath));
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
@@ -371,6 +372,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         kind: 'space',
         space: spaceId,
         basePath: '',
+        siteBasePath: '',
         pathname: url.pathname,
         apiToken,
         visitorToken: undefined,

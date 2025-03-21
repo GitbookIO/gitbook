@@ -10,6 +10,7 @@ import { headers } from 'next/headers';
 
 import { GITBOOK_APP_URL } from '@v2/lib/env';
 import { getPagePath } from './pages';
+import { withLeadingSlash, withTrailingSlash } from './paths';
 import { assertIsNotV2 } from './v2';
 
 export interface PageHrefContext {
@@ -27,17 +28,21 @@ export interface PageHrefContext {
 export async function getBasePath(): Promise<string> {
     assertIsNotV2();
     const headersList = await headers();
-    let path = headersList.get('x-gitbook-basepath') ?? '/';
+    const path = headersList.get('x-gitbook-basepath') ?? '/';
 
-    if (!path.startsWith('/')) {
-        path = `/${path}`;
-    }
+    return withTrailingSlash(withLeadingSlash(path));
+}
 
-    if (!path.endsWith('/')) {
-        path = `${path}/`;
-    }
+/**
+ * Return the site base path for the current request.
+ * The value will start and finish with /
+ */
+export async function getSiteBasePath(): Promise<string> {
+    assertIsNotV2();
+    const headersList = await headers();
+    const path = headersList.get('x-gitbook-site-basepath') ?? '/';
 
-    return path;
+    return withTrailingSlash(withLeadingSlash(path));
 }
 
 /**
