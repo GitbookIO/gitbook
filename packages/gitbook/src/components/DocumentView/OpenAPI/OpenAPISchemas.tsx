@@ -50,6 +50,7 @@ async function OpenAPISchemasBody(props: BlockProps<OpenAPISchemasBlock>) {
     return (
         <BaseOpenAPISchemas
             data={data}
+            grouped={block.data.grouped}
             context={{
                 specUrl,
                 icons: {

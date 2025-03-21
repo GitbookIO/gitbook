@@ -16,8 +16,12 @@ export function OpenAPISchemas(props: {
     className?: string;
     data: OpenAPISchemasData;
     context: OpenAPISchemasContextProps;
+    /**
+     * Whether to show the schema directly if there is only one.
+     */
+    grouped?: boolean;
 }) {
-    const { className, data, context } = props;
+    const { className, data, context, grouped } = props;
     const { schemas } = data;
 
     const clientContext: OpenAPIClientContext = {
@@ -32,7 +36,7 @@ export function OpenAPISchemas(props: {
 
     return (
         <div className={clsx('openapi-schemas', className)}>
-            <OpenAPIRootSchemasSchema schemas={schemas} context={clientContext} />
+            <OpenAPIRootSchemasSchema grouped={grouped} schemas={schemas} context={clientContext} />
         </div>
     );
 }
@@ -44,11 +48,12 @@ export function OpenAPISchemas(props: {
 function OpenAPIRootSchemasSchema(props: {
     schemas: OpenAPISchemasData['schemas'];
     context: OpenAPIClientContext;
+    grouped?: boolean;
 }) {
-    const { schemas, context } = props;
+    const { schemas, context, grouped } = props;
 
     // If there is only one model, we show it directly.
-    if (schemas.length === 1) {
+    if (schemas.length === 1 && !grouped) {
         const schema = schemas?.[0]?.schema;
 
         if (!schema) {
