@@ -123,7 +123,9 @@ function generateCodeSamples(props: {
                         }),
                         syntax: generator.syntax,
                     }),
-                    examples: generateMediaTypeExamples(mediaTypeObject).map((example) => ({
+                    examples: generateMediaTypeExamples(mediaTypeObject, {
+                        mode: 'write',
+                    }).map((example) => ({
                         example,
                         element: context.renderCodeBlock({
                             code: generator.generate({
