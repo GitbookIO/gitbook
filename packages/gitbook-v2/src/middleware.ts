@@ -163,8 +163,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
-        requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${data.basePath}`);
-        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(data));
+        requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${siteURLData.basePath}`);
+        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(siteURLData));
 
         // Preview of customization/theme
         const customization = siteURL.searchParams.get('customization');

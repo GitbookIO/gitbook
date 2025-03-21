@@ -323,7 +323,8 @@ async function resolveContentRefInSpace(
     );
     const linker = createLinker({
         host: baseURL.host,
-        pathname: baseURL.pathname,
+        spaceBasePath: baseURL.pathname,
+        siteBasePath: baseURL.pathname,
     });
 
     const resolved = await resolveContentRef(

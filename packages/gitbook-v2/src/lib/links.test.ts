@@ -1,14 +1,22 @@
 import { describe, expect, it } from 'bun:test';
-import { appendBasePathToLinker, createLinker } from './links';
+import { createLinker } from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
-    pathname: '/',
+    spaceBasePath: '/',
+    siteBasePath: '/',
 });
 
 const variantInSection = createLinker({
     host: 'docs.company.com',
-    pathname: '/section/variant',
+    spaceBasePath: '/section/variant',
+    siteBasePath: '/',
+});
+
+const siteGitBookIO = createLinker({
+    host: 'org.gitbook.io',
+    spaceBasePath: '/sitename/variant/',
+    siteBasePath: '/sitename/',
 });
 
 describe('toPathInContent', () => {
@@ -23,36 +31,18 @@ describe('toPathInContent', () => {
     });
 });
 
+describe('toPathInSite', () => {
+    it('should return the correct path', () => {
+        expect(root.toPathInSite('some/path')).toBe('/some/path');
+        expect(siteGitBookIO.toPathInSite('some/path')).toBe('/sitename/some/path');
+    });
+});
+
 describe('toAbsoluteURL', () => {
     it('should return the correct path', () => {
         expect(root.toAbsoluteURL('some/path')).toBe('https://docs.company.com/some/path');
         expect(variantInSection.toAbsoluteURL('some/path')).toBe(
             'https://docs.company.com/some/path'
         );
-    });
-});
-
-describe('appendBasePathToLinker', () => {
-    const prefixedRoot = appendBasePathToLinker(root, '/section/variant');
-    const prefixedVariantInSection = appendBasePathToLinker(variantInSection, '/base');
-
-    describe('toPathInContent', () => {
-        it('should return the correct path', () => {
-            expect(prefixedRoot.toPathInSpace('some/path')).toBe('/section/variant/some/path');
-            expect(prefixedVariantInSection.toPathInSpace('some/path')).toBe(
-                '/section/variant/base/some/path'
-            );
-        });
-    });
-
-    describe('toAbsoluteURL', () => {
-        it('should return the correct path', () => {
-            expect(prefixedRoot.toAbsoluteURL('some/path')).toBe(
-                'https://docs.company.com/some/path'
-            );
-            expect(prefixedVariantInSection.toAbsoluteURL('some/path')).toBe(
-                'https://docs.company.com/some/path'
-            );
-        });
     });
 });

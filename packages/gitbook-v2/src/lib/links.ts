@@ -93,34 +93,6 @@ export function createLinker(
     return linker;
 }
 
-/**
- * Append a prefix to a linker.
- */
-export function appendBasePathToLinker(linker: GitBookLinker, basePath: string): GitBookLinker {
-    const linkerWithPrefix: GitBookLinker = {
-        toPathInSpace(relativePath: string): string {
-            return linker.toPathInSpace(joinPaths(basePath, relativePath));
-        },
-
-        toAbsoluteURL(absolutePath: string): string {
-            return linker.toAbsoluteURL(absolutePath);
-        },
-
-        toPathForPage({ pages, page, anchor }) {
-            return (
-                linkerWithPrefix.toPathInSpace(getPagePath(pages, page)) +
-                (anchor ? `#${anchor}` : '')
-            );
-        },
-
-        toLinkForContent(url: string): string {
-            return linker.toLinkForContent(url);
-        },
-    };
-
-    return linkerWithPrefix;
-}
-
 function joinPaths(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
     const suffixPath = path.startsWith('/') ? path.slice(1) : path;
