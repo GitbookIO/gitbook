@@ -386,6 +386,7 @@ function encodePathInSiteContent(rawPathname: string): {
         case '~gitbook/icon':
         case 'llms.txt':
         case 'sitemap.xml':
+        case 'sitemap-pages.xml':
         case 'robots.txt':
             return { pathname };
         case '~gitbook/pdf':
