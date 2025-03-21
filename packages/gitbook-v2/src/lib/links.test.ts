@@ -46,3 +46,18 @@ describe('toAbsoluteURL', () => {
         );
     });
 });
+
+describe('toLinkForContent', () => {
+    it('should return the correct path', () => {
+        expect(root.toLinkForContent('https://docs.company.com/some/path')).toBe('/some/path');
+        expect(siteGitBookIO.toLinkForContent('https://org.gitbook.io/sitename/some/path')).toBe(
+            '/sitename/some/path'
+        );
+    });
+
+    it('should preserve an absolute URL if the site is not the same', () => {
+        expect(siteGitBookIO.toLinkForContent('https://org.gitbook.io/anothersite/some/path')).toBe(
+            'https://org.gitbook.io/anothersite/some/path'
+        );
+    });
+});

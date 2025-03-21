@@ -85,8 +85,16 @@ export function createLinker(
             return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
 
-        toLinkForContent(url: string): string {
-            return url;
+        toLinkForContent(rawURL: string): string {
+            const url = new URL(rawURL);
+
+            // If the link points to a content in the same site, we return an absolute path
+            // instead of a full URL; it makes it possible to use router navigation
+            if (url.hostname === servedOn.host && url.pathname.startsWith(servedOn.siteBasePath)) {
+                return url.pathname;
+            }
+
+            return rawURL;
         },
     };
 
