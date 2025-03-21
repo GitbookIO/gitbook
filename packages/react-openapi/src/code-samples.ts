@@ -17,7 +17,7 @@ export interface CodeSampleInput {
     body?: any;
 }
 
-interface CodeSampleGenerator {
+export interface CodeSampleGenerator {
     id: string;
     label: string;
     syntax: string;
@@ -240,7 +240,7 @@ const BodyGenerators = {
             body = `--data '${String(body).replace(/"/g, '')}'`;
         } else if (isXML(contentType) || isCSV(contentType)) {
             // We use --data-binary to avoid cURL converting newlines to \r\n
-            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '')}'`;
+            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '').replace(/\\n/g, '\n')}'`;
         } else if (isGraphQL(contentType)) {
             body = `--data '${stringifyOpenAPI(body)}'`;
             // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
@@ -249,7 +249,7 @@ const BodyGenerators = {
             // We use --data-binary to avoid cURL converting newlines to \r\n
             body = `--data-binary '@${String(body)}'`;
         } else {
-            body = `--data '${stringifyOpenAPI(body, null, 2)}'`;
+            body = `--data '${stringifyOpenAPI(body, null, 2).replace(/\\n/g, '\n')}'`;
         }
 
         return {
