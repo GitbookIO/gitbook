@@ -1,9 +1,7 @@
 import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
-export function checkIsReference(
-    input: unknown
-): input is OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject {
+export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
 }
 
