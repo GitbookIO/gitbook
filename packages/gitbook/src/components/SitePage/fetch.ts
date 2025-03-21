@@ -86,7 +86,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                 })
             );
             if (resolvedSiteRedirect) {
-                return redirect(resolvedSiteRedirect.target);
+                return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
             }
         }
     }

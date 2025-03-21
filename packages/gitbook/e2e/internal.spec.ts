@@ -806,6 +806,12 @@ const testCases: TestsCase[] = [
                 },
                 screenshot: false,
             },
+        ],
+    },
+    {
+        name: 'Site Redirects with sections',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
+        tests: [
             {
                 // This test that a redirect that incudes a section path works
                 name: 'Redirect to Quickstart page',
