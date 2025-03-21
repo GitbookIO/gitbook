@@ -7,17 +7,23 @@ import warnOnce from 'warn-once';
  *
  * URL levels:
  *
- * https://docs.company.com/section/variant/page
+ * https://docs.company.com/basename/section/variant/page
  *
- * toPathInSpace('some/path') => /section/variant/some/path
- * toPathForPage({ pages, page }) => /section/variant/some/path
+ * toPathInSpace('some/path') => /basename/section/variant/some/path
+ * toPathInSite('some/path') => /basename/some/path
+ * toPathForPage({ pages, page }) => /basename/section/variant/some/path
  * toAbsoluteURL('some/path') => https://docs.company.com/some/path
  */
-export interface GitBookSpaceLinker {
+export interface GitBookLinker {
     /**
      * Generate an absolute path for a relative path to the current content.
      */
     toPathInSpace(relativePath: string): string;
+
+    /**
+     * Generate an absolute path for a relative path to the current site.
+     */
+    toPathInSite(relativePath: string): string;
 
     /**
      * Generate an absolute path for a page in the current content.
@@ -48,14 +54,23 @@ export function createLinker(
     servedOn: {
         protocol?: string;
         host?: string;
-        pathname: string;
+
+        /** The base path of the space */
+        spaceBasePath: string;
+
+        /** The base path of the site */
+        siteBasePath: string;
     }
-): GitBookSpaceLinker {
+): GitBookLinker {
     warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
 
-    const linker: GitBookSpaceLinker = {
+    const linker: GitBookLinker = {
         toPathInSpace(relativePath: string): string {
-            return joinPaths(servedOn.pathname, relativePath);
+            return joinPaths(servedOn.spaceBasePath, relativePath);
+        },
+
+        toPathInSite(relativePath: string): string {
+            return joinPaths(servedOn.siteBasePath, relativePath);
         },
 
         toAbsoluteURL(absolutePath: string): string {
@@ -81,11 +96,8 @@ export function createLinker(
 /**
  * Append a prefix to a linker.
  */
-export function appendBasePathToLinker(
-    linker: GitBookSpaceLinker,
-    basePath: string
-): GitBookSpaceLinker {
-    const linkerWithPrefix: GitBookSpaceLinker = {
+export function appendBasePathToLinker(linker: GitBookLinker, basePath: string): GitBookLinker {
+    const linkerWithPrefix: GitBookLinker = {
         toPathInSpace(relativePath: string): string {
             return linker.toPathInSpace(joinPaths(basePath, relativePath));
         },

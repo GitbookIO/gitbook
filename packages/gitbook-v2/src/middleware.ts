@@ -14,7 +14,6 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 import { serveResizedImage } from '@/routes/image';
-import { getLinkerForSiteURL } from '@v2/lib/context';
 import {
     DataFetcherError,
     getPublishedContentByURL,
@@ -90,7 +89,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     });
 
     const withAPIToken = async (apiToken: string | null) => {
-        const data = await throwIfDataError(
+        const siteURLData = await throwIfDataError(
             getPublishedContentByURL({
                 url: siteURL.toString(),
                 visitorAuthToken: visitorToken?.token ?? null,
@@ -109,21 +108,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         //
         // Handle redirects
         //
-        if ('redirect' in data) {
+        if ('redirect' in siteURLData) {
             // biome-ignore lint/suspicious/noConsole: we want to log the redirect
-            console.log('redirect', data.redirect);
-            if (data.target === 'content') {
-                // For content redirects, we use the linker to redirect the optimal URL
-                // during development and testing in 'url' mode.
-                const linker = getLinkerForSiteURL({
-                    siteURL,
-                    urlMode: mode,
-                });
+            console.log('redirect', siteURLData.redirect);
+            if (siteURLData.target === 'content') {
+                let contentRedirect = new URL(siteURLData.redirect, request.url);
 
-                const contentRedirect = new URL(
-                    linker.toLinkForContent(data.redirect),
-                    request.url
-                );
+                // For content redirects, we redirect using the /url/:url format
+                // during development and testing in 'url' mode.
+                if (mode === 'url') {
+                    const urlObject = new URL(siteURLData.redirect);
+                    contentRedirect = new URL(
+                        `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`,
+                        request.url
+                    );
+                }
 
                 // Keep the same search params as the original request
                 // as it might contain a VA token
@@ -132,10 +131,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 return NextResponse.redirect(contentRedirect);
             }
 
-            return NextResponse.redirect(data.redirect);
+            return NextResponse.redirect(siteURLData.redirect);
         }
 
-        cookies.push(...getResponseCookiesForVisitorAuth(data.siteBasePath, visitorToken));
+        cookies.push(...getResponseCookiesForVisitorAuth(siteURLData.siteBasePath, visitorToken));
 
         //
         // Make sure the URL is clean of any va token after a successful lookup
@@ -189,9 +188,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('x-forwarded-host', request.nextUrl.host);
         requestHeaders.set('origin', request.nextUrl.origin);
 
-        const siteURLWithoutProtocol = `${siteURL.host}${data.basePath}`;
+        const siteURLWithoutProtocol = `${siteURL.host}${siteURLData.basePath}`;
         const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
-            data.pathname
+            siteURLData.pathname
         );
         routeType = routeTypeFromPathname ?? routeType;
 
@@ -200,7 +199,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
-            encodeURIComponent(rison.encode(data)),
+            encodeURIComponent(rison.encode(siteURLData)),
             pathname,
         ].join('/');
 

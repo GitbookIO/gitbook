@@ -46,7 +46,8 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
 
     const linker = createLinker({
         host,
-        pathname: basePath,
+        spaceBasePath: basePath,
+        siteBasePath: basePath,
     });
 
     const dataFetcher = await getDataFetcherV1();
@@ -56,7 +57,8 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
         // In V1, we always resize at the top level of the hostname, not relative to the content.
         linker: createLinker({
             host,
-            pathname: '/',
+            spaceBasePath: '/',
+            siteBasePath: '/',
         }),
     });
 
