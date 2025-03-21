@@ -5,6 +5,9 @@ on:
         branches:
             - main
 
+env:
+    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
+    
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
