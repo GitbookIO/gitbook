@@ -806,6 +806,15 @@ const testCases: TestsCase[] = [
                 },
                 screenshot: false,
             },
+            {
+                // This test that a redirect that incudes a section path works
+                name: 'Redirect to Quickstart page',
+                url: 'sections-2/redirect-test',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('Quickstart');
+                },
+                screenshot: false,
+            },
         ],
     },
     {
