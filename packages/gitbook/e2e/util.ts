@@ -340,6 +340,11 @@ async function waitForIcons(page: Page) {
                 return false;
             }
 
+            // Ignore icons that are not visible.
+            if (!icon.checkVisibility()) {
+                return true;
+            }
+
             // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
             const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
             const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
