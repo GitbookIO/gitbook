@@ -1,4 +1,5 @@
 import { getPagePath } from '@/lib/pages';
+import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import warnOnce from 'warn-once';
 
@@ -24,6 +25,11 @@ export interface GitBookLinker {
      * Generate an absolute path for a relative path to the current site.
      */
     toPathInSite(relativePath: string): string;
+
+    /**
+     * Transform an absolute path in a site, to a relative path from the root of the site.
+     */
+    toRelativePathInSite(absolutePath: string): string;
 
     /**
      * Generate an absolute path for a page in the current content.
@@ -64,13 +70,26 @@ export function createLinker(
 ): GitBookLinker {
     warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
 
+    const siteBasePath = withTrailingSlash(withLeadingSlash(servedOn.siteBasePath));
+    const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
+
     const linker: GitBookLinker = {
         toPathInSpace(relativePath: string): string {
-            return joinPaths(servedOn.spaceBasePath, relativePath);
+            return joinPaths(spaceBasePath, relativePath);
         },
 
         toPathInSite(relativePath: string): string {
-            return joinPaths(servedOn.siteBasePath, relativePath);
+            return joinPaths(siteBasePath, relativePath);
+        },
+
+        toRelativePathInSite(absolutePath: string): string {
+            const normalizedPath = withLeadingSlash(absolutePath);
+
+            if (!normalizedPath.startsWith(servedOn.siteBasePath)) {
+                return normalizedPath;
+            }
+
+            return normalizedPath.slice(servedOn.siteBasePath.length);
         },
 
         toAbsoluteURL(absolutePath: string): string {

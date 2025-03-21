@@ -28,7 +28,7 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
-import { joinPath, normalizePathname } from '@/lib/paths';
+import { joinPath, withLeadingSlash } from '@/lib/paths';
 import { getProxyModeBasePath } from '@/lib/proxy';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { addResponseCacheTag } from './lib/cache/response';
@@ -139,7 +139,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
-    const rewritePathname = normalizePathname(encodePathname(resolved.pathname));
+    const rewritePathname = withLeadingSlash(encodePathname(resolved.pathname));
 
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
@@ -549,7 +549,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         };
     }
 
-    const basePath = normalizePathname(basePathParts.join('/'));
+    const basePath = withLeadingSlash(basePathParts.join('/'));
     return {
         // In multi-id mode, complete is always considered true because there is no URL to resolve
         ...(decoded.kind === 'site' ? { ...decoded, complete: true } : decoded),
@@ -557,7 +557,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         revision: revisionId,
         siteBasePath: basePath,
         basePath,
-        pathname: normalizePathname(pathSegments.join('/')),
+        pathname: withLeadingSlash(pathSegments.join('/')),
         apiToken,
         apiEndpoint,
         contextId,
