@@ -20,7 +20,7 @@ import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlock>) {
     const { style } = props;
     return (
-        <div className={tcls('flex w-full', style, 'max-w-full')}>
+        <div className={tcls('flex w-full min-w-0', style, 'max-w-full')}>
             <OpenAPIOperationBody {...props} />
         </div>
     );
