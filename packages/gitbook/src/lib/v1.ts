@@ -50,6 +50,11 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
         siteBasePath: basePath,
     });
 
+    // On V1, we use hard-navigation between different spaces because of layout issues
+    linker.toLinkForContent = (url) => {
+        return url;
+    };
+
     const dataFetcher = await getDataFetcherV1();
 
     const imageResizer = createImageResizer({
