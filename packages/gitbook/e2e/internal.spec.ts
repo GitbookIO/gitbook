@@ -420,7 +420,6 @@ const testCases: TestsCase[] = [
                     await zoomImage.first().click();
                     await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
                 },
-                fullPage: true,
                 screenshot: { threshold: 0.8 },
             },
             {

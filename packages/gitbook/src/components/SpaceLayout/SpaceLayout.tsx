@@ -136,7 +136,7 @@ export function SpaceLayout(props: {
                                 </>
                             }
                         />
-                        <div className={tcls('flex-1', 'flex', 'flex-col')}>{children}</div>
+                        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
                     </div>
                 </div>
 
