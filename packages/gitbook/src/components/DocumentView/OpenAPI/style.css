@@ -201,6 +201,10 @@
     @apply text-warning-subtle text-[0.813rem];
 }
 
+.openapi-schema-optional {
+    @apply text-info-subtle text-[0.813rem];
+}
+
 .openapi-schema-readonly {
     @apply text-primary-subtle/9 text-[0.813rem];
 }
