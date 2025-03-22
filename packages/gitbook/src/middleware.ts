@@ -165,6 +165,11 @@ export async function middleware(request: NextRequest) {
             : joinPath(originBasePath, resolved.basePath)
     );
     headers.set('x-gitbook-site-basepath', joinPath(originBasePath, resolved.siteBasePath));
+    console.log('resolved.siteBasePath', resolved.siteBasePath);
+    console.log(
+        'joinPath(originBasePath, resolved.siteBasePath)',
+        joinPath(originBasePath, resolved.siteBasePath)
+    );
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);

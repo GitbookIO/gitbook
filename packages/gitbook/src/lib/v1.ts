@@ -51,6 +51,9 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
         siteBasePath: siteBasePath,
     });
 
+    console.log('linker siteBasePath', siteBasePath);
+    console.log('linker basePath', basePath);
+
     // On V1, we use hard-navigation between different spaces because of layout issues
     linker.toLinkForContent = (url) => {
         return url;
