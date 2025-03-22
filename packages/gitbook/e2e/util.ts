@@ -199,12 +199,30 @@ export function runTestCases(testCases: TestsCase[]) {
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
+                            stabilize: {
+                                imageSizes: false,
+                            },
                             beforeScreenshot: async ({ runStabilization }) => {
-                                await runStabilization();
+                                await runStabilization({ imageSizes: false });
+                                await stabilizeImageSizes(page);
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
+                            },
+                            afterScreenshot: async () => {
+                                await page.evaluate(() => {
+                                    const images = Array.from(document.images);
+                                    images.forEach((img) => {
+                                        if (img.dataset.argosStabilization) {
+                                            img.style.width = img.dataset.argosBckWidth ?? '';
+                                            img.style.height = img.dataset.argosBckHeight ?? '';
+                                            delete img.dataset.argosBckWidth;
+                                            delete img.dataset.argosBckHeight;
+                                            delete img.dataset.argosStabilization;
+                                        }
+                                    });
+                                });
                             },
                         });
                     }
@@ -212,6 +230,72 @@ export function runTestCases(testCases: TestsCase[]) {
             }
         });
     }
+}
+
+/**
+ * Stabilize all image sizes.
+ * - Reload all images to ensure the dimensions are correctly calculated.
+ * - Set the width and height to the rounded values.
+ */
+async function stabilizeImageSizes(page: Page) {
+    await page.waitForFunction(() => {
+        const images = Array.from(document.images);
+
+        const results = images.map((img) => {
+            // If the image is stabilizing, we skip it.
+            if (img.dataset.argosStabilization === 'pending') {
+                return false;
+            }
+
+            // If the image is already stabilized, we skip it.
+            if (img.dataset.argosStabilization === 'complete') {
+                return true;
+            }
+
+            // Mark it as pending
+            img.dataset.argosStabilization = 'pending';
+
+            // Force the re-rendering of the image by removing the src and srcset attributes
+            // and then restoring them.
+            // This will recalculate the dimensions of the image and make it right.
+            // const originalSrcSet = img.srcset;
+            // const originalSrc = img.src;
+            // img.srcset = '';
+            // img.src = '';
+            // img.srcset = originalSrcSet;
+            // img.src = originalSrc;
+
+            const update = () => {
+                // Preserve the original width and height
+                img.dataset.argosBckWidth = img.style.width ?? '';
+                img.dataset.argosBckHeight = img.style.height ?? '';
+
+                // Set the width and height to the rounded values
+                const rect = img.getBoundingClientRect();
+                img.style.width = `${Math.round(rect.width)}px`;
+                img.style.height = `${Math.round(rect.height)}px`;
+
+                console.log(rect.height);
+
+                // Mark it as complete
+                img.dataset.argosStabilization = 'complete';
+
+                img.removeEventListener('load', update);
+                img.removeEventListener('error', update);
+            };
+
+            if (img.complete) {
+                update();
+                return true;
+            }
+
+            img.addEventListener('load', update);
+            img.addEventListener('error', update);
+            return false;
+        });
+
+        return results.every((x) => x);
+    });
 }
 
 /**
