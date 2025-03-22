@@ -71,7 +71,7 @@
         "usehooks-ts": "^3.1.0"
     },
     "devDependencies": {
-        "@argos-ci/playwright": "^4.2.3",
+        "@argos-ci/playwright": "^4.3.0",
         "@cloudflare/next-on-pages": "1.13.7",
         "vercel": "^39.3.0",
         "@cloudflare/workers-types": "^4.20241230.0",
