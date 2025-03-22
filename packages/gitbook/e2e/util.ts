@@ -217,23 +217,23 @@ export function runTestCases(testCases: TestsCase[]) {
                             },
                             beforeScreenshot: async ({ runStabilization }) => {
                                 await runStabilization({ imageSizes: false });
-                                // await stabilizeImageSizes(page);
+                                await stabilizeImageSizes(page);
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
                             },
                             afterScreenshot: async () => {
-                                // await page.evaluate(() => {
-                                //     Array.from(document.images).forEach((img) => {
-                                //         if (img.dataset.argosBckWidth !== undefined) {
-                                //             img.style.width = img.dataset.argosBckWidth;
-                                //         }
-                                //         if (img.dataset.argosBckHeight !== undefined) {
-                                //             img.style.height = img.dataset.argosBckHeight;
-                                //         }
-                                //     });
-                                // });
+                                await page.evaluate(() => {
+                                    Array.from(document.images).forEach((img) => {
+                                        if (img.dataset.argosBckWidth !== undefined) {
+                                            img.style.width = img.dataset.argosBckWidth;
+                                        }
+                                        if (img.dataset.argosBckHeight !== undefined) {
+                                            img.style.height = img.dataset.argosBckHeight;
+                                        }
+                                    });
+                                });
                             },
                         });
                     }
@@ -251,12 +251,6 @@ export function runTestCases(testCases: TestsCase[]) {
 async function stabilizeImageSizes(page: Page) {
     await page.evaluate(() => {
         Array.from(document.images).forEach((img) => {
-            // Force the re-rendering of the image by changing its height
-            const originalHeight = img.style.height;
-            img.style.height = '0';
-            img.clientHeight + 1; // Force reflow
-            img.style.height = originalHeight;
-
             // Backup the original width and height
             img.dataset.argosBckWidth = img.style.width;
             img.dataset.argosBckHeight = img.style.height;
