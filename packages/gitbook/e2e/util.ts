@@ -212,14 +212,12 @@ export function runTestCases(testCases: TestsCase[]) {
                             },
                             afterScreenshot: async () => {
                                 await page.evaluate(() => {
-                                    const images = Array.from(document.images);
-                                    images.forEach((img) => {
-                                        if (img.dataset.argosStabilization) {
-                                            img.style.width = img.dataset.argosBckWidth ?? '';
-                                            img.style.height = img.dataset.argosBckHeight ?? '';
-                                            delete img.dataset.argosBckWidth;
-                                            delete img.dataset.argosBckHeight;
-                                            delete img.dataset.argosStabilization;
+                                    Array.from(document.images).forEach((img) => {
+                                        if (img.dataset.argosBckWidth !== undefined) {
+                                            img.style.width = img.dataset.argosBckWidth;
+                                        }
+                                        if (img.dataset.argosBckHeight !== undefined) {
+                                            img.style.height = img.dataset.argosBckHeight;
                                         }
                                     });
                                 });
@@ -238,57 +236,23 @@ export function runTestCases(testCases: TestsCase[]) {
  * - Set the width and height to the rounded values.
  */
 async function stabilizeImageSizes(page: Page) {
-    await page.waitForFunction(() => {
-        const images = Array.from(document.images);
-
-        const results = images.map((img) => {
-            // If the image is stabilizing, we skip it.
-            if (img.dataset.argosStabilization === 'pending') {
-                return false;
-            }
-
-            // If the image is already stabilized, we skip it.
-            if (img.dataset.argosStabilization === 'complete') {
-                return true;
-            }
-
-            // Mark it as pending
-            img.dataset.argosStabilization = 'pending';
-
-            // Force the re-rendering of the image by removing the src and srcset attributes
-            // and then restoring them.
-            const bckHeight = img.style.height;
+    await page.evaluate(() => {
+        Array.from(document.images).forEach((img) => {
+            // Force the re-rendering of the image by changing its height
+            const originalHeight = img.style.height;
             img.style.height = '0';
-            img.style.height = bckHeight;
+            img.clientHeight + 1; // Force reflow
+            img.style.height = originalHeight;
 
-            const update = () => {
-                // Preserve the original width and height
-                img.dataset.argosBckWidth = img.style.width ?? '';
-                img.dataset.argosBckHeight = img.style.height ?? '';
+            // Backup the original width and height
+            img.dataset.argosBckWidth = img.style.width;
+            img.dataset.argosBckHeight = img.style.height;
 
-                // Set the width and height to the rounded values
-                const rect = img.getBoundingClientRect();
-                img.style.width = `${Math.round(rect.width)}px`;
-                img.style.height = `${Math.round(rect.height)}px`;
-
-                // Mark it as complete
-                img.dataset.argosStabilization = 'complete';
-
-                img.removeEventListener('load', update);
-                img.removeEventListener('error', update);
-            };
-
-            if (img.complete) {
-                update();
-                return true;
-            }
-
-            img.addEventListener('load', update);
-            img.addEventListener('error', update);
-            return false;
+            // Set the width and height to the rounded values
+            const rect = img.getBoundingClientRect();
+            img.style.width = `${Math.round(rect.width)}px`;
+            img.style.height = `${Math.round(rect.height)}px`;
         });
-
-        return results.every((x) => x);
     });
 }
 
