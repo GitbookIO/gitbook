@@ -38,6 +38,17 @@ describe('toPathInSite', () => {
     });
 });
 
+describe('toRelativePathInSite', () => {
+    it('should return the correct path', () => {
+        expect(root.toRelativePathInSite('/some/path')).toBe('some/path');
+        expect(siteGitBookIO.toRelativePathInSite('/sitename/some/path')).toBe('some/path');
+    });
+
+    it('should preserve absolute paths outside of the site', () => {
+        expect(siteGitBookIO.toRelativePathInSite('/outside/some/path')).toBe('/outside/some/path');
+    });
+});
+
 describe('toAbsoluteURL', () => {
     it('should return the correct path', () => {
         expect(root.toAbsoluteURL('some/path')).toBe('https://docs.company.com/some/path');

@@ -2,6 +2,7 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 import { redirect } from 'next/navigation';
 
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
+import { withLeadingSlash } from '@/lib/paths';
 import { getDataOrNull } from '@v2/lib/data';
 
 export interface PagePathParams {
@@ -35,14 +36,14 @@ export async function fetchPageData(context: GitBookSiteContext, params: PagePar
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
 async function resolvePage(context: GitBookSiteContext, params: PagePathParams | PageIdParams) {
-    const { organizationId, site, space, revisionId, pages, shareKey } = context;
+    const { organizationId, site, space, revisionId, pages, shareKey, linker } = context;
 
     if ('pageId' in params) {
         return resolvePageId(pages, params.pageId);
     }
 
     const rawPathname = getPathnameParam(params);
-    const pathname = normalizePathname(rawPathname);
+    const pathname = rawPathname.toLowerCase();
 
     // When resolving a page, we use the lowercased pathname
     const page = resolvePagePath(pages, pathname);
@@ -67,16 +68,31 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         }
 
         // If a page still can't be found, we try with the API, in case we have a redirect at site level.
-        const resolvedSiteRedirect = await getDataOrNull(
-            context.dataFetcher.getSiteRedirectBySource({
-                organizationId,
-                siteId: site.id,
-                source: rawPathname.startsWith('/') ? rawPathname : `/${rawPathname}`,
-                siteShareKey: shareKey,
-            })
-        );
-        if (resolvedSiteRedirect) {
-            return redirect(resolvedSiteRedirect.target);
+        const redirectPathname = withLeadingSlash(rawPathname);
+        if (/^\/[a-zA-Z0-9-_.\/]+[a-zA-Z0-9-_.]$/.test(redirectPathname)) {
+            const redirectSources = new Set<string>([
+                // Test the pathname relative to the root
+                // For example hello/world -> section/variant/hello/world
+                withLeadingSlash(
+                    linker.toRelativePathInSite(linker.toPathInSpace(redirectPathname))
+                ),
+                // Test the pathname relative to the content/space
+                // For example hello/world -> /hello/world
+                redirectPathname,
+            ]);
+            for (const source of redirectSources) {
+                const resolvedSiteRedirect = await getDataOrNull(
+                    context.dataFetcher.getSiteRedirectBySource({
+                        organizationId,
+                        siteId: site.id,
+                        source,
+                        siteShareKey: shareKey,
+                    })
+                );
+                if (resolvedSiteRedirect) {
+                    return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
+                }
+            }
         }
     }
 
@@ -98,11 +114,4 @@ export function getPathnameParam(params: PagePathParams): string {
     }
 
     return pathname.map((part) => decodeURIComponent(part)).join('/');
-}
-
-/**
- * Normalize the URL pathname into the format used in the revision page path.
- */
-export function normalizePathname(pathname: string) {
-    return pathname.toLowerCase();
 }

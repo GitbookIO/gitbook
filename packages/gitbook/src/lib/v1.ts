@@ -31,7 +31,7 @@ import {
     searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
-import { getBasePath, getHost } from './links';
+import { getBasePath, getHost, getSiteBasePath } from './links';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -43,11 +43,12 @@ import { getBasePath, getHost } from './links';
 export async function getV1BaseContext(): Promise<GitBookBaseContext> {
     const host = await getHost();
     const basePath = await getBasePath();
+    const siteBasePath = await getSiteBasePath();
 
     const linker = createLinker({
         host,
         spaceBasePath: basePath,
-        siteBasePath: basePath,
+        siteBasePath: siteBasePath,
     });
 
     // On V1, we use hard-navigation between different spaces because of layout issues

@@ -1,5 +1,5 @@
 import type { PublishedSiteContent } from '@gitbook/api';
-import { joinPath, normalizePathname, removeTrailingSlash } from './paths';
+import { joinPath, removeTrailingSlash, withLeadingSlash } from './paths';
 
 /**
  * Compute the final base path for a site served in proxy mode.
@@ -16,6 +16,6 @@ export function getProxyModeBasePath(
         .replace(removeTrailingSlash(resolved.pathname), '')
         .replace(removeTrailingSlash(resolved.basePath), '');
 
-    const result = joinPath(normalizePathname(proxySitePath), resolved.basePath);
+    const result = joinPath(withLeadingSlash(proxySitePath), resolved.basePath);
     return result.endsWith('/') ? result : `${result}/`;
 }

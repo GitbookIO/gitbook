@@ -809,6 +809,21 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Site Redirects with sections',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
+        tests: [
+            {
+                // This test that a redirect that incudes a section path works
+                name: 'Redirect to Quickstart page',
+                url: 'sections-2/redirect-test',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('Quickstart');
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
         name: 'Share links',
         contentBaseURL: 'https://gitbook.gitbook.io/gbo-tests-share-links/',
         tests: [

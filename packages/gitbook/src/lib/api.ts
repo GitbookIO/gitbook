@@ -153,7 +153,7 @@ export function withAPI<T>(client: GitBookAPIContext, fn: () => Promise<T>): Pro
 
 type SpaceContentLookup = Pick<
     PublishedSiteContent,
-    'space' | 'changeRequest' | 'revision' | 'pathname' | 'basePath' | 'apiToken'
+    'space' | 'changeRequest' | 'revision' | 'pathname' | 'basePath' | 'siteBasePath' | 'apiToken'
 > & { kind: 'space' };
 
 export type PublishedContentWithCache =
