@@ -643,6 +643,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
 
     return {
         ...lookup,
+        siteBasePath: joinPath(target.host, lookup.siteBasePath),
         basePath: joinPath(target.host, lookup.basePath),
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
@@ -729,6 +730,7 @@ async function lookupSiteByAPI(
                 space: data.space,
                 changeRequest,
                 revision: data.revision ?? lookup.revision,
+                siteBasePath: data.siteBasePath,
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
                 pathname: joinPath(data.pathname, alternative.extraPath),
                 apiToken: data.apiToken,
