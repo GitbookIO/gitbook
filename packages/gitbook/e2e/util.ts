@@ -189,19 +189,6 @@ export function runTestCases(testCases: TestsCase[]) {
                     }
                     const screenshotOptions = testEntry.screenshot;
                     if (screenshotOptions !== false) {
-                        await page.evaluate(() => {
-                            window.addEventListener('resize', () => {
-                                Array.from(document.images).forEach((img) => {
-                                    const srcset = img.getAttribute('srcset');
-                                    if (srcset) {
-                                        img.setAttribute('srcset', '');
-                                        // Force reflow
-                                        img.offsetWidth;
-                                        img.setAttribute('srcset', srcset);
-                                    }
-                                });
-                            });
-                        });
                         await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                             viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                             argosCSS: `
@@ -212,28 +199,12 @@ export function runTestCases(testCases: TestsCase[]) {
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
-                            stabilize: {
-                                imageSizes: false,
-                            },
                             beforeScreenshot: async ({ runStabilization }) => {
-                                await runStabilization({ imageSizes: false });
-                                await stabilizeImageSizes(page);
+                                await runStabilization();
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
-                            },
-                            afterScreenshot: async () => {
-                                await page.evaluate(() => {
-                                    Array.from(document.images).forEach((img) => {
-                                        if (img.dataset.argosBckWidth !== undefined) {
-                                            img.style.width = img.dataset.argosBckWidth;
-                                        }
-                                        if (img.dataset.argosBckHeight !== undefined) {
-                                            img.style.height = img.dataset.argosBckHeight;
-                                        }
-                                    });
-                                });
                             },
                         });
                     }
@@ -241,26 +212,6 @@ export function runTestCases(testCases: TestsCase[]) {
             }
         });
     }
-}
-
-/**
- * Stabilize all image sizes.
- * - Reload all images to ensure the dimensions are correctly calculated.
- * - Set the width and height to the rounded values.
- */
-async function stabilizeImageSizes(page: Page) {
-    await page.evaluate(() => {
-        Array.from(document.images).forEach((img) => {
-            // Backup the original width and height
-            img.dataset.argosBckWidth = img.style.width;
-            img.dataset.argosBckHeight = img.style.height;
-
-            // Set the width and height to the rounded values
-            const rect = img.getBoundingClientRect();
-            img.style.width = `${Math.round(rect.width)}px`;
-            img.style.height = `${Math.round(rect.height)}px`;
-        });
-    });
 }
 
 /**
