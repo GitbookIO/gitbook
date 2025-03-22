@@ -189,6 +189,19 @@ export function runTestCases(testCases: TestsCase[]) {
                     }
                     const screenshotOptions = testEntry.screenshot;
                     if (screenshotOptions !== false) {
+                        await page.evaluate(() => {
+                            window.addEventListener('resize', () => {
+                                Array.from(document.images).forEach((img) => {
+                                    const srcset = img.getAttribute('srcset');
+                                    if (srcset) {
+                                        img.setAttribute('srcset', '');
+                                        // Force reflow
+                                        img.offsetWidth;
+                                        img.setAttribute('srcset', srcset);
+                                    }
+                                });
+                            });
+                        });
                         await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                             viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                             argosCSS: `
@@ -204,23 +217,23 @@ export function runTestCases(testCases: TestsCase[]) {
                             },
                             beforeScreenshot: async ({ runStabilization }) => {
                                 await runStabilization({ imageSizes: false });
-                                await stabilizeImageSizes(page);
+                                // await stabilizeImageSizes(page);
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
                                 }
                             },
                             afterScreenshot: async () => {
-                                await page.evaluate(() => {
-                                    Array.from(document.images).forEach((img) => {
-                                        if (img.dataset.argosBckWidth !== undefined) {
-                                            img.style.width = img.dataset.argosBckWidth;
-                                        }
-                                        if (img.dataset.argosBckHeight !== undefined) {
-                                            img.style.height = img.dataset.argosBckHeight;
-                                        }
-                                    });
-                                });
+                                // await page.evaluate(() => {
+                                //     Array.from(document.images).forEach((img) => {
+                                //         if (img.dataset.argosBckWidth !== undefined) {
+                                //             img.style.width = img.dataset.argosBckWidth;
+                                //         }
+                                //         if (img.dataset.argosBckHeight !== undefined) {
+                                //             img.style.height = img.dataset.argosBckHeight;
+                                //         }
+                                //     });
+                                // });
                             },
                         });
                     }
