@@ -70,7 +70,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         // If a page still can't be found, we try with the API, in case we have a redirect at site level.
         const redirectPathname = withLeadingSlash(rawPathname);
         if (/^\/[a-zA-Z0-9-_.\/]+[a-zA-Z0-9-_.]$/.test(redirectPathname)) {
-            const redirectSources = [
+            const redirectSources = new Set<string>([
                 // Test the pathname relative to the root
                 // For example hello/world -> section/variant/hello/world
                 withLeadingSlash(
@@ -79,7 +79,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                 // Test the pathname relative to the content/space
                 // For example hello/world -> /hello/world
                 redirectPathname,
-            ];
+            ]);
             for (const source of redirectSources) {
                 const resolvedSiteRedirect = await getDataOrNull(
                     context.dataFetcher.getSiteRedirectBySource({
