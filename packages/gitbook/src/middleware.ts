@@ -28,7 +28,7 @@ import {
     normalizeVisitorAuthURL,
 } from '@/lib/visitor-token';
 
-import { joinPath, normalizePathname } from '@/lib/paths';
+import { joinPath, withLeadingSlash } from '@/lib/paths';
 import { getProxyModeBasePath } from '@/lib/proxy';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { addResponseCacheTag } from './lib/cache/response';
@@ -139,7 +139,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
-    const rewritePathname = normalizePathname(encodePathname(resolved.pathname));
+    const rewritePathname = withLeadingSlash(encodePathname(resolved.pathname));
 
     // Resolution might have changed the API endpoint
     apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
@@ -164,6 +164,7 @@ export async function middleware(request: NextRequest) {
             ? getProxyModeBasePath(inputURL, resolved)
             : joinPath(originBasePath, resolved.basePath)
     );
+    headers.set('x-gitbook-site-basepath', joinPath(originBasePath, resolved.siteBasePath));
     headers.set('x-gitbook-content-space', resolved.space);
     if ('site' in resolved) {
         headers.set('x-gitbook-content-organization', resolved.organization);
@@ -371,6 +372,7 @@ async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
         kind: 'space',
         space: spaceId,
         basePath: '',
+        siteBasePath: '',
         pathname: url.pathname,
         apiToken,
         visitorToken: undefined,
@@ -549,7 +551,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         };
     }
 
-    const basePath = normalizePathname(basePathParts.join('/'));
+    const basePath = withLeadingSlash(basePathParts.join('/'));
     return {
         // In multi-id mode, complete is always considered true because there is no URL to resolve
         ...(decoded.kind === 'site' ? { ...decoded, complete: true } : decoded),
@@ -557,7 +559,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         revision: revisionId,
         siteBasePath: basePath,
         basePath,
-        pathname: normalizePathname(pathSegments.join('/')),
+        pathname: withLeadingSlash(pathSegments.join('/')),
         apiToken,
         apiEndpoint,
         contextId,
@@ -636,6 +638,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
 
     return {
         ...lookup,
+        siteBasePath: joinPath(target.host, lookup.siteBasePath),
         basePath: joinPath(target.host, lookup.basePath),
         ...('basePath' in lookup && visitorAuthToken
             ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
@@ -722,6 +725,7 @@ async function lookupSiteByAPI(
                 space: data.space,
                 changeRequest,
                 revision: data.revision ?? lookup.revision,
+                siteBasePath: data.siteBasePath,
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
                 pathname: joinPath(data.pathname, alternative.extraPath),
                 apiToken: data.apiToken,

@@ -22,9 +22,20 @@ export function removeLeadingSlash(path: string): string {
 /**
  * Normalize a pathname to make it start with a slash
  */
-export function normalizePathname(pathname: string): string {
+export function withLeadingSlash(pathname: string): string {
     if (!pathname.startsWith('/')) {
         pathname = `/${pathname}`;
+    }
+
+    return pathname;
+}
+
+/**
+ * Normalize a pathname to make it end with a slash
+ */
+export function withTrailingSlash(pathname: string): string {
+    if (!pathname.endsWith('/')) {
+        pathname = `${pathname}/`;
     }
 
     return pathname;
