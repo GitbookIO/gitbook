@@ -73,7 +73,6 @@
     "devDependencies": {
         "@argos-ci/playwright": "^4.3.0",
         "@cloudflare/next-on-pages": "1.13.7",
-        "vercel": "^39.3.0",
         "@cloudflare/workers-types": "^4.20241230.0",
         "@playwright/test": "^1.51.1",
         "@types/js-cookie": "^3.0.6",
@@ -93,8 +92,10 @@
         "jsonwebtoken": "^9.0.2",
         "postcss": "^8",
         "psi": "^4.1.0",
+        "stylelint": "^16.16.0",
         "tailwindcss": "^3.4.0",
         "ts-essentials": "^10.0.1",
-        "typescript": "^5.5.3"
+        "typescript": "^5.5.3",
+        "vercel": "^39.3.0"
     }
 }

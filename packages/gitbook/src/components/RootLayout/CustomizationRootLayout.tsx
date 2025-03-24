@@ -21,8 +21,10 @@ import {
     hexToRgb,
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
+import * as ReactDOM from 'react-dom';
 
-import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
+import { getFontData } from '@/fonts';
+import { fontNotoColorEmoji, ibmPlexMono } from '@/fonts/default';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -31,7 +33,7 @@ import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
-import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
+import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -48,6 +50,22 @@ export async function CustomizationRootLayout(props: {
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
+    const fontData = getFontData(customization.styling.font);
+
+    // Preconnect and preload custom fonts if needed
+    if (fontData.type === 'custom') {
+        ReactDOM.preconnect(GITBOOK_FONTS_URL);
+        fontData.preloadSources
+            .flatMap((face) => face.sources)
+            .forEach(({ url, format }) => {
+                ReactDOM.preload(url, {
+                    as: 'font',
+                    crossOrigin: 'anonymous',
+                    fetchPriority: 'high',
+                    type: format ? `font/${format}` : undefined,
+                });
+            });
+    }
 
     return (
         <html
@@ -66,16 +84,18 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                typeof customization.styling.font === 'string'
-                    ? fonts[customization.styling.font].variable
-                    : '',
-                ibmPlexMono.variable
+                ibmPlexMono.variable,
+                fontData.type === 'default' ? fontData.variable : 'font-custom'
             )}
         >
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+
+                {/* Inject custom font @font-face rules */}
+                {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
+
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
