@@ -16,6 +16,8 @@ const nextConfig = {
             dynamic: 3600, // 1 hour
             static: 3600, // 1 hour
         },
+
+        nodeMiddleware: true,
     },
 
     env: {
