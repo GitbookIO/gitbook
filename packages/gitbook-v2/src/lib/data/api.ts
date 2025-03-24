@@ -178,12 +178,14 @@ export function createDataFetcher(
 async function getUserById(input: DataFetcherInput, params: { userId: string }) {
     'use cache';
 
-    cacheLife('days');
+    return trace('getUserById.uncached', () => {
+        cacheLife('days');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.users.getUserById(params.userId);
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.users.getUserById(params.userId);
+            return res.data;
+        });
     });
 }
 
@@ -196,20 +198,22 @@ async function getSpace(
 ) {
     'use cache';
 
-    cacheLife('days');
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: params.spaceId,
-        })
-    );
+    return trace('getSpace.uncached', () => {
+        cacheLife('days');
+        cacheTag(
+            getCacheTag({
+                tag: 'space',
+                space: params.spaceId,
+            })
+        );
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getSpaceById(params.spaceId, {
-            shareKey: params.shareKey,
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getSpaceById(params.spaceId, {
+                shareKey: params.shareKey,
+            });
+            return res.data;
         });
-        return res.data;
     });
 }
 
@@ -222,19 +226,24 @@ async function getChangeRequest(
 ) {
     'use cache';
 
-    cacheLife('minutes');
+    return trace('getChangeRequest.uncached', () => {
+        cacheLife('minutes');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getChangeRequestById(params.spaceId, params.changeRequestId);
-        cacheTag(
-            getCacheTag({
-                tag: 'change-request',
-                space: params.spaceId,
-                changeRequest: res.data.id,
-            })
-        );
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getChangeRequestById(
+                params.spaceId,
+                params.changeRequestId
+            );
+            cacheTag(
+                getCacheTag({
+                    tag: 'change-request',
+                    space: params.spaceId,
+                    changeRequest: res.data.id,
+                })
+            );
+            return res.data;
+        });
     });
 }
 
@@ -248,14 +257,16 @@ async function getRevision(
 ) {
     'use cache';
 
-    cacheLife('max');
+    return trace('getRevision.uncached', () => {
+        cacheLife('max');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
-            metadata: params.metadata,
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
+                metadata: params.metadata,
+            });
+            return res.data;
         });
-        return res.data;
     });
 }
 
@@ -269,14 +280,20 @@ async function getRevisionPages(
 ) {
     'use cache';
 
-    cacheLife('max');
+    return trace('getRevisionPages.uncached', () => {
+        cacheLife('max');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.listPagesInRevisionById(params.spaceId, params.revisionId, {
-            metadata: params.metadata,
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.listPagesInRevisionById(
+                params.spaceId,
+                params.revisionId,
+                {
+                    metadata: params.metadata,
+                }
+            );
+            return res.data.pages;
         });
-        return res.data.pages;
     });
 }
 
@@ -290,17 +307,19 @@ async function getRevisionFile(
 ) {
     'use cache';
 
-    cacheLife('max');
+    return trace('getRevisionFile.uncached', () => {
+        cacheLife('max');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getFileInRevisionById(
-            params.spaceId,
-            params.revisionId,
-            params.fileId,
-            {}
-        );
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getFileInRevisionById(
+                params.spaceId,
+                params.revisionId,
+                params.fileId,
+                {}
+            );
+            return res.data;
+        });
     });
 }
 
@@ -314,19 +333,21 @@ async function getRevisionPageByPath(
 ) {
     'use cache';
 
-    cacheLife('max');
+    return trace('getRevisionPageByPath.uncached', () => {
+        cacheLife('max');
 
-    const encodedPath = encodeURIComponent(params.path);
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getPageInRevisionByPath(
-            params.spaceId,
-            params.revisionId,
-            encodedPath,
-            {}
-        );
+        const encodedPath = encodeURIComponent(params.path);
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getPageInRevisionByPath(
+                params.spaceId,
+                params.revisionId,
+                encodedPath,
+                {}
+            );
 
-        return res.data;
+            return res.data;
+        });
     });
 }
 
@@ -339,12 +360,14 @@ async function getDocument(
 ) {
     'use cache';
 
-    cacheLife('max');
+    return trace('getDocument.uncached', () => {
+        cacheLife('max');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
+            return res.data;
+        });
     });
 }
 
@@ -359,25 +382,27 @@ async function getComputedDocument(
 ) {
     'use cache';
 
-    cacheLife('days');
+    return trace('getComputedDocument.uncached', () => {
+        cacheLife('days');
 
-    cacheTag(
-        ...getComputedContentSourceCacheTags(
-            {
-                spaceId: params.spaceId,
-                organizationId: params.organizationId,
-            },
-            params.source
-        )
-    );
+        cacheTag(
+            ...getComputedContentSourceCacheTags(
+                {
+                    spaceId: params.spaceId,
+                    organizationId: params.organizationId,
+                },
+                params.source
+            )
+        );
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getComputedDocument(params.spaceId, {
-            source: params.source,
-            seed: params.seed,
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getComputedDocument(params.spaceId, {
+                source: params.source,
+                seed: params.seed,
+            });
+            return res.data;
         });
-        return res.data;
     });
 }
 
@@ -391,16 +416,18 @@ async function getReusableContent(
 ) {
     'use cache';
 
-    cacheLife('max');
+    return trace('getReusableContent.uncached', () => {
+        cacheLife('max');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getReusableContentInRevisionById(
-            params.spaceId,
-            params.revisionId,
-            params.reusableContentId
-        );
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getReusableContentInRevisionById(
+                params.spaceId,
+                params.revisionId,
+                params.reusableContentId
+            );
+            return res.data;
+        });
     });
 }
 
@@ -413,22 +440,24 @@ async function getLatestOpenAPISpecVersionContent(
 ) {
     'use cache';
 
-    cacheTag(
-        getCacheTag({
-            tag: 'openapi',
-            organization: params.organizationId,
-            openAPISpec: params.slug,
-        })
-    );
-    cacheLife('days');
-
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.orgs.getLatestOpenApiSpecVersionContent(
-            params.organizationId,
-            params.slug
+    return trace('getLatestOpenAPISpecVersionContent.uncached', () => {
+        cacheTag(
+            getCacheTag({
+                tag: 'openapi',
+                organization: params.organizationId,
+                openAPISpec: params.slug,
+            })
         );
-        return res.data;
+        cacheLife('days');
+
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.orgs.getLatestOpenApiSpecVersionContent(
+                params.organizationId,
+                params.slug
+            );
+            return res.data;
+        });
     });
 }
 
@@ -442,20 +471,28 @@ async function getPublishedContentSite(
 ) {
     'use cache';
 
-    cacheLife('days');
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: params.siteId,
-        })
-    );
+    return trace('getPublishedContentSite.uncached', () => {
+        cacheLife('days');
+        cacheTag(
+            getCacheTag({
+                tag: 'site',
+                site: params.siteId,
+            })
+        );
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.orgs.getPublishedContentSite(params.organizationId, params.siteId, {
-            shareKey: params.siteShareKey,
+        return trace('getPublishedContentSite', () => {
+            return wrapDataFetcherError(async () => {
+                const api = await apiClient(input);
+                const res = await api.orgs.getPublishedContentSite(
+                    params.organizationId,
+                    params.siteId,
+                    {
+                        shareKey: params.siteShareKey,
+                    }
+                );
+                return res.data;
+            });
         });
-        return res.data;
     });
 }
 
@@ -470,22 +507,28 @@ async function getSiteRedirectBySource(
 ) {
     'use cache';
 
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: params.siteId,
-        })
-    );
-    cacheLife('days');
+    return trace('getSiteRedirectBySource.uncached', () => {
+        cacheTag(
+            getCacheTag({
+                tag: 'site',
+                site: params.siteId,
+            })
+        );
+        cacheLife('days');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.orgs.getSiteRedirectBySource(params.organizationId, params.siteId, {
-            shareKey: params.siteShareKey,
-            source: params.source,
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.orgs.getSiteRedirectBySource(
+                params.organizationId,
+                params.siteId,
+                {
+                    shareKey: params.siteShareKey,
+                    source: params.source,
+                }
+            );
+
+            return res.data;
         });
-
-        return res.data;
     });
 }
 
@@ -498,12 +541,14 @@ async function getEmbedByUrl(
 ) {
     'use cache';
 
-    cacheLife('weeks');
+    return trace('getEmbedByUrl.uncached', () => {
+        cacheLife('weeks');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
+            return res.data;
+        });
     });
 }
 
@@ -513,17 +558,19 @@ async function searchSiteContent(
 ) {
     'use cache';
 
-    const { organizationId, siteId, query, scope } = params;
+    return trace('searchSiteContent.uncached', () => {
+        const { organizationId, siteId, query, scope } = params;
 
-    cacheLife('days');
+        cacheLife('days');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.orgs.searchSiteContent(organizationId, siteId, {
-            query,
-            ...scope,
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.orgs.searchSiteContent(organizationId, siteId, {
+                query,
+                ...scope,
+            });
+            return res.data.items;
         });
-        return res.data.items;
     });
 }
 
@@ -536,16 +583,18 @@ async function renderIntegrationUi(
 ) {
     'use cache';
 
-    cacheTag(getCacheTag({ tag: 'integration', integration: params.integrationName }));
-    cacheLife('days');
+    return trace('renderIntegrationUi.uncached', () => {
+        cacheTag(getCacheTag({ tag: 'integration', integration: params.integrationName }));
+        cacheLife('days');
 
-    return wrapDataFetcherError(async () => {
-        const api = await apiClient(input);
-        const res = await api.integrations.renderIntegrationUiWithPost(
-            params.integrationName,
-            params.request
-        );
-        return res.data;
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.integrations.renderIntegrationUiWithPost(
+                params.integrationName,
+                params.request
+            );
+            return res.data;
+        });
     });
 }
 
