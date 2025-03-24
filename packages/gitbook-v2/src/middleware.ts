@@ -24,7 +24,6 @@ import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 
 export const config = {
-    runtime: 'nodejs',
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
     ],

@@ -3,7 +3,7 @@
     "version": "0.2.2",
     "private": true,
     "dependencies": {
-        "next": "canary",
+        "next": "^15.2.3",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "@gitbook/api": "*",
