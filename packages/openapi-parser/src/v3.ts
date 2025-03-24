@@ -12,12 +12,16 @@ import type { Filesystem, OpenAPIV3xDocument } from './types';
 export async function parseOpenAPIV3(
     input: ParseOpenAPIInput
 ): Promise<Filesystem<OpenAPIV3xDocument>> {
-    const { value, rootURL, trust } = input;
+    const { value, rootURL, trust, options = {} } = input;
     const specification = trust
         ? await trustedValidate({ value, rootURL })
         : await untrustedValidate({ value, rootURL });
 
-    const filesystem = await createFileSystem({ value: specification, rootURL });
+    const filesystem = await createFileSystem({
+        value: specification,
+        rootURL,
+        options,
+    });
 
     return filesystem;
 }
