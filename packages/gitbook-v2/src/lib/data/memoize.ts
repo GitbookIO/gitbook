@@ -1,8 +1,8 @@
-import memoizee from 'memoizee';
+import pMemoize from 'p-memoize';
 
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
-    return memoizee(f, {
-        normalizer: (args) => {
+    return pMemoize(f, {
+        cacheKey: (args) => {
             return JSON.stringify(deepSortValue(args));
         },
     });

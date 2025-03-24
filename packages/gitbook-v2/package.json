@@ -13,7 +13,7 @@
         "warn-once": "^0.1.1",
         "rison": "^0.1.1",
         "jwt-decode": "^4.0.0",
-        "memoizee": "^0.4.17"
+        "p-memoize": "^7.1.1"
     },
     "devDependencies": {
         "gitbook": "*",
