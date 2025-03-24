@@ -48,22 +48,6 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    customization.announcement = {
-        enabled: true,
-        message:
-            'v2023-09-01 is in the deprecation process and all prior versions have been deprecated. We advise everyone to upgrade before 2024-03-01.',
-        link: {
-            to: { kind: 'url', url: 'https://gitbook.com' },
-            title: 'Review our version upgrade guide.',
-        },
-        // Pick a random style every time for now
-        style: ['info', 'warning', 'danger', 'success'][Math.floor(Math.random() * 4)] as
-            | 'info'
-            | 'warning'
-            | 'danger'
-            | 'success',
-    };
-
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <InsightsProvider
