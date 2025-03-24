@@ -9,6 +9,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { wrapDataFetcherError } from './errors';
+import { memoize } from './memoize';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -175,7 +176,10 @@ export function createDataFetcher(
     };
 }
 
-async function getUserById(input: DataFetcherInput, params: { userId: string }) {
+const getUserById = memoize(async function getUserById(
+    input: DataFetcherInput,
+    params: { userId: string }
+) {
     'use cache';
 
     return trace('getUserById.uncached', () => {
@@ -187,9 +191,9 @@ async function getUserById(input: DataFetcherInput, params: { userId: string }) 
             return res.data;
         });
     });
-}
+});
 
-async function getSpace(
+const getSpace = memoize(async function getSpace(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -215,9 +219,9 @@ async function getSpace(
             return res.data;
         });
     });
-}
+});
 
-async function getChangeRequest(
+const getChangeRequest = memoize(async function getChangeRequest(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -245,9 +249,9 @@ async function getChangeRequest(
             return res.data;
         });
     });
-}
+});
 
-async function getRevision(
+const getRevision = memoize(async function getRevision(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -268,9 +272,9 @@ async function getRevision(
             return res.data;
         });
     });
-}
+});
 
-async function getRevisionPages(
+const getRevisionPages = memoize(async function getRevisionPages(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -295,9 +299,9 @@ async function getRevisionPages(
             return res.data.pages;
         });
     });
-}
+});
 
-async function getRevisionFile(
+const getRevisionFile = memoize(async function getRevisionFile(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -321,9 +325,9 @@ async function getRevisionFile(
             return res.data;
         });
     });
-}
+});
 
-async function getRevisionPageByPath(
+const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -349,9 +353,9 @@ async function getRevisionPageByPath(
             return res.data;
         });
     });
-}
+});
 
-async function getDocument(
+const getDocument = memoize(async function getDocument(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -369,9 +373,9 @@ async function getDocument(
             return res.data;
         });
     });
-}
+});
 
-async function getComputedDocument(
+const getComputedDocument = memoize(async function getComputedDocument(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -404,9 +408,9 @@ async function getComputedDocument(
             return res.data;
         });
     });
-}
+});
 
-async function getReusableContent(
+const getReusableContent = memoize(async function getReusableContent(
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -429,39 +433,41 @@ async function getReusableContent(
             return res.data;
         });
     });
-}
+});
 
-async function getLatestOpenAPISpecVersionContent(
-    input: DataFetcherInput,
-    params: {
-        organizationId: string;
-        slug: string;
-    }
-) {
-    'use cache';
+const getLatestOpenAPISpecVersionContent = memoize(
+    async function getLatestOpenAPISpecVersionContent(
+        input: DataFetcherInput,
+        params: {
+            organizationId: string;
+            slug: string;
+        }
+    ) {
+        'use cache';
 
-    return trace('getLatestOpenAPISpecVersionContent.uncached', () => {
-        cacheTag(
-            getCacheTag({
-                tag: 'openapi',
-                organization: params.organizationId,
-                openAPISpec: params.slug,
-            })
-        );
-        cacheLife('days');
-
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.orgs.getLatestOpenApiSpecVersionContent(
-                params.organizationId,
-                params.slug
+        return trace('getLatestOpenAPISpecVersionContent.uncached', () => {
+            cacheTag(
+                getCacheTag({
+                    tag: 'openapi',
+                    organization: params.organizationId,
+                    openAPISpec: params.slug,
+                })
             );
-            return res.data;
-        });
-    });
-}
+            cacheLife('days');
 
-async function getPublishedContentSite(
+            return wrapDataFetcherError(async () => {
+                const api = await apiClient(input);
+                const res = await api.orgs.getLatestOpenApiSpecVersionContent(
+                    params.organizationId,
+                    params.slug
+                );
+                return res.data;
+            });
+        });
+    }
+);
+
+const getPublishedContentSite = memoize(async function getPublishedContentSite(
     input: DataFetcherInput,
     params: {
         organizationId: string;
@@ -494,9 +500,9 @@ async function getPublishedContentSite(
             });
         });
     });
-}
+});
 
-async function getSiteRedirectBySource(
+const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
     input: DataFetcherInput,
     params: {
         organizationId: string;
@@ -530,9 +536,9 @@ async function getSiteRedirectBySource(
             return res.data;
         });
     });
-}
+});
 
-async function getEmbedByUrl(
+const getEmbedByUrl = memoize(async function getEmbedByUrl(
     input: DataFetcherInput,
     params: {
         url: string;
@@ -550,9 +556,9 @@ async function getEmbedByUrl(
             return res.data;
         });
     });
-}
+});
 
-async function searchSiteContent(
+const searchSiteContent = memoize(async function searchSiteContent(
     input: DataFetcherInput,
     params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
 ) {
@@ -572,9 +578,9 @@ async function searchSiteContent(
             return res.data.items;
         });
     });
-}
+});
 
-async function renderIntegrationUi(
+const renderIntegrationUi = memoize(async function renderIntegrationUi(
     input: DataFetcherInput,
     params: {
         integrationName: string;
@@ -596,7 +602,7 @@ async function renderIntegrationUi(
             return res.data;
         });
     });
-}
+});
 
 let loggedServiceBinding = false;
 
