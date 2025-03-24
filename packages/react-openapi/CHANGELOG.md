@@ -1,5 +1,20 @@
 # @gitbook/react-openapi
 
+## 1.1.6
+
+### Patch Changes
+
+- 6eae764: Support body examples
+- 7212973: Update scalar
+- d2facb2: Mark properties as optional if not required
+- 73e2b47: Fix write only properties in request example
+- 70be2c6: Stringify default value
+- fc00b51: Remove default value in generateSchemaExample
+- a84b06b: Update resolveDescription and add minItems/maxItems
+- Updated dependencies [48c18c0]
+- Updated dependencies [7212973]
+  - @gitbook/openapi-parser@2.1.1
+
 ## 1.1.5
 
 ### Patch Changes

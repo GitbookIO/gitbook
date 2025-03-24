@@ -1,5 +1,12 @@
 # gitbook-v2
 
+## 0.2.2
+
+### Patch Changes
+
+- 54ee014: Add initial support for loading custom fonts
+- bba2e52: Fix site redirects when it includes a section/variant path
+
 ## 0.2.1
 
 ### Patch Changes

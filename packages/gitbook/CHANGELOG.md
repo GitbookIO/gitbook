@@ -1,5 +1,29 @@
 # gitbook
 
+## 0.8.2
+
+### Patch Changes
+
+- ed07206: Fix OpenAPI path overflow on mobile
+- 4dab1c5: Fix alignment of `prominent` search bar on full-width pages
+- 6eae764: Support body examples
+- 54ee014: Add initial support for loading custom fonts
+- d2facb2: Mark properties as optional if not required
+- bba2e52: Fix site redirects when it includes a section/variant path
+- 4723f03: Restyle section group dropdown
+- 24b7808: Fix `prominent` search bar width on `md` screens
+- 1fe3286: Fix OpenAPI block overflow issue
+- Updated dependencies [48c18c0]
+- Updated dependencies [6eae764]
+- Updated dependencies [7212973]
+- Updated dependencies [d2facb2]
+- Updated dependencies [73e2b47]
+- Updated dependencies [70be2c6]
+- Updated dependencies [fc00b51]
+- Updated dependencies [a84b06b]
+  - @gitbook/openapi-parser@2.1.1
+  - @gitbook/react-openapi@1.1.6
+
 ## 0.8.1
 
 ### Patch Changes
