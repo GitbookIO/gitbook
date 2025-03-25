@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { CONTAINER_STYLE } from '../layout';
 import { linkStyles } from '../primitives';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
-import './style.css';
 
 export function AnnouncementBanner(props: {
     announcement: CustomizationAnnouncement;
@@ -22,10 +21,6 @@ export function AnnouncementBanner(props: {
 
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
-
-    if (!announcement.enabled || !announcement.message) {
-        return null;
-    }
 
     return (
         <div className="announcement-banner scroll-nojump theme-bold:bg-header-background pt-4 pb-2">

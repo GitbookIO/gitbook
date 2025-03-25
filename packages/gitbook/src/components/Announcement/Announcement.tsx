@@ -1,7 +1,6 @@
 import { resolveContentRef } from '@/lib/references';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { AnnouncementBanner } from './AnnouncementBanner';
-import './style.css';
 
 export async function Announcement(props: {
     context: GitBookSiteContext;
@@ -9,7 +8,11 @@ export async function Announcement(props: {
     const { context } = props;
     const { customization } = context;
 
-    if (!customization.announcement) {
+    if (
+        !customization.announcement ||
+        !customization.announcement.enabled ||
+        !customization.announcement.message
+    ) {
         return null;
     }
 
