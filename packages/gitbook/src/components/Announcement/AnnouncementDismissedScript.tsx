@@ -10,11 +10,15 @@ import {
  * Inject a script to read the local storage state for the announcement banner and apply the appropriate CSS class to the <html> element as early as possible.
  * Bypasses react state to prevent flickering.
  */
-export function AnnouncementScript() {
+export function AnnouncementDismissedScript() {
     /**
      * Read the local storage state for the announcement banner and apply the appropriate CSS class to the <html> element.
      */
-    function readLocalStorageScript(storageKey: string, daysTillReset: number, cssClass: string) {
+    function checkStorageForDismissedScript(
+        storageKey: string,
+        daysTillReset: number,
+        cssClass: string
+    ) {
         let showBanner = true;
 
         try {
@@ -52,7 +56,7 @@ export function AnnouncementScript() {
         <script
             suppressHydrationWarning
             dangerouslySetInnerHTML={{
-                __html: `(${readLocalStorageScript.toString()})(${scriptArgs})`,
+                __html: `(${checkStorageForDismissedScript.toString()})(${scriptArgs})`,
             }}
         />
     );
