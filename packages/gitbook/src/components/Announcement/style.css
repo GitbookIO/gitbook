@@ -1,7 +1,0 @@
-.announcement-hidden .accouncement-banner {
-    @apply hidden;
-}
-
-.announcement-hidden .accouncement-banner {
-    display: none !important;
-}

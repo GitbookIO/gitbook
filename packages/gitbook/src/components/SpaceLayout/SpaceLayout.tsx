@@ -63,7 +63,7 @@ export function SpaceLayout(props: {
                 spaceId={context.space.id}
                 visitorAuthClaims={visitorAuthClaims}
             >
-                {customization.announcement?.enabled ? <Announcement context={context} /> : null}
+                <Announcement context={context} />
                 <Header withTopHeader={withTopHeader} context={context} />
                 <div className="scroll-nojump">
                     <div

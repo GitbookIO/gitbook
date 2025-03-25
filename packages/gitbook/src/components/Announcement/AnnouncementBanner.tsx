@@ -23,7 +23,7 @@ export function AnnouncementBanner(props: {
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
-    if (!announcement.message) {
+    if (!announcement.enabled || !announcement.message) {
         return null;
     }
 
