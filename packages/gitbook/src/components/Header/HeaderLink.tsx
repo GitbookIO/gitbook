@@ -142,10 +142,9 @@ function HeaderItemButton(
                     position: SiteInsightsLinkPosition.Header,
                 },
             }}
+            label={title}
             {...rest}
-        >
-            {title}
-        </Button>
+        />
     );
 }
 

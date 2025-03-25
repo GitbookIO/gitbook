@@ -510,6 +510,11 @@ const config: Config = {
             addVariant('page-default-width', 'body:has(.page-default-width) &');
 
             /**
+             * Variant when the adaptive pane is open.
+             */
+            addVariant('adaptive-pane', 'body.adaptive-pane &');
+
+            /**
              * Variant when the page is configured to hide the table of content.
              * `page.layout.tableOfContents` is set to false.
              */
