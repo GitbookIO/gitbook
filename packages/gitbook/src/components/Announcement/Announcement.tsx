@@ -2,6 +2,9 @@ import { resolveContentRef } from '@/lib/references';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { AnnouncementBanner } from './AnnouncementBanner';
 
+/**
+ * Server-side component to resolve content refs and pass down to client-side component
+ */
 export async function Announcement(props: {
     context: GitBookSiteContext;
 }) {

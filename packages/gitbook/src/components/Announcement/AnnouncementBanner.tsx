@@ -10,6 +10,9 @@ import { CONTAINER_STYLE } from '../layout';
 import { linkStyles } from '../primitives';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 
+/**
+ * Client-side component to enable closing the banner
+ */
 export function AnnouncementBanner(props: {
     announcement: CustomizationAnnouncement;
     contentRef: ResolvedContentRef | null;
