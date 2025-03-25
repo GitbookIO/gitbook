@@ -32,8 +32,6 @@ export function InteractiveSection(props: {
     defaultTab?: string;
     /** Content of the header */
     header?: React.ReactNode;
-    /** Body of the section */
-    children?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
 }) {
@@ -45,7 +43,6 @@ export function InteractiveSection(props: {
         tabs = [],
         defaultTab = tabs[0]?.key,
         header,
-        children,
         overlay,
         toggleIcon = '▶',
     } = props;
@@ -83,7 +80,7 @@ export function InteractiveSection(props: {
                     className={className}
                 >
                     <SectionHeaderContent className={className}>
-                        {(children || selectedTab?.body) && toggeable ? (
+                        {selectedTab?.body && toggeable ? (
                             <button
                                 {...mergeProps(buttonProps, focusProps)}
                                 ref={triggerRef}
@@ -131,9 +128,8 @@ export function InteractiveSection(props: {
                     </div>
                 </SectionHeader>
             ) : null}
-            {(!toggeable || state.isExpanded) && (children || selectedTab?.body) ? (
+            {(!toggeable || state.isExpanded) && selectedTab?.body ? (
                 <SectionBody ref={panelRef} {...panelProps} className={className}>
-                    {children}
                     {selectedTab?.body}
                 </SectionBody>
             ) : null}

@@ -189,9 +189,9 @@ function OpenAPICodeSampleFooter(props: {
     const { method, path } = data;
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
-    const hasMediaTypes = renderers.length > 0;
+    const hasMultipleMediaTypes = renderers.length > 1;
 
-    if (hideTryItPanel && !hasMediaTypes) {
+    if (hideTryItPanel && !hasMultipleMediaTypes) {
         return null;
     }
 
@@ -201,7 +201,7 @@ function OpenAPICodeSampleFooter(props: {
 
     return (
         <div className="openapi-codesample-footer">
-            {hasMediaTypes ? (
+            {hasMultipleMediaTypes ? (
                 <OpenAPIMediaTypeExamplesSelector data={data} renderers={renderers} />
             ) : (
                 <span />

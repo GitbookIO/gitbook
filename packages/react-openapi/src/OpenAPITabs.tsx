@@ -137,21 +137,11 @@ export function OpenAPITabsPanels() {
     const key = selectedTab.key.toString();
 
     return (
-        <TabPanel key={key} id={key} className="openapi-tabs-panel">
-            {selectedTab.body}
+        <TabPanel id={key} className="openapi-tabs-panel">
+            <div className="openapi-tabs-body">{selectedTab.body}</div>
             {selectedTab.footer ? (
-                <OpenAPITabsPanelFooter>{selectedTab.footer}</OpenAPITabsPanelFooter>
+                <div className="openapi-tabs-footer">{selectedTab.footer}</div>
             ) : null}
         </TabPanel>
     );
-}
-
-/**
- * The OpenAPI Tabs panel footer component.
- * This component should be used as a child of the OpenAPITabs component.
- */
-function OpenAPITabsPanelFooter(props: { children: React.ReactNode }) {
-    const { children } = props;
-
-    return <div className="openapi-tabs-footer">{children}</div>;
 }

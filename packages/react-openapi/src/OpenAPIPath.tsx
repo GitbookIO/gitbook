@@ -47,7 +47,7 @@ function formatPath(path: string) {
             parts.push(path.slice(lastIndex, offset));
         }
         parts.push(
-            <span key={offset} className="openapi-path-variable">
+            <span key={`offset-${offset}`} className="openapi-path-variable">
                 {match}
             </span>
         );
@@ -61,7 +61,7 @@ function formatPath(path: string) {
 
     const formattedPath = parts.map((part, index) => {
         if (typeof part === 'string') {
-            return <span key={index}>{part}</span>;
+            return <span key={`part-${index}`}>{part}</span>;
         }
         return part;
     });
