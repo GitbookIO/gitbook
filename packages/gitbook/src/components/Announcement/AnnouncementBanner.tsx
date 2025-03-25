@@ -1,6 +1,5 @@
 'use client';
 
-import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 import * as storage from '@/lib/local-storage';
 import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -9,6 +8,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 import Link from 'next/link';
 import { CONTAINER_STYLE } from '../layout';
 import { linkStyles } from '../primitives';
+import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 import './style.css';
 
 export function AnnouncementBanner(props: {
