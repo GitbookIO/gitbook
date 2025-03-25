@@ -56,4 +56,7 @@ export const en = {
     pdf_limit_reached: "Couldn't generate the PDF for ${1} pages, generation stopped at ${2}.",
     pdf_limit_reached_continue: 'Extend with ${1} more pages.',
     more: 'More',
+    adaptive_pane_open: 'Open panel',
+    adaptive_pane_close: 'Close panel',
+    adaptive_pane_title: 'For you',
 };
