@@ -110,6 +110,23 @@ describe('curL code sample generator', () => {
         );
     });
 
+    it('should convert json to xml body properly', () => {
+        const input: CodeSampleInput = {
+            method: 'GET',
+            url: 'https://example.com/path',
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+            body: '{ "key": "value" }',
+        };
+
+        const output = generator?.generate(input);
+
+        expect(output).toBe(
+            "curl -L \\\n  --url 'https://example.com/path' \\\n  --header 'Content-Type: application/xml' \\\n  --data-binary $'<?xml version=1.0?>\n  <key>value</key>\n  '"
+        );
+    });
+
     it('should format application/graphql body properly', () => {
         const input: CodeSampleInput = {
             method: 'GET',
@@ -255,6 +272,23 @@ describe('javascript code sample generator', () => {
 
         expect(output).toBe(
             'const xml = `\n    <key>value</key>`;\n\nconst response = await fetch(\'https://example.com/path\', {\n    method: \'GET\',\n    headers: {\n      "Content-Type": "application/xml"\n    },\n    body: xml\n});\n\nconst data = await response.json();'
+        );
+    });
+
+    it('should convert json to xml body properly', () => {
+        const input: CodeSampleInput = {
+            method: 'GET',
+            url: 'https://example.com/path',
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+            body: '{ "key": "value" }',
+        };
+
+        const output = generator?.generate(input);
+
+        expect(output).toBe(
+            'const xml = `\n    <?xml version=1.0?>\n    <key>value</key>\n`;\n\nconst response = await fetch(\'https://example.com/path\', {\n    method: \'GET\',\n    headers: {\n      "Content-Type": "application/xml"\n    },\n    body: xml\n});\n\nconst data = await response.json();'
         );
     });
 
@@ -406,6 +440,23 @@ describe('python code sample generator', () => {
         );
     });
 
+    it('should convert json to xml body properly', () => {
+        const input: CodeSampleInput = {
+            method: 'GET',
+            url: 'https://example.com/path',
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+            body: '{ "key": "value" }',
+        };
+
+        const output = generator?.generate(input);
+
+        expect(output).toBe(
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/xml"},\n    data="<?xml version=1.0?>\\n<key>value</key>\\n"\n)\n\ndata = response.json()'
+        );
+    });
+
     it('should format application/graphql body properly', () => {
         const input: CodeSampleInput = {
             method: 'GET',
@@ -514,7 +565,7 @@ describe('http code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'GET /path HTTP/1.1\nHost: example.com\nContent-Type: application/x-www-form-urlencoded\nContent-Length: 15\nAccept: */*\n\n"key=value"'
+            'GET /path HTTP/1.1\nHost: example.com\nContent-Type: application/x-www-form-urlencoded\nContent-Length: 15\nAccept: */*\n\n"key=\'value\'"'
         );
     });
 
@@ -551,6 +602,23 @@ describe('http code sample generator', () => {
 
         expect(output).toBe(
             'GET /path HTTP/1.1\nHost: example.com\nContent-Type: application/xml\nContent-Length: 18\nAccept: */*\n\n"<key>value</key>"'
+        );
+    });
+
+    it('should convert json to xml body properly', () => {
+        const input: CodeSampleInput = {
+            method: 'GET',
+            url: 'https://example.com/path',
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+            body: '{ "key": "value" }',
+        };
+
+        const output = generator?.generate(input);
+
+        expect(output).toBe(
+            'GET /path HTTP/1.1\nHost: example.com\nContent-Type: application/xml\nContent-Length: 24\nAccept: */*\n\n"<?xml version=1.0?>\n<key>value</key>\n"'
         );
     });
 
