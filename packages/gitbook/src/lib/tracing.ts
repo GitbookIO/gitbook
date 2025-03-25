@@ -28,16 +28,21 @@ export async function trace<T>(
     };
 
     const start = now();
+    let failed = false;
     try {
         return await fn(span);
     } catch (error) {
         span.setAttribute('error', true);
+        failed = true;
         throw error;
     } finally {
-        if (process.env.SILENT !== 'true') {
+        if (process.env.SILENT !== 'true' && process.env.NODE_ENV !== 'development') {
             const end = now();
             // biome-ignore lint/suspicious/noConsole: we want to log performance data
-            console.log(`trace ${completeName} ${end - start}ms`, attributes);
+            console.log(
+                `trace ${completeName} ${failed ? 'failed' : 'succeeded'} in ${end - start}ms`,
+                attributes
+            );
         }
     }
 }
