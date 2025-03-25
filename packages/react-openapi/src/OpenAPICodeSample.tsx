@@ -195,7 +195,8 @@ function OpenAPICodeSampleFooter(props: {
     const { method, path } = data;
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
-    const hasMultipleMediaTypes = renderers.length > 1;
+    const hasMultipleMediaTypes =
+        renderers.length > 1 || renderers.some((renderer) => renderer.examples.length > 0);
 
     if (hideTryItPanel && !hasMultipleMediaTypes) {
         return null;

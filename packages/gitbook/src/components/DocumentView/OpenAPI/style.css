@@ -467,13 +467,9 @@
 
 /* Common Elements */
 .openapi-select {
-    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint-subtle bg-tint;
+    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 truncate border border-tint-subtle bg-tint;
 }
 
-.openapi-select {
-    min-width: fit-content;
-    max-width: fit-content;
-}
 .openapi-select:focus {
     width: auto;
 }
