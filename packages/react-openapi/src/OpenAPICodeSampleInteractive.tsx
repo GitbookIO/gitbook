@@ -5,7 +5,15 @@ import { useStore } from 'zustand';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
 import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
 
-function useMediaTypeState(data: { method: string; path: string }, defaultKey: string) {
+type MediaTypeState = {
+    mediaType: string;
+    setMediaType: (mediaType: string) => void;
+};
+
+function useMediaTypeState(
+    data: { method: string; path: string },
+    defaultKey: string
+): MediaTypeState {
     const { method, path } = data;
     const store = useStore(getOrCreateTabStoreByKey(`media-type-${method}-${path}`, defaultKey));
     if (typeof store.tabKey !== 'string') {
@@ -45,19 +53,34 @@ export function OpenAPIMediaTypeExamplesSelector(props: {
 
     return (
         <div className="openapi-codesample-selectors">
-            <select
-                className={clsx('openapi-select')}
-                value={state.mediaType}
-                onChange={(e) => state.setMediaType(e.target.value)}
-            >
-                {renderers.map((renderer) => (
-                    <option key={renderer.mediaType} value={renderer.mediaType}>
-                        {renderer.mediaType}
-                    </option>
-                ))}
-            </select>
+            <MediaTypeSelector state={state} renderers={renderers} />
             <ExamplesSelector method={method} path={path} renderer={selected} />
         </div>
+    );
+}
+
+function MediaTypeSelector(props: {
+    state: MediaTypeState;
+    renderers: MediaTypeRenderer[];
+}) {
+    const { renderers, state } = props;
+
+    if (renderers.length < 2) {
+        return null;
+    }
+
+    return (
+        <select
+            className={clsx('openapi-select')}
+            value={state.mediaType}
+            onChange={(e) => state.setMediaType(e.target.value)}
+        >
+            {renderers.map((renderer) => (
+                <option key={renderer.mediaType} value={renderer.mediaType}>
+                    {renderer.mediaType}
+                </option>
+            ))}
+        </select>
     );
 }
 
