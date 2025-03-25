@@ -148,7 +148,13 @@ function generateCodeSamples(props: {
             return {
                 key: `default-${generator.id}`,
                 label: generator.label,
-                body: <OpenAPIMediaTypeExamplesBody data={data} renderers={renderers} />,
+                body: (
+                    <OpenAPIMediaTypeExamplesBody
+                        method={data.method}
+                        path={data.path}
+                        renderers={renderers}
+                    />
+                ),
                 footer: (
                     <OpenAPICodeSampleFooter renderers={renderers} data={data} context={context} />
                 ),
@@ -202,7 +208,11 @@ function OpenAPICodeSampleFooter(props: {
     return (
         <div className="openapi-codesample-footer">
             {hasMultipleMediaTypes ? (
-                <OpenAPIMediaTypeExamplesSelector data={data} renderers={renderers} />
+                <OpenAPIMediaTypeExamplesSelector
+                    method={data.method}
+                    path={data.path}
+                    renderers={renderers}
+                />
             ) : (
                 <span />
             )}
