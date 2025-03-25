@@ -8,6 +8,7 @@ import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
+import { AIPageRecommendedQuestions } from '../Adaptive';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -26,7 +27,7 @@ export function PageBody(props: {
     withPageFeedback: boolean;
 }) {
     const { page, context, ancestors, document, withPageFeedback } = props;
-    const { customization } = context;
+    const { site, customization } = context;
 
     const asFullWidth = document ? hasFullWidthBlock(document) : false;
     const language = getSpaceLanguage(customization);
@@ -80,6 +81,14 @@ export function PageBody(props: {
 
                 {page.layout.pagination && customization.pagination.enabled ? (
                     <PageFooterNavigation context={context} page={page} />
+                ) : null}
+
+                {site.adaptiveContent ? (
+                    <AIPageRecommendedQuestions
+                        spaceId={context.space.id}
+                        revisionId={context.revisionId}
+                        pageId={page.id}
+                    />
                 ) : null}
 
                 <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
