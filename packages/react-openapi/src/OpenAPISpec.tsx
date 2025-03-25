@@ -2,7 +2,7 @@ import type { OpenAPI } from '@gitbook/openapi-parser';
 
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
-import { OpenAPISchemaProperties } from './OpenAPISchema';
+import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext, OpenAPIOperationData } from './types';

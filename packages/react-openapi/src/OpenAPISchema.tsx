@@ -6,6 +6,7 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { useId } from 'react';
 
 import clsx from 'clsx';
+import { retrocycle } from 'json-decycle';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
@@ -14,7 +15,7 @@ import { checkIsReference, resolveDescription, resolveFirstExample } from './uti
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
-interface OpenAPISchemaPropertyEntry {
+export interface OpenAPISchemaPropertyEntry {
     propertyName?: string | undefined;
     required?: boolean | undefined;
     schema: OpenAPIV3.SchemaObject;
@@ -84,7 +85,7 @@ function OpenAPISchemaProperty(props: {
 /**
  * Render a set of properties of an OpenAPI schema.
  */
-export function OpenAPISchemaProperties(props: {
+function OpenAPISchemaProperties(props: {
     id?: string;
     properties: OpenAPISchemaPropertyEntry[];
     circularRefs?: CircularRefsIds;
@@ -113,10 +114,24 @@ export function OpenAPISchemaProperties(props: {
     );
 }
 
+export function OpenAPISchemaPropertiesFromServer(props: {
+    id?: string;
+    properties: string;
+    context: OpenAPIClientContext;
+}) {
+    return (
+        <OpenAPISchemaProperties
+            id={props.id}
+            properties={JSON.parse(props.properties, retrocycle())}
+            context={props.context}
+        />
+    );
+}
+
 /**
  * Render a root schema (such as the request body or response body).
  */
-export function OpenAPIRootSchema(props: {
+function OpenAPIRootSchema(props: {
     schema: OpenAPIV3.SchemaObject;
     context: OpenAPIClientContext;
     circularRefs?: CircularRefsIds;
@@ -149,6 +164,18 @@ export function OpenAPIRootSchema(props: {
             property={{ schema }}
             context={context}
             circularRefs={parentCircularRefs}
+        />
+    );
+}
+
+export function OpenAPIRootSchemaFromServer(props: {
+    schema: string;
+    context: OpenAPIClientContext;
+}) {
+    return (
+        <OpenAPIRootSchema
+            schema={JSON.parse(props.schema, retrocycle())}
+            context={props.context}
         />
     );
 }
