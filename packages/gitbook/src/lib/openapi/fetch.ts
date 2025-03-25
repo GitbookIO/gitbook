@@ -6,6 +6,7 @@ import type {
     OpenAPISchemasBlock,
     ResolveOpenAPIBlockArgs,
 } from '@/lib/openapi/types';
+import { memoize } from '@v2/lib/data/memoize';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
@@ -65,7 +66,7 @@ const fetchFilesystemV1 = cache({
     },
 });
 
-async function fetchFilesystemV2(url: string) {
+const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(url: string) {
     'use cache';
 
     // TODO: add cache lifetime once we can use next.js 15 code here
@@ -73,7 +74,7 @@ async function fetchFilesystemV2(url: string) {
     const response = await fetchFilesystemUncached(url);
 
     return response;
-}
+});
 
 async function fetchFilesystemUncached(
     url: string,

@@ -1,5 +1,11 @@
 import pMemoize from 'p-memoize';
 
+/**
+ * We wrap 'use cache' calls in a p-memoize function to avoid
+ * executing the function multiple times when doing concurrent calls.
+ *
+ * Hopefully one day this can be done directly by 'use cache'.
+ */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
     return pMemoize(f, {
         cacheKey: (args) => {
