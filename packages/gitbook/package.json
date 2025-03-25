@@ -32,7 +32,6 @@
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tailwindcss/typography": "^0.5.16",
-        "@upstash/redis": "^1.27.1",
         "ai": "^4.2.2",
         "assert-never": "^1.2.1",
         "bun-types": "^1.1.20",
@@ -71,7 +70,8 @@
         "zod": "^3.24.2",
         "zod-to-json-schema": "^3.24.5",
         "event-iterator": "^2.0.0",
-        "partial-json": "^0.1.7"
+        "partial-json": "^0.1.7",
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^4.3.0",
