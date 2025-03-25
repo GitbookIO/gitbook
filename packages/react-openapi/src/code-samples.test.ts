@@ -385,7 +385,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data={"key":"value"}\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    json={"key":"value"}\n)\n\ndata = response.json()'
         );
     });
 
@@ -419,7 +419,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/graphql"},\n    data="{ key }"\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    json="{ key }"\n)\n\ndata = response.json()'
         );
     });
 
