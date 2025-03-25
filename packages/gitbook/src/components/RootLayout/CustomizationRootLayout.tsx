@@ -97,7 +97,9 @@ export async function CustomizationRootLayout(props: {
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
 
-                {customization.announcement?.enabled ? <AnnouncementScript /> : null}
+                {'announcement' in customization && customization.announcement?.enabled ? (
+                    <AnnouncementScript />
+                ) : null}
 
                 <style
                     nonce={

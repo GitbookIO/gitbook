@@ -23,6 +23,10 @@ export function AnnouncementBanner(props: {
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
+    if (!announcement.message) {
+        return null;
+    }
+
     return (
         <div className="announcement-banner scroll-nojump theme-bold:bg-header-background pt-4 pb-2">
             <div className={tcls('relative', CONTAINER_STYLE)}>
