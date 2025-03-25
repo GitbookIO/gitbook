@@ -12,11 +12,12 @@ export function useScrollActiveId(
 ) {
     const { rootMargin, threshold = 0.5 } = options;
 
-    const [activeId, setActiveId] = React.useState<string | null>(null);
+    const [activeId, setActiveId] = React.useState<string>(ids[0]);
     const sectionsIntersectingMap = React.useRef<Map<string, boolean>>(new Map());
 
     React.useEffect(() => {
-        setActiveId(null);
+        const defaultActiveId = ids[0];
+        setActiveId((activeId) => (ids.indexOf(activeId) !== -1 ? activeId : defaultActiveId));
 
         if (typeof IntersectionObserver === 'undefined') {
             return;
