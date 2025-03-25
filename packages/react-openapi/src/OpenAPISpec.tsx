@@ -2,18 +2,12 @@ import type { OpenAPI } from '@gitbook/openapi-parser';
 
 import { OpenAPIRequestBody } from './OpenAPIRequestBody';
 import { OpenAPIResponses } from './OpenAPIResponses';
-import { OpenAPISchemaProperties } from './OpenAPISchema';
+import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { parameterToProperty } from './utils';
 
-/**
- * Client component to render the spec for the request and response.
- *
- * We use a client component as rendering recursive JSON schema in the server is expensive
- * (the entire schema is rendered at once, while the client component only renders the visible part)
- */
 export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAPIClientContext }) {
     const { data, context } = props;
 
@@ -25,13 +19,13 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
     return (
         <>
             {securities.length > 0 ? (
-                <OpenAPISecurities securities={securities} context={context} />
+                <OpenAPISecurities key="securities" securities={securities} context={context} />
             ) : null}
 
             {parameterGroups.map((group) => {
                 return (
                     <StaticSection
-                        key={group.key}
+                        key={`parameter-${group.key}`}
                         className="openapi-parameters"
                         header={group.label}
                     >
@@ -44,10 +38,18 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
             })}
 
             {operation.requestBody ? (
-                <OpenAPIRequestBody requestBody={operation.requestBody} context={context} />
+                <OpenAPIRequestBody
+                    key="body"
+                    requestBody={operation.requestBody}
+                    context={context}
+                />
             ) : null}
             {operation.responses ? (
-                <OpenAPIResponses responses={operation.responses} context={context} />
+                <OpenAPIResponses
+                    key="responses"
+                    responses={operation.responses}
+                    context={context}
+                />
             ) : null}
         </>
     );

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
-import { OpenAPIRootSchema } from '../OpenAPISchema';
+import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
 import { Section, SectionBody } from '../StaticSection';
 import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPISchemasData } from '../types';
 

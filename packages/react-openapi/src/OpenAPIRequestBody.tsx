@@ -1,6 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { InteractiveSection } from './InteractiveSection';
-import { OpenAPIRootSchema } from './OpenAPISchema';
+import { OpenAPIRootSchema } from './OpenAPISchemaServer';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference } from './utils';
 

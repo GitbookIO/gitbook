@@ -3,10 +3,9 @@ import clsx from 'clsx';
 import { useCallback } from 'react';
 import { useStore } from 'zustand';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
-import type { OpenAPIOperationData } from './types';
 import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
 
-function useMediaTypeState(data: OpenAPIOperationData, defaultKey: string) {
+function useMediaTypeState(data: { method: string; path: string }, defaultKey: string) {
     const { method, path } = data;
     const store = useStore(getOrCreateTabStoreByKey(`media-type-${method}-${path}`, defaultKey));
     if (typeof store.tabKey !== 'string') {
@@ -18,7 +17,7 @@ function useMediaTypeState(data: OpenAPIOperationData, defaultKey: string) {
     };
 }
 
-function useMediaTypeSampleIndexState(data: OpenAPIOperationData, mediaType: string) {
+function useMediaTypeSampleIndexState(data: { method: string; path: string }, mediaType: string) {
     const { method, path } = data;
     const store = useStore(
         getOrCreateTabStoreByKey(`media-type-sample-${mediaType}-${method}-${path}`, 0)
@@ -33,14 +32,15 @@ function useMediaTypeSampleIndexState(data: OpenAPIOperationData, mediaType: str
 }
 
 export function OpenAPIMediaTypeExamplesSelector(props: {
-    data: OpenAPIOperationData;
+    method: string;
+    path: string;
     renderers: MediaTypeRenderer[];
 }) {
-    const { data, renderers } = props;
+    const { method, path, renderers } = props;
     if (!renderers[0]) {
         throw new Error('No renderers provided');
     }
-    const state = useMediaTypeState(data, renderers[0].mediaType);
+    const state = useMediaTypeState({ method, path }, renderers[0].mediaType);
     const selected = renderers.find((r) => r.mediaType === state.mediaType) || renderers[0];
 
     return (
@@ -56,17 +56,18 @@ export function OpenAPIMediaTypeExamplesSelector(props: {
                     </option>
                 ))}
             </select>
-            <ExamplesSelector data={data} renderer={selected} />
+            <ExamplesSelector method={method} path={path} renderer={selected} />
         </div>
     );
 }
 
 function ExamplesSelector(props: {
-    data: OpenAPIOperationData;
+    method: string;
+    path: string;
     renderer: MediaTypeRenderer;
 }) {
-    const { data, renderer } = props;
-    const state = useMediaTypeSampleIndexState(data, renderer.mediaType);
+    const { method, path, renderer } = props;
+    const state = useMediaTypeSampleIndexState({ method, path }, renderer.mediaType);
     if (renderer.examples.length < 2) {
         return null;
     }
@@ -87,25 +88,26 @@ function ExamplesSelector(props: {
 }
 
 export function OpenAPIMediaTypeExamplesBody(props: {
-    data: OpenAPIOperationData;
+    method: string;
+    path: string;
     renderers: MediaTypeRenderer[];
 }) {
-    const { renderers, data } = props;
+    const { renderers, method, path } = props;
     if (!renderers[0]) {
         throw new Error('No renderers provided');
     }
-    const mediaTypeState = useMediaTypeState(data, renderers[0].mediaType);
+    const mediaTypeState = useMediaTypeState({ method, path }, renderers[0].mediaType);
     const selected =
         renderers.find((r) => r.mediaType === mediaTypeState.mediaType) ?? renderers[0];
     if (selected.examples.length === 0) {
         return selected.element;
     }
-    return <ExamplesBody data={data} renderer={selected} />;
+    return <ExamplesBody method={method} path={path} renderer={selected} />;
 }
 
-function ExamplesBody(props: { data: OpenAPIOperationData; renderer: MediaTypeRenderer }) {
-    const { data, renderer } = props;
-    const exampleState = useMediaTypeSampleIndexState(data, renderer.mediaType);
+function ExamplesBody(props: { method: string; path: string; renderer: MediaTypeRenderer }) {
+    const { method, path, renderer } = props;
+    const exampleState = useMediaTypeSampleIndexState({ method, path }, renderer.mediaType);
     const example = renderer.examples[exampleState.index] ?? renderer.examples[0];
     if (!example) {
         throw new Error(`No example found for index ${exampleState.index}`);

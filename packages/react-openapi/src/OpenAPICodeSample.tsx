@@ -148,7 +148,13 @@ function generateCodeSamples(props: {
             return {
                 key: `default-${generator.id}`,
                 label: generator.label,
-                body: <OpenAPIMediaTypeExamplesBody data={data} renderers={renderers} />,
+                body: (
+                    <OpenAPIMediaTypeExamplesBody
+                        method={data.method}
+                        path={data.path}
+                        renderers={renderers}
+                    />
+                ),
                 footer: (
                     <OpenAPICodeSampleFooter renderers={renderers} data={data} context={context} />
                 ),
@@ -189,9 +195,9 @@ function OpenAPICodeSampleFooter(props: {
     const { method, path } = data;
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
-    const hasMediaTypes = renderers.length > 0;
+    const hasMultipleMediaTypes = renderers.length > 1;
 
-    if (hideTryItPanel && !hasMediaTypes) {
+    if (hideTryItPanel && !hasMultipleMediaTypes) {
         return null;
     }
 
@@ -201,8 +207,12 @@ function OpenAPICodeSampleFooter(props: {
 
     return (
         <div className="openapi-codesample-footer">
-            {hasMediaTypes ? (
-                <OpenAPIMediaTypeExamplesSelector data={data} renderers={renderers} />
+            {hasMultipleMediaTypes ? (
+                <OpenAPIMediaTypeExamplesSelector
+                    method={data.method}
+                    path={data.path}
+                    renderers={renderers}
+                />
             ) : (
                 <span />
             )}
