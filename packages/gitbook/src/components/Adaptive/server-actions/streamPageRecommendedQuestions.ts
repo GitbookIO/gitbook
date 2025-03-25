@@ -20,11 +20,11 @@ export async function* streamPageRecommendedQuestions({
     revisionId: string;
     pageId: string;
 }) {
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
     const { stream } = await streamGenerateObject(
-        context,
+        baseContext,
         {
             organizationId: siteURLData.organization,
             siteId: siteURLData.site,
@@ -52,7 +52,7 @@ export async function* streamPageRecommendedQuestions({
                 },
                 {
                     role: AIMessageRole.User,
-                    content: 'Content of the documentation:',
+                    content: 'Content of the current page:',
                     attachments: [
                         {
                             type: 'page',

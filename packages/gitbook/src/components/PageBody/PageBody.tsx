@@ -8,7 +8,7 @@ import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
-import { AIPageRecommendedQuestions } from '../Adaptive';
+import { AIPageNextRecommendedPages, AIPageRecommendedQuestions } from '../Adaptive';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -84,11 +84,18 @@ export function PageBody(props: {
                 ) : null}
 
                 {site.adaptiveContent ? (
-                    <AIPageRecommendedQuestions
-                        spaceId={context.space.id}
-                        revisionId={context.revisionId}
-                        pageId={page.id}
-                    />
+                    <>
+                        <AIPageNextRecommendedPages
+                            spaceId={context.space.id}
+                            revisionId={context.revisionId}
+                            pageId={page.id}
+                        />
+                        <AIPageRecommendedQuestions
+                            spaceId={context.space.id}
+                            revisionId={context.revisionId}
+                            pageId={page.id}
+                        />
+                    </>
                 ) : null}
 
                 <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">

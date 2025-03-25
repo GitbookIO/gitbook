@@ -3,33 +3,39 @@
 import { tcls } from '@/lib/tailwind';
 import { useEffect, useState } from 'react';
 import { Link } from '../primitives';
-import { streamPageRecommendedQuestions } from './server-actions';
+import { streamNextRecommendedPages } from './server-actions';
 
 /**
- * Show a list of recommended questions for a page.
+ * Show a list of recommended pages to read next.
  */
-export function AIPageRecommendedQuestions(props: {
+export function AIPageNextRecommendedPages(props: {
     spaceId: string;
     revisionId: string;
     pageId: string;
 }) {
     const { spaceId, revisionId, pageId } = props;
 
-    const [questions, setQuestions] = useState<string[]>([]);
+    const [pages, setPages] = useState<{ title: string; href: string }[]>([]);
 
     useEffect(() => {
         let canceled = false;
 
-        setQuestions([]);
+        setPages([]);
 
         (async () => {
-            const stream = await streamPageRecommendedQuestions({ spaceId, revisionId, pageId });
-            for await (const question of stream) {
+            const stream = await streamNextRecommendedPages({
+                spaceId,
+                revisionId,
+                pageId,
+                previousPageIds: [],
+            });
+
+            for await (const page of stream) {
                 if (canceled) {
                     return;
                 }
 
-                setQuestions((questions) => [...questions, question]);
+                setPages((pages) => [...pages, page]);
             }
         })();
 
@@ -47,14 +53,10 @@ export function AIPageRecommendedQuestions(props: {
                 'page-api-block:ml-0'
             )}
         >
-            {questions.map((question) => {
-                const urlParams = new URLSearchParams();
-                urlParams.set('q', question);
-                urlParams.set('ask', 'true');
-
+            {pages.map((page) => {
                 return (
-                    <Link key={question} href={`?${urlParams.toString()}`}>
-                        {question}
+                    <Link key={page.href} href={page.href}>
+                        {page.title}
                     </Link>
                 );
             })}

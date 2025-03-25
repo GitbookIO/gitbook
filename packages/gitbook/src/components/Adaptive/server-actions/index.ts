@@ -1,1 +1,2 @@
-export * from './getPageRecommendedQuestions';
+export * from './streamPageRecommendedQuestions';
+export * from './streamNextRecommendedPages';
