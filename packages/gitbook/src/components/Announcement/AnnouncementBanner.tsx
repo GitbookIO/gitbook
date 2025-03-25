@@ -1,5 +1,7 @@
 'use client';
 
+import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
+import * as storage from '@/lib/local-storage';
 import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import type { CustomizationAnnouncement } from '@gitbook/api';
@@ -7,7 +9,6 @@ import { Icon, type IconName } from '@gitbook/icons';
 import Link from 'next/link';
 import { CONTAINER_STYLE } from '../layout';
 import { linkStyles } from '../primitives';
-import { useAnnouncementState } from './useAnnouncementState';
 import './style.css';
 
 export function AnnouncementBanner(props: {
@@ -15,7 +16,6 @@ export function AnnouncementBanner(props: {
     contentRef: ResolvedContentRef | null;
 }) {
     const { announcement, contentRef } = props;
-    const { visible, dismiss } = useAnnouncementState();
 
     const hasLink = announcement.link && contentRef?.href;
     const closeable = announcement.style !== 'danger';
@@ -24,12 +24,7 @@ export function AnnouncementBanner(props: {
     const style = BANNER_STYLES[announcement.style];
 
     return (
-        <div
-            className={tcls(
-                'announcement-banner scroll-nojump theme-bold:bg-header-background pt-4 pb-2',
-                !visible && 'hidden'
-            )}
-        >
+        <div className="announcement-banner scroll-nojump theme-bold:bg-header-background pt-4 pb-2">
             <div className={tcls('relative', CONTAINER_STYLE)}>
                 <Tag
                     href={contentRef?.href ?? ''}
@@ -70,7 +65,7 @@ export function AnnouncementBanner(props: {
                     <button
                         className={`absolute top-0 right-4 mt-2 mr-2 rounded straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
                         type="button"
-                        onClick={dismiss}
+                        onClick={dismissAnnouncement}
                     >
                         <Icon icon="close" className="size-4" />
                     </button>
@@ -78,6 +73,19 @@ export function AnnouncementBanner(props: {
             </div>
         </div>
     );
+}
+
+/**
+ * Dismiss the announcement banner and store the dismissal state in local storage.
+ * @see AnnouncementScript
+ */
+function dismissAnnouncement() {
+    storage.setItem(ANNOUNCEMENT_STORAGE_KEY, {
+        visible: false,
+        at: Date.now(),
+    });
+
+    document.documentElement.classList.add(ANNOUNCEMENT_CSS_CLASS);
 }
 
 const BANNER_STYLES = {
