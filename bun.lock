@@ -74,6 +74,7 @@
         "bun-types": "^1.1.20",
         "classnames": "^2.5.1",
         "framer-motion": "^10.16.14",
+        "holy-loader": "^2.3.13",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
         "jwt-decode": "^4.0.0",
@@ -1956,6 +1957,8 @@
     "highlightjs-curl": ["highlightjs-curl@1.3.0", "", {}, "sha512-50UEfZq1KR0Lfk2Tr6xb/MUIZH3h10oNC0OTy9g7WELcs5Fgy/mKN1vEhuKTkKbdo8vr5F9GXstu2eLhApfQ3A=="],
 
     "highlightjs-vue": ["highlightjs-vue@1.0.0", "", {}, "sha512-PDEfEF102G23vHmPhLyPboFCD+BkMGu+GuJe2d9/eH4FsCwvgBpnc9n0pGE+ffKdph38s6foEZiEjdgHdzp+IA=="],
+
+    "holy-loader": ["holy-loader@2.3.13", "", { "peerDependencies": { "react": ">= 16.0.0" } }, "sha512-SnQ06sfMgbhiRGkHZ0RFMbexSpZN3i6tgItt3q8GWNba3mOdsq1RNJXkoqsWkqPIAmyroj2/xIOHu1hCFnjkBQ=="],
 
     "hookable": ["hookable@5.5.3", "", {}, "sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ=="],
 
