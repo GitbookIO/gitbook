@@ -10,8 +10,6 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const isRoot = checkIsRootSiteContext(context);
     const lines = [
         'User-agent: *',
-        // Disallow image resizing
-        'Disallow: /~gitbook/',
         // Disallow dynamic routes / search queries
         'Disallow: /*?',
         ...((await isSiteIndexable(context))
