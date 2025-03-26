@@ -131,7 +131,7 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb('theme' in customization.styling && customization.styling.theme ? (tintColor?.dark ?? customization.styling.primaryColor.dark) : (customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark))};
-                        --header-link: ${hexToRgb('theme' in customization.styling && customization.styling.theme ? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark) : customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
+                        --header-link: ${hexToRgb('theme' in customization.styling && customization.styling.theme ? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark) : (customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark)))};
 
                         ${generateColorVariable('info', infoColor.dark, { darkMode: true })}
                         ${generateColorVariable('warning', warningColor.dark, { darkMode: true })}
