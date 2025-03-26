@@ -325,7 +325,7 @@ async function serveWithQueryAPIToken(
  */
 function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     console.log('nextRequestUrl', request.nextUrl.toString());
-    request.headers.entries().forEach(([key, value]) => console.log(key, value));
+    Array.from(request.headers.entries()).forEach(([key, value]) => console.log(key, value));
 
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
