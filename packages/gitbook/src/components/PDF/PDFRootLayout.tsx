@@ -1,5 +1,5 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
-import { defaultCustomizationForSpace } from '@/lib/utils';
+import { defaultCustomization } from '@/lib/utils';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
 
 /**
@@ -14,7 +14,7 @@ export async function PDFRootLayout(props: {
     return (
         <CustomizationRootLayout
             customization={
-                'customization' in context ? context.customization : defaultCustomizationForSpace()
+                'customization' in context ? context.customization : defaultCustomization()
             }
         >
             {children}

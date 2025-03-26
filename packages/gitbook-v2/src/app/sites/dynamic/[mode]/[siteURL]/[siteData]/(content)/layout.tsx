@@ -20,7 +20,7 @@ export default async function SiteDynamicLayout({
     const forcedTheme = await getThemeFromMiddleware();
 
     return (
-        <CustomizationRootLayout customization={context.customization}>
+        <CustomizationRootLayout forcedTheme={forcedTheme} customization={context.customization}>
             <SiteLayout
                 context={context}
                 forcedTheme={forcedTheme}

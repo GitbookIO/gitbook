@@ -1,5 +1,4 @@
 import {
-    type CustomizationSettings,
     type Revision,
     type RevisionPageDocument,
     type RevisionPageGroup,
@@ -24,7 +23,7 @@ import { tString } from '@/intl/translate';
 import { getPagePDFContainerId } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { defaultCustomizationForSpace } from '@/lib/utils';
+import { defaultCustomization } from '@/lib/utils';
 import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
 import { PageControlButtons } from './PageControlButtons';
@@ -57,7 +56,7 @@ export async function PDFPage(props: {
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
     const customization =
-        'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
+        'customization' in baseContext ? baseContext.customization : defaultCustomization();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
@@ -180,7 +179,7 @@ export async function PDFPage(props: {
 
 async function PDFSpaceIntro(props: {
     space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    customization: SiteCustomizationSettings;
 }) {
     const { space, customization } = props;
 

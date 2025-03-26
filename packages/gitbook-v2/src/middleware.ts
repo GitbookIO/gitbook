@@ -199,7 +199,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
-            encodeURIComponent(rison.encode(siteURLData)),
+            encodeURIComponent(
+                rison.encode({
+                    ...siteURLData,
+                    // The pathname is passed as the next segment of the route and should not cause this segment to change
+                    // based on the page being visited
+                    pathname: '<DO_NOT_USE>',
+                })
+            ),
             pathname,
         ].join('/');
 
