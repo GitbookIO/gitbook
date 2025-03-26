@@ -13,7 +13,13 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
-import { type GitBookDataFetcher, createDataFetcher, throwIfDataError } from '@v2/lib/data';
+import {
+    type GitBookDataFetcher,
+    createDataFetcher,
+    getDataOrNull,
+    throwIfDataError,
+} from '@v2/lib/data';
+import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
@@ -277,7 +283,7 @@ export async function fetchSpaceContextByIds(
             })
         ),
         ids.changeRequest
-            ? throwIfDataError(
+            ? getDataOrNull(
                   dataFetcher.getChangeRequest({
                       spaceId: ids.space,
                       changeRequestId: ids.changeRequest,
@@ -285,6 +291,12 @@ export async function fetchSpaceContextByIds(
               )
             : null,
     ]);
+
+    if (ids.changeRequest && !changeRequest) {
+        // When trying to render a change request with an invalid / non-existing ID,
+        // we should return a 404.
+        notFound();
+    }
 
     const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
 
