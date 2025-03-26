@@ -6,10 +6,10 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { useId } from 'react';
 
 import clsx from 'clsx';
-import { retrocycle } from 'json-decycle';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { retrocycle } from './decycle';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
 
