@@ -111,12 +111,13 @@ export async function CustomizationRootLayout(props: {
                             /** If the site still has a (deprecated) custom header link or background set, we use that.
                              * These values are no longer supported in the Customiser, and will eventually be unsupported in the front-end. */
                             hexToRgb(
-                                customization.header.backgroundColor?.light ??
-                                    tintColor?.light ??
-                                    customization.styling.primaryColor.light
+                                'theme' in customization.styling && customization.styling.theme
+                                    ? customization.styling.primaryColor.light
+                                    : (customization.header.backgroundColor?.light ??
+                                          customization.styling.primaryColor.light)
                             )
                         };
-                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
+                        --header-link: ${hexToRgb('theme' in customization.styling && customization.styling.theme ? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light) : (customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light)))};
 
                         ${generateColorVariable('info', infoColor.light)}
                         ${generateColorVariable('warning', warningColor.light)}
@@ -129,8 +130,8 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
-                        --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
-                        --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
+                        --header-background: ${hexToRgb('theme' in customization.styling && customization.styling.theme ? (tintColor?.dark ?? customization.styling.primaryColor.dark) : (customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark))};
+                        --header-link: ${hexToRgb('theme' in customization.styling && customization.styling.theme ? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark) : customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
 
                         ${generateColorVariable('info', infoColor.dark, { darkMode: true })}
                         ${generateColorVariable('warning', warningColor.dark, { darkMode: true })}
