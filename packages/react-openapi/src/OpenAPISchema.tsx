@@ -6,10 +6,10 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { useId } from 'react';
 
 import clsx from 'clsx';
-import { retrocycle } from 'json-decycle';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { retrocycle } from './decycle';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
 
@@ -122,7 +122,7 @@ export function OpenAPISchemaPropertiesFromServer(props: {
     return (
         <OpenAPISchemaProperties
             id={props.id}
-            properties={safeJSONParse(props.properties)}
+            properties={JSON.parse(props.properties, retrocycle())}
             context={props.context}
         />
     );
@@ -172,7 +172,12 @@ export function OpenAPIRootSchemaFromServer(props: {
     schema: string;
     context: OpenAPIClientContext;
 }) {
-    return <OpenAPIRootSchema schema={safeJSONParse(props.schema)} context={props.context} />;
+    return (
+        <OpenAPIRootSchema
+            schema={JSON.parse(props.schema, retrocycle())}
+            context={props.context}
+        />
+    );
 }
 
 /**
@@ -459,20 +464,4 @@ function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string {
     }
 
     return schema.title || 'child attributes';
-}
-
-/**
- * Safely parse a JSON string using retrocycle.
- * If parsing fails, it falls back to standard JSON.parse.
- */
-function safeJSONParse(jsonString: string) {
-    try {
-        return JSON.parse(jsonString, retrocycle());
-    } catch {
-        try {
-            return JSON.parse(jsonString);
-        } catch (fallbackError) {
-            throw new Error(`Failed to parse JSON string: ${fallbackError}`);
-        }
-    }
 }

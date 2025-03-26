@@ -1,10 +1,10 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { decycle } from 'json-decycle';
 import {
     OpenAPIRootSchemaFromServer,
     OpenAPISchemaPropertiesFromServer,
     type OpenAPISchemaPropertyEntry,
 } from './OpenAPISchema';
+import { decycle } from './decycle';
 import type { OpenAPIClientContext } from './types';
 
 export function OpenAPISchemaProperties(props: {
