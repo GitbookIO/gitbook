@@ -112,7 +112,7 @@ export async function CustomizationRootLayout(props: {
                              * These values are no longer supported in the Customiser, and will eventually be unsupported in the front-end. */
                             hexToRgb(
                                 'theme' in customization.styling && customization.styling.theme
-                                    ? customization.styling.primaryColor.light
+                                    ? (tintColor?.light ?? customization.styling.primaryColor.light)
                                     : (customization.header.backgroundColor?.light ??
                                           customization.styling.primaryColor.light)
                             )
