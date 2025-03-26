@@ -34,6 +34,7 @@ import { ClientContexts } from './ClientContexts';
 import '@gitbook/icons/style.css';
 import './globals.css';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
+import { AnnouncementDismissedScript } from '../Announcement';
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -101,6 +102,11 @@ export async function CustomizationRootLayout(props: {
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
+
+                {/* Inject a script to detect if the announcmeent banner has been dismissed */}
+                {'announcement' in customization && customization.announcement?.enabled ? (
+                    <AnnouncementDismissedScript />
+                ) : null}
 
                 <style
                     nonce={
