@@ -694,7 +694,11 @@
 }
 
 .openapi-codesample pre,
-.openapi-response-example pre,
-.openapi-response-example-empty pre {
-    @apply !bg-tint-subtle text-[0.8125rem] leading-5 theme-gradient:!bg-transparent;
+.openapi-response-example pre {
+    @apply !bg-tint-subtle theme-gradient:!bg-transparent;
+}
+
+.openapi-codesample pre .highlight-line-content,
+.openapi-response-example pre .highlight-line-content {
+    @apply !text-[0.8125rem] !leading-5;
 }
