@@ -352,6 +352,12 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         return null;
     }
 
+    console.log(
+        'requestHeaders',
+        request.headers.entries().map(([key, value]) => [key, value])
+    );
+    console.log('nextUrl', request.nextUrl.toString());
+
     const xForwardedHost = request.headers.get('x-forwarded-host');
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
