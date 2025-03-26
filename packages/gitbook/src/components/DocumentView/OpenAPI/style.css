@@ -384,7 +384,7 @@
 
 /* Code Sample */
 .openapi-codesample {
-    @apply border rounded bg-tint-subtle theme-gradient:bg-transparent border-tint-subtle;
+    @apply border rounded bg-tint-subtle theme-gradient:bg-tint-12/1 border-tint-subtle;
 }
 
 .openapi-codesample-header {
@@ -458,11 +458,11 @@
 
 /* Response Example */
 .openapi-response-example {
-    @apply border rounded bg-tint-subtle theme-gradient:bg-transparent border-tint-subtle;
+    @apply border rounded bg-tint-subtle theme-gradient:bg-tint-12/1 border-tint-subtle;
 }
 
 .openapi-response-example-empty {
-    @apply relative text-tint bg-tint-subtle theme-gradient:bg-transparent min-h-20 flex flex-col justify-center items-center;
+    @apply relative text-tint bg-tint-subtle theme-gradient:bg-tint-12/1 min-h-20 flex flex-col justify-center items-center;
 }
 
 /* Common Elements */
@@ -696,5 +696,5 @@
 .openapi-codesample pre,
 .openapi-response-example pre,
 .openapi-response-example-empty pre {
-    @apply !bg-tint-subtle text-[0.8125rem] leading-5;
+    @apply !bg-tint-subtle text-[0.8125rem] leading-5 theme-gradient:!bg-transparent;
 }
