@@ -1,5 +1,4 @@
 import {
-    type CustomizationSettings,
     type Revision,
     type RevisionPageDocument,
     type RevisionPageGroup,
@@ -180,7 +179,7 @@ export async function PDFPage(props: {
 
 async function PDFSpaceIntro(props: {
     space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    customization: SiteCustomizationSettings;
 }) {
     const { space, customization } = props;
 
