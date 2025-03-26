@@ -33,7 +33,7 @@ export interface Test {
     /**
      * Test to run
      */
-    run?: (page: Page, response: Response) => Promise<unknown>;
+    run?: (page: Page, response: Response | null) => Promise<unknown>;
     /**
      * Whether the test should be fullscreened during testing.
      */
