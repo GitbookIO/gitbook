@@ -9,6 +9,7 @@ import type { BlockProps } from '../Block';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightToken } from './highlight';
 
+import './theme.css';
 import './CodeBlockRenderer.css';
 
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {

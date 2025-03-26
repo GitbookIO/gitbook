@@ -3,8 +3,6 @@ import type { DocumentBlockCode } from '@gitbook/api';
 import { getNodeFragmentByType } from '@/lib/document';
 import { isV2 } from '@/lib/v2';
 
-import { MiddlewareHeaders } from '@v2/lib/middleware';
-import { headers } from 'next/headers';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { ClientCodeBlock } from './ClientCodeBlock';
@@ -40,14 +38,9 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
 
     if (isV2() && !isEstimatedOffscreen) {
         // In v2, we render the code block server-side
-        const theme = getTheme();
-        const lines = await highlight(block, richInlines, theme);
+        const lines = await highlight(block, richInlines);
         return <CodeBlockRenderer block={block} style={style} lines={lines} />;
     }
 
     return <ClientCodeBlock block={block} style={style} inlines={richInlines} />;
-}
-
-function getTheme() {
-    return headers().get(MiddlewareHeaders.Theme) || 'light';
 }
