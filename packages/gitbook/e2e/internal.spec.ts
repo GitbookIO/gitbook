@@ -28,6 +28,7 @@ import {
     headerLinks,
     runTestCases,
     waitForCookiesDialog,
+    waitForNotFound,
 } from './util';
 
 const testCases: TestsCase[] = [
@@ -307,6 +308,11 @@ const testCases: TestsCase[] = [
                 name: 'Revision',
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
                 run: waitForCookiesDialog,
+            },
+            {
+                name: 'Invalid change request',
+                url: '~/changes/idnotfound/blocks/headings',
+                run: waitForNotFound,
             },
         ],
     },
