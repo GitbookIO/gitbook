@@ -34,7 +34,11 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         dataFetcher.renderIntegrationUi({
             integrationName: block.data.integration,
             request: initialInput,
-        })
+        }),
+
+        // The API can respond with a 400 error if the integration is not installed
+        // and 404 if the integration is not found.
+        [404, 400]
     );
     if (!initialOutput || initialOutput.type === 'complete') {
         return null;
