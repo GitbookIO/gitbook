@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
+import { useTheme } from 'next-themes';
 import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
@@ -26,6 +27,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const [isInViewport, setIsInViewport] = useState(false);
     const plainLines = useMemo(() => plainHighlight(block, []), [block]);
     const [lines, setLines] = useState<null | HighlightLine[]>(null);
+    const { resolvedTheme } = useTheme();
 
     // Preload the highlighter when the block is mounted.
     useEffect(() => {
@@ -78,7 +80,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
             if (typeof window !== 'undefined') {
                 import('./highlight').then(({ highlight }) => {
-                    highlight(block, inlines).then((lines) => {
+                    highlight(block, inlines, resolvedTheme).then((lines) => {
                         if (cancelled) {
                             return;
                         }
@@ -95,7 +97,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
         // Otherwise if the block is not in viewport, we reset to the plain lines
         setLines(null);
-    }, [isInViewport, block, inlines]);
+    }, [isInViewport, block, inlines, resolvedTheme]);
 
     return (
         <CodeBlockRenderer ref={blockRef} block={block} style={style} lines={lines ?? plainLines} />

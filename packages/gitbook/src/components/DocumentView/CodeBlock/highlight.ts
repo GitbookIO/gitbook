@@ -3,15 +3,11 @@ import type {
     DocumentBlockCodeLine,
     DocumentInlineAnnotation,
 } from '@gitbook/api';
-import {
-    type ThemedToken,
-    createCssVariablesTheme,
-    createSingletonShorthands,
-    createdBundledHighlighter,
-} from 'shiki/core';
+import { type ThemedToken, createSingletonShorthands, createdBundledHighlighter } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
-
+import githubDarkDefault from 'shiki/themes/github-dark-default.mjs';
+import minLight from 'shiki/themes/min-light.mjs';
 import { plainHighlight } from './plain-highlight';
 
 export type HighlightLine = {
@@ -33,12 +29,15 @@ export type RenderedInline = {
     body: React.ReactNode;
 };
 
-const theme = createCssVariablesTheme();
+const themes = {
+    light: minLight,
+    dark: githubDarkDefault,
+};
 
 const { getSingletonHighlighter } = createSingletonShorthands(
     createdBundledHighlighter<any, any>({
         langs: bundledLanguages,
-        themes: {},
+        themes: themes,
         engine: () => createJavaScriptRegexEngine({ forgiving: true, target: 'ES2018' }),
     })
 );
@@ -51,7 +50,7 @@ export async function preloadHighlight(block: DocumentBlockCode) {
     if (langName) {
         await getSingletonHighlighter({
             langs: [langName],
-            themes: [theme],
+            themes: Object.values(themes),
         });
     }
 }
@@ -61,9 +60,11 @@ export async function preloadHighlight(block: DocumentBlockCode) {
  */
 export async function highlight(
     block: DocumentBlockCode,
-    inlines: RenderedInline[]
+    inlines: RenderedInline[],
+    theme?: string
 ): Promise<HighlightLine[]> {
     const langName = getBlockLang(block);
+
     if (!langName) {
         // Language not found, fallback to plain highlighting
         return plainHighlight(block, inlines);
@@ -73,12 +74,19 @@ export async function highlight(
 
     const highlighter = await getSingletonHighlighter({
         langs: [langName],
-        themes: [theme],
+        themes: Object.values(themes),
     });
+
+    const selectedTheme = (() => {
+        if (theme === 'dark') {
+            return themes.dark;
+        }
+        return themes.light;
+    })();
 
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
-        theme,
+        theme: selectedTheme,
         tokenizeMaxLineLength: 400,
     });
 
