@@ -310,9 +310,16 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
+                name: 'Invalid revision',
+                url: '~/revisions/idnotfound/blocks/headings',
+                run: waitForNotFound,
+                screenshot: false,
+            },
+            {
                 name: 'Invalid change request',
                 url: '~/changes/idnotfound/blocks/headings',
                 run: waitForNotFound,
+                screenshot: false,
             },
         ],
     },

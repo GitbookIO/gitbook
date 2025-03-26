@@ -298,17 +298,24 @@ export async function fetchSpaceContextByIds(
         notFound();
     }
 
-    const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
+    const revisionId = ids.revision ?? changeRequest?.revision ?? space.revision;
 
-    const pages = await throwIfDataError(
+    const pages = await getDataOrNull(
         dataFetcher.getRevisionPages({
             spaceId: ids.space,
             revisionId,
             // We only care about the Git metadata when the Git sync is enabled,
             // otherwise we can optimize performance by not fetching it
             metadata: !!space.gitSync,
-        })
+        }),
+
+        // When trying to render a revision with an invalid / non-existing ID,
+        // we should handle gracefully the 404 and throw notFound.
+        ids.revision ? [404] : undefined
     );
+    if (!pages) {
+        notFound();
+    }
 
     return {
         ...baseContext,
