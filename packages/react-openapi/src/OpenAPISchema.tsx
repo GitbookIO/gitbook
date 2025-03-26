@@ -122,7 +122,7 @@ export function OpenAPISchemaPropertiesFromServer(props: {
     return (
         <OpenAPISchemaProperties
             id={props.id}
-            properties={JSON.parse(props.properties, retrocycle())}
+            properties={safeJSONParse(props.properties)}
             context={props.context}
         />
     );
@@ -172,12 +172,7 @@ export function OpenAPIRootSchemaFromServer(props: {
     schema: string;
     context: OpenAPIClientContext;
 }) {
-    return (
-        <OpenAPIRootSchema
-            schema={JSON.parse(props.schema, retrocycle())}
-            context={props.context}
-        />
-    );
+    return <OpenAPIRootSchema schema={safeJSONParse(props.schema)} context={props.context} />;
 }
 
 /**
@@ -464,4 +459,20 @@ function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string {
     }
 
     return schema.title || 'child attributes';
+}
+
+/**
+ * Safely parse a JSON string using retrocycle.
+ * If parsing fails, it falls back to standard JSON.parse.
+ */
+function safeJSONParse(jsonString: string) {
+    try {
+        return JSON.parse(jsonString, retrocycle());
+    } catch {
+        try {
+            return JSON.parse(jsonString);
+        } catch (fallbackError) {
+            throw new Error(`Failed to parse JSON string: ${fallbackError}`);
+        }
+    }
 }
