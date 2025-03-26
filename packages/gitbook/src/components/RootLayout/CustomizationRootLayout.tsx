@@ -40,7 +40,7 @@ import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/l
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
-    forcedTheme?: CustomizationThemeMode;
+    forcedTheme?: CustomizationThemeMode | null;
     customization: SiteCustomizationSettings;
     children: React.ReactNode;
 }) {
