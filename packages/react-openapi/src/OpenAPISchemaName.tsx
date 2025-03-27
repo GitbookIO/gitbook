@@ -32,6 +32,9 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
                 ) : null}
             </span>
             {schema?.readOnly ? <span className="openapi-schema-readonly">read-only</span> : null}
+            {schema?.writeOnly ? (
+                <span className="openapi-schema-writeonly">write-only</span>
+            ) : null}
             {required ? (
                 <span className="openapi-schema-required">required</span>
             ) : (
