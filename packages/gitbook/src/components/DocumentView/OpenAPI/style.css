@@ -142,6 +142,10 @@
     @apply py-2.5 flex flex-col gap-2;
 }
 
+.openapi-schema[data-deprecated="true"] {
+    @apply bg-gray-100;
+}
+
 .openapi-section-body .openapi-schema-properties {
     @apply divide-y divide-tint-subtle;
 }

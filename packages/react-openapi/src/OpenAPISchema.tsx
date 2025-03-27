@@ -37,7 +37,11 @@ function OpenAPISchemaProperty(props: {
     const id = useId();
 
     return (
-        <div id={id} className={clsx('openapi-schema', className)}>
+        <div
+            id={id}
+            data-deprecated={schema.deprecated}
+            className={clsx('openapi-schema', className)}
+        >
             <OpenAPISchemaPresentation property={property} />
             {(() => {
                 const circularRefId = parentCircularRefs.get(schema);
