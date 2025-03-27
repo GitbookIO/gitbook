@@ -564,6 +564,7 @@ async function lookupSiteOrSpaceInMultiIdMode(
         apiEndpoint,
         contextId,
         cookies,
+        canonicalUrl: url.toString(),
     };
 }
 

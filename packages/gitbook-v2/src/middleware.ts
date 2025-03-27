@@ -152,6 +152,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             );
         }
 
+        // We use the host/origin from the canonical URL to ensure the links are
+        // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
+        const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
+
         //
         // Render and serve the content
         //
@@ -163,7 +167,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
-        requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${siteURLData.basePath}`);
+        requestHeaders.set(
+            MiddlewareHeaders.SiteURL,
+            `${siteCanonicalURL.origin}${siteURLData.basePath}`
+        );
         requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(siteURLData));
 
         // Preview of customization/theme
@@ -188,7 +195,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('x-forwarded-host', request.nextUrl.host);
         requestHeaders.set('origin', request.nextUrl.origin);
 
-        const siteURLWithoutProtocol = `${siteURL.host}${siteURLData.basePath}`;
+        const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
         const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
             siteURLData.pathname
         );
@@ -196,7 +203,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
-        const stableSiteURLData: Omit<typeof siteURLData, 'pathname'> = {
+        const stableSiteURLData: Omit<typeof siteURLData, 'pathname' | 'canonicalUrl'> = {
             site: siteURLData.site,
             siteSection: siteURLData.siteSection,
             siteSpace: siteURLData.siteSpace,
