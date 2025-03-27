@@ -10,5 +10,5 @@ export async function GET(
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const { context } = await getStaticSiteContext(await params);
-    return serveLLMsTxt(context);
+    return serveLLMsTxt(context, { withMarkdownPages: true });
 }
