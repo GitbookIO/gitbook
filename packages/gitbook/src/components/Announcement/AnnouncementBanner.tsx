@@ -42,7 +42,7 @@ export function AnnouncementBanner(props: {
                                       type: 'link_click',
                                       link: {
                                           target: announcement.link.to,
-                                          position: SiteInsightsLinkPosition.Header,
+                                          position: SiteInsightsLinkPosition.Announcement,
                                       },
                                   }
                                 : undefined

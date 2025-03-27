@@ -12,7 +12,7 @@
         "@codemirror/state": "6.4.1",
         "react": "18.3.1",
         "react-dom": "18.3.1",
-        "@gitbook/api": "0.102.0"
+        "@gitbook/api": "0.105.0"
     },
     "private": true,
     "scripts": {
