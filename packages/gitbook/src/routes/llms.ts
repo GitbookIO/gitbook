@@ -1,14 +1,12 @@
-import type { SiteSection, SiteSpace } from '@gitbook/api';
-import assertNever from 'assert-never';
-import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
-import { toMarkdown } from 'mdast-util-to-markdown';
-
-import { getPagePath } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
+import type { SiteSection, SiteSpace } from '@gitbook/api';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
 import { throwIfDataError } from '@v2/lib/data';
+import assertNever from 'assert-never';
+import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
+import { toMarkdown } from 'mdast-util-to-markdown';
 
 /**
  * Generate a llms.txt file for the site.
@@ -146,7 +144,7 @@ async function getNodesFromSiteSpaces(
             const listChildren = await Promise.all(
                 pages.map(async ({ page }): Promise<ListItem> => {
                     const pageURL = new URL(siteSpaceUrl);
-                    pageURL.pathname = joinPath(pageURL.pathname, getPagePath(rootPages, page));
+                    pageURL.pathname = joinPath(pageURL.pathname, page.path);
                     if (options.withMarkdownPages) {
                         pageURL.pathname = `${pageURL.pathname}.md`;
                     }
