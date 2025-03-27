@@ -13,7 +13,17 @@ import { throwIfDataError } from '@v2/lib/data';
 /**
  * Generate a llms.txt file for the site.
  */
-export async function serveLLMsTxt(context: GitBookSiteContext) {
+export async function serveLLMsTxt(
+    context: GitBookSiteContext,
+    {
+        withMarkdownPages = false,
+    }: {
+        /**
+         * If true, a markdown extension will be added to the page path.
+         */
+        withMarkdownPages?: boolean;
+    } = {}
+) {
     const { site } = context;
 
     if (!checkIsRootSiteContext(context)) {
@@ -28,7 +38,7 @@ export async function serveLLMsTxt(context: GitBookSiteContext) {
                 depth: 1,
                 children: [{ type: 'text', value: site.title }],
             },
-            ...(await getNodesFromSiteStructure(context)),
+            ...(await getNodesFromSiteStructure(context, { withMarkdownPages })),
         ],
     };
 
@@ -47,15 +57,24 @@ export async function serveLLMsTxt(context: GitBookSiteContext) {
 /**
  * Get MDAST nodes from site structure.
  */
-async function getNodesFromSiteStructure(context: GitBookSiteContext): Promise<RootContent[]> {
+async function getNodesFromSiteStructure(
+    context: GitBookSiteContext,
+    options: {
+        withMarkdownPages: boolean;
+    }
+): Promise<RootContent[]> {
     switch (context.structure.type) {
         case 'sections':
             return getNodesFromSections(
                 context,
-                getSiteStructureSections(context.structure, { ignoreGroups: true })
+                getSiteStructureSections(context.structure, { ignoreGroups: true }),
+                { withMarkdownPages: options.withMarkdownPages }
             );
         case 'siteSpaces':
-            return getNodesFromSiteSpaces(context, context.structure.structure, { heading: true });
+            return getNodesFromSiteSpaces(context, context.structure.structure, {
+                heading: true,
+                withMarkdownPages: options.withMarkdownPages,
+            });
         default:
             assertNever(context.structure);
     }
@@ -66,12 +85,16 @@ async function getNodesFromSiteStructure(context: GitBookSiteContext): Promise<R
  */
 async function getNodesFromSections(
     context: GitBookSiteContext,
-    siteSections: SiteSection[]
+    siteSections: SiteSection[],
+    options: {
+        withMarkdownPages: boolean;
+    }
 ): Promise<RootContent[]> {
     const all = await Promise.all(
         siteSections.map(async (siteSection): Promise<RootContent[]> => {
             const siteSpaceNodes = await getNodesFromSiteSpaces(context, siteSection.siteSpaces, {
                 heading: false,
+                withMarkdownPages: options.withMarkdownPages,
             });
             return [
                 {
@@ -97,6 +120,11 @@ async function getNodesFromSiteSpaces(
          * Includes a heading for each site space.
          */
         heading?: boolean;
+
+        /**
+         * If true, a markdown extension will be added to the page path.
+         */
+        withMarkdownPages: boolean;
     }
 ): Promise<RootContent[]> {
     const { dataFetcher, linker } = context;
@@ -119,6 +147,9 @@ async function getNodesFromSiteSpaces(
                 pages.map(async ({ page }): Promise<ListItem> => {
                     const pageURL = new URL(siteSpaceUrl);
                     pageURL.pathname = joinPath(pageURL.pathname, getPagePath(rootPages, page));
+                    if (options.withMarkdownPages) {
+                        pageURL.pathname = `${pageURL.pathname}.md`;
+                    }
 
                     const url = linker.toLinkForContent(pageURL.toString());
                     const children: Paragraph['children'] = [

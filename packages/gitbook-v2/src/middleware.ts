@@ -401,11 +401,14 @@ function encodePathInSiteContent(rawPathname: string): {
 
     switch (pathname) {
         case '~gitbook/icon':
+            return { pathname };
         case 'llms.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
-            return { pathname };
+            // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+            // as they only depend on the site structure / pages.
+            return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };
