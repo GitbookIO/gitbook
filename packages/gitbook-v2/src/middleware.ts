@@ -194,18 +194,38 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         );
         routeType = routeTypeFromPathname ?? routeType;
 
+        // We pick only stable data from the siteURL data to prevent re-rendering of
+        // the root layout when changing pages..
+        const stableSiteURLData: Omit<typeof siteURLData, 'pathname'> = {
+            site: siteURLData.site,
+            siteSection: siteURLData.siteSection,
+            siteSpace: siteURLData.siteSpace,
+            siteBasePath: siteURLData.siteBasePath,
+            basePath: siteURLData.basePath,
+            space: siteURLData.space,
+            organization: siteURLData.organization,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+            shareKey: siteURLData.shareKey,
+            apiToken: siteURLData.apiToken,
+            complete: siteURLData.complete,
+            contextId: siteURLData.contextId,
+        };
+
         const route = [
             'sites',
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
             encodeURIComponent(
-                rison.encode({
-                    ...siteURLData,
-                    // The pathname is passed as the next segment of the route and should not cause this segment to change
-                    // based on the page being visited
-                    pathname: '<DO_NOT_USE>',
-                })
+                rison.encode(
+                    // rison can't encode undefined values
+                    Object.fromEntries(
+                        Object.entries(stableSiteURLData).filter(
+                            ([_, v]) => typeof v !== 'undefined'
+                        )
+                    )
+                )
             ),
             pathname,
         ].join('/');
