@@ -154,6 +154,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
+        console.log(`using site canonical URL: ${siteURLData.canonicalUrl}`);
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
 
         //
