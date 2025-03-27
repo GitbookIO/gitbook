@@ -3,4 +3,4 @@
 'gitbook': patch
 ---
 
-Improve OpenAPI schema deprecated + write-only
+Add OpenAPI write-only indicator
