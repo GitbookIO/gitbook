@@ -6,6 +6,19 @@ export function joinPath(...parts: string[]): string {
 }
 
 /**
+ * Join a path with a base URL.
+ */
+export function joinPathWithBaseURL(baseURL: string, path: string): string {
+    if (!baseURL.endsWith('/')) {
+        baseURL += '/';
+    }
+    if (path.startsWith('/')) {
+        path = path.slice(1);
+    }
+    return baseURL + path;
+}
+
+/**
  * Remove the trailing slash from a path.
  */
 export function removeTrailingSlash(path: string): string {

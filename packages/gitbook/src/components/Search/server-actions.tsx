@@ -1,5 +1,9 @@
 'use server';
 
+import { resolvePageId } from '@/lib/pages';
+import { findSiteSpaceById } from '@/lib/sites';
+import { filterOutNullable } from '@/lib/typescript';
+import { getV1BaseContext } from '@/lib/v1';
 import type {
     RevisionPage,
     SearchAIAnswer,
@@ -13,12 +17,7 @@ import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/li
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
-import { getAbsoluteHref } from '@/lib/links';
-import { resolvePageId } from '@/lib/pages';
-import { findSiteSpaceById } from '@/lib/sites';
-import { filterOutNullable } from '@/lib/typescript';
-import { getV1BaseContext } from '@/lib/v1';
-
+import { joinPathWithBaseURL } from '@/lib/paths';
 import { isV2 } from '@/lib/v2';
 import { throwIfDataError } from '@v2/lib/data';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
@@ -309,7 +308,7 @@ async function transformAnswer(
                 const spaceURL = siteSpace?.urls.published;
 
                 const href = spaceURL
-                    ? await getURLWithSections(page.page.path, spaceURL)
+                    ? joinPathWithBaseURL(spaceURL, page.page.path)
                     : context.linker.toPathForPage({
                           pages,
                           page: page.page,
@@ -358,7 +357,9 @@ async function transformSitePageResult(
         type: 'page',
         id: `${spaceItem.id}/${pageItem.id}`,
         title: pageItem.title,
-        href: linker.toLinkForContent(await getURLWithSections(pageItem.path, spaceURL)),
+        href: spaceURL
+            ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
+            : linker.toPathInSpace(pageItem.path),
         spaceTitle: space?.title,
         pageId: pageItem.id,
         spaceId: spaceItem.id,
@@ -369,7 +370,9 @@ async function transformSitePageResult(
             type: 'section',
             id: `${page.id}/${section.id}`,
             title: section.title,
-            href: linker.toLinkForContent(await getURLWithSections(section.path, spaceURL)),
+            href: spaceURL
+                ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
+                : linker.toPathInSpace(pageItem.path),
             body: section.body,
             pageId: pageItem.id,
             spaceId: spaceItem.id,
@@ -377,21 +380,4 @@ async function transformSitePageResult(
     );
 
     return [page, ...sections];
-}
-
-// Resolve a relative path to an absolute URL
-// if the search result is relative to another space, we use the space URL
-async function getURLWithSections(path: string, spaceURL?: string) {
-    if (spaceURL) {
-        if (!spaceURL.endsWith('/')) {
-            spaceURL += '/';
-        }
-        if (path.startsWith('/')) {
-            path = path.slice(1);
-        }
-        return spaceURL + path;
-    }
-
-    throw new Error('spaceURL is required');
-    return getAbsoluteHref(path);
 }
