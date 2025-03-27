@@ -1,4 +1,4 @@
-import { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationThemeMode, type PublishedSiteContent } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
@@ -196,17 +196,28 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
-        const { pathname: siteURLDataPathname, ...stableSiteURLData } = siteURLData;
+        const stableSiteURLData: Omit<PublishedSiteContent, 'pathname'> = {
+            site: siteURLData.site,
+            siteSection: siteURLData.siteSection,
+            siteSpace: siteURLData.siteSpace,
+            siteBasePath: siteURLData.siteBasePath,
+            basePath: siteURLData.basePath,
+            space: siteURLData.space,
+            organization: siteURLData.organization,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+            shareKey: siteURLData.shareKey,
+            apiToken: siteURLData.apiToken,
+            complete: siteURLData.complete,
+            contextId: siteURLData.contextId,
+        };
+
         const route = [
             'sites',
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
-            encodeURIComponent(
-                rison.encode({
-                    ...stableSiteURLData,
-                })
-            ),
+            encodeURIComponent(rison.encode(stableSiteURLData)),
             pathname,
         ].join('/');
 
