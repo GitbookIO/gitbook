@@ -389,6 +389,16 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
+    // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
+    if (pathname.match(/\.md$/)) {
+        const pagePathWithoutMD = pathname.slice(0, -3);
+        return {
+            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+            routeType: 'static',
+        };
+    }
+
     switch (pathname) {
         case '~gitbook/icon':
         case 'llms.txt':
