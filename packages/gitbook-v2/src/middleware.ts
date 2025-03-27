@@ -219,6 +219,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             encodeURIComponent(siteURLWithoutProtocol),
             encodeURIComponent(
                 rison.encode(
+                    // rison can't encode undefined values
                     Object.fromEntries(
                         Object.entries(stableSiteURLData).filter(
                             ([_, v]) => typeof v !== 'undefined'
