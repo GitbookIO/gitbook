@@ -166,12 +166,9 @@ export function createDataFetcher(
                 })
             );
         },
-        //
-        // API that are not tied to the token
-        // where the data is the same for all users
-        //
+
         getUserById(userId) {
-            return trace('getUserById', () => getUserById({ apiToken: null }, { userId }));
+            return trace('getUserById', () => getUserById(input, { userId }));
         },
     };
 }
