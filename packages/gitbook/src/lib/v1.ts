@@ -153,6 +153,10 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             });
         },
 
+        getRevisionPageMarkdown() {
+            throw new Error('Not implemented in v1');
+        },
+
         getDocument(params) {
             return wrapDataFetcherError(async () => {
                 const document = await getDocument(params.spaceId, params.documentId);

@@ -98,6 +98,15 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<api.RevisionPageDocument | api.RevisionPageGroup>>;
 
     /**
+     * Get the markdown content of a page by its path.
+     */
+    getRevisionPageMarkdown(params: {
+        spaceId: string;
+        revisionId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<string>>;
+
+    /**
      * Get a document by its space ID and document ID.
      */
     getDocument(params: { spaceId: string; documentId: string }): Promise<

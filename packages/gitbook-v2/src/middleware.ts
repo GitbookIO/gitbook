@@ -409,13 +409,26 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
+    // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
+    if (pathname.match(/\.md$/)) {
+        const pagePathWithoutMD = pathname.slice(0, -3);
+        return {
+            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+            routeType: 'static',
+        };
+    }
+
     switch (pathname) {
         case '~gitbook/icon':
+            return { pathname };
         case 'llms.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
-            return { pathname };
+            // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+            // as they only depend on the site structure / pages.
+            return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };
