@@ -194,6 +194,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         );
         routeType = routeTypeFromPathname ?? routeType;
 
+        // We pick only stable data from the siteURL data to prevent re-rendering of
+        // the root layout when changing pages..
+        const { pathname: siteURLDataPathname, ...stableSiteURLData } = siteURLData;
         const route = [
             'sites',
             routeType,
@@ -201,10 +204,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             encodeURIComponent(siteURLWithoutProtocol),
             encodeURIComponent(
                 rison.encode({
-                    ...siteURLData,
-                    // The pathname is passed as the next segment of the route and should not cause this segment to change
-                    // based on the page being visited
-                    pathname: '<DO_NOT_USE>',
+                    ...stableSiteURLData,
                 })
             ),
             pathname,
