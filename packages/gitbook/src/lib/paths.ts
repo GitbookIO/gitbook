@@ -9,6 +9,10 @@ export function joinPath(...parts: string[]): string {
  * Join a path with a base URL.
  */
 export function joinPathWithBaseURL(baseURL: string, path: string): string {
+    if (!path) {
+        return baseURL;
+    }
+
     if (!baseURL.endsWith('/')) {
         baseURL += '/';
     }
