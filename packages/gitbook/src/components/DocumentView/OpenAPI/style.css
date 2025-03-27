@@ -210,7 +210,7 @@
 }
 
 .openapi-schema-writeonly {
-    @apply text-success text-[0.813rem];
+    @apply text-success dark:text-success-subtle/9 text-[0.813rem];
 }
 
 .openapi-schema-type {
