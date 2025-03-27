@@ -15,7 +15,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
     const { page } = pageLookup;
 
     if (page.type !== RevisionPageType.Document) {
-        return new Response('Page is not a document', { status: 400 });
+        return new Response(`Page "${pagePath}" is not a document`, { status: 404 });
     }
 
     const markdown = await throwIfDataError(
