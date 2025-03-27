@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/primitives/Button';
-import { t, useLanguage } from '@/intl/client';
+import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 export default function ErrorPage(props: {
@@ -35,9 +35,8 @@ export default function ErrorPage(props: {
                         }}
                         variant="secondary"
                         size="small"
-                    >
-                        {t(language, 'unexpected_error_retry')}
-                    </Button>
+                        label={tString(language, 'unexpected_error_retry')}
+                    />
                 </div>
             </div>
         </div>

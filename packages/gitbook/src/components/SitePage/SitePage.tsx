@@ -11,6 +11,7 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@v2/lib/images';
+import { AdaptivePane } from '../Adaptive';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
 
@@ -73,6 +74,7 @@ export async function SitePage(props: SitePageProps) {
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
             <div className="flex grow flex-row-reverse justify-end">
+                <AdaptivePane />
                 <PageAside
                     page={page}
                     document={document}
