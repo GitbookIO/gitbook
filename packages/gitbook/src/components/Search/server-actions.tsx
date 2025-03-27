@@ -5,7 +5,7 @@ import type {
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
     SearchPageResult,
-    SiteSpace,
+    SearchSpaceResult,
     Space,
 } from '@gitbook/api';
 import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
@@ -30,15 +30,22 @@ export interface ComputedSectionResult {
     type: 'section';
     id: string;
     title: string;
-    href: string;
     body: string;
+    href: string;
+
+    pageId: string;
+    spaceId: string;
 }
 
 export interface ComputedPageResult {
     type: 'page';
     id: string;
     title: string;
+
     href: string;
+
+    pageId: string;
+    spaceId: string;
 
     /** When part of a multi-spaces search, the title of the space */
     spaceTitle?: string;
@@ -255,8 +262,13 @@ async function searchSiteContent(
                 const siteSpace = findSiteSpaceById(structure, spaceItem.id);
 
                 return Promise.all(
-                    spaceItem.pages.map((item) =>
-                        transformSitePageResult(item, siteSpace ?? undefined)
+                    spaceItem.pages.map((pageItem) =>
+                        transformSitePageResult(context, {
+                            pageItem,
+                            spaceItem,
+                            space: siteSpace?.space,
+                            spaceURL: siteSpace?.urls.published,
+                        })
                     )
                 );
             })
@@ -330,40 +342,39 @@ async function transformAnswer(
     };
 }
 
-async function transformSectionsAndPage(args: {
-    item: SearchPageResult;
-    space?: Space;
-    spaceURL?: string;
-}): Promise<[ComputedPageResult, ComputedSectionResult[]]> {
-    const { item, space, spaceURL } = args;
-
-    const sections = await Promise.all(
-        item.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
-            type: 'section',
-            id: `${item.id}/${section.id}`,
-            title: section.title,
-            href: await getURLWithSections(section.path, spaceURL),
-            body: section.body,
-        })) ?? []
-    );
+async function transformSitePageResult(
+    context: GitBookBaseContext,
+    args: {
+        pageItem: SearchPageResult;
+        spaceItem: SearchSpaceResult;
+        space?: Space;
+        spaceURL?: string;
+    }
+): Promise<OrderedComputedResult[]> {
+    const { pageItem, spaceItem, space, spaceURL } = args;
+    const { linker } = context;
 
     const page: ComputedPageResult = {
         type: 'page',
-        id: item.id,
-        title: item.title,
-        href: await getURLWithSections(item.path, spaceURL),
+        id: `${spaceItem.id}/${pageItem.id}`,
+        title: pageItem.title,
+        href: linker.toLinkForContent(await getURLWithSections(pageItem.path, spaceURL)),
         spaceTitle: space?.title,
+        pageId: pageItem.id,
+        spaceId: spaceItem.id,
     };
 
-    return [page, sections];
-}
-
-async function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
-    const [page, sections] = await transformSectionsAndPage({
-        item,
-        space: siteSpace?.space,
-        spaceURL: siteSpace?.urls.published,
-    });
+    const sections = await Promise.all(
+        pageItem.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
+            type: 'section',
+            id: `${page.id}/${section.id}`,
+            title: section.title,
+            href: linker.toLinkForContent(await getURLWithSections(section.path, spaceURL)),
+            body: section.body,
+            pageId: pageItem.id,
+            spaceId: spaceItem.id,
+        })) ?? []
+    );
 
     return [page, ...sections];
 }
@@ -380,5 +391,7 @@ async function getURLWithSections(path: string, spaceURL?: string) {
         }
         return spaceURL + path;
     }
+
+    throw new Error('spaceURL is required');
     return getAbsoluteHref(path);
 }

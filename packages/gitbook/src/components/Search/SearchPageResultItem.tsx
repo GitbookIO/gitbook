@@ -2,7 +2,6 @@ import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-
 import { Link } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './server-actions';
@@ -38,6 +37,14 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     ? ['is-active', 'bg-primary', 'text-contrast-primary', 'hover:bg-primary-hover']
                     : null
             )}
+            insights={{
+                type: 'search_open_result',
+                query,
+                result: {
+                    pageId: item.pageId,
+                    spaceId: item.spaceId,
+                },
+            }}
         >
             <div className="size-4">
                 <Icon
