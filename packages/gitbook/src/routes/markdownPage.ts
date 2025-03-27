@@ -28,7 +28,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
 
     return new Response(markdown, {
         headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
+            'Content-Type': 'text/markdown; charset=utf-8',
         },
     });
 }
