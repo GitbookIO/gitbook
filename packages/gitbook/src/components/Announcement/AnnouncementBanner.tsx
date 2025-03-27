@@ -3,11 +3,10 @@
 import * as storage from '@/lib/local-storage';
 import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
-import type { CustomizationAnnouncement } from '@gitbook/api';
+import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import Link from 'next/link';
 import { CONTAINER_STYLE } from '../layout';
-import { linkStyles } from '../primitives';
+import { Link, linkStyles } from '../primitives';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 
 /**
@@ -36,6 +35,17 @@ export function AnnouncementBanner(props: {
                         closeable && 'pr-12',
                         hasLink && style.hover
                     )}
+                    insights={
+                        hasLink
+                            ? {
+                                  type: 'link_click',
+                                  link: {
+                                      target: announcement.link!.to,
+                                      position: SiteInsightsLinkPosition.Header,
+                                  },
+                              }
+                            : undefined
+                    }
                 >
                     <Icon
                         icon={style.icon as IconName}
