@@ -6,4 +6,5 @@ export type * from '@scalar/openapi-types';
 export * from './error';
 export * from './helpers/shouldIgnoreEntity';
 export * from './traverse';
+export * from './schemas';
 export type * from './types';
