@@ -217,7 +217,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
-            encodeURIComponent(rison.encode({ ...stableSiteURLData })),
+            encodeURIComponent(
+                rison.encode(
+                    Object.fromEntries(
+                        Object.entries(stableSiteURLData).filter(
+                            ([_, v]) => typeof v !== 'undefined'
+                        )
+                    )
+                )
+            ),
             pathname,
         ].join('/');
 
