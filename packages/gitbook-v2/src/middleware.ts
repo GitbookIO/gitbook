@@ -1,4 +1,4 @@
-import { CustomizationThemeMode, type PublishedSiteContent } from '@gitbook/api';
+import { CustomizationThemeMode } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
@@ -196,7 +196,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
-        const stableSiteURLData: Omit<PublishedSiteContent, 'pathname'> = {
+        const stableSiteURLData: Omit<typeof siteURLData, 'pathname'> = {
             site: siteURLData.site,
             siteSection: siteURLData.siteSection,
             siteSpace: siteURLData.siteSpace,
@@ -217,7 +217,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
-            encodeURIComponent(rison.encode(stableSiteURLData)),
+            encodeURIComponent(rison.encode({ ...stableSiteURLData })),
             pathname,
         ].join('/');
 
