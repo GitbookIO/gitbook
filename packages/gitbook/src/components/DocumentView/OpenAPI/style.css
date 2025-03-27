@@ -213,6 +213,10 @@
     @apply text-primary-subtle/9 text-[0.813rem];
 }
 
+.openapi-schema-writeonly {
+    @apply text-success text-[0.813rem];
+}
+
 .openapi-schema-type {
     @apply text-tint select-text text-[0.813rem] font-mono [word-spacing:-0.25rem];
 }
