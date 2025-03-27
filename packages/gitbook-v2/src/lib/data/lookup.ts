@@ -1,5 +1,5 @@
 import { race, tryCatch } from '@/lib/async';
-import { joinPath } from '@/lib/paths';
+import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 import { trace } from '@/lib/tracing';
 import type { PublishedSiteContentLookup } from '@gitbook/api';
 import { apiClient } from './api';
@@ -36,6 +36,13 @@ export async function getPublishedContentByURL(input: {
                             url: alternative.url,
                             visitorAuthToken: input.visitorAuthToken ?? undefined,
                             redirectOnError: input.redirectOnError,
+
+                            // As this endpoint is cached by our API, we version the request
+                            // to void getting stale data with missing properties.
+                            // this could be improved by ensuring our API cache layer is versioned
+                            // or invalidated when needed
+                            // @ts-expect-error - cacheVersion is not a real query param
+                            cacheVersion: 'v2',
                         },
                         {
                             signal,
@@ -100,6 +107,7 @@ export async function getPublishedContentByURL(input: {
 
             const siteResult: PublishedSiteContentLookup = {
                 ...data,
+                canonicalUrl: joinPathWithBaseURL(data.canonicalUrl, alternative.extraPath),
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
                 pathname: joinPath(data.pathname, alternative.extraPath),
                 ...(changeRequest ? { changeRequest } : {}),
