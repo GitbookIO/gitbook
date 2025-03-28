@@ -50,7 +50,7 @@ function OpenAPISchemaProperty(props: {
                 circularRefs.set(schema, id);
 
                 const properties = getSchemaProperties(schema);
-                if (properties) {
+                if (properties?.length) {
                     return (
                         <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
                             <OpenAPISchemaProperties

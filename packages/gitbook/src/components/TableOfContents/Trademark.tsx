@@ -1,5 +1,4 @@
 import type {
-    CustomizationSettings,
     SiteCustomizationSettings,
     SiteInsightsTrademarkPlacement,
     Space,
@@ -16,7 +15,7 @@ import { Link } from '../primitives';
  */
 export function Trademark(props: {
     space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    customization: SiteCustomizationSettings;
     placement: SiteInsightsTrademarkPlacement;
 }) {
     return (
@@ -69,7 +68,7 @@ export function Trademark(props: {
  */
 export function TrademarkLink(props: {
     space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    customization: SiteCustomizationSettings;
     placement: SiteInsightsTrademarkPlacement;
 }) {
     const { space, customization, placement } = props;

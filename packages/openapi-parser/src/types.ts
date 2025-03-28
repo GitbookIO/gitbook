@@ -79,3 +79,8 @@ export type FilesystemEntry<T extends AnyObject> = {
     filename: string;
     specification: T;
 };
+
+export type OpenAPISchema = {
+    name: string;
+    schema: OpenAPIV3.SchemaObject;
+};

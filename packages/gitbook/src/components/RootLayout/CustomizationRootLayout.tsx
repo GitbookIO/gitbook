@@ -2,9 +2,9 @@ import {
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
-    type CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
+    CustomizationThemeMode,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -41,10 +41,11 @@ import { AnnouncementDismissedScript } from '../Announcement';
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
-    customization: SiteCustomizationSettings | CustomizationSettings;
+    forcedTheme?: CustomizationThemeMode | null;
+    customization: SiteCustomizationSettings;
     children: React.ReactNode;
 }) {
-    const { customization, children } = props;
+    const { customization, forcedTheme, children } = props;
 
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
@@ -86,7 +87,12 @@ export async function CustomizationRootLayout(props: {
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
                 ibmPlexMono.variable,
-                fontData.type === 'default' ? fontData.variable : 'font-custom'
+                fontData.type === 'default' ? fontData.variable : 'font-custom',
+
+                // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
+                (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
+                    ? 'dark'
+                    : ''
             )}
         >
             <head>
@@ -181,7 +187,7 @@ export async function CustomizationRootLayout(props: {
  * If the tint color is not set or it is a space customization, it will return the default color.
  */
 function getTintColor(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: SiteCustomizationSettings
 ): CustomizationTint['color'] | undefined {
     if ('tint' in customization.styling && customization.styling.tint) {
         return {
@@ -228,7 +234,7 @@ function getTintMixColor(
  * If it is a space customization, it will return the default styles.
  */
 function getSidebarStyles(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: SiteCustomizationSettings
 ): SiteCustomizationSettings['styling']['sidebar'] {
     if ('sidebar' in customization.styling) {
         return {
@@ -248,7 +254,7 @@ function getSidebarStyles(
  * If it is a space customization, it will return the default styles.
  */
 function getSemanticColors(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: SiteCustomizationSettings
 ): Pick<
     SiteCustomizationSettings['styling'],
     'infoColor' | 'successColor' | 'warningColor' | 'dangerColor'

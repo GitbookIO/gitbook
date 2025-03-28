@@ -6,6 +6,7 @@ import { generateFontFacesCSS, getFontSourcesToPreload } from './custom';
 const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
     basic: {
         id: 'open-sans',
+        custom: true,
         fontFamily: 'Open Sans',
         fontFaces: [
             {
@@ -31,6 +32,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
 
     multiWeight: {
         id: 'roboto',
+        custom: true,
         fontFamily: 'Roboto',
         fontFaces: [
             {
@@ -83,6 +85,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
 
     multiSource: {
         id: 'lato',
+        custom: true,
         fontFamily: 'Lato',
         fontFaces: [
             {
@@ -100,6 +103,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
 
     missingFormat: {
         id: 'source-sans',
+        custom: true,
         fontFamily: 'Source Sans Pro',
         fontFaces: [
             {
@@ -117,12 +121,14 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
 
     empty: {
         id: 'empty-font',
+        custom: true,
         fontFamily: 'Empty Font',
         fontFaces: [],
     },
 
     specialChars: {
         id: 'special-font',
+        custom: true,
         fontFamily: 'Special Font & Co.',
         fontFaces: [
             {
@@ -134,6 +140,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
 
     complex: {
         id: 'complex-font',
+        custom: true,
         fontFamily: 'Complex Font',
         fontFaces: [
             {
@@ -155,6 +162,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
 
     variousURLs: {
         id: 'various-urls',
+        custom: true,
         fontFamily: 'Various URLs Font',
         fontFaces: [
             {

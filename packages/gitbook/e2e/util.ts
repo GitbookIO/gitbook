@@ -16,7 +16,7 @@ import {
     type CustomizationThemedColor,
     type SiteCustomizationSettings,
 } from '@gitbook/api';
-import { type BrowserContext, type Page, expect, test } from '@playwright/test';
+import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
@@ -33,7 +33,7 @@ export interface Test {
     /**
      * Test to run
      */
-    run?: (page: Page) => Promise<unknown>;
+    run?: (page: Page, response: Response | null) => Promise<unknown>;
     /**
      * Whether the test should be fullscreened during testing.
      */
@@ -138,6 +138,11 @@ export async function waitForCookiesDialog(page: Page) {
     await expect(dialog).toBeVisible();
 }
 
+export async function waitForNotFound(_page: Page, response: Response | null) {
+    expect(response).not.toBeNull();
+    expect(response?.status()).toBe(404);
+}
+
 /**
  * Transform test cases into Playwright tests and run it.
  */
@@ -183,9 +188,9 @@ export function runTestCases(testCases: TestsCase[]) {
                         }
                     });
 
-                    await page.goto(url);
+                    const response = await page.goto(url);
                     if (testEntry.run) {
-                        await testEntry.run(page);
+                        await testEntry.run(page, response);
                     }
                     const screenshotOptions = testEntry.screenshot;
                     if (screenshotOptions !== false) {

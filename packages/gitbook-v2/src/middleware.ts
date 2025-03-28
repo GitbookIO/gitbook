@@ -21,7 +21,9 @@ import {
     throwIfDataError,
 } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
+import { getImageResizingContextId } from '@v2/lib/images';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
+import type { SiteURLData } from './lib/context';
 
 export const config = {
     matcher: [
@@ -63,7 +65,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return null;
     }
 
-    const { url: siteURL, mode } = match;
+    const { url: siteRequestURL, mode } = match;
+    const imagesContextId = getImageResizingContextId(siteRequestURL);
 
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -73,9 +76,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
      * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
      * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
      */
-    if (siteURL.pathname.endsWith('/~gitbook/image')) {
+    if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
         return await serveResizedImage(request, {
-            host: siteURL.host,
+            imagesContextId: imagesContextId,
         });
     }
 
@@ -85,13 +88,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     // @ts-ignore - request typing
     const visitorToken = getVisitorToken({
         cookies: request.cookies.getAll(),
-        url: siteURL,
+        url: siteRequestURL,
     });
 
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             getPublishedContentByURL({
-                url: siteURL.toString(),
+                url: siteRequestURL.toString(),
                 visitorAuthToken: visitorToken?.token ?? null,
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
@@ -136,11 +139,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         cookies.push(...getResponseCookiesForVisitorAuth(siteURLData.siteBasePath, visitorToken));
 
+        // We use the host/origin from the canonical URL to ensure the links are
+        // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
+        const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
+
         //
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response
         //
-        const incomingURL = mode === 'url' ? requestURL : siteURL;
+        const incomingURL = mode === 'url' ? requestURL : siteCanonicalURL;
         const requestURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
         if (
             requestURLWithoutToken !== incomingURL &&
@@ -163,16 +170,19 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
-        requestHeaders.set(MiddlewareHeaders.SiteURL, `${siteURL.origin}${siteURLData.basePath}`);
+        requestHeaders.set(
+            MiddlewareHeaders.SiteURL,
+            `${siteCanonicalURL.origin}${siteURLData.basePath}`
+        );
         requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(siteURLData));
 
         // Preview of customization/theme
-        const customization = siteURL.searchParams.get('customization');
+        const customization = siteRequestURL.searchParams.get('customization');
         if (customization && validateSerializedCustomization(customization)) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Customization, customization);
         }
-        const theme = siteURL.searchParams.get('theme');
+        const theme = siteRequestURL.searchParams.get('theme');
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Theme, theme);
@@ -188,18 +198,44 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('x-forwarded-host', request.nextUrl.host);
         requestHeaders.set('origin', request.nextUrl.origin);
 
-        const siteURLWithoutProtocol = `${siteURL.host}${siteURLData.basePath}`;
+        const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
         const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
             siteURLData.pathname
         );
         routeType = routeTypeFromPathname ?? routeType;
+
+        // We pick only stable data from the siteURL data to prevent re-rendering of
+        // the root layout when changing pages..
+        const stableSiteURLData: SiteURLData = {
+            site: siteURLData.site,
+            siteSection: siteURLData.siteSection,
+            siteSpace: siteURLData.siteSpace,
+            siteBasePath: siteURLData.siteBasePath,
+            basePath: siteURLData.basePath,
+            space: siteURLData.space,
+            organization: siteURLData.organization,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+            shareKey: siteURLData.shareKey,
+            apiToken: siteURLData.apiToken,
+            imagesContextId: imagesContextId,
+        };
 
         const route = [
             'sites',
             routeType,
             mode,
             encodeURIComponent(siteURLWithoutProtocol),
-            encodeURIComponent(rison.encode(siteURLData)),
+            encodeURIComponent(
+                rison.encode(
+                    // rison can't encode undefined values
+                    Object.fromEntries(
+                        Object.entries(stableSiteURLData).filter(
+                            ([_, v]) => typeof v !== 'undefined'
+                        )
+                    )
+                )
+            ),
             pathname,
         ].join('/');
 
@@ -226,10 +262,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     };
 
     // For https://preview/<siteURL> requests,
-    if (siteURL.hostname === 'preview') {
+    if (siteRequestURL.hostname === 'preview') {
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
-            `${siteURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
+            `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
             request,
             withAPIToken
         );
@@ -385,13 +421,26 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
+    // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
+    if (pathname.match(/\.md$/)) {
+        const pagePathWithoutMD = pathname.slice(0, -3);
+        return {
+            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+            routeType: 'static',
+        };
+    }
+
     switch (pathname) {
         case '~gitbook/icon':
+            return { pathname };
         case 'llms.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
-            return { pathname };
+            // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+            // as they only depend on the site structure / pages.
+            return { pathname, routeType: 'static' };
         case '~gitbook/pdf':
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };

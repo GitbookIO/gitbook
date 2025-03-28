@@ -16,7 +16,8 @@ export type LinkInsightsProps = {
     insights?:
         | TrackEventInput<'ad_click'>
         | TrackEventInput<'link_click'>
-        | TrackEventInput<'trademark_click'>;
+        | TrackEventInput<'trademark_click'>
+        | TrackEventInput<'search_open_result'>;
 };
 
 export type LinkProps = Omit<BaseLinkProps, 'href'> &

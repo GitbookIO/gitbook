@@ -1,6 +1,6 @@
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
-import type { PublishedSiteContent, SiteAPIToken } from '@gitbook/api';
-import { fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
+import type { SiteAPIToken } from '@gitbook/api';
+import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
 import { jwtDecode } from 'jwt-decode';
 import { forbidden } from 'next/navigation';
 import rison from 'rison';
@@ -98,7 +98,7 @@ function getModeFromParams(mode: string): RouteParamMode {
 /**
  * Get the decoded site data from the params.
  */
-function getSiteURLDataFromParams(params: RouteLayoutParams): PublishedSiteContent {
+function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
     const decoded = decodeURIComponent(params.siteData);
     return rison.decode(decoded);
 }

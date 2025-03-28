@@ -13,11 +13,41 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
-import { type GitBookDataFetcher, createDataFetcher, throwIfDataError } from '@v2/lib/data';
+import {
+    type GitBookDataFetcher,
+    createDataFetcher,
+    getDataOrNull,
+    throwIfDataError,
+} from '@v2/lib/data';
+import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker } from './links';
+
+/**
+ * Data about the site URL. Provided by the middleware.
+ * These data are stable between pages in the same site space.
+ */
+export type SiteURLData = Pick<
+    PublishedSiteContent,
+    | 'organization'
+    | 'apiToken'
+    | 'site'
+    | 'siteSpace'
+    | 'space'
+    | 'revision'
+    | 'changeRequest'
+    | 'shareKey'
+    | 'siteSection'
+    | 'siteBasePath'
+    | 'basePath'
+> & {
+    /**
+     * Identifier used for image resizing.
+     */
+    imagesContextId: string;
+};
 
 /**
  * Generic context when rendering content.
@@ -105,7 +135,7 @@ export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
  */
 export function getBaseContext(input: {
     siteURL: URL | string;
-    siteURLData: PublishedSiteContent;
+    siteURLData: SiteURLData;
     urlMode: 'url' | 'url-host';
 }) {
     const { urlMode, siteURLData } = input;
@@ -139,7 +169,7 @@ export function getBaseContext(input: {
     }
 
     const imageResizer = createImageResizer({
-        host: siteURL.host,
+        imagesContextId: siteURLData.imagesContextId,
         // To ensure image resizing work for proxied sites,
         // we serve images from the root of the site.
         linker: linker,
@@ -157,7 +187,7 @@ export function getBaseContext(input: {
  */
 export async function fetchSiteContextByURLLookup(
     baseContext: GitBookBaseContext,
-    data: PublishedSiteContent
+    data: SiteURLData
 ): Promise<GitBookSiteContext> {
     return await fetchSiteContextByIds(baseContext, {
         organization: data.organization,
@@ -277,7 +307,7 @@ export async function fetchSpaceContextByIds(
             })
         ),
         ids.changeRequest
-            ? throwIfDataError(
+            ? getDataOrNull(
                   dataFetcher.getChangeRequest({
                       spaceId: ids.space,
                       changeRequestId: ids.changeRequest,
@@ -286,17 +316,30 @@ export async function fetchSpaceContextByIds(
             : null,
     ]);
 
-    const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
+    if (ids.changeRequest && !changeRequest) {
+        // When trying to render a change request with an invalid / non-existing ID,
+        // we should return a 404.
+        notFound();
+    }
 
-    const pages = await throwIfDataError(
+    const revisionId = ids.revision ?? changeRequest?.revision ?? space.revision;
+
+    const pages = await getDataOrNull(
         dataFetcher.getRevisionPages({
             spaceId: ids.space,
             revisionId,
             // We only care about the Git metadata when the Git sync is enabled,
             // otherwise we can optimize performance by not fetching it
             metadata: !!space.gitSync,
-        })
+        }),
+
+        // When trying to render a revision with an invalid / non-existing ID,
+        // we should handle gracefully the 404 and throw notFound.
+        ids.revision ? [404] : undefined
     );
+    if (!pages) {
+        notFound();
+    }
 
     return {
         ...baseContext,

@@ -8,7 +8,7 @@ import {
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
-import { wrapDataFetcherError } from './errors';
+import { DataFetcherError, wrapDataFetcherError } from './errors';
 import { memoize } from './memoize';
 import type { GitBookDataFetcher } from './types';
 
@@ -95,6 +95,15 @@ export function createDataFetcher(
                 })
             );
         },
+        getRevisionPageMarkdown(params) {
+            return trace('getRevisionPageMarkdown', () =>
+                getRevisionPageMarkdown(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                })
+            );
+        },
         getReusableContent(params) {
             return trace('getReusableContent', () =>
                 getReusableContent(input, {
@@ -166,12 +175,9 @@ export function createDataFetcher(
                 })
             );
         },
-        //
-        // API that are not tied to the token
-        // where the data is the same for all users
-        //
+
         getUserById(userId) {
-            return trace('getUserById', () => getUserById({ apiToken: null }, { userId }));
+            return trace('getUserById', () => getUserById(input, { userId }));
         },
     };
 }
@@ -323,6 +329,39 @@ const getRevisionFile = memoize(async function getRevisionFile(
                 {}
             );
             return res.data;
+        });
+    });
+});
+
+const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
+    input: DataFetcherInput,
+    params: {
+        spaceId: string;
+        revisionId: string;
+        pageId: string;
+    }
+) {
+    'use cache';
+
+    return trace('getRevisionPageMarkdown.uncached', () => {
+        cacheLife('max');
+
+        return wrapDataFetcherError(async () => {
+            const api = await apiClient(input);
+            const res = await api.spaces.getPageInRevisionById(
+                params.spaceId,
+                params.revisionId,
+                params.pageId,
+                {
+                    format: 'markdown',
+                }
+            );
+
+            if (!('markdown' in res.data)) {
+                throw new DataFetcherError('Page is not a document', 404);
+            }
+
+            return res.data.markdown;
         });
     });
 });

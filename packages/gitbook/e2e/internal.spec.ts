@@ -28,6 +28,7 @@ import {
     headerLinks,
     runTestCases,
     waitForCookiesDialog,
+    waitForNotFound,
 } from './util';
 
 const testCases: TestsCase[] = [
@@ -308,6 +309,18 @@ const testCases: TestsCase[] = [
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'Invalid revision',
+                url: '~/revisions/idnotfound/blocks/headings',
+                run: waitForNotFound,
+                screenshot: false,
+            },
+            {
+                name: 'Invalid change request',
+                url: '~/changes/idnotfound/blocks/headings',
+                run: waitForNotFound,
+                screenshot: false,
+            },
         ],
     },
     {
@@ -386,6 +399,22 @@ const testCases: TestsCase[] = [
                 screenshot: false,
                 run: async (page) => {
                     await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
+        name: 'Markdown page',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Text page',
+                url: 'text-page.md',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
                 },
             },
         ],
