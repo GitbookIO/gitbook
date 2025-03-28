@@ -17,9 +17,9 @@ export async function serveResizedImage(
     request: Request,
     requestOptions: {
         /**
-         * The host to use for the image.
+         * The site identifier to use for verifying the image signature.
          */
-        host?: string;
+        imagesContextId?: string;
     } = {}
 ) {
     const requestURL = new URL(request.url);
@@ -45,8 +45,8 @@ export async function serveResizedImage(
     }
 
     // Verify the signature
-    const host =
-        requestOptions.host ??
+    const imagesContextId =
+        requestOptions.imagesContextId ??
         request.headers.get('x-gitbook-host') ?? // Only for v1, to be removed
         request.headers.get('x-forwarded-host') ??
         request.headers.get('host') ??
@@ -54,13 +54,13 @@ export async function serveResizedImage(
     const verified = await verifyImageSignature(
         {
             url,
-            host,
+            imagesContextId,
         },
         { signature, version: signatureVersion }
     );
     if (!verified) {
         return new Response(
-            `Invalid signature "${signature ?? ''}" (version ${signatureVersion}) for "${url}" on "${host}"`,
+            `Invalid signature "${signature ?? ''}" (version ${signatureVersion}) for "${url}" on identifier "${imagesContextId}"`,
             { status: 400 }
         );
     }
