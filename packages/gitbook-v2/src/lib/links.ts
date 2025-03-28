@@ -1,4 +1,5 @@
 import { getPagePath } from '@/lib/pages';
+import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@gitbook/api';
 import warnOnce from 'warn-once';
 
@@ -7,17 +8,28 @@ import warnOnce from 'warn-once';
  *
  * URL levels:
  *
- * https://docs.company.com/section/variant/page
+ * https://docs.company.com/basename/section/variant/page
  *
- * toPathInContent('some/path') => /section/variant/some/path
- * toPathForPage({ pages, page }) => /section/variant/some/path
+ * toPathInSpace('some/path') => /basename/section/variant/some/path
+ * toPathInSite('some/path') => /basename/some/path
+ * toPathForPage({ pages, page }) => /basename/section/variant/some/path
  * toAbsoluteURL('some/path') => https://docs.company.com/some/path
  */
-export interface GitBookSpaceLinker {
+export interface GitBookLinker {
     /**
      * Generate an absolute path for a relative path to the current content.
      */
-    toPathInContent(relativePath: string): string;
+    toPathInSpace(relativePath: string): string;
+
+    /**
+     * Generate an absolute path for a relative path to the current site.
+     */
+    toPathInSite(relativePath: string): string;
+
+    /**
+     * Transform an absolute path in a site, to a relative path from the root of the site.
+     */
+    toRelativePathInSite(absolutePath: string): string;
 
     /**
      * Generate an absolute path for a page in the current content.
@@ -48,14 +60,36 @@ export function createLinker(
     servedOn: {
         protocol?: string;
         host?: string;
-        pathname: string;
+
+        /** The base path of the space */
+        spaceBasePath: string;
+
+        /** The base path of the site */
+        siteBasePath: string;
     }
-): GitBookSpaceLinker {
+): GitBookLinker {
     warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
 
-    const linker: GitBookSpaceLinker = {
-        toPathInContent(relativePath: string): string {
-            return joinPaths(servedOn.pathname, relativePath);
+    const siteBasePath = withTrailingSlash(withLeadingSlash(servedOn.siteBasePath));
+    const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
+
+    const linker: GitBookLinker = {
+        toPathInSpace(relativePath: string): string {
+            return joinPaths(spaceBasePath, relativePath);
+        },
+
+        toPathInSite(relativePath: string): string {
+            return joinPaths(siteBasePath, relativePath);
+        },
+
+        toRelativePathInSite(absolutePath: string): string {
+            const normalizedPath = withLeadingSlash(absolutePath);
+
+            if (!normalizedPath.startsWith(servedOn.siteBasePath)) {
+                return normalizedPath;
+            }
+
+            return normalizedPath.slice(servedOn.siteBasePath.length);
         },
 
         toAbsoluteURL(absolutePath: string): string {
@@ -67,46 +101,23 @@ export function createLinker(
         },
 
         toPathForPage({ pages, page, anchor }) {
-            return linker.toPathInContent(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+            return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
 
-        toLinkForContent(url: string): string {
-            return url;
+        toLinkForContent(rawURL: string): string {
+            const url = new URL(rawURL);
+
+            // If the link points to a content in the same site, we return an absolute path
+            // instead of a full URL; it makes it possible to use router navigation
+            if (url.hostname === servedOn.host && url.pathname.startsWith(servedOn.siteBasePath)) {
+                return url.pathname;
+            }
+
+            return rawURL;
         },
     };
 
     return linker;
-}
-
-/**
- * Append a prefix to a linker.
- */
-export function appendBasePathToLinker(
-    linker: GitBookSpaceLinker,
-    basePath: string
-): GitBookSpaceLinker {
-    const linkerWithPrefix: GitBookSpaceLinker = {
-        toPathInContent(relativePath: string): string {
-            return linker.toPathInContent(joinPaths(basePath, relativePath));
-        },
-
-        toAbsoluteURL(absolutePath: string): string {
-            return linker.toAbsoluteURL(absolutePath);
-        },
-
-        toPathForPage({ pages, page, anchor }) {
-            return (
-                linkerWithPrefix.toPathInContent(getPagePath(pages, page)) +
-                (anchor ? `#${anchor}` : '')
-            );
-        },
-
-        toLinkForContent(url: string): string {
-            return linker.toLinkForContent(url);
-        },
-    };
-
-    return linkerWithPrefix;
 }
 
 function joinPaths(prefix: string, path: string): string {

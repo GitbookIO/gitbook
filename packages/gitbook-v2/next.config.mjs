@@ -5,7 +5,17 @@
  */
 const nextConfig = {
     experimental: {
+        // This is needed to throw "forbidden" when the api token expired during revalidation
+        authInterrupts: true,
+
+        // This is needed to use 'use cache'
         useCache: true,
+
+        // Content is fully static, we can cache it in the session memory cache for a long time
+        staleTimes: {
+            dynamic: 3600, // 1 hour
+            static: 3600, // 1 hour
+        },
     },
 
     env: {
@@ -23,6 +33,7 @@ const nextConfig = {
         GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
         GITBOOK_SECRET: process.env.GITBOOK_SECRET,
         GITBOOK_IMAGE_RESIZE_SIGNING_KEY: process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+        GITBOOK_FONTS_URL: process.env.GITBOOK_FONTS_URL,
 
         // Next.js envs
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,

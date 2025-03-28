@@ -1,9 +1,7 @@
 import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
-export function checkIsReference(
-    input: unknown
-): input is OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject {
+export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
 }
 
@@ -22,17 +20,22 @@ function hasDescription(object: AnyObject) {
  * Resolve the description of an object.
  */
 export function resolveDescription(object: OpenAPIV3.SchemaObject | AnyObject) {
-    // If the object has items and has a description, we resolve the description from items
+    // Resolve description from the object first
+    if (hasDescription(object)) {
+        return 'x-gitbook-description-html' in object &&
+            typeof object['x-gitbook-description-html'] === 'string'
+            ? object['x-gitbook-description-html'].trim()
+            : typeof object.description === 'string'
+              ? object.description.trim()
+              : undefined;
+    }
+
+    // If the object has no description, try to resolve it from the items
     if ('items' in object && typeof object.items === 'object' && hasDescription(object.items)) {
         return resolveDescription(object.items);
     }
 
-    return 'x-gitbook-description-html' in object &&
-        typeof object['x-gitbook-description-html'] === 'string'
-        ? object['x-gitbook-description-html'].trim()
-        : typeof object.description === 'string'
-          ? object.description.trim()
-          : undefined;
+    return undefined;
 }
 
 /**

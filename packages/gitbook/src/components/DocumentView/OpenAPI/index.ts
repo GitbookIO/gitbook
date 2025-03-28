@@ -1,1 +1,2 @@
-export * from './OpenAPI';
+export * from './OpenAPIOperation';
+export * from './OpenAPISchemas';

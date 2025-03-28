@@ -40,6 +40,14 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'hover:bg-primary-hover',
                 ]
             )}
+            insights={{
+                type: 'search_open_result',
+                query,
+                result: {
+                    pageId: item.pageId,
+                    spaceId: item.spaceId,
+                },
+            }}
         >
             <div
                 className={tcls(

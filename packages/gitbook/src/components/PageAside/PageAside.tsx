@@ -35,7 +35,7 @@ export function PageAside(props: {
     const { customization, site, space } = context;
     const language = getSpaceLanguage(customization);
 
-    const pdfHref = context.linker.toPathInContent(
+    const pdfHref = context.linker.toPathInSpace(
         `~gitbook/pdf?${getPDFURLSearchParams({
             page: page.id,
             only: true,
@@ -48,8 +48,11 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
+                // 'page-no-toc:lg:flex',
                 'flex-col',
                 'basis-56',
+                // 'page-no-toc:basis-40',
+                // 'page-no-toc:xl:basis-56',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout

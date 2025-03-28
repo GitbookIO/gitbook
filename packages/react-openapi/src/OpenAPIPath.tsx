@@ -1,7 +1,6 @@
-import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import type React from 'react';
-import { ScalarApiButton } from './ScalarApiButton';
+import { OpenAPICopyButton } from './OpenAPICopyButton';
 import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
+import { getDefaultServerURL } from './util/server';
 
 /**
  * Display the path of an operation.
@@ -10,63 +9,62 @@ export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
     context: OpenAPIContextProps;
 }) {
-    const { data, context } = props;
-    const { method, path } = data;
-    const { specUrl } = context;
-    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
+    const { data } = props;
+    const { method, path, operation } = data;
+
+    const server = getDefaultServerURL(data.servers);
+    const formattedPath = formatPath(path);
 
     return (
         <div className="openapi-path">
             <div className={`openapi-method openapi-method-${method}`}>{method}</div>
-            <div className="openapi-path-title" data-deprecated={data.operation.deprecated}>
-                <p>{formatPath(path)}</p>
-            </div>
-            {!hideTryItPanel && validateHttpMethod(method) && (
-                <ScalarApiButton method={method} path={path} specUrl={specUrl} />
-            )}
+
+            <OpenAPICopyButton
+                value={server + path}
+                className="openapi-path-title"
+                data-deprecated={operation.deprecated}
+            >
+                <span className="openapi-path-server">{server}</span>
+                {formattedPath}
+            </OpenAPICopyButton>
         </div>
     );
 }
 
-function validateHttpMethod(method: string): method is OpenAPIV3_1.HttpMethods {
-    return ['get', 'post', 'put', 'delete', 'patch', 'head', 'options', 'trace'].includes(method);
-}
-
-// Format the path to highlight placeholders
+/**
+ * Format the path by wrapping placeholders in <span> tags.
+ */
 function formatPath(path: string) {
     // Matches placeholders like {id}, {userId}, etc.
-    const regex = /\{(\w+)\}/g;
+    const regex = /\{\s*(\w+)\s*\}|:\w+/g;
 
     const parts: (string | React.JSX.Element)[] = [];
     let lastIndex = 0;
 
-    // Replace placeholders with <em> tags
-    path.replace(regex, (match, key, offset) => {
-        parts.push(path.slice(lastIndex, offset));
-        parts.push(<em key={key}>{`{${key}}`}</em>);
+    //Wrap the variables in <span> tags and maintain either {variable} or :variable
+    path.replace(regex, (match, _, offset) => {
+        if (offset > lastIndex) {
+            parts.push(path.slice(lastIndex, offset));
+        }
+        parts.push(
+            <span key={`offset-${offset}`} className="openapi-path-variable">
+                {match}
+            </span>
+        );
         lastIndex = offset + match.length;
         return match;
     });
 
-    // Push remaining text after the last placeholder
-    parts.push(path.slice(lastIndex));
+    if (lastIndex < path.length) {
+        parts.push(path.slice(lastIndex));
+    }
 
-    // Join parts with separators wrapped in <span>
-    const formattedPath = parts.reduce(
-        (acc, part, index) => {
-            if (typeof part === 'string' && index > 0 && part === '/') {
-                acc.push(
-                    <span className="openapi-path-separator" key={`sep-${index}`}>
-                        /
-                    </span>
-                );
-            }
+    const formattedPath = parts.map((part, index) => {
+        if (typeof part === 'string') {
+            return <span key={`part-${index}`}>{part}</span>;
+        }
+        return part;
+    });
 
-            acc.push(part);
-            return acc;
-        },
-        [] as (string | React.JSX.Element)[]
-    );
-
-    return <span>{formattedPath}</span>;
+    return formattedPath;
 }

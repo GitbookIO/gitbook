@@ -1,7 +1,6 @@
 'use server';
 
-import { getAbsoluteHref } from '@/lib/links';
-import { type AncestorRevisionPage, resolvePageId } from '@/lib/pages';
+import { resolvePageId } from '@/lib/pages';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
@@ -10,8 +9,8 @@ import type {
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
     SearchPageResult,
+    SearchSpaceResult,
     SiteSection,
-    SiteSpace,
     Space,
 } from '@gitbook/api';
 import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
@@ -19,6 +18,7 @@ import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/li
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
+import { joinPathWithBaseURL } from '@/lib/paths';
 import { isV2 } from '@/lib/v2';
 import { throwIfDataError } from '@v2/lib/data';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
@@ -30,15 +30,22 @@ export interface ComputedSectionResult {
     type: 'section';
     id: string;
     title: string;
-    href: string;
     body: string;
+    href: string;
+
+    pageId: string;
+    spaceId: string;
 }
 
 export interface ComputedPageResult {
     type: 'page';
     id: string;
     title: string;
+
     href: string;
+
+    pageId: string;
+    spaceId: string;
 
     /** When part of a multi-spaces search, the title of the space */
     spaceTitle?: string;
@@ -260,14 +267,17 @@ async function searchSiteContent(
                 const siteSection = sections.find((i) => i.id === siteSpace?.section);
 
                 return Promise.all(
-                    spaceItem.pages.map((item) =>
-                        transformSitePageResult(
-                            item,
-                            !siteSection || siteSection.siteSpaces.length > 1
-                                ? (siteSpace ?? undefined)
-                                : undefined,
-                            siteSection ?? undefined
-                        )
+                    spaceItem.pages.map((pageItem) =>
+                        transformSitePageResult(context, {
+                            pageItem,
+                            spaceItem,
+                            space:
+                                !siteSection || siteSection.siteSpaces.length > 1
+                                    ? siteSpace?.space
+                                    : undefined,
+                            spaceURL: siteSpace?.urls.published,
+                            siteSection: siteSection ?? undefined,
+                        })
                     )
                 );
             })
@@ -308,7 +318,7 @@ async function transformAnswer(
                 const spaceURL = siteSpace?.urls.published;
 
                 const href = spaceURL
-                    ? await getURLWithPageSections(page.page.path, spaceURL)
+                    ? joinPathWithBaseURL(spaceURL, page.page.path)
                     : context.linker.toPathForPage({
                           pages,
                           page: page.page,
@@ -341,63 +351,46 @@ async function transformAnswer(
     };
 }
 
-async function transformSectionsAndPage(args: {
-    item: SearchPageResult;
-    space?: Space;
-    section?: SiteSection;
-    spaceURL?: string;
-}): Promise<[ComputedPageResult, ComputedSectionResult[]]> {
-    const { item, space, section, spaceURL } = args;
-
-    const pageSections = await Promise.all(
-        item.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
-            type: 'section',
-            id: `${item.id}/${section.id}`,
-            title: section.title,
-            href: await getURLWithPageSections(section.path, spaceURL),
-            body: section.body,
-        })) ?? []
-    );
+async function transformSitePageResult(
+    context: GitBookBaseContext,
+    args: {
+        pageItem: SearchPageResult;
+        spaceItem: SearchSpaceResult;
+        space?: Space;
+        spaceURL?: string;
+        siteSection?: SiteSection;
+    }
+): Promise<OrderedComputedResult[]> {
+    const { pageItem, spaceItem, space, spaceURL, siteSection } = args;
+    const { linker } = context;
 
     const page: ComputedPageResult = {
         type: 'page',
-        id: item.id,
-        title: item.title,
-        href: await getURLWithPageSections(item.path, spaceURL),
+        id: `${spaceItem.id}/${pageItem.id}`,
+        title: pageItem.title,
+        href: spaceURL
+            ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
+            : linker.toPathInSpace(pageItem.path),
         spaceTitle: space?.title,
-        section: section,
-        ancestors: [], // @TODO: Empty for now, let's populate
+        pageId: pageItem.id,
+        spaceId: spaceItem.id,
+        section: siteSection,
+        ancestors: [], // @TODO: empty for now until we calculate performantly
     };
 
-    return [page, pageSections];
-}
-
-async function transformSitePageResult(
-    item: SearchPageResult,
-    siteSpace?: SiteSpace,
-    siteSection?: SiteSection
-) {
-    const [page, pageSections] = await transformSectionsAndPage({
-        item,
-        space: siteSpace?.space,
-        section: siteSection,
-        spaceURL: siteSpace?.urls.published,
-    });
+    const pageSections = await Promise.all(
+        pageItem.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
+            type: 'section',
+            id: `${page.id}/${section.id}`,
+            title: section.title,
+            href: spaceURL
+                ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
+                : linker.toPathInSpace(pageItem.path),
+            body: section.body,
+            pageId: pageItem.id,
+            spaceId: spaceItem.id,
+        })) ?? []
+    );
 
     return [page, ...pageSections];
-}
-
-// Resolve a relative path to an absolute URL
-// if the search result is relative to another space, we use the space URL
-async function getURLWithPageSections(path: string, spaceURL?: string) {
-    if (spaceURL) {
-        if (!spaceURL.endsWith('/')) {
-            spaceURL += '/';
-        }
-        if (path.startsWith('/')) {
-            path = path.slice(1);
-        }
-        return spaceURL + path;
-    }
-    return getAbsoluteHref(path);
 }

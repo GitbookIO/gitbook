@@ -1,29 +1,31 @@
-import { CustomizationFont, CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationDefaultFont, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { type PageParams, fetchPageData } from '@/components/SitePage';
+import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { getResizedImageURL } from '@v2/lib/images';
 
-const googleFontsMap: { [fontName in CustomizationFont]: string } = {
-    [CustomizationFont.Inter]: 'Inter',
-    [CustomizationFont.FiraSans]: 'Fira Sans Extra Condensed',
-    [CustomizationFont.IBMPlexSerif]: 'IBM Plex Serif',
-    [CustomizationFont.Lato]: 'Lato',
-    [CustomizationFont.Merriweather]: 'Merriweather',
-    [CustomizationFont.NotoSans]: 'Noto Sans',
-    [CustomizationFont.OpenSans]: 'Open Sans',
-    [CustomizationFont.Overpass]: 'Overpass',
-    [CustomizationFont.Poppins]: 'Poppins',
-    [CustomizationFont.Raleway]: 'Raleway',
-    [CustomizationFont.Roboto]: 'Roboto',
-    [CustomizationFont.RobotoSlab]: 'Roboto Slab',
-    [CustomizationFont.SourceSansPro]: 'Source Sans 3',
-    [CustomizationFont.Ubuntu]: 'Ubuntu',
-    [CustomizationFont.ABCFavorit]: 'Inter',
+const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
+    [CustomizationDefaultFont.Inter]: 'Inter',
+    [CustomizationDefaultFont.FiraSans]: 'Fira Sans Extra Condensed',
+    [CustomizationDefaultFont.IBMPlexSerif]: 'IBM Plex Serif',
+    [CustomizationDefaultFont.Lato]: 'Lato',
+    [CustomizationDefaultFont.Merriweather]: 'Merriweather',
+    [CustomizationDefaultFont.NotoSans]: 'Noto Sans',
+    [CustomizationDefaultFont.OpenSans]: 'Open Sans',
+    [CustomizationDefaultFont.Overpass]: 'Overpass',
+    [CustomizationDefaultFont.Poppins]: 'Poppins',
+    [CustomizationDefaultFont.Raleway]: 'Raleway',
+    [CustomizationDefaultFont.Roboto]: 'Roboto',
+    [CustomizationDefaultFont.RobotoSlab]: 'Roboto Slab',
+    [CustomizationDefaultFont.SourceSansPro]: 'Source Sans 3',
+    [CustomizationDefaultFont.Ubuntu]: 'Ubuntu',
+    [CustomizationDefaultFont.ABCFavorit]: 'Inter',
 };
 
 /**
@@ -31,12 +33,17 @@ const googleFontsMap: { [fontName in CustomizationFont]: string } = {
  */
 export async function serveOGImage(baseContext: GitBookSiteContext, params: PageParams) {
     const { context, pageTarget } = await fetchPageData(baseContext, params);
-    const { customization, site, linker } = context;
+    const { customization, site, linker, imageResizer } = context;
     const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
     if (customization.socialPreview.url) {
-        redirect(customization.socialPreview.url);
+        redirect(
+            await getResizedImageURL(imageResizer, customization.socialPreview.url, {
+                width: 1200,
+                height: 630,
+            })
+        );
     }
 
     // Compute all text to load only the necessary fonts
@@ -53,17 +60,45 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 : page.description
             : '';
 
-    const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
+    // Load the fonts
+    const { fontFamily, fonts } = await (async () => {
+        // google fonts
+        if (typeof customization.styling.font === 'string') {
+            const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
 
-    const regularText = pageDescription;
-    const boldText = `${contentTitle}${pageTitle}`;
+            const regularText = pageDescription;
+            const boldText = `${contentTitle}${pageTitle}`;
 
-    const fonts = (
-        await Promise.all([
-            loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
-            loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
-        ])
-    ).filter(filterOutNullable);
+            const fonts = (
+                await Promise.all([
+                    loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
+                    loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
+                ])
+            ).filter(filterOutNullable);
+
+            return { fontFamily, fonts };
+        }
+
+        // custom fonts
+        // We only load the primary font weights for now
+        const primaryFontWeights = getFontSourcesToPreload(customization.styling.font);
+
+        const fonts = (
+            await Promise.all(
+                primaryFontWeights.map((face) => {
+                    const { weight, sources } = face;
+                    if (sources.length === 0) {
+                        return null;
+                    }
+                    const url = sources[0].url;
+
+                    return loadCustomFont({ url, weight });
+                })
+            )
+        ).filter(filterOutNullable);
+
+        return { fontFamily: 'CustomFont', fonts };
+    })();
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -135,9 +170,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 </span>
             );
         const src = linker.toAbsoluteURL(
-            linker.toPathInContent(
-                `~gitbook/icon?size=medium&theme=${customization.themes.default}`
-            )
+            linker.toPathInSpace(`~gitbook/icon?size=medium&theme=${customization.themes.default}`)
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();
@@ -211,7 +244,6 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
     url.searchParams.set('text', text);
 
     const result = await fetch(url.href);
-
     if (!result.ok) {
         return null;
     }
@@ -235,4 +267,21 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
 
     // If for some reason we can't load the font, we'll just use the default one
     return null;
+}
+
+async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
+    const { url, weight } = input;
+    const response = await fetch(url);
+    if (!response.ok) {
+        return null;
+    }
+
+    const data = await response.arrayBuffer();
+
+    return {
+        name: 'CustomFont',
+        data,
+        style: 'normal' as const,
+        weight,
+    };
 }

@@ -1,8 +1,13 @@
 import clsx from 'clsx';
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
-import { OpenAPIRootSchema } from '../OpenAPISchema';
+import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
 import { Section, SectionBody } from '../StaticSection';
 import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPISchemasData } from '../types';
+
+type OpenAPISchemasContextProps = Omit<
+    OpenAPIContextProps,
+    'renderCodeBlock' | 'renderHeading' | 'renderDocument'
+>;
 
 /**
  * Display OpenAPI Schemas.
@@ -10,7 +15,7 @@ import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPISchemasData } fr
 export function OpenAPISchemas(props: {
     className?: string;
     data: OpenAPISchemasData;
-    context: OpenAPIContextProps;
+    context: OpenAPISchemasContextProps;
 }) {
     const { className, data, context } = props;
     const { schemas } = data;

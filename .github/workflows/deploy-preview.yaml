@@ -35,21 +35,11 @@ jobs:
             - name: Sets env vars for production
               if: github.ref == 'refs/heads/main'
               run: |
-                echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
                 echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
-            - name: Sets env vars for preview
-              if: github.ref != 'refs/heads/main'
-              run: |
-                  echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
             - name: Build Next.js with next-on-pages
               run: bun run turbo gitbook#build:cloudflare
               env:
-                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-                  SENTRY_RELEASE: ${{ github.sha }}
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.14.0

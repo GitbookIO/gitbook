@@ -1,9 +1,10 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { getResizedImageURL } from '@v2/lib/images';
 
 const SIZES = {
     /** Size for a favicon */
@@ -25,11 +26,24 @@ const SIZES = {
 /**
  * Generate an icon for a site content.
  */
-export function serveIcon(context: GitBookSiteContext, req: Request) {
+export async function serveIcon(context: GitBookSiteContext, req: Request) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
     const { site, customization } = context;
+    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
+
+    // If the site has a custom icon, redirect to it
+    if (customIcon) {
+        const iconUrl = options.theme === 'light' ? customIcon.light : customIcon.dark;
+        redirect(
+            await getResizedImageURL(context.imageResizer, iconUrl, {
+                width: size.width,
+                height: size.height,
+            })
+        );
+    }
+
     const contentTitle = site.title;
 
     return new ImageResponse(

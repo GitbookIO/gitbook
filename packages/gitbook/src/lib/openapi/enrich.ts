@@ -19,7 +19,7 @@ export async function enrichFilesystem(filesystem: Filesystem) {
             if (key !== 'example') {
                 const description = node.description.trim();
                 if (description) {
-                    node['x-gitbook-description-html'] = parseMarkdownWithCache(description);
+                    node['x-gitbook-description-html'] = await parseMarkdownWithCache(description);
                 }
             }
         }
@@ -31,7 +31,7 @@ export async function enrichFilesystem(filesystem: Filesystem) {
  * Create a markdown parser that caches the results of parsing.
  */
 const createMarkdownParser = () => (input: string) => {
-    const cache: Record<string, string> = {};
+    const cache: Record<string, Promise<string>> = {};
     const existing = cache[input];
     if (existing) {
         return existing;

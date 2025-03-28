@@ -8,6 +8,7 @@ import {
     isText,
     isXML,
 } from './contentTypeChecks';
+import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 export interface CodeSampleInput {
@@ -17,7 +18,7 @@ export interface CodeSampleInput {
     body?: any;
 }
 
-interface CodeSampleGenerator {
+export interface CodeSampleGenerator {
     id: string;
     label: string;
     syntax: string;
@@ -238,9 +239,12 @@ const BodyGenerators = {
                 : String(body);
         } else if (isText(contentType)) {
             body = `--data '${String(body).replace(/"/g, '')}'`;
-        } else if (isXML(contentType) || isCSV(contentType)) {
+        } else if (isXML(contentType)) {
+            // Convert to XML and ensure proper formatting
+            body = `--data-binary $'${convertBodyToXML(body)}'`;
+        } else if (isCSV(contentType)) {
             // We use --data-binary to avoid cURL converting newlines to \r\n
-            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '')}'`;
+            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '').replace(/\\n/g, '\n')}'`;
         } else if (isGraphQL(contentType)) {
             body = `--data '${stringifyOpenAPI(body)}'`;
             // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
@@ -249,7 +253,7 @@ const BodyGenerators = {
             // We use --data-binary to avoid cURL converting newlines to \r\n
             body = `--data-binary '@${String(body)}'`;
         } else {
-            body = `--data '${stringifyOpenAPI(body, null, 2)}'`;
+            body = `--data '${stringifyOpenAPI(body, null, 2).replace(/\\n/g, '\n')}'`;
         }
 
         return {
@@ -312,7 +316,9 @@ const BodyGenerators = {
             body = 'formData';
         } else if (isXML(contentType)) {
             code += 'const xml = `\n';
-            code += indent(String(body), 4);
+
+            // Convert JSON to XML if needed
+            code += indent(convertBodyToXML(body), 4);
             code += '`;\n\n';
             body = 'xml';
         } else if (isText(contentType)) {
@@ -346,6 +352,11 @@ const BodyGenerators = {
             body = 'files';
         }
 
+        if (isXML(contentType)) {
+            // Convert JSON to XML if needed
+            body = convertBodyToXML(body);
+        }
+
         return { body, code, headers };
     },
     getHTTPBody: (body: any, headers?: Record<string, string>) => {
@@ -358,23 +369,48 @@ const BodyGenerators = {
             formUrlEncoded: () => {
                 const encoded = isPlainObject(body)
                     ? Object.entries(body)
-                          .map(([key, value]) => `${key}=${String(value)}`)
+                          .map(([key, value]) => `${key}=${stringifyOpenAPI(value)}`)
                           .join('&')
-                    : String(body);
-                return `"${encoded}"`;
+                    : stringifyOpenAPI(body);
+                return `"${encoded.replace(/"/g, "'")}"`;
             },
             text: () => `"${String(body)}"`,
-            xmlOrCsv: () => `"${stringifyOpenAPI(body).replace(/"/g, '')}"`,
+            xml: () => {
+                // Convert JSON to XML if needed
+                return `"${convertBodyToXML(body)}"`;
+            },
+            csv: () => `"${stringifyOpenAPI(body).replace(/"/g, '')}"`,
             default: () => `${stringifyOpenAPI(body, null, 2)}`,
         };
 
         if (isPDF(contentType)) return typeHandlers.pdf();
         if (isFormUrlEncoded(contentType)) return typeHandlers.formUrlEncoded();
         if (isText(contentType)) return typeHandlers.text();
-        if (isXML(contentType) || isCSV(contentType)) {
-            return typeHandlers.xmlOrCsv();
-        }
+        if (isXML(contentType)) return typeHandlers.xml();
+        if (isCSV(contentType)) return typeHandlers.csv();
 
         return typeHandlers.default();
     },
 };
+
+/**
+ * Converts a body to XML format
+ */
+function convertBodyToXML(body: any): string {
+    // If body is already a string and looks like XML, return it as is
+    if (typeof body === 'string' && body.trim().startsWith('<')) {
+        return body;
+    }
+
+    // If body is not an object, try to parse it as JSON
+    if (typeof body !== 'object' || body === null) {
+        try {
+            body = JSON.parse(body);
+        } catch {
+            // If parsing fails, return the original body
+            return body;
+        }
+    }
+
+    return json2xml(body).replace(/"/g, '').replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+}

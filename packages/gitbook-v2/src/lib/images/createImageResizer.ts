@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY, GITBOOK_IMAGE_RESIZE_URL } from '../env';
-import type { GitBookSpaceLinker } from '../links';
+import type { GitBookLinker } from '../links';
 import { type SignatureVersion, generateImageSignature } from './signatures';
 import type { ImageResizer } from './types';
 
@@ -37,7 +37,7 @@ export function createImageResizer({
     linker,
 }: {
     /** The linker to use to create URLs. */
-    linker: GitBookSpaceLinker;
+    linker: GitBookLinker;
     /** The host name of the current site. */
     host: string;
 }): ImageResizer {
@@ -62,7 +62,7 @@ export function createImageResizer({
                     url: urlInput,
                 });
 
-                const url = linker.toAbsoluteURL(linker.toPathInContent('/~gitbook/image'));
+                const url = linker.toAbsoluteURL(linker.toPathInSite('/~gitbook/image'));
                 const searchParams = new URLSearchParams();
                 searchParams.set('url', getImageAPIUrl(urlInput));
 

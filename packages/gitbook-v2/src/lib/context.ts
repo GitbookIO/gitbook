@@ -1,7 +1,7 @@
 import { getSiteStructureSections } from '@/lib/sites';
 import type {
     ChangeRequest,
-    PublishedSiteContentLookup,
+    PublishedSiteContent,
     RevisionPage,
     RevisionPageDocument,
     Site,
@@ -13,12 +13,17 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
-import { type GitBookDataFetcher, createDataFetcher, throwIfDataError } from '@v2/lib/data';
-import { redirect } from 'next/navigation';
+import {
+    type GitBookDataFetcher,
+    createDataFetcher,
+    getDataOrNull,
+    throwIfDataError,
+} from '@v2/lib/data';
+import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_URL } from './env';
+import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
-import { type GitBookSpaceLinker, createLinker } from './links';
+import { type GitBookLinker, createLinker } from './links';
 
 /**
  * Generic context when rendering content.
@@ -32,7 +37,7 @@ export type GitBookBaseContext = {
     /**
      * Linker to generate links in the current space.
      */
-    linker: GitBookSpaceLinker;
+    linker: GitBookLinker;
 
     /**
      * Image resizer to resize images.
@@ -102,28 +107,45 @@ export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
 };
 
 /**
- * Get the base context for a request.
+ * Get the base context for a request on a site.
  */
 export function getBaseContext(input: {
     siteURL: URL | string;
+    siteURLData: PublishedSiteContent;
     urlMode: 'url' | 'url-host';
-    apiToken?: string | null;
 }) {
-    const url = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
-    const urlMode = input.urlMode;
+    const { urlMode, siteURLData } = input;
+    const siteURL = typeof input.siteURL === 'string' ? new URL(input.siteURL) : input.siteURL;
 
     const dataFetcher = createDataFetcher({
-        apiToken: input.apiToken ?? GITBOOK_API_TOKEN,
-        apiEndpoint: GITBOOK_API_URL,
+        apiToken: siteURLData.apiToken ?? null,
     });
 
-    const linker = getLinkerForSiteURL({
-        siteURL: url,
-        urlMode,
-    });
+    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
+    const linker =
+        urlMode === 'url-host'
+            ? createLinker({
+                  host: siteURL.host,
+                  siteBasePath: siteURLData.siteBasePath,
+                  spaceBasePath: siteURLData.basePath,
+              })
+            : createLinker({
+                  protocol: gitbookURL?.protocol,
+                  host: gitbookURL?.host,
+                  siteBasePath: `/url/${siteURL.host}${siteURLData.siteBasePath}`,
+                  spaceBasePath: `/url/${siteURL.host}${siteURLData.basePath}`,
+              });
+
+    if (urlMode === 'url') {
+        // Create link in the same format for links to other sites/sections.
+        linker.toLinkForContent = (rawURL: string) => {
+            const urlObject = new URL(rawURL);
+            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`;
+        };
+    }
 
     const imageResizer = createImageResizer({
-        host: url.host,
+        host: siteURL.host,
         // To ensure image resizing work for proxied sites,
         // we serve images from the root of the site.
         linker: linker,
@@ -137,91 +159,22 @@ export function getBaseContext(input: {
 }
 
 /**
- * Get the linker for a given site URL.
- */
-export function getLinkerForSiteURL(input: {
-    siteURL: URL;
-    urlMode: 'url' | 'url-host';
-}) {
-    const { siteURL, urlMode } = input;
-
-    const gitbookURL = GITBOOK_URL ? new URL(GITBOOK_URL) : undefined;
-    const linker =
-        urlMode === 'url-host'
-            ? createLinker({
-                  host: siteURL.host,
-                  pathname: siteURL.pathname,
-              })
-            : createLinker({
-                  protocol: gitbookURL?.protocol,
-                  host: gitbookURL?.host,
-                  pathname: `/url/${siteURL.host}${siteURL.pathname}`,
-              });
-
-    if (urlMode === 'url') {
-        // Create link in the same format for links to other sites/sections.
-        linker.toLinkForContent = (rawURL: string) => {
-            const urlObject = new URL(rawURL);
-            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`;
-        };
-    }
-
-    return linker;
-}
-
-/**
- * Fetch the context of a site for a given URL and a base context.
- */
-export async function fetchSiteContextByURL(
-    baseContext: GitBookBaseContext,
-    input: {
-        url: string;
-        visitorAuthToken: string | null;
-        redirectOnError: boolean;
-    }
-): Promise<GitBookSiteContext> {
-    const { dataFetcher } = baseContext;
-    const data = await throwIfDataError(
-        dataFetcher.getPublishedContentByUrl({
-            url: input.url,
-            visitorAuthToken: input.visitorAuthToken,
-            redirectOnError: input.redirectOnError,
-        })
-    );
-
-    return fetchSiteContextByURLLookup(baseContext, data);
-}
-
-/**
  * Fetch the context of a site using the resolution of a URL
  */
 export async function fetchSiteContextByURLLookup(
     baseContext: GitBookBaseContext,
-    data: PublishedSiteContentLookup
+    data: PublishedSiteContent
 ): Promise<GitBookSiteContext> {
-    const { dataFetcher } = baseContext;
-    if ('redirect' in data) {
-        redirect(data.redirect);
-    }
-
-    return await fetchSiteContextByIds(
-        {
-            ...baseContext,
-            dataFetcher: dataFetcher.withToken({
-                apiToken: data.apiToken,
-            }),
-        },
-        {
-            organization: data.organization,
-            site: data.site,
-            siteSection: data.siteSection,
-            siteSpace: data.siteSpace,
-            space: data.space,
-            shareKey: data.shareKey,
-            changeRequest: data.changeRequest,
-            revision: data.revision,
-        }
-    );
+    return await fetchSiteContextByIds(baseContext, {
+        organization: data.organization,
+        site: data.site,
+        siteSection: data.siteSection,
+        siteSpace: data.siteSpace,
+        space: data.space,
+        shareKey: data.shareKey,
+        changeRequest: data.changeRequest,
+        revision: data.revision,
+    });
 }
 
 /**
@@ -330,7 +283,7 @@ export async function fetchSpaceContextByIds(
             })
         ),
         ids.changeRequest
-            ? throwIfDataError(
+            ? getDataOrNull(
                   dataFetcher.getChangeRequest({
                       spaceId: ids.space,
                       changeRequestId: ids.changeRequest,
@@ -339,17 +292,30 @@ export async function fetchSpaceContextByIds(
             : null,
     ]);
 
-    const revisionId = changeRequest?.revision ?? ids.revision ?? space.revision;
+    if (ids.changeRequest && !changeRequest) {
+        // When trying to render a change request with an invalid / non-existing ID,
+        // we should return a 404.
+        notFound();
+    }
 
-    const pages = await throwIfDataError(
+    const revisionId = ids.revision ?? changeRequest?.revision ?? space.revision;
+
+    const pages = await getDataOrNull(
         dataFetcher.getRevisionPages({
             spaceId: ids.space,
             revisionId,
             // We only care about the Git metadata when the Git sync is enabled,
             // otherwise we can optimize performance by not fetching it
             metadata: !!space.gitSync,
-        })
+        }),
+
+        // When trying to render a revision with an invalid / non-existing ID,
+        // we should handle gracefully the 404 and throw notFound.
+        ids.revision ? [404] : undefined
     );
+    if (!pages) {
+        notFound();
+    }
 
     return {
         ...baseContext,

@@ -112,6 +112,17 @@ export function getCacheTag(
 }
 
 /**
+ * Get the cache tag for a given URL.
+ */
+export function getCacheTagForURL(url: string | URL) {
+    const parsedURL = url instanceof URL ? url : new URL(url);
+    return getCacheTag({
+        tag: 'url',
+        hostname: parsedURL.hostname,
+    });
+}
+
+/**
  * Get the tags for a computed content source.
  */
 export function getComputedContentSourceCacheTags(

@@ -7,7 +7,6 @@
         "ARGOS_*",
         "GITHUB_*",
         "GITBOOK_*",
-        "SENTRY_*",
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"
     ],
     "tasks": {
@@ -37,7 +36,7 @@
         },
         // Check the package for type errors
         "typecheck": {
-            "dependsOn": ["^typecheck", "build", "generate"]
+            "dependsOn": ["^typecheck", "build"]
         },
         // Lint the package for style errors
         "lint": {

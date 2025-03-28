@@ -1,12 +1,12 @@
 import hash from 'object-hash';
 
-import { captureException } from '../../sentry';
 import { race, singletonMap } from '../async';
 import { type TraceSpan, trace } from '../tracing';
 import { assertIsNotV2 } from '../v2';
 import { waitUntil } from '../waitUntil';
 import { cacheBackends } from './backends';
 import { memoryCache } from './memory';
+import { addResponseCacheTag } from './response';
 import type { CacheBackend, CacheEntry } from './types';
 
 export type CacheFunctionOptions = {
@@ -53,6 +53,9 @@ export interface CacheDefinition<Args extends any[], Result> {
 
     /** Tag to associate to the entry */
     tag?: (...args: Args) => string;
+
+    /** If true, the tag will not be sent to the HTTP response, as we consider it immutable */
+    tagImmutable?: boolean;
 
     /** Filter the arguments that should be taken into consideration for the cache key */
     getKeyArgs?: (args: Args) => any[];
@@ -134,6 +137,11 @@ export function cache<Args extends any[], Result>(
             let result: readonly [CacheEntry, string] | null = null;
             const tag = cacheDef.tag?.(...args);
 
+            // Add the cache tag to the HTTP response
+            if (tag && !cacheDef.tagImmutable) {
+                addResponseCacheTag(tag);
+            }
+
             // Try the memory backend, independently of the other backends as it doesn't have a network cost
             const memoryEntry = await memoryCache.get({ key, tag });
             if (memoryEntry) {
@@ -150,17 +158,11 @@ export function cache<Args extends any[], Result>(
                         }
 
                         // Detect empty cache entries to avoid returning them.
-                        // Also log in Sentry to investigate what cache is returning empty entries.
                         if (
                             entry.data &&
                             typeof entry.data === 'object' &&
                             Object.keys(entry.data).length === 0
                         ) {
-                            captureException(
-                                new Error(
-                                    `Cache entry ${key} from ${backendName} is an empty object`
-                                )
-                            );
                             return null;
                         }
 

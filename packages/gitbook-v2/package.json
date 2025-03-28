@@ -1,20 +1,24 @@
 {
     "name": "gitbook-v2",
-    "version": "0.2.0",
+    "version": "0.2.2",
     "private": true,
     "dependencies": {
-        "next": "^15.2.1",
+        "next": "^15.2.3",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "@gitbook/api": "0.96.1",
+        "@gitbook/api": "*",
         "@gitbook/cache-tags": "workspace:*",
         "@sindresorhus/fnv1a": "^3.1.0",
         "server-only": "^0.0.1",
-        "warn-once": "^0.1.1"
+        "warn-once": "^0.1.1",
+        "rison": "^0.1.1",
+        "jwt-decode": "^4.0.0",
+        "p-memoize": "^7.1.1"
     },
     "devDependencies": {
         "gitbook": "*",
-        "@opennextjs/cloudflare": "https://pkg.pr.new/opennextjs/opennextjs-cloudflare/@opennextjs/cloudflare@236c84d",
+        "@opennextjs/cloudflare": "^0.5.10",
+        "@types/rison": "^0.0.9",
         "tailwindcss": "^3.4.0",
         "postcss": "^8"
     },
@@ -26,6 +30,7 @@
         "start": "next start",
         "build:v2:cloudflare": "opennextjs-cloudflare",
         "dev:v2:cloudflare": "wrangler dev --port 8771",
-        "unit": "bun test"
+        "unit": "bun test",
+        "typecheck": "tsc --noEmit"
     }
 }

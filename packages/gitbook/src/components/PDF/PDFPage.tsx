@@ -1,5 +1,4 @@
 import {
-    type CustomizationSettings,
     type Revision,
     type RevisionPageDocument,
     type RevisionPageGroup,
@@ -11,7 +10,7 @@ import {
 import { Icon } from '@gitbook/icons';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
 import { getPageDocument } from '@v2/lib/data';
-import type { GitBookSpaceLinker } from '@v2/lib/links';
+import type { GitBookLinker } from '@v2/lib/links';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -24,7 +23,7 @@ import { tString } from '@/intl/translate';
 import { getPagePDFContainerId } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import { defaultCustomizationForSpace } from '@/lib/utils';
+import { defaultCustomization } from '@/lib/utils';
 import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
 import { PageControlButtons } from './PageControlButtons';
@@ -57,7 +56,7 @@ export async function PDFPage(props: {
     const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
 
     const customization =
-        'customization' in baseContext ? baseContext.customization : defaultCustomizationForSpace();
+        'customization' in baseContext ? baseContext.customization : defaultCustomization();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
@@ -67,7 +66,7 @@ export async function PDFPage(props: {
     );
 
     // Build a linker that create anchor links for the pages rendered in the PDF page.
-    const linker: GitBookSpaceLinker = {
+    const linker: GitBookLinker = {
         ...baseContext.linker,
         toPathForPage(input) {
             if (pages.some((p) => p.page.id === input.page.id)) {
@@ -93,7 +92,7 @@ export async function PDFPage(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInContent(''))}
+                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInSpace(''))}
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -180,7 +179,7 @@ export async function PDFPage(props: {
 
 async function PDFSpaceIntro(props: {
     space: Space;
-    customization: CustomizationSettings | SiteCustomizationSettings;
+    customization: SiteCustomizationSettings;
 }) {
     const { space, customization } = props;
 

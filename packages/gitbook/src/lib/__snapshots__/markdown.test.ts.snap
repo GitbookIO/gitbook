@@ -89,14 +89,14 @@ A serialnumbers value governs its order within the given token.id</p>
 <td>lt(e)</td>
 <td>Y</td>
 <td>Single occurrence only. Requires the presence of an <strong>lte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td>
-<td>?token.id=lte:X&amp;serialnumber=lt:Y</td>
+<td>?token.id=lte:X&#x26;serialnumber=lt:Y</td>
 </tr>
 <tr>
 <td></td>
 <td>gt(e)</td>
 <td>Y</td>
 <td>Single occurrence only. Requires the presence of an <strong>gte</strong> or <strong>eq</strong> <strong>token.id</strong> query</td>
-<td>?token.id=gte:X&amp;serialnumber=gt:Y</td>
+<td>?token.id=gte:X&#x26;serialnumber=gt:Y</td>
 </tr>
 <tr>
 <td>spender.id</td>
@@ -130,4 +130,17 @@ A serialnumbers value governs its order within the given token.id</p>
 </table>
 <p>Note: When searching across a range for individual NFTs a <strong>serialnumber</strong> with an additional <strong>token.id</strong> query filter must be provided.
 Both filters must be a single occurrence of <strong>gt(e)</strong> or <strong>lt(e)</strong> which provide a lower and or upper boundary for search.</p>"
+`;
+
+exports[`parseMarkdown should parse html 1`] = `
+"<p>Returns trending events for the given time frame.</p>
+<p>The events are sorted by <code>trending score</code>.</p>
+<p>To calculate trending score for an event, each bet placed on this event
+contributes a value determined by how recently the bet was placed.</p>
+<p>Recent bets add more value than older ones.</p>
+<p>The normalized value of its score is also assigned to each event as its confidence.</p>
+<p>In this example we get all trending events where <code>league</code> is <code>UEFA Champions League</code>.</p>
+<pre><code class="language-bash">$ curl --request GET \\
+  --url 'https://api.vaix.ai/api/sports/events/trending?filters=league%3Aeq%3AUEFA%20Champions%20League'
+</code></pre>"
 `;

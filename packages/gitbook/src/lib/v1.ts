@@ -18,7 +18,6 @@ import {
     getDocument,
     getEmbedByUrlInSpace,
     getLatestOpenAPISpecVersionContent,
-    getPublishedContentByUrl,
     getPublishedContentSite,
     getReusableContent,
     getRevision,
@@ -28,10 +27,11 @@ import {
     getSiteRedirectBySource,
     getSpace,
     getUserById,
+    renderIntegrationUi,
     searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
-import { getBasePath, getHost } from './links';
+import { getBasePath, getHost, getSiteBasePath } from './links';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -43,11 +43,18 @@ import { getBasePath, getHost } from './links';
 export async function getV1BaseContext(): Promise<GitBookBaseContext> {
     const host = await getHost();
     const basePath = await getBasePath();
+    const siteBasePath = await getSiteBasePath();
 
     const linker = createLinker({
         host,
-        pathname: basePath,
+        spaceBasePath: basePath,
+        siteBasePath: siteBasePath,
     });
+
+    // On V1, we use hard-navigation between different spaces because of layout issues
+    linker.toLinkForContent = (url) => {
+        return url;
+    };
 
     const dataFetcher = await getDataFetcherV1();
 
@@ -56,7 +63,8 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
         // In V1, we always resize at the top level of the hostname, not relative to the content.
         linker: createLinker({
             host,
-            pathname: '/',
+            spaceBasePath: '/',
+            siteBasePath: '/',
         }),
     });
 
@@ -73,11 +81,7 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
  * This data fetcher should only be used at the top of the tree.
  */
 async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
-    const apiClient = await api();
-
     const dataFetcher: GitBookDataFetcher = {
-        apiEndpoint: apiClient.client.endpoint,
-
         async api() {
             const result = await api();
             return result.client;
@@ -97,17 +101,6 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                 }
 
                 return user;
-            });
-        },
-
-        // @ts-ignore - types are compatible enough, and this will not be called in v1 this way
-        getPublishedContentByUrl(params) {
-            return wrapDataFetcherError(async () => {
-                return getPublishedContentByUrl(
-                    params.url,
-                    params.visitorAuthToken ?? undefined,
-                    params.redirectOnError ? true : undefined
-                );
             });
         },
 
@@ -160,6 +153,10 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             });
         },
 
+        getRevisionPageMarkdown() {
+            throw new Error('Not implemented in v1');
+        },
+
         getDocument(params) {
             return wrapDataFetcherError(async () => {
                 const document = await getDocument(params.spaceId, params.documentId);
@@ -173,7 +170,12 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getComputedDocument(params) {
             return wrapDataFetcherError(() => {
-                return getComputedDocument(params.organizationId, params.spaceId, params.source);
+                return getComputedDocument(
+                    params.organizationId,
+                    params.spaceId,
+                    params.source,
+                    params.seed
+                );
             });
         },
 
@@ -248,7 +250,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
             });
         },
 
-        async searchSiteContent(params) {
+        searchSiteContent(params) {
             return wrapDataFetcherError(async () => {
                 const { organizationId, siteId, query, cacheBust, scope } = params;
                 const result = await searchSiteContent(
@@ -259,6 +261,13 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                     cacheBust
                 );
                 return result.items;
+            });
+        },
+
+        renderIntegrationUi(params) {
+            return wrapDataFetcherError(async () => {
+                const result = await renderIntegrationUi(params.integrationName, params.request);
+                return result;
             });
         },
     };

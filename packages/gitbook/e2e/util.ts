@@ -2,12 +2,13 @@ import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationBackground,
     CustomizationCorners,
-    CustomizationFont,
+    CustomizationDefaultFont,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationLinksStyle,
     CustomizationLocale,
+    CustomizationSearchStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
     CustomizationTheme,
@@ -15,7 +16,7 @@ import {
     type CustomizationThemedColor,
     type SiteCustomizationSettings,
 } from '@gitbook/api';
-import { type BrowserContext, type Page, expect, test } from '@playwright/test';
+import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
 import deepMerge from 'deepmerge';
 import rison from 'rison';
 import type { DeepPartial } from 'ts-essentials';
@@ -32,7 +33,7 @@ export interface Test {
     /**
      * Test to run
      */
-    run?: (page: Page) => Promise<unknown>;
+    run?: (page: Page, response: Response | null) => Promise<unknown>;
     /**
      * Whether the test should be fullscreened during testing.
      */
@@ -62,6 +63,7 @@ export interface Test {
 
 export type TestsCase = {
     name: string;
+    skip?: boolean;
     tests: Array<Test>;
     contentBaseURL?: string;
 };
@@ -109,6 +111,11 @@ export const allSidebarBackgroundStyles: CustomizationSidebarBackgroundStyle[] =
     CustomizationSidebarBackgroundStyle.Filled,
 ];
 
+export const allSearchStyles: CustomizationSearchStyle[] = [
+    CustomizationSearchStyle.Prominent,
+    CustomizationSearchStyle.Subtle,
+];
+
 // Common customization settings
 
 export const headerLinks: CustomizationHeaderItem[] = [
@@ -127,11 +134,13 @@ export const headerLinks: CustomizationHeaderItem[] = [
 ];
 
 export async function waitForCookiesDialog(page: Page) {
-    const dialog = page.getByRole('dialog', { name: 'Cookies' });
-    const accept = dialog.getByRole('button', { name: 'Accept' });
-    const reject = dialog.getByRole('button', { name: 'Reject' });
-    await expect(accept).toBeVisible();
-    await expect(reject).toBeVisible();
+    const dialog = page.getByTestId('cookies-dialog');
+    await expect(dialog).toBeVisible();
+}
+
+export async function waitForNotFound(_page: Page, response: Response | null) {
+    expect(response).not.toBeNull();
+    expect(response?.status()).toBe(404);
 }
 
 /**
@@ -139,6 +148,10 @@ export async function waitForCookiesDialog(page: Page) {
  */
 export function runTestCases(testCases: TestsCase[]) {
     for (const testCase of testCases) {
+        if (testCase.skip) {
+            continue;
+        }
+
         test.describe(testCase.name, () => {
             for (const testEntry of testCase.tests) {
                 const testFn = testEntry.only ? test.only : test;
@@ -175,23 +188,24 @@ export function runTestCases(testCases: TestsCase[]) {
                         }
                     });
 
-                    await page.goto(url);
+                    const response = await page.goto(url);
                     if (testEntry.run) {
-                        await testEntry.run(page);
+                        await testEntry.run(page, response);
                     }
                     const screenshotOptions = testEntry.screenshot;
                     if (screenshotOptions !== false) {
                         await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
                             viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
                             argosCSS: `
-                        /* Hide Intercom */
-                        .intercom-lightweight-app {
-                            display: none !important;
+                            /* Hide Intercom */
+                            .intercom-lightweight-app {
+                                display: none !important;
                             }
                             `,
                             threshold: screenshotOptions?.threshold ?? undefined,
                             fullPage: testEntry.fullPage ?? false,
-                            beforeScreenshot: async () => {
+                            beforeScreenshot: async ({ runStabilization }) => {
+                                await runStabilization();
                                 await waitForIcons(page);
                                 if (screenshotOptions?.waitForTOCScrolling !== false) {
                                     await waitForTOCScrolling(page);
@@ -249,7 +263,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             dangerColor: { light: '#FB2C36', dark: '#FB2C36' },
             successColor: { light: '#00C950', dark: '#00C950' },
             corners: CustomizationCorners.Rounded,
-            font: CustomizationFont.Inter,
+            font: CustomizationDefaultFont.Inter,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,
@@ -257,6 +271,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,
             },
+            search: CustomizationSearchStyle.Subtle,
         },
         internationalization: {
             locale: CustomizationLocale.En,
@@ -312,29 +327,66 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  * Wait for all icons present on the page to be loaded.
  */
 async function waitForIcons(page: Page) {
-    await page.waitForFunction(async () => {
-        function loadImage(src: string) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = (_error) => reject(new Error(`Failed to load image: ${src}`));
-                img.src = src;
-            });
-        }
-
+    await page.waitForFunction(() => {
+        const urls = new Set<string>();
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
-        await Promise.all(
-            icons.map(async (icon) => {
-                // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
-                const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
-                const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
-                const url = urlMatch ? urlMatch[1] : null;
-                if (!url) {
-                    throw new Error('No mask-image');
-                }
-                await loadImage(url);
-            })
-        );
+        const results = icons.map((icon) => {
+            if (!(icon instanceof SVGElement)) {
+                throw new Error('Icon is not an SVGElement');
+            }
+
+            // If loaded, good it passes the test.
+            if (icon.dataset.loadingState === 'loaded') {
+                return true;
+            }
+
+            // If not loaded yet, we need to load it.
+            if (icon.dataset.loadingState === 'pending') {
+                return false;
+            }
+
+            // Ignore icons that are not visible.
+            if (!icon.checkVisibility()) {
+                return true;
+            }
+
+            // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
+            const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
+            const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
+            const url = urlMatch ? urlMatch[1] : null;
+
+            // If URL is invalid we throw an error.
+            if (!url) {
+                throw new Error('No mask-image');
+            }
+
+            // If the URL is already loaded, we just mark it as loaded.
+            if (urls.has(url)) {
+                icon.dataset.loadingState = 'loaded';
+                return true;
+            }
+
+            // Mark the icon as pending and load the image.
+            icon.dataset.loadingState = 'pending';
+
+            // Mark the URL as seen.
+            urls.add(url);
+
+            const img = new Image();
+            img.src = url;
+            img.decode().then(() => {
+                // Wait two frames to let the time to the icon to repaint.
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        icon.dataset.loadingState = 'loaded';
+                    });
+                });
+            });
+
+            return false;
+        });
+
+        return results.every((x) => x);
     });
 }
 

@@ -1,18 +1,25 @@
 import { parseOpenAPI } from '@gitbook/openapi-parser';
 
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
-import type { ResolveOpenAPIBlockArgs } from '@/lib/openapi/types';
+import type {
+    AnyOpenAPIOperationsBlock,
+    OpenAPISchemasBlock,
+    ResolveOpenAPIBlockArgs,
+} from '@/lib/openapi/types';
+import { memoize } from '@v2/lib/data/memoize';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
 import type { FetchOpenAPIFilesystemResult } from './types';
 
+type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock;
+
 /**
  * Fetch OpenAPI block.
  */
 export async function fetchOpenAPIFilesystem(
-    args: ResolveOpenAPIBlockArgs
+    args: ResolveOpenAPIBlockArgs<AnyOpenAPIBlock>
 ): Promise<FetchOpenAPIFilesystemResult> {
     const { context, block } = args;
 
@@ -50,7 +57,7 @@ const fetchFilesystemV1 = cache({
     get: async (url: string, options: CacheFunctionOptions) => {
         const richFilesystem = await fetchFilesystemUncached(url, options);
         return {
-            // Cache for 4 hours
+            // Cache for 24 hours
             ttl: 24 * 60 * 60,
             // Revalidate every 2 hours
             revalidateBefore: 22 * 60 * 60,
@@ -59,7 +66,7 @@ const fetchFilesystemV1 = cache({
     },
 });
 
-async function fetchFilesystemV2(url: string) {
+const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(url: string) {
     'use cache';
 
     // TODO: add cache lifetime once we can use next.js 15 code here
@@ -67,7 +74,7 @@ async function fetchFilesystemV2(url: string) {
     const response = await fetchFilesystemUncached(url);
 
     return response;
-}
+});
 
 async function fetchFilesystemUncached(
     url: string,

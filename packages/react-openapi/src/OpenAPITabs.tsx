@@ -3,14 +3,13 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
 import { useEventCallback } from 'usehooks-ts';
-import { Markdown } from './Markdown';
 import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
 
 export type TabItem = {
     key: Key;
     label: string;
     body: React.ReactNode;
-    description?: string;
+    footer?: React.ReactNode;
 };
 
 type OpenAPITabsContextData = {
@@ -138,10 +137,10 @@ export function OpenAPITabsPanels() {
     const key = selectedTab.key.toString();
 
     return (
-        <TabPanel key={key} id={key} className="openapi-tabs-panel">
-            {selectedTab.body}
-            {selectedTab.description ? (
-                <Markdown source={selectedTab.description} className="openapi-tabs-footer" />
+        <TabPanel id={key} className="openapi-tabs-panel">
+            <div className="openapi-tabs-body">{selectedTab.body}</div>
+            {selectedTab.footer ? (
+                <div className="openapi-tabs-footer">{selectedTab.footer}</div>
             ) : null}
         </TabPanel>
     );

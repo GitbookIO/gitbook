@@ -47,18 +47,11 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
             aria-label={tString(language, 'table_of_contents_button_label')}
             onClick={toggleNavigation}
             className={tcls(
-                'flex',
-                'flex-row',
-                'items-center',
-                'py-1',
-                'px-2',
-                'rounded',
-                'straight-corners:rounded-sm',
-                'page-no-toc:hidden',
+                'flex flex-row items-center rounded straight-corners:rounded-sm px-2 py-1',
                 props.className
             )}
         >
-            <Icon icon="bars" className={tcls('size-4', 'text-inherit')} />
+            <Icon icon="bars" className="size-4 text-inherit" />
         </button>
     );
 }

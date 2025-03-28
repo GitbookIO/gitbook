@@ -21,11 +21,6 @@ export type DataFetcherResponse<T> =
  */
 export interface GitBookDataFetcher {
     /**
-     * Endpoint of the API.
-     */
-    apiEndpoint: string;
-
-    /**
      * Get an API client for the current context.
      */
     api(): Promise<api.GitBookAPI>;
@@ -41,15 +36,6 @@ export interface GitBookDataFetcher {
      * Get a user by its ID.
      */
     getUserById(userId: string): Promise<DataFetcherResponse<api.User>>;
-
-    /**
-     * Get a published content by its URL.
-     */
-    getPublishedContentByUrl(params: {
-        url: string;
-        visitorAuthToken: string | null;
-        redirectOnError: boolean;
-    }): Promise<DataFetcherResponse<api.PublishedSiteContentLookup>>;
 
     /**
      * Get a published content site by its organization ID and site ID.
@@ -112,6 +98,15 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<api.RevisionPageDocument | api.RevisionPageGroup>>;
 
     /**
+     * Get the markdown content of a page by its path.
+     */
+    getRevisionPageMarkdown(params: {
+        spaceId: string;
+        revisionId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<string>>;
+
+    /**
      * Get a document by its space ID and document ID.
      */
     getDocument(params: { spaceId: string; documentId: string }): Promise<
@@ -125,6 +120,7 @@ export interface GitBookDataFetcher {
         organizationId: string;
         spaceId: string;
         source: api.ComputedContentSource;
+        seed: string;
     }): Promise<DataFetcherResponse<api.JSONDocument>>;
 
     /**
@@ -175,4 +171,12 @@ export interface GitBookDataFetcher {
         /** Cache bust to ensure the search results are fresh when the space is updated. */
         cacheBust?: string;
     }): Promise<DataFetcherResponse<api.SearchSpaceResult[]>>;
+
+    /**
+     * Render an integration UI.
+     */
+    renderIntegrationUi(params: {
+        integrationName: string;
+        request: api.RenderIntegrationUI;
+    }): Promise<DataFetcherResponse<api.ContentKitRenderOutput>>;
 }

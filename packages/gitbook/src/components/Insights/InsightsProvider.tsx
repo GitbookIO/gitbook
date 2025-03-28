@@ -5,8 +5,8 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import * as cookies from '@/lib/cookies';
-
+import type { VisitorAuthClaims } from '@/lib/adaptive';
+import { getAllBrowserCookiesMap } from '@/lib/browser-cookies';
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';
 
@@ -23,6 +23,7 @@ type InsightsEventContext = {
     siteShareKey: string | null;
     spaceId: string;
     revisionId: string;
+    visitorAuthClaims: VisitorAuthClaims;
 };
 
 /**
@@ -65,7 +66,6 @@ interface InsightsProviderProps extends InsightsEventContext {
     enabled: boolean;
     appURL: string;
     apiHost: string;
-    visitorAuthToken: string | null;
     children: React.ReactNode;
 }
 
@@ -73,7 +73,7 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, visitorAuthToken, children, ...context } = props;
+    const { enabled, appURL, apiHost, children, ...context } = props;
 
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
@@ -116,7 +116,6 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     pageContext: eventsForPathname.pageContext,
                     visitorId,
                     sessionId: session.id,
-                    visitorAuthToken,
                 })
             );
 
@@ -253,16 +252,15 @@ function transformEvents(input: {
     pageContext: InsightsEventPageContext;
     visitorId: string;
     sessionId: string;
-    visitorAuthToken: string | null;
 }): api.SiteInsightsEvent[] {
     const session: api.SiteInsightsEventSession = {
         sessionId: input.sessionId,
         visitorId: input.visitorId,
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
-        cookies: cookies.getAll(),
+        cookies: getAllBrowserCookiesMap(),
         referrer: document.referrer || null,
-        visitorAuthToken: input.visitorAuthToken ?? null,
+        visitorAuthClaims: input.context.visitorAuthClaims,
     };
 
     const location: api.SiteInsightsEventLocation = {
