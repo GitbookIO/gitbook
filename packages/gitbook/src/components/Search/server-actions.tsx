@@ -1,7 +1,7 @@
 'use server';
 
 import { resolvePageId } from '@/lib/pages';
-import { findSiteSpaceById } from '@/lib/sites';
+import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 import type {
@@ -10,6 +10,8 @@ import type {
     SearchAIRecommendedQuestionStream,
     SearchPageResult,
     SearchSpaceResult,
+    SiteSection,
+    SiteSectionGroup,
     Space,
 } from '@gitbook/api';
 import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
@@ -19,6 +21,7 @@ import type * as React from 'react';
 
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { isV2 } from '@/lib/v2';
+import type { IconName } from '@gitbook/icons';
 import { throwIfDataError } from '@v2/lib/data';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { DocumentView } from '../DocumentView';
@@ -46,8 +49,7 @@ export interface ComputedPageResult {
     pageId: string;
     spaceId: string;
 
-    /** When part of a multi-spaces search, the title of the space */
-    spaceTitle?: string;
+    breadcrumbs?: Array<{ icon?: IconName; label: string }>;
 }
 
 export interface AskAnswerSource {
@@ -258,7 +260,16 @@ async function searchSiteContent(
     return (
         await Promise.all(
             searchResults.map(async (spaceItem) => {
+                const sections = getSiteStructureSections(structure).flatMap((item) =>
+                    item.object === 'site-section-group' ? [item, ...item.sections] : item
+                );
                 const siteSpace = findSiteSpaceById(structure, spaceItem.id);
+                const siteSection = sections.find(
+                    (section) => section.id === siteSpace?.section
+                ) as SiteSection;
+                const siteSectionGroup = siteSection?.sectionGroup
+                    ? sections.find((sectionGroup) => sectionGroup.id === siteSection.sectionGroup)
+                    : null;
 
                 return Promise.all(
                     spaceItem.pages.map((pageItem) =>
@@ -267,6 +278,8 @@ async function searchSiteContent(
                             spaceItem,
                             space: siteSpace?.space,
                             spaceURL: siteSpace?.urls.published,
+                            siteSection: siteSection ?? undefined,
+                            siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
                         })
                     )
                 );
@@ -348,9 +361,11 @@ async function transformSitePageResult(
         spaceItem: SearchSpaceResult;
         space?: Space;
         spaceURL?: string;
+        siteSection?: SiteSection;
+        siteSectionGroup?: SiteSectionGroup;
     }
 ): Promise<OrderedComputedResult[]> {
-    const { pageItem, spaceItem, space, spaceURL } = args;
+    const { pageItem, spaceItem, space, spaceURL, siteSection, siteSectionGroup } = args;
     const { linker } = context;
 
     const page: ComputedPageResult = {
@@ -360,12 +375,26 @@ async function transformSitePageResult(
         href: spaceURL
             ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, pageItem.path))
             : linker.toPathInSpace(pageItem.path),
-        spaceTitle: space?.title,
         pageId: pageItem.id,
         spaceId: spaceItem.id,
+        breadcrumbs: [
+            siteSectionGroup && {
+                icon: siteSectionGroup?.icon as IconName,
+                label: siteSectionGroup.title,
+            },
+            siteSection && {
+                icon: siteSection?.icon as IconName,
+                label: siteSection.title,
+            },
+            (!siteSection || siteSection?.siteSpaces.length > 1) && space
+                ? {
+                      label: space?.title,
+                  }
+                : undefined,
+        ].filter((item) => item !== undefined),
     };
 
-    const sections = await Promise.all(
+    const pageSections = await Promise.all(
         pageItem.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
             type: 'section',
             id: `${page.id}/${section.id}`,
@@ -379,5 +408,5 @@ async function transformSitePageResult(
         })) ?? []
     );
 
-    return [page, ...sections];
+    return [page, ...pageSections];
 }
