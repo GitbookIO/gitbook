@@ -271,10 +271,7 @@ async function searchSiteContent(
                         transformSitePageResult(context, {
                             pageItem,
                             spaceItem,
-                            space:
-                                !siteSection || siteSection.siteSpaces.length > 1
-                                    ? siteSpace?.space
-                                    : undefined,
+                            space: siteSpace?.space,
                             spaceURL: siteSpace?.urls.published,
                             siteSection: siteSection ?? undefined,
                         })
