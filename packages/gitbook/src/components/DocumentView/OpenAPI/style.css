@@ -20,8 +20,29 @@
     @apply flex flex-col items-start justify-start gap-3;
 }
 
-.openapi-deprecated {
+.openapi-summary-tags {
+    @apply flex flex-row gap-2 mt-[0.75em];
+}
+
+.openapi-deprecated,
+.openapi-stability {
     @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+}
+
+.openapi-stability-stable {
+    @apply text-green-600 dark:text-green-300 bg-green-50 dark:bg-green-900/6 ring-green-500/5;
+}
+
+.openapi-stability-alpha {
+    @apply text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/6 ring-amber-500/5;
+}
+
+.openapi-stability-beta {
+    @apply text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/6 ring-blue-500/5;
+}
+
+.openapi-stability-experimental {
+    @apply text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/6 ring-violet-500/5;
 }
 
 .openapi-deprecated-sunset-date {

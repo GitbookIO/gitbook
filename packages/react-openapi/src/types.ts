@@ -13,7 +13,11 @@ export interface OpenAPIContextProps extends OpenAPIClientContext {
     /**
      * Render the heading of the operation.
      */
-    renderHeading: (props: { deprecated: boolean; title: string }) => React.ReactNode;
+    renderHeading: (props: {
+        deprecated: boolean;
+        title: string;
+        stability?: string;
+    }) => React.ReactNode;
     /**
      * Render the document of the operation.
      */
