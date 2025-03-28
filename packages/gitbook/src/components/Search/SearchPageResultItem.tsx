@@ -16,9 +16,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
 ) {
     const { query, item, active } = props;
 
-    const breadcrumbs: (string | React.ReactNode)[] = item.ancestors.map(
-        (ancestor) => ancestor.title
-    );
+    const breadcrumbs: React.ReactNode[] = [];
     if ((!item.section || item.section?.siteSpaces.length > 1) && item.spaceTitle) {
         breadcrumbs.unshift(item.spaceTitle);
     }

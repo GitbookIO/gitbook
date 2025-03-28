@@ -1,6 +1,6 @@
 'use server';
 
-import { type AncestorRevisionPage, resolvePageId } from '@/lib/pages';
+import { resolvePageId } from '@/lib/pages';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
@@ -50,8 +50,6 @@ export interface ComputedPageResult {
     /** When part of a multi-spaces search, the title of the space */
     spaceTitle?: string;
     section?: SiteSection;
-
-    ancestors: AncestorRevisionPage[];
 }
 
 export interface AskAnswerSource {
@@ -264,7 +262,7 @@ async function searchSiteContent(
             searchResults.map(async (spaceItem) => {
                 const sections = getSiteStructureSections(structure, { ignoreGroups: true });
                 const siteSpace = findSiteSpaceById(structure, spaceItem.id);
-                const siteSection = sections.find((i) => i.id === siteSpace?.section);
+                const siteSection = sections.find((section) => section.id === siteSpace?.section);
 
                 return Promise.all(
                     spaceItem.pages.map((pageItem) =>
@@ -372,7 +370,6 @@ async function transformSitePageResult(
         pageId: pageItem.id,
         spaceId: spaceItem.id,
         section: siteSection,
-        ancestors: [], // @TODO: empty for now until we calculate performantly
     };
 
     const pageSections = await Promise.all(
