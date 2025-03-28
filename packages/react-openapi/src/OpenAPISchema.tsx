@@ -242,38 +242,52 @@ function OpenAPISchemaEnum(props: {
 }) {
     const { schema } = props;
 
-    if (!schema.enum || !schema.enum.length || !schema['x-enumDescriptions']) {
+    if (!schema.enum?.length || (!schema['x-enumDescriptions'] && !schema['x-gitbook-enum'])) {
         return null;
     }
 
     const enumValues = (() => {
+        // Render x-gitbook-enum first, as it has a different format
+        if (schema['x-gitbook-enum']) {
+            return Object.entries(schema['x-gitbook-enum']).map(([name, { description }]) => {
+                return {
+                    value: name,
+                    description,
+                };
+            });
+        }
+
+        if (schema['x-enumDescriptions']) {
+            return Object.entries(schema['x-enumDescriptions']).map(([value, description]) => {
+                return {
+                    value,
+                    description,
+                };
+            });
+        }
+
         return schema.enum.map((value) => {
             return {
                 value,
-                description: schema['x-enumDescriptions']?.[value],
+                description: undefined,
             };
         });
     })();
 
     return (
         <div className="openapi-schema-enum">
-            <span>
-                Options:{' '}
+            <span>Available options:</span>
+            <div className="openapi-schema-enum-list">
                 {enumValues.map((item, index) => (
                     <span key={index} className="openapi-schema-enum-value">
-                        {item.description ? (
-                            <OpenAPITooltip label={item.description} delay={200}>
-                                <OpenAPITooltip.Button className="cursor-default">
-                                    <code>{`${item.value}`}</code>
-                                </OpenAPITooltip.Button>
-                            </OpenAPITooltip>
-                        ) : (
-                            <code>{`${item.value}`}</code>
-                        )}
-                        {index < enumValues.length - 1 ? ', ' : ''}
+                        <OpenAPITooltip label={item.description} delay={200}>
+                            <OpenAPITooltip.Button className="cursor-default">
+                                <code>{`${item.value}`}</code>
+                            </OpenAPITooltip.Button>
+                        </OpenAPITooltip>
                     </span>
                 ))}
-            </span>
+            </div>
         </div>
     );
 }
@@ -443,7 +457,7 @@ function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     // Otherwise try to infer a nice title
     let type = 'any';
 
-    if (schema.enum) {
+    if (schema.enum || schema['x-enumDescriptions'] || schema['x-gitbook-enum']) {
         type = `${schema.type} · enum`;
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {

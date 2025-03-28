@@ -4,10 +4,14 @@ import { Button, type ButtonProps, Tooltip, TooltipTrigger } from 'react-aria-co
 function OpenAPITooltip(
     props: TooltipTriggerProps & {
         children: React.ReactNode;
-        label: string;
+        label?: string;
     }
 ) {
     const { children, label } = props;
+
+    if (!label) {
+        return children;
+    }
 
     return (
         <TooltipTrigger {...props}>
