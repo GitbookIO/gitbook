@@ -39,6 +39,7 @@
         "bun-types": "^1.1.20",
         "classnames": "^2.5.1",
         "framer-motion": "^10.16.14",
+        "holy-loader": "^2.3.13",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
         "jwt-decode": "^4.0.0",
