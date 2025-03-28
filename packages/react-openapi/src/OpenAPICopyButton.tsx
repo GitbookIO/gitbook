@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, type ButtonProps, Tooltip, TooltipTrigger } from 'react-aria-components';
+import type { ButtonProps } from 'react-aria-components';
+import { OpenAPITooltip } from './OpenAPITooltip';
 
 export function OpenAPICopyButton(
     props: ButtonProps & {
         value: string;
+        children: React.ReactNode;
     }
 ) {
     const { value } = props;
@@ -26,29 +28,22 @@ export function OpenAPICopyButton(
     };
 
     return (
-        <TooltipTrigger isOpen={isOpen} onOpenChange={setIsOpen} closeDelay={200} delay={200}>
-            <Button
-                type="button"
-                preventFocusOnPress
+        <OpenAPITooltip
+            label={copied ? 'Copied' : 'Copy to clipboard'}
+            isOpen={isOpen}
+            onOpenChange={setIsOpen}
+            closeDelay={200}
+            delay={200}
+        >
+            <OpenAPITooltip.Button
                 onPress={(e) => {
                     handleCopy();
                     onPress?.(e);
                 }}
-                className={`openapi-copy-button ${className}`}
-                {...props}
+                className={className}
             >
                 {children}
-            </Button>
-
-            <Tooltip
-                isOpen={isOpen}
-                onOpenChange={setIsOpen}
-                placement="top"
-                offset={4}
-                className="openapi-tooltip"
-            >
-                {copied ? 'Copied' : 'Copy to clipboard'}{' '}
-            </Tooltip>
-        </TooltipTrigger>
+            </OpenAPITooltip.Button>
+        </OpenAPITooltip>
     );
 }

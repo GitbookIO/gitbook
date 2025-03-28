@@ -2,13 +2,14 @@
 // This component does not use any client feature but we don't want to
 // render it server-side because it has recursion.
 
-import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
 import { useId } from 'react';
 
 import clsx from 'clsx';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import { OpenAPITooltip } from './OpenAPITooltip';
 import { retrocycle } from './decycle';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
@@ -236,16 +237,39 @@ function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaO
 /**
  * Render the enum value for a schema.
  */
-function OpenAPISchemaEnum(props: { enumValues: any[] }) {
-    const { enumValues } = props;
+function OpenAPISchemaEnum(props: {
+    schema: OpenAPIV3.SchemaObject & OpenAPICustomOperationProperties;
+}) {
+    const { schema } = props;
+
+    if (!schema.enum || !schema.enum.length || !schema['x-enumDescriptions']) {
+        return null;
+    }
+
+    const enumValues = (() => {
+        return schema.enum.map((value) => {
+            return {
+                value,
+                description: schema['x-enumDescriptions']?.[value],
+            };
+        });
+    })();
 
     return (
         <div className="openapi-schema-enum">
             <span>
                 Options:{' '}
-                {enumValues.map((value, index) => (
+                {enumValues.map((item, index) => (
                     <span key={index} className="openapi-schema-enum-value">
-                        <code>{`${value}`}</code>
+                        {item.description ? (
+                            <OpenAPITooltip label={item.description} delay={200}>
+                                <OpenAPITooltip.Button className="cursor-default">
+                                    <code>{`${item.value}`}</code>
+                                </OpenAPITooltip.Button>
+                            </OpenAPITooltip>
+                        ) : (
+                            <code>{`${item.value}`}</code>
+                        )}
                         {index < enumValues.length - 1 ? ', ' : ''}
                     </span>
                 ))}
@@ -294,9 +318,7 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
                     Pattern: <code>{schema.pattern}</code>
                 </div>
             ) : null}
-            {schema.enum && schema.enum.length > 0 ? (
-                <OpenAPISchemaEnum enumValues={schema.enum} />
-            ) : null}
+            <OpenAPISchemaEnum schema={schema} />
         </div>
     );
 }
