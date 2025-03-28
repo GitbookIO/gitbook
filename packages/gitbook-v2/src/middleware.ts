@@ -31,7 +31,7 @@ export const config = {
     ],
 };
 
-type URLWithMode = { url: URL; mode: 'url' | 'url-host' | 'url-proxy' };
+type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {
