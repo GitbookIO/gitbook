@@ -16,12 +16,13 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
 ) {
     const { query, item, active } = props;
 
-    const breadcrumbs = item.breadcrumbs?.map((crumb) => (
-        <span key={crumb.label} className="flex items-center gap-1">
-            {crumb.icon ? <Icon className="size-3" icon={crumb.icon as IconName} /> : null}
-            {crumb.label}
-        </span>
-    ));
+    const breadcrumbs =
+        item.breadcrumbs?.map((crumb) => (
+            <span key={crumb.label} className="flex items-center gap-1">
+                {crumb.icon ? <Icon className="size-3" icon={crumb.icon as IconName} /> : null}
+                {crumb.label}
+            </span>
+        )) ?? [];
 
     return (
         <Link
@@ -65,6 +66,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         className={tcls(
                             'text-xs',
                             'opacity-6',
+                            'contrast-more:opacity-11',
                             'font-normal',
                             'uppercase',
                             'tracking-wider',
@@ -87,12 +89,12 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                             <>
                                 {index !== 0 ? (
                                     <Icon
-                                        key={`${index}-icon`}
+                                        key={`${crumb.key}-icon`}
                                         icon="chevron-right"
                                         className="size-3"
                                     />
                                 ) : null}
-                                <span key={index} className="line-clamp-1">
+                                <span key={crumb.key} className="line-clamp-1">
                                     {crumb}
                                 </span>
                             </>
