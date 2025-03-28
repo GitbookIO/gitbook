@@ -1,16 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import type { ButtonProps } from 'react-aria-components';
-import { OpenAPITooltip } from './OpenAPITooltip';
+import { Button, type ButtonProps, Tooltip, TooltipTrigger } from 'react-aria-components';
 
 export function OpenAPICopyButton(
     props: ButtonProps & {
         value: string;
         children: React.ReactNode;
+        label?: string;
+        /**
+         * Whether to show a tooltip.
+         * @default true
+         */
+        withTooltip?: boolean;
     }
 ) {
-    const { value, children, onPress, className } = props;
+    const { value, label, children, onPress, className, withTooltip = true } = props;
     const [copied, setCopied] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -22,27 +27,41 @@ export function OpenAPICopyButton(
 
             setTimeout(() => {
                 setCopied(false);
+                setIsOpen(false);
             }, 2000);
         });
     };
 
     return (
-        <OpenAPITooltip
-            label={copied ? 'Copied' : 'Copy to clipboard'}
+        <TooltipTrigger
             isOpen={isOpen}
             onOpenChange={setIsOpen}
+            isDisabled={!withTooltip}
             closeDelay={200}
             delay={200}
         >
-            <OpenAPITooltip.Button
+            <Button
+                type="button"
+                preventFocusOnPress
                 onPress={(e) => {
                     handleCopy();
                     onPress?.(e);
                 }}
-                className={className}
+                className={`openapi-copy-button ${className}`}
+                {...props}
             >
                 {children}
-            </OpenAPITooltip.Button>
-        </OpenAPITooltip>
+            </Button>
+
+            <Tooltip
+                isOpen={isOpen}
+                onOpenChange={setIsOpen}
+                placement="top"
+                offset={4}
+                className="openapi-tooltip"
+            >
+                {copied ? 'Copied' : label || 'Copy to clipboard'}
+            </Tooltip>
+        </TooltipTrigger>
     );
 }

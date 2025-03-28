@@ -696,3 +696,7 @@
         opacity: 0;
     }
 }
+
+.openapi-copy-button {
+    @apply hover:brightness-95;
+}

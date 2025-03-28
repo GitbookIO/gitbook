@@ -7,9 +7,9 @@ import { useId } from 'react';
 
 import clsx from 'clsx';
 import { Markdown } from './Markdown';
+import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import { OpenAPITooltip } from './OpenAPITooltip';
 import { retrocycle } from './decycle';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
@@ -280,11 +280,13 @@ function OpenAPISchemaEnum(props: {
             <div className="openapi-schema-enum-list">
                 {enumValues.map((item, index) => (
                     <span key={index} className="openapi-schema-enum-value">
-                        <OpenAPITooltip label={item.description} delay={200}>
-                            <OpenAPITooltip.Button className="cursor-default">
-                                <code>{`${item.value}`}</code>
-                            </OpenAPITooltip.Button>
-                        </OpenAPITooltip>
+                        <OpenAPICopyButton
+                            value={item.value}
+                            label={item.description}
+                            withTooltip={!!item.description}
+                        >
+                            <code>{`${item.value}`}</code>
+                        </OpenAPICopyButton>
                     </span>
                 ))}
             </div>
