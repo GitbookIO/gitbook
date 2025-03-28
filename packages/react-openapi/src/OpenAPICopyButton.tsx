@@ -6,10 +6,16 @@ import { Button, type ButtonProps, Tooltip, TooltipTrigger } from 'react-aria-co
 export function OpenAPICopyButton(
     props: ButtonProps & {
         value: string;
+        children: React.ReactNode;
+        label?: string;
+        /**
+         * Whether to show a tooltip.
+         * @default true
+         */
+        withTooltip?: boolean;
     }
 ) {
-    const { value } = props;
-    const { children, onPress, className } = props;
+    const { value, label, children, onPress, className, withTooltip = true } = props;
     const [copied, setCopied] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -21,12 +27,19 @@ export function OpenAPICopyButton(
 
             setTimeout(() => {
                 setCopied(false);
+                setIsOpen(false);
             }, 2000);
         });
     };
 
     return (
-        <TooltipTrigger isOpen={isOpen} onOpenChange={setIsOpen} closeDelay={200} delay={200}>
+        <TooltipTrigger
+            isOpen={isOpen}
+            onOpenChange={setIsOpen}
+            isDisabled={!withTooltip}
+            closeDelay={200}
+            delay={200}
+        >
             <Button
                 type="button"
                 preventFocusOnPress
@@ -47,7 +60,7 @@ export function OpenAPICopyButton(
                 offset={4}
                 className="openapi-tooltip"
             >
-                {copied ? 'Copied' : 'Copy to clipboard'}{' '}
+                {copied ? 'Copied' : label || 'Copy to clipboard'}
             </Tooltip>
         </TooltipTrigger>
     );

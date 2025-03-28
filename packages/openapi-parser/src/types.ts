@@ -47,6 +47,21 @@ export interface OpenAPICustomOperationProperties {
      * Description in Document format.
      */
     'x-gitbook-description-document'?: object;
+
+    /**
+     * Enums with name and description
+     */
+    'x-enumDescriptions'?: object;
+
+    /**
+     * Enums with name and description
+     */
+    'x-gitbook-enum'?: {
+        [key: string]: {
+            description?: string;
+            name?: string;
+        };
+    };
 }
 
 /**
