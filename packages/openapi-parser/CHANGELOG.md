@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.1.2
+
+### Patch Changes
+
+- 7bb37c7: Move filterSelectedOpenAPISchemas to @gitbook/openapi-parser
+
 ## 2.1.1
 
 ### Patch Changes
