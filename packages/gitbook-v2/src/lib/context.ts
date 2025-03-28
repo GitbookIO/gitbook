@@ -26,6 +26,30 @@ import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker } from './links';
 
 /**
+ * Data about the site URL. Provided by the middleware.
+ * These data are stable between pages in the same site space.
+ */
+export type SiteURLData = Pick<
+    PublishedSiteContent,
+    | 'organization'
+    | 'apiToken'
+    | 'site'
+    | 'siteSpace'
+    | 'space'
+    | 'revision'
+    | 'changeRequest'
+    | 'shareKey'
+    | 'siteSection'
+    | 'siteBasePath'
+    | 'basePath'
+> & {
+    /**
+     * Identifier used for image resizing.
+     */
+    imagesSiteId: string;
+};
+
+/**
  * Generic context when rendering content.
  */
 export type GitBookBaseContext = {
@@ -111,7 +135,7 @@ export type GitBookPageContext = (GitBookSpaceContext | GitBookSiteContext) & {
  */
 export function getBaseContext(input: {
     siteURL: URL | string;
-    siteURLData: PublishedSiteContent;
+    siteURLData: SiteURLData;
     urlMode: 'url' | 'url-host';
 }) {
     const { urlMode, siteURLData } = input;
@@ -145,7 +169,7 @@ export function getBaseContext(input: {
     }
 
     const imageResizer = createImageResizer({
-        host: siteURL.host,
+        siteIdentifier: siteURLData.imagesSiteId,
         // To ensure image resizing work for proxied sites,
         // we serve images from the root of the site.
         linker: linker,
@@ -163,7 +187,7 @@ export function getBaseContext(input: {
  */
 export async function fetchSiteContextByURLLookup(
     baseContext: GitBookBaseContext,
-    data: PublishedSiteContent
+    data: SiteURLData
 ): Promise<GitBookSiteContext> {
     return await fetchSiteContextByIds(baseContext, {
         organization: data.organization,

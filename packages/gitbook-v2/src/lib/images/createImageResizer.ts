@@ -33,13 +33,13 @@ export interface CloudflareImageOptions {
  * Create an image resizer for a rendering context.
  */
 export function createImageResizer({
-    host,
+    siteIdentifier,
     linker,
 }: {
     /** The linker to use to create URLs. */
     linker: GitBookLinker;
-    /** The host name of the current site. */
-    host: string;
+    /** The site identifier to use for verifying the image signature. */
+    siteIdentifier: string;
 }): ImageResizer {
     if (!GITBOOK_IMAGE_RESIZE_URL || !GITBOOK_IMAGE_RESIZE_SIGNING_KEY) {
         return createNoopImageResizer();
@@ -58,7 +58,7 @@ export function createImageResizer({
 
             return async (options) => {
                 cachedSignature ??= await generateImageSignature({
-                    host,
+                    siteIdentifier,
                     url: urlInput,
                 });
 

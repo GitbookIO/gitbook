@@ -21,7 +21,9 @@ import {
     throwIfDataError,
 } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
+import { getImageResizingSiteId } from '@v2/lib/images';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
+import type { SiteURLData } from './lib/context';
 
 export const config = {
     matcher: [
@@ -29,7 +31,7 @@ export const config = {
     ],
 };
 
-type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
+type URLWithMode = { url: URL; mode: 'url' | 'url-host' | 'url-proxy' };
 
 export async function middleware(request: NextRequest) {
     try {
@@ -64,6 +66,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
+    const imagesSiteId = getImageResizingSiteId(siteRequestURL);
 
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -75,7 +78,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
      */
     if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
         return await serveResizedImage(request, {
-            host: siteRequestURL.host,
+            siteIdentifier: imagesSiteId,
         });
     }
 
@@ -203,7 +206,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
-        const stableSiteURLData: Omit<typeof siteURLData, 'pathname' | 'canonicalUrl'> = {
+        const stableSiteURLData: SiteURLData = {
             site: siteURLData.site,
             siteSection: siteURLData.siteSection,
             siteSpace: siteURLData.siteSpace,
@@ -215,8 +218,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
             apiToken: siteURLData.apiToken,
-            complete: siteURLData.complete,
-            contextId: siteURLData.contextId,
+            imagesSiteId: imagesSiteId,
         };
 
         const route = [
