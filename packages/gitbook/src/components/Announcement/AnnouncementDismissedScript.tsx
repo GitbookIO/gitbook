@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import {
     ANNOUNCEMENT_CSS_CLASS,
     ANNOUNCEMENT_DAYS_TILL_RESET,
@@ -17,6 +18,15 @@ export function AnnouncementDismissedScript() {
         ANNOUNCEMENT_DAYS_TILL_RESET,
         ANNOUNCEMENT_CSS_CLASS,
     ]).slice(1, -1);
+
+    // makes sure the banner dismissed state is kept when navigating between sites
+    React.useEffect(() => {
+        checkStorageForDismissedScript(
+            ANNOUNCEMENT_STORAGE_KEY,
+            ANNOUNCEMENT_DAYS_TILL_RESET,
+            ANNOUNCEMENT_CSS_CLASS
+        );
+    }, []);
 
     return (
         <script
