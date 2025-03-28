@@ -12,7 +12,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
     const tabs: TabsItem[] = [];
     const tabsBody: React.ReactNode[] = [];
 
-    block.nodes.forEach((tab) => {
+    block.nodes.forEach((tab, index) => {
         tabs.push({
             id: tab.meta?.id ?? tab.key!,
             title: tab.data.title ?? '',
@@ -20,6 +20,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
 
         tabsBody.push(
             <Blocks
+                key={tab.key ?? index}
                 nodes={tab.nodes}
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block, tab]}
