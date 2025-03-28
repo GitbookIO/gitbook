@@ -101,7 +101,10 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                 ) : (
                                     <NavigationMenu.Link asChild>
                                         <SectionTab
-                                            url={sectionOrGroup.url}
+                                            url={sectionOrGroup.url.replace(
+                                                'https://',
+                                                'https://pr3057.gitbook-open.pages.dev/'
+                                            )}
                                             isActive={isActive}
                                             title={title}
                                             icon={icon ? (icon as IconName) : undefined}
