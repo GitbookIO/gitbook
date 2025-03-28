@@ -47,7 +47,15 @@ export interface OpenAPICustomOperationProperties {
      * Description in Document format.
      */
     'x-gitbook-description-document'?: object;
+
+    /**
+     * Stability of the operation.
+     * @enum 'experimental' | 'alpha' | 'beta' | 'stable'
+     */
+    'x-stability'?: OpenAPIStability;
 }
+
+export type OpenAPIStability = 'experimental' | 'alpha' | 'beta' | 'stable';
 
 /**
  * Custom code samples that can be defined at the operation level.
