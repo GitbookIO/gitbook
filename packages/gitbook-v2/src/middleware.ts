@@ -21,7 +21,7 @@ import {
     throwIfDataError,
 } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
-import { getImageResizingSiteId } from '@v2/lib/images';
+import { getImageResizingContextId } from '@v2/lib/images';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import type { SiteURLData } from './lib/context';
 
@@ -66,7 +66,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     const { url: siteRequestURL, mode } = match;
-    const imagesSiteId = getImageResizingSiteId(siteRequestURL);
+    const imagesContextId = getImageResizingContextId(siteRequestURL);
 
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
@@ -78,7 +78,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
      */
     if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
         return await serveResizedImage(request, {
-            siteIdentifier: imagesSiteId,
+            imagesContextId: imagesContextId,
         });
     }
 
@@ -218,7 +218,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             revision: siteURLData.revision,
             shareKey: siteURLData.shareKey,
             apiToken: siteURLData.apiToken,
-            imagesSiteId: imagesSiteId,
+            imagesContextId: imagesContextId,
         };
 
         const route = [

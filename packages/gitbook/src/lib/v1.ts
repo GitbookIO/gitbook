@@ -59,7 +59,7 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
     const dataFetcher = await getDataFetcherV1();
 
     const imageResizer = createImageResizer({
-        siteIdentifier: host,
+        imagesContextId: host,
         // In V1, we always resize at the top level of the hostname, not relative to the content.
         linker: createLinker({
             host,

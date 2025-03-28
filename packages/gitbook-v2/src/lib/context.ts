@@ -46,7 +46,7 @@ export type SiteURLData = Pick<
     /**
      * Identifier used for image resizing.
      */
-    imagesSiteId: string;
+    imagesContextId: string;
 };
 
 /**
@@ -169,7 +169,7 @@ export function getBaseContext(input: {
     }
 
     const imageResizer = createImageResizer({
-        siteIdentifier: siteURLData.imagesSiteId,
+        imagesContextId: siteURLData.imagesContextId,
         // To ensure image resizing work for proxied sites,
         // we serve images from the root of the site.
         linker: linker,

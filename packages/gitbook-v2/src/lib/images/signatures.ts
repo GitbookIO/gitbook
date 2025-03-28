@@ -18,7 +18,7 @@ export const CURRENT_SIGNATURE_VERSION: SignatureVersion = '2';
 
 type SignFnInput = {
     url: string;
-    siteIdentifier: string;
+    imagesContextId: string;
 };
 
 type SignFn = (input: SignFnInput) => MaybePromise<string>;
@@ -60,7 +60,7 @@ const generateSignatureV2: SignFn = async (input) => {
     assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
     const all = [
         input.url,
-        input.siteIdentifier, // The hostname is used to avoid serving images from other sites on the same domain
+        input.imagesContextId, // The hostname is used to avoid serving images from other sites on the same domain
         GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
     ]
         .filter(Boolean)
