@@ -2,7 +2,7 @@
 
 import { getAbsoluteHref } from '@/lib/links';
 import { type AncestorRevisionPage, resolvePageId } from '@/lib/pages';
-import { findSiteSpaceById } from '@/lib/sites';
+import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 import type {
@@ -10,6 +10,7 @@ import type {
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
     SearchPageResult,
+    SiteSection,
     SiteSpace,
     Space,
 } from '@gitbook/api';
@@ -41,6 +42,7 @@ export interface ComputedPageResult {
 
     /** When part of a multi-spaces search, the title of the space */
     spaceTitle?: string;
+    section?: SiteSection;
 
     ancestors: AncestorRevisionPage[];
 }
@@ -253,11 +255,19 @@ async function searchSiteContent(
     return (
         await Promise.all(
             searchResults.map(async (spaceItem) => {
+                const sections = getSiteStructureSections(structure, { ignoreGroups: true });
                 const siteSpace = findSiteSpaceById(structure, spaceItem.id);
+                const siteSection = sections.find((i) => i.id === siteSpace?.section);
 
                 return Promise.all(
                     spaceItem.pages.map((item) =>
-                        transformSitePageResult(item, siteSpace ?? undefined)
+                        transformSitePageResult(
+                            item,
+                            !siteSection || siteSection.siteSpaces.length > 1
+                                ? (siteSpace ?? undefined)
+                                : undefined,
+                            siteSection ?? undefined
+                        )
                     )
                 );
             })
@@ -298,7 +308,7 @@ async function transformAnswer(
                 const spaceURL = siteSpace?.urls.published;
 
                 const href = spaceURL
-                    ? await getURLWithSections(page.page.path, spaceURL)
+                    ? await getURLWithPageSections(page.page.path, spaceURL)
                     : context.linker.toPathForPage({
                           pages,
                           page: page.page,
@@ -334,16 +344,17 @@ async function transformAnswer(
 async function transformSectionsAndPage(args: {
     item: SearchPageResult;
     space?: Space;
+    section?: SiteSection;
     spaceURL?: string;
 }): Promise<[ComputedPageResult, ComputedSectionResult[]]> {
-    const { item, space, spaceURL } = args;
+    const { item, space, section, spaceURL } = args;
 
-    const sections = await Promise.all(
+    const pageSections = await Promise.all(
         item.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
             type: 'section',
             id: `${item.id}/${section.id}`,
             title: section.title,
-            href: await getURLWithSections(section.path, spaceURL),
+            href: await getURLWithPageSections(section.path, spaceURL),
             body: section.body,
         })) ?? []
     );
@@ -352,27 +363,33 @@ async function transformSectionsAndPage(args: {
         type: 'page',
         id: item.id,
         title: item.title,
-        href: await getURLWithSections(item.path, spaceURL),
+        href: await getURLWithPageSections(item.path, spaceURL),
         spaceTitle: space?.title,
+        section: section,
         ancestors: [], // @TODO: Empty for now, let's populate
     };
 
-    return [page, sections];
+    return [page, pageSections];
 }
 
-async function transformSitePageResult(item: SearchPageResult, siteSpace?: SiteSpace) {
-    const [page, sections] = await transformSectionsAndPage({
+async function transformSitePageResult(
+    item: SearchPageResult,
+    siteSpace?: SiteSpace,
+    siteSection?: SiteSection
+) {
+    const [page, pageSections] = await transformSectionsAndPage({
         item,
         space: siteSpace?.space,
+        section: siteSection,
         spaceURL: siteSpace?.urls.published,
     });
 
-    return [page, ...sections];
+    return [page, ...pageSections];
 }
 
 // Resolve a relative path to an absolute URL
 // if the search result is relative to another space, we use the space URL
-async function getURLWithSections(path: string, spaceURL?: string) {
+async function getURLWithPageSections(path: string, spaceURL?: string) {
     if (spaceURL) {
         if (!spaceURL.endsWith('/')) {
             spaceURL += '/';
