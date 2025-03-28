@@ -10,8 +10,7 @@ export function OpenAPICopyButton(
         children: React.ReactNode;
     }
 ) {
-    const { value } = props;
-    const { children, onPress, className } = props;
+    const { value, children, onPress, className } = props;
     const [copied, setCopied] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
