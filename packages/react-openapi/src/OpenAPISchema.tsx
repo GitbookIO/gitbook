@@ -242,10 +242,6 @@ function OpenAPISchemaEnum(props: {
 }) {
     const { schema } = props;
 
-    if (!schema.enum?.length || (!schema['x-enumDescriptions'] && !schema['x-gitbook-enum'])) {
-        return null;
-    }
-
     const enumValues = (() => {
         // Render x-gitbook-enum first, as it has a different format
         if (schema['x-gitbook-enum']) {
@@ -266,13 +262,17 @@ function OpenAPISchemaEnum(props: {
             });
         }
 
-        return schema.enum.map((value) => {
+        return schema.enum?.map((value) => {
             return {
                 value,
                 description: undefined,
             };
         });
     })();
+
+    if (!enumValues?.length) {
+        return null;
+    }
 
     return (
         <div className="openapi-schema-enum">
