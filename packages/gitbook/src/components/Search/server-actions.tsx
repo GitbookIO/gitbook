@@ -1,6 +1,6 @@
 'use server';
 
-import { resolvePageId } from '@/lib/pages';
+import { type AncestorRevisionPage, resolvePageId } from '@/lib/pages';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
