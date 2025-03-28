@@ -16,20 +16,12 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
 ) {
     const { query, item, active } = props;
 
-    const breadcrumbs: React.ReactNode[] = [];
-    if ((!item.section || item.section?.siteSpaces.length > 1) && item.spaceTitle) {
-        breadcrumbs.unshift(item.spaceTitle);
-    }
-    if (item.section) {
-        breadcrumbs.unshift(
-            <span className="flex items-center gap-1">
-                {item.section.icon ? (
-                    <Icon className="size-3" icon={item.section.icon as IconName} />
-                ) : null}
-                {item.section.title}
-            </span>
-        );
-    }
+    const breadcrumbs = item.breadcrumbs?.map((crumb) => (
+        <span key={crumb.label} className="flex items-center gap-1">
+            {crumb.icon ? <Icon className="size-3" icon={crumb.icon as IconName} /> : null}
+            {crumb.label}
+        </span>
+    ));
 
     return (
         <Link
