@@ -1,31 +1,31 @@
 :root {
-    --shiki-color-text: theme("colors.tint.11");
-    --shiki-token-constant: #0a6355;
-    --shiki-token-string: #8b6d32;
-    --shiki-token-comment: theme("colors.teal.700/.64");
-    --shiki-token-keyword: theme("colors.pomegranate.600");
-    --shiki-token-parameter: #0a3069;
-    --shiki-token-function: #8250df;
-    --shiki-token-string-expression: #6a4906;
-    --shiki-token-punctuation: theme("colors.pomegranate.700/.92");
-    --shiki-token-link: theme("colors.tint.12");
-    --shiki-token-inserted: #22863a;
-    --shiki-token-deleted: #b31d28;
-    --shiki-token-changed: #8250df;
+    --shiki-color-text: #24292eff;
+    --shiki-token-constant: #1976d2;
+    --shiki-token-string: #2b5581;
+    --shiki-token-comment: #c2c3c5;
+    --shiki-token-keyword: #d32f2f;
+    --shiki-token-parameter: #ff9800;
+    --shiki-token-function: #6f42c1;
+    --shiki-token-string-expression: #22863a;
+    --shiki-token-punctuation: #212121;
+    --shiki-token-link: #22863a;
+    --shiki-token-inserted: #b7e7a44b;
+    --shiki-token-deleted: #e597af52;
+    --shiki-token-changed: #0000001a;
 }
 
 html.dark {
-    --shiki-color-text: theme("colors.tint.11");
-    --shiki-token-constant: #d19a66;
-    --shiki-token-string: theme("colors.pomegranate.300");
-    --shiki-token-comment: theme("colors.teal.300/.64");
-    --shiki-token-keyword: theme("colors.pomegranate.400");
-    --shiki-token-parameter: theme("colors.yellow.500");
-    --shiki-token-function: #56b6c2;
-    --shiki-token-string-expression: theme("colors.tint.11");
-    --shiki-token-punctuation: #acc6ee;
-    --shiki-token-link: theme("colors.pomegranate.400");
-    --shiki-token-inserted: #85e89d;
-    --shiki-token-deleted: #fdaeb7;
-    --shiki-token-changed: #56b6c2;
+    --shiki-color-text: #eeffff;
+    --shiki-token-constant: #82aaff;
+    --shiki-token-string: #82aaff;
+    --shiki-token-comment: #676767;
+    --shiki-token-keyword: #c792ea;
+    --shiki-token-parameter: #f07178;
+    --shiki-token-function: #ffcb6b;
+    --shiki-token-string-expression: #c3e88d;
+    --shiki-token-punctuation: #89ddff;
+    --shiki-token-link: #80cbc4;
+    --shiki-token-inserted: #c3e88d;
+    --shiki-token-deleted: #f07178;
+    --shiki-token-changed: #ffcb6b;
 }

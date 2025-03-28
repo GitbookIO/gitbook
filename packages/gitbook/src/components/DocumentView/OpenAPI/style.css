@@ -388,7 +388,7 @@
 
 /* Code Sample */
 .openapi-codesample {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded bg-tint-subtle theme-gradient:bg-tint-12/1 border-tint-subtle;
 }
 
 .openapi-codesample-header {
@@ -462,11 +462,11 @@
 
 /* Response Example */
 .openapi-response-example {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded bg-tint-subtle theme-gradient:bg-tint-12/1 border-tint-subtle;
 }
 
 .openapi-response-example-empty {
-    @apply relative text-tint bg-tint min-h-20 flex flex-col justify-center items-center;
+    @apply relative text-tint bg-tint-subtle theme-gradient:bg-tint-12/1 min-h-20 flex flex-col justify-center items-center;
 }
 
 /* Common Elements */
@@ -691,4 +691,14 @@
     100% {
         opacity: 0;
     }
+}
+
+.openapi-codesample pre,
+.openapi-response-example pre {
+    @apply !bg-tint-subtle theme-gradient:!bg-transparent;
+}
+
+.openapi-codesample pre .highlight-line-content,
+.openapi-response-example pre .highlight-line-content {
+    @apply !text-[0.8125rem] !leading-5;
 }
