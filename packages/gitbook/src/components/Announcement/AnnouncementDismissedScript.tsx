@@ -19,7 +19,7 @@ export function AnnouncementDismissedScript() {
         ANNOUNCEMENT_CSS_CLASS,
     ]).slice(1, -1);
 
-    // makes sure keeps the banner state when navigating between sites
+    // makes sure the banner dismissed state is kept when navigating between sites
     React.useEffect(() => {
         checkStorageForDismissedScript(
             ANNOUNCEMENT_STORAGE_KEY,
