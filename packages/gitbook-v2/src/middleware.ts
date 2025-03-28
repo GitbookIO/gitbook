@@ -1,4 +1,4 @@
-import { CustomizationThemeMode } from '@gitbook/api';
+import { CustomizationThemeMode, type PublishedSiteContentLookup } from '@gitbook/api';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
@@ -8,6 +8,7 @@ import { validateSerializedCustomization } from '@/lib/customization';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
+    type VisitorTokenLookup,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorToken,
@@ -65,20 +66,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     const { url: siteRequestURL, mode } = match;
 
-    /**
-     * Serve image resizing requests (all requests containing `/~gitbook/image`).
-     * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
-     * and serve from a single route handler.
-     *
-     * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
-     * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
-     */
-    if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
-        return await serveResizedImage(request, {
-            host: siteRequestURL.host,
-        });
-    }
-
     //
     // Detect and extract the visitor authentication token from the request
     //
@@ -89,20 +76,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     });
 
     const withAPIToken = async (apiToken: string | null) => {
-        const siteURLData = await throwIfDataError(
-            getPublishedContentByURL({
-                url: siteRequestURL.toString(),
-                visitorAuthToken: visitorToken?.token ?? null,
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
-                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
-
-                // Use the API token passed in the request, if any
-                // as it could be used for .preview hostnames
-                apiToken,
-            })
-        );
+        const siteURLData = await getSiteURLData(siteRequestURL, visitorToken, apiToken);
         const cookies: ResponseCookies = [];
 
         //
@@ -259,6 +233,26 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return writeResponseCookies(response, cookies);
     };
 
+    /**
+     * Serve image resizing requests (all requests containing `/~gitbook/image`).
+     * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
+     * and serve from a single route handler.
+     *
+     * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
+     * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
+     */
+    if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
+        const siteURLData = await getSiteURLData(siteRequestURL, visitorToken, null);
+        if ('redirect' in siteURLData) {
+            // This should not happen because the redirect would've been taken care of earlier.
+            throw new Error(`Unexpected redirect while serving image at ${siteRequestURL}`);
+        }
+
+        return await serveResizedImage(request, {
+            host: new URL(siteURLData.canonicalUrl).host,
+        });
+    }
+
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {
         return serveWithQueryAPIToken(
@@ -270,6 +264,29 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     return withAPIToken(null);
+}
+
+async function getSiteURLData(
+    siteRequestURL: URL,
+    visitorToken: VisitorTokenLookup,
+    apiToken: string | null
+): Promise<PublishedSiteContentLookup> {
+    const siteURLData = await throwIfDataError(
+        getPublishedContentByURL({
+            url: siteRequestURL.toString(),
+            visitorAuthToken: visitorToken?.token ?? null,
+            // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+            // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+            // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+            redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
+
+            // Use the API token passed in the request, if any
+            // as it could be used for .preview hostnames
+            apiToken,
+        })
+    );
+
+    return siteURLData;
 }
 
 /**
