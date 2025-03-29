@@ -360,6 +360,9 @@ async function serveWithQueryAPIToken(
  *      URL is taken from the pathname.
  */
 function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
+    console.log('nextRequestUrl', request.nextUrl.toString());
+    Array.from(request.headers.entries()).forEach(([key, value]) => console.log(key, value));
+
     const xGitbookUrl = request.headers.get('x-gitbook-url');
     if (xGitbookUrl) {
         return {
