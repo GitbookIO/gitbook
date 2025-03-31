@@ -22,7 +22,7 @@ export function generateSchemaExample(
             emptyString: 'text',
             ...options,
         },
-        3 // Max depth for circular references
+        0 // Max depth for circular references
     );
 }
 
@@ -65,7 +65,7 @@ export function generateMediaTypeExamples(
 }
 
 /** Hard limit for rendering circular references */
-const MAX_LEVELS_DEEP = 5;
+const MAX_LEVELS_DEEP = 3;
 
 const genericExampleValues: Record<string, string> = {
     'date-time': new Date().toISOString(),
@@ -103,21 +103,6 @@ function guessFromFormat(schema: Record<string, any>, fallback = '') {
     return genericExampleValues[schema.format] ?? fallback;
 }
 
-/** Map of all the results */
-const resultCache = new WeakMap<Record<string, any>, any>();
-
-/** Store result in the cache, and return the result */
-function cache(schema: Record<string, any>, result: unknown) {
-    // Avoid unnecessary WeakMap operations for primitive values
-    if (typeof result !== 'object' || result === null) {
-        return result;
-    }
-
-    resultCache.set(schema, result);
-
-    return result;
-}
-
 /**
  * This function takes an OpenAPI schema and generates an example from it
  * Forked from : https://github.com/scalar/scalar/blob/main/packages/oas-utils/src/spec-getters/getExampleFromSchema.ts
@@ -152,8 +137,26 @@ const getExampleFromSchema = (
     },
     level = 0,
     parentSchema?: Record<string, any>,
-    name?: string
+    name?: string,
+    _resultCache?: WeakMap<Record<string, any>, any>
 ): any => {
+    // Create or reset cache on top-level calls
+    const resultCache =
+        level === 0
+            ? new WeakMap<Record<string, any>, any>()
+            : (_resultCache ?? new WeakMap<Record<string, any>, any>());
+
+    // Store result in the cache, and return the result
+    function cache(schema: Record<string, any>, result: unknown) {
+        // Avoid unnecessary WeakMap operations for primitive values
+        if (typeof result !== 'object' || result === null) {
+            return result;
+        }
+
+        resultCache.set(schema, result);
+        return result;
+    }
+
     // Check if the result is already cached
     if (resultCache.has(schema)) {
         return resultCache.get(schema);
@@ -245,7 +248,8 @@ const getExampleFromSchema = (
                         options,
                         level + 1,
                         schema,
-                        propertyName
+                        propertyName,
+                        resultCache
                     );
 
                     if (typeof response[propertyXmlTagName ?? propertyName] === 'undefined') {
@@ -269,7 +273,8 @@ const getExampleFromSchema = (
                         options,
                         level + 1,
                         schema,
-                        exampleKey
+                        exampleKey,
+                        resultCache
                     );
                 }
             }
@@ -290,21 +295,51 @@ const getExampleFromSchema = (
                 response.ANY_ADDITIONAL_PROPERTY = getExampleFromSchema(
                     schema.additionalProperties,
                     options,
-                    level + 1
+                    level + 1,
+                    undefined,
+                    undefined,
+                    resultCache
                 );
             }
         }
 
         if (schema.anyOf !== undefined) {
-            Object.assign(response, getExampleFromSchema(schema.anyOf[0], options, level + 1));
+            Object.assign(
+                response,
+                getExampleFromSchema(
+                    schema.anyOf[0],
+                    options,
+                    level + 1,
+                    undefined,
+                    undefined,
+                    resultCache
+                )
+            );
         } else if (schema.oneOf !== undefined) {
-            Object.assign(response, getExampleFromSchema(schema.oneOf[0], options, level + 1));
+            Object.assign(
+                response,
+                getExampleFromSchema(
+                    schema.oneOf[0],
+                    options,
+                    level + 1,
+                    undefined,
+                    undefined,
+                    resultCache
+                )
+            );
         } else if (schema.allOf !== undefined) {
             Object.assign(
                 response,
                 ...schema.allOf
                     .map((item: Record<string, any>) =>
-                        getExampleFromSchema(item, options, level + 1, schema)
+                        getExampleFromSchema(
+                            item,
+                            options,
+                            level + 1,
+                            schema,
+                            undefined,
+                            resultCache
+                        )
                     )
                     .filter((item: any) => item !== undefined)
             );
@@ -335,7 +370,9 @@ const getExampleFromSchema = (
                         { type: 'object', allOf: schema.items.allOf },
                         options,
                         level + 1,
-                        schema
+                        schema,
+                        undefined,
+                        resultCache
                     );
 
                     return cache(
@@ -346,7 +383,14 @@ const getExampleFromSchema = (
                 // For non-objects (like strings), collect all examples
                 const examples = schema.items.allOf
                     .map((item: Record<string, any>) =>
-                        getExampleFromSchema(item, options, level + 1, schema)
+                        getExampleFromSchema(
+                            item,
+                            options,
+                            level + 1,
+                            schema,
+                            undefined,
+                            resultCache
+                        )
                     )
                     .filter((item: any) => item !== undefined);
 
@@ -368,7 +412,14 @@ const getExampleFromSchema = (
                 const schemas = schema.items[rule].slice(0, 1);
                 const exampleFromRule = schemas
                     .map((item: Record<string, any>) =>
-                        getExampleFromSchema(item, options, level + 1, schema)
+                        getExampleFromSchema(
+                            item,
+                            options,
+                            level + 1,
+                            schema,
+                            undefined,
+                            resultCache
+                        )
                     )
                     .filter((item: any) => item !== undefined);
 
@@ -380,7 +431,14 @@ const getExampleFromSchema = (
         }
 
         if (schema.items?.type) {
-            const exampleFromSchema = getExampleFromSchema(schema.items, options, level + 1);
+            const exampleFromSchema = getExampleFromSchema(
+                schema.items,
+                options,
+                level + 1,
+                undefined,
+                undefined,
+                resultCache
+            );
 
             return wrapItems ? [{ [itemsXmlTagName]: exampleFromSchema }] : [exampleFromSchema];
         }
@@ -407,7 +465,14 @@ const getExampleFromSchema = (
         const firstOneOfItem = discriminateSchema[0];
 
         // Return an example for the first item
-        return getExampleFromSchema(firstOneOfItem, options, level + 1);
+        return getExampleFromSchema(
+            firstOneOfItem,
+            options,
+            level + 1,
+            undefined,
+            undefined,
+            resultCache
+        );
     }
 
     // Check if schema has the `allOf` key
@@ -417,7 +482,14 @@ const getExampleFromSchema = (
         // Loop through all `allOf` schemas
         schema.allOf.forEach((allOfItem: Record<string, any>) => {
             // Return an example from the schema
-            const newExample = getExampleFromSchema(allOfItem, options, level + 1);
+            const newExample = getExampleFromSchema(
+                allOfItem,
+                options,
+                level + 1,
+                undefined,
+                undefined,
+                resultCache
+            );
 
             // Merge or overwrite the example
             example =

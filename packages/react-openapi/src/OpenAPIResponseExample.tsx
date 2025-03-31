@@ -268,6 +268,7 @@ function getExamplesFromMediaTypeObject(args: {
                         value: {
                             [root]: generateSchemaExample(mediaTypeObject.schema, {
                                 xml: mediaType === 'application/xml',
+                                mode: 'read',
                             }),
                         },
                     },
@@ -277,7 +278,11 @@ function getExamplesFromMediaTypeObject(args: {
         return [
             {
                 key: 'default',
-                example: { value: generateSchemaExample(mediaTypeObject.schema) },
+                example: {
+                    value: generateSchemaExample(mediaTypeObject.schema, {
+                        mode: 'read',
+                    }),
+                },
             },
         ];
     }
