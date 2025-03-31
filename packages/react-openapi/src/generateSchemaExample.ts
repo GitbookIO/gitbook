@@ -16,14 +16,10 @@ export function generateSchemaExample(
     schema: OpenAPIV3.SchemaObject,
     options?: GenerateSchemaExampleOptions
 ): JSONValue | undefined {
-    return getExampleFromSchema(
-        schema,
-        {
-            emptyString: 'text',
-            ...options,
-        },
-        0 // Max depth for circular references
-    );
+    return getExampleFromSchema(schema, {
+        emptyString: 'text',
+        ...options,
+    });
 }
 
 /**
@@ -65,7 +61,7 @@ export function generateMediaTypeExamples(
 }
 
 /** Hard limit for rendering circular references */
-const MAX_LEVELS_DEEP = 3;
+const MAX_LEVELS_DEEP = 5;
 
 const genericExampleValues: Record<string, string> = {
     'date-time': new Date().toISOString(),
@@ -138,14 +134,8 @@ const getExampleFromSchema = (
     level = 0,
     parentSchema?: Record<string, any>,
     name?: string,
-    _resultCache?: WeakMap<Record<string, any>, any>
+    resultCache = new WeakMap<Record<string, any>, any>()
 ): any => {
-    // Create or reset cache on top-level calls
-    const resultCache =
-        level === 0
-            ? new WeakMap<Record<string, any>, any>()
-            : (_resultCache ?? new WeakMap<Record<string, any>, any>());
-
     // Store result in the cache, and return the result
     function cache(schema: Record<string, any>, result: unknown) {
         // Avoid unnecessary WeakMap operations for primitive values
