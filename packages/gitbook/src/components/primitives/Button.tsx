@@ -1,6 +1,6 @@
 'use client';
 
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -28,10 +28,14 @@ const variantClasses = {
         'contrast-more:ring-1',
     ],
     blank: [
-        'bg-tint',
+        'bg-transparent',
         'text-tint',
+        'ring-0',
+        'shadow-none',
         'hover:bg-tint-hover',
         'hover:text-primary',
+        'hover:scale-1',
+        'hover:shadow-none',
         'contrast-more:bg-tint-subtle',
     ],
     secondary: [
@@ -49,15 +53,16 @@ export function Button({
     size = 'default',
     className,
     insights,
+    target,
     label,
     icon,
     iconOnly = false,
     ...rest
-}: ButtonProps) {
+}: ButtonProps & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
         default: ['text-base', 'px-4', 'py-2'],
         medium: ['text-sm', 'px-3', 'py-1.5'],
-        small: ['text-xs', 'px-3 py-2'],
+        small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
     };
 
     const sizeClasses = sizes[size] || sizes.default;
@@ -65,6 +70,8 @@ export function Button({
     const domClassName = tcls(
         'button',
         'inline-flex',
+        'items-center',
+        'gap-2',
         'rounded-md',
         'straight-corners:rounded-none',
         'place-self-start',
@@ -102,9 +109,10 @@ export function Button({
                 className={domClassName}
                 insights={insights}
                 aria-label={label}
+                target={target}
                 {...rest}
             >
-                {icon ? <Icon icon={icon} className={tcls('size-4')} /> : null}
+                {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
                 {iconOnly ? null : label}
             </Link>
         );
@@ -112,7 +120,7 @@ export function Button({
 
     return (
         <button type="button" className={domClassName} aria-label={label} {...rest}>
-            {icon ? <Icon icon={icon} className={tcls('size-4')} /> : null}
+            {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
             {iconOnly ? null : label}
         </button>
     );

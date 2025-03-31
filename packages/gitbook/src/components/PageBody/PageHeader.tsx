@@ -35,7 +35,7 @@ export async function PageHeader(props: {
                                     <li key={breadcrumb.id}>
                                         <StyledLink
                                             href={href}
-                                            style={tcls(
+                                            className={tcls(
                                                 'no-underline',
                                                 'hover:underline',
                                                 'text-xs',
