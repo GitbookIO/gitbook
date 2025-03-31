@@ -21,6 +21,7 @@ import {
     hexToRgb,
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
+import HolyLoader from 'holy-loader';
 import * as ReactDOM from 'react-dom';
 
 import { getFontData } from '@/fonts';
@@ -28,7 +29,6 @@ import { fontNotoColorEmoji, ibmPlexMono } from '@/fonts/default';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
-
 import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
@@ -151,6 +151,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
+            <HolyLoader color="rgb(var(--primary-9))" height={1} />
             <body
                 className={tcls(
                     'bg-tint-base',
