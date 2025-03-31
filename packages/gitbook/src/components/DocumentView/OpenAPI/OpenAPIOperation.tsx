@@ -77,7 +77,12 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
                         ancestorBlocks={props.ancestorBlocks}
                         isEstimatedOffscreen={props.isEstimatedOffscreen}
                         context={props.context}
-                        style={headingProps.deprecated ? 'line-through' : undefined}
+                        style={tcls([
+                            headingProps.deprecated ? 'line-through' : undefined,
+                            headingProps.deprecated || !!headingProps.stability
+                                ? '[&>div]:mt-0'
+                                : undefined,
+                        ])}
                         block={{
                             object: 'block',
                             key: `${block.key}-heading`,

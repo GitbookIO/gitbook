@@ -1,6 +1,10 @@
 import clsx from 'clsx';
 
-import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
+import type {
+    OpenAPICustomOperationProperties,
+    OpenAPIStability,
+    OpenAPIV3,
+} from '@gitbook/openapi-parser';
 import { Markdown } from './Markdown';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIPath } from './OpenAPIPath';
@@ -29,14 +33,24 @@ export function OpenAPIOperation(props: {
     return (
         <div className={clsx('openapi-operation', className)}>
             <div className="openapi-summary" id={operation.summary ? undefined : context.id}>
+                {(operation.deprecated || operation['x-stability']) && (
+                    <div className="openapi-summary-tags">
+                        {operation.deprecated && (
+                            <div className="openapi-deprecated">Deprecated</div>
+                        )}
+                        {operation['x-stability'] && (
+                            <OpenAPIOperationStability stability={operation['x-stability']} />
+                        )}
+                    </div>
+                )}
                 {operation.summary
                     ? context.renderHeading({
                           deprecated: operation.deprecated ?? false,
+                          stability: operation['x-stability'],
                           title: operation.summary,
                       })
                     : null}
                 <OpenAPIPath data={data} context={context} />
-                {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
             </div>
             <div className="openapi-columns">
                 <div className="openapi-column-spec">
@@ -86,6 +100,29 @@ function OpenAPIOperationDescription(props: {
     return (
         <div className="openapi-intro">
             <Markdown className="openapi-description" source={description} />
+        </div>
+    );
+}
+
+const stabilityEnum = {
+    experimental: 'Experimental',
+    alpha: 'Alpha',
+    beta: 'Beta',
+    stable: 'Stable',
+} as const;
+
+function OpenAPIOperationStability(props: { stability: OpenAPIStability }) {
+    const { stability } = props;
+
+    const foundStability = stabilityEnum[stability];
+
+    if (!foundStability) {
+        return null;
+    }
+
+    return (
+        <div className={`openapi-stability openapi-stability-${foundStability.toLowerCase()}`}>
+            {foundStability}
         </div>
     );
 }
