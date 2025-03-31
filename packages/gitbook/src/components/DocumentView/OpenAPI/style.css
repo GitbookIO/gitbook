@@ -131,7 +131,7 @@
 
 /* Schema Structure */
 .openapi-schema-root {
-    @apply mt-2;
+    /* unstyled */
 }
 
 .openapi-schema-properties {
@@ -655,7 +655,8 @@
     @apply border border-tint-subtle rounded-lg;
 }
 
-.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema,
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-root {
     @apply p-2.5;
 }
 
