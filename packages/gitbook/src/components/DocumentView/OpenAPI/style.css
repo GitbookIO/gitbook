@@ -244,7 +244,11 @@
 
 /* Schema Enum */
 .openapi-schema-enum {
-    @apply flex flex-row text-sm leading-relaxed flex-wrap text-tint;
+    @apply flex flex-row text-sm leading-relaxed gap-2 flex-wrap text-tint;
+}
+
+.openapi-schema-enum-list {
+    @apply flex flex-row gap-1.5 items-center;
 }
 
 .openapi-schema-enum-value {
@@ -692,4 +696,8 @@
     100% {
         opacity: 0;
     }
+}
+
+.openapi-copy-button {
+    @apply hover:brightness-95;
 }
