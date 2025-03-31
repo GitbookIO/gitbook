@@ -366,7 +366,7 @@ async function resolveContentRefInSpace(
         ancestors: [
             {
                 label: space.title,
-                href: baseURL,
+                href: baseURL.toString(),
             },
             ...(resolved.ancestors ?? []),
         ].filter(filterOutNullable),
