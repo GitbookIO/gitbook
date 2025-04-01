@@ -60,7 +60,7 @@ export function getCacheTag(
         | {
               tag: 'computed-document';
               space: string;
-              integration: string;
+              sourceType: string;
           }
         /**
          * All data related to the URL of a content
@@ -99,7 +99,7 @@ export function getCacheTag(
         case 'document':
             return `space:${spec.space}:document:${spec.document}`;
         case 'computed-document':
-            return `space:${spec.space}:computed-document:${spec.integration}`;
+            return `space:${spec.space}:computed-document:${spec.sourceType}`;
         case 'site':
             return `site:${spec.site}`;
         case 'integration':
@@ -169,18 +169,22 @@ export function getComputedContentSourceCacheTags(
             getCacheTag({
                 tag: 'computed-document',
                 space: inContext.spaceId,
-                integration: source.integration,
+                sourceType: source.type,
             })
         );
     }
 
     // We invalidate the computed content when a new version of the integration is deployed.
-    tags.push(
-        getCacheTag({
-            tag: 'integration',
-            integration: source.integration,
-        })
-    );
+
+    if (source.type.startsWith('integration:')) {
+        const integration = source.type.split(':')[1];
+        tags.push(
+            getCacheTag({
+                tag: 'integration',
+                integration,
+            })
+        );
+    }
 
     return tags;
 }
