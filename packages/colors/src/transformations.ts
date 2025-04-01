@@ -220,7 +220,7 @@ export function colorScale(
             continue;
         }
 
-        const chromaRatio = index < 8 ? (index + 1) * 0.05 : 1;
+        const chromaRatio = index < 8 ? index * 0.05 : 1;
 
         const shade = {
             L: targetL, // Blend lightness

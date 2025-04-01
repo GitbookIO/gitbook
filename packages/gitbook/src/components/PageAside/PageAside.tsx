@@ -228,7 +228,7 @@ export function PageAside(props: {
             ) : null}
             <div
                 className={tcls(
-                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-bold-tint:bg-tint-subtle theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:group-hover/aside:flex',
+                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:group-hover/aside:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'page-api-block:xl:max-2xl:bg-transparent'
                 )}
             >

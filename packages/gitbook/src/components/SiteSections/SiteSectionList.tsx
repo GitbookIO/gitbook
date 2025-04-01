@@ -32,7 +32,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
             <nav
                 aria-label="Sections"
                 className={tcls(
-                    '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-bold-tint:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-gradient-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-muted_&]:to-tint-base',
+                    '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-gradient-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base',
                     className
                 )}
             >

@@ -104,7 +104,7 @@ const HINT_STYLES: {
             '[&_.can-override-text]:text-neutral-strong',
         ],
         container:
-            'bg-info border-info theme-muted-tint:bg-info-solid/2 theme-bold-tint:bg-info-solid/2',
+            'bg-info border-info theme-muted-tint:bg-info-solid/2 [html.sidebar-filled.theme-bold.tint_&]:bg-info-solid/2',
         containerWithHeader: 'border-info-solid bg-info-subtle',
     },
     warning: {

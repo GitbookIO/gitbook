@@ -153,9 +153,9 @@ export async function CustomizationRootLayout(props: {
             </head>
             <body
                 className={tcls(
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'bg-tint-base',
                     'theme-muted:bg-tint-subtle',
-                    'theme-bold-tint:bg-tint-subtle',
 
                     'theme-gradient:bg-gradient-primary',
                     'theme-gradient-tint:bg-gradient-tint'

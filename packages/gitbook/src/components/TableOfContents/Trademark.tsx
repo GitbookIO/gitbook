@@ -52,7 +52,7 @@ export function Trademark(props: {
                 'before:to-tint-base',
                 'sidebar-filled:before:to-tint-subtle',
                 'theme-muted:before:to-tint-subtle',
-                'theme-bold-tint:before:to-tint-subtle',
+                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
                 'page-no-toc:before:!to-transparent'

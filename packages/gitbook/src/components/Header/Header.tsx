@@ -38,7 +38,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
 
                 'bg-tint-base/9',
                 'theme-muted:bg-tint-subtle/9',
-                'theme-bold-tint:bg-tint-subtle/9',
+                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle/9',
                 'theme-gradient:bg-gradient-primary',
                 'theme-gradient-tint:bg-gradient-tint',
                 'contrast-more:bg-tint-base',
