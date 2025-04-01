@@ -21,7 +21,42 @@ export function OpenAPIResponses(props: {
                 icon={context.icons.chevronRight}
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
-                        const content = Object.entries(response.content ?? {});
+                        const tabs = (() => {
+                            // If there is no content, but there are headers, we need to show the headers
+                            if (
+                                (!response.content || !Object.keys(response.content).length) &&
+                                response.headers &&
+                                Object.keys(response.headers).length
+                            ) {
+                                return [
+                                    {
+                                        id: 'default',
+                                        body: (
+                                            <OpenAPIResponse
+                                                response={response}
+                                                mediaType={{}}
+                                                context={context}
+                                            />
+                                        ),
+                                    },
+                                ];
+                            }
+
+                            return Object.entries(response.content ?? {}).map(
+                                ([contentType, mediaType]) => ({
+                                    id: contentType,
+                                    label: contentType,
+                                    body: (
+                                        <OpenAPIResponse
+                                            response={response}
+                                            mediaType={mediaType}
+                                            context={context}
+                                        />
+                                    ),
+                                })
+                            );
+                        })();
+
                         const description = response.description;
 
                         return {
@@ -39,17 +74,7 @@ export function OpenAPIResponses(props: {
                                     ) : null}
                                 </div>
                             ),
-                            tabs: content.map(([contentType, mediaType]) => ({
-                                id: contentType,
-                                label: contentType,
-                                body: (
-                                    <OpenAPIResponse
-                                        response={response}
-                                        mediaType={mediaType}
-                                        context={context}
-                                    />
-                                ),
-                            })),
+                            tabs,
                         };
                     }
                 )}

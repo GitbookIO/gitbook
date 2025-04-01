@@ -36,13 +36,15 @@ export function OpenAPIResponse(props: {
                     />
                 </OpenAPIDisclosure>
             ) : null}
-            <div className="openapi-responsebody">
-                <OpenAPISchemaProperties
-                    id={`response-${context.blockKey}`}
-                    properties={mediaType.schema ? [{ schema: mediaType.schema }] : []}
-                    context={context}
-                />
-            </div>
+            {mediaType.schema && (
+                <div className="openapi-responsebody">
+                    <OpenAPISchemaProperties
+                        id={`response-${context.blockKey}`}
+                        properties={[{ schema: mediaType.schema }]}
+                        context={context}
+                    />
+                </div>
+            )}
         </div>
     );
 }
