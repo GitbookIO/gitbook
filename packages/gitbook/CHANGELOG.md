@@ -1,5 +1,44 @@
 # gitbook
 
+## 0.9.0
+
+### Minor Changes
+
+- 77fd393: Track event when visitor is opening a search result.
+- d70d566: Support site announcement banner
+- 77fd393: Track event when clicking announcement banner link.
+
+### Patch Changes
+
+- e84a46a: Fix OpenAPI tabs indicator overflow
+- bc90adb: Fix favicon not being displayed in Google because `robots.txt` was preventing the indexation of the image route
+- 434af90: Fix image resizing when using the proxy feature in a site.
+- c756761: Add breadcrumbs to search results
+- 40e8e69: Disallow crawling by web-robots of search/ask URLs
+- 77fd393: Fix clicking search results when the site is embedded in an iframe.
+- 1505ddb: Fix multiple request examples selector not showing
+- 61db166: Add OpenAPI write-only indicator
+- 6f71da8: Fix padding in schemas
+- fa91eb7: Fix PDF generation when user has dark mode configured.
+- 5b1e01c: Support for x-stability property
+- 57ca4e0: Fix a crash when a page contains a block of an integration that is no longer installed
+- d236bf0: Fix flash when loading sites with dark mode as default theme
+- cd99ed5: Fix spec properties rendering and missing keys
+- 813b2af: Support for x-enumDescriptions and x-gitbook-enum
+- e9fa50d: Trim the search query to avoid showing a loading state when typing
+- Updated dependencies [bd35348]
+- Updated dependencies [ae78fc5]
+- Updated dependencies [7bb37c7]
+- Updated dependencies [373183a]
+- Updated dependencies [1505ddb]
+- Updated dependencies [61db166]
+- Updated dependencies [5b1e01c]
+- Updated dependencies [cd99ed5]
+- Updated dependencies [813b2af]
+- Updated dependencies [a25fded]
+  - @gitbook/react-openapi@1.1.7
+  - @gitbook/openapi-parser@2.1.2
+
 ## 0.8.2
 
 ### Patch Changes

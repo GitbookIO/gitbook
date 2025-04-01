@@ -1,5 +1,11 @@
 # gitbook-v2
 
+## 0.2.3
+
+### Patch Changes
+
+- 5b2bf82: Use stable site URL data for route rewrite in the middleware
+
 ## 0.2.2
 
 ### Patch Changes
