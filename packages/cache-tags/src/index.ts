@@ -84,6 +84,14 @@ export function getCacheTag(
               organization: string;
               openAPISpec: string;
           }
+        /**
+         * All data related to a translation
+         */
+        | {
+              tag: 'translation';
+              organization: string;
+              translationSettings: string;
+          }
 ): string {
     switch (spec.tag) {
         case 'user':
@@ -106,6 +114,8 @@ export function getCacheTag(
             return `integration:${spec.integration}`;
         case 'openapi':
             return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
+        case 'translation':
+            return `organization:${spec.organization}:translation:${spec.translationSettings}`;
         default:
             assertNever(spec);
     }
@@ -154,6 +164,15 @@ export function getComputedContentSourceCacheTags(
                             tag: 'openapi',
                             organization: inContext.organizationId,
                             openAPISpec: dependency.ref.spec,
+                        })
+                    );
+                    break;
+                case 'translation-language':
+                    tags.push(
+                        getCacheTag({
+                            tag: 'translation',
+                            organization: inContext.organizationId,
+                            translationSettings: dependency.ref.translationSettings,
                         })
                     );
                     break;
