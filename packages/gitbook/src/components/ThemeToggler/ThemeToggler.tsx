@@ -79,7 +79,7 @@ function ThemeButton(props: {
                 active && [
                     'bg-primary',
                     'theme-muted:bg-primary-hover',
-                    'theme-bold-tint:bg-primary-hover',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-primary-hover',
                     'hover:bg-primary',
                     'text-primary-strong',
                     'contrast-more:text-primary-strong',

@@ -75,7 +75,7 @@ export function TableOfContents(props: {
 
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
-                    'theme-bold-tint:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     'page-no-toc:!bg-transparent',
