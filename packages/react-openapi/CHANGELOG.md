@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.1.8
+
+### Patch Changes
+
+- 7d0b422: Handle grouped OpenAPISchemas
+
 ## 1.1.7
 
 ### Patch Changes

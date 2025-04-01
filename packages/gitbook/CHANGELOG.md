@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.9.1
+
+### Patch Changes
+
+- fb90eb0: Limit tinted background on bold theme to sites with filled sidebar
+- 7d0b422: Handle grouped OpenAPISchemas
+- Updated dependencies [7d0b422]
+- Updated dependencies [fb90eb0]
+  - @gitbook/react-openapi@1.1.8
+  - @gitbook/colors@0.3.1
+
 ## 0.9.0
 
 ### Minor Changes
