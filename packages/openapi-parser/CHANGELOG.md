@@ -1,5 +1,13 @@
 # @gitbook/openapi-parser
 
+## 2.1.2
+
+### Patch Changes
+
+- 7bb37c7: Move filterSelectedOpenAPISchemas to @gitbook/openapi-parser
+- 5b1e01c: Support for x-stability property
+- 813b2af: Support for x-enumDescriptions and x-gitbook-enum
+
 ## 2.1.1
 
 ### Patch Changes

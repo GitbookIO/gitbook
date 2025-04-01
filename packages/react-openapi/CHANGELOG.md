@@ -1,5 +1,24 @@
 # @gitbook/react-openapi
 
+## 1.1.7
+
+### Patch Changes
+
+- bd35348: Fix missing alternative schemas
+- ae78fc5: Fix XML in code sample
+- 7bb37c7: Move filterSelectedOpenAPISchemas to @gitbook/openapi-parser
+- 373183a: Safe parse OpenAPI JSON schema
+- 1505ddb: Fix multiple request examples selector not showing
+- 61db166: Add OpenAPI write-only indicator
+- 5b1e01c: Support for x-stability property
+- cd99ed5: Fix spec properties rendering and missing keys
+- 813b2af: Support for x-enumDescriptions and x-gitbook-enum
+- a25fded: Replace $ref with $reference in json-decycle
+- Updated dependencies [7bb37c7]
+- Updated dependencies [5b1e01c]
+- Updated dependencies [813b2af]
+  - @gitbook/openapi-parser@2.1.2
+
 ## 1.1.6
 
 ### Patch Changes
