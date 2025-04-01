@@ -52,7 +52,7 @@ function OpenAPIRootSchemasSchema(props: {
 }) {
     const { schemas, context, grouped } = props;
 
-    // If there is only one model, we show it directly.
+    // If there is only one model and we are not grouping, we show it directly.
     if (schemas.length === 1 && !grouped) {
         const schema = schemas?.[0]?.schema;
 
