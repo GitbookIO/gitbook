@@ -1,5 +1,11 @@
 # @gitbook/colors
 
+## 0.3.1
+
+### Patch Changes
+
+- fb90eb0: Reduce chroma of first color scale step
+
 ## 0.3.0
 
 ### Minor Changes
