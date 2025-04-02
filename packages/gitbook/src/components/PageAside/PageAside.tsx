@@ -13,7 +13,7 @@ import urlJoin from 'url-join';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
-
+import { AIPageNextRecommendedPages } from '../Adaptive';
 import { Ad } from '../Ads';
 import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -42,12 +42,16 @@ export function PageAside(props: {
             limit: 100,
         }).toString()}`
     );
+
+    const prevPages = ['GitBook Documentation', 'GitHub & GitLab Sync', 'Troubleshooting'];
+
     return (
         <aside
             className={tcls(
                 'group/aside',
                 'hidden',
                 'xl:flex',
+                'text-sm',
                 // 'page-no-toc:lg:flex',
                 'flex-col',
                 'basis-56',
@@ -88,146 +92,132 @@ export function PageAside(props: {
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:my-8',
-                'page-api-block:p-2',
+                'page-api-block:p-2'
 
                 // When the adaptive pane is open, we hide the aside
-                'adaptive-pane:hidden'
+                // 'adaptive-pane:hidden'
             )}
         >
             {page.layout.outline ? (
-                <>
-                    <div
-                        className={tcls(
-                            'hidden',
-                            'page-api-block:xl:max-2xl:flex',
-                            'text-xs',
-                            'tracking-wide',
-                            'font-semibold',
-                            'uppercase',
+                <div
+                    className={tcls(
+                        'overflow-y-auto',
+                        'overflow-x-visible',
 
-                            'flex-row',
-                            'items-center',
-                            'gap-2'
-                        )}
-                    >
-                        <Icon icon="block-quote" className={tcls('size-3')} />
-                        {t(language, 'on_this_page')}
-                        <Icon
-                            icon="chevron-down"
-                            className={tcls(
-                                'size-3',
-                                'opacity-6',
-                                'ml-auto',
-                                'page-api-block:xl:max-2xl:group-hover/aside:hidden'
-                            )}
-                        />
+                        'flex',
+                        'flex-col',
+                        'shrink',
+                        'pb-12',
+
+                        'sticky',
+                        'lg:top:0',
+                        'site-header:lg:top-16',
+                        'site-header-sections:lg:top-[6.75rem]',
+
+                        'gap-2',
+                        'pt-8',
+
+                        'page-api-block:xl:max-2xl:py-0',
+                        // Hide it for api page, until hovered
+                        'page-api-block:xl:max-2xl:hidden',
+                        'page-api-block:xl:max-2xl:group-hover/aside:flex'
+                    )}
+                >
+                    <div className="flex items-center gap-2 font-semibold text-xs uppercase tracking-wide">
+                        <Icon icon="block-quote" className="size-3" />
+                        On this page
                     </div>
-                    <div
-                        className={tcls(
-                            'overflow-y-auto',
-                            'overflow-x-visible',
-
-                            'flex',
-                            'flex-col',
-                            'shrink',
-                            'pb-12',
-
-                            'sticky',
-                            'lg:top:0',
-                            'site-header:lg:top-16',
-                            'site-header-sections:lg:top-[6.75rem]',
-
-                            'gap-6',
-                            'pt-8',
-
-                            'page-api-block:xl:max-2xl:py-0',
-                            // Hide it for api page, until hovered
-                            'page-api-block:xl:max-2xl:hidden',
-                            'page-api-block:xl:max-2xl:group-hover/aside:flex'
-                        )}
-                    >
-                        {document ? (
+                    {document ? (
+                        <div className="-ml-3">
                             <React.Suspense fallback={null}>
                                 <PageAsideSections document={document} context={context} />
                             </React.Suspense>
-                        ) : null}
-                        <div
-                            className={tcls(
-                                'flex',
-                                'flex-col',
-                                'gap-3',
-                                'sidebar-list-default:px-3',
-                                'border-t',
-                                'first:border-none',
-                                'border-tint-subtle',
-                                'py-4',
-                                'first:pt-0',
-                                'page-api-block:xl:max-2xl:px-3',
-                                'empty:hidden'
-                            )}
-                        >
-                            {withPageFeedback ? (
-                                <React.Suspense fallback={null}>
-                                    <PageFeedbackForm pageId={page.id} className={tcls('mt-2')} />
-                                </React.Suspense>
-                            ) : null}
-                            {customization.git.showEditLink && space.gitSync?.url && page.git ? (
-                                <div>
-                                    <a
-                                        href={urlJoin(space.gitSync.url, page.git.path)}
-                                        className={tcls(
-                                            'flex',
-                                            'flex-row',
-                                            'items-center',
-                                            'text-sm',
-                                            'hover:text-tint-strong',
-                                            'links-accent:hover:underline',
-                                            'links-accent:hover:underline-offset-4',
-                                            'links-accent:hover:decoration-[3px]',
-                                            'links-accent:hover:decoration-primary-subtle',
-                                            'py-2'
-                                        )}
-                                    >
-                                        <Icon
-                                            icon={
-                                                space.gitSync.installationProvider === 'gitlab'
-                                                    ? 'gitlab'
-                                                    : 'github'
-                                            }
-                                            className={tcls('size-4', 'mr-1.5')}
-                                        />
-                                        {t(language, 'edit_on_git', getGitSyncName(space))}
-                                    </a>
-                                </div>
-                            ) : null}
-                            {customization.pdf.enabled ? (
-                                <div>
-                                    <a
-                                        href={pdfHref}
-                                        className={tcls(
-                                            'flex',
-                                            'flex-row',
-                                            'items-center',
-                                            'text-sm',
-                                            'hover:text-tint-strong',
-                                            'links-accent:hover:underline',
-                                            'links-accent:hover:underline-offset-4',
-                                            'links-accent:hover:decoration-[3px]',
-                                            'links-accent:hover:decoration-primary-subtle',
-                                            'py-2'
-                                        )}
-                                    >
-                                        <Icon
-                                            icon="file-pdf"
-                                            className={tcls('size-4', 'mr-1.5')}
-                                        />
-                                        {t(language, 'pdf_download')}
-                                    </a>
-                                </div>
-                            ) : null}
                         </div>
+                    ) : null}
+
+                    <div className='mt-6 flex items-center gap-2 font-semibold text-xs uppercase tracking-wide'>
+                        <Icon icon="sparkle" className="size-3" />
+                        Next pages
                     </div>
-                </>
+                    <AIPageNextRecommendedPages
+                        spaceId={context.space.id}
+                        pageId={page.id}
+                        revisionId={context.revisionId}
+                    />
+
+                    <div
+                        className={tcls(
+                            'flex',
+                            'flex-col',
+                            'gap-3',
+                            'sidebar-list-default:px-3',
+                            'border-t',
+                            'first:border-none',
+                            'border-tint-subtle',
+                            'py-4',
+                            'first:pt-0',
+                            'page-api-block:xl:max-2xl:px-3',
+                            'empty:hidden'
+                        )}
+                    >
+                        {withPageFeedback ? (
+                            <React.Suspense fallback={null}>
+                                <PageFeedbackForm pageId={page.id} className={tcls('mt-2')} />
+                            </React.Suspense>
+                        ) : null}
+                        {customization.git.showEditLink && space.gitSync?.url && page.git ? (
+                            <div>
+                                <a
+                                    href={urlJoin(space.gitSync.url, page.git.path)}
+                                    className={tcls(
+                                        'flex',
+                                        'flex-row',
+                                        'items-center',
+                                        'text-sm',
+                                        'hover:text-tint-strong',
+                                        'links-accent:hover:underline',
+                                        'links-accent:hover:underline-offset-4',
+                                        'links-accent:hover:decoration-[3px]',
+                                        'links-accent:hover:decoration-primary-subtle',
+                                        'py-2'
+                                    )}
+                                >
+                                    <Icon
+                                        icon={
+                                            space.gitSync.installationProvider === 'gitlab'
+                                                ? 'gitlab'
+                                                : 'github'
+                                        }
+                                        className={tcls('size-4', 'mr-1.5')}
+                                    />
+                                    {t(language, 'edit_on_git', getGitSyncName(space))}
+                                </a>
+                            </div>
+                        ) : null}
+                        {customization.pdf.enabled ? (
+                            <div>
+                                <a
+                                    href={pdfHref}
+                                    className={tcls(
+                                        'flex',
+                                        'flex-row',
+                                        'items-center',
+                                        'text-sm',
+                                        'hover:text-tint-strong',
+                                        'links-accent:hover:underline',
+                                        'links-accent:hover:underline-offset-4',
+                                        'links-accent:hover:decoration-[3px]',
+                                        'links-accent:hover:decoration-primary-subtle',
+                                        'py-2'
+                                    )}
+                                >
+                                    <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
+                                    {t(language, 'pdf_download')}
+                                </a>
+                            </div>
+                        ) : null}
+                    </div>
+                </div>
             ) : null}
             <div
                 className={tcls(

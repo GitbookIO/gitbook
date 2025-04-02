@@ -131,8 +131,6 @@ The content of the target page is:`,
         fetchServerActionSiteContext(baseContext),
     ]);
 
-    console.log(await response);
-
     const emitted = new Set<string>();
     for await (const value of stream) {
         const highlight = value.highlight;

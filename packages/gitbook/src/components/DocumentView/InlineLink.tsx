@@ -20,7 +20,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
           })
         : null;
 
-    if (!resolved) {
+    if (!context.contentContext || !resolved) {
         return (
             <span title="Broken link" className="underline">
                 <Inlines
@@ -141,20 +141,24 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                             </div>
 
                             {!isExternal &&
-                            context.contentContext ? (
+                            'site' in context.contentContext &&
+                            'page' in context.contentContext &&
+                            context.contentContext.site.adaptiveContent?.enabled &&
+                            inline.data.ref.kind === 'page' ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
-                                    <div className="mb-1 flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
-                                        <Icon icon="sparkle" className="size-3" />
-                                        <h6 className="text-tint">AI Summary</h6>
-                                    </div>
                                     <AIPageLinkSummary
                                         currentPageId={context.contentContext.page.id}
                                         currentSpaceId={context.contentContext.space.id}
-                                        targetPageId={inline.data.ref.page}
+                                        targetPageId={
+                                            inline.data.ref.page ?? context.contentContext.page.id
+                                        }
                                         targetSpaceId={
                                             inline.data.ref.space ?? context.contentContext.space.id
                                         }
                                         linkPreview={`**${resolved.text}**: ${resolved.subText}`}
+                                        showTrademark={
+                                            context.contentContext.customization.trademark.enabled
+                                        }
                                     />
 
                                     {/* <div className="-m-2 mt-0 flex flex-col rounded-md p-2 text-sm">

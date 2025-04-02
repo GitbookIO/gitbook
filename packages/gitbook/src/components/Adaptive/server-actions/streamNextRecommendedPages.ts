@@ -104,6 +104,7 @@ export async function* streamNextRecommendedPages({
             }
 
             yield {
+                icon: page.page.icon ?? page.page.emoji,
                 title: page.page.title,
                 href: context.linker.toPathForPage({
                     pages: context.pages,

@@ -1,6 +1,7 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
 import { Link } from '../primitives';
 import { streamNextRecommendedPages } from './server-actions';
@@ -15,7 +16,7 @@ export function AIPageNextRecommendedPages(props: {
 }) {
     const { spaceId, revisionId, pageId } = props;
 
-    const [pages, setPages] = useState<{ title: string; href: string }[]>([]);
+    const [pages, setPages] = useState<{ title: string; href: string; icon?: string }[]>([]);
 
     useEffect(() => {
         let canceled = false;
@@ -45,17 +46,11 @@ export function AIPageNextRecommendedPages(props: {
     }, [spaceId, revisionId, pageId]);
 
     return (
-        <div
-            className={tcls(
-                'flex flex-row flex-wrap gap-2',
-                'max-w-3xl',
-                'mx-auto',
-                'page-api-block:ml-0'
-            )}
-        >
+        <div className={tcls('flex flex-col gap-2')}>
             {pages.map((page) => {
                 return (
-                    <Link key={page.href} href={page.href}>
+                    <Link className='flex items-center gap-3' key={page.href} href={page.href}>
+                        <Icon className="size-4" icon={page.icon} />
                         {page.title}
                     </Link>
                 );
