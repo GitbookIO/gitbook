@@ -11,6 +11,7 @@ import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import { retrocycle } from './decycle';
+import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIClientContext } from './types';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
 
@@ -145,27 +146,38 @@ function OpenAPIRootSchema(props: {
 
     const id = useId();
     const properties = getSchemaProperties(schema);
+    const description = resolveDescription(schema);
 
     if (properties?.length) {
         const circularRefs = new Map(parentCircularRefs);
         circularRefs.set(schema, id);
 
         return (
-            <OpenAPISchemaProperties
-                properties={properties}
-                circularRefs={circularRefs}
-                context={context}
-            />
+            <>
+                {description ? (
+                    <Markdown source={description} className="openapi-schema-root-description" />
+                ) : null}
+                <OpenAPISchemaProperties
+                    properties={properties}
+                    circularRefs={circularRefs}
+                    context={context}
+                />
+            </>
         );
     }
 
     return (
-        <OpenAPISchemaProperty
-            className="openapi-schema-root"
-            property={{ schema }}
-            context={context}
-            circularRefs={parentCircularRefs}
-        />
+        <>
+            {description ? (
+                <Markdown source={description} className="openapi-schema-root-description" />
+            ) : null}
+            <OpenAPISchemaProperty
+                className="openapi-schema-root"
+                property={{ schema }}
+                context={context}
+                circularRefs={parentCircularRefs}
+            />
+        </>
     );
 }
 
@@ -322,15 +334,25 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
             {description ? (
                 <Markdown source={description} className="openapi-schema-description" />
             ) : null}
+            {typeof schema.default !== 'undefined' ? (
+                <span className="openapi-schema-default">
+                    Default:{' '}
+                    <code>
+                        {typeof schema.default === 'string' && schema.default
+                            ? schema.default
+                            : stringifyOpenAPI(schema.default)}
+                    </code>
+                </span>
+            ) : null}
             {typeof example === 'string' ? (
-                <div className="openapi-schema-example">
+                <span className="openapi-schema-example">
                     Example: <code>{example}</code>
-                </div>
+                </span>
             ) : null}
             {schema.pattern ? (
-                <div className="openapi-schema-pattern">
+                <span className="openapi-schema-pattern">
                     Pattern: <code>{schema.pattern}</code>
-                </div>
+                </span>
             ) : null}
             <OpenAPISchemaEnum schema={schema} />
         </div>

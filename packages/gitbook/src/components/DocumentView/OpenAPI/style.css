@@ -155,6 +155,10 @@
     /* unstyled */
 }
 
+.openapi-schema-root-description.openapi-markdown {
+    @apply prose-sm text-balance mt-1.5 !text-[0.813rem] text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+}
+
 .openapi-schema-properties {
     @apply flex flex-col;
 }
@@ -203,7 +207,7 @@
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none flex gap-x-2.5 items-baseline text-sm flex-wrap;
+    @apply select-none text-sm text-balance *:whitespace-nowrap flex flex-wrap gap-y-1.5 gap-x-2.5;
 }
 
 .openapi-schema-name .openapi-deprecated {
@@ -282,7 +286,7 @@
 
 /* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint overflow-hidden text-pretty !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre:has(code) {
@@ -302,13 +306,15 @@
 
 /* Schema Examples */
 .openapi-schema-example,
-.openapi-schema-pattern {
+.openapi-schema-pattern,
+.openapi-schema-default {
     @apply prose-sm text-tint;
 }
 
 .openapi-schema-example code,
 .openapi-schema-pattern code,
-.openapi-schema-enum-value code {
+.openapi-schema-enum-value code,
+.openapi-schema-default code {
     @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
@@ -322,7 +328,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint !font-normal select-text text-pretty prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
@@ -348,7 +354,7 @@
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint !font-normal text-pretty select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 /* Responses */
@@ -365,7 +371,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply text-left prose-sm text-[0.813rem] h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply text-left prose-sm text-[0.813rem] text-pretty h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description.openapi-markdown::-webkit-scrollbar {
