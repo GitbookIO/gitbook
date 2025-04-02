@@ -95,7 +95,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                                                                 crumb.href &&
                                                                     'links-default:text-tint no-underline hover:underline contrast-more:underline contrast-more:decoration-current'
                                                             )}
-                                                            href={crumb.href ?? ''}
+                                                            href={crumb.href ?? '#'}
                                                         >
                                                             {crumb.icon ? (
                                                                 <span className="mt-0.5 text-tint-subtle empty:hidden">
@@ -141,9 +141,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                             </div>
 
                             {!isExternal &&
-                            context.contentContext &&
-                            'page' in context.contentContext &&
-                            inline.data.ref.kind === 'page' ? (
+                            context.contentContext ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <div className="mb-1 flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                                         <Icon icon="sparkle" className="size-3" />
@@ -156,6 +154,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                                         targetSpaceId={
                                             inline.data.ref.space ?? context.contentContext.space.id
                                         }
+                                        linkPreview={`**${resolved.text}**: ${resolved.subText}`}
                                     />
 
                                     {/* <div className="-m-2 mt-0 flex flex-col rounded-md p-2 text-sm">
