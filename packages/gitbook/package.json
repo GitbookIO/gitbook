@@ -46,7 +46,7 @@
         "mathjax": "^3.2.2",
         "mdast-util-to-markdown": "^2.1.2",
         "memoizee": "^0.4.17",
-        "next": "14.2.25",
+        "next": "14.2.26",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
