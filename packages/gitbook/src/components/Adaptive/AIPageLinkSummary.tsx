@@ -56,18 +56,21 @@ export function AIPageLinkSummary(props: {
     }, [currentSpaceId, currentPageId, targetSpaceId, targetPageId]);
 
     return (
-        <div>
-            <div className="mb-1 flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
+        <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                 {showTrademark ? (
                     <Loading className="size-4" busy={!highlight || highlight.length === 0} />
                 ) : (
                     <Icon icon="sparkle" className="size-3" />
                 )}
-                <h6 className="text-tint">
-                    Page highlight
-                </h6>
+                <h6 className="text-tint">Page highlight</h6>
             </div>
-            {highlight}
+            {highlight.length > 0 ? <p>{highlight}</p> : null}
+            {highlight.length > 0 ? (
+                <div className="text-tint-subtle text-xs">
+                    Based on your context. May contain mistakes.
+                </div>
+            ) : null}
         </div>
     );
 }
