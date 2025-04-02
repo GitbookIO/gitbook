@@ -15,18 +15,20 @@ export async function* streamLinkPageSummary({
     currentPageId,
     targetSpaceId,
     targetPageId,
-    previousPageIds,
+    linkPreview,
 }: {
     currentSpaceId: string;
     currentPageId: string;
     targetSpaceId: string;
     targetPageId: string;
-    previousPageIds: string[];
+    linkPreview?: string;
+    linkContext?: string;
+    previousPageIds?: string[];
 }) {
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream }, context] = await Promise.all([
+    const [{ stream, response }, context] = await Promise.all([
         streamGenerateObject(
             baseContext,
             {
@@ -35,37 +37,22 @@ export async function* streamLinkPageSummary({
             },
             {
                 schema: z.object({
-                    summary: z.array(z.string().describe('The summary of the target page')),
+                    highlight: z.string().describe('The most important content of the target page'),
                     // questions: z.array(z.string().describe('The questions to sea')).max(3),
                 }),
                 messages: [
                     {
                         role: AIMessageRole.Developer,
-                        content: `You are a documentation navigator, tasked with generating summaries of articles the user might navigate to next.
-                        Given a user's current article and the target article the user is inspecting, respond with a one-sentence summary of the target article. Make sure to tailor the summary to the user's current article, for example by examining the paragraph the link to the target article is mentioned in.
-                        Do not repeat the article's title and description, because these are already shown to the user. Avoid the passive voice, and don't reference the article itself.`,
+                        content: `# Task
+You are a documentation navigator, tasked with extracting information from pages the user might navigate to next.
+The user is currently reading a page, and is considering clicking a link to another ("target") page. 
+Use the user's context and the page they are currently on.`,
                     },
                     {
                         role: AIMessageRole.Developer,
-                        content: 'Pages in the documentation:',
-                        attachments: [
-                            {
-                                type: 'pages',
-                                spaceId: currentSpaceId,
-                            },
-                        ],
-                    },
-                    ...(previousPageIds.length > 0
-                        ? [
-                              {
-                                  role: AIMessageRole.User,
-                                  content: `The user has visited the following pages: ${previousPageIds.join(', ')}`,
-                              },
-                          ]
-                        : []),
-                    {
-                        role: AIMessageRole.User,
-                        content: `The user is currently on page ID ${currentPageId}, the content of the page is:`,
+                        content: `# Context
+## Current page
+The user is currently on page ID ${currentPageId}, the content of this page is:`,
                         attachments: [
                             {
                                 type: 'page',
@@ -75,8 +62,20 @@ export async function* streamLinkPageSummary({
                         ],
                     },
                     {
-                        role: AIMessageRole.User,
-                        content: `The user is looking at page ID ${targetPageId}, the content of the page is:`,
+                        role: AIMessageRole.Developer,
+                        content: `## Link context
+The user is inspecting a link to page ID ${targetPageId}. Look for this ID in the current article and inspect the paragraph that surrounds it, to understand the link context.`,
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `## Link preview: 
+This text is displayed directly above your summary. Use pronouns to reference concepts that have already been introduced in this preview.
+${linkPreview}`,
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `# Target page
+The content of the target page is:`,
                         attachments: [
                             {
                                 type: 'page',
@@ -85,20 +84,63 @@ export async function* streamLinkPageSummary({
                             },
                         ],
                     },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `---
+# Formatting
+## Style guide
+- Respond with one or two sentences maximum. 
+- Keep sentences short. Don't use more than 1 comma per sentence.
+- Stick to the facts on the target page.
+- Do not reference "the page" itself.
+
+## Example 1
+- Link context:
+  > This feature is only available on the [Ultimate plan](/pricing).
+- Link preview:
+  > **Pricing**
+  > Learn about our different pricing tiers.
+- Correct response: 
+  > The Ultimate plan costs $25 per month. A Pro plan is available too.
+
+## Example 2
+- Link context:
+  > You can use [keyboard shortcuts](/keyboard-shortcuts) to get to the Search menu faster.
+- Link preview:
+  > **Keyboard shortcuts**
+  > A quick reference guide to all the keyboard shortcuts available.
+- Correct response: 
+  > To open the Search menu, use the keyboard shortcut ⌘K or Ctrl+K.
+
+## Example 3
+- Link context:
+  > This feature can only be enabled by an [admin](/roles).
+- Link preview:
+  > **Roles**
+  > An overview of the different roles on the platform.
+- Correct response: 
+  > The admin role is reserved for the creator of the organisation.`,
+                    },
+                    {
+                        role: AIMessageRole.User,
+                        content: `I'm considering reading page ID ${targetPageId}. Give the most relevant information from this page. Please relate it to my current page.`,
+                    },
                 ],
             }
         ),
         fetchServerActionSiteContext(baseContext),
     ]);
 
+    console.log(await response);
+
     const emitted = new Set<string>();
     for await (const value of stream) {
-        const summary = value.summary;
-        if (!summary) {
+        const highlight = value.highlight;
+        if (!highlight) {
             continue;
         }
 
-        yield summary;
+        yield highlight;
 
         // for (const pageId of pages) {
         //     if (!pageId) {

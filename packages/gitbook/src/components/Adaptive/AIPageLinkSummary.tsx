@@ -10,15 +10,16 @@ export function AIPageLinkSummary(props: {
     currentPageId: string;
     targetSpaceId: string;
     targetPageId: string;
+    linkPreview?: string;
 }) {
-    const { currentSpaceId, currentPageId, targetSpaceId, targetPageId } = props;
+    const { currentSpaceId, currentPageId, targetSpaceId, targetPageId, linkPreview } = props;
 
-    const [summary, setSummary] = useState('');
+    const [highlight, setHighlight] = useState('');
 
     useEffect(() => {
         let canceled = false;
 
-        setSummary('');
+        setHighlight('');
 
         (async () => {
             const stream = await streamLinkPageSummary({
@@ -26,15 +27,16 @@ export function AIPageLinkSummary(props: {
                 currentPageId,
                 targetSpaceId,
                 targetPageId,
+                linkPreview,
                 previousPageIds: [],
             });
 
-            for await (const [summary] of stream) {
+            for await (const highlight of stream) {
                 if (canceled) return;
 
                 // join the chunk if it's an array of strings or string|undefined
                 // console.log(summary[0]);
-                setSummary(summary ?? '');
+                setHighlight(highlight ?? '');
             }
         })();
 
@@ -43,5 +45,5 @@ export function AIPageLinkSummary(props: {
         };
     }, [currentSpaceId, currentPageId, targetSpaceId, targetPageId]);
 
-    return <p>{summary.length > 1 ? summary : "Loading..."}</p>;
+    return <p>{highlight.length > 1 ? highlight : "Loading..."}</p>;
 }
