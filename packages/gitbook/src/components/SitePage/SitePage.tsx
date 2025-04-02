@@ -74,7 +74,7 @@ export async function SitePage(props: SitePageProps) {
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
             <div className="flex grow flex-row-reverse justify-end">
-                <AdaptivePane />
+                <AdaptivePane spaceId={context.space.id} revisionId={context.revisionId} pageId={page.id} />
                 <PageAside
                     page={page}
                     document={document}

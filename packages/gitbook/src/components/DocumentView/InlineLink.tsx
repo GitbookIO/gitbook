@@ -6,6 +6,7 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Fragment } from 'react';
+import { AIPageLinkSummary } from '../Adaptive/AIPageLinkSummary';
 import { Button, StyledLink } from '../primitives';
 import type { InlineProps } from './Inline';
 import { Inlines } from './Inlines';
@@ -139,20 +140,25 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                                 ) : null}
                             </div>
 
-                            {!isExternal ? (
+                            {!isExternal &&
+                            context.contentContext &&
+                            'page' in context.contentContext &&
+                            inline.data.ref.kind === 'page' ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <div className="mb-1 flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                                         <Icon icon="sparkle" className="size-3" />
                                         <h6 className="text-tint">AI Summary</h6>
                                     </div>
-                                    <p>
-                                        This integration synchronizes your docs with the code
-                                        repository so that your API spec updates in GitBook mirror
-                                        any changes made in GitHub or GitLab, keeping your content
-                                        aligned with your code.
-                                    </p>
+                                    <AIPageLinkSummary
+                                        currentPageId={context.contentContext.page.id}
+                                        currentSpaceId={context.contentContext.space.id}
+                                        targetPageId={inline.data.ref.page}
+                                        targetSpaceId={
+                                            inline.data.ref.space ?? context.contentContext.space.id
+                                        }
+                                    />
 
-                                    <div className="-m-2 mt-0 flex flex-col rounded-md p-2 text-sm">
+                                    {/* <div className="-m-2 mt-0 flex flex-col rounded-md p-2 text-sm">
                                         <details className="-mx-2 rounded-md px-2 py-1 transition-colors has-[summary:hover]:bg-tint-hover">
                                             <summary className="flex items-center gap-1 text-tint hover:cursor-pointer">
                                                 <Icon
@@ -190,21 +196,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                                                 It works with GitHub and GitLab.
                                             </div>
                                         </details>
-                                        <div className="mt-2 flex gap-2">
-                                            <input
-                                                type="text"
-                                                className="w-full rounded-md px-4 py-1 text-sm ring-1 ring-tint-subtle"
-                                                placeholder="Ask AI about this page"
-                                            />
-                                            <Button
-                                                variant="secondary"
-                                                size="small"
-                                                label="Ask question"
-                                                iconOnly={true}
-                                                icon="paper-plane-alt"
-                                            />
-                                        </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             ) : null}
                         </div>
