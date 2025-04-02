@@ -265,15 +265,11 @@
 
 /* Schema Enum */
 .openapi-schema-enum {
-    @apply flex flex-row text-sm leading-relaxed gap-2 flex-wrap text-tint;
-}
-
-.openapi-schema-enum-list {
-    @apply flex flex-row gap-1.5 items-center;
+    @apply text-sm leading-relaxed max-w-full text-tint;
 }
 
 .openapi-schema-enum-value {
-    @apply text-sm;
+    @apply text-sm mr-1.5;
 }
 
 .openapi-schema-enum-value:first-child {
