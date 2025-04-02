@@ -4,15 +4,15 @@ import React from 'react';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
+import Link from 'next/link';
 import { Button } from '../primitives';
-import { AIPageNextRecommendedPages } from './AIPageNextRecommendedPages';
 import { useAdaptivePane } from './state';
 
 export function AdaptivePane(props: { spaceId: string; revisionId: string; pageId: string }) {
     const language = useLanguage();
     const { opened, open, close } = useAdaptivePane();
 
-    const {spaceId, revisionId, pageId} = props;
+    const { spaceId, revisionId, pageId } = props;
 
     React.useEffect(() => {
         if (opened) {
@@ -22,10 +22,17 @@ export function AdaptivePane(props: { spaceId: string; revisionId: string; pageI
         }
     }, [opened]);
 
+    const pages = [
+        'GitBook Documentation',
+        'GitHub & GitLab Sync',
+        'Troubleshooting',
+        'Version control',
+    ];
+
     return (
-        <div className={tcls('w-80 flex-col', opened ? 'flex' : 'hidden')}>
-            <div className="sticky top-28 flex flex-col gap-4 py-4">
-                <div className="flex items-center gap-2">
+        <div className={tcls('w-80 flex-col text-sm', opened ? 'flex' : 'hidden')}>
+            <div className="sticky top-28 my-4 flex flex-col gap-2 rounded-md border border-tint-subtle bg-tint-subtle theme-gradient:bg-tint-1/1 p-4">
+                <div className='flex items-center gap-2 border-tint-subtle border-b pb-2'>
                     <h2
                         className={tcls(
                             'flex-1',
@@ -35,11 +42,12 @@ export function AdaptivePane(props: { spaceId: string; revisionId: string; pageI
                             'uppercase'
                         )}
                     >
-                        {tString(language, 'adaptive_pane_title')}
+                        History
                     </h2>
                     <Button
                         iconOnly
                         variant="blank"
+                        size="medium"
                         icon={opened ? 'chevrons-right' : 'chevrons-left'}
                         label={
                             opened
@@ -52,7 +60,18 @@ export function AdaptivePane(props: { spaceId: string; revisionId: string; pageI
                     />
                 </div>
                 <div>
-                    <AIPageNextRecommendedPages spaceId={spaceId} revisionId={revisionId} pageId={pageId} />
+                    <ol className="-mx-2 flex flex-col gap-0.5 text-tint-subtle">
+                        {pages.map((page) => (
+                            <li key={page}>
+                                <Link
+                                    className="block rounded px-2 py-1.5 last:bg-primary-hover hover:bg-primary-hover"
+                                    href="#"
+                                >
+                                    {page}
+                                </Link>
+                            </li>
+                        ))}
+                    </ol>
                 </div>
             </div>
         </div>

@@ -32,7 +32,7 @@ const variantClasses = {
         'text-tint',
         'ring-0',
         'shadow-none',
-        'hover:bg-tint-hover',
+        'hover:bg-primary-hover',
         'hover:text-primary',
         'hover:scale-1',
         'hover:shadow-none',
