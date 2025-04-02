@@ -5,11 +5,14 @@ import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { Button } from '../primitives';
+import { AIPageNextRecommendedPages } from './AIPageNextRecommendedPages';
 import { useAdaptivePane } from './state';
 
-export function AdaptivePane() {
+export function AdaptivePane(props: { spaceId: string; revisionId: string; pageId: string }) {
     const language = useLanguage();
     const { opened, open, close } = useAdaptivePane();
+
+    const {spaceId, revisionId, pageId} = props;
 
     React.useEffect(() => {
         if (opened) {
@@ -47,6 +50,9 @@ export function AdaptivePane() {
                             close();
                         }}
                     />
+                </div>
+                <div>
+                    <AIPageNextRecommendedPages spaceId={spaceId} revisionId={revisionId} pageId={pageId} />
                 </div>
             </div>
         </div>
