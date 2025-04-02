@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.9.2
+
+### Patch Changes
+
+- da7b369: Fix missing headers in OpenAPIResponses
+- 139a805: Fix OpenAPI enum display
+- Updated dependencies [da7b369]
+- Updated dependencies [da485f5]
+- Updated dependencies [139a805]
+  - @gitbook/react-openapi@1.1.9
+
 ## 0.9.1
 
 ### Patch Changes
