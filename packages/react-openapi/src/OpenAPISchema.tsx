@@ -275,22 +275,20 @@ function OpenAPISchemaEnum(props: {
     }
 
     return (
-        <div className="openapi-schema-enum">
-            <span>Available options:</span>
-            <div className="openapi-schema-enum-list">
-                {enumValues.map((item, index) => (
-                    <span key={index} className="openapi-schema-enum-value">
-                        <OpenAPICopyButton
-                            value={item.value}
-                            label={item.description}
-                            withTooltip={!!item.description}
-                        >
-                            <code>{`${item.value}`}</code>
-                        </OpenAPICopyButton>
-                    </span>
-                ))}
-            </div>
-        </div>
+        <span className="openapi-schema-enum">
+            Available options:{' '}
+            {enumValues.map((item, index) => (
+                <span key={index} className="openapi-schema-enum-value">
+                    <OpenAPICopyButton
+                        value={item.value}
+                        label={item.description}
+                        withTooltip={!!item.description}
+                    >
+                        <code>{`${item.value}`}</code>
+                    </OpenAPICopyButton>
+                </span>
+            ))}
+        </span>
     );
 }
 
