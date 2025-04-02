@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.1.9
+
+### Patch Changes
+
+- da7b369: Fix missing headers in OpenAPIResponses
+- da485f5: Fix read-only in generateSchemaExample
+- 139a805: Fix OpenAPI enum display
+
 ## 1.1.8
 
 ### Patch Changes
