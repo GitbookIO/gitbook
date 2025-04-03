@@ -1,1 +1,1 @@
-export * from './streamLinkPageSummary'
+export * from './streamLinkPageSummary';
