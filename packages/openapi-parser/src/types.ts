@@ -65,12 +65,12 @@ export interface OpenAPICustomOperationProperties {
 
     /**
      * Stability of the operation.
-     * @enum 'experimental' | 'alpha' | 'beta' | 'stable'
+     * @enum 'experimental' | 'alpha' | 'beta'
      */
     'x-stability'?: OpenAPIStability;
 }
 
-export type OpenAPIStability = 'experimental' | 'alpha' | 'beta' | 'stable';
+export type OpenAPIStability = 'experimental' | 'alpha' | 'beta';
 
 /**
  * Custom code samples that can be defined at the operation level.
