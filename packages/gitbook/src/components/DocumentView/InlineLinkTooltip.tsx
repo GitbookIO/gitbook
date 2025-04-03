@@ -139,7 +139,8 @@ export async function InlineLinkTooltip(
                             context.contentContext.customization.ai?.pageLinkSummaries.enabled &&
                             !isExternal &&
                             'page' in context.contentContext &&
-                            inline.data.ref.kind === 'page' ? (
+                            (inline.data.ref.kind === 'page' ||
+                                inline.data.ref.kind === 'anchor') ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <AIPageLinkSummary
                                         currentPageId={context.contentContext.page.id}
