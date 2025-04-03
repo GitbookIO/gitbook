@@ -334,7 +334,7 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
             {description ? (
                 <Markdown source={description} className="openapi-schema-description" />
             ) : null}
-            {typeof schema.default !== 'undefined' ? (
+            {schema.default !== undefined ? (
                 <span className="openapi-schema-default">
                     Default:{' '}
                     <code>
