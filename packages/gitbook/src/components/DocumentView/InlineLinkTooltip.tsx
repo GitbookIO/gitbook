@@ -63,7 +63,7 @@ export async function InlineLinkTooltip(
                     <Tooltip.Content className="z-40 w-screen max-w-md animate-present px-4 sm:w-auto">
                         <div className="overflow-hidden rounded-md straight-corners:rounded-none shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1 ">
                             <div className="bg-tint-base p-4">
-                                <div className={tcls('flex gap-4')}>
+                                <div className="flex items-start gap-4">
                                     <div className="flex flex-col">
                                         {breadcrumbs && breadcrumbs.length > 0 ? (
                                             <div className="mb-1 flex grow flex-wrap items-center gap-x-2 gap-y-0.5 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
@@ -117,8 +117,8 @@ export async function InlineLinkTooltip(
                                             className={tcls(
                                                 '-mx-2 -my-2 ml-auto',
                                                 breadcrumbs?.length === 0
-                                                    ? null
-                                                    : 'place-self-start'
+                                                    ? 'place-self-center'
+                                                    : null
                                             )}
                                             variant="blank"
                                             href={resolved.href}
