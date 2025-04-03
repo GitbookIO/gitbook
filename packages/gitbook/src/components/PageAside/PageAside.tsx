@@ -108,7 +108,7 @@ export function PageAside(props: {
                         'site-header:lg:top-16',
                         'site-header-sections:lg:top-[6.75rem]',
 
-                        'gap-2',
+                        'gap-6',
                         'pt-8',
 
                         'page-api-block:xl:max-2xl:py-0',
