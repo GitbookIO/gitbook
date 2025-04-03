@@ -1,6 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type React from 'react';
-import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
@@ -19,7 +18,7 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
     const additionalItems = schema && getAdditionalItems(schema);
 
     return (
-        <div className="openapi-schema-name">
+        <span className="openapi-schema-name">
             {propertyName ? (
                 <span data-deprecated={schema?.deprecated} className="openapi-schema-propertyname">
                     {propertyName}
@@ -41,7 +40,7 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
                 <span className="openapi-schema-optional">optional</span>
             )}
             {schema?.deprecated ? <span className="openapi-deprecated">Deprecated</span> : null}
-        </div>
+        </span>
     );
 }
 
@@ -54,11 +53,6 @@ function getAdditionalItems(schema: OpenAPIV3.SchemaObject): string {
 
     if (schema.maximum || schema.maxLength || schema.maxItems) {
         additionalItems += ` · max: ${schema.maximum || schema.maxLength || schema.maxItems}`;
-    }
-
-    // If the schema has a default value, we display it
-    if (typeof schema.default !== 'undefined') {
-        additionalItems += ` · default: ${stringifyOpenAPI(schema.default)}`;
     }
 
     if (schema.nullable) {
