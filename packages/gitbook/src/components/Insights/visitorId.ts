@@ -13,10 +13,13 @@ let pendingVisitorId: Promise<string> | null = null;
 /**
  * Return the current visitor identifier.
  */
-export async function getVisitorId(appURL: string): Promise<string> {
+export async function getVisitorId(
+    appURL: string,
+    visitorCookieTrackingEnabled: boolean
+): Promise<string> {
     if (!visitorId) {
         if (!pendingVisitorId) {
-            pendingVisitorId = fetchVisitorID(appURL).finally(() => {
+            pendingVisitorId = fetchVisitorID(appURL, visitorCookieTrackingEnabled).finally(() => {
                 pendingVisitorId = null;
             });
         }
@@ -30,10 +33,13 @@ export async function getVisitorId(appURL: string): Promise<string> {
 /**
  * Propose a visitor identifier to the GitBook.com server and get the devideId back.
  */
-async function fetchVisitorID(appURL: string): Promise<string> {
+async function fetchVisitorID(
+    appURL: string,
+    visitorCookieTrackingEnabled: boolean
+): Promise<string> {
     const withoutCookies = isCookiesTrackingDisabled();
 
-    if (withoutCookies) {
+    if (withoutCookies || !visitorCookieTrackingEnabled) {
         return generateRandomId();
     }
 

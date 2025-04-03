@@ -63,9 +63,19 @@ type TrackEventCallback = <EventName extends InsightsEventName>(
 const InsightsContext = React.createContext<TrackEventCallback>(() => {});
 
 interface InsightsProviderProps extends InsightsEventContext {
+    /** If true, the events will be sent to the server. */
     enabled: boolean;
+
+    /** If true, the visitor cookie tracking will be used */
+    visitorCookieTrackingEnabled: boolean;
+
+    /** The URL of the app. */
     appURL: string;
+
+    /** The host of the API. */
     apiHost: string;
+
+    /** The children of the provider. */
     children: React.ReactNode;
 }
 
@@ -73,7 +83,7 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, children, ...context } = props;
+    const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled, ...context } = props;
 
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
@@ -140,7 +150,8 @@ export function InsightsProvider(props: InsightsProviderProps) {
     });
 
     const flushBatchedEvents = useDebounceCallback(async () => {
-        const visitorId = visitorIdRef.current ?? (await getVisitorId(appURL));
+        const visitorId =
+            visitorIdRef.current ?? (await getVisitorId(appURL, visitorCookieTrackingEnabled));
         visitorIdRef.current = visitorId;
 
         flushEventsSync();
@@ -184,7 +195,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
      * Get the visitor ID and store it in a ref.
      */
     React.useEffect(() => {
-        getVisitorId(appURL).then((visitorId) => {
+        getVisitorId(appURL, visitorCookieTrackingEnabled).then((visitorId) => {
             visitorIdRef.current = visitorId;
             // When the page is unloaded, flush all events, but only if the visitor ID is set
             window.addEventListener('beforeunload', flushEventsSync);
@@ -192,7 +203,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync, appURL]);
+    }, [flushEventsSync, appURL, visitorCookieTrackingEnabled]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>

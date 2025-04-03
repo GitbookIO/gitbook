@@ -62,6 +62,7 @@ export function SpaceLayout(props: {
                 revisionId={context.revisionId}
                 spaceId={context.space.id}
                 visitorAuthClaims={visitorAuthClaims}
+                visitorCookieTrackingEnabled={context.customization.insights.trackingCookie}
             >
                 <Announcement context={context} />
                 <Header withTopHeader={withTopHeader} context={context} />

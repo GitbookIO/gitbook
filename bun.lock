@@ -35,7 +35,7 @@
     },
     "packages/colors": {
       "name": "@gitbook/colors",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "devDependencies": {
         "typescript": "^5.5.3",
       },
@@ -49,7 +49,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.8.2",
+      "version": "0.9.2",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/cache-do": "workspace:*",
@@ -136,7 +136,7 @@
     },
     "packages/gitbook-v2": {
       "name": "gitbook-v2",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/cache-tags": "workspace:*",
@@ -180,7 +180,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "dependencies": {
         "@scalar/openapi-parser": "^0.10.10",
         "@scalar/openapi-types": "^0.1.9",
@@ -234,7 +234,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.1.6",
+      "version": "1.1.9",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.2.5",
@@ -262,7 +262,7 @@
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
-    "@gitbook/api": "0.106.0",
+    "@gitbook/api": "0.108.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
   },
@@ -623,7 +623,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@0.106.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-2qA/w18JwHe2fwR2A45q1pEdCZArxqUloegfNibu0xngDhea+iKTXSBrN94wD6Lwkh7cqBp9MvtxC+YMz3hx1g=="],
+    "@gitbook/api": ["@gitbook/api@0.108.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-OytauuT3IMf0zl6rBvIacQ7YphzNhpuNAvEVQbysCGo3BhGYD1xv+vXVmtkAGUnFEAclw2fg2VjWPt3sOlQsAg=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 
