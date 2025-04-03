@@ -50,10 +50,10 @@ export async function PageCover(props: {
                               size: resolved.file?.dimensions,
                           }
                         : {
-                              src: defaultPageCover.src,
+                              src: defaultPageCover,
                               size: {
-                                  width: defaultPageCover.width,
-                                  height: defaultPageCover.height,
+                                  width: PAGE_COVER_SIZE.width,
+                                  height: PAGE_COVER_SIZE.height,
                               },
                           },
                 }}
