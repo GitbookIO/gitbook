@@ -74,7 +74,7 @@ export function Button({
         'gap-2',
         'rounded-md',
         'straight-corners:rounded-none',
-        'place-self-start',
+        // 'place-self-start',
 
         'ring-1',
         'ring-tint',
