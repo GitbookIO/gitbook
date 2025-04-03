@@ -108,7 +108,6 @@ const stabilityEnum = {
     experimental: 'Experimental',
     alpha: 'Alpha',
     beta: 'Beta',
-    stable: 'Stable',
 } as const;
 
 function OpenAPIOperationStability(props: { stability: OpenAPIStability }) {
