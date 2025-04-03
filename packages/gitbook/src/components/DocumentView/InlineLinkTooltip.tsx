@@ -58,14 +58,18 @@ export async function InlineLinkTooltip(
     return (
         <Tooltip.Provider delayDuration={200}>
             <Tooltip.Root>
-                <Tooltip.Trigger>{children}</Tooltip.Trigger>
+                <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
                 <Tooltip.Portal>
                     <Tooltip.Content className="z-40 w-screen max-w-md animate-present px-4 sm:w-auto">
                         <div className="overflow-hidden rounded-md straight-corners:rounded-none shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1 ">
                             <div className="bg-tint-base p-4">
-                                <div className="flex gap-4">
+                                <div
+                                    className={tcls(
+                                        'flex gap-4',
+                                    )}
+                                >
                                     <div className="flex flex-col">
-                                        {breadcrumbs ? (
+                                        {breadcrumbs && breadcrumbs.length > 0 ? (
                                             <div className="mb-1 flex grow flex-wrap items-center gap-x-2 gap-y-0.5 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                                                 {breadcrumbs.map((crumb, index) => {
                                                     const Tag = crumb.href ? StyledLink : 'div';
@@ -114,7 +118,10 @@ export async function InlineLinkTooltip(
                                     </div>
                                     {!isSamePage && resolved.href ? (
                                         <Button
-                                            className="-mx-2 -my-2 ml-auto"
+                                            className={tcls(
+                                                '-mx-2 -my-2 ml-auto',
+                                                breadcrumbs?.length === 0 ? null : 'place-self-start'
+                                            )}
                                             variant="blank"
                                             href={resolved.href}
                                             target="_blank"
@@ -130,10 +137,10 @@ export async function InlineLinkTooltip(
                                 ) : null}
                             </div>
 
-                            {!isExternal &&
-                            'site' in context.contentContext &&
+                            {'customization' in context.contentContext &&
+                            context.contentContext.customization.ai?.pageLinkSummaries.enabled &&
+                            !isExternal &&
                             'page' in context.contentContext &&
-                            context.contentContext.site.adaptiveContent?.enabled &&
                             inline.data.ref.kind === 'page' ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <AIPageLinkSummary

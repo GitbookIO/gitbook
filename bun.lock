@@ -264,7 +264,7 @@
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
-    "@gitbook/api": "0.106.0",
+    "@gitbook/api": "0.107.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
   },
@@ -625,7 +625,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.7.2", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.7.2" } }, "sha512-yxtOBWDrdi5DD5o1pmVdq3WMCvnobT0LU6R8RyyVXPvFRd2o79/0NCuQoCjNTeZz9EzA9xS3JxNWfv54RIHFEA=="],
 
-    "@gitbook/api": ["@gitbook/api@0.106.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-2qA/w18JwHe2fwR2A45q1pEdCZArxqUloegfNibu0xngDhea+iKTXSBrN94wD6Lwkh7cqBp9MvtxC+YMz3hx1g=="],
+    "@gitbook/api": ["@gitbook/api@0.107.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-YW37fNY3/UYKizHbq9KptSQUfhFwyVZ8eF2d3WYpc2+eJ+74JVkrX1fjaHox2QBqSjhYSNm/ZZeh4k4tXUma6w=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 
