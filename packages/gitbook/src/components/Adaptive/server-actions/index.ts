@@ -1,2 +1,1 @@
-export * from './streamPageRecommendedQuestions';
-export * from './streamNextRecommendedPages';
+export * from './streamLinkPageSummary'
