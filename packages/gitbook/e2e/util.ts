@@ -276,6 +276,9 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         internationalization: {
             locale: CustomizationLocale.En,
         },
+        insights: {
+            trackingCookie: true,
+        },
         favicon: {},
         header: {
             preset: CustomizationHeaderPreset.Default,

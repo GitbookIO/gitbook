@@ -26,6 +26,9 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         internationalization: {
             locale: api.CustomizationLocale.En,
         },
+        insights: {
+            trackingCookie: true,
+        },
         favicon: {},
         header: {
             preset: api.CustomizationHeaderPreset.Default,
