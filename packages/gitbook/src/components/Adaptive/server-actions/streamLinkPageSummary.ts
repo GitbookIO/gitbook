@@ -16,19 +16,20 @@ export async function* streamLinkPageSummary({
     targetSpaceId,
     targetPageId,
     linkPreview,
+    linkTitle,
 }: {
     currentSpaceId: string;
     currentPageId: string;
     targetSpaceId: string;
     targetPageId: string;
     linkPreview?: string;
-    linkContext?: string;
+    linkTitle?: string;
     previousPageIds?: string[];
 }) {
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream, response }, context] = await Promise.all([
+    const [{ stream }] = await Promise.all([
         streamGenerateObject(
             baseContext,
             {
@@ -43,16 +44,42 @@ export async function* streamLinkPageSummary({
                 messages: [
                     {
                         role: AIMessageRole.Developer,
-                        content: `# Task
-You are a documentation navigator, tasked with extracting information from pages the user might navigate to next.
-The user is currently reading a page, and is considering clicking a link to another ("target") page. 
-Use the user's context and the page they are currently on.`,
+                        content: `# Role
+You are a documentation navigator. Your job is to help the user read documentation more efficiently. Your aim is to prevent the user from having to read the target page by giving them all the information they need to know.
+
+# Task
+Using both the current page context and the target page content, produce a page highlight that:
+- Highlights the key facts from the target page.
+- Relates strongly to the topic the user is currently reading about.
+- Is very succinct and direct, using only one or two short sentences (each sentence using no more than one comma).
+- Remains strictly factual, without referring to “the page”.
+
+# Instructions
+1.	Identify the key paragraph surrounding the link's text (e.g., “change request”) from the current page.
+2.	Extract and combine relevant information from the target page to address the link's context.
+3.	Combine in one or two short sentences that are direct and brief.
+
+# Examples
+## Example 1
+- Link context: “This feature is only available on the Ultimate plan.”
+- Link preview: “Pricing: Learn about our different pricing tiers.”
+- Response: “The Ultimate plan costs $25 per month. A Pro plan is available too.”
+
+## Example 2
+- Link context: “You can use keyboard shortcuts to get to the Search menu faster.”
+- Link preview: “Keyboard shortcuts: A quick reference guide to all the keyboard shortcuts available.”
+- Response: “To open the Search menu, use the keyboard shortcut ⌘K or Ctrl+K.”
+
+## Example 3
+- Link context: “This feature can only be enabled by an admin.”
+- Link preview: “Roles: An overview of the different roles on the platform.”
+- Response: “The admin role is reserved for the creator of the organisation.”`,
                     },
                     {
                         role: AIMessageRole.Developer,
                         content: `# Context
 ## Current page
-The user is currently on page ID ${currentPageId}, the content of this page is:`,
+The content of the current page is:`,
                         attachments: [
                             {
                                 type: 'page',
@@ -63,18 +90,7 @@ The user is currently on page ID ${currentPageId}, the content of this page is:`
                     },
                     {
                         role: AIMessageRole.Developer,
-                        content: `## Link context
-The user is inspecting a link to page ID ${targetPageId}. Look for this ID in the current article and inspect the paragraph that surrounds it, to understand the link context.`,
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `## Link preview: 
-This text is displayed directly above your summary. Use pronouns to reference concepts that have already been introduced in this preview.
-${linkPreview}`,
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# Target page
+                        content: `## Target page
 The content of the target page is:`,
                         attachments: [
                             {
@@ -86,44 +102,13 @@ The content of the target page is:`,
                     },
                     {
                         role: AIMessageRole.Developer,
-                        content: `---
-# Formatting
-## Style guide
-- Respond with one or two sentences maximum. 
-- Keep sentences short. Don't use more than 1 comma per sentence.
-- Stick to the facts on the target page.
-- Do not reference "the page" itself.
-
-## Example 1
-- Link context:
-  > This feature is only available on the [Ultimate plan](/pricing).
-- Link preview:
-  > **Pricing**
-  > Learn about our different pricing tiers.
-- Correct response: 
-  > The Ultimate plan costs $25 per month. A Pro plan is available too.
-
-## Example 2
-- Link context:
-  > You can use [keyboard shortcuts](/keyboard-shortcuts) to get to the Search menu faster.
-- Link preview:
-  > **Keyboard shortcuts**
-  > A quick reference guide to all the keyboard shortcuts available.
-- Correct response: 
-  > To open the Search menu, use the keyboard shortcut ⌘K or Ctrl+K.
-
-## Example 3
-- Link context:
-  > This feature can only be enabled by an [admin](/roles).
-- Link preview:
-  > **Roles**
-  > An overview of the different roles on the platform.
-- Correct response: 
-  > The admin role is reserved for the creator of the organisation.`,
+                        content: `## Link preview
+The content of the link preview is:
+> ${linkPreview}`,
                     },
                     {
                         role: AIMessageRole.User,
-                        content: `I'm considering reading page ID ${targetPageId}. Give the most relevant information from this page. Please relate it to my current page.`,
+                        content: `I'm considering reading the link titled "${linkTitle}" to page ID ${targetPageId}. Give the most relevant information from this page. Relate it to my current page and in particular the paragraph I'm currently reading. Be very concise.`,
                     },
                 ],
             }
@@ -131,7 +116,6 @@ The content of the target page is:`,
         fetchServerActionSiteContext(baseContext),
     ]);
 
-    const emitted = new Set<string>();
     for await (const value of stream) {
         const highlight = value.highlight;
         if (!highlight) {
@@ -139,30 +123,5 @@ The content of the target page is:`,
         }
 
         yield highlight;
-
-        // for (const pageId of pages) {
-        //     if (!pageId) {
-        //         continue;
-        //     }
-
-        //     if (emitted.has(pageId)) {
-        //         continue;
-        //     }
-
-        //     emitted.add(pageId);
-
-        //     const page = resolvePageId(context.pages, pageId);
-        //     if (!page) {
-        //         continue;
-        //     }
-
-        //     yield {
-        //         title: page.page.title,
-        //         href: context.linker.toPathForPage({
-        //             pages: context.pages,
-        //             page: page.page,
-        //         }),
-        //     };
-        // }
     }
 }

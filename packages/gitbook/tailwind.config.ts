@@ -330,7 +330,7 @@ const config: Config = {
                 present: {
                     from: {
                         opacity: '0',
-                        transform: 'translateY(20%) scale(90%)',
+                        transform: 'translateY(1rem) scale(90%)',
                     },
                     to: {
                         opacity: '1',

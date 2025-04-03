@@ -10,9 +10,11 @@ import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
 export function AIPageLinkSummary(props: {
     currentSpaceId: string;
     currentPageId: string;
+    currentPageTitle: string;
     targetSpaceId: string;
     targetPageId: string;
     linkPreview?: string;
+    linkTitle?: string;
     showTrademark: boolean;
 }) {
     const {
@@ -21,6 +23,7 @@ export function AIPageLinkSummary(props: {
         targetSpaceId,
         targetPageId,
         linkPreview,
+        linkTitle,
         showTrademark = true,
     } = props;
 
@@ -38,14 +41,12 @@ export function AIPageLinkSummary(props: {
                 targetSpaceId,
                 targetPageId,
                 linkPreview,
+                linkTitle,
                 previousPageIds: [],
             });
 
             for await (const highlight of stream) {
                 if (canceled) return;
-
-                // join the chunk if it's an array of strings or string|undefined
-                // console.log(summary[0]);
                 setHighlight(highlight ?? '');
             }
         })();
@@ -53,11 +54,11 @@ export function AIPageLinkSummary(props: {
         return () => {
             canceled = true;
         };
-    }, [currentSpaceId, currentPageId, targetSpaceId, targetPageId]);
+    }, [currentSpaceId, currentPageId, targetSpaceId, targetPageId, linkPreview, linkTitle]);
 
     return (
         <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
+            <div className="flex w-screen items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                 {showTrademark ? (
                     <Loading className="size-4" busy={!highlight || highlight.length === 0} />
                 ) : (
