@@ -167,17 +167,12 @@ function OpenAPIRootSchema(props: {
     }
 
     return (
-        <>
-            {description ? (
-                <Markdown source={description} className="openapi-schema-root-description" />
-            ) : null}
-            <OpenAPISchemaProperty
-                className="openapi-schema-root"
-                property={{ schema }}
-                context={context}
-                circularRefs={parentCircularRefs}
-            />
-        </>
+        <OpenAPISchemaProperty
+            className="openapi-schema-root"
+            property={{ schema }}
+            context={context}
+            circularRefs={parentCircularRefs}
+        />
     );
 }
 
