@@ -10,6 +10,7 @@ import { no } from './no';
 import { pt_br } from './pt-br';
 import type { TranslationLanguage } from './types';
 import { zh } from './zh';
+import { zh_tw } from './zh-tw';
 
 export * from './types';
 
@@ -27,4 +28,5 @@ export const languages: {
     nl,
     no,
     'pt-br': pt_br,
+    'zh-tw': zh_tw,
 };
