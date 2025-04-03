@@ -166,6 +166,11 @@ const getExampleFromSchema = (
     // But if `emptyString` is  set, we do want to see some values.
     const makeUpRandomData = !!options?.emptyString;
 
+    // If the property is deprecated we don't show it in examples.
+    if (schema.deprecated) {
+        return undefined;
+    }
+
     // Check if the property is read-only/write-only
     if (
         (options?.mode === 'write' && schema.readOnly) ||
