@@ -92,10 +92,10 @@ export function PageAside(props: {
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:my-8',
-                'page-api-block:p-2'
+                'page-api-block:p-2',
 
                 // When the adaptive pane is open, we hide the aside
-                // 'adaptive-pane:hidden'
+                'adaptive-pane:hidden'
             )}
         >
             {page.layout.outline ? (
@@ -128,14 +128,12 @@ export function PageAside(props: {
                         On this page
                     </div>
                     {document ? (
-                        <div className="-ml-3">
-                            <React.Suspense fallback={null}>
-                                <PageAsideSections document={document} context={context} />
-                            </React.Suspense>
-                        </div>
+                        <React.Suspense fallback={null}>
+                            <PageAsideSections document={document} context={context} />
+                        </React.Suspense>
                     ) : null}
 
-                    <div className='mt-6 flex items-center gap-2 font-semibold text-xs uppercase tracking-wide'>
+                    <div className="mt-6 flex items-center gap-2 font-semibold text-xs uppercase tracking-wide">
                         <Icon icon="sparkle" className="size-3" />
                         Next pages
                     </div>
