@@ -50,7 +50,7 @@ export function AIPageNextRecommendedPages(props: {
             {pages.map((page) => {
                 return (
                     <Link className='flex items-center gap-3' key={page.href} href={page.href}>
-                        <Icon className="size-4" icon={page.icon} />
+                        <Icon className="size-4 text-primary-subtle" icon={page.icon} />
                         {page.title}
                     </Link>
                 );
