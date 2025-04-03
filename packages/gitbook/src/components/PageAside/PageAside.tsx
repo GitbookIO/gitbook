@@ -89,7 +89,7 @@ export function PageAside(props: {
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:my-8',
-                'page-api-block:p-2',
+                'page-api-block:p-2'
             )}
         >
             {page.layout.outline ? (
