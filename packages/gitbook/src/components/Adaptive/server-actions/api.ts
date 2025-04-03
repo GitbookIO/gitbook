@@ -60,7 +60,6 @@ export async function streamGenerateObject<T>(
         input: messages,
         output: {
             type: 'object',
-            // @ts-expect-error
             schema: zodToJsonSchema(schema),
         },
         model,

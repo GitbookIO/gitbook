@@ -13,7 +13,6 @@ import urlJoin from 'url-join';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
-import { AIPageNextRecommendedPages } from '../Adaptive';
 import { Ad } from '../Ads';
 import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -42,8 +41,6 @@ export function PageAside(props: {
             limit: 100,
         }).toString()}`
     );
-
-    const prevPages = ['GitBook Documentation', 'GitHub & GitLab Sync', 'Troubleshooting'];
 
     return (
         <aside
@@ -93,9 +90,6 @@ export function PageAside(props: {
                 'page-api-block:xl:max-2xl:h-auto',
                 'page-api-block:xl:max-2xl:my-8',
                 'page-api-block:p-2',
-
-                // When the adaptive pane is open, we hide the aside
-                'adaptive-pane:hidden'
             )}
         >
             {page.layout.outline ? (
@@ -123,25 +117,11 @@ export function PageAside(props: {
                         'page-api-block:xl:max-2xl:group-hover/aside:flex'
                     )}
                 >
-                    <div className="flex items-center gap-2 font-semibold text-xs uppercase tracking-wide">
-                        <Icon icon="block-quote" className="size-3" />
-                        On this page
-                    </div>
                     {document ? (
                         <React.Suspense fallback={null}>
                             <PageAsideSections document={document} context={context} />
                         </React.Suspense>
                     ) : null}
-
-                    <div className="mt-6 flex items-center gap-2 font-semibold text-xs uppercase tracking-wide">
-                        <Icon icon="sparkle" className="size-3" />
-                        Next pages
-                    </div>
-                    <AIPageNextRecommendedPages
-                        spaceId={context.space.id}
-                        pageId={page.id}
-                        revisionId={context.revisionId}
-                    />
 
                     <div
                         className={tcls(
