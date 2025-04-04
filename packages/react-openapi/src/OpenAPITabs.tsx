@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { type Key, Tab, TabList, TabPanel, Tabs, type TabsProps } from 'react-aria-components';
 import { useEventCallback } from 'usehooks-ts';
-import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
+import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 
 export type TabItem = {
     key: Key;
@@ -36,8 +36,8 @@ export function OpenAPITabs(
     const { children, items, stateKey } = props;
     const [tabKey, setTabKey] = useState<Key | null>(() => {
         if (stateKey && typeof window !== 'undefined') {
-            const store = getOrCreateTabStoreByKey(stateKey);
-            const tabKey = store.getState().tabKey;
+            const store = getOrCreateStoreByKey(stateKey);
+            const tabKey = store.getState().key;
             if (tabKey) {
                 return tabKey;
             }
@@ -60,10 +60,10 @@ export function OpenAPITabs(
         if (!stateKey) {
             return undefined;
         }
-        const store = getOrCreateTabStoreByKey(stateKey);
+        const store = getOrCreateStoreByKey(stateKey);
         return store.subscribe((state) => {
             cancelDeferRef.current?.();
-            cancelDeferRef.current = defer(() => selectTab(state.tabKey));
+            cancelDeferRef.current = defer(() => selectTab(state.key));
         });
     }, [stateKey, selectTab]);
     useEffect(() => {
@@ -77,8 +77,8 @@ export function OpenAPITabs(
                 onSelectionChange={(tabKey) => {
                     selectTab(tabKey);
                     if (stateKey) {
-                        const store = getOrCreateTabStoreByKey(stateKey);
-                        store.setState({ tabKey });
+                        const store = getOrCreateStoreByKey(stateKey);
+                        store.setState({ key: tabKey });
                     }
                 }}
                 selectedKey={tabKey}
