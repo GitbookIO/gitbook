@@ -14,11 +14,21 @@ interface JsonBody {
  * The body should be a JSON with { tags: string[] }
  */
 export async function POST(req: NextRequest) {
-    const json = (await req.json()) as JsonBody;
+    let json: JsonBody;
+
+    try {
+        json = await req.json();
+    } catch (err) {
+        return NextResponse.json({
+            success: false,
+            error: `invalid json body: ${err}`,
+        })
+    }   
 
     if (!json.tags || !Array.isArray(json.tags)) {
         return NextResponse.json(
             {
+                success: false,
                 error: 'tags must be an array',
             },
             { status: 400 }
@@ -32,16 +42,10 @@ export async function POST(req: NextRequest) {
             stats: result.stats,
         });
     } catch (err: unknown) {
-        const message = [
-            err instanceof Error ? err.name : 'Internal Server Error',
-            ...(err instanceof Error && err.message ? [err.message] : []),
-            ...(err instanceof Error && err.cause ? [err.cause] : []),
-            ...(err instanceof Error && err.stack ? [err.stack] : []),
-        ].join('\n');
-
-        return new NextResponse(null, {
-            status: 500,
-            statusText: message,
-        });
+        return NextResponse.json({
+            success: false,
+            error: `unexpected error ${err}`,
+            stack: err instanceof Error ? err.stack : null,
+        }, { status: 500 });
     }
 }
