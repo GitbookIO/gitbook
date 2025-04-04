@@ -31,7 +31,7 @@ export async function* streamLinkPageSummary({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream, response }] = await Promise.all([
+    const [{ stream }] = await Promise.all([
         streamGenerateObject(
             baseContext,
             {
