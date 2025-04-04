@@ -178,7 +178,6 @@ export async function InlineLinkTooltip(
                                             'customization' in context.contentContext &&
                                             context.contentContext.customization.trademark.enabled
                                         }
-                                        language={language}
                                     />
                                 </div>
                             ) : null}

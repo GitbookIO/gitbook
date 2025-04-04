@@ -22,6 +22,7 @@ export async function* streamLinkPageSummary({
 }: {
     currentSpaceId: string;
     currentPageId: string;
+    currentPageTitle: string;
     targetSpaceId: string;
     targetPageId: string;
     linkPreview?: string;

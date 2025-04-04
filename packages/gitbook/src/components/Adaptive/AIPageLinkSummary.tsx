@@ -1,36 +1,28 @@
 'use client';
+import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
-import type { TranslationLanguage } from '@/intl/translations';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
 import { useVisitedPages } from '../Insights';
+import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
+
 /**
  * Summarise a page's content for use in a link preview
  */
 export function AIPageLinkSummary(props: {
-    currentSpaceId: string;
-    currentPageId: string;
-    currentPageTitle: string;
     targetSpaceId: string;
     targetPageId: string;
     linkPreview?: string;
     linkTitle?: string;
     showTrademark: boolean;
-    language: TranslationLanguage;
 }) {
-    const {
-        currentSpaceId,
-        currentPageId,
-        targetSpaceId,
-        targetPageId,
-        linkPreview,
-        linkTitle,
-        showTrademark = true,
-        language,
-    } = props;
+    const { targetSpaceId, targetPageId, linkPreview, linkTitle, showTrademark = true } = props;
 
+    const currentPage = usePageContext();
+
+    const language = useLanguage();
     const visitedPages = useVisitedPages((state) => state.pages);
     const [highlight, setHighlight] = useState('');
 
@@ -41,8 +33,9 @@ export function AIPageLinkSummary(props: {
 
         (async () => {
             const stream = await streamLinkPageSummary({
-                currentSpaceId,
-                currentPageId,
+                currentSpaceId: currentPage.spaceId,
+                currentPageId: currentPage.pageId,
+                currentPageTitle: currentPage.title,
                 targetSpaceId,
                 targetPageId,
                 linkPreview,
@@ -60,8 +53,9 @@ export function AIPageLinkSummary(props: {
             canceled = true;
         };
     }, [
-        currentSpaceId,
-        currentPageId,
+        currentPage.pageId,
+        currentPage.spaceId,
+        currentPage.title,
         targetSpaceId,
         targetPageId,
         linkPreview,
