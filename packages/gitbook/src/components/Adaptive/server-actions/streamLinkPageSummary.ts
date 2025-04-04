@@ -63,42 +63,11 @@ Extract a contextually-relevant fact that:
 2. Find the specific fact in the target page that addresses this exact contextual need
 3. Ensure the fact relates directly to the context of the paragraph containing the link
 4. Avoid ALL instructional language including words like "use", "click", "select", "create"
-5. Keep it under 15 words, factual and declarative about what EXISTS or IS TRUE`,
+5. Keep it under 30 words, factual and declarative about what EXISTS or IS TRUE`,
                     },
                     {
                         role: AIMessageRole.Developer,
-                        content: `# 4. Guidelines & Examples
-ALWAYS:
-- Choose facts that directly fulfill the contextual need where the link appears
-- Connect target page information specifically to the current paragraph context
-- Focus on the gap in knowledge that the link is meant to fill
-- Consider user's navigation history to ensure contextual continuity
-
-NEVER:
-- Include ANY "how to" language or instructions
-- Select general facts unrelated to the specific link context
-- Use action verbs like "click", "select", "use", "create", "enable"
-- Ignore the specific context where the link appears
-
-## Examples 
-Current paragraph: "When organizing content, headings are limited to 3 levels. For more advanced editing, you can use (multiple select)[/multiple-select] to move multiple blocks at once."
-Preview: "Multiple Select: Select multiple content blocks at once."
-✓ "Shift selects content between two points, useful for reorganizing your current heading structure."
-✗ "Shift and Ctrl/Cmd keys are the modifiers for selecting multiple blocks."
-
-Current paragraph: "Most changes can be published directly, but for major revisions, if you want others to review changes before publishing, create a (change request)[/change-requests]."
-Preview: "Change Requests: Collaborative content editing workflow."
-✓ "Each reviewer's approval is tracked separately, with specific change highlighting for your major revisions."
-✗ "Each reviewer receives an email notification and can approve or request changes."
-
-Current paragraph: "Your team mentioned issues with conflicting edits. Need to collaborate in real-time? You can use (live edit mode)[/live-edit]."
-Preview: "Live Edit: Real-time collaborative editing."
-✓ "Teams with GitHub repositories (like yours) cannot use this feature due to sync limitations."
-✗ "Incompatible with GitHub/GitLab sync and requires specific visibility settings."`,
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# 5. Current page
+                        content: `# 4. Current page
 The content of the current page is:`,
                         attachments: [
                             {
@@ -112,7 +81,7 @@ The content of the current page is:`,
                         ? [
                               {
                                   role: AIMessageRole.Developer,
-                                  content: '# 6. Previous pages',
+                                  content: '# 5. Previous pages',
                               },
                               ...visitedPages.map(({ spaceId, pageId }) => ({
                                   role: AIMessageRole.Developer,
@@ -129,7 +98,7 @@ The content of the current page is:`,
                         : []),
                     {
                         role: AIMessageRole.Developer,
-                        content: `# 7. Target page
+                        content: `# 6. Target page
 The content of the target page is:`,
                         attachments: [
                             {
@@ -141,9 +110,41 @@ The content of the target page is:`,
                     },
                     {
                         role: AIMessageRole.Developer,
-                        content: `# 8. Link preview
+                        content: `# 7. Link preview
 The content of the link preview is:
 > ${linkPreview}`,
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `# 8. Guidelines & Examples
+ALWAYS:
+- ALWAYS choose facts that directly fulfill the contextual need where the link appears
+- ALWAYS connect target page information specifically to the current paragraph context
+- ALWAYS focus on the gap in knowledge that the link is meant to fill
+- ALWAYS consider user's navigation history to ensure contextual continuity
+- ALWAYS use action verbs like "click", "select", "use", "create", "enable"
+
+NEVER:
+- NEVER include ANY unspecifc language like "learn", "how to", "discover", etc. State the fact directly.
+- NEVER select general facts unrelated to the specific link context
+- NEVER ignore the specific context where the link appears
+- NEVER repeat the same fact in different words
+
+## Examples 
+Current paragraph: "When organizing content, headings are limited to 3 levels. For more advanced editing, you can use (multiple select)[/multiple-select] to move multiple blocks at once."
+Preview: "Multiple Select: Select multiple content blocks at once."
+✓ "Shift selects content between two points, useful for reorganizing your current heading structure."
+✗ "Shift and Ctrl/Cmd keys are the modifiers for selecting multiple blocks."
+
+Current paragraph: "Most changes can be published directly, but for major revisions, if you want others to review changes before publishing, create a (change request)[/change-requests]."
+Preview: "Change Requests: Collaborative content editing workflow."
+✓ "Each reviewer's approval is tracked separately, with specific change highlighting for your major revisions."
+✗ "Each reviewer receives an email notification and can approve or request changes."
+
+Current paragraph: "Your team mentioned issues with conflicting edits. Need to collaborate in real-time? You can use (live edit mode)[/live-edit]."
+Preview: "Live Edit: Real-time collaborative editing."
+✓ "Teams with GitHub repositories (like yours) cannot use this feature due to sync limitations."
+✗ "Incompatible with GitHub/GitLab sync and requires specific visibility settings."`,
                     },
                     {
                         role: AIMessageRole.User,
