@@ -60,4 +60,8 @@ export const es: TranslationLanguage = {
         'No se pudo generar el PDF para ${1} páginas, la generación se detuvo en ${2}.',
     pdf_limit_reached_continue: 'Extender con ${1} páginas más.',
     more: 'Más',
+    link_tooltip_external_link: 'Enlace externo a',
+    link_tooltip_page_anchor: 'Saltar a la sección',
+    link_tooltip_ai_summary: 'Resumen de la página',
+    link_tooltip_ai_summary_description: 'Basado en tu contexto. Puede contener errores.',
 };

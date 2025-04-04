@@ -1,10 +1,11 @@
 'use client';
+import { t } from '@/intl/translate';
+import type { TranslationLanguage } from '@/intl/translations';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
 import { useVisitedPages } from '../Insights';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
-
 /**
  * Summarise a page's content for use in a link preview
  */
@@ -17,6 +18,7 @@ export function AIPageLinkSummary(props: {
     linkPreview?: string;
     linkTitle?: string;
     showTrademark: boolean;
+    language: TranslationLanguage;
 }) {
     const {
         currentSpaceId,
@@ -26,6 +28,7 @@ export function AIPageLinkSummary(props: {
         linkPreview,
         linkTitle,
         showTrademark = true,
+        language,
     } = props;
 
     const visitedPages = useVisitedPages((state) => state.pages);
@@ -83,10 +86,10 @@ export function AIPageLinkSummary(props: {
                 ) : (
                     <Icon icon="sparkle" className="size-3" />
                 )}
-                <h6 className="text-tint">Page highlight</h6>
+                <h6 className="text-tint">{t(language, 'link_tooltip_ai_summary')}</h6>
             </div>
             {highlight.length > 0 ? (
-                <p className='animate-fadeIn'>{highlight}</p>
+                <p className="animate-fadeIn">{highlight}</p>
             ) : (
                 <div className="mt-2 flex flex-wrap gap-2">
                     {shimmerBlocks.map((block, index) => (
@@ -98,8 +101,8 @@ export function AIPageLinkSummary(props: {
                 </div>
             )}
             {highlight.length > 0 ? (
-                <div className='animate-fadeIn text-tint-subtle text-xs'>
-                    Based on your context. May contain mistakes.
+                <div className="animate-fadeIn text-tint-subtle text-xs">
+                    {t(language, 'link_tooltip_ai_summary_description')}
                 </div>
             ) : null}
         </div>

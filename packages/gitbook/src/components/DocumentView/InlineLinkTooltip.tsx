@@ -2,6 +2,9 @@ import type { DocumentInlineLink } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
 
+import { getSpaceLanguage } from '@/intl/server';
+import { tString } from '@/intl/translate';
+import { languages } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -36,19 +39,23 @@ export async function InlineLinkTooltip(
     }
 
     let breadcrumbs = resolved.ancestors;
+    const language =
+        'customization' in context.contentContext
+            ? getSpaceLanguage(context.contentContext.customization)
+            : languages.en;
     const isExternal = inline.data.ref.kind === 'url';
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
     if (isExternal) {
         breadcrumbs = [
             {
-                label: 'External link to',
+                label: tString(language, 'link_tooltip_external_link'),
             },
         ];
     }
     if (isSamePage) {
         breadcrumbs = [
             {
-                label: 'Jump to section',
+                label: tString(language, 'link_tooltip_page_anchor'),
                 icon: <Icon icon="arrow-down-short-wide" className="size-3" />,
             },
         ];
@@ -171,6 +178,7 @@ export async function InlineLinkTooltip(
                                             'customization' in context.contentContext &&
                                             context.contentContext.customization.trademark.enabled
                                         }
+                                        language={language}
                                     />
                                 </div>
                             ) : null}

@@ -58,4 +58,8 @@ export const de = {
         'Das PDF konnte für ${1} Seiten nicht generiert werden, Generierung wurde bei ${2} gestoppt.',
     pdf_limit_reached_continue: 'Mit ${1} weiteren Seiten erweitern.',
     more: 'Mehr',
+    link_tooltip_external_link: 'Externe Verlinkung zu',
+    link_tooltip_page_anchor: 'Zum Abschnitt springen',
+    link_tooltip_ai_summary: 'Seitenhighlight',
+    link_tooltip_ai_summary_description: 'Basierend auf Ihrem Kontext. Kann Fehler enthalten.',
 };

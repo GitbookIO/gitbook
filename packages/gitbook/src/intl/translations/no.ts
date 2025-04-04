@@ -58,4 +58,8 @@ export const no: TranslationLanguage = {
     pdf_limit_reached: 'Kunne ikke generere PDF for ${1} sider, generering stoppet ved ${2}.',
     pdf_limit_reached_continue: 'Utvid med ${1} flere sider.',
     more: 'Mer',
+    link_tooltip_external_link: 'Ekstern lenke til',
+    link_tooltip_page_anchor: 'Hopp til seksjon',
+    link_tooltip_ai_summary: 'Sidesammendrag',
+    link_tooltip_ai_summary_description: 'Basert på din kontekst. Kan inneholde feil.',
 };

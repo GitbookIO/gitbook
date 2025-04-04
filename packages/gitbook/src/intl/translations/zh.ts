@@ -56,4 +56,8 @@ export const zh: TranslationLanguage = {
     pdf_limit_reached: '无法为${1}页生成 PDF，生成在${2}页时停止。',
     pdf_limit_reached_continue: '使用${1}页进行扩展。',
     more: '更多',
+    link_tooltip_external_link: '外部链接到',
+    link_tooltip_page_anchor: '跳转到页面',
+    link_tooltip_ai_summary: '页面要点',
+    link_tooltip_ai_summary_description: '基于您的上下文。可能包含错误。',
 };
