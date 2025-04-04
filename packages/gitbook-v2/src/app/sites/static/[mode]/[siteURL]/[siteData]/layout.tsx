@@ -4,10 +4,8 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
-import { getCacheTag } from '@gitbook/cache-tags';
 import { type RouteLayoutParams, getStaticSiteContext } from '@v2/app/utils';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
-import { unstable_cacheTag as cacheTag } from 'next/cache';
 
 interface SiteStaticLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -17,16 +15,7 @@ export default async function SiteStaticLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
-    'use cache';
-
     const { context, visitorAuthClaims } = await getStaticSiteContext(await params);
-
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: context.site.id,
-        })
-    );
 
     return (
         <CustomizationRootLayout customization={context.customization}>

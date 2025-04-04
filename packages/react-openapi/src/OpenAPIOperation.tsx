@@ -10,7 +10,8 @@ import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIPath } from './OpenAPIPath';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPISpec } from './OpenAPISpec';
-import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPIOperationData } from './types';
+import { getOpenAPIClientContext } from './context';
+import type { OpenAPIContext, OpenAPIOperationData } from './types';
 import { resolveDescription } from './utils';
 
 /**
@@ -19,16 +20,12 @@ import { resolveDescription } from './utils';
 export function OpenAPIOperation(props: {
     className?: string;
     data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { className, data, context } = props;
     const { operation } = data;
 
-    const clientContext: OpenAPIClientContext = {
-        defaultInteractiveOpened: context.defaultInteractiveOpened,
-        icons: context.icons,
-        blockKey: context.blockKey,
-    };
+    const clientContext = getOpenAPIClientContext(context);
 
     return (
         <div className={clsx('openapi-operation', className)}>
@@ -79,7 +76,7 @@ export function OpenAPIOperation(props: {
 
 function OpenAPIOperationDescription(props: {
     operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { operation } = props;
     if (operation['x-gitbook-description-document']) {

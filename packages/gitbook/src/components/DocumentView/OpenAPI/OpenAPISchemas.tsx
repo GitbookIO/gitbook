@@ -1,6 +1,5 @@
 import { resolveOpenAPISchemasBlock } from '@/lib/openapi/resolveOpenAPISchemasBlock';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 import { OpenAPISchemas as BaseOpenAPISchemas } from '@gitbook/react-openapi';
 
 import type { BlockProps } from '../Block';
@@ -8,6 +7,7 @@ import type { BlockProps } from '../Block';
 import './scalar.css';
 import './style.css';
 import type { OpenAPISchemasBlock } from '@/lib/openapi/types';
+import { getOpenAPIContext } from './context';
 
 /**
  * Render an openapi-schemas block.
@@ -49,19 +49,9 @@ async function OpenAPISchemasBody(props: BlockProps<OpenAPISchemasBlock>) {
 
     return (
         <BaseOpenAPISchemas
-            data={data}
+            schemas={data.schemas}
             grouped={block.data.grouped}
-            context={{
-                specUrl,
-                icons: {
-                    chevronDown: <Icon icon="chevron-down" />,
-                    chevronRight: <Icon icon="chevron-right" />,
-                    plus: <Icon icon="plus" />,
-                },
-                defaultInteractiveOpened: context.mode === 'print',
-                id: block.meta?.id,
-                blockKey: block.key,
-            }}
+            context={getOpenAPIContext({ props, specUrl })}
             className="openapi-block"
         />
     );
