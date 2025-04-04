@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
         });
     } catch (err: unknown) {
         const message = [
-            err instanceof Error ? err.message : 'Internal Server Error',
+            err instanceof Error ? err.name : 'Internal Server Error',
+            ...(err instanceof Error && err.message ? [err.message] : []),
+            ...(err instanceof Error && err.cause ? [err.cause] : []),
             ...(err instanceof Error && err.stack ? [err.stack] : []),
         ].join('\n');
 
