@@ -270,6 +270,10 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                 return result;
             });
         },
+
+        streamAIResponse() {
+            throw new Error('Not implemented in v1');
+        },
     };
 
     return dataFetcher;

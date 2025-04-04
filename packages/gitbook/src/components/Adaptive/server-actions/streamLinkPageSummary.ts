@@ -4,7 +4,7 @@ import { getV1BaseContext } from '@/lib/v1';
 import { isV2 } from '@/lib/v2';
 import { AIMessageRole } from '@gitbook/api';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
+import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { z } from 'zod';
 import { streamGenerateObject } from './api';
 
@@ -32,24 +32,23 @@ export async function* streamLinkPageSummary({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream }] = await Promise.all([
-        streamGenerateObject(
-            baseContext,
-            {
-                organizationId: siteURLData.organization,
-                siteId: siteURLData.site,
-            },
-            {
-                schema: z.object({
-                    highlight: z
-                        .string()
-                        .describe('The reason why the user should read the target page.'),
-                    // questions: z.array(z.string().describe('The questions to sea')).max(3),
-                }),
-                messages: [
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# 1. Role
+    const { stream } = await streamGenerateObject(
+        baseContext,
+        {
+            organizationId: siteURLData.organization,
+            siteId: siteURLData.site,
+        },
+        {
+            schema: z.object({
+                highlight: z
+                    .string()
+                    .describe('The reason why the user should read the target page.'),
+                // questions: z.array(z.string().describe('The questions to sea')).max(3),
+            }),
+            messages: [
+                {
+                    role: AIMessageRole.Developer,
+                    content: `# 1. Role
 You are a contextual fact extractor. Your job is to find the exact fact from the linked page that directly answers the implied question in the current paragraph.
 
 # 2. Task
@@ -65,60 +64,60 @@ Extract a contextually-relevant fact that:
 3. Ensure the fact relates directly to the context of the paragraph containing the link
 4. Avoid ALL instructional language including words like "use", "click", "select", "create"
 5. Keep it under 30 words, factual and declarative about what EXISTS or IS TRUE`,
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# 4. Current page
+                },
+                {
+                    role: AIMessageRole.Developer,
+                    content: `# 4. Current page
 The content of the current page is:`,
-                        attachments: [
-                            {
-                                type: 'page' as const,
-                                spaceId: currentSpaceId,
-                                pageId: currentPageId,
-                            },
-                        ],
-                    },
-                    ...(visitedPages
-                        ? [
-                              {
-                                  role: AIMessageRole.Developer,
-                                  content: '# 5. Previous pages',
-                              },
-                              ...visitedPages.map(({ spaceId, pageId }) => ({
-                                  role: AIMessageRole.Developer,
-                                  content: `## Page ${pageId}`,
-                                  attachments: [
-                                      {
-                                          type: 'page' as const,
-                                          spaceId,
-                                          pageId,
-                                      },
-                                  ],
-                              })),
-                          ]
-                        : []),
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# 6. Target page
+                    attachments: [
+                        {
+                            type: 'page' as const,
+                            spaceId: currentSpaceId,
+                            pageId: currentPageId,
+                        },
+                    ],
+                },
+                ...(visitedPages
+                    ? [
+                          {
+                              role: AIMessageRole.Developer,
+                              content: '# 5. Previous pages',
+                          },
+                          ...visitedPages.map(({ spaceId, pageId }) => ({
+                              role: AIMessageRole.Developer,
+                              content: `## Page ${pageId}`,
+                              attachments: [
+                                  {
+                                      type: 'page' as const,
+                                      spaceId,
+                                      pageId,
+                                  },
+                              ],
+                          })),
+                      ]
+                    : []),
+                {
+                    role: AIMessageRole.Developer,
+                    content: `# 6. Target page
 The content of the target page is:`,
-                        attachments: [
-                            {
-                                type: 'page' as const,
-                                spaceId: targetSpaceId,
-                                pageId: targetPageId,
-                            },
-                        ],
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# 7. Link preview
+                    attachments: [
+                        {
+                            type: 'page' as const,
+                            spaceId: targetSpaceId,
+                            pageId: targetPageId,
+                        },
+                    ],
+                },
+                {
+                    role: AIMessageRole.Developer,
+                    content: `# 7. Link preview
 The content of the link preview is:
 > ${linkPreview}
 > Page ID: ${targetPageId}`,
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `# 8. Guidelines & Examples
+                },
+                {
+                    role: AIMessageRole.Developer,
+                    content: `# 8. Guidelines & Examples
 ALWAYS:
 - ALWAYS choose facts that directly fulfill the contextual need where the link appears
 - ALWAYS connect target page information specifically to the current paragraph context
@@ -147,16 +146,14 @@ Current paragraph: "Your team mentioned issues with conflicting edits. Need to c
 Preview: "Live Edit: Real-time collaborative editing."
 ✓ "Teams with GitHub repositories (like yours) cannot use this feature due to sync limitations."
 ✗ "Incompatible with GitHub/GitLab sync and requires specific visibility settings."`,
-                    },
-                    {
-                        role: AIMessageRole.User,
-                        content: `I'm considering reading the link titled "${linkTitle}" pointing to page ${targetPageId}. Why should I read it? Relate it to the paragraph I'm currently reading.`,
-                    },
-                ].filter(filterOutNullable),
-            }
-        ),
-        fetchServerActionSiteContext(baseContext),
-    ]);
+                },
+                {
+                    role: AIMessageRole.User,
+                    content: `I'm considering reading the link titled "${linkTitle}" pointing to page ${targetPageId}. Why should I read it? Relate it to the paragraph I'm currently reading.`,
+                },
+            ].filter(filterOutNullable),
+        }
+    );
 
     for await (const value of stream) {
         const highlight = value.highlight;
