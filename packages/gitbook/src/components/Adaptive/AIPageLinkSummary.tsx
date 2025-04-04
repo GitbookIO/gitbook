@@ -1,6 +1,7 @@
 'use client';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
+import { useVisitedPages } from '../Insights';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
 
@@ -27,6 +28,7 @@ export function AIPageLinkSummary(props: {
         showTrademark = true,
     } = props;
 
+    const visitedPages = useVisitedPages((state) => state.pages);
     const [highlight, setHighlight] = useState('');
 
     useEffect(() => {
@@ -42,7 +44,7 @@ export function AIPageLinkSummary(props: {
                 targetPageId,
                 linkPreview,
                 linkTitle,
-                previousPageIds: [],
+                visitedPages,
             });
 
             for await (const highlight of stream) {
@@ -54,7 +56,15 @@ export function AIPageLinkSummary(props: {
         return () => {
             canceled = true;
         };
-    }, [currentSpaceId, currentPageId, targetSpaceId, targetPageId, linkPreview, linkTitle]);
+    }, [
+        currentSpaceId,
+        currentPageId,
+        targetSpaceId,
+        targetPageId,
+        linkPreview,
+        linkTitle,
+        visitedPages,
+    ]);
 
     return (
         <div className="flex flex-col gap-1">

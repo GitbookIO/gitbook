@@ -24,7 +24,7 @@ export async function* streamLinkPageSummary({
     targetPageId: string;
     linkPreview?: string;
     linkTitle?: string;
-    previousPageIds?: string[];
+    visitedPages?: Array<{ spaceId: string; pageId: string }>;
 }) {
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
