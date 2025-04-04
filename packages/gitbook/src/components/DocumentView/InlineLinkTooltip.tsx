@@ -1,6 +1,6 @@
 import type { DocumentInlineLink } from '@gitbook/api';
 
-import { resolveContentRef } from '@/lib/references';
+import type { ResolvedContentRef } from '@/lib/references';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
@@ -9,41 +9,22 @@ import { getNodeText } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import type { GitBookAnyContext } from '@v2/lib/context';
 import { Fragment } from 'react';
 import { AIPageLinkSummary } from '../Adaptive/AIPageLinkSummary';
 import { Button, StyledLink } from '../primitives';
-import type { InlineProps } from './Inline';
-import { Inlines } from './Inlines';
 
-export async function InlineLinkTooltip(
-    props: InlineProps<DocumentInlineLink> & { children: React.ReactNode }
-) {
-    const { inline, document, context, ancestorInlines, children } = props;
-
-    const resolved = context.contentContext
-        ? await resolveContentRef(inline.data.ref, context.contentContext, {
-              resolveAnchorText: true,
-          })
-        : null;
-
-    if (!context.contentContext || !resolved) {
-        return (
-            <span title="Broken link" className="underline">
-                <Inlines
-                    context={context}
-                    document={document}
-                    nodes={inline.nodes}
-                    ancestorInlines={[...ancestorInlines, inline]}
-                />
-            </span>
-        );
-    }
+export async function InlineLinkTooltip(props: {
+    inline: DocumentInlineLink;
+    context: GitBookAnyContext;
+    children: React.ReactNode;
+    resolved: ResolvedContentRef;
+}) {
+    const { inline, context, resolved, children } = props;
 
     let breadcrumbs = resolved.ancestors;
     const language =
-        'customization' in context.contentContext
-            ? getSpaceLanguage(context.contentContext.customization)
-            : languages.en;
+        'customization' in context ? getSpaceLanguage(context.customization) : languages.en;
     const isExternal = inline.data.ref.kind === 'url';
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
     if (isExternal) {
@@ -66,8 +47,8 @@ export async function InlineLinkTooltip(
     const hasAISummary =
         !isExternal &&
         !isSamePage &&
-        'customization' in context.contentContext &&
-        context.contentContext.customization.ai?.pageLinkSummaries.enabled &&
+        'customization' in context &&
+        context.customization.ai?.pageLinkSummaries.enabled &&
         (inline.data.ref.kind === 'page' || inline.data.ref.kind === 'anchor');
 
     return (
@@ -150,22 +131,20 @@ export async function InlineLinkTooltip(
                                 ) : null}
                             </div>
 
-                            {hasAISummary &&
-                            'page' in context.contentContext &&
-                            'page' in inline.data.ref ? (
+                            {hasAISummary && 'page' in context && 'page' in inline.data.ref ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <AIPageLinkSummary
                                         targetPageId={
-                                            inline.data.ref.page ?? context.contentContext.page.id
+                                            resolved.page?.id ??
+                                            inline.data.ref.page ??
+                                            context.page.id
                                         }
-                                        targetSpaceId={
-                                            inline.data.ref.space ?? context.contentContext.space.id
-                                        }
+                                        targetSpaceId={inline.data.ref.space ?? context.space.id}
                                         linkTitle={getNodeText(inline)}
                                         linkPreview={`**${resolved.text}**: ${resolved.subText}`}
                                         showTrademark={
-                                            'customization' in context.contentContext &&
-                                            context.contentContext.customization.trademark.enabled
+                                            'customization' in context &&
+                                            context.customization.trademark.enabled
                                         }
                                     />
                                 </div>
