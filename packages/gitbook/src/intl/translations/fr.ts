@@ -62,4 +62,5 @@ export const fr: TranslationLanguage = {
     link_tooltip_page_anchor: 'Sauter à la section',
     link_tooltip_ai_summary: 'Résumé de la page',
     link_tooltip_ai_summary_description: 'Basé sur votre contexte. Peut contenir des erreurs.',
+    open_in_new_tab: 'Ouvrir dans un nouvel onglet',
 };

@@ -63,4 +63,5 @@ export const ja: TranslationLanguage = {
     link_tooltip_ai_summary: 'ページのハイライト',
     link_tooltip_ai_summary_description:
         'あなたのコンテキストに基づいています。間違いが含まれる可能性があります。',
+    open_in_new_tab: '新しいタブで開く',
 };

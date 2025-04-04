@@ -137,7 +137,7 @@ export async function InlineLinkTooltip(
                                             variant="blank"
                                             href={resolved.href}
                                             target="_blank"
-                                            label="Open in new tab"
+                                            label={tString(language, 'open_in_new_tab')}
                                             size="small"
                                             icon="arrow-up-right-from-square"
                                             iconOnly={true}

@@ -60,4 +60,5 @@ export const zh: TranslationLanguage = {
     link_tooltip_page_anchor: '跳转到页面',
     link_tooltip_ai_summary: '页面要点',
     link_tooltip_ai_summary_description: '基于您的上下文。可能包含错误。',
+    open_in_new_tab: '在新标签页中打开',
 };

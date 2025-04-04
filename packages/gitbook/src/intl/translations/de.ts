@@ -62,4 +62,5 @@ export const de = {
     link_tooltip_page_anchor: 'Zum Abschnitt springen',
     link_tooltip_ai_summary: 'Seitenhighlight',
     link_tooltip_ai_summary_description: 'Basierend auf Ihrem Kontext. Kann Fehler enthalten.',
+    open_in_new_tab: 'In neuem Tab öffnen',
 };

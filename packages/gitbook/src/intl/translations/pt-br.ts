@@ -62,4 +62,5 @@ export const pt_br = {
     link_tooltip_page_anchor: 'Pular para a seção',
     link_tooltip_ai_summary: 'Resumo da página',
     link_tooltip_ai_summary_description: 'Baseado no seu contexto. Pode conter erros.',
+    open_in_new_tab: 'Abrir em uma nova guia',
 };

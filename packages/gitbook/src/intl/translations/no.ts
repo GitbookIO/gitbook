@@ -62,4 +62,5 @@ export const no: TranslationLanguage = {
     link_tooltip_page_anchor: 'Hopp til seksjon',
     link_tooltip_ai_summary: 'Sidesammendrag',
     link_tooltip_ai_summary_description: 'Basert på din kontekst. Kan inneholde feil.',
+    open_in_new_tab: 'Åpne i ny fane',
 };
