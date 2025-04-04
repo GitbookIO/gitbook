@@ -54,9 +54,9 @@ export async function streamGenerateObject<T>(
         previousResponseId?: string;
     }
 ) {
-    const apiClient = await context.dataFetcher.api();
-
-    const rawStream = apiClient.orgs.streamAiResponseInSite(organizationId, siteId, {
+    const rawStream = context.dataFetcher.streamAIResponse({
+        organizationId,
+        siteId,
         input: messages,
         output: {
             type: 'object',

@@ -179,6 +179,10 @@ export function createDataFetcher(
         getUserById(userId) {
             return trace('getUserById', () => getUserById(input, { userId }));
         },
+
+        streamAIResponse(params) {
+            return streamAIResponse(input, params);
+        },
     };
 }
 
@@ -642,6 +646,22 @@ const renderIntegrationUi = memoize(async function renderIntegrationUi(
         });
     });
 });
+
+async function* streamAIResponse(
+    input: DataFetcherInput,
+    params: Parameters<GitBookDataFetcher['streamAIResponse']>[0]
+) {
+    const api = await apiClient(input);
+    const res = await api.orgs.streamAiResponseInSite(params.organizationId, params.siteId, {
+        input: params.input,
+        output: params.output,
+        model: params.model,
+    });
+
+    for await (const event of res) {
+        yield event;
+    }
+}
 
 let loggedServiceBinding = false;
 
