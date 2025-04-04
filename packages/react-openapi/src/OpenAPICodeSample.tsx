@@ -3,7 +3,7 @@ import {
     OpenAPIMediaTypeExamplesBody,
     OpenAPIMediaTypeExamplesSelector,
 } from './OpenAPICodeSampleInteractive';
-import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
+import { OpenAPICodeSampleBody, OpenAPICodeSampleHeader } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
 import { StaticSection } from './StaticSection';
 import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
@@ -11,7 +11,7 @@ import { generateMediaTypeExamples, generateSchemaExample } from './generateSche
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIContext, OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
-import { checkIsReference, createStateKey } from './utils';
+import { checkIsReference } from './utils';
 
 const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
 
@@ -45,11 +45,12 @@ export function OpenAPICodeSample(props: {
     }
 
     return (
-        <OpenAPITabs stateKey={createStateKey('codesample')} items={samples}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-codesample">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
+        <StaticSection
+            header={<OpenAPICodeSampleHeader data={data} items={samples} />}
+            className="openapi-codesample"
+        >
+            <OpenAPICodeSampleBody items={samples} />
+        </StaticSection>
     );
 }
 

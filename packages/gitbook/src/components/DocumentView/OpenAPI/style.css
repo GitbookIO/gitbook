@@ -90,7 +90,7 @@
 
 /* Method Tags */
 .openapi-method {
-    @apply rounded uppercase font-mono font-bold text-xs px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+    @apply rounded uppercase font-mono shrink-0 font-bold text-xs px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get {
@@ -420,7 +420,15 @@
 }
 
 .openapi-codesample-header-content {
-    @apply flex flex-row items-center h-fit;
+    @apply flex flex-row items-center justify-between h-fit p-2.5;
+}
+
+.openapi-codesample-header-content .openapi-path {
+    @apply flex items-center font-mono *:text-[0.813rem] gap-2 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
+}
+
+.openapi-codesample-header-content .openapi-path .openapi-path-variable {
+    @apply text-[0.813rem];
 }
 
 .openapi-codesample-footer {
@@ -433,7 +441,7 @@
 
 /* Path */
 .openapi-path {
-    @apply flex items-start text-sm gap-2 h-fit overflow-x-auto min-w-0 max-w-full;
+    @apply flex items-center text-sm gap-2 h-fit overflow-x-auto min-w-0 max-w-full;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -447,12 +455,12 @@
 }
 
 .openapi-path .openapi-method {
-    @apply text-[0.813rem] m-0 mt-0.5 items-center flex px-2;
+    @apply text-[0.813rem] m-0 mt-0.5 items-center flex px-1;
 }
 
 .openapi-path-title {
     @apply flex-1 relative font-normal text-left font-mono text-tint-strong/10;
-    @apply py-0.5 px-1 rounded hover:bg-tint cursor-pointer transition-colors;
+    @apply py-0.5 px-1 rounded hover:bg-tint transition-colors;
     @apply whitespace-nowrap md:whitespace-normal;
 }
 
@@ -463,14 +471,6 @@
 .openapi-path-title::-webkit-scrollbar {
     display: none;
 }
-
-/* .openapi-path-copy {
-    @apply absolute opacity-0 h-fit right-0 top-1/2 -translate-y-1/2 bg-light dark:bg-dark border rounded-md border-tint-subtle px-1.5 py-0;
-}
-
-.openapi-path-title:hover .openapi-path-copy {
-    @apply opacity-11;
-} */
 
 .openapi-path-title em {
     @apply not-italic text-primary font-medium;
@@ -498,7 +498,8 @@
     @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
 }
 
-.openapi-panel-footer {
+.openapi-panel-footer,
+.openapi-codesample-footer {
     @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
 }
 
@@ -513,7 +514,41 @@
 
 /* Common Elements */
 .openapi-select {
-    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 truncate border border-tint-subtle bg-tint;
+    /* unstyled */
+}
+
+/* Prevent react-aria popover from setting overflow:auto on body */
+body:has(.openapi-select-popover) {
+    overflow: unset !important;
+}
+
+.openapi-select > button {
+    @apply flex items-center cursor-pointer gap-1.5 text-tint-strong max-w-60 rounded text-xs leading-6 px-1.5 truncate border border-tint-subtle bg-tint;
+    @apply hover:bg-tint-hover transition-all;
+}
+
+.openapi-select > button svg {
+    @apply size-2.5;
+}
+
+.openapi-select-popover {
+    @apply min-w-[var(--trigger-width)] max-w-40 w-full max-h-52 right-0 overflow-y-auto p-1.5 border border-tint-subtle bg-tint/9 backdrop-blur-xl rounded-md;
+    @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
+}
+
+.openapi-select-item {
+    @apply text-sm cursor-pointer px-1.5 py-0.5 truncate text-tint ring-0 border-none rounded !outline-none;
+    @apply hover:bg-tint-hover theme-gradient:hover:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
+}
+
+.openapi-select-item-selected {
+    @apply text-primary-subtle hover:text-primary hover:bg-primary-hover;
+    @apply theme-muted:hover:bg-primary-active theme-gradient:hover:bg-primary-active tint:font-semibold;
+    @apply contrast-more:text-primary contrast-more:hover:text-primary-strong contrast-more:font-semibold;
+}
+
+.openapi-select-listbox {
+    @apply flex flex-col gap-1;
 }
 
 .openapi-select:focus {
@@ -576,8 +611,10 @@
     @apply text-primary after:absolute after:-bottom-[calc(0.375rem_+_1px)] after:z-20 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
 }
 
-.openapi-tabs-panel {
+.openapi-tabs-panel,
+.openapi-codesample-panel {
     @apply flex-1 text-sm relative focus-visible:outline-none;
+    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
 }
 
 /* Disclosure group */
@@ -728,5 +765,9 @@
 }
 
 .openapi-copy-button {
-    @apply hover:brightness-95;
+    @apply hover:brightness-95 cursor-pointer;
+}
+
+.openapi-copy-button[data-disabled="true"] {
+    @apply cursor-default;
 }

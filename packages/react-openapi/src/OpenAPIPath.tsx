@@ -1,5 +1,5 @@
 import { OpenAPICopyButton } from './OpenAPICopyButton';
-import type { OpenAPIContext, OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 
 /**
@@ -7,25 +7,42 @@ import { getDefaultServerURL } from './util/server';
  */
 export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
-    context: OpenAPIContext;
+    /** Wether to show the server URL.
+     * @default true
+     */
+    withServer?: boolean;
+    /**
+     * Wether the path is copyable.
+     * @default true
+     */
+    canCopy?: boolean;
 }) {
-    const { data } = props;
+    const { data, withServer = true, canCopy = true } = props;
     const { method, path, operation } = data;
 
     const server = getDefaultServerURL(data.servers);
     const formattedPath = formatPath(path);
+
+    const element = (() => {
+        return (
+            <>
+                {withServer ? <span className="openapi-path-server">{server}</span> : null}
+                {formattedPath}
+            </>
+        );
+    })();
 
     return (
         <div className="openapi-path">
             <div className={`openapi-method openapi-method-${method}`}>{method}</div>
 
             <OpenAPICopyButton
-                value={server + path}
+                value={`${withServer ? server : ''}${path}`}
                 className="openapi-path-title"
                 data-deprecated={operation.deprecated}
+                isDisabled={!canCopy}
             >
-                <span className="openapi-path-server">{server}</span>
-                {formattedPath}
+                {element}
             </OpenAPICopyButton>
         </div>
     );

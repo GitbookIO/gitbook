@@ -47,7 +47,7 @@ export function OpenAPIOperation(props: {
                           title: operation.summary,
                       })
                     : null}
-                <OpenAPIPath data={data} context={context} />
+                <OpenAPIPath data={data} />
             </div>
             <div className="openapi-columns">
                 <div className="openapi-column-spec">
