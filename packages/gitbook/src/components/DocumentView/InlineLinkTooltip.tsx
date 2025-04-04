@@ -55,6 +55,13 @@ export async function InlineLinkTooltip(
         resolved.subText = undefined;
     }
 
+    const hasAISummary =
+        !isExternal &&
+        !isSamePage &&
+        'customization' in context.contentContext &&
+        context.contentContext.customization.ai?.pageLinkSummaries.enabled &&
+        (inline.data.ref.kind === 'page' || inline.data.ref.kind === 'anchor');
+
     return (
         <Tooltip.Provider delayDuration={200}>
             <Tooltip.Root>
@@ -135,13 +142,9 @@ export async function InlineLinkTooltip(
                                 ) : null}
                             </div>
 
-                            {'customization' in context.contentContext &&
-                            context.contentContext.customization.ai?.pageLinkSummaries.enabled &&
-                            !isExternal &&
-                            !isSamePage &&
+                            {hasAISummary &&
                             'page' in context.contentContext &&
-                            (inline.data.ref.kind === 'page' ||
-                                inline.data.ref.kind === 'anchor') ? (
+                            'page' in inline.data.ref ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <AIPageLinkSummary
                                         currentPageId={context.contentContext.page.id}
@@ -165,13 +168,14 @@ export async function InlineLinkTooltip(
                                             .join('')}
                                         linkPreview={`**${resolved.text}**: ${resolved.subText}`}
                                         showTrademark={
+                                            'customization' in context.contentContext &&
                                             context.contentContext.customization.trademark.enabled
                                         }
                                     />
                                 </div>
                             ) : null}
                         </div>
-                        <Tooltip.Arrow className="fill-tint-1" />
+                        <Tooltip.Arrow className={hasAISummary ? 'fill-tint-3' : 'fill-tint-1'} />
                     </Tooltip.Content>
                 </Tooltip.Portal>
             </Tooltip.Root>

@@ -148,7 +148,7 @@ Preview: "Live Edit: Real-time collaborative editing."
                     },
                     {
                         role: AIMessageRole.User,
-                        content: `I'm considering reading the link titled "${linkTitle}". Give the most relevant information given what I already know. Relate to the instructions and examples above. Don't explain what the page is about, just why I should read it.`,
+                        content: `I'm considering reading the link titled "${linkTitle}" pointing to page ${targetPageId}. Why should I read it? Relate it to the paragraph I'm currently reading.`,
                     },
                 ].filter(filterOutNullable),
             }

@@ -66,6 +66,15 @@ export function AIPageLinkSummary(props: {
         visitedPages,
     ]);
 
+    const shimmerBlocks = [
+        'w-[20%] [animation-delay:-1s]',
+        'w-[35%] [animation-delay:-0.8s]',
+        'w-[25%] [animation-delay:-0.6s]',
+        'w-[10%] [animation-delay:-0.4s]',
+        'w-[40%] [animation-delay:-0.2s]',
+        'w-[30%] [animation-delay:0s]',
+    ];
+
     return (
         <div className="flex flex-col gap-1">
             <div className="flex w-screen items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
@@ -76,9 +85,20 @@ export function AIPageLinkSummary(props: {
                 )}
                 <h6 className="text-tint">Page highlight</h6>
             </div>
-            {highlight.length > 0 ? <p>{highlight}</p> : null}
             {highlight.length > 0 ? (
-                <div className="text-tint-subtle text-xs">
+                <p className='animate-fadeIn'>{highlight}</p>
+            ) : (
+                <div className="mt-2 flex flex-wrap gap-2">
+                    {shimmerBlocks.map((block, index) => (
+                        <div
+                            key={`${index}-${block}`}
+                            className={`${block} h-4 animate-pulse rounded straight-corners:rounded-none bg-tint-active`}
+                        />
+                    ))}
+                </div>
+            )}
+            {highlight.length > 0 ? (
+                <div className='animate-fadeIn text-tint-subtle text-xs'>
                     Based on your context. May contain mistakes.
                 </div>
             ) : null}
