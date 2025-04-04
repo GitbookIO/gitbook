@@ -138,6 +138,7 @@ export async function InlineLinkTooltip(
                             {'customization' in context.contentContext &&
                             context.contentContext.customization.ai?.pageLinkSummaries.enabled &&
                             !isExternal &&
+                            !isSamePage &&
                             'page' in context.contentContext &&
                             (inline.data.ref.kind === 'page' ||
                                 inline.data.ref.kind === 'anchor') ? (

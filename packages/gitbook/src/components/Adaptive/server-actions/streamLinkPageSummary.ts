@@ -31,7 +31,7 @@ export async function* streamLinkPageSummary({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream, response }] = await Promise.all([
+    const [{ stream }] = await Promise.all([
         streamGenerateObject(
             baseContext,
             {
@@ -40,42 +40,56 @@ export async function* streamLinkPageSummary({
             },
             {
                 schema: z.object({
-                    highlight: z.string().describe('The most important content of the target page'),
+                    highlight: z
+                        .string()
+                        .describe('The reason why the user should read the target page.'),
                     // questions: z.array(z.string().describe('The questions to sea')).max(3),
                 }),
                 messages: [
                     {
                         role: AIMessageRole.Developer,
                         content: `# 1. Role
-You are a documentation navigator. Your job is to help the user read documentation more efficiently. Your aim is to prevent the user from having to read the target page by giving them all the information they need to know.
+You are a documentation navigator. Your job is to help the user read documentation more efficiently.
 
 # 2. Task
-Using both the current page context and the target page content, produce a page highlight that:
-- Highlights the key facts from the target page.
-- Relates strongly to the topic the user is currently reading about.
-- Is very succinct and direct, using only one or two short sentences (each sentence using no more than one comma).
-- Remains strictly factual, without referring to "the page".
+Using the user's navigation history and the target page content, produce an answer that:
+- Tells the user **why they should read the target page**.
+- Relates strongly to what the user already knows and what they're currently reading.
+- Is very succinct and direct, using a one or two sentences. Don't combine sentences with commas. 
 
 # 3. Instructions
-1.	Identify the key paragraph surrounding the link's text (e.g., "change request") from the current page.
-2.	Extract and combine relevant information from the target page to address the link's context.
-3.	Combine in one or two short sentences that are direct and brief.
+1. Identify the key paragraph surrounding the link's text (e.g., "change request") from the current page.
+2. Extract and combine relevant information from the target page to address the link's context.
+3. Leave out information that's already covered in the link preview or previous pages.
+4. Combine in one sentence that is direct and brief. Be concise, avoid long words and fluffy language.`,
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `# 4. Examples
+- Start immediately with a fact.
+- Use specific details from the target page. Don't just summarise it.
+- Don't refer to the page itself, so avoid using "the page", "it contains", "it explains", etc.
+- Remain neutral about importance, so avoid using "crucial", "important", "urgent", etc.
 
-# 4. Examples
 ## Example 1
-- Link context: "This feature is only available on the Ultimate plan."
-- Link preview: "Pricing: Learn about our different pricing tiers."
-- Response: "The Ultimate plan costs $25 per month. A Pro plan is available too."
+- Link context: "You can create a redirect to any (section)[/sections] of your site."
+- Link preview: "Sections: Organise your site into different parts."
+- Response: "Another way to split up content is with Variants. Redirects to a section will target the first page of the section."
 
 ## Example 2
-- Link context: "You can use keyboard shortcuts to get to the Search menu faster."
-- Link preview: "Keyboard shortcuts: A quick reference guide to all the keyboard shortcuts available."
-- Response: "To open the Search menu, use the keyboard shortcut ⌘K or Ctrl+K."
+- Link context: "This feature is only available on the (Ultimate plan)[/pricing]."
+- Link preview: "Pricing: Learn about our different pricing tiers."
+- Response: "Contains info about the Ultimate plan, which is required for most of the features you viewed. It costs $25 per month. A Pro plan is available too."
 
 ## Example 3
-- Link context: "This feature can only be enabled by an admin."
+- Link context: "You can use (keyboard shortcuts)[/keyboard-shortcuts] to get to the Search menu faster."
+- Link preview: "Keyboard shortcuts: A quick reference guide to all the keyboard shortcuts available."
+- Response: "Relevant shortcuts for you include ⌘/Ctrl+K for Search, ⌘/Ctrl+I for Italics, and ⌘/Ctrl+B for Bold."
+
+## Example 4
+- Link context: "This feature can only be enabled by an (admin)[/roles]."
 - Link preview: "Roles: An overview of the different roles on the platform."
-- Response: "The admin role is reserved for the creator of the organisation."`,
+- Response: "The features you've read about require Editor or Admin roles. The admin role is reserved for the creator of the organisation."`,
                     },
                     {
                         role: AIMessageRole.Developer,
@@ -128,15 +142,13 @@ The content of the link preview is:
                     },
                     {
                         role: AIMessageRole.User,
-                        content: `I'm considering reading the link titled "${linkTitle}" to page ID ${targetPageId}. Give the most relevant information from this page. Relate it to my current page and in particular the paragraph I'm currently reading. Be very concise.`,
+                        content: `I'm considering reading the link titled "${linkTitle}". Give the most relevant information given what I already know. Relate to the instructions and examples above. Don't explain what the page is about, just why I should read it.`,
                     },
                 ].filter(filterOutNullable),
             }
         ),
         fetchServerActionSiteContext(baseContext),
     ]);
-
-    console.log((await response).responseId);
 
     for await (const value of stream) {
         const highlight = value.highlight;
