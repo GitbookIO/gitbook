@@ -35,7 +35,7 @@
     },
     "packages/colors": {
       "name": "@gitbook/colors",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "devDependencies": {
         "typescript": "^5.5.3",
       },
@@ -49,7 +49,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.8.2",
+      "version": "0.9.1",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/cache-do": "workspace:*",
@@ -136,7 +136,7 @@
     },
     "packages/gitbook-v2": {
       "name": "gitbook-v2",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/cache-tags": "workspace:*",
@@ -162,7 +162,7 @@
       "name": "@gitbook/icons",
       "version": "0.2.0",
       "bin": {
-        "gitbook-icons": "./bin/gitbook-icons.js",
+        "gitbook-icons": "./bin/gitbook-icons.js"
       },
       "dependencies": {
         "@fortawesome/fontawesome-free": "^6.6.0",
@@ -180,7 +180,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "dependencies": {
         "@scalar/openapi-parser": "^0.10.10",
         "@scalar/openapi-types": "^0.1.9",
@@ -219,7 +219,7 @@
       "name": "@gitbook/react-math",
       "version": "0.6.0",
       "bin": {
-        "gitbook-math": "./bin/gitbook-math.js",
+        "gitbook-math": "./bin/gitbook-math.js"
       },
       "dependencies": {
         "object-hash": "^3.0.0",
@@ -234,7 +234,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.1.6",
+      "version": "1.1.8",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.2.5",

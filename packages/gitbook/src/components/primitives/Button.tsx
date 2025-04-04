@@ -6,7 +6,7 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link, type LinkInsightsProps } from './Link';
 
-type ButtonProps = {
+export type ButtonProps = {
     href?: string;
     variant?: 'primary' | 'secondary';
     size?: 'default' | 'medium' | 'small';

@@ -270,6 +270,22 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                 return result;
             });
         },
+
+        getAction(params) {
+            return wrapDataFetcherError(async () => {
+                console.log('fetching', params.url);
+                const url = new URL(params.url);
+                Object.keys(params.claims).forEach((key) => {
+                    url.searchParams.append(key, params.claims[key]);
+                });
+                const result = await fetch(url.toString());
+                console.log('fetched', result.statusText)
+                if (!result) {
+                    throw new DataFetcherError('Action not found', 404);
+                }
+                return await result.json();
+            });
+        }
     };
 
     return dataFetcher;

@@ -13,6 +13,7 @@ import assertNever from 'assert-never';
 import { Annotation } from './Annotation/Annotation';
 import type { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
+import { InlineAction } from './InlineAction';
 import { InlineImage } from './InlineImage';
 import { InlineLink } from './InlineLink';
 import { InlineMath } from './Math';
@@ -61,6 +62,8 @@ export function Inline<
             return <Mention {...contextProps} inline={inline} />;
         case 'inline-image':
             return <InlineImage {...contextProps} inline={inline} />;
+        case 'action':
+            return <InlineAction {...contextProps} inline={inline} />;
         default:
             assertNever(inline);
     }

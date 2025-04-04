@@ -6,6 +6,7 @@ import { headers } from 'next/headers';
 export async function shouldTrackEvents(): Promise<boolean> {
     const headersList = await headers();
 
+    return true;
     if (
         process.env.NODE_ENV === 'development' ||
         (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&

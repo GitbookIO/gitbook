@@ -179,4 +179,9 @@ export interface GitBookDataFetcher {
         integrationName: string;
         request: api.RenderIntegrationUI;
     }): Promise<DataFetcherResponse<api.ContentKitRenderOutput>>;
+
+    getAction(params: {
+        url: string
+        claims: any
+    }): Promise<DataFetcherResponse<{ text: string; url: string; icon?: string }>>;
 }

@@ -93,6 +93,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
     const flushEventsSync = useEventCallback(() => {
         const session = getSession();
         const visitorId = visitorIdRef.current;
+        console.log('flushEventsSync');
         if (!visitorId) {
             throw new Error('Visitor ID should be set before flushing events');
         }
@@ -126,6 +127,8 @@ export function InsightsProvider(props: InsightsProviderProps) {
             };
         }
 
+        console.log('allEvents', allEvents.length)
+
         if (allEvents.length > 0) {
             if (enabled) {
                 sendEvents({
@@ -143,6 +146,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         const visitorId = visitorIdRef.current ?? (await getVisitorId(appURL));
         visitorIdRef.current = visitorId;
 
+        console.log('flushBatchedEvents');
         flushEventsSync();
     }, 1500);
 
@@ -166,6 +170,8 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 ],
                 context,
             };
+
+            console.log('trackEvent', event, eventsRef.current[pathname].pageContext);
 
             if (eventsRef.current[pathname].pageContext !== undefined) {
                 // If the pageId is set, we know that the page_view event has been tracked

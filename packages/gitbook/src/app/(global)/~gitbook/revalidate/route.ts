@@ -25,10 +25,21 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const result = await revalidateTags(json.tags);
+    try {
+        const result = await revalidateTags(json.tags);
+        return NextResponse.json({
+            success: true,
+            stats: result.stats,
+        });
+    } catch (err: unknown) {
+            return NextResponse.json(
+                {
+                    error: 'Failed to revalidate tags',
+                    message: err instanceof Error ? err.message : 'Internal Server Error',
+                    stack: err instanceof Error ? err.stack : '',
+                },
+                { status: 500 }
+            );
+    }
 
-    return NextResponse.json({
-        success: true,
-        stats: result.stats,
-    });
 }
