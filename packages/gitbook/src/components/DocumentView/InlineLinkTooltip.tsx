@@ -5,6 +5,7 @@ import { resolveContentRef } from '@/lib/references';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
 import { languages } from '@/intl/translations';
+import { getNodeText } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -154,25 +155,13 @@ export async function InlineLinkTooltip(
                             'page' in inline.data.ref ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <AIPageLinkSummary
-                                        currentPageId={context.contentContext.page.id}
-                                        currentSpaceId={context.contentContext.space.id}
-                                        currentPageTitle={context.contentContext.page.title}
                                         targetPageId={
                                             inline.data.ref.page ?? context.contentContext.page.id
                                         }
                                         targetSpaceId={
                                             inline.data.ref.space ?? context.contentContext.space.id
                                         }
-                                        linkTitle={inline.nodes
-                                            .map((node) => {
-                                                if (node.object === 'text') {
-                                                    return node.leaves
-                                                        .map((leaf) => leaf.text)
-                                                        .join('');
-                                                }
-                                                return '';
-                                            })
-                                            .join('')}
+                                        linkTitle={getNodeText(inline)}
                                         linkPreview={`**${resolved.text}**: ${resolved.subText}`}
                                         showTrademark={
                                             'customization' in context.contentContext &&
