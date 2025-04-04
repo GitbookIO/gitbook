@@ -106,9 +106,8 @@ export function PageFeedbackForm(props: {
                                 <Button
                                     size="small"
                                     onClick={() => onSubmitComment(rating, comment)}
-                                >
-                                    {t(languages, 'submit')}
-                                </Button>
+                                    label={tString(languages, 'submit')}
+                                />
                                 {comment.length > MAX_COMMENT_LENGTH * 0.8 ? (
                                     <span
                                         className={

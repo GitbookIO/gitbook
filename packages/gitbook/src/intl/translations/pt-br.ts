@@ -58,4 +58,9 @@ export const pt_br = {
         'Não foi possível gerar o PDF para ${1} páginas, generation stopped at ${2}.',
     pdf_limit_reached_continue: 'Extender com mais ${1} páginas.',
     more: 'Mais',
+    link_tooltip_external_link: 'Link externo para',
+    link_tooltip_page_anchor: 'Pular para a seção',
+    link_tooltip_ai_summary: 'Resumo da página',
+    link_tooltip_ai_summary_description: 'Baseado no seu contexto. Pode conter erros.',
+    open_in_new_tab: 'Abrir em uma nova guia',
 };

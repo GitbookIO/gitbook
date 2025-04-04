@@ -168,7 +168,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 key={index}
                                 href={ref.href}
                                 target="_blank"
-                                style={['flex', 'flex-row', 'items-center', 'gap-2']}
+                                className="flex flex-row items-center gap-2"
                                 insights={
                                     ref.file
                                         ? {

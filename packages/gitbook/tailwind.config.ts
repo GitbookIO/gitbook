@@ -295,7 +295,7 @@ const config: Config = {
                 ),
             },
             animation: {
-                present: 'present .5s ease-out both',
+                present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
                 scaleIn: 'scaleIn 200ms ease',
                 scaleOut: 'scaleOut 200ms ease',
                 fadeIn: 'fadeIn 200ms ease forwards',
@@ -330,7 +330,7 @@ const config: Config = {
                 present: {
                     from: {
                         opacity: '0',
-                        transform: 'translateY(2rem) scale(0.9)',
+                        transform: 'translateY(1rem) scale(90%)',
                     },
                     to: {
                         opacity: '1',
