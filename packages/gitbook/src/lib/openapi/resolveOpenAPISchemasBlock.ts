@@ -1,5 +1,5 @@
-import { OpenAPIParseError } from '@gitbook/openapi-parser';
-import { type OpenAPISchemasData, resolveOpenAPISchemas } from '@gitbook/react-openapi';
+import { OpenAPIParseError, type OpenAPISchema } from '@gitbook/openapi-parser';
+import { resolveOpenAPISchemas } from '@gitbook/react-openapi';
 import { fetchOpenAPIFilesystem } from './fetch';
 import type {
     OpenAPISchemasBlock,
@@ -7,7 +7,9 @@ import type {
     ResolveOpenAPIBlockResult,
 } from './types';
 
-type ResolveOpenAPISchemasBlockResult = ResolveOpenAPIBlockResult<OpenAPISchemasData>;
+type ResolveOpenAPISchemasBlockResult = ResolveOpenAPIBlockResult<{
+    schemas: OpenAPISchema[];
+}>;
 
 const weakmap = new WeakMap<OpenAPISchemasBlock, Promise<ResolveOpenAPISchemasBlockResult>>();
 

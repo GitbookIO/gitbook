@@ -1,9 +1,3 @@
-import type {
-    OpenAPICustomOperationProperties,
-    OpenAPICustomSpecProperties,
-    OpenAPIV3,
-} from '@gitbook/openapi-parser';
-
 export interface OpenAPIClientContext {
     /**
      * Icons used in the block.
@@ -41,7 +35,7 @@ export interface OpenAPIContext extends OpenAPIClientContext {
      * Render the heading of the operation.
      */
     renderHeading: (props: {
-        deprecated?: boolean;
+        deprecated: boolean;
         title: string;
         stability?: string;
     }) => React.ReactNode;
@@ -57,16 +51,14 @@ export interface OpenAPIContext extends OpenAPIClientContext {
     specUrl: string;
 }
 
-export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
-    path: string;
-    method: string;
-
-    /** Servers to be used for this operation */
-    servers: OpenAPIV3.ServerObject[];
-
-    /** Spec of the operation */
-    operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
-
-    /** Securities that should be used for this operation */
-    securities: [string, OpenAPIV3.SecuritySchemeObject][];
+/**
+ * Get the client context from the OpenAPI context.
+ */
+export function getOpenAPIClientContext(context: OpenAPIContext): OpenAPIClientContext {
+    return {
+        icons: context.icons,
+        defaultInteractiveOpened: context.defaultInteractiveOpened,
+        blockKey: context.blockKey,
+        id: context.id,
+    };
 }

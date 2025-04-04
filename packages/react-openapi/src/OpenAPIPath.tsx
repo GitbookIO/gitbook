@@ -1,5 +1,5 @@
 import { OpenAPICopyButton } from './OpenAPICopyButton';
-import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
+import type { OpenAPIContext, OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 
 /**
@@ -7,7 +7,7 @@ import { getDefaultServerURL } from './util/server';
  */
 export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { data } = props;
     const { method, path, operation } = data;

@@ -9,7 +9,7 @@ import { StaticSection } from './StaticSection';
 import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
+import type { OpenAPIContext, OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 import { checkIsReference, createStateKey } from './utils';
 
@@ -21,7 +21,7 @@ const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-code
  */
 export function OpenAPICodeSample(props: {
     data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { data } = props;
 
@@ -58,7 +58,7 @@ export function OpenAPICodeSample(props: {
  */
 function generateCodeSamples(props: {
     data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { data, context } = props;
 
@@ -189,7 +189,7 @@ export interface MediaTypeRenderer {
 function OpenAPICodeSampleFooter(props: {
     data: OpenAPIOperationData;
     renderers: MediaTypeRenderer[];
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { data, context, renderers } = props;
     const { method, path } = data;
@@ -227,7 +227,7 @@ function OpenAPICodeSampleFooter(props: {
  */
 function getCustomCodeSamples(props: {
     data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
 }) {
     const { data, context } = props;
 
