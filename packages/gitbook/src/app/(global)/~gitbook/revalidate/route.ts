@@ -44,5 +44,4 @@ export async function POST(req: NextRequest) {
             statusText: message,
         });
     }
-
 }
