@@ -64,4 +64,5 @@ export const es: TranslationLanguage = {
     link_tooltip_page_anchor: 'Saltar a la sección',
     link_tooltip_ai_summary: 'Resumen de la página',
     link_tooltip_ai_summary_description: 'Basado en tu contexto. Puede contener errores.',
+    open_in_new_tab: 'Abrir en una nueva pestaña',
 };
