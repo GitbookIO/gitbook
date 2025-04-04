@@ -179,4 +179,15 @@ export interface GitBookDataFetcher {
         integrationName: string;
         request: api.RenderIntegrationUI;
     }): Promise<DataFetcherResponse<api.ContentKitRenderOutput>>;
+
+    /**
+     * Stream an AI response.
+     */
+    streamAIResponse(params: {
+        organizationId: string;
+        siteId: string;
+        input: api.AIMessageInput[];
+        output: api.AIOutputFormat;
+        model: api.AIModel;
+    }): AsyncGenerator<api.AIStreamResponse, void, unknown>;
 }

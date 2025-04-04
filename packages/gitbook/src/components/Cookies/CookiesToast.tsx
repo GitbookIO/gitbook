@@ -97,9 +97,8 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     onClick={() => {
                         onUpdateState(true);
                     }}
-                >
-                    {t(language, 'cookies_accept')}
-                </Button>
+                    label={tString(language, 'cookies_accept')}
+                />
                 <Button
                     variant="secondary"
                     size="small"
@@ -107,9 +106,8 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     onClick={() => {
                         onUpdateState(false);
                     }}
-                >
-                    {t(language, 'cookies_reject')}
-                </Button>
+                    label={tString(language, 'cookies_reject')}
+                />
             </div>
         </div>
     );

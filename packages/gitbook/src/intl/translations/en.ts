@@ -56,4 +56,9 @@ export const en = {
     pdf_limit_reached: "Couldn't generate the PDF for ${1} pages, generation stopped at ${2}.",
     pdf_limit_reached_continue: 'Extend with ${1} more pages.',
     more: 'More',
+    link_tooltip_external_link: 'External link to',
+    link_tooltip_page_anchor: 'Jump to section',
+    link_tooltip_ai_summary: 'Page highlight',
+    link_tooltip_ai_summary_description: 'Based on your context. May contain mistakes.',
+    open_in_new_tab: 'Open in new tab',
 };
