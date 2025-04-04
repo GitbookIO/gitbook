@@ -124,7 +124,7 @@ async function getPlaceholderAd(): Promise<{ ad: AdItem; ip: string }> {
             longlink: '',
             num_slots: '1',
             rendering: 'carbon',
-            smallImage: adRainbow,
+            smallImage: adRainbow.src,
             statimp: '',
             statlink:
                 'https://www.gitbook.com/solutions/open-source?utm_campaign=sponsored-content&utm_medium=ad&utm_source=content',
