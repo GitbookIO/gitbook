@@ -32,14 +32,15 @@ export async function POST(req: NextRequest) {
             stats: result.stats,
         });
     } catch (err: unknown) {
-            return NextResponse.json(
-                {
-                    error: 'Failed to revalidate tags',
-                    message: err instanceof Error ? err.message : 'Internal Server Error',
-                    stack: err instanceof Error ? err.stack : '',
-                },
-                { status: 500 }
-            );
+        const message = [
+            err instanceof Error ? err.message : 'Internal Server Error',
+            ...(err instanceof Error && err.stack ? [err.stack] : []),
+        ].join('\n');
+
+        return new NextResponse(null, {
+            status: 500,
+            statusText: message,
+        });
     }
 
 }
