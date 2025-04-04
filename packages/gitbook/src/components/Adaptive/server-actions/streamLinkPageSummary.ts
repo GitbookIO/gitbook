@@ -31,7 +31,7 @@ export async function* streamLinkPageSummary({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream }] = await Promise.all([
+    const [{ stream, response }] = await Promise.all([
         streamGenerateObject(
             baseContext,
             {
@@ -112,7 +112,8 @@ The content of the target page is:`,
                         role: AIMessageRole.Developer,
                         content: `# 7. Link preview
 The content of the link preview is:
-> ${linkPreview}`,
+> ${linkPreview}
+> Page ID: ${targetPageId}`,
                     },
                     {
                         role: AIMessageRole.Developer,
