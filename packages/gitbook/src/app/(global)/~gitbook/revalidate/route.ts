@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
     } catch (err) {
         return NextResponse.json({
             error: `invalid json body: ${err}`,
-        })
-    }   
+        });
+    }
 
     if (!json.tags || !Array.isArray(json.tags)) {
         return NextResponse.json(
@@ -40,9 +40,12 @@ export async function POST(req: NextRequest) {
             stats: result.stats,
         });
     } catch (err: unknown) {
-        return NextResponse.json({
-            error: `unexpected error ${err}`,
-            stack: err instanceof Error ? err.stack : null,
-        }, { status: 500 });
+        return NextResponse.json(
+            {
+                error: `unexpected error ${err}`,
+                stack: err instanceof Error ? err.stack : null,
+            },
+            { status: 500 }
+        );
     }
 }

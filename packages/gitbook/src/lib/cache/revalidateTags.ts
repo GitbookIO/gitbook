@@ -38,16 +38,19 @@ export async function revalidateTags(tags: string[]): Promise<{
         cacheBackends.map(async (backend, backendIndex) => {
             try {
                 const { entries: addedEntries } = await backend.revalidateTags(tags);
-    
+
                 addedEntries.forEach(({ key, tag }) => {
                     stats[key] = stats[key] ?? {
                         tag,
                         backends: {},
                     };
                     stats[key].backends[backend.name] = { set: true };
-    
+
                     entries.set(key, { tag, key });
-                    keysByBackend.set(backendIndex, [...(keysByBackend.get(backendIndex) ?? []), key]);
+                    keysByBackend.set(backendIndex, [
+                        ...(keysByBackend.get(backendIndex) ?? []),
+                        key,
+                    ]);
                 });
             } catch (err) {
                 throw new Error(`error revalidating tags on backend ${backend.name}: ${err}`);
