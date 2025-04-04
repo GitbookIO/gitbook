@@ -31,12 +31,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const isExternal = inline.data.ref.kind === 'url';
 
     return (
-        <InlineLinkTooltip
-            inline={inline}
-            document={document}
-            context={context}
-            ancestorInlines={ancestorInlines}
-        >
+        <InlineLinkTooltip inline={inline} context={context.contentContext} resolved={resolved}>
             <StyledLink
                 href={resolved.href}
                 insights={{

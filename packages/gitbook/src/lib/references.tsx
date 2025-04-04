@@ -1,6 +1,7 @@
 import type {
     ContentRef,
     RevisionFile,
+    RevisionPageDocument,
     RevisionReusableContent,
     SiteSpace,
     Space,
@@ -28,8 +29,6 @@ export interface ResolvedContentRef {
     subText?: string;
     /** Icon associated with it */
     icon?: React.ReactNode;
-    /** ID of the content ref */
-    id?: string;
     /** Emoji associated with the reference */
     emoji?: string;
     /** The content ref's ancestors */
@@ -40,6 +39,8 @@ export interface ResolvedContentRef {
     active: boolean;
     /** File, if the reference is a file */
     file?: RevisionFile;
+    /** Page document resolved from the content ref */
+    page?: RevisionPageDocument;
     /** Resolved reusable content, if the ref points to reusable content on a revision. */
     reusableContent?: RevisionReusableContent;
     /** Resolve OpenAPI spec filesystem. */
@@ -177,7 +178,7 @@ export async function resolveContentRef(
                 ancestors: ancestors,
                 emoji,
                 icon,
-                id: page.id,
+                page,
                 active: !anchor && page.id === activePage?.id,
             };
         }
