@@ -28,8 +28,6 @@ export interface ResolvedContentRef {
     subText?: string;
     /** Icon associated with it */
     icon?: React.ReactNode;
-    /** ID of the content ref */
-    id?: string;
     /** Emoji associated with the reference */
     emoji?: string;
     /** The content ref's ancestors */
@@ -177,7 +175,6 @@ export async function resolveContentRef(
                 ancestors: ancestors,
                 emoji,
                 icon,
-                id: page.id,
                 active: !anchor && page.id === activePage?.id,
             };
         }
