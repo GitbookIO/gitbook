@@ -42,8 +42,7 @@ export async function POST(req: NextRequest) {
     } catch (err: unknown) {
         return NextResponse.json(
             {
-                error: `unexpected error ${err}`,
-                stack: err instanceof Error ? err.stack : null,
+                error: `${err}`,
             },
             { status: 500 }
         );
