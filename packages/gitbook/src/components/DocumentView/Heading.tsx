@@ -20,7 +20,15 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
     return (
         <Tag
             id={id}
-            className={tcls(textStyle.textSize, 'heading', 'group', 'relative', 'grid', style)}
+            className={tcls(
+                textStyle.textSize,
+                'heading',
+                'group',
+                'relative',
+                'grid',
+                'scroll-m-12',
+                style
+            )}
         >
             <div
                 className={tcls(

@@ -1,9 +1,6 @@
-import type { Filesystem, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
+import type { Filesystem, OpenAPISchema, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
 import { filterSelectedOpenAPISchemas } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from '../dereference';
-import type { OpenAPISchemasData } from '../types';
-
-//!!TODO: We should return only the schemas that are used in the block. Still a WIP awaiting future work.
 
 /**
  * Resolve an OpenAPI schemas from a file and compile it to a more usable format.
@@ -14,7 +11,9 @@ export async function resolveOpenAPISchemas(
     options: {
         schemas: string[];
     }
-): Promise<OpenAPISchemasData | null> {
+): Promise<{
+    schemas: OpenAPISchema[];
+} | null> {
     const { schemas: selectedSchemas } = options;
 
     const schema = await dereferenceFilesystem(filesystem);

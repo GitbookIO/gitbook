@@ -138,9 +138,9 @@ export function OpenAPITabsPanels() {
 
     return (
         <TabPanel id={key} className="openapi-tabs-panel">
-            <div className="openapi-tabs-body">{selectedTab.body}</div>
+            <div className="openapi-panel-body">{selectedTab.body}</div>
             {selectedTab.footer ? (
-                <div className="openapi-tabs-footer">{selectedTab.footer}</div>
+                <div className="openapi-panel-footer">{selectedTab.footer}</div>
             ) : null}
         </TabPanel>
     );
