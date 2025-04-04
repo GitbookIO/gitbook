@@ -61,5 +61,6 @@ export const ja: TranslationLanguage = {
     link_tooltip_external_link: '外部リンク先',
     link_tooltip_page_anchor: 'ページ内リンク先',
     link_tooltip_ai_summary: 'ページのハイライト',
-    link_tooltip_ai_summary_description: 'あなたのコンテキストに基づいています。間違いが含まれる可能性があります。',
+    link_tooltip_ai_summary_description:
+        'あなたのコンテキストに基づいています。間違いが含まれる可能性があります。',
 };
