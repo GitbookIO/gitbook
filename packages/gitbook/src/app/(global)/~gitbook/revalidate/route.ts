@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
         json = await req.json();
     } catch (err) {
         return NextResponse.json({
-            success: false,
             error: `invalid json body: ${err}`,
         })
     }   
@@ -28,7 +27,6 @@ export async function POST(req: NextRequest) {
     if (!json.tags || !Array.isArray(json.tags)) {
         return NextResponse.json(
             {
-                success: false,
                 error: 'tags must be an array',
             },
             { status: 400 }
@@ -43,7 +41,6 @@ export async function POST(req: NextRequest) {
         });
     } catch (err: unknown) {
         return NextResponse.json({
-            success: false,
             error: `unexpected error ${err}`,
             stack: err instanceof Error ? err.stack : null,
         }, { status: 500 });

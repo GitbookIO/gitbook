@@ -256,7 +256,7 @@ function ZoomImageModal(props: {
                 )}
                 onClick={onClose}
             >
-                <Icon icon="compress-wide" className={tcls('size-5')} />
+                <Icon icon="close" className={tcls('size-5')} />
             </button>
         </div>
     );

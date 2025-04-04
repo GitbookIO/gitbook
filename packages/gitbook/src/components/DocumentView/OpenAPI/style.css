@@ -494,7 +494,7 @@
 }
 
 .openapi-panel-body {
-    @apply theme-gradient:bg-tint-12/1 relative;
+    @apply relative;
     @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
 }
 
