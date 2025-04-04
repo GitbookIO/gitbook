@@ -25,10 +25,23 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const result = await revalidateTags(json.tags);
+    try {
+        const result = await revalidateTags(json.tags);
+        return NextResponse.json({
+            success: true,
+            stats: result.stats,
+        });
+    } catch (err: unknown) {
+        const message = [
+            err instanceof Error ? err.name : 'Internal Server Error',
+            ...(err instanceof Error && err.message ? [err.message] : []),
+            ...(err instanceof Error && err.cause ? [err.cause] : []),
+            ...(err instanceof Error && err.stack ? [err.stack] : []),
+        ].join('\n');
 
-    return NextResponse.json({
-        success: true,
-        stats: result.stats,
-    });
+        return new NextResponse(null, {
+            status: 500,
+            statusText: message,
+        });
+    }
 }
