@@ -53,6 +53,8 @@ runs:
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Build worker
           run: bun run turbo build:v2:cloudflare
+          env:
+            GITBOOK_RUNTIME: cloudflare
           shell: bash
         - id: deploy
           name: Deploy to Cloudflare
@@ -63,7 +65,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
-              command: ${{ fromJSON(inputs.deploy) == true && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+              command: ${{ fromJSON(inputs.deploy) == true && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.jsonc
         - name: Outputs
           shell: bash
           env:
