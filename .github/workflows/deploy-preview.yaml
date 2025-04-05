@@ -90,7 +90,7 @@ jobs:
               uses: ./.github/composite/deploy-cloudflare
               with:
                   environment: preview
-                  deploy: true
+                  deploy: ${{ github.ref == 'refs/heads/main' }}
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   opItem: op://gitbook-open/2c-preview
