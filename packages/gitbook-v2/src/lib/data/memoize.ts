@@ -10,6 +10,10 @@ import pMemoize, { type CacheStorage } from 'p-memoize';
  * Hopefully one day this can be done directly by 'use cache'.
  */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
+    if (process.env.NODE_ENV === 'production') {
+        return f;
+    }
+
     const getFunctionCache = async () => {
         const functionsCache = await getRequestCacheWeakMap();
         const cache = functionsCache.get(f);
