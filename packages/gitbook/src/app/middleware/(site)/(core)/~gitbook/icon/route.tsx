@@ -13,10 +13,7 @@ export async function GET(req: NextRequest) {
 
         // biome-ignore lint/suspicious/noConsole: we want to log here
         console.log(`serving icon for ${context.site.id}`);
-        const response = await serveIcon(context, req);
-        // biome-ignore lint/suspicious/noConsole: we want to log here
-        console.log(`served icon for ${context.site.id}`);
-        return response;
+        return await serveIcon(context, req);
     } catch (err) {
         // biome-ignore lint/suspicious/noConsole: we want to log here
         console.log(`serveIcon error: ${err}`, (err as Error).stack);
