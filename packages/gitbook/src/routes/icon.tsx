@@ -58,7 +58,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
     const dst = new ArrayBuffer(fontOrigin.byteLength);
     new Uint8Array(dst).set(new Uint8Array(fontOrigin));
 
-    if (('detached' in dst && dst.detached) || dst.byteLength === 0) {
+    if (dst.detached) {
         console.log('about to use detached font buffer..');
     }
 
