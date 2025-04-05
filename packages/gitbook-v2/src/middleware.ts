@@ -36,6 +36,7 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {
+        console.log(`middleware: ${request.url}`);
         const requestURL = new URL(request.url);
 
         // Redirect to normalize the URL
