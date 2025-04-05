@@ -26,12 +26,7 @@ export const cloudflareDOCache: CacheBackend = {
                     return null;
                 }
 
-                try {
-                    return (await stub.get<CacheEntry>(key)) ?? null;
-                } catch (err) {
-                    console.error('cloudflareDO.get', err);
-                    return null;
-                }
+                return (await stub.get<CacheEntry>(key)) ?? null;
             }
         );
     },
