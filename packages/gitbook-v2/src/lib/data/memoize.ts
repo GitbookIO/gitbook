@@ -1,40 +1,23 @@
-import QuickLRU from 'quick-lru';
-
 /**
- * Wrap cache calls to avoid duplicated executions of the same function during concurrent calls.
- * The implementation is based on `p-memoize` but is adapted to work per-request in Cloudflare Workers.
+ * Wrap a function by preventing concurrent executions of the same function.
+ * With a logic to work per-request in Cloudflare Workers.
  */
-export function memoize<ArgsType extends any[], ReturnType>(
+export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
     getGlobalContext: () => object | null | undefined,
-    wrapped: (cacheKey: string, ...args: ArgsType) => Promise<ReturnType>
-): (...args: ArgsType) => Promise<ReturnType> {
-    const globalCache = new WeakMap<object, QuickLRU<string, ReturnType>>();
+    wrapped: (...args: ArgsType) => Promise<ReturnType>
+): (cacheKey: string, ...args: ArgsType) => Promise<ReturnType> {
     const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
 
-    return (...args: ArgsType) => {
+    return (key: string, ...args: ArgsType) => {
         const globalContext = getGlobalContext() ?? globalThis;
 
         /**
          * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
          * to avoid "Cannot perform I/O on behalf of a different request" errors.
          */
-        const cache =
-            globalCache.get(globalContext) ??
-            new QuickLRU<string, ReturnType>({
-                maxSize: 1000,
-            });
-        globalCache.set(globalContext, cache);
-
         const promiseCache =
             globalPromiseCache.get(globalContext) ?? new Map<string, Promise<ReturnType>>();
         globalPromiseCache.set(globalContext, promiseCache);
-
-        const key = getCacheKey(args);
-
-        if (cache.has(key)) {
-            const result = cache.get(key);
-            return Promise.resolve(result as ReturnType);
-        }
 
         const concurrent = promiseCache.get(key);
         if (concurrent) {
@@ -43,9 +26,7 @@ export function memoize<ArgsType extends any[], ReturnType>(
 
         const promise = (async () => {
             try {
-                const result = await wrapped(key, ...args);
-                cache.set(key, result);
-
+                const result = await wrapped(...args);
                 return result;
             } finally {
                 promiseCache.delete(key);
@@ -58,7 +39,22 @@ export function memoize<ArgsType extends any[], ReturnType>(
     };
 }
 
-export function getCacheKey(args: any[]) {
+/**
+ * Wrap a function by passing it a cache key that is computed from the function arguments.
+ */
+export function withCacheKey<ArgsType extends any[], ReturnType>(
+    wrapped: (cacheKey: string, ...args: ArgsType) => Promise<ReturnType>
+): (...args: ArgsType) => Promise<ReturnType> {
+    return (...args: ArgsType) => {
+        const cacheKey = getCacheKey(args);
+        return wrapped(cacheKey, ...args);
+    };
+}
+
+/**
+ * Compute a cache key from the function arguments.
+ */
+function getCacheKey(args: any[]) {
     return JSON.stringify(deepSortValue(args));
 }
 
