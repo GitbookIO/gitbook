@@ -81,7 +81,7 @@ export function createLinker(
             return servedOn.host.startsWith('localhost') ? 'http:' : 'https:';
         }
 
-        return 'https:'
+        return 'https:';
     })();
 
     const linker: GitBookLinker = {
