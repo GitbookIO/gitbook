@@ -35,7 +35,7 @@ export function memoize<F extends (...args: any[]) => any>(f: F): F {
             },
             get: async (key) => {
                 const cache = await getFunctionCache();
-                return cache.get(key);
+                return cache.get(key) as Awaited<ReturnType<F>> | undefined;
             },
             set: async (key, value) => {
                 const cache = await getFunctionCache();
