@@ -1,9 +1,8 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-import pMemoize, { type CacheStorage } from 'p-memoize';
-// import { getCloudflareContext } from './cloudflare';
+import pMemoize from 'p-memoize';
 
-// const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
+const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
 
 /**
  * We wrap 'use cache' calls in a p-memoize function to avoid
@@ -12,94 +11,28 @@ import pMemoize, { type CacheStorage } from 'p-memoize';
  * Hopefully one day this can be done directly by 'use cache'.
  */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
-    // const globalContext = getCloudflareContext()?.cf ?? globalThis;
+    const globalContext = getCloudflareContext()?.cf ?? globalThis;
 
-    // const requestCache = requestWeakCache.get(globalContext);
-    // if (requestCache) {
-    //     const cache = requestCache.get(f);
-    //     if (cache) {
-    //         return cache as F;
-    //     }
-    // }
-
-    if (process.env.NODE_ENV === 'production') {
-        return f;
+    /**
+     * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
+     * to avoid "Cannot perform I/O on behalf of a different request" errors.
+     */
+    const requestCache = requestWeakCache.get(globalContext) ?? new WeakMap<any, any>();
+    const cached = requestCache.get(f);
+    if (cached) {
+        return cached as F;
     }
 
-    const getFunctionCache = async () => {
-        const functionsCache = await getRequestCacheWeakMap();
-        const cache = functionsCache.get(f);
-        if (cache) {
-            return cache;
-        }
-
-        const newCache = new Map<string, unknown>();
-        functionsCache.set(f, newCache);
-        return newCache;
-    };
-
-    return pMemoize(f, {
+    const memoized = pMemoize(f, {
         cacheKey: (args) => {
             return JSON.stringify(deepSortValue(args));
         },
-        /**
-         * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
-         * to avoid "Cannot perform I/O on behalf of a different request" errors.
-         */
-        cache: {
-            has: async (key) => {
-                const cache = await getFunctionCache();
-                return cache.has(key);
-            },
-            get: async (key) => {
-                const cache = await getFunctionCache();
-                return cache.get(key) as Awaited<ReturnType<F>> | undefined;
-            },
-            set: async (key, value) => {
-                const cache = await getFunctionCache();
-                cache.set(key, value);
-            },
-            delete: async (key) => {
-                const cache = await getFunctionCache();
-                cache.delete(key);
-            },
-            clear: async () => {
-                const cache = await getFunctionCache();
-                cache.clear?.();
-            },
-        },
     });
-}
 
-const globalCache = new WeakMap<any, CacheStorage<string, unknown>>();
-const perRequestCache = new WeakMap<object, WeakMap<any, CacheStorage<string, unknown>>>();
+    requestCache.set(f, memoized);
+    requestWeakCache.set(globalContext, requestCache);
 
-/**
- * Get a global weakmap that is scoped to the current request when executed in Cloudflare Workers,
- * to avoid "Cannot perform I/O on behalf of a different request" errors.
- * And global when executed in Node.js.
- */
-async function getRequestCacheWeakMap(): Promise<WeakMap<any, CacheStorage<string, unknown>>> {
-    try {
-        const cloudflareContext = getCloudflareContext();
-        if (cloudflareContext?.cf) {
-            // `cf` changes for each request, we can use it as an identifier of the request to isolate the cache per request
-            const requestCache = perRequestCache.get(cloudflareContext.cf);
-            if (requestCache) {
-                return requestCache;
-            }
-
-            const newRequestCache = new WeakMap<any, CacheStorage<string, unknown>>();
-            perRequestCache.set(cloudflareContext.cf, newRequestCache);
-            return newRequestCache;
-        }
-    } catch (error) {
-        if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
-            throw error;
-        }
-    }
-
-    return globalCache;
+    return memoized;
 }
 
 export function getCacheKey(args: any[]) {
