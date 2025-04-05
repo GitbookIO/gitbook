@@ -1,5 +1,5 @@
+import { ImageResponse } from '@vercel/og';
 import { notFound, redirect } from 'next/navigation';
-import { ImageResponse } from 'next/og';
 
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
@@ -27,13 +27,11 @@ const SIZES = {
  * Generate an icon for a site content.
  */
 export async function serveIcon(context: GitBookSiteContext, req: Request) {
-    console.log('icon: serveIcon', req.url);
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
     const { site, customization } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
-
     // If the site has a custom icon, redirect to it
     if (customIcon) {
         const iconUrl = options.theme === 'light' ? customIcon.light : customIcon.dark;
@@ -46,7 +44,6 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
     }
 
     const contentTitle = site.title;
-
     return new ImageResponse(
         <div
             tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
