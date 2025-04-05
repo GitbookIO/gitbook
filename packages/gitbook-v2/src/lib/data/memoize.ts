@@ -10,28 +10,33 @@ const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
  * Hopefully one day this can be done directly by 'use cache'.
  */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
-    const globalContext = getCloudflareContext()?.cf ?? globalThis;
+    // @ts-ignore
+    const globalMemoized: F = (...args) => {
+        const globalContext = getCloudflareContext()?.cf ?? globalThis;
 
-    /**
-     * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
-     * to avoid "Cannot perform I/O on behalf of a different request" errors.
-     */
-    const requestCache = requestWeakCache.get(globalContext) ?? new WeakMap<any, any>();
-    const cached = requestCache.get(f);
-    if (cached) {
-        return cached as F;
-    }
+        /**
+         * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
+         * to avoid "Cannot perform I/O on behalf of a different request" errors.
+         */
+        const requestCache = requestWeakCache.get(globalContext) ?? new WeakMap<any, any>();
+        const cached = requestCache.get(f) as F | undefined;
+        if (cached) {
+            return cached(...args);
+        }
 
-    const memoized = pMemoize(f, {
-        cacheKey: (args) => {
-            return JSON.stringify(deepSortValue(args));
-        },
-    });
+        const memoized = pMemoize(f, {
+            cacheKey: (args) => {
+                return JSON.stringify(deepSortValue(args));
+            },
+        });
 
-    requestCache.set(f, memoized);
-    requestWeakCache.set(globalContext, requestCache);
+        requestCache.set(f, memoized);
+        requestWeakCache.set(globalContext, requestCache);
 
-    return memoized;
+        return memoized(...args);
+    };
+
+    return globalMemoized;
 }
 
 export function getCacheKey(args: any[]) {
