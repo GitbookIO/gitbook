@@ -675,7 +675,7 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
 
     const cloudflareContext = await getCloudflareContext();
     if (cloudflareContext) {
-        serviceBinding = cloudflareContext.env.GITBOOK_API;
+        serviceBinding = cloudflareContext.env.GITBOOK_API as GitBookAPIServiceBinding | undefined;
         if (!loggedServiceBinding) {
             loggedServiceBinding = true;
             if (serviceBinding) {
