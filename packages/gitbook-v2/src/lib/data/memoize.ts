@@ -81,16 +81,13 @@ const perRequestCache = new WeakMap<object, WeakMap<any, CacheStorage<string, un
  */
 async function getRequestCacheWeakMap(): Promise<WeakMap<any, CacheStorage<string, unknown>>> {
     try {
-        const cloudflareContext = await getCloudflareContext();
+        const cloudflareContext = getCloudflareContext();
         if (cloudflareContext?.cf) {
             // `cf` changes for each request, we can use it as an identifier of the request to isolate the cache per request
             const requestCache = perRequestCache.get(cloudflareContext.cf);
             if (requestCache) {
-                console.log('Reusing per-request cache', cloudflareContext.cf);
                 return requestCache;
             }
-
-            console.log('Allocating per-request cache', cloudflareContext.cf);
 
             const newRequestCache = new WeakMap<any, CacheStorage<string, unknown>>();
             perRequestCache.set(cloudflareContext.cf, newRequestCache);
@@ -100,11 +97,13 @@ async function getRequestCacheWeakMap(): Promise<WeakMap<any, CacheStorage<strin
         if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
             throw error;
         }
-
-        console.warn('Failed to get cloudflare context, using global cache', error);
     }
 
     return globalCache;
+}
+
+export function getCacheKey(args: any[]) {
+    return JSON.stringify(deepSortValue(args));
 }
 
 function deepSortValue(value: unknown): unknown {

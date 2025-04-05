@@ -10,7 +10,7 @@ import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/
 import { unstable_cache } from 'next/cache';
 import { getCloudflareContext } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
-import { memoize } from './memoize';
+import { getCacheKey, memoize } from './memoize';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -201,9 +201,10 @@ const getUserById = memoize(async function getUserById(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.userId],
         {
             revalidate: 60 * 60 * 24,
+            tags: [],
         }
     );
 
@@ -240,14 +241,15 @@ const getSpace = memoize(async function getSpace(
                 });
             });
         },
-        [
-            getCacheTag({
-                tag: 'space',
-                space: params.spaceId,
-            }),
-        ],
+        [input.apiToken ?? '', params.spaceId, params.shareKey ?? ''],
         {
             revalidate: 60 * 60 * 24,
+            tags: [
+                getCacheTag({
+                    tag: 'space',
+                    space: params.spaceId,
+                }),
+            ],
         }
     );
 
@@ -293,15 +295,16 @@ const getChangeRequest = memoize(async function getChangeRequest(
                 });
             });
         },
-        [
-            getCacheTag({
-                tag: 'change-request',
-                space: params.spaceId,
-                changeRequest: params.changeRequestId,
-            }),
-        ],
+        [input.apiToken ?? '', params.spaceId, params.changeRequestId ?? ''],
         {
             revalidate: 60 * 5,
+            tags: [
+                getCacheTag({
+                    tag: 'change-request',
+                    space: params.spaceId,
+                    changeRequest: params.changeRequestId,
+                }),
+            ],
         }
     );
 
@@ -353,9 +356,10 @@ const getRevision = memoize(async function getRevision(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.revisionId],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -399,9 +403,10 @@ const getRevisionPages = memoize(async function getRevisionPages(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.revisionId],
         {
             revalidate: 60 * 60 * 24,
+            tags: [],
         }
     );
 
@@ -448,9 +453,10 @@ const getRevisionFile = memoize(async function getRevisionFile(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.revisionId, params.fileId],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -500,9 +506,10 @@ const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.revisionId, params.pageId],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -555,9 +562,10 @@ const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.revisionId, params.path],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -603,9 +611,10 @@ const getDocument = memoize(async function getDocument(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.documentId],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -645,15 +654,22 @@ const getComputedDocument = memoize(async function getComputedDocument(
                 });
             });
         },
-        getComputedContentSourceCacheTags(
-            {
-                spaceId: params.spaceId,
-                organizationId: params.organizationId,
-            },
-            params.source
-        ),
+        [
+            input.apiToken ?? '',
+            params.spaceId,
+            params.organizationId,
+            getCacheKey([params.source]),
+            params.seed,
+        ],
         {
             revalidate: 60 * 60 * 24,
+            tags: getComputedContentSourceCacheTags(
+                {
+                    spaceId: params.spaceId,
+                    organizationId: params.organizationId,
+                },
+                params.source
+            ),
         }
     );
 
@@ -706,9 +722,10 @@ const getReusableContent = memoize(async function getReusableContent(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.revisionId, params.reusableContentId],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -749,15 +766,16 @@ const getLatestOpenAPISpecVersionContent = memoize(
                     });
                 });
             },
-            [
-                getCacheTag({
-                    tag: 'openapi',
-                    organization: params.organizationId,
-                    openAPISpec: params.slug,
-                }),
-            ],
+            [input.apiToken ?? '', params.organizationId, params.slug],
             {
                 revalidate: 60 * 60 * 24,
+                tags: [
+                    getCacheTag({
+                        tag: 'openapi',
+                        organization: params.organizationId,
+                        openAPISpec: params.slug,
+                    }),
+                ],
             }
         );
 
@@ -810,14 +828,15 @@ const getPublishedContentSite = memoize(async function getPublishedContentSite(
                 });
             });
         },
-        [
-            getCacheTag({
-                tag: 'site',
-                site: params.siteId,
-            }),
-        ],
+        [input.apiToken ?? '', params.organizationId, params.siteId, params.siteShareKey ?? ''],
         {
             revalidate: 60 * 60 * 24,
+            tags: [
+                getCacheTag({
+                    tag: 'site',
+                    site: params.siteId,
+                }),
+            ],
         }
     );
 
@@ -875,13 +894,20 @@ const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
             });
         },
         [
-            getCacheTag({
-                tag: 'site',
-                site: params.siteId,
-            }),
+            input.apiToken ?? '',
+            params.organizationId,
+            params.siteId,
+            params.siteShareKey ?? '',
+            params.source,
         ],
         {
             revalidate: 60 * 60 * 24,
+            tags: [
+                getCacheTag({
+                    tag: 'site',
+                    site: params.siteId,
+                }),
+            ],
         }
     );
 
@@ -926,9 +952,10 @@ const getEmbedByUrl = memoize(async function getEmbedByUrl(
                 });
             });
         },
-        [],
+        [input.apiToken ?? '', params.spaceId, params.url],
         {
             revalidate: 60 * 60 * 24 * 7,
+            tags: [],
         }
     );
 
@@ -964,9 +991,16 @@ const searchSiteContent = memoize(async function searchSiteContent(
                 });
             });
         },
-        [],
+        [
+            input.apiToken ?? '',
+            params.organizationId,
+            params.siteId,
+            params.query,
+            getCacheKey([params.scope]),
+        ],
         {
             revalidate: 60 * 60 * 24,
+            tags: [],
         }
     );
 
@@ -1009,14 +1043,15 @@ const renderIntegrationUi = memoize(async function renderIntegrationUi(
                 });
             });
         },
-        [
-            getCacheTag({
-                tag: 'integration',
-                integration: params.integrationName,
-            }),
-        ],
+        [input.apiToken ?? '', params.integrationName],
         {
             revalidate: 60 * 60 * 24,
+            tags: [
+                getCacheTag({
+                    tag: 'integration',
+                    integration: params.integrationName,
+                }),
+            ],
         }
     );
 

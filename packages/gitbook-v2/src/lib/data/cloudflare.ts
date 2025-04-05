@@ -20,6 +20,10 @@ export function getCloudflareContext(): {
      */
     ctx: Record<string, unknown>;
 } | null {
+    if (process.env.NODE_ENV === 'development') {
+        return null;
+    }
+
     try {
         // @ts-ignore
         return getCloudflareContextOpenNext();
