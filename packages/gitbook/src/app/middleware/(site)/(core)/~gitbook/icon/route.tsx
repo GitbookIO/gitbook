@@ -7,21 +7,8 @@ import { serveIcon } from '@/routes/icon';
 export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
-    try {
-        console.log('icon: getSiteContentPointer');
-        const pointer = await getSiteContentPointer();
-        console.log('icon: fetchV1context');
-        const context = await fetchV1ContextForSitePointer(pointer);
+    const pointer = await getSiteContentPointer();
+    const context = await fetchV1ContextForSitePointer(pointer);
 
-        // biome-ignore lint/suspicious/noConsole: we want to log here
-        console.log(`serving icon for ${context.site.id}`);
-
-        return await serveIcon(context, req);
-    } catch (err) {
-        if (err instanceof Error) {
-            console.error(`icon: ${err.toString()}`, err.stack);
-        }
-
-        throw err;
-    }
+    return serveIcon(context, req);
 }
