@@ -1,6 +1,5 @@
-import { getCloudflareContext } from '@opennextjs/cloudflare';
-
 import pMemoize from 'p-memoize';
+import { getCloudflareContext } from './cloudflare';
 
 const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
 
