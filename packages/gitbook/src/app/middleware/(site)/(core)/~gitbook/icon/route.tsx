@@ -7,13 +7,13 @@ import { serveIcon } from '@/routes/icon';
 export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
-    console.log('~gitbook/icon route');
+    console.log('icon: getSiteContentPointer');
     const pointer = await getSiteContentPointer();
-    console.log('pointer', pointer);
+    console.log('icon: fetchV1context');
     const context = await fetchV1ContextForSitePointer(pointer);
 
     // biome-ignore lint/suspicious/noConsole: we want to log here
     console.log(`serving icon for ${context.site.id}`);
 
-    return serveIcon(context, req);
+    return await serveIcon(context, req);
 }

@@ -27,7 +27,7 @@ const SIZES = {
  * Generate an icon for a site content.
  */
 export async function serveIcon(context: GitBookSiteContext, req: Request) {
-    console.log('serveIcon');
+    console.log('icon: serveIcon', req.url);
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
