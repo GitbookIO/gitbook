@@ -1,3 +1,5 @@
+import { getCloudflareContext as getCloudflareContextOpenNext } from '@opennextjs/cloudflare';
+
 /**
  * Load the cloudflare context.
  * This is a workaround to avoid webpack trying to bundle this cloudflare only module.
@@ -19,12 +21,8 @@ export async function getCloudflareContext(): Promise<{
     ctx: Record<string, unknown>;
 } | null> {
     try {
-        // HACK: This is a workaround to avoid webpack trying to bundle this cloudflare only module
         // @ts-ignore
-        const cloudflareContext = await import(
-            /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
-        );
-        return cloudflareContext;
+        return await getCloudflareContextOpenNext();
     } catch (error) {
         if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
             throw error;
@@ -32,4 +30,17 @@ export async function getCloudflareContext(): Promise<{
     }
 
     return null;
+    // try {
+    //     // HACK: This is a workaround to avoid webpack trying to bundle this cloudflare only module
+    //     // @ts-ignore
+    //     const cloudflareContext = await import(
+    //         /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
+    //     );
+    //     return cloudflareContext;
+    // } catch (error) {
+    //     if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+    //         throw error;
+    //     }
+    // }
+    // return null;
 }
