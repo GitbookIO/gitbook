@@ -21,9 +21,11 @@ export function memoize<F extends (...args: any[]) => any>(f: F): F {
         const requestCache = requestWeakCache.get(globalContext) ?? new WeakMap<any, any>();
         const cached = requestCache.get(f) as F | undefined;
         if (cached) {
+            console.log('reuse memoized function', f.name);
             return cached(...args);
         }
 
+        console.log('create memoized function', f.name);
         const memoized = pMemoize(f, {
             cacheKey: (args) => {
                 return JSON.stringify(deepSortValue(args));
