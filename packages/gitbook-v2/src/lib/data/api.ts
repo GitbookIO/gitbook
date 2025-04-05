@@ -7,7 +7,7 @@ import {
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
-import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { unstable_cache } from 'next/cache';
 import { getCloudflareContext } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import { memoize } from './memoize';
@@ -191,17 +191,34 @@ const getUserById = memoize(async function getUserById(
     input: DataFetcherInput,
     params: { userId: string }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getUserById.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.users.getUserById(params.userId);
+                    return res.data;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-    return trace('getUserById.uncached', () => {
-        cacheLife('days');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.users.getUserById(params.userId);
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('getUserById.uncached', () => {
+    //     cacheLife('days');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.users.getUserById(params.userId);
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getSpace = memoize(async function getSpace(
@@ -211,25 +228,49 @@ const getSpace = memoize(async function getSpace(
         shareKey: string | undefined;
     }
 ) {
-    'use cache';
-
-    return trace('getSpace.uncached', () => {
-        cacheLife('days');
-        cacheTag(
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getSpace.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getSpaceById(params.spaceId, {
+                        shareKey: params.shareKey,
+                    });
+                    return res.data;
+                });
+            });
+        },
+        [
             getCacheTag({
                 tag: 'space',
                 space: params.spaceId,
-            })
-        );
+            }),
+        ],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getSpaceById(params.spaceId, {
-                shareKey: params.shareKey,
-            });
-            return res.data;
-        });
-    });
+    return uncached();
+
+    // 'use cache';
+    // return trace('getSpace.uncached', () => {
+    //     cacheLife('days');
+    //     cacheTag(
+    //         getCacheTag({
+    //             tag: 'space',
+    //             space: params.spaceId,
+    //         })
+    //     );
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getSpaceById(params.spaceId, {
+    //             shareKey: params.shareKey,
+    //         });
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getChangeRequest = memoize(async function getChangeRequest(
@@ -239,27 +280,53 @@ const getChangeRequest = memoize(async function getChangeRequest(
         changeRequestId: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getChangeRequest.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getChangeRequestById(
+                        params.spaceId,
+                        params.changeRequestId
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [
+            getCacheTag({
+                tag: 'change-request',
+                space: params.spaceId,
+                changeRequest: params.changeRequestId,
+            }),
+        ],
+        {
+            revalidate: 60 * 5,
+        }
+    );
 
-    return trace('getChangeRequest.uncached', () => {
-        cacheLife('minutes');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getChangeRequestById(
-                params.spaceId,
-                params.changeRequestId
-            );
-            cacheTag(
-                getCacheTag({
-                    tag: 'change-request',
-                    space: params.spaceId,
-                    changeRequest: res.data.id,
-                })
-            );
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('getChangeRequest.uncached', () => {
+    //     cacheLife('minutes');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getChangeRequestById(
+    //             params.spaceId,
+    //             params.changeRequestId
+    //         );
+    //         cacheTag(
+    //             getCacheTag({
+    //                 tag: 'change-request',
+    //                 space: params.spaceId,
+    //                 changeRequest: res.data.id,
+    //             })
+    //         );
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getRevision = memoize(async function getRevision(
@@ -270,19 +337,42 @@ const getRevision = memoize(async function getRevision(
         metadata: boolean;
     }
 ) {
-    'use cache';
-
-    return trace('getRevision.uncached', () => {
-        cacheLife('max');
-
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
-                metadata: params.metadata,
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getRevision.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            metadata: params.metadata,
+                        }
+                    );
+                    return res.data;
+                });
             });
-            return res.data;
-        });
-    });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
+
+    return uncached();
+
+    // 'use cache';
+    // return trace('getRevision.uncached', () => {
+    //     cacheLife('max');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
+    //             metadata: params.metadata,
+    //         });
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getRevisionPages = memoize(async function getRevisionPages(
@@ -293,23 +383,46 @@ const getRevisionPages = memoize(async function getRevisionPages(
         metadata: boolean;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getRevisionPages.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.listPagesInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            metadata: params.metadata,
+                        }
+                    );
+                    return res.data.pages;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-    return trace('getRevisionPages.uncached', () => {
-        cacheLife('max');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.listPagesInRevisionById(
-                params.spaceId,
-                params.revisionId,
-                {
-                    metadata: params.metadata,
-                }
-            );
-            return res.data.pages;
-        });
-    });
+    // 'use cache';
+    // return trace('getRevisionPages.uncached', () => {
+    //     cacheLife('max');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.listPagesInRevisionById(
+    //             params.spaceId,
+    //             params.revisionId,
+    //             {
+    //                 metadata: params.metadata,
+    //             }
+    //         );
+    //         return res.data.pages;
+    //     });
+    // });
 });
 
 const getRevisionFile = memoize(async function getRevisionFile(
@@ -320,22 +433,43 @@ const getRevisionFile = memoize(async function getRevisionFile(
         fileId: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getRevisionFile.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getFileInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.fileId,
+                        {}
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
 
-    return trace('getRevisionFile.uncached', () => {
-        cacheLife('max');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getFileInRevisionById(
-                params.spaceId,
-                params.revisionId,
-                params.fileId,
-                {}
-            );
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('getRevisionFile.uncached', () => {
+    //     cacheLife('max');
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getFileInRevisionById(
+    //             params.spaceId,
+    //             params.revisionId,
+    //             params.fileId,
+    //             {}
+    //         );
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
@@ -346,29 +480,56 @@ const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
         pageId: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getRevisionPageMarkdown.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getPageInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.pageId,
+                        {
+                            format: 'markdown',
+                        }
+                    );
+                    if (!('markdown' in res.data)) {
+                        throw new DataFetcherError('Page is not a document', 404);
+                    }
+                    return res.data.markdown;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
 
-    return trace('getRevisionPageMarkdown.uncached', () => {
-        cacheLife('max');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getPageInRevisionById(
-                params.spaceId,
-                params.revisionId,
-                params.pageId,
-                {
-                    format: 'markdown',
-                }
-            );
+    // 'use cache';
+    // return trace('getRevisionPageMarkdown.uncached', () => {
+    //     cacheLife('max');
 
-            if (!('markdown' in res.data)) {
-                throw new DataFetcherError('Page is not a document', 404);
-            }
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getPageInRevisionById(
+    //             params.spaceId,
+    //             params.revisionId,
+    //             params.pageId,
+    //             {
+    //                 format: 'markdown',
+    //             }
+    //         );
 
-            return res.data.markdown;
-        });
-    });
+    //         if (!('markdown' in res.data)) {
+    //             throw new DataFetcherError('Page is not a document', 404);
+    //         }
+
+    //         return res.data.markdown;
+    //     });
+    // });
 });
 
 const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
@@ -379,24 +540,46 @@ const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
         path: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getRevisionPageByPath.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getPageInRevisionByPath(
+                        params.spaceId,
+                        params.revisionId,
+                        params.path,
+                        {}
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
 
-    return trace('getRevisionPageByPath.uncached', () => {
-        cacheLife('max');
+    return uncached();
 
-        const encodedPath = encodeURIComponent(params.path);
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getPageInRevisionByPath(
-                params.spaceId,
-                params.revisionId,
-                encodedPath,
-                {}
-            );
+    // 'use cache';
+    // return trace('getRevisionPageByPath.uncached', () => {
+    //     cacheLife('max');
 
-            return res.data;
-        });
-    });
+    //     const encodedPath = encodeURIComponent(params.path);
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getPageInRevisionByPath(
+    //             params.spaceId,
+    //             params.revisionId,
+    //             encodedPath,
+    //             {}
+    //         );
+
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getDocument = memoize(async function getDocument(
@@ -406,17 +589,38 @@ const getDocument = memoize(async function getDocument(
         documentId: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getDocument.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getDocumentById(
+                        params.spaceId,
+                        params.documentId,
+                        {}
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
 
-    return trace('getDocument.uncached', () => {
-        cacheLife('max');
+    return uncached();
+    //
+    // 'use cache';
+    // return trace('getDocument.uncached', () => {
+    //     cacheLife('max');
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
-            return res.data;
-        });
-    });
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getComputedDocument = memoize(async function getComputedDocument(
@@ -428,30 +632,56 @@ const getComputedDocument = memoize(async function getComputedDocument(
         seed: string;
     }
 ) {
-    'use cache';
-
-    return trace('getComputedDocument.uncached', () => {
-        cacheLife('days');
-
-        cacheTag(
-            ...getComputedContentSourceCacheTags(
-                {
-                    spaceId: params.spaceId,
-                    organizationId: params.organizationId,
-                },
-                params.source
-            )
-        );
-
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getComputedDocument(params.spaceId, {
-                source: params.source,
-                seed: params.seed,
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getComputedDocument.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getComputedDocument(params.spaceId, {
+                        source: params.source,
+                        seed: params.seed,
+                    });
+                    return res.data;
+                });
             });
-            return res.data;
-        });
-    });
+        },
+        getComputedContentSourceCacheTags(
+            {
+                spaceId: params.spaceId,
+                organizationId: params.organizationId,
+            },
+            params.source
+        ),
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
+
+    return uncached();
+
+    // 'use cache';
+    // return trace('getComputedDocument.uncached', () => {
+    //     cacheLife('days');
+
+    //     cacheTag(
+    //         ...getComputedContentSourceCacheTags(
+    //             {
+    //                 spaceId: params.spaceId,
+    //                 organizationId: params.organizationId,
+    //             },
+    //             params.source
+    //         )
+    //     );
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getComputedDocument(params.spaceId, {
+    //             source: params.source,
+    //             seed: params.seed,
+    //         });
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getReusableContent = memoize(async function getReusableContent(
@@ -462,21 +692,40 @@ const getReusableContent = memoize(async function getReusableContent(
         reusableContentId: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getReusableContent.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getReusableContentInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.reusableContentId
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
 
-    return trace('getReusableContent.uncached', () => {
-        cacheLife('max');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getReusableContentInRevisionById(
-                params.spaceId,
-                params.revisionId,
-                params.reusableContentId
-            );
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('getReusableContent.uncached', () => {
+    //     cacheLife('max');
+    //     return wrapDataFetcherError(async () => {
+    //         const res = await api.spaces.getReusableContentInRevisionById(
+    //             params.spaceId,
+    //             params.revisionId,
+    //             params.reusableContentId
+    //         );
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getLatestOpenAPISpecVersionContent = memoize(
@@ -487,27 +736,53 @@ const getLatestOpenAPISpecVersionContent = memoize(
             slug: string;
         }
     ) {
-        'use cache';
-
-        return trace('getLatestOpenAPISpecVersionContent.uncached', () => {
-            cacheTag(
+        const uncached = unstable_cache(
+            async () => {
+                return trace('getLatestOpenAPISpecVersionContent.uncached', async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = await apiClient(input);
+                        const res = await api.orgs.getLatestOpenApiSpecVersionContent(
+                            params.organizationId,
+                            params.slug
+                        );
+                        return res.data;
+                    });
+                });
+            },
+            [
                 getCacheTag({
                     tag: 'openapi',
                     organization: params.organizationId,
                     openAPISpec: params.slug,
-                })
-            );
-            cacheLife('days');
+                }),
+            ],
+            {
+                revalidate: 60 * 60 * 24,
+            }
+        );
 
-            return wrapDataFetcherError(async () => {
-                const api = await apiClient(input);
-                const res = await api.orgs.getLatestOpenApiSpecVersionContent(
-                    params.organizationId,
-                    params.slug
-                );
-                return res.data;
-            });
-        });
+        return uncached();
+
+        // 'use cache';
+        // return trace('getLatestOpenAPISpecVersionContent.uncached', () => {
+        //     cacheTag(
+        //         getCacheTag({
+        //             tag: 'openapi',
+        //             organization: params.organizationId,
+        //             openAPISpec: params.slug,
+        //         })
+        //     );
+        //     cacheLife('days');
+
+        //     return wrapDataFetcherError(async () => {
+        //         const api = await apiClient(input);
+        //         const res = await api.orgs.getLatestOpenApiSpecVersionContent(
+        //             params.organizationId,
+        //             params.slug
+        //         );
+        //         return res.data;
+        //     });
+        // });
     }
 );
 
@@ -519,31 +794,58 @@ const getPublishedContentSite = memoize(async function getPublishedContentSite(
         siteShareKey: string | undefined;
     }
 ) {
-    'use cache';
-
-    return trace('getPublishedContentSite.uncached', () => {
-        cacheLife('days');
-        cacheTag(
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getPublishedContentSite.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.orgs.getPublishedContentSite(
+                        params.organizationId,
+                        params.siteId,
+                        {
+                            shareKey: params.siteShareKey,
+                        }
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [
             getCacheTag({
                 tag: 'site',
                 site: params.siteId,
-            })
-        );
+            }),
+        ],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-        return trace('getPublishedContentSite', () => {
-            return wrapDataFetcherError(async () => {
-                const api = await apiClient(input);
-                const res = await api.orgs.getPublishedContentSite(
-                    params.organizationId,
-                    params.siteId,
-                    {
-                        shareKey: params.siteShareKey,
-                    }
-                );
-                return res.data;
-            });
-        });
-    });
+    return uncached();
+    // 'use cache';
+    // return trace('getPublishedContentSite.uncached', () => {
+    //     cacheLife('days');
+    //     cacheTag(
+    //         getCacheTag({
+    //             tag: 'site',
+    //             site: params.siteId,
+    //         })
+    //     );
+
+    //     return trace('getPublishedContentSite', () => {
+    //         return wrapDataFetcherError(async () => {
+    //             const api = await apiClient(input);
+    //             const res = await api.orgs.getPublishedContentSite(
+    //                 params.organizationId,
+    //                 params.siteId,
+    //                 {
+    //                     shareKey: params.siteShareKey,
+    //                 }
+    //             );
+    //             return res.data;
+    //         });
+    //     });
+    // });
 });
 
 const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
@@ -555,31 +857,54 @@ const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
         source: string;
     }
 ) {
-    'use cache';
-
-    return trace('getSiteRedirectBySource.uncached', () => {
-        cacheTag(
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getSiteRedirectBySource.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.orgs.getSiteRedirectBySource(
+                        params.organizationId,
+                        params.siteId,
+                        {
+                            shareKey: params.siteShareKey,
+                            source: params.source,
+                        }
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [
             getCacheTag({
                 tag: 'site',
                 site: params.siteId,
-            })
-        );
-        cacheLife('days');
+            }),
+        ],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.orgs.getSiteRedirectBySource(
-                params.organizationId,
-                params.siteId,
-                {
-                    shareKey: params.siteShareKey,
-                    source: params.source,
-                }
-            );
+    return uncached();
 
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('getSiteRedirectBySource.uncached', () => {
+    //     cacheLife('days');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.orgs.getSiteRedirectBySource(
+    //             params.organizationId,
+    //             params.siteId,
+    //             {
+    //                 shareKey: params.siteShareKey,
+    //                 source: params.source,
+    //             }
+    //         );
+
+    //         return res.data;
+    //     });
+    // });
 });
 
 const getEmbedByUrl = memoize(async function getEmbedByUrl(
@@ -589,39 +914,79 @@ const getEmbedByUrl = memoize(async function getEmbedByUrl(
         spaceId: string;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('getEmbedByUrl.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, {
+                        url: params.url,
+                    });
+                    return res.data;
+                });
+            });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24 * 7,
+        }
+    );
 
-    return trace('getEmbedByUrl.uncached', () => {
-        cacheLife('weeks');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('getEmbedByUrl.uncached', () => {
+    //     cacheLife('weeks');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, { url: params.url });
+    //         return res.data;
+    //     });
+    // });
 });
 
 const searchSiteContent = memoize(async function searchSiteContent(
     input: DataFetcherInput,
     params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
 ) {
-    'use cache';
-
-    return trace('searchSiteContent.uncached', () => {
-        const { organizationId, siteId, query, scope } = params;
-
-        cacheLife('days');
-
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.orgs.searchSiteContent(organizationId, siteId, {
-                query,
-                ...scope,
+    const uncached = unstable_cache(
+        async () => {
+            return trace('searchSiteContent.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const { organizationId, siteId, query, scope } = params;
+                    const api = await apiClient(input);
+                    const res = await api.orgs.searchSiteContent(organizationId, siteId, {
+                        query,
+                        ...scope,
+                    });
+                    return res.data.items;
+                });
             });
-            return res.data.items;
-        });
-    });
+        },
+        [],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
+
+    return uncached();
+
+    // 'use cache';
+    // return trace('searchSiteContent.uncached', () => {
+    //     const { organizationId, siteId, query, scope } = params;
+
+    //     cacheLife('days');
+
+    //     return wrapDataFetcherError(async () => {
+    //         const api = await apiClient(input);
+    //         const res = await api.orgs.searchSiteContent(organizationId, siteId, {
+    //             query,
+    //             ...scope,
+    //         });
+    //         return res.data.items;
+    //     });
+    // });
 });
 
 const renderIntegrationUi = memoize(async function renderIntegrationUi(
@@ -631,21 +996,44 @@ const renderIntegrationUi = memoize(async function renderIntegrationUi(
         request: RenderIntegrationUI;
     }
 ) {
-    'use cache';
+    const uncached = unstable_cache(
+        async () => {
+            return trace('renderIntegrationUi.uncached', async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = await apiClient(input);
+                    const res = await api.integrations.renderIntegrationUiWithPost(
+                        params.integrationName,
+                        params.request
+                    );
+                    return res.data;
+                });
+            });
+        },
+        [
+            getCacheTag({
+                tag: 'integration',
+                integration: params.integrationName,
+            }),
+        ],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-    return trace('renderIntegrationUi.uncached', () => {
-        cacheTag(getCacheTag({ tag: 'integration', integration: params.integrationName }));
-        cacheLife('days');
+    return uncached();
 
-        return wrapDataFetcherError(async () => {
-            const api = await apiClient(input);
-            const res = await api.integrations.renderIntegrationUiWithPost(
-                params.integrationName,
-                params.request
-            );
-            return res.data;
-        });
-    });
+    // 'use cache';
+    // return trace('renderIntegrationUi.uncached', () => {
+    //     cacheTag(getCacheTag({ tag: 'integration', integration: params.integrationName }));
+    // return wrapDataFetcherError(async () => {
+    //     const api = await apiClient(input);
+    //     const res = await api.integrations.renderIntegrationUiWithPost(
+    //         params.integrationName,
+    //             params.request
+    //         );
+    //         return res.data;
+    //     });
+    // });
 });
 
 async function* streamAIResponse(
@@ -673,7 +1061,7 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
-    const cloudflareContext = await getCloudflareContext();
+    const cloudflareContext = getCloudflareContext();
     if (cloudflareContext) {
         serviceBinding = cloudflareContext.env.GITBOOK_API as GitBookAPIServiceBinding | undefined;
         if (!loggedServiceBinding) {

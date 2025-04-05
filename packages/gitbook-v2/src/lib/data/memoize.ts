@@ -3,6 +3,8 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import pMemoize, { type CacheStorage } from 'p-memoize';
 // import { getCloudflareContext } from './cloudflare';
 
+// const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
+
 /**
  * We wrap 'use cache' calls in a p-memoize function to avoid
  * executing the function multiple times when doing concurrent calls.
@@ -10,6 +12,16 @@ import pMemoize, { type CacheStorage } from 'p-memoize';
  * Hopefully one day this can be done directly by 'use cache'.
  */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
+    // const globalContext = getCloudflareContext()?.cf ?? globalThis;
+
+    // const requestCache = requestWeakCache.get(globalContext);
+    // if (requestCache) {
+    //     const cache = requestCache.get(f);
+    //     if (cache) {
+    //         return cache as F;
+    //     }
+    // }
+
     if (process.env.NODE_ENV === 'production') {
         return f;
     }
