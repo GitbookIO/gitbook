@@ -11,3 +11,15 @@ export function getCloudflareContext() {
 
     return getCloudflareContextOpenNext();
 }
+
+/**
+ * Return an object representing the current request.
+ */
+export function getCloudflareRequestGlobal() {
+    const context = getCloudflareContext();
+    if (!context) {
+        return null;
+    }
+
+    return context.cf;
+}

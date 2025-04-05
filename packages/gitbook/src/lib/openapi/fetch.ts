@@ -7,6 +7,7 @@ import type {
     OpenAPISchemasBlock,
     ResolveOpenAPIBlockArgs,
 } from '@/lib/openapi/types';
+import { getCloudflareRequestGlobal } from '@v2/lib/data/cloudflare';
 import { memoize } from '@v2/lib/data/memoize';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
@@ -67,14 +68,17 @@ const fetchFilesystemV1 = cache({
     },
 });
 
-const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(cacheKey, url: string) {
-    const uncached = unstable_cache(fetchFilesystemUncached, [cacheKey], {
-        revalidate: 60 * 60 * 24,
-    });
+const fetchFilesystemV2 = memoize(
+    getCloudflareRequestGlobal,
+    async function fetchFilesystemV2(cacheKey, url: string) {
+        const uncached = unstable_cache(fetchFilesystemUncached, [cacheKey], {
+            revalidate: 60 * 60 * 24,
+        });
 
-    const response = await uncached(url);
-    return response;
-});
+        const response = await uncached(url);
+        return response;
+    }
+);
 
 async function fetchFilesystemUncached(
     url: string,

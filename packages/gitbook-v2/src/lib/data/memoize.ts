@@ -1,17 +1,16 @@
-import { getCloudflareContext } from './cloudflare';
-
 /**
  * Wrap cache calls to avoid duplicated executions of the same function during concurrent calls.
  * The implementation is based on `p-memoize` but is adapted to work per-request in Cloudflare Workers.
  */
 export function memoize<ArgsType extends any[], ReturnType>(
+    getGlobalContext: () => object | null | undefined,
     wrapped: (cacheKey: string, ...args: ArgsType) => Promise<ReturnType>
 ): (...args: ArgsType) => Promise<ReturnType> {
     const globalCache = new WeakMap<object, Map<string, ReturnType>>();
     const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
 
     return (...args: ArgsType) => {
-        const globalContext = getCloudflareContext()?.cf ?? globalThis;
+        const globalContext = getGlobalContext() ?? globalThis;
 
         /**
          * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
