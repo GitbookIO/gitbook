@@ -1,10 +1,17 @@
 import { defineCloudflareConfig } from '@opennextjs/cloudflare';
-import d1TagCache from '@opennextjs/cloudflare/d1-tag-cache';
-import kvIncrementalCache from '@opennextjs/cloudflare/kv-cache';
-import memoryQueue from '@opennextjs/cloudflare/memory-queue';
+import kvIncrementalCache from '@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache';
+import doQueue from '@opennextjs/cloudflare/overrides/queue/do-queue';
+import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache';
 
 export default defineCloudflareConfig({
     incrementalCache: kvIncrementalCache,
-    queue: memoryQueue,
-    tagCache: d1TagCache,
+    tagCache: doShardedTagCache({
+        baseShardSize: 12,
+        regionalCache: true,
+        shardReplication: {
+            numberOfSoftReplicas: 2,
+            numberOfHardReplicas: 1,
+        },
+    }),
+    queue: doQueue,
 });

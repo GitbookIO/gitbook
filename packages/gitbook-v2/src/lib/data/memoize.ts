@@ -1,17 +1,48 @@
 import pMemoize from 'p-memoize';
+import { getCloudflareContext } from './cloudflare';
+
+const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
 
 /**
- * We wrap 'use cache' calls in a p-memoize function to avoid
+ * We wrap cache calls in a p-memoize function to avoid
  * executing the function multiple times when doing concurrent calls.
  *
  * Hopefully one day this can be done directly by 'use cache'.
  */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
-    return pMemoize(f, {
-        cacheKey: (args) => {
-            return JSON.stringify(deepSortValue(args));
-        },
-    });
+    // @ts-ignore
+    const globalMemoized: F = (...args) => {
+        const globalContext = getCloudflareContext()?.cf ?? globalThis;
+
+        /**
+         * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
+         * to avoid "Cannot perform I/O on behalf of a different request" errors.
+         */
+        const requestCache = requestWeakCache.get(globalContext) ?? new WeakMap<any, any>();
+        const cached = requestCache.get(f) as F | undefined;
+        if (cached) {
+            console.log('reuse memoized function', f.name);
+            return cached(...args);
+        }
+
+        console.log('create memoized function', f.name);
+        const memoized = pMemoize(f, {
+            cacheKey: (args) => {
+                return JSON.stringify(deepSortValue(args));
+            },
+        });
+
+        requestCache.set(f, memoized);
+        requestWeakCache.set(globalContext, requestCache);
+
+        return memoized(...args);
+    };
+
+    return globalMemoized;
+}
+
+export function getCacheKey(args: any[]) {
+    return JSON.stringify(deepSortValue(args));
 }
 
 function deepSortValue(value: unknown): unknown {

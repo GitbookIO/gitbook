@@ -8,8 +8,9 @@ const nextConfig = {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
 
-        // This is needed to use 'use cache'
-        useCache: true,
+        // We don't use 'use cache' as it's not supported in OpenNext yet
+        // and instead we scope `unstable_cache` to the parameters of the function
+        useCache: false,
 
         // Content is fully static, we can cache it in the session memory cache for a long time
         staleTimes: {
@@ -34,6 +35,7 @@ const nextConfig = {
         GITBOOK_SECRET: process.env.GITBOOK_SECRET,
         GITBOOK_IMAGE_RESIZE_SIGNING_KEY: process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
         GITBOOK_FONTS_URL: process.env.GITBOOK_FONTS_URL,
+        GITBOOK_RUNTIME: process.env.GITBOOK_RUNTIME,
 
         // Next.js envs
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,

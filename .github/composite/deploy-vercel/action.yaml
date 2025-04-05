@@ -62,6 +62,7 @@ runs:
           env:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+            GITBOOK_RUNTIME: vercel
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash

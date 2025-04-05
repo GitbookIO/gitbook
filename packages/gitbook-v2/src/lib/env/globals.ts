@@ -7,6 +7,14 @@ import 'server-only';
  */
 
 /**
+ * Runtime environment.
+ */
+export const GITBOOK_RUNTIME = (process.env.GITBOOK_RUNTIME ?? 'unknown') as
+    | 'vercel'
+    | 'cloudflare'
+    | 'unknown';
+
+/**
  * Main host on which GitBook is running.
  */
 export const GITBOOK_URL =

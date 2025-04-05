@@ -1,4 +1,5 @@
 import { parseOpenAPI } from '@gitbook/openapi-parser';
+import { unstable_cache } from 'next/cache';
 
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
 import type {
@@ -67,12 +68,11 @@ const fetchFilesystemV1 = cache({
 });
 
 const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(url: string) {
-    'use cache';
+    const uncached = unstable_cache(fetchFilesystemUncached, [url], {
+        revalidate: 60 * 60 * 24,
+    });
 
-    // TODO: add cache lifetime once we can use next.js 15 code here
-
-    const response = await fetchFilesystemUncached(url);
-
+    const response = await uncached(url);
     return response;
 });
 
