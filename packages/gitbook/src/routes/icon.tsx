@@ -1,5 +1,5 @@
+import { ImageResponse } from '@vercel/og';
 import { notFound, redirect } from 'next/navigation';
-import { ImageResponse } from 'next/og';
 
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
@@ -53,7 +53,6 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: 'system-ui, sans-serif',
             }}
         >
             <h2
@@ -72,9 +71,6 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
         {
             width: size.width,
             height: size.height,
-
-            // Explicitly disable any fonts to avoid ArrayBuffer detachment errors.
-            fonts: [],
         }
     );
 }
