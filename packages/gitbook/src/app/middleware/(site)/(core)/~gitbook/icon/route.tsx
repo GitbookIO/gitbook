@@ -11,7 +11,9 @@ export async function GET(req: NextRequest) {
     const pointer = await getSiteContentPointer();
     console.log('pointer', pointer);
     const context = await fetchV1ContextForSitePointer(pointer);
-    console.log('context success');
+
+    // biome-ignore lint/suspicious/noConsole: we want to log here
+    console.log(`serving icon for ${context.site.id}`);
 
     return serveIcon(context, req);
 }
