@@ -1,3 +1,4 @@
+import { GITBOOK_RUNTIME } from '@v2/lib/env';
 import {
     CURRENT_SIGNATURE_VERSION,
     type CloudflareImageOptions,
@@ -23,11 +24,17 @@ export async function serveResizedImage(
     } = {}
 ) {
     const requestURL = new URL(request.url);
-    const urlParam = requestURL.searchParams.get('url');
+    let urlParam = requestURL.searchParams.get('url');
     const signature = requestURL.searchParams.get('sign');
 
     if (!urlParam || !signature) {
         return new Response('Missing url/sign parameters', { status: 400 });
+    }
+
+    if (GITBOOK_RUNTIME === 'cloudflare') {
+        // OpenNextJS decodes the url param before passing it to the middleware
+        // https://github.com/opennextjs/opennextjs-cloudflare/issues/533
+        urlParam = encodeURI(urlParam);
     }
 
     const signatureVersion = parseSignatureVersion(requestURL.searchParams.get('sv'));

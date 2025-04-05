@@ -848,6 +848,7 @@ export function apiClient(input: DataFetcherInput = { apiToken: null }) {
 
     const cloudflareContext = getCloudflareContext();
     if (cloudflareContext) {
+        // @ts-expect-error
         serviceBinding = cloudflareContext.env.GITBOOK_API as GitBookAPIServiceBinding | undefined;
         if (!loggedServiceBinding) {
             loggedServiceBinding = true;
