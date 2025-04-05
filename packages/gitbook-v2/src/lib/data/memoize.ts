@@ -5,7 +5,7 @@ import pMemoize from 'p-memoize';
 const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
 
 /**
- * We wrap 'use cache' calls in a p-memoize function to avoid
+ * We wrap cache calls in a p-memoize function to avoid
  * executing the function multiple times when doing concurrent calls.
  *
  * Hopefully one day this can be done directly by 'use cache'.
