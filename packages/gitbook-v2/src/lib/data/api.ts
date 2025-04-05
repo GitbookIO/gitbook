@@ -21,6 +21,18 @@ interface DataFetcherInput {
 }
 
 /**
+ * Revalidation profile for the cache.
+ * Based on https://nextjs.org/docs/app/api-reference/functions/cacheLife#default-cache-profiles
+ */
+enum RevalidationProfile {
+    minutes = 60,
+    hours = 60 * 60,
+    days = 60 * 60 * 24,
+    weeks = 60 * 60 * 24 * 7,
+    max = 60 * 60 * 24 * 30,
+}
+
+/**
  * Create a data fetcher using an API token.
  * The data are being cached by Next.js built-in cache.
  */
@@ -204,7 +216,7 @@ const getUserById = memoize(async function getUserById(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.days,
             tags: [],
         }
     );
@@ -234,7 +246,7 @@ const getSpace = memoize(async function getSpace(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.days,
             tags: [
                 getCacheTag({
                     tag: 'space',
@@ -273,7 +285,7 @@ const getChangeRequest = memoize(async function getChangeRequest(
         },
         [cacheKey],
         {
-            revalidate: 60 * 5,
+            revalidate: RevalidationProfile.minutes * 5,
             tags: [
                 getCacheTag({
                     tag: 'change-request',
@@ -317,7 +329,7 @@ const getRevision = memoize(async function getRevision(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -355,7 +367,7 @@ const getRevisionPages = memoize(async function getRevisionPages(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -392,7 +404,7 @@ const getRevisionFile = memoize(async function getRevisionFile(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -434,7 +446,7 @@ const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -471,7 +483,7 @@ const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -506,7 +518,7 @@ const getDocument = memoize(async function getDocument(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -542,7 +554,7 @@ const getComputedDocument = memoize(async function getComputedDocument(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.days,
             tags: getComputedContentSourceCacheTags(
                 {
                     spaceId: params.spaceId,
@@ -584,7 +596,7 @@ const getReusableContent = memoize(async function getReusableContent(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.max,
             tags: [],
         }
     );
@@ -619,7 +631,7 @@ const getLatestOpenAPISpecVersionContent = memoize(
             },
             [cacheKey],
             {
-                revalidate: 60 * 60 * 24,
+                revalidate: RevalidationProfile.days,
                 tags: [
                     getCacheTag({
                         tag: 'openapi',
@@ -664,7 +676,7 @@ const getPublishedContentSite = memoize(async function getPublishedContentSite(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.days,
             tags: [
                 getCacheTag({
                     tag: 'site',
@@ -709,7 +721,7 @@ const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.days,
             tags: [
                 getCacheTag({
                     tag: 'site',
@@ -744,7 +756,7 @@ const getEmbedByUrl = memoize(async function getEmbedByUrl(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24 * 7,
+            revalidate: RevalidationProfile.weeks,
             tags: [],
         }
     );
@@ -776,7 +788,7 @@ const searchSiteContent = memoize(async function searchSiteContent(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.hours,
             tags: [],
         }
     );
@@ -807,7 +819,7 @@ const renderIntegrationUi = memoize(async function renderIntegrationUi(
         },
         [cacheKey],
         {
-            revalidate: 60 * 60 * 24,
+            revalidate: RevalidationProfile.days,
             tags: [
                 getCacheTag({
                     tag: 'integration',
