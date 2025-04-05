@@ -1,44 +1,56 @@
-import pMemoize from 'p-memoize';
 import { getCloudflareContext } from './cloudflare';
 
-const requestWeakCache = new WeakMap<object, WeakMap<any, any>>();
-
 /**
- * We wrap cache calls in a p-memoize function to avoid
- * executing the function multiple times when doing concurrent calls.
- *
- * Hopefully one day this can be done directly by 'use cache'.
+ * Wrap cache calls to avoid duplicated executions of the same function during concurrent calls.
+ * The implementation is based on `p-memoize` but is adapted to work per-request in Cloudflare Workers.
  */
-export function memoize<F extends (...args: any[]) => any>(f: F): F {
-    // @ts-ignore
-    const globalMemoized: F = (...args) => {
+export function memoize<ArgsType extends any[], ReturnType>(
+    wrapped: (cacheKey: string, ...args: ArgsType) => Promise<ReturnType>
+): (...args: ArgsType) => Promise<ReturnType> {
+    const globalCache = new WeakMap<object, Map<string, ReturnType>>();
+    const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
+
+    return (...args: ArgsType) => {
         const globalContext = getCloudflareContext()?.cf ?? globalThis;
 
         /**
          * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
          * to avoid "Cannot perform I/O on behalf of a different request" errors.
          */
-        const requestCache = requestWeakCache.get(globalContext) ?? new WeakMap<any, any>();
-        const cached = requestCache.get(f) as F | undefined;
-        if (cached) {
-            console.log('reuse memoized function', f.name);
-            return cached(...args);
+        const cache = globalCache.get(globalContext) ?? new Map<string, ReturnType>();
+        globalCache.set(globalContext, cache);
+
+        const promiseCache =
+            globalPromiseCache.get(globalContext) ?? new Map<string, Promise<ReturnType>>();
+        globalPromiseCache.set(globalContext, promiseCache);
+
+        const key = getCacheKey(args);
+
+        if (cache.has(key)) {
+            const result = cache.get(key);
+            return Promise.resolve(result as ReturnType);
         }
 
-        console.log('create memoized function', f.name);
-        const memoized = pMemoize(f, {
-            cacheKey: (args) => {
-                return JSON.stringify(deepSortValue(args));
-            },
-        });
+        const concurrent = promiseCache.get(key);
+        if (concurrent) {
+            return concurrent;
+        }
 
-        requestCache.set(f, memoized);
-        requestWeakCache.set(globalContext, requestCache);
+        const promise = (async () => {
+            try {
+                const result = await wrapped(key, ...args);
+                cache.set(key, result);
 
-        return memoized(...args);
+                return result;
+            } finally {
+                promiseCache.delete(key);
+            }
+        })();
+
+        promiseCache.set(key, promise);
+
+        return promise;
     };
-
-    return globalMemoized;
 }
 
 export function getCacheKey(args: any[]) {

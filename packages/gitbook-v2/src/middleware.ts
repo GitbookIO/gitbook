@@ -29,14 +29,12 @@ export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
     ],
-    skipMiddlewareUrlNormalize: true,
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {
-        console.log(`middleware: ${request.url}`);
         const requestURL = new URL(request.url);
 
         // Redirect to normalize the URL

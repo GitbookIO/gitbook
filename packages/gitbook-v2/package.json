@@ -12,8 +12,7 @@
         "server-only": "^0.0.1",
         "warn-once": "^0.1.1",
         "rison": "^0.1.1",
-        "jwt-decode": "^4.0.0",
-        "p-memoize": "^7.1.1"
+        "jwt-decode": "^4.0.0"
     },
     "devDependencies": {
         "gitbook": "*",

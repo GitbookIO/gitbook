@@ -67,8 +67,8 @@ const fetchFilesystemV1 = cache({
     },
 });
 
-const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(url: string) {
-    const uncached = unstable_cache(fetchFilesystemUncached, [url], {
+const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(cacheKey, url: string) {
+    const uncached = unstable_cache(fetchFilesystemUncached, [cacheKey], {
         revalidate: 60 * 60 * 24,
     });
 

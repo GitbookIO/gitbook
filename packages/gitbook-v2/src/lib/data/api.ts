@@ -10,7 +10,7 @@ import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/
 import { unstable_cache } from 'next/cache';
 import { getCloudflareContext } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
-import { getCacheKey, memoize } from './memoize';
+import { memoize } from './memoize';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -188,6 +188,7 @@ export function createDataFetcher(
 }
 
 const getUserById = memoize(async function getUserById(
+    cacheKey,
     input: DataFetcherInput,
     params: { userId: string }
 ) {
@@ -201,7 +202,7 @@ const getUserById = memoize(async function getUserById(
                 });
             });
         },
-        [input.apiToken ?? '', params.userId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [],
@@ -212,6 +213,7 @@ const getUserById = memoize(async function getUserById(
 });
 
 const getSpace = memoize(async function getSpace(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -230,7 +232,7 @@ const getSpace = memoize(async function getSpace(
                 });
             });
         },
-        [input.apiToken ?? '', params.spaceId, params.shareKey ?? ''],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [
@@ -246,6 +248,7 @@ const getSpace = memoize(async function getSpace(
 });
 
 const getChangeRequest = memoize(async function getChangeRequest(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -268,7 +271,7 @@ const getChangeRequest = memoize(async function getChangeRequest(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.changeRequestId ?? ''],
+        [cacheKey],
         {
             revalidate: 60 * 5,
             tags: [
@@ -285,6 +288,7 @@ const getChangeRequest = memoize(async function getChangeRequest(
 });
 
 const getRevision = memoize(async function getRevision(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -311,7 +315,7 @@ const getRevision = memoize(async function getRevision(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.revisionId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -322,6 +326,7 @@ const getRevision = memoize(async function getRevision(
 });
 
 const getRevisionPages = memoize(async function getRevisionPages(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -348,7 +353,7 @@ const getRevisionPages = memoize(async function getRevisionPages(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.revisionId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [],
@@ -359,6 +364,7 @@ const getRevisionPages = memoize(async function getRevisionPages(
 });
 
 const getRevisionFile = memoize(async function getRevisionFile(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -384,7 +390,7 @@ const getRevisionFile = memoize(async function getRevisionFile(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.revisionId, params.fileId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -395,6 +401,7 @@ const getRevisionFile = memoize(async function getRevisionFile(
 });
 
 const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -425,7 +432,7 @@ const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.revisionId, params.pageId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -436,6 +443,7 @@ const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
 });
 
 const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -461,7 +469,7 @@ const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.revisionId, params.path],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -472,6 +480,7 @@ const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
 });
 
 const getDocument = memoize(async function getDocument(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -495,7 +504,7 @@ const getDocument = memoize(async function getDocument(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.documentId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -506,6 +515,7 @@ const getDocument = memoize(async function getDocument(
 });
 
 const getComputedDocument = memoize(async function getComputedDocument(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -530,13 +540,7 @@ const getComputedDocument = memoize(async function getComputedDocument(
                 }
             );
         },
-        [
-            input.apiToken ?? '',
-            params.spaceId,
-            params.organizationId,
-            getCacheKey([params.source]),
-            params.seed,
-        ],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: getComputedContentSourceCacheTags(
@@ -553,6 +557,7 @@ const getComputedDocument = memoize(async function getComputedDocument(
 });
 
 const getReusableContent = memoize(async function getReusableContent(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         spaceId: string;
@@ -577,7 +582,7 @@ const getReusableContent = memoize(async function getReusableContent(
                 }
             );
         },
-        [input.apiToken ?? '', params.spaceId, params.revisionId, params.reusableContentId],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -589,6 +594,7 @@ const getReusableContent = memoize(async function getReusableContent(
 
 const getLatestOpenAPISpecVersionContent = memoize(
     async function getLatestOpenAPISpecVersionContent(
+        cacheKey,
         input: DataFetcherInput,
         params: {
             organizationId: string;
@@ -611,7 +617,7 @@ const getLatestOpenAPISpecVersionContent = memoize(
                     }
                 );
             },
-            [input.apiToken ?? '', params.organizationId, params.slug],
+            [cacheKey],
             {
                 revalidate: 60 * 60 * 24,
                 tags: [
@@ -629,6 +635,7 @@ const getLatestOpenAPISpecVersionContent = memoize(
 );
 
 const getPublishedContentSite = memoize(async function getPublishedContentSite(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         organizationId: string;
@@ -655,7 +662,7 @@ const getPublishedContentSite = memoize(async function getPublishedContentSite(
                 }
             );
         },
-        [input.apiToken ?? '', params.organizationId, params.siteId, params.siteShareKey ?? ''],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [
@@ -671,6 +678,7 @@ const getPublishedContentSite = memoize(async function getPublishedContentSite(
 });
 
 const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         organizationId: string;
@@ -699,13 +707,7 @@ const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
                 }
             );
         },
-        [
-            input.apiToken ?? '',
-            params.organizationId,
-            params.siteId,
-            params.siteShareKey ?? '',
-            params.source,
-        ],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [
@@ -721,6 +723,7 @@ const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
 });
 
 const getEmbedByUrl = memoize(async function getEmbedByUrl(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         url: string;
@@ -739,7 +742,7 @@ const getEmbedByUrl = memoize(async function getEmbedByUrl(
                 });
             });
         },
-        [input.apiToken ?? '', params.spaceId, params.url],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24 * 7,
             tags: [],
@@ -750,6 +753,7 @@ const getEmbedByUrl = memoize(async function getEmbedByUrl(
 });
 
 const searchSiteContent = memoize(async function searchSiteContent(
+    cacheKey,
     input: DataFetcherInput,
     params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
 ) {
@@ -770,13 +774,7 @@ const searchSiteContent = memoize(async function searchSiteContent(
                 }
             );
         },
-        [
-            input.apiToken ?? '',
-            params.organizationId,
-            params.siteId,
-            params.query,
-            getCacheKey([params.scope]),
-        ],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [],
@@ -787,6 +785,7 @@ const searchSiteContent = memoize(async function searchSiteContent(
 });
 
 const renderIntegrationUi = memoize(async function renderIntegrationUi(
+    cacheKey,
     input: DataFetcherInput,
     params: {
         integrationName: string;
@@ -806,7 +805,7 @@ const renderIntegrationUi = memoize(async function renderIntegrationUi(
                 });
             });
         },
-        [input.apiToken ?? '', params.integrationName],
+        [cacheKey],
         {
             revalidate: 60 * 60 * 24,
             tags: [

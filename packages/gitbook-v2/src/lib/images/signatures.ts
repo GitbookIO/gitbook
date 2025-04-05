@@ -33,7 +33,8 @@ export async function verifyImageSignature(
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);
 
-    console.log(`Comparing "${generated}" === "${signature}"`);
+    // biome-ignore lint/suspicious/noConsole: we want to log the signature comparison
+    console.log(`comparing image signature "${generated}" (expected) === "${signature}" (actual)`);
     return generated === signature;
 }
 
@@ -68,7 +69,6 @@ const generateSignatureV2: SignFn = async (input) => {
         .filter(Boolean)
         .join(':');
 
-    console.log(`Generating signature for "${all}"`);
     return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
 };
 
