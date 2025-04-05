@@ -285,6 +285,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) {
     const baseContext = await getV1BaseContext();
 
+    console.log('baseContext success');
     const context = await fetchSiteContextByIds(baseContext, {
         organization: pointer.organizationId,
         site: pointer.siteId,
@@ -295,8 +296,10 @@ export async function fetchV1ContextForSitePointer(pointer: SiteContentPointer) 
         changeRequest: pointer.changeRequestId,
         revision: pointer.revisionId,
     });
+    console.log('context inner success');
 
     context.customization = await getDynamicCustomizationSettings(context.customization);
+    console.log('customization success');
 
     return context;
 }
