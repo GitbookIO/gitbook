@@ -9,7 +9,7 @@ import { getCloudflareContext } from './cloudflare';
  */
 export function memoize<F extends (...args: any[]) => any>(f: F): F {
     const getFunctionCache = async () => {
-        const functionsCache = await getRequestCacheMap();
+        const functionsCache = await getRequestCacheWeakMap();
         const cache = functionsCache.get(f);
         if (cache) {
             return cache;
@@ -57,9 +57,11 @@ const globalCache = new WeakMap<any, CacheStorage<string, unknown>>();
 const perRequestCache = new WeakMap<object, WeakMap<any, CacheStorage<string, unknown>>>();
 
 /**
- * Get the cache storage for the current request.
+ * Get a global weakmap that is scoped to the current request when executed in Cloudflare Workers,
+ * to avoid "Cannot perform I/O on behalf of a different request" errors.
+ * And global when executed in Node.js.
  */
-async function getRequestCacheMap(): Promise<WeakMap<any, CacheStorage<string, unknown>>> {
+async function getRequestCacheWeakMap(): Promise<WeakMap<any, CacheStorage<string, unknown>>> {
     const cloudflareContext = await getCloudflareContext();
     if (cloudflareContext) {
         // `cf` changes for each request, so we use a per-request cache
