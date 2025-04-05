@@ -31,9 +31,13 @@ export async function serveResizedImage(
         return new Response('Missing url/sign parameters', { status: 400 });
     }
 
+    console.log(`urlParam: ${urlParam} and runtime: ${GITBOOK_RUNTIME}`);
+
     if (GITBOOK_RUNTIME === 'cloudflare') {
         // OpenNextJS decodes the url param before passing it to the middleware
         // https://github.com/opennextjs/opennextjs-cloudflare/issues/533
+        console.log(`encodeURI urlParam: ${encodeURI(urlParam)}`);
+        console.log(`encodeURIComponent urlParam: ${encodeURIComponent(urlParam)}`);
         urlParam = encodeURI(urlParam);
     }
 
