@@ -1,5 +1,7 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+
 import pMemoize, { type CacheStorage } from 'p-memoize';
-import { getCloudflareContext } from './cloudflare';
+// import { getCloudflareContext } from './cloudflare';
 
 /**
  * We wrap 'use cache' calls in a p-memoize function to avoid
@@ -62,17 +64,23 @@ const perRequestCache = new WeakMap<object, WeakMap<any, CacheStorage<string, un
  * And global when executed in Node.js.
  */
 async function getRequestCacheWeakMap(): Promise<WeakMap<any, CacheStorage<string, unknown>>> {
-    const cloudflareContext = await getCloudflareContext();
-    if (cloudflareContext) {
-        // `cf` changes for each request, so we use a per-request cache
-        const requestCache = perRequestCache.get(cloudflareContext.cf);
-        if (requestCache) {
-            return requestCache;
-        }
+    try {
+        const cloudflareContext = await getCloudflareContext();
+        if (cloudflareContext?.cf) {
+            // `cf` changes for each request, we can use it as an identifier of the request to isolate the cache per request
+            const requestCache = perRequestCache.get(cloudflareContext.cf);
+            if (requestCache) {
+                return requestCache;
+            }
 
-        const newRequestCache = new WeakMap<any, CacheStorage<string, unknown>>();
-        perRequestCache.set(cloudflareContext.cf, newRequestCache);
-        return newRequestCache;
+            const newRequestCache = new WeakMap<any, CacheStorage<string, unknown>>();
+            perRequestCache.set(cloudflareContext.cf, newRequestCache);
+            return newRequestCache;
+        }
+    } catch (error) {
+        if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+            throw error;
+        }
     }
 
     return globalCache;
