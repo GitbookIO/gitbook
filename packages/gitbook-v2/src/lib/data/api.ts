@@ -8,6 +8,7 @@ import {
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { getCloudflareContext } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import { memoize } from './memoize';
 import type { GitBookDataFetcher } from './types';
@@ -672,13 +673,9 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
     let serviceBinding: GitBookAPIServiceBinding | undefined;
 
-    try {
-        // HACK: This is a workaround to avoid webpack trying to bundle this cloudflare only module
-        // @ts-ignore
-        const { env } = await import(
-            /* webpackIgnore: true */ `${'__cloudflare:workers'.replaceAll('_', '')}`
-        );
-        serviceBinding = env.GITBOOK_API;
+    const cloudflareContext = await getCloudflareContext();
+    if (cloudflareContext) {
+        serviceBinding = cloudflareContext.env.GITBOOK_API;
         if (!loggedServiceBinding) {
             loggedServiceBinding = true;
             if (serviceBinding) {
@@ -688,10 +685,6 @@ export async function apiClient(input: DataFetcherInput = { apiToken: null }) {
                 // biome-ignore lint/suspicious/noConsole: we want to log here
                 console.warn(`no service binding for the API (${GITBOOK_API_URL})`);
             }
-        }
-    } catch (error) {
-        if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
-            throw error;
         }
     }
 
