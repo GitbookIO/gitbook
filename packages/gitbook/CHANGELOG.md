@@ -1,5 +1,28 @@
 # gitbook
 
+## 0.10.0
+
+### Minor Changes
+
+- b62b101: Do not set cookie to identify visitor for insights when disabled.
+
+### Patch Changes
+
+- b92ecfa: Implement retry logic for the DO cache to prevent when revalidating content.
+- 70c4182: Improve OpenAPI schema style
+- 2b6c593: Remove stable from x-stability
+- 580f7ad: Improve the error message returned by the revalidate endpoint.
+- e59076a: Improve OpenAPI schemas block ungrouped style. Classnames have changed, please refer to this PR to update GBX.
+- 90ead98: Better error handling in cache revalidation.
+- Updated dependencies [cdffd7c]
+- Updated dependencies [70c4182]
+- Updated dependencies [2b6c593]
+- Updated dependencies [e59076a]
+- Updated dependencies [23cedd2]
+  - @gitbook/colors@0.3.2
+  - @gitbook/react-openapi@1.1.10
+  - @gitbook/openapi-parser@2.1.3
+
 ## 0.9.2
 
 ### Patch Changes
