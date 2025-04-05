@@ -1,53 +1,19 @@
 import { describe, expect, it, mock } from 'bun:test';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { memoize } from './memoize';
+import { withCacheKey, withoutConcurrentExecution } from './memoize';
 
-describe('memoize', () => {
-    it('should memoize the function', async () => {
-        const fn = mock(async () => Math.random());
-        const memoized = memoize(() => null, fn);
-        expect(await memoized()).toBe(await memoized());
-    });
+describe('withoutConcurrentExecution', () => {
+    it('should memoize the function based on the cache key', async () => {
+        const fn = mock(async (a: number, b: number) => a + b);
+        const memoized = withoutConcurrentExecution(() => null, fn);
 
-    it('should memoize the function with different arguments', async () => {
-        const fn = mock(async (_cacheKey: string, a: number, b: number) => a + b);
-        const memoized = memoize(() => null, fn);
-        expect(await memoized(1, 2)).toBe(await memoized(1, 2));
-        expect(fn.mock.calls.length).toBe(1);
-        expect(await memoized(1, 2)).not.toBe(await memoized(2, 3));
+        const p1 = memoized('c1', 1, 2);
+        const p2 = memoized('c1', 1, 2);
+        const p3 = memoized('c3', 2, 3);
+
+        expect(await p1).toBe(await p2);
+        expect(await p1).not.toBe(await p3);
         expect(fn.mock.calls.length).toBe(2);
-    });
-
-    it('should memoize a function complex object', async () => {
-        const fn = mock(
-            async (_cacheKey: string, a: { foo: string; bar: number }) => a.foo + a.bar
-        );
-        const memoized = memoize(() => null, fn);
-        expect(await memoized({ foo: 'foo', bar: 1 })).toBe(await memoized({ foo: 'foo', bar: 1 }));
-        expect(fn.mock.calls.length).toBe(1);
-        expect(await memoized({ foo: 'foo', bar: 1 })).not.toBe(
-            await memoized({ foo: 'foo', bar: 2 })
-        );
-        expect(fn.mock.calls.length).toBe(2);
-    });
-
-    it('should wrap concurrent async calls', async () => {
-        const fn = mock(async () => Math.random());
-        const memoized = memoize(() => null, fn);
-        const promise1 = memoized();
-        const promise2 = memoized();
-        expect(await promise1).toBe(await promise2);
-        expect(fn.mock.calls.length).toBe(1);
-    });
-
-    it('should pass the cache key to the function', async () => {
-        const fn = mock(
-            async (cacheKey: string, arg: { a: number; b: number }, c: number) =>
-                `${cacheKey}, result=${arg.a + arg.b + c}`
-        );
-        const memoized = memoize(() => null, fn);
-        expect(await memoized({ a: 1, b: 2 }, 4)).toBe('[[["a",1],["b",2]],4], result=7');
-        expect(fn.mock.calls.length).toBe(1);
     });
 
     it('should support caching per request', async () => {
@@ -58,17 +24,29 @@ describe('memoize', () => {
 
         const requestContext = new AsyncLocalStorage<{ id: string }>();
 
-        const memoized = memoize(() => requestContext.getStore(), fn);
+        const memoized = withoutConcurrentExecution(() => requestContext.getStore(), fn);
 
         // Both in the same request
-        const promise1 = requestContext.run(request1, () => memoized());
-        const promise2 = requestContext.run(request1, () => memoized());
+        const promise1 = requestContext.run(request1, () => memoized('c1'));
+        const promise2 = requestContext.run(request1, () => memoized('c1'));
 
         // In a different request
-        const promise3 = requestContext.run(request2, () => memoized());
+        const promise3 = requestContext.run(request2, () => memoized('c1'));
 
         expect(await promise1).toBe(await promise2);
         expect(await promise1).not.toBe(await promise3);
         expect(fn.mock.calls.length).toBe(2);
+    });
+});
+
+describe('withCacheKey', () => {
+    it('should wrap the function by passing the cache key', async () => {
+        const fn = mock(
+            async (cacheKey: string, arg: { a: number; b: number }, c: number) =>
+                `${cacheKey}, result=${arg.a + arg.b + c}`
+        );
+        const memoized = withCacheKey(fn);
+        expect(await memoized({ a: 1, b: 2 }, 4)).toBe('[[["a",1],["b",2]],4], result=7');
+        expect(fn.mock.calls.length).toBe(1);
     });
 });
