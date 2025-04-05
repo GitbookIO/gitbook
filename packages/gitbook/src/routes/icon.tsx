@@ -52,15 +52,9 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
     const contentTitle = site.title;
 
     // Load the font locally to prevent the shared instance used by ImageResponse.
-    const fontOrigin = await fetch(
-        new URL('../fonts/Inter/Inter-Regular.ttf', import.meta.url)
-    ).then((res) => res.arrayBuffer());
-    const dst = new ArrayBuffer(fontOrigin.byteLength);
-    new Uint8Array(dst).set(new Uint8Array(fontOrigin));
-
-    if (dst.detached) {
-        console.log('about to use detached font buffer..');
-    }
+    const font = await fetch(new URL('../fonts/Inter/Inter-Regular.ttf', import.meta.url)).then(
+        (res) => res.arrayBuffer()
+    );
 
     return new ImageResponse(
         <div
@@ -92,7 +86,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
             height: size.height,
             fonts: [
                 {
-                    data: dst,
+                    data: font,
                     name: 'Inter',
                     weight: 400,
                     style: 'normal',
