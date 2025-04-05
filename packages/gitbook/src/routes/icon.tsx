@@ -27,13 +27,17 @@ const SIZES = {
  * Generate an icon for a site content.
  */
 export async function serveIcon(context: GitBookSiteContext, req: Request) {
-    console.log('icon: serveIcon', req.url);
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
     const { site, customization } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
+    console.log(
+        'icon: serveIcon',
+        req.url,
+        customIcon ? 'custom' : 'emoji' in customization.favicon ? 'emoji' : 'fallback'
+    );
     // If the site has a custom icon, redirect to it
     if (customIcon) {
         const iconUrl = options.theme === 'light' ? customIcon.light : customIcon.dark;
@@ -47,6 +51,17 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
 
     const contentTitle = site.title;
 
+    // Load the font locally to prevent the shared instance used by ImageResponse.
+    const fontOrigin = await fetch(new URL('../fonts/Inter/Inter-Regular.ttf', import.meta.url)).then(
+        (res) => res.arrayBuffer()
+    );
+    const dst = new ArrayBuffer(fontOrigin.byteLength);
+    new Uint8Array(dst).set(new Uint8Array(fontOrigin));
+
+    if (dst.detached) {
+        console.log('about to use detached font buffer..')
+    }
+
     return new ImageResponse(
         <div
             tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
@@ -56,6 +71,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                fontFamily: 'Inter',
             }}
         >
             <h2
@@ -74,6 +90,14 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
         {
             width: size.width,
             height: size.height,
+            fonts: [
+                {
+                    data: dst,
+                    name: 'Inter',
+                    weight: 400,
+                    style: 'normal',
+                },
+            ],
         }
     );
 }
