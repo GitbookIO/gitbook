@@ -1,8 +1,7 @@
 import { getCloudflareContext as getCloudflareContextOpenNext } from '@opennextjs/cloudflare';
 
 /**
- * Load the cloudflare context.
- * This is a workaround to avoid webpack trying to bundle this cloudflare only module.
+ * Return the Cloudflare context or null when not running in Cloudflare.
  */
 export function getCloudflareContext(): {
     /**
