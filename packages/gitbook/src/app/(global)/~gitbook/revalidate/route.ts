@@ -14,7 +14,15 @@ interface JsonBody {
  * The body should be a JSON with { tags: string[] }
  */
 export async function POST(req: NextRequest) {
-    const json = (await req.json()) as JsonBody;
+    let json: JsonBody;
+
+    try {
+        json = await req.json();
+    } catch (err) {
+        return NextResponse.json({
+            error: `invalid json body: ${err}`,
+        });
+    }
 
     if (!json.tags || !Array.isArray(json.tags)) {
         return NextResponse.json(
@@ -25,10 +33,18 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const result = await revalidateTags(json.tags);
-
-    return NextResponse.json({
-        success: true,
-        stats: result.stats,
-    });
+    try {
+        const result = await revalidateTags(json.tags);
+        return NextResponse.json({
+            success: true,
+            stats: result.stats,
+        });
+    } catch (err: unknown) {
+        return NextResponse.json(
+            {
+                error: `${err}`,
+            },
+            { status: 500 }
+        );
+    }
 }

@@ -1,99 +1,104 @@
+import type { OpenAPISchema } from '@gitbook/openapi-parser';
 import clsx from 'clsx';
 import { OpenAPIDisclosureGroup } from '../OpenAPIDisclosureGroup';
+import { OpenAPIExample, getExampleFromSchema } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
-import { Section, SectionBody } from '../StaticSection';
-import type { OpenAPIClientContext, OpenAPIContextProps, OpenAPISchemasData } from '../types';
-
-type OpenAPISchemasContextProps = Omit<
-    OpenAPIContextProps,
-    'renderCodeBlock' | 'renderHeading' | 'renderDocument'
->;
+import { Section, SectionBody, StaticSection } from '../StaticSection';
+import { getOpenAPIClientContext } from '../context';
+import type { OpenAPIContext } from '../types';
 
 /**
- * Display OpenAPI Schemas.
+ * OpenAPI Schemas component.
  */
 export function OpenAPISchemas(props: {
     className?: string;
-    data: OpenAPISchemasData;
-    context: OpenAPISchemasContextProps;
+    schemas: OpenAPISchema[];
+    context: OpenAPIContext;
     /**
      * Whether to show the schema directly if there is only one.
      */
     grouped?: boolean;
 }) {
-    const { className, data, context, grouped } = props;
-    const { schemas } = data;
+    const { schemas, context, grouped, className } = props;
 
-    const clientContext: OpenAPIClientContext = {
-        defaultInteractiveOpened: context.defaultInteractiveOpened,
-        icons: context.icons,
-        blockKey: context.blockKey,
-    };
+    const firstSchema = schemas[0];
 
-    if (!schemas.length) {
+    if (!firstSchema) {
         return null;
     }
 
-    return (
-        <div className={clsx('openapi-schemas', className)}>
-            <OpenAPIRootSchemasSchema grouped={grouped} schemas={schemas} context={clientContext} />
-        </div>
-    );
-}
-
-/**
- * Root schema for OpenAPI schemas.
- * It displays a single model or a disclosure group for multiple schemas.
- */
-function OpenAPIRootSchemasSchema(props: {
-    schemas: OpenAPISchemasData['schemas'];
-    context: OpenAPIClientContext;
-    grouped?: boolean;
-}) {
-    const { schemas, context, grouped } = props;
+    const clientContext = getOpenAPIClientContext(context);
 
     // If there is only one model and we are not grouping, we show it directly.
     if (schemas.length === 1 && !grouped) {
-        const schema = schemas?.[0]?.schema;
-
-        if (!schema) {
-            return null;
-        }
-
+        const title = `The ${firstSchema.name} object`;
         return (
-            <Section>
-                <SectionBody>
-                    <OpenAPIRootSchema schema={schema} context={context} />
-                </SectionBody>
-            </Section>
+            <div className={clsx('openapi-schemas', className)}>
+                <div className="openapi-summary" id={context.id}>
+                    {context.renderHeading({
+                        title,
+                    })}
+                </div>
+                <div className="openapi-columns">
+                    <div className="openapi-column-spec">
+                        <StaticSection className="openapi-parameters" header="Attributes">
+                            <OpenAPIRootSchema
+                                schema={firstSchema.schema}
+                                context={clientContext}
+                            />
+                        </StaticSection>
+                    </div>
+                    <div className="openapi-column-preview">
+                        <div className="openapi-column-preview-body">
+                            <div className="openapi-panel">
+                                <h4 className="openapi-panel-heading">{title}</h4>
+                                <div className="openapi-panel-body">
+                                    <OpenAPIExample
+                                        example={getExampleFromSchema({
+                                            schema: firstSchema.schema,
+                                        })}
+                                        context={context}
+                                        syntax="json"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 
     // If there are multiple schemas, we use a disclosure group to show them all.
     return (
-        <OpenAPIDisclosureGroup
-            allowsMultipleExpanded
-            icon={context.icons.chevronRight}
-            groups={schemas.map(({ name, schema }) => ({
-                id: name,
-                label: (
-                    <div className="openapi-response-tab-content" key={`model-${name}`}>
-                        <span className="openapi-response-statuscode">{name}</span>
-                    </div>
-                ),
-                tabs: [
-                    {
-                        id: 'model',
-                        body: (
-                            <Section className="openapi-section-schemas">
-                                <SectionBody>
-                                    <OpenAPIRootSchema schema={schema} context={context} />
-                                </SectionBody>
-                            </Section>
-                        ),
-                    },
-                ],
-            }))}
-        />
+        <div className={clsx('openapi-schemas', className)}>
+            <OpenAPIDisclosureGroup
+                allowsMultipleExpanded
+                icon={context.icons.chevronRight}
+                groups={schemas.map(({ name, schema }) => ({
+                    id: name,
+                    label: (
+                        <div className="openapi-response-tab-content" key={`model-${name}`}>
+                            <span className="openapi-response-statuscode">{name}</span>
+                        </div>
+                    ),
+                    tabs: [
+                        {
+                            id: 'model',
+                            body: (
+                                <Section className="openapi-section-schemas">
+                                    <SectionBody>
+                                        <OpenAPIRootSchema
+                                            schema={schema}
+                                            context={clientContext}
+                                        />
+                                    </SectionBody>
+                                </Section>
+                            ),
+                        },
+                    ],
+                }))}
+            />
+        </div>
     );
 }

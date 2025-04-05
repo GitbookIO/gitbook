@@ -1,5 +1,6 @@
 /* Layout Components */
-.openapi-operation {
+.openapi-operation,
+.openapi-schemas {
     @apply flex-1 flex flex-col gap-8 mb-14 min-w-0;
 }
 
@@ -17,7 +18,7 @@
 }
 
 .openapi-summary {
-    @apply flex flex-col items-start justify-start gap-3;
+    @apply flex flex-col items-start justify-start gap-3 scroll-m-12;
 }
 
 .openapi-summary-tags {
@@ -483,12 +484,30 @@
     @apply flex flex-row items-center py-2 px-3 justify-end border-t border-tint-subtle;
 }
 
-/* Response Example */
-.openapi-response-example {
+/* Panel */
+.openapi-panel {
     @apply border rounded bg-tint border-tint-subtle;
 }
 
-.openapi-response-example-empty {
+.openapi-panel-heading {
+    @apply font-medium px-4 py-2 text-xs uppercase;
+}
+
+.openapi-panel-body {
+    @apply relative;
+    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
+}
+
+.openapi-panel-footer {
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
+}
+
+.openapi-panel-footer .openapi-markdown {
+    @apply text-[0.813rem] text-tint;
+}
+
+/* Example */
+.openapi-example-empty {
     @apply relative text-tint bg-tint min-h-20 flex flex-col justify-center items-center;
 }
 
@@ -559,15 +578,6 @@
 
 .openapi-tabs-panel {
     @apply flex-1 text-sm relative focus-visible:outline-none;
-    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
-}
-
-.openapi-tabs-footer {
-    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
-}
-
-.openapi-tabs-footer .openapi-markdown {
-    @apply text-[0.813rem] text-tint;
 }
 
 /* Disclosure group */

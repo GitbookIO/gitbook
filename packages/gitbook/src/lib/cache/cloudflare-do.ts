@@ -26,7 +26,12 @@ export const cloudflareDOCache: CacheBackend = {
                     return null;
                 }
 
-                return (await stub.get<CacheEntry>(key)) ?? null;
+                try {
+                    return (await stub.get<CacheEntry>(key)) ?? null;
+                } catch (err) {
+                    console.error('cloudflareDO.get', err);
+                    return null;
+                }
             }
         );
     },
@@ -64,7 +69,10 @@ export const cloudflareDOCache: CacheBackend = {
                     return;
                 }
 
-                const keys = await stub.purge();
+                const keys = await retryOnDurableObjectError(async () => {
+                    return await stub.purge();
+                });
+
                 keys.forEach((key) => {
                     entries.push({ key, tag });
                 });
@@ -98,4 +106,51 @@ async function getStub(tag: string): Promise<CacheObjectStub | null> {
     requestStubs.set(tag, stub);
 
     return stub;
+}
+
+/**
+ * Retry an operation on a Durable Object if it fails with a retriable error.
+ * It will retry up to 4 times with an exponential backoff.
+ */
+export async function retryOnDurableObjectError<T>(
+    operation: () => T | Promise<T>,
+    attemptsLeft = 4,
+    delay = 50
+): Promise<T> {
+    if (attemptsLeft <= 0) {
+        return operation();
+    }
+
+    try {
+        return await operation();
+    } catch (error) {
+        if (!shouldRetryError(error)) {
+            throw error;
+        }
+
+        if (attemptsLeft > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            return retryOnDurableObjectError(operation, attemptsLeft - 1, delay * 2);
+        }
+
+        throw error;
+    }
+}
+
+const RETRIABLE_ERROR_MESSAGES = new Set([
+    'Cannot resolve Durable Object due to transient issue on remote node.',
+    'internal error',
+    `Durable Object's isolate exceeded its memory limit and was reset.`,
+    'cannot access storage because object has moved to a different machine',
+    'Durable Object reset because its code was updated.',
+    "The Durable Object's code has been updated, this version can no longer access storage.",
+    // https://developers.cloudflare.com/workers/observability/errors/#runtime-errors
+    'Network connection lost.',
+]);
+
+/**
+ * Check if an error should be retried based on its error message.
+ */
+function shouldRetryError(error: unknown): boolean {
+    return error instanceof Error && RETRIABLE_ERROR_MESSAGES.has(error.message);
 }

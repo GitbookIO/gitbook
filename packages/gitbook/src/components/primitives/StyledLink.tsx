@@ -25,11 +25,11 @@ export const linkStyles = [
 /**
  * Styled version of Link component.
  */
-export function StyledLink(props: Omit<LinkProps, 'style'> & { style?: ClassValue }) {
-    const { style, ...rest } = props;
+export function StyledLink(props: Omit<LinkProps, 'style'> & { className?: ClassValue }) {
+    const { className, ...rest } = props;
 
     return (
-        <Link {...rest} className={tcls(linkStyles, style)}>
+        <Link {...rest} className={tcls(linkStyles, className)}>
             {props.children}
         </Link>
     );

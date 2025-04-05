@@ -8,6 +8,7 @@ import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { getAllBrowserCookiesMap } from '@/lib/browser-cookies';
 import { getSession } from './sessions';
+import { useVisitedPages } from './useVisitedPages';
 import { getVisitorId } from './visitorId';
 
 export type InsightsEventName = api.SiteInsightsEvent['type'];
@@ -85,6 +86,7 @@ interface InsightsProviderProps extends InsightsEventContext {
 export function InsightsProvider(props: InsightsProviderProps) {
     const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled, ...context } = props;
 
+    const addVisitedPage = useVisitedPages((state) => state.addPage);
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
         [pathname: string]:
@@ -134,6 +136,14 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 ...eventsForPathname,
                 events: [],
             };
+
+            // Mark the page as visited in our local state
+            if (eventsForPathname.pageContext.pageId) {
+                addVisitedPage({
+                    spaceId: context.spaceId,
+                    pageId: eventsForPathname.pageContext.pageId,
+                });
+            }
         }
 
         if (allEvents.length > 0) {
