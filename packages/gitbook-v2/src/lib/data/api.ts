@@ -193,7 +193,7 @@ const getUserById = memoize(async function getUserById(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getUserById.uncached', async () => {
+            return trace(`getUserById.uncached(${params.userId})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
                     const res = await api.users.getUserById(params.userId);
@@ -220,7 +220,7 @@ const getSpace = memoize(async function getSpace(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getSpace.uncached', async () => {
+            return trace(`getSpace.uncached(${params.spaceId}, ${params.shareKey})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
                     const res = await api.spaces.getSpaceById(params.spaceId, {
@@ -254,16 +254,19 @@ const getChangeRequest = memoize(async function getChangeRequest(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getChangeRequest.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getChangeRequestById(
-                        params.spaceId,
-                        params.changeRequestId
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getChangeRequest.uncached(${params.spaceId}, ${params.changeRequestId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getChangeRequestById(
+                            params.spaceId,
+                            params.changeRequestId
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.changeRequestId ?? ''],
         {
@@ -291,19 +294,22 @@ const getRevision = memoize(async function getRevision(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getRevision.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        {
-                            metadata: params.metadata,
-                        }
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getRevision.uncached(${params.spaceId}, ${params.revisionId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            {
+                                metadata: params.metadata,
+                            }
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.revisionId],
         {
@@ -325,19 +331,22 @@ const getRevisionPages = memoize(async function getRevisionPages(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getRevisionPages.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.listPagesInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        {
-                            metadata: params.metadata,
-                        }
-                    );
-                    return res.data.pages;
-                });
-            });
+            return trace(
+                `getRevisionPages.uncached(${params.spaceId}, ${params.revisionId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.listPagesInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            {
+                                metadata: params.metadata,
+                            }
+                        );
+                        return res.data.pages;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.revisionId],
         {
@@ -359,18 +368,21 @@ const getRevisionFile = memoize(async function getRevisionFile(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getRevisionFile.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getFileInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.fileId,
-                        {}
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getRevisionFile.uncached(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getFileInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.fileId,
+                            {}
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.revisionId, params.fileId],
         {
@@ -392,23 +404,26 @@ const getRevisionPageMarkdown = memoize(async function getRevisionPageMarkdown(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getRevisionPageMarkdown.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getPageInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.pageId,
-                        {
-                            format: 'markdown',
+            return trace(
+                `getRevisionPageMarkdown.uncached(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getPageInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.pageId,
+                            {
+                                format: 'markdown',
+                            }
+                        );
+                        if (!('markdown' in res.data)) {
+                            throw new DataFetcherError('Page is not a document', 404);
                         }
-                    );
-                    if (!('markdown' in res.data)) {
-                        throw new DataFetcherError('Page is not a document', 404);
-                    }
-                    return res.data.markdown;
-                });
-            });
+                        return res.data.markdown;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.revisionId, params.pageId],
         {
@@ -430,18 +445,21 @@ const getRevisionPageByPath = memoize(async function getRevisionPageByPath(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getRevisionPageByPath.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getPageInRevisionByPath(
-                        params.spaceId,
-                        params.revisionId,
-                        params.path,
-                        {}
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getRevisionPageByPath.uncached(${params.spaceId}, ${params.revisionId}, ${params.path})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getPageInRevisionByPath(
+                            params.spaceId,
+                            params.revisionId,
+                            params.path,
+                            {}
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.revisionId, params.path],
         {
@@ -462,17 +480,20 @@ const getDocument = memoize(async function getDocument(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getDocument.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getDocumentById(
-                        params.spaceId,
-                        params.documentId,
-                        {}
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getDocument.uncached(${params.spaceId}, ${params.documentId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getDocumentById(
+                            params.spaceId,
+                            params.documentId,
+                            {}
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.documentId],
         {
@@ -495,16 +516,19 @@ const getComputedDocument = memoize(async function getComputedDocument(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getComputedDocument.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getComputedDocument(params.spaceId, {
-                        source: params.source,
-                        seed: params.seed,
+            return trace(
+                `getComputedDocument.uncached(${params.spaceId}, ${params.organizationId}, ${params.source.type}, ${params.seed})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getComputedDocument(params.spaceId, {
+                            source: params.source,
+                            seed: params.seed,
+                        });
+                        return res.data;
                     });
-                    return res.data;
-                });
-            });
+                }
+            );
         },
         [
             input.apiToken ?? '',
@@ -538,17 +562,20 @@ const getReusableContent = memoize(async function getReusableContent(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getReusableContent.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getReusableContentInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.reusableContentId
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getReusableContent.uncached(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getReusableContentInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.reusableContentId
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.spaceId, params.revisionId, params.reusableContentId],
         {
@@ -570,16 +597,19 @@ const getLatestOpenAPISpecVersionContent = memoize(
     ) {
         const uncached = unstable_cache(
             async () => {
-                return trace('getLatestOpenAPISpecVersionContent.uncached', async () => {
-                    return wrapDataFetcherError(async () => {
-                        const api = apiClient(input);
-                        const res = await api.orgs.getLatestOpenApiSpecVersionContent(
-                            params.organizationId,
-                            params.slug
-                        );
-                        return res.data;
-                    });
-                });
+                return trace(
+                    `getLatestOpenAPISpecVersionContent.uncached(${params.organizationId}, ${params.slug})`,
+                    async () => {
+                        return wrapDataFetcherError(async () => {
+                            const api = apiClient(input);
+                            const res = await api.orgs.getLatestOpenApiSpecVersionContent(
+                                params.organizationId,
+                                params.slug
+                            );
+                            return res.data;
+                        });
+                    }
+                );
             },
             [input.apiToken ?? '', params.organizationId, params.slug],
             {
@@ -608,19 +638,22 @@ const getPublishedContentSite = memoize(async function getPublishedContentSite(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getPublishedContentSite.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.orgs.getPublishedContentSite(
-                        params.organizationId,
-                        params.siteId,
-                        {
-                            shareKey: params.siteShareKey,
-                        }
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getPublishedContentSite.uncached(${params.organizationId}, ${params.siteId}, ${params.siteShareKey})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.orgs.getPublishedContentSite(
+                            params.organizationId,
+                            params.siteId,
+                            {
+                                shareKey: params.siteShareKey,
+                            }
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [input.apiToken ?? '', params.organizationId, params.siteId, params.siteShareKey ?? ''],
         {
@@ -648,20 +681,23 @@ const getSiteRedirectBySource = memoize(async function getSiteRedirectBySource(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getSiteRedirectBySource.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.orgs.getSiteRedirectBySource(
-                        params.organizationId,
-                        params.siteId,
-                        {
-                            shareKey: params.siteShareKey,
-                            source: params.source,
-                        }
-                    );
-                    return res.data;
-                });
-            });
+            return trace(
+                `getSiteRedirectBySource.uncached(${params.organizationId}, ${params.siteId}, ${params.siteShareKey}, ${params.source})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.orgs.getSiteRedirectBySource(
+                            params.organizationId,
+                            params.siteId,
+                            {
+                                shareKey: params.siteShareKey,
+                                source: params.source,
+                            }
+                        );
+                        return res.data;
+                    });
+                }
+            );
         },
         [
             input.apiToken ?? '',
@@ -693,7 +729,7 @@ const getEmbedByUrl = memoize(async function getEmbedByUrl(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('getEmbedByUrl.uncached', async () => {
+            return trace(`getEmbedByUrl.uncached(${params.spaceId}, ${params.url})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
                     const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, {
@@ -719,17 +755,20 @@ const searchSiteContent = memoize(async function searchSiteContent(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('searchSiteContent.uncached', async () => {
-                return wrapDataFetcherError(async () => {
-                    const { organizationId, siteId, query, scope } = params;
-                    const api = apiClient(input);
-                    const res = await api.orgs.searchSiteContent(organizationId, siteId, {
-                        query,
-                        ...scope,
+            return trace(
+                `searchSiteContent.uncached(${params.organizationId}, ${params.siteId}, ${params.query})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const { organizationId, siteId, query, scope } = params;
+                        const api = apiClient(input);
+                        const res = await api.orgs.searchSiteContent(organizationId, siteId, {
+                            query,
+                            ...scope,
+                        });
+                        return res.data.items;
                     });
-                    return res.data.items;
-                });
-            });
+                }
+            );
         },
         [
             input.apiToken ?? '',
@@ -756,7 +795,7 @@ const renderIntegrationUi = memoize(async function renderIntegrationUi(
 ) {
     const uncached = unstable_cache(
         async () => {
-            return trace('renderIntegrationUi.uncached', async () => {
+            return trace(`renderIntegrationUi.uncached(${params.integrationName})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
                     const res = await api.integrations.renderIntegrationUiWithPost(
