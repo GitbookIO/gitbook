@@ -17,7 +17,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Deploy staging
+            - name: Deploy
               id: deploy
               uses: ./.github/composite/deploy-vercel
               with:
