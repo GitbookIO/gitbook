@@ -72,17 +72,6 @@ export function createLinker(
 
     const siteBasePath = withTrailingSlash(withLeadingSlash(servedOn.siteBasePath));
     const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
-    const protocol = (() => {
-        if (servedOn.protocol) {
-            return servedOn.protocol;
-        }
-
-        if (servedOn.host) {
-            return servedOn.host.startsWith('localhost') ? 'http:' : 'https:';
-        }
-
-        return 'https:';
-    })();
 
     const linker: GitBookLinker = {
         toPathInSpace(relativePath: string): string {
@@ -108,7 +97,7 @@ export function createLinker(
                 return absolutePath;
             }
 
-            return `${protocol}//${joinPaths(servedOn.host, absolutePath)}`;
+            return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
         },
 
         toPathForPage({ pages, page, anchor }) {
