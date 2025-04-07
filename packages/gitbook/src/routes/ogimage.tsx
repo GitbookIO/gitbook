@@ -8,6 +8,7 @@ import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { getCloudflareContext } from '@v2/lib/data/cloudflare';
 import { GITBOOK_RUNTIME } from '@v2/lib/env';
 import { getResizedImageURL } from '@v2/lib/images';
 
@@ -203,7 +204,11 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             />
 
             {/* Grid */}
-            {/* <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" /> */}
+            <img
+                tw="absolute inset-0 w-[100vw] h-[100vh]"
+                src={await readImage(await fetchSelf(gridAsset))}
+                alt="Grid"
+            />
 
             {/* Logo */}
             {customization.header.logo && 0 ? (
@@ -295,4 +300,26 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
         style: 'normal' as const,
         weight,
     };
+}
+
+/**
+ * Fetch a resource from the function itself.
+ * To avoid error with worker to worker requests in the same zone, we use the `WORKER_SELF_REFERENCE` binding.
+ */
+async function fetchSelf(url: string) {
+    const cloudflare = getCloudflareContext();
+    if (cloudflare?.env.WORKER_SELF_REFERENCE) {
+        return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(url);
+    }
+
+    return await fetch(url);
+}
+
+/**
+ * Read an image from a response as a base64 encoded string.
+ */
+async function readImage(response: Response) {
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString('base64');
+    return `data:image/${response.headers.get('content-type')};base64,${base64}`;
 }
