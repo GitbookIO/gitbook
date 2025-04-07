@@ -1,7 +1,6 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
-
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import type { SlimDocumentBlock, SlimJSONDocument } from '@/lib/slim-document';
 import { Block } from './Block';
 import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
@@ -9,7 +8,7 @@ import { isBlockOffscreen } from './utils';
 /**
  * Renders a list of blocks with a wrapper element.
  */
-export function Blocks<TBlock extends DocumentBlock, Tag extends React.ElementType = 'div'>(
+export function Blocks<TBlock extends SlimDocumentBlock, Tag extends React.ElementType = 'div'>(
     props: UnwrappedBlocksProps<TBlock> & {
         /** HTML tag to use for the wrapper */
         tag?: Tag;
@@ -30,15 +29,15 @@ export function Blocks<TBlock extends DocumentBlock, Tag extends React.ElementTy
     );
 }
 
-type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps & {
+type UnwrappedBlocksProps<TBlock extends SlimDocumentBlock> = DocumentContextProps & {
     /** Blocks to render */
     nodes: TBlock[];
 
     /** Document being rendered */
-    document: JSONDocument;
+    document: SlimJSONDocument;
 
     /** Ancestors of the blocks */
-    ancestorBlocks: DocumentBlock[];
+    ancestorBlocks: SlimDocumentBlock[];
 
     /** Style passed to all blocks */
     blockStyle?: ClassValue;
@@ -50,7 +49,9 @@ type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps &
 /**
  * Renders a list of blocks without a wrapper element.
  */
-export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBlocksProps<TBlock>) {
+export function UnwrappedBlocks<TBlock extends SlimDocumentBlock>(
+    props: UnwrappedBlocksProps<TBlock>
+) {
     const { nodes, blockStyle, isOffscreen: defaultIsOffscreen = false, ...contextProps } = props;
 
     let isOffscreen = defaultIsOffscreen;
@@ -65,11 +66,11 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
 
         return (
             <Block
-                key={node.key || `${node.type}-${index}`}
+                key={'key' in node && node.key ? node.key : `${node.type}-${index}`}
                 block={node}
                 style={[
                     'mx-auto w-full decoration-primary/6',
-                    node.data && 'fullWidth' in node.data && node.data.fullWidth
+                    'data' in node && node.data && 'fullWidth' in node.data && node.data.fullWidth
                         ? 'max-w-screen-xl'
                         : 'max-w-3xl',
                     blockStyle,

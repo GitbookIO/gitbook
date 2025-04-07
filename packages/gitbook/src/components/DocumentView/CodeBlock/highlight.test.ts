@@ -1,14 +1,19 @@
 import { expect, it } from 'bun:test';
 import type { DocumentBlockCode } from '@gitbook/api';
 
+import { getSlimDocumentBlock } from '@/lib/slim-document';
 import { type RenderedInline, getInlines, highlight } from './highlight';
 
 async function highlightWithInlines(block: DocumentBlockCode) {
-    const inlines: RenderedInline[] = getInlines(block).map((inline) => ({
+    const slimBlock = getSlimDocumentBlock(block);
+    const inlines: RenderedInline[] = getInlines(slimBlock).map((inline) => ({
         inline,
         body: null,
     }));
-    return highlight(block, inlines);
+    return highlight({
+        inlines,
+        block: slimBlock,
+    });
 }
 
 it('should parse plain code', async () => {
@@ -46,31 +51,29 @@ it('should parse plain code', async () => {
 
 it('should parse different code in parallel', async () => {
     await Promise.all(
-        ['shell', 'scss', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) =>
-            highlight(
-                {
-                    object: 'block',
-                    type: 'code',
-                    data: {
-                        syntax: syntax,
-                    },
-                    nodes: [
-                        {
-                            object: 'block',
-                            type: 'code-line',
-                            data: {},
-                            nodes: [
-                                {
-                                    object: 'text',
-                                    leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
-                                },
-                            ],
-                        },
-                    ],
+        ['shell', 'scss', 'scss', 'css', 'scss', 'yaml'].map(async (syntax) => {
+            const block: DocumentBlockCode = {
+                object: 'block',
+                type: 'code',
+                data: {
+                    syntax,
                 },
-                []
-            )
-        )
+                nodes: [
+                    {
+                        object: 'block',
+                        type: 'code-line',
+                        data: {},
+                        nodes: [
+                            {
+                                object: 'text',
+                                leaves: [{ object: 'leaf', marks: [], text: 'Hello world' }],
+                            },
+                        ],
+                    },
+                ],
+            };
+            highlight({ block: getSlimDocumentBlock(block), inlines: [] });
+        })
     );
 });
 

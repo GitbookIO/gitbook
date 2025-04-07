@@ -1,9 +1,9 @@
-import type { JSONDocument } from '@gitbook/api';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { getNodeText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
 import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock';
+import type { SlimJSONDocument } from './slim-document';
 
 export interface DocumentSection {
     id: string;
@@ -18,7 +18,7 @@ export interface DocumentSection {
  */
 export async function getDocumentSections(
     context: GitBookAnyContext,
-    document: JSONDocument
+    document: SlimJSONDocument
 ): Promise<DocumentSection[]> {
     const sections: DocumentSection[] = [];
     let depth = 0;

@@ -29,6 +29,7 @@ import {
     noCacheFetchOptions,
     parseCacheResponse,
 } from './cache';
+import { type SlimJSONDocument, getSlimJSONDocument } from './slim-document';
 
 /**
  * Pointer to a relative content, it might change overtime, the pointer is relative in the content history.
@@ -710,7 +711,9 @@ export const getDocument = cache({
                 ...noCacheFetchOptions,
             }
         );
-        return cacheResponse(response, cacheTtl_7days);
+        const slimResponse = response as unknown as HttpResponse<SlimJSONDocument, Error>;
+        slimResponse.data = getSlimJSONDocument(response.data);
+        return cacheResponse(slimResponse, cacheTtl_7days);
     },
     // Temporarily allow for a longer timeout than the default 10s
     // because GitBook's API currently re-normalizes all documents
@@ -752,6 +755,8 @@ export const getComputedDocument = cache({
                 ...noCacheFetchOptions,
             }
         );
+        const slimResponse = response as unknown as HttpResponse<SlimJSONDocument, Error>;
+        slimResponse.data = getSlimJSONDocument(response.data);
         return cacheResponse(response, cacheTtl_7days);
     },
     // Temporarily allow for a longer timeout than the default 10s

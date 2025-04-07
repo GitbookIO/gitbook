@@ -1,5 +1,4 @@
 import type {
-    DocumentBlock,
     DocumentBlockListItem,
     DocumentBlockListOrdered,
     DocumentBlockListUnordered,
@@ -10,6 +9,7 @@ import { assert } from 'ts-essentials';
 import { Checkbox } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
+import type { SlimDocumentBlock } from '@/lib/slim-document';
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
@@ -103,7 +103,7 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
 }
 
 function getListItemDepth(input: {
-    ancestorBlocks: DocumentBlock[];
+    ancestorBlocks: SlimDocumentBlock[];
     type: DocumentBlockListOrdered['type'] | DocumentBlockListUnordered['type'];
 }): number {
     const { ancestorBlocks, type } = input;

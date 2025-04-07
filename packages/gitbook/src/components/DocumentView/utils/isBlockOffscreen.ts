@@ -1,4 +1,4 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
+import type { SlimDocumentBlock, SlimJSONDocument } from '@/lib/slim-document';
 import memoize from 'memoizee/weak';
 
 /**
@@ -11,9 +11,9 @@ export function isBlockOffscreen(
         document,
         ancestorBlocks,
     }: {
-        document: JSONDocument;
-        block: DocumentBlock;
-        ancestorBlocks: DocumentBlock[];
+        document: SlimJSONDocument;
+        block: SlimDocumentBlock;
+        ancestorBlocks: SlimDocumentBlock[];
     },
     screenHeight = 500
 ): boolean {
@@ -44,8 +44,8 @@ function getBlockOffset({
     block,
     parent,
 }: {
-    block: DocumentBlock;
-    parent: DocumentBlock | JSONDocument;
+    block: SlimDocumentBlock;
+    parent: SlimDocumentBlock | SlimJSONDocument;
 }): number {
     if (!('nodes' in parent)) {
         return 0;
@@ -66,7 +66,7 @@ function getBlockOffset({
     return offset;
 }
 
-const getBlockHeight = memoize((block: DocumentBlock | undefined): number => {
+const getBlockHeight = memoize((block: SlimDocumentBlock | undefined): number => {
     if (!block) {
         return 0;
     }
@@ -115,6 +115,6 @@ const getBlockHeight = memoize((block: DocumentBlock | undefined): number => {
     }
 });
 
-const getBlockHeights = memoize((blocks: DocumentBlock[]): number => {
+const getBlockHeights = memoize((blocks: SlimDocumentBlock[]): number => {
     return blocks.reduce((total, block) => total + getBlockHeight(block), 0);
 });

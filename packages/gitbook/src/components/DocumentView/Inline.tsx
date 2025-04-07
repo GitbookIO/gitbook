@@ -7,10 +7,10 @@ import type {
     DocumentInlineLink,
     DocumentInlineMath,
     DocumentInlineMention,
-    JSONDocument,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
 
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import { Annotation } from './Annotation/Annotation';
 import type { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
@@ -26,7 +26,7 @@ export interface InlineProps<T extends DocumentInline> extends DocumentContextPr
     /**
      * Document being rendered.
      */
-    document: JSONDocument;
+    document: SlimJSONDocument;
 
     /**
      * Inline ancestors of the current inline.
