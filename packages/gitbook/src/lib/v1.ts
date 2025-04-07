@@ -336,7 +336,7 @@ export function getSitePointerFromContext(context: GitBookSiteContext): SiteCont
  * Return the base path for the current request.
  * The value will start and finish with /
  */
-export async function getBasePath(): Promise<string> {
+async function getBasePath(): Promise<string> {
     assertIsNotV2();
     const headersList = await headers();
     const path = headersList.get('x-gitbook-basepath') ?? '/';
@@ -348,7 +348,7 @@ export async function getBasePath(): Promise<string> {
  * Return the site base path for the current request.
  * The value will start and finish with /
  */
-export async function getSiteBasePath(): Promise<string> {
+async function getSiteBasePath(): Promise<string> {
     assertIsNotV2();
     const headersList = await headers();
     const path = headersList.get('x-gitbook-site-basepath') ?? '/';
@@ -359,7 +359,7 @@ export async function getSiteBasePath(): Promise<string> {
 /**
  * Return the current host for the current request.
  */
-export async function getHost(): Promise<string> {
+async function getHost(): Promise<string> {
     assertIsNotV2();
     const headersList = await headers();
     const mode = headersList.get('x-gitbook-mode');

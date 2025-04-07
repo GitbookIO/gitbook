@@ -358,7 +358,7 @@ function selectPages(
 }
 
 /**
- * Create the HTML ID for the container of a page during a PDF rendering.
+ * Create the HTML ID for the container of a page or a given anchor in it.
  */
 function getPagePDFContainerId(
     page: RevisionPageDocument | RevisionPageGroup,
