@@ -13,4 +13,4 @@ export const useSummaries = create<SummariesState>((set) => ({
             newCache.set(key, summary);
             return { cache: newCache };
         }),
-})); 
+}));
