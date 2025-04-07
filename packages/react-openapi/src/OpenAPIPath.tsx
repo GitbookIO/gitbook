@@ -7,12 +7,12 @@ import { getDefaultServerURL } from './util/server';
  */
 export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
-    /** Wether to show the server URL.
+    /** Whether to show the server URL.
      * @default true
      */
     withServer?: boolean;
     /**
-     * Wether the path is copyable.
+     * Whether the path is copyable.
      * @default true
      */
     canCopy?: boolean;
