@@ -7,7 +7,9 @@ import { type PageParams, fetchPageData } from '@/components/SitePage';
 import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
+import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { getCloudflareContext } from '@v2/lib/data/cloudflare';
 import { getResizedImageURL } from '@v2/lib/images';
 
 const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
@@ -169,8 +171,12 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
                 </span>
             );
-        const src = linker.toAbsoluteURL(
-            linker.toPathInSpace(`~gitbook/icon?size=medium&theme=${customization.themes.default}`)
+        const src = await readSelfImage(
+            linker.toAbsoluteURL(
+                linker.toPathInSpace(
+                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`
+                )
+            )
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();
@@ -192,7 +198,11 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             />
 
             {/* Grid */}
-            <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" />
+            <img
+                tw="absolute inset-0 w-[100vw] h-[100vh]"
+                src={await readStaticImage(gridAsset)}
+                alt="Grid"
+            />
 
             {/* Logo */}
             {customization.header.logo ? (
@@ -228,6 +238,18 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             width: 1200,
             height: 630,
             fonts: fonts.length ? fonts : undefined,
+            headers: {
+                'cache-tag': [
+                    getCacheTag({
+                        tag: 'site',
+                        site: baseContext.site.id,
+                    }),
+                    getCacheTag({
+                        tag: 'space',
+                        space: baseContext.space.id,
+                    }),
+                ].join(','),
+            },
         }
     );
 }
@@ -284,4 +306,56 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
         style: 'normal' as const,
         weight,
     };
+}
+
+/**
+ * Fetch a resource from the function itself.
+ * To avoid error with worker to worker requests in the same zone, we use the `WORKER_SELF_REFERENCE` binding.
+ */
+async function fetchSelf(url: string) {
+    const cloudflare = getCloudflareContext();
+    if (cloudflare?.env.WORKER_SELF_REFERENCE) {
+        return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(url);
+    }
+
+    return await fetch(url);
+}
+
+/**
+ * Read an image from a response as a base64 encoded string.
+ */
+async function readImage(response: Response) {
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.startsWith('image/')) {
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString('base64');
+    return `data:${contentType};base64,${base64}`;
+}
+
+const staticImagesCache = new Map<string, string>();
+
+/**
+ * Read a static image and cache it in memory.
+ */
+async function readStaticImage(url: string) {
+    const cached = staticImagesCache.get(url);
+    if (cached) {
+        return cached;
+    }
+
+    const image = await readSelfImage(url);
+    staticImagesCache.set(url, image);
+    return image;
+}
+
+/**
+ * Read an image from GitBook itself.
+ */
+async function readSelfImage(url: string) {
+    const response = await fetchSelf(url);
+    const image = await readImage(response);
+    return image;
 }
