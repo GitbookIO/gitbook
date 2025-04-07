@@ -5,6 +5,8 @@ import type {
     DocumentMarkItalic,
     DocumentMarkKeyboard,
     DocumentMarkStrikethrough,
+    DocumentMarkSubscript,
+    DocumentMarkSuperscript,
     DocumentText,
     DocumentTextMark,
 } from '@gitbook/api';
@@ -47,10 +49,8 @@ const MARK_STYLES = {
     strikethrough: Strikethrough,
     color: Color,
     keyboard: Keyboard,
-
-    // TODO: add support for these marks
-    subscript: null,
-    superscript: null,
+    superscript: Superscript,
+    subscript: Subscript,
 };
 
 interface MarkedLeafProps<Mark extends DocumentTextMark> {
@@ -75,6 +75,18 @@ function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
         <kbd className="rounded border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
             {props.children}
         </kbd>
+    );
+}
+
+function Superscript(props: MarkedLeafProps<DocumentMarkSuperscript>) {
+    return (
+        <sup>{props.children}</sup>
+    );
+}
+
+function Subscript(props: MarkedLeafProps<DocumentMarkSubscript>) {
+    return (
+        <sub>{props.children}</sub>
     );
 }
 
