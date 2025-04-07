@@ -3,6 +3,7 @@ import { ImageResponse } from 'next/og';
 
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
+import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { getResizedImageURL } from '@v2/lib/images';
 
@@ -73,6 +74,14 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
         {
             width: size.width,
             height: size.height,
+            headers: {
+                'cache-tag': [
+                    getCacheTag({
+                        tag: 'site',
+                        site: context.site.id,
+                    }),
+                ].join(','),
+            },
         }
     );
 }
