@@ -1,8 +1,10 @@
+import type { GitBookSiteContext } from '@v2/lib/context';
+import React from 'react';
+
 import { Image } from '@/components/utils';
 import { partition } from '@/lib/arrays';
 import { tcls } from '@/lib/tailwind';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import React from 'react';
+
 import { ThemeToggler } from '../ThemeToggler';
 import { CONTAINER_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
@@ -12,9 +14,6 @@ const FOOTER_COLUMNS = 4;
 export function Footer(props: { context: GitBookSiteContext }) {
     const { context } = props;
     const { customization } = context;
-
-    // customization.footer.logo = undefined;
-    // customization.footer.groups = [...customization.footer.groups, ...customization.footer.groups];
 
     const hasLogo = customization.footer.logo;
     const groupCount = customization.footer.groups?.length ?? 0;
