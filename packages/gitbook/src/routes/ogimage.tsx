@@ -203,7 +203,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             />
 
             {/* Grid */}
-            <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" />
+            {/* <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" /> */}
 
             {/* Logo */}
             {customization.header.logo ? (
