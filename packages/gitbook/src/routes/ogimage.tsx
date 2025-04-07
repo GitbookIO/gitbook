@@ -118,7 +118,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     // For Cloudflare, we use absolute URLs from the root of the site instead
     // to avoid issues with worker to worker requests in the same zone.
     const gridWhitePath = 'images/ogimage-grid-white.png';
-    const gridDarkPath = 'images/ogimage-grid-dark.png';
+    const gridDarkPath = 'images/ogimage-grid-black.png';
     const gridWhite =
         GITBOOK_RUNTIME === 'cloudflare'
             ? linker.toAbsoluteURL(`/~gitbook/static/${gridWhitePath}`)
