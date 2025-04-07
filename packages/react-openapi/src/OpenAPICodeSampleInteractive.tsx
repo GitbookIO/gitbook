@@ -70,6 +70,11 @@ function MediaTypeSelector(props: {
         return null;
     }
 
+    const items = renderers.map((renderer) => ({
+        key: renderer.mediaType,
+        label: renderer.mediaType,
+    }));
+
     return (
         <OpenAPISelect
             className={clsx('openapi-select')}
@@ -78,11 +83,12 @@ function MediaTypeSelector(props: {
                 key: renderer.mediaType,
                 label: renderer.mediaType,
             }))}
-            onChange={(e) => state.setMediaType(String(e))}
+            onSelectionChange={(e) => state.setMediaType(String(e))}
+            placement="bottom start"
         >
-            {renderers.map((renderer) => (
-                <OpenAPISelectItem key={renderer.mediaType} value={renderer}>
-                    {renderer.mediaType}
+            {items.map((item) => (
+                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
+                    {item.label}
                 </OpenAPISelectItem>
             ))}
         </OpenAPISelect>
@@ -107,13 +113,13 @@ function ExamplesSelector(props: {
 
     return (
         <OpenAPISelect
-            className={clsx('openapi-select')}
             items={items}
-            selectedKey={String(state.index)}
-            onChange={(e) => state.setIndex(Number(e))}
+            selectedKey={state.index}
+            onSelectionChange={(e) => state.setIndex(Number(e))}
+            placement="bottom start"
         >
             {items.map((item) => (
-                <OpenAPISelectItem key={item.key} value={item}>
+                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
                     {item.label}
                 </OpenAPISelectItem>
             ))}

@@ -37,11 +37,11 @@ export function OpenAPICodeSampleHeader(props: {
             {items.length > 1 ? (
                 <OpenAPISelect
                     selectedKey={selected?.key}
-                    onChange={(key) => {
+                    onSelectionChange={(key) => {
                         state.setKey(key);
                     }}
                     items={items}
-                    defaultSelectedKey={items[0]?.key}
+                    placement="bottom end"
                 >
                     {items.map((item) => (
                         <OpenAPISelectItem key={item.key} id={item.key} value={item}>

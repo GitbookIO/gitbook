@@ -8,6 +8,7 @@ import {
     ListBoxItem,
     type ListBoxItemProps,
     Popover,
+    type PopoverProps,
     Select,
     type SelectProps,
     SelectValue,
@@ -23,18 +24,14 @@ interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectPro
     children: React.ReactNode | ((item: T) => React.ReactNode);
     selectedKey?: Key;
     onChange?: (key: string | number) => void;
+    placement?: PopoverProps['placement'];
 }
 
 export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectProps<T>) {
-    const { items, children, className, selectedKey, onChange } = props;
+    const { items, children, className, placement } = props;
 
     return (
-        <Select
-            {...props}
-            className={clsx('openapi-select', className)}
-            selectedKey={selectedKey}
-            onSelectionChange={onChange}
-        >
+        <Select {...props} className={clsx('openapi-select', className)}>
             <Button>
                 <SelectValue />
                 <span aria-hidden="true">
@@ -49,7 +46,7 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
                     />
                 </span>
             </Button>
-            <Popover placement="bottom end" className="openapi-select-popover">
+            <Popover placement={placement} className="openapi-select-popover">
                 <ListBox className="openapi-select-listbox" items={items}>
                     {children}
                 </ListBox>

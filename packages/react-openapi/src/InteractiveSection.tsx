@@ -114,7 +114,7 @@ export function InteractiveSection(props: {
                                 )}
                                 items={tabs}
                                 selectedKey={selectedTab?.key ?? ''}
-                                onChange={(key) => {
+                                onSelectionChange={(key) => {
                                     setSelectedTab(String(key));
                                     state.expand();
                                 }}

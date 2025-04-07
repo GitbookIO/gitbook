@@ -531,12 +531,20 @@ body:has(.openapi-select-popover) {
     @apply hover:bg-tint-hover transition-all;
 }
 
+.openapi-select > button > span.react-aria-SelectValue {
+    @apply shrink truncate;
+}
+
+.openapi-select > button > .gb-icon {
+    @apply shrink-0;
+}
+
 .openapi-select > button svg {
     @apply size-2.5;
 }
 
 .openapi-select-popover {
-    @apply min-w-32 max-w-44 w-fit max-h-52 right-0 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md;
+    @apply min-w-32 max-w-fit w-auto max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
