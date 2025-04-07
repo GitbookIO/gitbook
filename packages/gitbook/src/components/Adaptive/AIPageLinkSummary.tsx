@@ -7,9 +7,7 @@ import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
-
-// Create a simple in-memory cache for page summaries
-const summaryCache = new Map<string, string>();
+import { useSummaries } from './summariesStore';
 
 /**
  * Get a unique cache key for a page summary
@@ -31,18 +29,17 @@ export function AIPageLinkSummary(props: {
     const { targetSpaceId, targetPageId, linkPreview, linkTitle, showTrademark = true } = props;
 
     const currentPage = usePageContext();
-
     const language = useLanguage();
     const visitedPages = useVisitedPages((state) => state.pages);
     const [summary, setSummary] = useState('');
+    const cacheKey = getCacheKey(targetSpaceId, targetPageId);
+    const cachedSummary = useSummaries((state) => state.cache.get(cacheKey) ?? '');
+    const setCachedSummary = useSummaries((state) => state.setSummary);
 
     useEffect(() => {
         let canceled = false;
 
         setSummary('');
-
-        const cacheKey = getCacheKey(targetSpaceId, targetPageId);
-        const cachedSummary = summaryCache.get(cacheKey);
 
         if (cachedSummary) {
             setSummary(cachedSummary);
@@ -70,7 +67,7 @@ export function AIPageLinkSummary(props: {
 
             // Cache the complete summary
             if (generatedSummary) {
-                summaryCache.set(cacheKey, generatedSummary);
+                setCachedSummary(cacheKey, generatedSummary);
             }
         })();
 
@@ -86,6 +83,9 @@ export function AIPageLinkSummary(props: {
         linkPreview,
         linkTitle,
         visitedPages,
+        cachedSummary,
+        cacheKey,
+        setCachedSummary,
     ]);
 
     const shimmerBlocks = [
