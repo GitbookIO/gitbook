@@ -8,6 +8,16 @@ import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
 
+// Create a simple in-memory cache for page summaries
+const summaryCache = new Map<string, string>();
+
+/**
+ * Get a unique cache key for a page summary
+ */
+function getCacheKey(targetSpaceId: string, targetPageId: string): string {
+    return `${targetSpaceId}:${targetPageId}`;
+}
+
 /**
  * Summarise a page's content for use in a link preview
  */
@@ -24,12 +34,20 @@ export function AIPageLinkSummary(props: {
 
     const language = useLanguage();
     const visitedPages = useVisitedPages((state) => state.pages);
-    const [highlight, setHighlight] = useState('');
+    const [summary, setSummary] = useState('');
 
     useEffect(() => {
         let canceled = false;
 
-        setHighlight('');
+        setSummary('');
+
+        const cacheKey = getCacheKey(targetSpaceId, targetPageId);
+        const cachedSummary = summaryCache.get(cacheKey);
+
+        if (cachedSummary) {
+            setSummary(cachedSummary);
+            return;
+        }
 
         (async () => {
             const stream = await streamLinkPageSummary({
@@ -43,9 +61,16 @@ export function AIPageLinkSummary(props: {
                 visitedPages,
             });
 
+            let generatedSummary = '';
             for await (const highlight of stream) {
                 if (canceled) return;
-                setHighlight(highlight ?? '');
+                generatedSummary = highlight ?? '';
+                setSummary(generatedSummary);
+            }
+
+            // Cache the complete summary
+            if (generatedSummary) {
+                summaryCache.set(cacheKey, generatedSummary);
             }
         })();
 
@@ -76,14 +101,14 @@ export function AIPageLinkSummary(props: {
         <div className="flex flex-col gap-1">
             <div className="flex w-screen items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                 {showTrademark ? (
-                    <Loading className="size-4" busy={!highlight || highlight.length === 0} />
+                    <Loading className="size-4" busy={!summary || summary.length === 0} />
                 ) : (
                     <Icon icon="sparkle" className="size-3" />
                 )}
                 <h6 className="text-tint">{t(language, 'link_tooltip_ai_summary')}</h6>
             </div>
-            {highlight.length > 0 ? (
-                <p className="animate-fadeIn">{highlight}</p>
+            {summary.length > 0 ? (
+                <p className="animate-fadeIn">{summary}</p>
             ) : (
                 <div className="mt-2 flex flex-wrap gap-2">
                     {shimmerBlocks.map((block, index) => (
@@ -94,7 +119,7 @@ export function AIPageLinkSummary(props: {
                     ))}
                 </div>
             )}
-            {highlight.length > 0 ? (
+            {summary.length > 0 ? (
                 <div className="animate-fadeIn text-tint-subtle text-xs">
                     {t(language, 'link_tooltip_ai_summary_description')}
                 </div>
