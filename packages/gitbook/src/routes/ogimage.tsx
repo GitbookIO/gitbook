@@ -164,22 +164,22 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     }
 
     const favicon = await (async () => {
-        if ('icon' in customization.favicon)
-            return (
-                <img
-                    src={customization.favicon.icon[theme]}
-                    width={40}
-                    height={40}
-                    tw="mr-4"
-                    alt="Icon"
-                />
-            );
-        if ('emoji' in customization.favicon)
-            return (
-                <span tw="text-4xl mr-4">
-                    {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
-                </span>
-            );
+        // if ('icon' in customization.favicon)
+        //     return (
+        //         <img
+        //             src={customization.favicon.icon[theme]}
+        //             width={40}
+        //             height={40}
+        //             tw="mr-4"
+        //             alt="Icon"
+        //         />
+        //     );
+        // if ('emoji' in customization.favicon)
+        //     return (
+        //         <span tw="text-4xl mr-4">
+        //             {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
+        //         </span>
+        //     );
         const src = linker.toAbsoluteURL(
             linker.toPathInSpace(`~gitbook/icon?size=medium&theme=${customization.themes.default}`)
         );
@@ -206,7 +206,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             {/* <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" /> */}
 
             {/* Logo */}
-            {customization.header.logo ? (
+            {customization.header.logo && 0 ? (
                 <img
                     alt="Logo"
                     height={60}
