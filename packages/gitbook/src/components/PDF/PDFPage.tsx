@@ -20,7 +20,6 @@ import { TrademarkLink } from '@/components/TableOfContents/Trademark';
 import type { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
-import { getPagePDFContainerId } from '@/lib/links';
 import { resolvePageId } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
@@ -29,6 +28,7 @@ import { type PDFSearchParams, getPDFSearchParams } from './urls';
 import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
 import './pdf.css';
+import { sanitizeGitBookAppURL } from '@/lib/app';
 
 const DEFAULT_LIMIT = 100;
 
@@ -92,7 +92,10 @@ export async function PDFPage(props: {
                 <div className={tcls('fixed', 'left-12', 'top-12', 'print:hidden', 'z-50')}>
                     <a
                         title={tString(language, 'pdf_goback')}
-                        href={pdfParams.back ?? linker.toAbsoluteURL(linker.toPathInSpace(''))}
+                        href={
+                            (pdfParams.back ? sanitizeGitBookAppURL(pdfParams.back) : null) ??
+                            linker.toAbsoluteURL(linker.toPathInSpace(''))
+                        }
                         className={tcls(
                             'flex',
                             'flex-row',
@@ -352,4 +355,14 @@ function selectPages(
         return flattenPage(page, 0);
     });
     return limitTo(allPages);
+}
+
+/**
+ * Create the HTML ID for the container of a page during a PDF rendering.
+ */
+function getPagePDFContainerId(
+    page: RevisionPageDocument | RevisionPageGroup,
+    anchor?: string
+): string {
+    return `pdf-page-${page.id}${anchor ? `-${anchor}` : ''}`;
 }
