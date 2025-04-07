@@ -81,6 +81,7 @@ export function createImageResizer({
 
                 searchParams.set('sign', cachedSignature.signature);
                 searchParams.set('sv', cachedSignature.version);
+                searchParams.set('sid', imagesContextId);
 
                 return `${url}?${searchParams.toString()}`;
             };

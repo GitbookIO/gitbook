@@ -34,7 +34,9 @@ export async function verifyImageSignature(
     const generated = await generator(input);
 
     // biome-ignore lint/suspicious/noConsole: we want to log the signature comparison
-    console.log(`comparing image signature "${generated}" (expected) === "${signature}" (actual)`);
+    console.log(
+        `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
+    );
     return generated === signature;
 }
 
