@@ -165,22 +165,22 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     }
 
     const favicon = await (async () => {
-        // if ('icon' in customization.favicon)
-        //     return (
-        //         <img
-        //             src={customization.favicon.icon[theme]}
-        //             width={40}
-        //             height={40}
-        //             tw="mr-4"
-        //             alt="Icon"
-        //         />
-        //     );
-        // if ('emoji' in customization.favicon)
-        //     return (
-        //         <span tw="text-4xl mr-4">
-        //             {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
-        //         </span>
-        //     );
+        if ('icon' in customization.favicon)
+            return (
+                <img
+                    src={customization.favicon.icon[theme]}
+                    width={40}
+                    height={40}
+                    tw="mr-4"
+                    alt="Icon"
+                />
+            );
+        if ('emoji' in customization.favicon)
+            return (
+                <span tw="text-4xl mr-4">
+                    {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
+                </span>
+            );
         const src = await readSelfImage(
             linker.toAbsoluteURL(
                 linker.toPathInSpace(
@@ -215,7 +215,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             />
 
             {/* Logo */}
-            {customization.header.logo && 0 ? (
+            {customization.header.logo ? (
                 <img
                     alt="Logo"
                     height={60}
@@ -323,9 +323,14 @@ async function fetchSelf(url: string) {
  * Read an image from a response as a base64 encoded string.
  */
 async function readImage(response: Response) {
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.startsWith('image/')) {
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+
     const arrayBuffer = await response.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString('base64');
-    return `data:image/${response.headers.get('content-type')};base64,${base64}`;
+    return `data:${contentType};base64,${base64}`;
 }
 
 const staticImagesCache = new Map<string, string>();
