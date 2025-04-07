@@ -156,6 +156,10 @@
     @apply prose-sm text-balance mt-1.5 !text-[0.813rem] text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-root-description {
+    @apply px-2.5 pt-1 !text-sm;
+}
+
 .openapi-schema-properties {
     @apply flex flex-col;
 }
