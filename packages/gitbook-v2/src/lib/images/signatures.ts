@@ -71,7 +71,11 @@ const generateSignatureV2: SignFn = async (input) => {
         .filter(Boolean)
         .join(':');
 
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+    const signature = fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+
+    console.log(`generateSignatureV2: "${all}" -> "${signature}"`);
+
+    return signature;
 };
 
 // Reused buffer for FNV-1a hashing in the v1 algorithm
