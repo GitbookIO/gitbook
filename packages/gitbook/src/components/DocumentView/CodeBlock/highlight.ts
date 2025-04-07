@@ -1,8 +1,4 @@
-import type {
-    DocumentBlockCode,
-    DocumentBlockCodeLine,
-    DocumentInlineAnnotation,
-} from '@gitbook/api';
+import type { DocumentInlineAnnotation } from '@gitbook/api';
 import {
     type ThemedToken,
     createCssVariablesTheme,
@@ -13,6 +9,7 @@ import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
 
 import { plainHighlight } from './plain-highlight';
+import type { LightNode } from './tree';
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -46,8 +43,8 @@ const { getSingletonHighlighter } = createSingletonShorthands(
 /**
  * Preload the highlighter for a code block.
  */
-export async function preloadHighlight(block: DocumentBlockCode) {
-    const langName = getBlockLang(block);
+export async function preloadHighlight(syntax: string | undefined): Promise<void> {
+    const langName = getLanguageFromSyntax(syntax);
     if (langName) {
         await getSingletonHighlighter({
             langs: [langName],
@@ -59,17 +56,20 @@ export async function preloadHighlight(block: DocumentBlockCode) {
 /**
  * Highlight a code block while preserving inline elements.
  */
-export async function highlight(
-    block: DocumentBlockCode,
-    inlines: RenderedInline[]
-): Promise<HighlightLine[]> {
-    const langName = getBlockLang(block);
+export async function highlight(args: {
+    syntax: string | undefined;
+    inlines: RenderedInline[];
+    lightNodes: LightNode[];
+    // block: DocumentBlockCode,
+}): Promise<HighlightLine[]> {
+    const { syntax, inlines, lightNodes } = args;
+    const langName = getLanguageFromSyntax(syntax);
     if (!langName) {
         // Language not found, fallback to plain highlighting
-        return plainHighlight(block, inlines);
+        return plainHighlight({ syntax, inlines, lightNodes });
     }
 
-    const code = getPlainCodeBlock(block);
+    const code = getPlainCodeBlock(lightNodes);
 
     const highlighter = await getSingletonHighlighter({
         langs: [langName],
@@ -84,7 +84,7 @@ export async function highlight(
 
     let currentIndex = 0;
     return lines.map((tokens, index) => {
-        const lineBlock = block.nodes[index];
+        const lightNode = lightNodes[index];
         const result: HighlightToken[] = [];
 
         const eatToken = (): PositionedToken | null => {
@@ -104,7 +104,7 @@ export async function highlight(
         currentIndex += 1; // for the \n
 
         return {
-            highlighted: Boolean(lineBlock.data.highlighted),
+            highlighted: Boolean(lightNode.highlighted),
             tokens: result,
         };
     });
@@ -113,8 +113,8 @@ export async function highlight(
 /**
  * Get the language of a code block.
  */
-function getBlockLang(block: DocumentBlockCode): string | null {
-    return block.data.syntax ? getLanguageForSyntax(block.data.syntax) : null;
+function getLanguageFromSyntax(syntax: string | undefined): string | null {
+    return syntax ? getLanguageForSyntax(syntax) : null;
 }
 
 const syntaxAliases: Record<string, BundledLanguage> = {
@@ -148,9 +148,9 @@ function getLanguageForSyntax(syntax: string): BundledLanguage | null {
     return null;
 }
 
-export function getInlines(block: DocumentBlockCode) {
+export function getInlines(lightNodes: LightNode[]): InlineIndexed[] {
     const inlines: InlineIndexed[] = [];
-    getPlainCodeBlock(block, inlines);
+    getPlainCodeBlock(lightNodes, inlines);
 
     inlines.sort((a, b) => a.start - b.start);
 
@@ -237,14 +237,14 @@ function matchTokenAndInlines(
     return result;
 }
 
-function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): string {
+function getPlainCodeBlock(lightNodes: LightNode[], inlines?: InlineIndexed[]): string {
     let content = '';
 
-    code.nodes.forEach((node, index) => {
+    lightNodes.forEach((node, index) => {
         const lineContent = getPlainCodeBlockLine(node, content.length, inlines);
         content += lineContent;
 
-        if (index < code.nodes.length - 1) {
+        if (index < lightNodes.length - 1) {
             content += '\n';
         }
     });
@@ -253,26 +253,32 @@ function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): 
 }
 
 function getPlainCodeBlockLine(
-    parent: DocumentBlockCodeLine | DocumentInlineAnnotation,
+    parent: LightNode | DocumentInlineAnnotation,
     index: number,
     inlines?: InlineIndexed[]
 ): string {
     let content = '';
 
-    for (const node of parent.nodes) {
-        if (node.object === 'text') {
-            content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
-        } else {
-            const start = index + content.length;
-            content += getPlainCodeBlockLine(node, index + content.length, inlines);
-            const end = index + content.length;
+    if ('text' in parent && parent.text) {
+        return cleanupLine(parent.text);
+    }
 
-            if (inlines) {
-                inlines.push({
-                    inline: node,
-                    start,
-                    end,
-                });
+    if ('nodes' in parent && parent.nodes) {
+        for (const node of parent.nodes) {
+            if (node.object === 'text') {
+                content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
+            } else {
+                const start = index + content.length;
+                content += getPlainCodeBlockLine(node, index + content.length, inlines);
+                const end = index + content.length;
+
+                if (inlines) {
+                    inlines.push({
+                        inline: node,
+                        start,
+                        end,
+                    });
+                }
             }
         }
     }

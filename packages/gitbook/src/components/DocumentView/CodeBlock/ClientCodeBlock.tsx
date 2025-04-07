@@ -1,36 +1,40 @@
 'use client';
 
-import type { DocumentBlockCode } from '@gitbook/api';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { useDebounceCallback } from 'usehooks-ts';
-import type { BlockProps } from '../Block';
-import { CodeBlockRenderer } from './CodeBlockRenderer';
+import { CodeBlockRenderer, type CodeBlockRendererProps } from './CodeBlockRenderer';
 import type { HighlightLine, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
+import type { LightNode } from './tree';
 
-type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
+interface ClientBlockProps extends Omit<CodeBlockRendererProps, 'lines'> {
+    lightNodes: LightNode[];
     inlines: RenderedInline[];
-};
+    syntax: string | undefined;
+}
 
 /**
  * Render a code-block client-side by loading the highlighter asynchronously.
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, style, inlines } = props;
+    const { lightNodes, style, inlines, syntax } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
-    const plainLines = useMemo(() => plainHighlight(block, []), [block]);
+    const plainLines = useMemo(
+        () => plainHighlight({ lightNodes, inlines: [], syntax }),
+        [lightNodes, syntax]
+    );
     const [lines, setLines] = useState<null | HighlightLine[]>(null);
 
     // Preload the highlighter when the block is mounted.
     useEffect(() => {
-        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block));
-    }, [block]);
+        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(syntax));
+    }, [syntax]);
 
     // When user scrolls, we need to wait for the scroll to finish before running the highlight
     const isScrollingRef = useRef(false);
@@ -78,7 +82,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
             if (typeof window !== 'undefined') {
                 import('./highlight').then(({ highlight }) => {
-                    highlight(block, inlines).then((lines) => {
+                    highlight({ lightNodes, inlines, syntax }).then((lines) => {
                         if (cancelled) {
                             return;
                         }
@@ -95,9 +99,16 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
         // Otherwise if the block is not in viewport, we reset to the plain lines
         setLines(null);
-    }, [isInViewport, block, inlines]);
+    }, [isInViewport, lightNodes, inlines, syntax]);
 
     return (
-        <CodeBlockRenderer ref={blockRef} block={block} style={style} lines={lines ?? plainLines} />
+        <CodeBlockRenderer
+            ref={blockRef}
+            title={props.title}
+            withLineNumbers={props.withLineNumbers}
+            withWrap={props.withWrap}
+            style={style}
+            lines={lines ?? plainLines}
+        />
     );
 }
