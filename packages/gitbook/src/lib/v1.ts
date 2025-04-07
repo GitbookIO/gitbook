@@ -9,6 +9,7 @@ import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 
 import { DataFetcherError, wrapDataFetcherError } from '@v2/lib/data';
+import { headers } from 'next/headers';
 import {
     type SiteContentPointer,
     type SpaceContentPointer,
@@ -31,7 +32,8 @@ import {
     searchSiteContent,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
-import { getBasePath, getHost, getSiteBasePath } from './links';
+import { withLeadingSlash, withTrailingSlash } from './paths';
+import { assertIsNotV2 } from './v2';
 
 /*
  * Code that will be used until the migration to v2 is complete.
@@ -328,4 +330,42 @@ export function getSitePointerFromContext(context: GitBookSiteContext): SiteCont
         changeRequestId: context.changeRequest?.id,
         siteShareKey: context.shareKey,
     };
+}
+
+/**
+ * Return the base path for the current request.
+ * The value will start and finish with /
+ */
+async function getBasePath(): Promise<string> {
+    assertIsNotV2();
+    const headersList = await headers();
+    const path = headersList.get('x-gitbook-basepath') ?? '/';
+
+    return withTrailingSlash(withLeadingSlash(path));
+}
+
+/**
+ * Return the site base path for the current request.
+ * The value will start and finish with /
+ */
+async function getSiteBasePath(): Promise<string> {
+    assertIsNotV2();
+    const headersList = await headers();
+    const path = headersList.get('x-gitbook-site-basepath') ?? '/';
+
+    return withTrailingSlash(withLeadingSlash(path));
+}
+
+/**
+ * Return the current host for the current request.
+ */
+async function getHost(): Promise<string> {
+    assertIsNotV2();
+    const headersList = await headers();
+    const mode = headersList.get('x-gitbook-mode');
+    if (mode === 'proxy') {
+        return headersList.get('x-forwarded-host') ?? '';
+    }
+
+    return headersList.get('x-gitbook-host') ?? headersList.get('host') ?? '';
 }
