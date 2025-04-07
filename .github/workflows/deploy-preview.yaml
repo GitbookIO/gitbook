@@ -40,6 +40,7 @@ jobs:
               run: bun run turbo gitbook#build:cloudflare
               env:
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  GITBOOK_RUNTIME: cloudflare
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.14.0

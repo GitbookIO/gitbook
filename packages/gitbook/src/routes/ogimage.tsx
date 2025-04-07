@@ -8,6 +8,7 @@ import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { GITBOOK_RUNTIME } from '@v2/lib/env';
 import { getResizedImageURL } from '@v2/lib/images';
 
 const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
@@ -113,8 +114,18 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
         body: baseColors[useLightTheme ? 'dark' : 'light'], // Invert text on background
     };
 
-    const gridWhite = getAssetURL('images/ogimage-grid-white.png');
-    const gridBlack = getAssetURL('images/ogimage-grid-black.png');
+    // For Cloudflare, we use absolute URLs from the root of the site instead
+    // to avoid issues with worker to worker requests in the same zone.
+    const gridWhitePath = 'images/ogimage-grid-white.png';
+    const gridDarkPath = 'images/ogimage-grid-dark.png';
+    const gridWhite =
+        GITBOOK_RUNTIME === 'cloudflare'
+            ? linker.toAbsoluteURL(`/~gitbook/static/${gridWhitePath}`)
+            : getAssetURL(gridWhitePath);
+    const gridBlack =
+        GITBOOK_RUNTIME === 'cloudflare'
+            ? linker.toAbsoluteURL(`/~gitbook/static/${gridDarkPath}`)
+            : getAssetURL(gridDarkPath);
 
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
