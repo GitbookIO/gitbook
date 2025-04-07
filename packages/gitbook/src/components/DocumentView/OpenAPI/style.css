@@ -419,6 +419,10 @@
     @apply flex flex-row items-center;
 }
 
+.openapi-codesample-header .openapi-select > button {
+    @apply border-none;
+}
+
 .openapi-codesample-header-content {
     @apply flex flex-row items-center justify-between h-fit p-2.5;
 }
@@ -532,8 +536,16 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-[var(--trigger-width)] max-w-40 w-full max-h-52 right-0 overflow-y-auto p-1.5 border border-tint-subtle bg-tint/9 backdrop-blur-xl rounded-md;
+    @apply min-w-32 max-w-44 w-fit max-h-52 right-0 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
+}
+
+.openapi-select-popover[data-entering] {
+    animation: popover-enter 0.2s ease-in-out;
+}
+
+.openapi-select-popover[data-exiting] {
+    animation: popover-leave 0.2s ease-in-out;
 }
 
 .openapi-select-item {
@@ -548,7 +560,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-listbox {
-    @apply flex flex-col gap-1;
+    @apply flex flex-col gap-1 focus:ring-0 focus:outline-none;
 }
 
 .openapi-select:focus {
@@ -761,6 +773,28 @@ body:has(.openapi-select-popover) {
     }
     100% {
         opacity: 0;
+    }
+}
+
+@keyframes popover-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(4px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes popover-leave {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(4px) scale(0.95);
     }
 }
 

@@ -3,9 +3,8 @@ import {
     OpenAPIMediaTypeExamplesBody,
     OpenAPIMediaTypeExamplesSelector,
 } from './OpenAPICodeSampleInteractive';
-import { OpenAPICodeSampleBody, OpenAPICodeSampleHeader } from './OpenAPICodeSampleSelector';
+import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
-import { StaticSection } from './StaticSection';
 import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
@@ -44,14 +43,7 @@ export function OpenAPICodeSample(props: {
         return null;
     }
 
-    return (
-        <StaticSection
-            header={<OpenAPICodeSampleHeader data={data} items={samples} />}
-            className="openapi-codesample"
-        >
-            <OpenAPICodeSampleBody items={samples} />
-        </StaticSection>
-    );
+    return <OpenAPICodeSampleBody data={data} items={samples} />;
 }
 
 /**
