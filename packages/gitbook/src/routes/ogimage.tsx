@@ -7,6 +7,7 @@ import { type PageParams, fetchPageData } from '@/components/SitePage';
 import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
+import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { getCloudflareContext } from '@v2/lib/data/cloudflare';
 import { GITBOOK_RUNTIME } from '@v2/lib/env';
@@ -248,6 +249,18 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             width: 1200,
             height: 630,
             fonts: fonts.length ? fonts : undefined,
+            headers: {
+                'cache-tag': [
+                    getCacheTag({
+                        tag: 'site',
+                        site: baseContext.site.id,
+                    }),
+                    getCacheTag({
+                        tag: 'space',
+                        space: baseContext.space.id,
+                    }),
+                ].join(','),
+            },
         }
     );
 }
