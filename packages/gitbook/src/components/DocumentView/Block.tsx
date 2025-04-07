@@ -1,4 +1,3 @@
-import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 import React from 'react';
 
 import {
@@ -10,6 +9,7 @@ import {
 } from '@/components/primitives';
 import type { ClassValue } from '@/lib/tailwind';
 
+import type { SlimDocumentBlock, SlimJSONDocument } from '@/lib/slim-document';
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
 import { Divider } from './Divider';
@@ -34,10 +34,10 @@ import { StepperStep } from './StepperStep';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
 
-export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
+export interface BlockProps<Block extends SlimDocumentBlock> extends DocumentContextProps {
     block: Block;
-    document: JSONDocument;
-    ancestorBlocks: DocumentBlock[];
+    document: SlimJSONDocument;
+    ancestorBlocks: SlimDocumentBlock[];
     /** If true, we estimate that the block will be outside the initial viewport */
     isEstimatedOffscreen: boolean;
     /** Class names to be passed to the underlying DOM element */
@@ -51,7 +51,7 @@ function nullIfNever(_value: never): null {
     return null;
 }
 
-export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
+export function Block<T extends SlimDocumentBlock>(props: BlockProps<T>) {
     const { block, style, isEstimatedOffscreen, context } = props;
 
     const content = (() => {
@@ -132,7 +132,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
 /**
  * Skeleton for a block while it is being loaded.
  */
-export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }) {
+export function BlockSkeleton(props: { block: SlimDocumentBlock; style: ClassValue }) {
     const { block, style } = props;
     const id = 'meta' in block && block.meta && 'id' in block.meta ? block.meta.id : undefined;
 

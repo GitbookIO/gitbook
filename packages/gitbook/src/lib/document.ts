@@ -1,11 +1,6 @@
-import type {
-    DocumentBlock,
-    DocumentFragment,
-    DocumentInline,
-    DocumentText,
-    JSONDocument,
-} from '@gitbook/api';
+import type { DocumentFragment, DocumentInline, DocumentText } from '@gitbook/api';
 import assertNever from 'assert-never';
+import type { SlimDocumentBlock, SlimJSONDocument } from './slim-document';
 
 export interface DocumentSection {
     id: string;
@@ -17,7 +12,7 @@ export interface DocumentSection {
 /**
  * Check if the document contains one block that should be rendered in full-width mode.
  */
-export function hasFullWidthBlock(document: JSONDocument): boolean {
+export function hasFullWidthBlock(document: SlimJSONDocument): boolean {
     for (const node of document.nodes) {
         if (node.data && 'fullWidth' in node.data && node.data.fullWidth) {
             return true;
@@ -34,7 +29,7 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
  * Get the text of a block/inline.
  */
 export function getNodeText(
-    node: JSONDocument | DocumentText | DocumentFragment | DocumentInline | DocumentBlock
+    node: DocumentText | DocumentFragment | DocumentInline | SlimDocumentBlock | SlimJSONDocument
 ): string {
     switch (node.object) {
         case 'text':
@@ -57,7 +52,7 @@ export function getNodeText(
  * Get a fragment by its type in a node.
  */
 export function getNodeFragmentByType(
-    node: DocumentInline | DocumentBlock,
+    node: DocumentInline | SlimDocumentBlock,
     type: string
 ): DocumentFragment | null {
     if (!('fragments' in node)) {
@@ -71,7 +66,7 @@ export function getNodeFragmentByType(
  * Get a fragment by its `fragment` name in a node.
  */
 export function getNodeFragmentByName(
-    node: DocumentInline | DocumentBlock,
+    node: DocumentInline | SlimDocumentBlock,
     name: string
 ): DocumentFragment | null {
     if (!('fragments' in node)) {
@@ -85,7 +80,7 @@ export function getNodeFragmentByName(
  * Test if a node is empty.
  */
 export function isNodeEmpty(
-    node: DocumentText | DocumentFragment | DocumentInline | DocumentBlock | JSONDocument
+    node: DocumentText | DocumentFragment | DocumentInline | SlimJSONDocument | SlimDocumentBlock
 ): boolean {
     if ((node.object === 'block' || node.object === 'inline') && node.isVoid) {
         return false;
@@ -106,7 +101,7 @@ export function isNodeEmpty(
 /**
  * Get the title for a node.
  */
-export function getBlockTitle(block: DocumentBlock): string {
+export function getBlockTitle(block: SlimDocumentBlock): string {
     switch (block.type) {
         case 'expandable': {
             const titleFragment = getNodeFragmentByType(block, 'expandable-title');
@@ -132,7 +127,7 @@ export function getBlockTitle(block: DocumentBlock): string {
 /**
  * Get a block by its ID in the document.
  */
-export function getBlockById(document: JSONDocument, id: string): DocumentBlock | null {
+export function getBlockById(document: SlimJSONDocument, id: string): SlimDocumentBlock | null {
     return findBlock(document, (block) => {
         if ('meta' in block && block.meta && 'id' in block.meta) {
             return block.meta.id === id;
@@ -145,9 +140,9 @@ export function getBlockById(document: JSONDocument, id: string): DocumentBlock 
  * Find a block by a predicate in the document.
  */
 function findBlock(
-    container: JSONDocument | DocumentBlock | DocumentFragment,
-    test: (block: DocumentBlock) => boolean
-): DocumentBlock | null {
+    container: SlimJSONDocument | SlimDocumentBlock | DocumentFragment,
+    test: (block: SlimDocumentBlock) => boolean
+): SlimDocumentBlock | null {
     if (!('nodes' in container)) {
         return null;
     }

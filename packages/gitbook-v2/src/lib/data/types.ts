@@ -1,3 +1,4 @@
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import type * as api from '@gitbook/api';
 
 export type DataFetcherErrorData = {
@@ -110,7 +111,7 @@ export interface GitBookDataFetcher {
      * Get a document by its space ID and document ID.
      */
     getDocument(params: { spaceId: string; documentId: string }): Promise<
-        DataFetcherResponse<api.JSONDocument>
+        DataFetcherResponse<SlimJSONDocument>
     >;
 
     /**
@@ -121,7 +122,7 @@ export interface GitBookDataFetcher {
         spaceId: string;
         source: api.ComputedContentSource;
         seed: string;
-    }): Promise<DataFetcherResponse<api.JSONDocument>>;
+    }): Promise<DataFetcherResponse<SlimJSONDocument>>;
 
     /**
      * Get a reusable content by its space ID, revision ID and reusable content ID.

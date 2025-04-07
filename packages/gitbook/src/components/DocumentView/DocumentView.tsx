@@ -1,7 +1,7 @@
 import type { ClassValue } from '@/lib/tailwind';
-import type { JSONDocument } from '@gitbook/api';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
 
@@ -39,7 +39,7 @@ export interface DocumentContextProps {
  */
 export function DocumentView(
     props: DocumentContextProps & {
-        document: JSONDocument;
+        document: SlimJSONDocument;
 
         /** Style passed to the container */
         style?: ClassValue;
@@ -73,14 +73,17 @@ export function DocumentView(
 /**
  * Placeholder for the entire document layout.
  */
-export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle: ClassValue }) {
+export function DocumentViewSkeleton(props: {
+    document: SlimJSONDocument;
+    blockStyle: ClassValue;
+}) {
     const { document, blockStyle } = props;
 
     return (
         <div className="flex flex-col gap-4">
-            {document.nodes.map((block) => (
+            {document.nodes.map((block, index) => (
                 <BlockSkeleton
-                    key={block.key!}
+                    key={block.key ?? `idx-${index}`}
                     block={block}
                     style={[
                         'mx-auto w-full decoration-primary/6',

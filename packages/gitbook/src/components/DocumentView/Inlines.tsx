@@ -1,5 +1,6 @@
-import type { DocumentInline, DocumentText, JSONDocument } from '@gitbook/api';
+import type { DocumentInline, DocumentText } from '@gitbook/api';
 
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import type { DocumentContextProps } from './DocumentView';
 import { Inline } from './Inline';
 import { Text } from './Text';
@@ -9,7 +10,7 @@ export function Inlines<T extends DocumentInline | DocumentText>(
         /**
          * Document being rendered.
          */
-        document: JSONDocument;
+        document: SlimJSONDocument;
 
         /**
          * Ancestors of the current inline.
