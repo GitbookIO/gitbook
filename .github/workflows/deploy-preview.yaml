@@ -97,7 +97,7 @@ jobs:
                   opItem: op://gitbook-open/2c-preview
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
                   commitTag: ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
-                  commitMessage: ${{ github.event.pull_request.title }}
+                  commitMessage: ${{ github.sha }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

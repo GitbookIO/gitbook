@@ -49,7 +49,7 @@ jobs:
                   opItem: op://gitbook-open/2c-production
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
                   commitTag: main
-                  commitMessage: ''
+                  commitMessage: ${{ github.sha }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
