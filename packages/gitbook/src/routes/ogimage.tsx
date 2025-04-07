@@ -181,8 +181,12 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
         //             {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
         //         </span>
         //     );
-        const src = linker.toAbsoluteURL(
-            linker.toPathInSpace(`~gitbook/icon?size=medium&theme=${customization.themes.default}`)
+        const src = await readSelfImage(
+            linker.toAbsoluteURL(
+                linker.toPathInSpace(
+                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`
+                )
+            )
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();
@@ -335,10 +339,19 @@ async function readStaticImage(url: string) {
         return cached;
     }
 
-    const response = await fetchSelf(url);
-    const image = await readImage(response);
-    console.log('readStaticImage', url, image);
+    const image = await readSelfImage(url);
     staticImagesCache.set(url, image);
 
+    return image;
+}
+
+/**
+ * Read an image from GitBook itself.
+ */
+async function readSelfImage(url: string) {
+    const response = await fetchSelf(url);
+    const image = await readImage(response);
+
+    console.log('readSelfImage', url, image);
     return image;
 }
