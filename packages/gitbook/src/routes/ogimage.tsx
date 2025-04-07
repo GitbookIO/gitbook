@@ -206,7 +206,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             {/* Grid */}
             <img
                 tw="absolute inset-0 w-[100vw] h-[100vh]"
-                src={await readImage(await fetchSelf(gridAsset))}
+                src={await readStaticImage(gridAsset)}
                 alt="Grid"
             />
 
@@ -322,4 +322,23 @@ async function readImage(response: Response) {
     const arrayBuffer = await response.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString('base64');
     return `data:image/${response.headers.get('content-type')};base64,${base64}`;
+}
+
+const staticImagesCache = new Map<string, string>();
+
+/**
+ * Read a static image and cache it in memory.
+ */
+async function readStaticImage(url: string) {
+    const cached = staticImagesCache.get(url);
+    if (cached) {
+        return cached;
+    }
+
+    const response = await fetchSelf(url);
+    const image = await readImage(response);
+    console.log('readStaticImage', url, image);
+    staticImagesCache.set(url, image);
+
+    return image;
 }
