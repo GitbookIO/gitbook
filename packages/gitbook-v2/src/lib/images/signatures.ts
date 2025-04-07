@@ -72,9 +72,6 @@ const generateSignatureV2: SignFn = async (input) => {
         .join(':');
 
     const signature = fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
-
-    console.log(`generateSignatureV2: "${all}" -> "${signature}"`);
-
     return signature;
 };
 
