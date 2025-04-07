@@ -346,7 +346,6 @@ async function readStaticImage(url: string) {
 
     const image = await readSelfImage(url);
     staticImagesCache.set(url, image);
-
     return image;
 }
 
@@ -356,7 +355,5 @@ async function readStaticImage(url: string) {
 async function readSelfImage(url: string) {
     const response = await fetchSelf(url);
     const image = await readImage(response);
-
-    console.log('readSelfImage', url, image);
     return image;
 }
