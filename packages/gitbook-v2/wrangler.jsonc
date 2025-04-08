@@ -53,7 +53,19 @@
                     "binding": "GITBOOK_API",
                     "service": "gitbook-x-prod-api-cache"
                 }
-            ]
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    }
+                ]
+            }
         },
         "staging": {
             "routes": [
@@ -94,7 +106,19 @@
                 {
                     "service": "gitbook-x-staging-tail"
                 }
-            ]
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    }
+                ]
+            }
         },
         "production": {
             "routes": [
@@ -135,7 +159,19 @@
                 {
                     "service": "gitbook-x-prod-tail"
                 }
-            ]
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    }
+                ]
+            }
         }
     }
 }
