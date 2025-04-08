@@ -47,6 +47,10 @@ const MARK_STYLES = {
     strikethrough: Strikethrough,
     color: Color,
     keyboard: Keyboard,
+
+    // TODO: add support for these marks
+    subscript: null,
+    superscript: null,
 };
 
 interface MarkedLeafProps<Mark extends DocumentTextMark> {

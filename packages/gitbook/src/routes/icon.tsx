@@ -1,8 +1,9 @@
-import { ImageResponse } from '@vercel/og';
 import { notFound, redirect } from 'next/navigation';
+import { ImageResponse } from 'next/og';
 
 import { getEmojiForCode } from '@/lib/emojis';
 import { tcls } from '@/lib/tailwind';
+import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { getResizedImageURL } from '@v2/lib/images';
 
@@ -32,6 +33,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
 
     const { site, customization } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
+
     // If the site has a custom icon, redirect to it
     if (customIcon) {
         const iconUrl = options.theme === 'light' ? customIcon.light : customIcon.dark;
@@ -44,6 +46,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
     }
 
     const contentTitle = site.title;
+
     return new ImageResponse(
         <div
             tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
@@ -71,6 +74,14 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
         {
             width: size.width,
             height: size.height,
+            headers: {
+                'cache-tag': [
+                    getCacheTag({
+                        tag: 'site',
+                        site: context.site.id,
+                    }),
+                ].join(','),
+            },
         }
     );
 }

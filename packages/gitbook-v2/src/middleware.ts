@@ -180,6 +180,23 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // (customization override, theme, etc)
         let routeType: 'dynamic' | 'static' = 'static';
 
+        // We pick only stable data from the siteURL data to prevent re-rendering of
+        // the root layout when changing pages..
+        const stableSiteURLData: SiteURLData = {
+            site: siteURLData.site,
+            siteSection: siteURLData.siteSection,
+            siteSpace: siteURLData.siteSpace,
+            siteBasePath: siteURLData.siteBasePath,
+            basePath: siteURLData.basePath,
+            space: siteURLData.space,
+            organization: siteURLData.organization,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+            shareKey: siteURLData.shareKey,
+            apiToken: siteURLData.apiToken,
+            imagesContextId: imagesContextId,
+        };
+
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
@@ -187,7 +204,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             MiddlewareHeaders.SiteURL,
             `${siteCanonicalURL.origin}${siteURLData.basePath}`
         );
-        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(siteURLData));
+        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
 
         // Preview of customization/theme
         const customization = siteRequestURL.searchParams.get('customization');
@@ -216,23 +233,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             siteURLData.pathname
         );
         routeType = routeTypeFromPathname ?? routeType;
-
-        // We pick only stable data from the siteURL data to prevent re-rendering of
-        // the root layout when changing pages..
-        const stableSiteURLData: SiteURLData = {
-            site: siteURLData.site,
-            siteSection: siteURLData.siteSection,
-            siteSpace: siteURLData.siteSpace,
-            siteBasePath: siteURLData.siteBasePath,
-            basePath: siteURLData.basePath,
-            space: siteURLData.space,
-            organization: siteURLData.organization,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
-            shareKey: siteURLData.shareKey,
-            apiToken: siteURLData.apiToken,
-            imagesContextId: imagesContextId,
-        };
 
         const route = [
             'sites',

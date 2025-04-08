@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useRef, useState } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
+import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
 
 interface InteractiveSectionTab {
@@ -106,24 +107,25 @@ export function InteractiveSection(props: {
                         }}
                     >
                         {tabs.length > 1 ? (
-                            <select
+                            <OpenAPISelect
                                 className={clsx(
                                     'openapi-section-select',
-                                    'openapi-select',
                                     `${className}-tabs-select`
                                 )}
-                                value={selectedTab?.key ?? ''}
-                                onChange={(event) => {
-                                    setSelectedTab(event.target.value);
+                                items={tabs}
+                                selectedKey={selectedTab?.key ?? ''}
+                                onSelectionChange={(key) => {
+                                    setSelectedTab(String(key));
                                     state.expand();
                                 }}
+                                placement="bottom end"
                             >
                                 {tabs.map((tab) => (
-                                    <option key={tab.key} value={tab.key}>
+                                    <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
                                         {tab.label}
-                                    </option>
+                                    </OpenAPISelectItem>
                                 ))}
-                            </select>
+                            </OpenAPISelect>
                         ) : null}
                     </div>
                 </SectionHeader>

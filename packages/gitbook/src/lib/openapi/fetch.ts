@@ -1,4 +1,5 @@
 import { parseOpenAPI } from '@gitbook/openapi-parser';
+import { unstable_cache } from 'next/cache';
 
 import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
 import type {
@@ -6,7 +7,8 @@ import type {
     OpenAPISchemasBlock,
     ResolveOpenAPIBlockArgs,
 } from '@/lib/openapi/types';
-import { memoize } from '@v2/lib/data/memoize';
+import { getCloudflareRequestGlobal } from '@v2/lib/data/cloudflare';
+import { withCacheKey, withoutConcurrentExecution } from '@v2/lib/data/memoize';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
@@ -66,15 +68,25 @@ const fetchFilesystemV1 = cache({
     },
 });
 
-const fetchFilesystemV2 = memoize(async function fetchFilesystemV2(url: string) {
-    'use cache';
+const fetchFilesystemV2 = withCacheKey(async (cacheKey, url: string) => {
+    const uncached = unstable_cache(
+        async () => fetchFilesystemV2Uncached(cacheKey, url),
+        [cacheKey],
+        {
+            revalidate: 60 * 60 * 24,
+        }
+    );
 
-    // TODO: add cache lifetime once we can use next.js 15 code here
-
-    const response = await fetchFilesystemUncached(url);
-
+    const response = await uncached();
     return response;
 });
+const fetchFilesystemV2Uncached = withoutConcurrentExecution(
+    getCloudflareRequestGlobal,
+    async function fetchFilesystemV2(url: string) {
+        const response = await fetchFilesystemUncached(url);
+        return response;
+    }
+);
 
 async function fetchFilesystemUncached(
     url: string,

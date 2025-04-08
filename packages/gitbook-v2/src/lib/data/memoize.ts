@@ -1,17 +1,61 @@
-import pMemoize from 'p-memoize';
+/**
+ * Wrap a function by preventing concurrent executions of the same function.
+ * With a logic to work per-request in Cloudflare Workers.
+ */
+export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
+    getGlobalContext: () => object | null | undefined,
+    wrapped: (...args: ArgsType) => Promise<ReturnType>
+): (cacheKey: string, ...args: ArgsType) => Promise<ReturnType> {
+    const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
+
+    return (key: string, ...args: ArgsType) => {
+        const globalContext = getGlobalContext() ?? globalThis;
+
+        /**
+         * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
+         * to avoid "Cannot perform I/O on behalf of a different request" errors.
+         */
+        const promiseCache =
+            globalPromiseCache.get(globalContext) ?? new Map<string, Promise<ReturnType>>();
+        globalPromiseCache.set(globalContext, promiseCache);
+
+        const concurrent = promiseCache.get(key);
+        if (concurrent) {
+            return concurrent;
+        }
+
+        const promise = (async () => {
+            try {
+                const result = await wrapped(...args);
+                return result;
+            } finally {
+                promiseCache.delete(key);
+            }
+        })();
+
+        promiseCache.set(key, promise);
+
+        return promise;
+    };
+}
 
 /**
- * We wrap 'use cache' calls in a p-memoize function to avoid
- * executing the function multiple times when doing concurrent calls.
- *
- * Hopefully one day this can be done directly by 'use cache'.
+ * Wrap a function by passing it a cache key that is computed from the function arguments.
  */
-export function memoize<F extends (...args: any[]) => any>(f: F): F {
-    return pMemoize(f, {
-        cacheKey: (args) => {
-            return JSON.stringify(deepSortValue(args));
-        },
-    });
+export function withCacheKey<ArgsType extends any[], ReturnType>(
+    wrapped: (cacheKey: string, ...args: ArgsType) => Promise<ReturnType>
+): (...args: ArgsType) => Promise<ReturnType> {
+    return (...args: ArgsType) => {
+        const cacheKey = getCacheKey(args);
+        return wrapped(cacheKey, ...args);
+    };
+}
+
+/**
+ * Compute a cache key from the function arguments.
+ */
+function getCacheKey(args: any[]) {
+    return JSON.stringify(deepSortValue(args));
 }
 
 function deepSortValue(value: unknown): unknown {

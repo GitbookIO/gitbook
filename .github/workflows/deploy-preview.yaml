@@ -40,6 +40,7 @@ jobs:
               run: bun run turbo gitbook#build:cloudflare
               env:
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+                  GITBOOK_RUNTIME: cloudflare
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.14.0
@@ -95,6 +96,8 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   opItem: op://gitbook-open/2c-preview
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  commitTag: ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
+                  commitMessage: ${{ github.sha }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"

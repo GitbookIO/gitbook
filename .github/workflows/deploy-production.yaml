@@ -17,7 +17,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Deploy staging
+            - name: Deploy
               id: deploy
               uses: ./.github/composite/deploy-vercel
               with:
@@ -48,6 +48,8 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   opItem: op://gitbook-open/2c-production
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  commitTag: main
+                  commitMessage: ${{ github.sha }}
             - name: Outputs
               run: |
                   echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
