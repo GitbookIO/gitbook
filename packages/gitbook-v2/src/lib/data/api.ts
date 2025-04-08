@@ -531,7 +531,7 @@ const getRevisionPageByPath = withCacheKey(
     ) => {
         const uncached = unstable_cache(
             async () => getRevisionPageByPathUncached(cacheKey, input, params),
-            [cacheKey],
+            [cacheKey, 'v2'],
             {
                 revalidate: RevalidationProfile.max,
                 tags: [],
@@ -551,12 +551,13 @@ const getRevisionPageByPathUncached = withoutConcurrentExecution(
         return trace(
             `getRevisionPageByPath.uncached(${params.spaceId}, ${params.revisionId}, ${params.path})`,
             async () => {
+                const encodedPath = encodeURIComponent(params.path);
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
                     const res = await api.spaces.getPageInRevisionByPath(
                         params.spaceId,
                         params.revisionId,
-                        params.path,
+                        encodedPath,
                         {}
                     );
                     return res.data;

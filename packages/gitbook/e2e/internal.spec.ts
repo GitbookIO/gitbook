@@ -838,6 +838,20 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Content Redirects',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
+        tests: [
+            {
+                name: 'Redirect to new location',
+                url: '/content-editor/editing-content/inline/redirect-test',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('Redirect test');
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
         name: 'Site Redirects with sections',
         contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
         tests: [
