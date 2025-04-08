@@ -196,13 +196,6 @@
         "typescript": "^5.5.3",
       },
     },
-    "packages/proxy": {
-      "name": "@gitbook/proxy",
-      "version": "0.1.0",
-      "devDependencies": {
-        "typescript": "^5.5.3",
-      },
-    },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
       "version": "0.7.0",
@@ -641,8 +634,6 @@
     "@gitbook/icons": ["@gitbook/icons@workspace:packages/icons"],
 
     "@gitbook/openapi-parser": ["@gitbook/openapi-parser@workspace:packages/openapi-parser"],
-
-    "@gitbook/proxy": ["@gitbook/proxy@workspace:packages/proxy"],
 
     "@gitbook/react-contentkit": ["@gitbook/react-contentkit@workspace:packages/react-contentkit"],
 
