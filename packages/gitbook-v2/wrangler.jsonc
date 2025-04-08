@@ -30,18 +30,17 @@
     ],
     "env": {
         "preview": {
-            "kv_namespaces": [
-                {
-                    // gitbook-open-v2-cache-preview
-                    "binding": "NEXT_INC_CACHE_KV",
-                    "id": "b7dd9cf58bf2458f84812a2d83b3760c"
-                }
-            ],
             "d1_databases": [
                 {
                     "binding": "NEXT_CACHE_D1",
                     "database_id": "f59ddb40-ad72-4312-9395-0ac6a129af8e",
                     "database_name": "gitbook-open-v2-tags-preview"
+                }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
                 }
             ],
             "services": [
@@ -78,11 +77,10 @@
                     "zone_name": "gitbook-staging.com"
                 }
             ],
-            "kv_namespaces": [
+            "r2_buckets": [
                 {
-                    // gitbook-open-v2-cache-staging
-                    "binding": "NEXT_INC_CACHE_KV",
-                    "id": "a446e25f12b741afb185f1e5b4474f0a"
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging"
                 }
             ],
             "d1_databases": [
@@ -131,11 +129,10 @@
                     "zone_name": "gitbook.com"
                 }
             ],
-            "kv_namespaces": [
+            "r2_buckets": [
                 {
-                    // gitbook-open-v2-cache-production
-                    "binding": "NEXT_INC_CACHE_KV",
-                    "id": "72379746280d4e79acf24440eea950dc"
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production"
                 }
             ],
             "d1_databases": [
