@@ -1,10 +1,13 @@
 import jwt from 'jsonwebtoken';
 import { type TestsCase, runTestCases } from './util';
 
+const xForwardedHostParam = 'x-forwarded-host=proxy.gitbook.site';
+
 /**
  * This test suite is designed to run tests for the site subdirectory
  * feature using a proxy.
  */
+
 const testCases: TestsCase[] = [
     {
         name: 'Site subdirectory (proxy)',
@@ -12,7 +15,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'Main',
-                url: '',
+                url: `?${xForwardedHostParam}`,
                 fullPage: true,
             },
         ],
@@ -35,7 +38,7 @@ const testCases: TestsCase[] = [
                             expiresIn: '24h',
                         }
                     );
-                    return `?jwt_token=${token}`;
+                    return `?jwt_token=${token}&${xForwardedHostParam}`;
                 },
                 fullPage: true,
             },
