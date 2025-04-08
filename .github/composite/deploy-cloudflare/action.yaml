@@ -19,6 +19,12 @@ inputs:
   deploy:
     description: 'Deploy as main version for all traffic instead of uploading versions'
     required: true
+  commitTag:
+    description: 'Commit branch to associate with the deployment'
+    required: true
+  commitMessage:
+    description: 'Commit message to associate with the deployment'
+    required: true
 outputs:
     deployment-url: 
       description: "Deployment URL"
@@ -65,7 +71,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '3.112.0'
               environment: ${{ inputs.environment }}
-              command: ${{ fromJSON(inputs.deploy) == true && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.jsonc
+              command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/wrangler.jsonc
         - name: Outputs
           shell: bash
           env:
