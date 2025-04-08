@@ -39,7 +39,7 @@ export function SpaceLayout(props: {
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(sections && sections.list.length > 0);
+    const withSections = Boolean(sections && sections.list.length > 1);
     const isMultiVariants = Boolean(siteSpaces.length > 1);
 
     const withFooter =
