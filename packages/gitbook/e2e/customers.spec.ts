@@ -239,6 +239,15 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.fluentbit.io',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
+    {
+        name: 'run-ai-docs.nvidia.com',
+        contentBaseURL: 'https://run-ai-docs.nvidia.com',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        tests: [
+            { name: 'Home', url: '/' },
+            { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO' },
+        ],
+    },
 ];
 
 runTestCases(testCases);
