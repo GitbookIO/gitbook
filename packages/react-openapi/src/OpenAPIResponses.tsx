@@ -2,12 +2,11 @@
 
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import clsx from 'clsx';
-import { useStore } from 'zustand';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
+import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
 import { StaticSection } from './StaticSection';
-import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 import type { OpenAPIClientContext } from './types';
 
 /**
@@ -18,6 +17,7 @@ export function OpenAPIResponses(props: {
     context: OpenAPIClientContext;
 }) {
     const { responses, context } = props;
+    const state = useResponseExamplesState(context.blockKey, 'default');
 
     const groups = Object.entries(responses).map(
         ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
@@ -82,20 +82,15 @@ export function OpenAPIResponses(props: {
         }
     );
 
-    const store = useStore(
-        getOrCreateStoreByKey(`openapi-responses-${context.blockKey}`, groups[0]?.id)
-    );
-
     return (
         <StaticSection header="Responses" className="openapi-responses">
             <OpenAPIDisclosureGroup
                 icon={context.icons.chevronRight}
-                expandedKeys={store.key ? new Set([store.key]) : new Set()}
+                expandedKeys={state.key ? new Set([state.key]) : new Set()}
                 onExpandedChange={(keys) => {
                     const key = keys.values().next().value;
-                    if (key) {
-                        store.setKey(key);
-                    }
+
+                    state.setKey(key ?? null);
                 }}
                 groups={groups}
             />

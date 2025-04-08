@@ -92,7 +92,7 @@
 /* Method Tags */
 .openapi-method,
 .openapi-statuscode {
-    @apply rounded uppercase font-mono shrink-0 font-semibold text-sm px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+    @apply rounded uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get,
@@ -144,7 +144,7 @@
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col gap-4 sticky top-4 site-header:top-20 site-header-sections:page-has-toc:top-32 page-api-block:xl:max-2xl:top-32 print-mode:static;
+    @apply flex flex-col gap-4 sticky top-4 site-header:top-20 site-header-sections:top-32 page-api-block:xl:max-2xl:top-32 print-mode:static;
 }
 
 .openapi-column-preview pre {
@@ -433,7 +433,7 @@
 }
 
 .openapi-codesample-header-content .openapi-path {
-    @apply flex items-center font-mono text-[0.813rem] gap-2 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
+    @apply flex items-center font-mono text-[0.813rem] gap-1 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
 }
 
 .openapi-codesample-header-content .openapi-path .openapi-path-variable {
@@ -525,6 +525,11 @@
     @apply flex flex-row items-center p-2.5;
 }
 
+.openapi-response-examples-statuscode-title {
+    @apply flex items-center;
+}
+
+.openapi-response-examples-header .openapi-select > button,
 .openapi-response-examples-header .openapi-markdown {
     @apply text-[0.813rem] truncate text-tint font-normal;
 }
@@ -567,7 +572,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-32 max-w-fit w-auto max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
+    @apply min-w-32 max-w-64 w-auto max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
