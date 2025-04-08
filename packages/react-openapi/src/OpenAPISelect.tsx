@@ -16,7 +16,7 @@ import {
 
 export type OpenAPISelectItem = {
     key: Key;
-    label: string;
+    label: string | React.ReactNode;
 };
 
 interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectProps<T>, 'children'> {

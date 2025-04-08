@@ -1,9 +1,13 @@
+'use client';
+
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import clsx from 'clsx';
+import { useStore } from 'zustand';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { StaticSection } from './StaticSection';
+import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 import type { OpenAPIClientContext } from './types';
 
 /**
@@ -15,74 +19,85 @@ export function OpenAPIResponses(props: {
 }) {
     const { responses, context } = props;
 
+    const groups = Object.entries(responses).map(
+        ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
+            const tabs = (() => {
+                // If there is no content, but there are headers, we need to show the headers
+                if (
+                    (!response.content || !Object.keys(response.content).length) &&
+                    response.headers &&
+                    Object.keys(response.headers).length
+                ) {
+                    return [
+                        {
+                            id: 'default',
+                            body: (
+                                <OpenAPIResponse
+                                    response={response}
+                                    mediaType={{}}
+                                    context={context}
+                                />
+                            ),
+                        },
+                    ];
+                }
+
+                return Object.entries(response.content ?? {}).map(([contentType, mediaType]) => ({
+                    id: contentType,
+                    label: contentType,
+                    body: (
+                        <OpenAPIResponse
+                            response={response}
+                            mediaType={mediaType}
+                            context={context}
+                        />
+                    ),
+                }));
+            })();
+
+            const description = response.description;
+
+            return {
+                id: statusCode,
+                label: (
+                    <div className="openapi-response-tab-content">
+                        <span
+                            className={clsx(
+                                'openapi-statuscode',
+                                `openapi-statuscode-${getStatusCodeClassName(statusCode)}`
+                            )}
+                        >
+                            {statusCode}
+                        </span>
+                        {description ? (
+                            <Markdown
+                                source={description}
+                                className="openapi-response-description"
+                            />
+                        ) : null}
+                    </div>
+                ),
+                tabs,
+            };
+        }
+    );
+
+    const store = useStore(
+        getOrCreateStoreByKey(`openapi-responses-${context.blockKey}`, groups[0]?.id)
+    );
+
     return (
         <StaticSection header="Responses" className="openapi-responses">
             <OpenAPIDisclosureGroup
                 icon={context.icons.chevronRight}
-                groups={Object.entries(responses).map(
-                    ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
-                        const tabs = (() => {
-                            // If there is no content, but there are headers, we need to show the headers
-                            if (
-                                (!response.content || !Object.keys(response.content).length) &&
-                                response.headers &&
-                                Object.keys(response.headers).length
-                            ) {
-                                return [
-                                    {
-                                        id: 'default',
-                                        body: (
-                                            <OpenAPIResponse
-                                                response={response}
-                                                mediaType={{}}
-                                                context={context}
-                                            />
-                                        ),
-                                    },
-                                ];
-                            }
-
-                            return Object.entries(response.content ?? {}).map(
-                                ([contentType, mediaType]) => ({
-                                    id: contentType,
-                                    label: contentType,
-                                    body: (
-                                        <OpenAPIResponse
-                                            response={response}
-                                            mediaType={mediaType}
-                                            context={context}
-                                        />
-                                    ),
-                                })
-                            );
-                        })();
-
-                        const description = response.description;
-
-                        return {
-                            id: statusCode,
-                            label: (
-                                <div className="openapi-response-tab-content">
-                                    <span
-                                        className={clsx(
-                                            'openapi-response-statuscode',
-                                            `openapi-response-statuscode-${getStatusCodeClassName(statusCode)}`
-                                        )}
-                                    >
-                                        {statusCode}
-                                    </span>
-                                    {description ? (
-                                        <Markdown
-                                            source={description}
-                                            className="openapi-response-description"
-                                        />
-                                    ) : null}
-                                </div>
-                            ),
-                            tabs,
-                        };
+                expandedKeys={store.key ? new Set([store.key]) : new Set()}
+                onExpandedChange={(keys) => {
+                    const key = keys.values().next().value;
+                    if (key) {
+                        store.setKey(key);
                     }
-                )}
+                }}
+                groups={groups}
             />
         </StaticSection>
     );
@@ -95,7 +110,7 @@ export function OpenAPIResponses(props: {
  * 3xx: redirect
  * 4xx, 5xx: error
  */
-function getStatusCodeClassName(statusCode: number | string): string {
+export function getStatusCodeClassName(statusCode: number | string): string {
     const code = typeof statusCode === 'string' ? Number.parseInt(statusCode, 10) : statusCode;
 
     if (Number.isNaN(code) || code < 100 || code >= 600) {

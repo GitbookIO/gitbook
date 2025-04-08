@@ -6,6 +6,7 @@ import {
     getExampleFromReference,
     getExamplesFromMediaTypeObject,
 } from './OpenAPIExample';
+import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
 import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIContext, OpenAPIOperationData } from './types';
@@ -49,7 +50,8 @@ export function OpenAPIResponseExample(props: {
         if (checkIsReference(responseObject)) {
             return {
                 key: key,
-                label: key,
+                label: description ? <Markdown source={description} /> : null,
+                statusCode: key,
                 body: (
                     <OpenAPIExample
                         example={getExampleFromReference(responseObject)}
@@ -57,24 +59,23 @@ export function OpenAPIResponseExample(props: {
                         syntax="json"
                     />
                 ),
-                footer: description ? <Markdown source={description} /> : undefined,
             };
         }
 
         if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
             return {
                 key: key,
-                label: key,
+                label: description ? <Markdown source={description} /> : null,
+                statusCode: key,
                 body: <OpenAPIEmptyExample />,
-                footer: description ? <Markdown source={description} /> : undefined,
             };
         }
 
         return {
             key: key,
-            label: key,
+            label: description ? <Markdown source={description} /> : null,
+            statusCode: key,
             body: <OpenAPIResponse context={context} content={responseObject.content} />,
-            footer: description ? <Markdown source={description} /> : undefined,
         };
     });
 
@@ -82,13 +83,7 @@ export function OpenAPIResponseExample(props: {
         return null;
     }
 
-    return (
-        <OpenAPITabs stateKey={createStateKey('response-example')} items={tabs}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-panel">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
-    );
+    return <OpenAPIResponseExampleContent blockKey={context.blockKey} items={tabs} />;
 }
 
 function OpenAPIResponse(props: {
