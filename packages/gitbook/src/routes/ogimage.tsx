@@ -89,12 +89,15 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             await Promise.all(
                 primaryFontWeights.map((face) => {
                     const { weight, sources } = face;
-                    if (sources.length === 0) {
+                    const source = sources[0];
+
+                    // Satori doesn't support WOFF2, so we skip it
+                    // https://github.com/vercel/satori?tab=readme-ov-file#fonts
+                    if (!source || source.format === 'woff2' || source.url.endsWith('.woff2')) {
                         return null;
                     }
-                    const url = sources[0].url;
 
-                    return loadCustomFont({ url, weight });
+                    return loadCustomFont({ url: source.url, weight });
                 })
             )
         ).filter(filterOutNullable);
