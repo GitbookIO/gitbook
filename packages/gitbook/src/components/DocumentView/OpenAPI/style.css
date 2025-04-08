@@ -384,7 +384,23 @@
 }
 
 .openapi-response-statuscode {
-    @apply tabular-nums text-sm font-normal font-mono shrink-0;
+    @apply tabular-nums text-[0.813rem] leading-4 font-mono shrink-0 font-medium px-1 py-0.5 bg-tint text-tint-strong rounded-md border;
+}
+
+.openapi-response-statuscode-informational {
+    @apply bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:border-blue-700;
+}
+
+.openapi-response-statuscode-success {
+    @apply bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-100 dark:border-green-700;
+}
+
+.openapi-response-statuscode-redirection {
+    @apply bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-100 dark:border-amber-700;
+}
+
+.openapi-response-statuscode-error {
+    @apply bg-pomegranate-100 text-pomegranate-800 border-pomegranate-200 dark:bg-pomegranate-900 dark:text-pomegranate-100 dark:border-pomegranate-700;
 }
 
 .openapi-response-content-type {
