@@ -8,6 +8,10 @@
     @apply flex flex-col mb-14 flex-1;
 }
 
+.openapi-schemas-title {
+    @apply tabular-nums text-[0.813rem] leading-4 font-mono shrink-0 font-medium text-tint-strong;
+}
+
 .openapi-columns {
     @apply grid grid-cols-1 lg:grid-cols-2 gap-6 print-mode:grid-cols-1 justify-stretch;
 }
@@ -46,10 +50,7 @@
     @apply font-semibold font-mono truncate;
 }
 
-.openapi-description.openapi-markdown {
-    @apply prose-sm text-[0.938rem];
-}
-
+.openapi-description.openapi-markdown,
 .openapi-description.openapi-markdown code {
     @apply prose-sm;
 }
@@ -157,7 +158,7 @@
 }
 
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-root-description {
-    @apply px-2.5 pt-1 !text-sm;
+    @apply px-2.5 pt-2.5 mt-0 !text-sm;
 }
 
 .openapi-schema-properties {
@@ -360,7 +361,7 @@
 
 /* Responses */
 .openapi-responses-header {
-    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
+    @apply py-2 max-w-full flex-1;
 }
 
 .openapi-responses-header-content {
@@ -384,23 +385,23 @@
 }
 
 .openapi-response-statuscode {
-    @apply tabular-nums text-[0.813rem] leading-4 font-mono shrink-0 font-medium px-1 py-0.5 bg-tint text-tint-strong rounded-md border;
+    @apply tabular-nums text-[0.813rem] leading-4 font-mono shrink-0 font-medium px-1 py-0.5 bg-tint ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 text-tint-strong rounded;
 }
 
 .openapi-response-statuscode-informational {
-    @apply bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:border-blue-700;
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
 }
 
 .openapi-response-statuscode-success {
-    @apply bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-100 dark:border-green-700;
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
 }
 
 .openapi-response-statuscode-redirection {
-    @apply bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900 dark:text-amber-100 dark:border-amber-700;
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100;
 }
 
 .openapi-response-statuscode-error {
-    @apply bg-pomegranate-100 text-pomegranate-800 border-pomegranate-200 dark:bg-pomegranate-900 dark:text-pomegranate-100 dark:border-pomegranate-700;
+    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-900 dark:text-pomegranate-100;
 }
 
 .openapi-response-content-type {
@@ -432,7 +433,7 @@
 
 /* Code Sample */
 .openapi-codesample {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded straight-corners:rounded-none bg-tint border-tint-subtle;
 }
 
 .openapi-codesample-header {
@@ -510,7 +511,7 @@
 
 /* Panel */
 .openapi-panel {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded straight-corners:rounded-none bg-tint border-tint-subtle;
 }
 
 .openapi-panel-heading {
@@ -564,7 +565,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-32 max-w-fit w-auto max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md;
+    @apply min-w-32 max-w-fit w-auto max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
@@ -659,7 +660,7 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-b border-tint-subtle relative;
+    @apply border-tint-subtle border-b border-x overflow-auto last:rounded-b straight-corners:last:rounded-none first:rounded-t straight-corners:first:rounded-none first:border-t relative;
 }
 
 .openapi-disclosure-group-header {
@@ -667,16 +668,11 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-baseline relative flex-1 gap-2.5 py-2 truncate -outline-offset-1;
+    @apply flex items-center transition-all hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {
-    @apply cursor-default;
-}
-
-.openapi-disclosure-group:only-child,
-.openapi-disclosure-group:last-child {
-    @apply border-b-0;
+    @apply cursor-default hover:bg-inherit;
 }
 
 .openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
@@ -696,7 +692,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-panel {
-    @apply pb-2.5;
+    @apply p-3 pt-1 transition-all;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
@@ -712,12 +708,25 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-mediatype > span {
-    @apply px-1 bg-tint-6 text-tint-12 rounded-full;
+    @apply px-1 bg-tint-6 text-tint-12 rounded-full straight-corners:rounded-md;
 }
 
 /* Disclosure */
+.openapi-schemas-disclosure > .openapi-disclosure-trigger {
+    @apply flex items-center !w-full transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+}
+
+.openapi-schemas-disclosure > .openapi-disclosure-trigger,
+.openapi-schemas-disclosure .openapi-disclosure-panel {
+    @apply straight-corners:!rounded-none;
+}
+
+.openapi-schemas-disclosure > .openapi-disclosure-trigger[aria-expanded="true"] > svg {
+    @apply rotate-90;
+}
+
 .openapi-disclosure-trigger {
-    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all bg-tint-base truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure-trigger span {
@@ -733,7 +742,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger[aria-expanded="true"] {
-    @apply w-full rounded-lg border-b rounded-b-none;
+    @apply w-full rounded-lg border-b rounded-b-none straight-corners:rounded-b-none;
 }
 
 .openapi-disclosure-trigger[aria-expanded="false"] {
@@ -741,7 +750,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-panel[aria-hidden="false"] {
-    @apply border-b border-x border-tint-subtle rounded-b-lg;
+    @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b bg-tint-base;
 }
 
 .openapi-disclosure-panel .openapi-schema {
@@ -761,17 +770,13 @@ body:has(.openapi-select-popover) {
     @apply space-y-2.5;
 }
 
-.openapi-section-schemas {
-    @apply border border-tint-subtle rounded-lg;
-}
-
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema,
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-root {
     @apply p-2.5;
 }
 
 .openapi-tooltip {
-    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
 }
 
 .openapi-tooltip svg {

@@ -18,7 +18,6 @@ export function OpenAPIResponses(props: {
     return (
         <StaticSection header="Responses" className="openapi-responses">
             <OpenAPIDisclosureGroup
-                allowsMultipleExpanded
                 icon={context.icons.chevronRight}
                 groups={Object.entries(responses).map(
                     ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
