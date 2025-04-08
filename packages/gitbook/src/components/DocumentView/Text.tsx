@@ -79,15 +79,11 @@ function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
 }
 
 function Superscript(props: MarkedLeafProps<DocumentMarkSuperscript>) {
-    return (
-        <sup>{props.children}</sup>
-    );
+    return <sup>{props.children}</sup>;
 }
 
 function Subscript(props: MarkedLeafProps<DocumentMarkSubscript>) {
-    return (
-        <sub>{props.children}</sub>
-    );
+    return <sub>{props.children}</sub>;
 }
 
 function Code(props: MarkedLeafProps<DocumentMarkCode>) {
