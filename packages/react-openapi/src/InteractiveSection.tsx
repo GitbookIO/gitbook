@@ -118,6 +118,7 @@ export function InteractiveSection(props: {
                                     setSelectedTab(String(key));
                                     state.expand();
                                 }}
+                                placement="bottom end"
                             >
                                 {tabs.map((tab) => (
                                     <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
