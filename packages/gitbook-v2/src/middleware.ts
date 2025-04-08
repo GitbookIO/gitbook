@@ -396,23 +396,29 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         };
     }
 
-    // Skip other requests to main hosts
-    if (isMainHost || isAssetsHost) {
-        return null;
-    }
-
+    // The x-forwarded-host is set by Vercel for all requests
+    // so we ignore it if the hostname is the same as the instance one.
     const xForwardedHost =
         request.nextUrl.searchParams.get('x-forwarded-host') ??
         request.headers.get('x-forwarded-host');
-    console.log({ xForwardedHost });
-    // The x-forwarded-host is set by Vercel for all requests
-    // so we ignore it if the hostname is the same as the instance one.
-    if (xForwardedHost) {
+
+    const forwardedRequest = xForwardedHost
+        ? appendQueryParams(
+              new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
+              request.nextUrl.searchParams
+          )
+        : null;
+
+    const isProxy = forwardedRequest ? isProxyRequest(forwardedRequest) : false;
+
+    // Skip other requests to main hosts
+    if ((isMainHost || isAssetsHost) && !isProxy) {
+        return null;
+    }
+
+    if (forwardedRequest) {
         return {
-            url: appendQueryParams(
-                new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
-                request.nextUrl.searchParams
-            ),
+            url: forwardedRequest,
             mode: 'url-host',
         };
     }
