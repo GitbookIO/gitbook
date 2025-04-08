@@ -57,7 +57,7 @@
             "env": ["BASE_URL", "SITE_BASE_URL"]
         },
         // Run end-to-end tests for proxy sites
-          "e2e-proxy": {
+        "e2e-proxy": {
             "dependsOn": ["^e2e-proxy"],
             "env": ["BASE_URL", "X_FORWARDED_HOST"]
         },
