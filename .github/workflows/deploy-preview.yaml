@@ -187,7 +187,7 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'v2-vercel'
-    visual-testing-v2-vercel-proxy:
+    visual-testing-proxy-v2-vercel:
         runs-on: ubuntu-latest
         name: Visual Testing v2 (Proxy)
         needs: deploy-v2-vercel
@@ -202,7 +202,7 @@ jobs:
             - name: Setup Playwright
               uses: ./.github/actions/setup-playwright
             - name: Run Playwright tests
-              run: bun e2e
+              run: bun e2e-proxy
               env:
                   BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
