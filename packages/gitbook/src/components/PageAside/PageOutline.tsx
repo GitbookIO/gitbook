@@ -7,7 +7,7 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 import { ScrollSectionsList } from './ScrollSectionsList';
 
-export function PageOutline(props: {
+export async function PageOutline(props: {
     document: JSONDocument | null;
     context: GitBookSiteContext;
 }) {
@@ -15,7 +15,11 @@ export function PageOutline(props: {
     const { customization } = context;
     const language = getSpaceLanguage(customization);
 
-    return (
+    if(!document) return;
+    
+    const sections = await getDocumentSections(context, document);
+
+    return document && sections.length > 1 ? (
         <div>
             <div className="mb-1 flex flex-row items-center gap-2 font-semibold text-xs uppercase tracking-wide">
                 <Icon icon="block-quote" className={tcls('size-3')} />
@@ -32,20 +36,10 @@ export function PageOutline(props: {
                     // 'page-api-block:xl:max-2xl:group-hover/aside:flex'
                 )}
             >
-                {document ? (
-                    <React.Suspense fallback={null}>
-                        <PageAsideSections document={document} context={context} />
-                    </React.Suspense>
-                ) : null}
+                <React.Suspense fallback={null}>
+                    <ScrollSectionsList sections={sections} />
+                </React.Suspense>
             </div>
         </div>
-    );
-}
-
-async function PageAsideSections(props: { document: JSONDocument; context: GitBookSiteContext }) {
-    const { document, context } = props;
-
-    const sections = await getDocumentSections(context, document);
-
-    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
+    ) : null;
 }
