@@ -187,27 +187,6 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'v2-vercel'
-    visual-testing-proxy-v2-vercel:
-        runs-on: ubuntu-latest
-        name: Visual Testing v2 (Proxy)
-        needs: deploy-v2-vercel
-        timeout-minutes: 10
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Bun
-              uses: ./.github/composite/setup-bun
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-            - name: Setup Playwright
-              uses: ./.github/actions/setup-playwright
-            - name: Run Playwright tests
-              run: bun e2e-proxy
-              env:
-                  BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
-                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'v2-vercel'
-                  X_FORWARDED_HOST: 'proxy.gitbook.site'
     visual-testing-customers-v1:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v1

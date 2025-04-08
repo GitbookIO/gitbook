@@ -56,11 +56,6 @@
             "dependsOn": ["^e2e-customers"],
             "env": ["BASE_URL", "SITE_BASE_URL"]
         },
-        // Run end-to-end tests for proxy sites
-        "e2e-proxy": {
-            "dependsOn": ["^e2e-proxy"],
-            "env": ["BASE_URL", "X_FORWARDED_HOST"]
-        },
         // Start the package in development mode
         "dev": {
             "persistent": true,

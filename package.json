@@ -27,7 +27,6 @@
         "unit": "turbo run unit",
         "e2e": "turbo run e2e",
         "e2e-customers": "turbo run e2e-customers",
-        "e2e-proxy": "turbo run e2e-proxy",
         "changeset": "changeset",
         "changeset-version": "changeset version && bun run format",
         "release": "turbo run release && changeset publish",

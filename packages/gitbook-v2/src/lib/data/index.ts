@@ -5,3 +5,4 @@ export * from './urls';
 export * from './errors';
 export * from './lookup';
 export * from './proxy';
+export * from './visitor';

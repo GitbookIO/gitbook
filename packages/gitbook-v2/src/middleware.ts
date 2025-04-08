@@ -16,9 +16,8 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
-    getProxyRequestIdentifier,
     getPublishedContentByURL,
-    isProxyRequest,
+    getVisitorAuthBasePath,
     normalizeURL,
     throwIfDataError,
 } from '@v2/lib/data';
@@ -26,7 +25,6 @@ import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { getImageResizingContextId } from '@v2/lib/images';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import type { SiteURLData } from './lib/context';
-
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -141,13 +139,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         cookies.push(
             ...getResponseCookiesForVisitorAuth(
-                // The siteRequestURL for proxy requests is of the form `https://proxy.gitbook.com/site/siteId/...`
-                // In such cases, we should not use the resolved siteBasePath for the cookie because for subsequent requests
-                // we will not have the siteBasePath in the request URL in order to retrieve the cookie. So we use the
-                // proxy identifier instead.
-                isProxyRequest(siteRequestURL)
-                    ? getProxyRequestIdentifier(siteRequestURL)
-                    : siteURLData.siteBasePath,
+                getVisitorAuthBasePath(siteRequestURL, siteURLData),
                 visitorToken
             )
         );
@@ -401,10 +393,7 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         return null;
     }
 
-    const xForwardedHost =
-        request.nextUrl.searchParams.get('x-forwarded-host') ??
-        request.headers.get('x-forwarded-host');
-    console.log({ xForwardedHost });
+    const xForwardedHost = request.headers.get('x-forwarded-host');
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
     if (xForwardedHost) {
