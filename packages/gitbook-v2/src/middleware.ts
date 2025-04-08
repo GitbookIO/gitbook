@@ -401,7 +401,7 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
         return null;
     }
 
-    const xForwardedHost = request.headers.get('x-forwarded-host');
+    const xForwardedHost = process.env.X_FORWARDED_HOST ?? request.headers.get('x-forwarded-host');
     // The x-forwarded-host is set by Vercel for all requests
     // so we ignore it if the hostname is the same as the instance one.
     if (xForwardedHost) {
