@@ -433,7 +433,7 @@
 
 /* Code Sample */
 .openapi-codesample {
-    @apply border rounded straight-corners:rounded-none bg-tint border-tint-subtle;
+    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
 }
 
 .openapi-codesample-header {
@@ -511,7 +511,7 @@
 
 /* Panel */
 .openapi-panel {
-    @apply border rounded straight-corners:rounded-none bg-tint border-tint-subtle;
+    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
 }
 
 .openapi-panel-heading {
@@ -660,7 +660,7 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-tint-subtle border-b border-x overflow-auto last:rounded-b straight-corners:last:rounded-none first:rounded-t straight-corners:first:rounded-none first:border-t relative;
+    @apply border-tint-subtle border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
 }
 
 .openapi-disclosure-group-header {
@@ -713,7 +713,7 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure */
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
-    @apply flex items-center !w-full transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex items-center font-mono !w-full transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger,
@@ -726,7 +726,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all bg-tint-base truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure-trigger span {
@@ -750,7 +750,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-panel[aria-hidden="false"] {
-    @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b bg-tint-base;
+    @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b;
 }
 
 .openapi-disclosure-panel .openapi-schema {

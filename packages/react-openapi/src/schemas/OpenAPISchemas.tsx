@@ -88,33 +88,6 @@ export function OpenAPISchemas(props: {
                     </OpenAPIDisclosure>
                 );
             })}
-
-            {/* <OpenAPIDisclosureGroup
-                icon={context.icons.chevronRight}
-                groups={schemas.map(({ name, schema }) => ({
-                    id: name,
-                    label: (
-                        <div className="openapi-response-tab-content" key={`model-${name}`}>
-                            <span className="openapi-schemas-title">{name}</span>
-                        </div>
-                    ),
-                    tabs: [
-                        {
-                            id: 'model',
-                            body: (
-                                <Section className="openapi-section-schemas">
-                                    <SectionBody>
-                                        <OpenAPIRootSchema
-                                            schema={schema}
-                                            context={clientContext}
-                                        />
-                                    </SectionBody>
-                                </Section>
-                            ),
-                        },
-                    ],
-                }))}
-            /> */}
         </div>
     );
 }
