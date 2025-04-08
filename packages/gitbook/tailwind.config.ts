@@ -298,7 +298,7 @@ const config: Config = {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
                 scaleIn: 'scaleIn 200ms ease',
                 scaleOut: 'scaleOut 200ms ease',
-                fadeIn: 'fadeIn 200ms ease forwards',
+                fadeIn: 'fadeIn 200ms ease both',
                 fadeOut: 'fadeOut 200ms ease forwards',
                 enterFromLeft: 'enterFromLeft 250ms ease',
                 enterFromRight: 'enterFromRight 250ms ease',
