@@ -315,7 +315,11 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
 async function fetchSelf(url: string) {
     const cloudflare = getCloudflareContext();
     if (cloudflare?.env.WORKER_SELF_REFERENCE) {
-        return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(url);
+        return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(
+            // `getAssetURL` can return a relative URL, so we need to make it absolute
+            // the URL doesn't matter, as we're using the worker-self-reference binding
+            new URL(url, 'https://worker-self-reference/')
+        );
     }
 
     return await fetch(url);
