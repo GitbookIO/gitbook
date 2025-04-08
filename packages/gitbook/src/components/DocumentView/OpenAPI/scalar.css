@@ -1,5 +1,11 @@
 @import "@scalar/api-client-react/style.css";
 
+html,
+body {
+    /** Override Scalar's overscroll-behavior */
+    @apply !overscroll-auto;
+}
+
 .light .scalar-modal-layout,
 .light .scalar-app,
 .light .scalar {
