@@ -17,6 +17,7 @@ import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
     getPublishedContentByURL,
+    getVisitorAuthBasePath,
     normalizeURL,
     throwIfDataError,
 } from '@v2/lib/data';
@@ -24,7 +25,6 @@ import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { getImageResizingContextId } from '@v2/lib/images';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import type { SiteURLData } from './lib/context';
-
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -137,7 +137,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             return NextResponse.redirect(siteURLData.redirect);
         }
 
-        cookies.push(...getResponseCookiesForVisitorAuth(siteURLData.siteBasePath, visitorToken));
+        cookies.push(
+            ...getResponseCookiesForVisitorAuth(
+                getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                visitorToken
+            )
+        );
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
