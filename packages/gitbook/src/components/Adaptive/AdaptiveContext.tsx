@@ -13,7 +13,7 @@ export type SuggestedPage = {
     emoji?: string;
 };
 
-type Journey = {
+export type Journey = {
     label: string;
     icon?: string;
     pages?: Array<SuggestedPage>;
@@ -30,7 +30,7 @@ type AdaptiveContextType = {
 
 export const AdaptiveContext = React.createContext<AdaptiveContextType | null>(null);
 
-const JOURNEY_COUNT = 4;
+export const JOURNEY_COUNT = 4;
 
 /**
  * Client side context provider to pass information about the current page.
@@ -39,9 +39,7 @@ export function JourneyContextProvider({
     children,
     spaces,
 }: { children: React.ReactNode; spaces: { id: string; title: string }[] }) {
-    const [journeys, setJourneys] = React.useState<Journey[]>(
-        Array.from({ length: JOURNEY_COUNT })
-    );
+    const [journeys, setJourneys] = React.useState<Journey[]>([]);
     const [selectedJourney, setSelectedJourney] = React.useState<Journey | undefined>(undefined);
     const [loading, setLoading] = React.useState(true);
     const [open, setOpen] = React.useState(true);
@@ -51,6 +49,8 @@ export function JourneyContextProvider({
 
     useEffect(() => {
         let canceled = false;
+
+        setJourneys([]);
 
         (async () => {
             const stream = await streamPageJourneySuggestions({
@@ -69,14 +69,7 @@ export function JourneyContextProvider({
             for await (const journey of stream) {
                 if (canceled) return;
 
-                setJourneys((prev) => {
-                    const newJourneys = [...prev];
-                    const emptyIndex = newJourneys.findIndex((j) => !j?.label);
-                    if (emptyIndex >= 0) {
-                        newJourneys[emptyIndex] = journey;
-                    }
-                    return newJourneys;
-                });
+                setJourneys((prev) => [...prev, journey]);
             }
 
             setLoading(false);

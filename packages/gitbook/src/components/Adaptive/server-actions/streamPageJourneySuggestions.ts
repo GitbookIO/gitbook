@@ -61,7 +61,7 @@ export async function* streamPageJourneySuggestions({
                                         })
                                     )
                                     .describe(
-                                        'A list of pages in the journey, excluding the current page.'
+                                        'A list of pages in the journey, excluding the current page. Try to avoid duplicate content that is very similar.'
                                     )
                                     .min(5)
                                     .max(10),
@@ -127,13 +127,7 @@ Feel free to create journeys across spaces.`,
     ]);
 
     const emitted: { label: string; pageIds: string[] }[] = [];
-    // for await (const value of stream) {
-    //     const journeys = value.journeys;
-
-    //     if (!journeys) continue;
-
-    //     yield journeys;
-    // }
+    const allEmittedPageIds = new Set<string>();
 
     for await (const value of stream) {
         const journeys = value.journeys;
@@ -142,7 +136,7 @@ Feel free to create journeys across spaces.`,
 
         for (const journey of journeys) {
             if (!journey?.label) continue;
-            if (!journey?.pages) continue;
+            if (!journey?.pages || journey.pages?.length === 0) continue;
             if (emitted.find((item) => item.label === journey.label)) continue;
 
             const pageIds: string[] = [];
@@ -153,6 +147,7 @@ Feel free to create journeys across spaces.`,
             for (const page of journey.pages) {
                 if (!page) continue;
                 if (!page.id) continue;
+                if (pageIds.includes(page.id)) continue;
 
                 pageIds.push(page.id);
 
@@ -167,11 +162,19 @@ Feel free to create journeys across spaces.`,
                 pageIds: pageIds,
             });
 
+            // Deduplicate pages before yielding
+            const uniquePages = resolvedPages.filter(page => {
+                if (allEmittedPageIds.has(page.page.id)) {
+                    return false;
+                }
+                allEmittedPageIds.add(page.page.id);
+                return true;
+            });
 
             yield {
                 label: journey.label,
                 icon: journey.icon,
-                pages: resolvedPages.map((page) => ({
+                pages: uniquePages.map((page) => ({
                     id: page.page.id,
                     title: page.page.title,
                     icon: page.page.icon,
@@ -184,19 +187,4 @@ Feel free to create journeys across spaces.`,
             };
         }
     }
-
-    // for await (const value of stream) {
-    //     const journeys = value.journeys;
-
-    //     if (!journeys) continue;
-
-    //     // for (const journey of journeys) {
-    //     //     if (emitted.has(journey)) {
-    //     //         continue;
-    //     //     }
-
-    //     //     emitted.add(journey);
-    //     //     yield journey;
-    //     // }
-    // }
 }
