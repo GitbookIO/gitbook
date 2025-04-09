@@ -15,8 +15,8 @@ export async function PageOutline(props: {
     const { customization } = context;
     const language = getSpaceLanguage(customization);
 
-    if(!document) return;
-    
+    if (!document) return;
+
     const sections = await getDocumentSections(context, document);
 
     return document && sections.length > 1 ? (
