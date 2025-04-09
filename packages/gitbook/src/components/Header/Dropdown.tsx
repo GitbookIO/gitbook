@@ -58,6 +58,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                         className={tcls(
                             'mt-2',
                             'w-full',
+                            'max-h-80',
                             'bg-tint-base',
                             'rounded-lg',
                             'straight-corners:rounded-sm',

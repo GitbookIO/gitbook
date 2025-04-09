@@ -2,11 +2,105 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { Icon } from '@gitbook/icons';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
+
+/**
+ * Get a unique cache key for a page summary
+ */
+function getCacheKey(targetSpaceId: string, targetPageId: string): string {
+    return `${targetSpaceId}:${targetPageId}`;
+}
+
+/**
+ * Global state for the summaries.
+ */
+const useSummaries = create<{
+    /**
+     * Cache of all summaries generated so far.
+     */
+    cache: Map<string, string>;
+
+    /**
+     * Get a summary for a page.
+     */
+    getSummary: (params: { targetSpaceId: string; targetPageId: string }) => string;
+
+    /**
+     * Stream the generation of a summary for a page.
+     */
+    streamSummary: (params: {
+        currentSpaceId: string;
+        currentPageId: string;
+        currentPageTitle: string;
+        targetSpaceId: string;
+        targetPageId: string;
+        linkPreview?: string;
+        linkTitle?: string;
+        visitedPages: { spaceId: string; pageId: string }[];
+    }) => Promise<void>;
+}>((set, get) => ({
+    cache: new Map(),
+
+    getSummary: ({
+        targetSpaceId,
+        targetPageId,
+    }: {
+        targetSpaceId: string;
+        targetPageId: string;
+    }) => {
+        return get().cache.get(getCacheKey(targetSpaceId, targetPageId)) ?? '';
+    },
+
+    streamSummary: async ({
+        currentSpaceId,
+        currentPageId,
+        currentPageTitle,
+        targetSpaceId,
+        targetPageId,
+        linkPreview,
+        linkTitle,
+        visitedPages,
+    }) => {
+        const cacheKey = getCacheKey(targetSpaceId, targetPageId);
+
+        if (get().cache.has(cacheKey)) {
+            // Already generated or generating
+            return;
+        }
+
+        const update = (summary: string) => {
+            set((prev) => {
+                const newCache = new Map(prev.cache);
+                newCache.set(cacheKey, summary);
+                return { cache: newCache };
+            });
+        };
+
+        update('');
+        const stream = await streamLinkPageSummary({
+            currentSpaceId,
+            currentPageId,
+            currentPageTitle,
+            targetSpaceId,
+            targetPageId,
+            linkPreview,
+            linkTitle,
+            visitedPages,
+        });
+
+        let generatedSummary = '';
+        for await (const highlight of stream) {
+            generatedSummary = highlight ?? '';
+            update(generatedSummary);
+        }
+    },
+}));
 
 /**
  * Summarise a page's content for use in a link preview
@@ -21,37 +115,28 @@ export function AIPageLinkSummary(props: {
     const { targetSpaceId, targetPageId, linkPreview, linkTitle, showTrademark = true } = props;
 
     const currentPage = usePageContext();
-
     const language = useLanguage();
     const visitedPages = useVisitedPages((state) => state.pages);
-    const [highlight, setHighlight] = useState('');
+    const { summary, streamSummary } = useSummaries(
+        useShallow((state) => {
+            return {
+                summary: state.getSummary({ targetSpaceId, targetPageId }),
+                streamSummary: state.streamSummary,
+            };
+        })
+    );
 
     useEffect(() => {
-        let canceled = false;
-
-        setHighlight('');
-
-        (async () => {
-            const stream = await streamLinkPageSummary({
-                currentSpaceId: currentPage.spaceId,
-                currentPageId: currentPage.pageId,
-                currentPageTitle: currentPage.title,
-                targetSpaceId,
-                targetPageId,
-                linkPreview,
-                linkTitle,
-                visitedPages,
-            });
-
-            for await (const highlight of stream) {
-                if (canceled) return;
-                setHighlight(highlight ?? '');
-            }
-        })();
-
-        return () => {
-            canceled = true;
-        };
+        streamSummary({
+            currentSpaceId: currentPage.spaceId,
+            currentPageId: currentPage.pageId,
+            currentPageTitle: currentPage.title,
+            targetSpaceId,
+            targetPageId,
+            linkPreview,
+            linkTitle,
+            visitedPages,
+        });
     }, [
         currentPage.pageId,
         currentPage.spaceId,
@@ -61,6 +146,7 @@ export function AIPageLinkSummary(props: {
         linkPreview,
         linkTitle,
         visitedPages,
+        streamSummary,
     ]);
 
     const shimmerBlocks = [
@@ -76,14 +162,14 @@ export function AIPageLinkSummary(props: {
         <div className="flex flex-col gap-1">
             <div className="flex w-screen items-center gap-1 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
                 {showTrademark ? (
-                    <Loading className="size-4" busy={!highlight || highlight.length === 0} />
+                    <Loading className="size-4" busy={!summary || summary.length === 0} />
                 ) : (
                     <Icon icon="sparkle" className="size-3" />
                 )}
                 <h6 className="text-tint">{t(language, 'link_tooltip_ai_summary')}</h6>
             </div>
-            {highlight.length > 0 ? (
-                <p className="animate-fadeIn">{highlight}</p>
+            {summary.length > 0 ? (
+                <p className="animate-fadeIn">{summary}</p>
             ) : (
                 <div className="mt-2 flex flex-wrap gap-2">
                     {shimmerBlocks.map((block, index) => (
@@ -94,7 +180,7 @@ export function AIPageLinkSummary(props: {
                     ))}
                 </div>
             )}
-            {highlight.length > 0 ? (
+            {summary.length > 0 ? (
                 <div className="animate-fadeIn text-tint-subtle text-xs">
                     {t(language, 'link_tooltip_ai_summary_description')}
                 </div>

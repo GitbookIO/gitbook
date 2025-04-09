@@ -35,6 +35,10 @@ export interface Test {
      */
     run?: (page: Page, response: Response | null) => Promise<unknown>;
     /**
+     * Mode for the test.
+     */
+    mode?: 'page' | 'image';
+    /**
      * Whether the test should be fullscreened during testing.
      */
     fullPage?: boolean;
@@ -154,6 +158,7 @@ export function runTestCases(testCases: TestsCase[]) {
 
         test.describe(testCase.name, () => {
             for (const testEntry of testCase.tests) {
+                const { mode = 'page' } = testEntry;
                 const testFn = testEntry.only ? test.only : test;
                 testFn(testEntry.name, async ({ page, context }) => {
                     const testEntryPathname =
@@ -194,24 +199,33 @@ export function runTestCases(testCases: TestsCase[]) {
                     }
                     const screenshotOptions = testEntry.screenshot;
                     if (screenshotOptions !== false) {
-                        await argosScreenshot(page, `${testCase.name} - ${testEntry.name}`, {
-                            viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
-                            argosCSS: `
+                        const screenshotName = `${testCase.name} - ${testEntry.name}`;
+                        if (mode === 'image') {
+                            await argosScreenshot(page, screenshotName, {
+                                viewports: ['macbook-13'],
+                                threshold: screenshotOptions?.threshold ?? undefined,
+                                fullPage: true,
+                            });
+                        } else {
+                            await argosScreenshot(page, screenshotName, {
+                                viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
+                                argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
                                 display: none !important;
                             }
                             `,
-                            threshold: screenshotOptions?.threshold ?? undefined,
-                            fullPage: testEntry.fullPage ?? false,
-                            beforeScreenshot: async ({ runStabilization }) => {
-                                await runStabilization();
-                                await waitForIcons(page);
-                                if (screenshotOptions?.waitForTOCScrolling !== false) {
-                                    await waitForTOCScrolling(page);
-                                }
-                            },
-                        });
+                                threshold: screenshotOptions?.threshold ?? undefined,
+                                fullPage: testEntry.fullPage ?? false,
+                                beforeScreenshot: async ({ runStabilization }) => {
+                                    await runStabilization();
+                                    await waitForIcons(page);
+                                    if (screenshotOptions?.waitForTOCScrolling !== false) {
+                                        await waitForTOCScrolling(page);
+                                    }
+                                },
+                            });
+                        }
                     }
                 });
             }

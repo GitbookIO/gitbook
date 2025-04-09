@@ -40,16 +40,27 @@ export async function resolveOpenAPIOperation(
     }
 
     const servers = 'servers' in schema ? (schema.servers ?? []) : [];
-    const security = flattenSecurities(operation.security ?? schema.security ?? []);
+    const security: OpenAPIV3_1.SecurityRequirementObject[] =
+        operation.security ?? schema.security ?? [];
+
+    // If security includes an empty object, it means that the security is optional
+    const isOptionalSecurity = security.some((entry) => Object.keys(entry).length === 0);
+    const flatSecurities = flattenSecurities(security);
 
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
-    for (const entry of security) {
+    for (const entry of flatSecurities) {
         const securityKey = Object.keys(entry)[0];
         if (securityKey) {
             const securityScheme = schema.components?.securitySchemes?.[securityKey];
             if (securityScheme && !checkIsReference(securityScheme)) {
-                securities.push([securityKey, securityScheme]);
+                securities.push([
+                    securityKey,
+                    {
+                        ...securityScheme,
+                        required: !isOptionalSecurity,
+                    },
+                ]);
             }
         }
     }

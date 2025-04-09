@@ -2,7 +2,7 @@
     "extends": ["//"],
     "tasks": {
         "generate": {
-            "outputs": ["src/data/*.json", "dist/data/*.json"]
+            "outputs": ["worker-configuration.d.ts"]
         }
     }
 }

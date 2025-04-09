@@ -1,6 +1,7 @@
 import type {
     DocumentInline,
     DocumentInlineAnnotation,
+    DocumentInlineButton,
     DocumentInlineEmoji,
     DocumentInlineImage,
     DocumentInlineLink,
@@ -13,6 +14,7 @@ import assertNever from 'assert-never';
 import { Annotation } from './Annotation/Annotation';
 import type { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
+import { InlineButton } from './InlineButton';
 import { InlineImage } from './InlineImage';
 import { InlineLink } from './InlineLink';
 import { InlineMath } from './Math';
@@ -44,7 +46,8 @@ export function Inline<
         | DocumentInlineEmoji
         | DocumentInlineLink
         | DocumentInlineMath
-        | DocumentInlineMention,
+        | DocumentInlineMention
+        | DocumentInlineButton,
 >(props: InlineProps<T>) {
     const { inline, ...contextProps } = props;
 
@@ -61,6 +64,8 @@ export function Inline<
             return <Mention {...contextProps} inline={inline} />;
         case 'inline-image':
             return <InlineImage {...contextProps} inline={inline} />;
+        case 'button':
+            return <InlineButton {...contextProps} inline={inline} />;
         default:
             assertNever(inline);
     }
