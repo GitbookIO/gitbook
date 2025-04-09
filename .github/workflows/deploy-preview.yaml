@@ -200,7 +200,7 @@ jobs:
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 10
-        if: startsWith(github.ref_name, 'refs/heads/cloudflare/')
+        if: startsWith(github.head_ref || github.ref_name, 'refs/heads/cloudflare/')
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -263,7 +263,7 @@ jobs:
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 8
-        if: startsWith(github.ref_name, 'refs/heads/cloudflare/')
+        if: startsWith(github.head_ref || github.ref_name, 'refs/heads/cloudflare/')
         steps:
             - name: Checkout
               uses: actions/checkout@v4
