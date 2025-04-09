@@ -148,18 +148,21 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
 
+        let incomingURL = requestURL;
+        // For cases where the site is proxied, we use the canonical URL
+        // as the incoming URL along with all the search params from the request.
+        if (mode !== 'url') {
+            incomingURL = siteCanonicalURL;
+            incomingURL.search = requestURL.search;
+        }
         //
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response
         //
-        const incomingURL = mode === 'url' ? requestURL : siteCanonicalURL;
-        const requestURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
-        if (
-            requestURLWithoutToken !== incomingURL &&
-            requestURLWithoutToken.toString() !== incomingURL.toString()
-        ) {
+        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
+        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(requestURLWithoutToken.toString()),
+                NextResponse.redirect(incomingURLWithoutToken.toString()),
                 cookies
             );
         }
