@@ -2,25 +2,13 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { Icon } from '@gitbook/icons';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
-
-const useSummaries = create<{
-    cache: Map<string, string>;
-    setSummary: (key: string, summary: string) => void;
-}>((set) => ({
-    cache: new Map(),
-    setSummary: (key, summary) =>
-        set((state) => {
-            const newCache = new Map(state.cache);
-            newCache.set(key, summary);
-            return { cache: newCache };
-        }),
-}));
 
 /**
  * Get a unique cache key for a page summary
@@ -28,6 +16,91 @@ const useSummaries = create<{
 function getCacheKey(targetSpaceId: string, targetPageId: string): string {
     return `${targetSpaceId}:${targetPageId}`;
 }
+
+/**
+ * Global state for the summaries.
+ */
+const useSummaries = create<{
+    /**
+     * Cache of all summaries generated so far.
+     */
+    cache: Map<string, string>;
+
+    /**
+     * Get a summary for a page.
+     */
+    getSummary: (params: { targetSpaceId: string; targetPageId: string }) => string;
+
+    /**
+     * Stream the generation of a summary for a page.
+     */
+    streamSummary: (params: {
+        currentSpaceId: string;
+        currentPageId: string;
+        currentPageTitle: string;
+        targetSpaceId: string;
+        targetPageId: string;
+        linkPreview?: string;
+        linkTitle?: string;
+        visitedPages: { spaceId: string; pageId: string }[];
+    }) => Promise<void>;
+}>((set, get) => ({
+    cache: new Map(),
+
+    getSummary: ({
+        targetSpaceId,
+        targetPageId,
+    }: {
+        targetSpaceId: string;
+        targetPageId: string;
+    }) => {
+        return get().cache.get(getCacheKey(targetSpaceId, targetPageId)) ?? '';
+    },
+
+    streamSummary: async ({
+        currentSpaceId,
+        currentPageId,
+        currentPageTitle,
+        targetSpaceId,
+        targetPageId,
+        linkPreview,
+        linkTitle,
+        visitedPages,
+    }) => {
+        const cacheKey = getCacheKey(targetSpaceId, targetPageId);
+
+        if (get().cache.has(cacheKey)) {
+            // Already generated or generating
+            return;
+        }
+
+        const update = (summary: string) => {
+            set((prev) => {
+                const newCache = new Map(prev.cache);
+                newCache.set(cacheKey, summary);
+                return { cache: newCache };
+            });
+        };
+
+        update('');
+        const stream = await streamLinkPageSummary({
+            currentSpaceId,
+            currentPageId,
+            currentPageTitle,
+            targetSpaceId,
+            targetPageId,
+            linkPreview,
+            linkTitle,
+            visitedPages,
+        });
+
+        let generatedSummary = '';
+        for await (const highlight of stream) {
+            generatedSummary = highlight ?? '';
+            update(generatedSummary);
+        }
+    },
+}));
 
 /**
  * Summarise a page's content for use in a link preview
@@ -44,53 +117,26 @@ export function AIPageLinkSummary(props: {
     const currentPage = usePageContext();
     const language = useLanguage();
     const visitedPages = useVisitedPages((state) => state.pages);
-    const [summary, setSummary] = useState('');
-    const cacheKey = getCacheKey(targetSpaceId, targetPageId);
-    const { cachedSummary, setCachedSummary } = useSummaries((state) => {
-        return {
-            cachedSummary: state.cache.get(cacheKey) ?? '',
-            setCachedSummary: state.setSummary,
-        };
-    });
+    const { summary, streamSummary } = useSummaries(
+        useShallow((state) => {
+            return {
+                summary: state.getSummary({ targetSpaceId, targetPageId }),
+                streamSummary: state.streamSummary,
+            };
+        })
+    );
 
     useEffect(() => {
-        let canceled = false;
-
-        setSummary('');
-
-        if (cachedSummary) {
-            setSummary(cachedSummary);
-            return;
-        }
-
-        (async () => {
-            const stream = await streamLinkPageSummary({
-                currentSpaceId: currentPage.spaceId,
-                currentPageId: currentPage.pageId,
-                currentPageTitle: currentPage.title,
-                targetSpaceId,
-                targetPageId,
-                linkPreview,
-                linkTitle,
-                visitedPages,
-            });
-
-            let generatedSummary = '';
-            for await (const highlight of stream) {
-                if (canceled) return;
-                generatedSummary = highlight ?? '';
-                setSummary(generatedSummary);
-            }
-
-            // Cache the complete summary
-            if (generatedSummary) {
-                setCachedSummary(cacheKey, generatedSummary);
-            }
-        })();
-
-        return () => {
-            canceled = true;
-        };
+        streamSummary({
+            currentSpaceId: currentPage.spaceId,
+            currentPageId: currentPage.pageId,
+            currentPageTitle: currentPage.title,
+            targetSpaceId,
+            targetPageId,
+            linkPreview,
+            linkTitle,
+            visitedPages,
+        });
     }, [
         currentPage.pageId,
         currentPage.spaceId,
@@ -100,9 +146,7 @@ export function AIPageLinkSummary(props: {
         linkPreview,
         linkTitle,
         visitedPages,
-        cachedSummary,
-        cacheKey,
-        setCachedSummary,
+        streamSummary,
     ]);
 
     const shimmerBlocks = [
