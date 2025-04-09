@@ -34,7 +34,9 @@ export async function verifyImageSignature(
     const generated = await generator(input);
 
     // biome-ignore lint/suspicious/noConsole: we want to log the signature comparison
-    console.log(`comparing image signature "${generated}" (expected) === "${signature}" (actual)`);
+    console.log(
+        `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
+    );
     return generated === signature;
 }
 
@@ -69,7 +71,8 @@ const generateSignatureV2: SignFn = async (input) => {
         .filter(Boolean)
         .join(':');
 
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+    const signature = fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+    return signature;
 };
 
 // Reused buffer for FNV-1a hashing in the v1 algorithm

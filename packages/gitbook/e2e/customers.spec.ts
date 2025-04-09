@@ -93,11 +93,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
-        name: 'docs.tradeonnova.io',
-        contentBaseURL: 'https://docs.tradeonnova.io',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'azcoiner.gitbook.io',
         contentBaseURL: 'https://azcoiner.gitbook.io',
         tests: [{ name: 'Home', url: '/' }],
@@ -243,6 +238,15 @@ const testCases: TestsCase[] = [
         name: 'docs.fluentbit.io',
         contentBaseURL: 'https://docs.fluentbit.io',
         tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    },
+    {
+        name: 'run-ai-docs.nvidia.com',
+        contentBaseURL: 'https://run-ai-docs.nvidia.com',
+        skip: process.env.ARGOS_BUILD_NAME !== 'customers-v2',
+        tests: [
+            { name: 'Home', url: '/' },
+            { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
+        ],
     },
 ];
 

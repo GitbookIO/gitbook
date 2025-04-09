@@ -17,6 +17,7 @@ import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
     getPublishedContentByURL,
+    getVisitorAuthBasePath,
     normalizeURL,
     throwIfDataError,
 } from '@v2/lib/data';
@@ -24,7 +25,6 @@ import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
 import { getImageResizingContextId } from '@v2/lib/images';
 import { MiddlewareHeaders } from '@v2/lib/middleware';
 import type { SiteURLData } from './lib/context';
-
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -137,7 +137,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             return NextResponse.redirect(siteURLData.redirect);
         }
 
-        cookies.push(...getResponseCookiesForVisitorAuth(siteURLData.siteBasePath, visitorToken));
+        cookies.push(
+            ...getResponseCookiesForVisitorAuth(
+                getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                visitorToken
+            )
+        );
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
@@ -167,6 +172,23 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // (customization override, theme, etc)
         let routeType: 'dynamic' | 'static' = 'static';
 
+        // We pick only stable data from the siteURL data to prevent re-rendering of
+        // the root layout when changing pages..
+        const stableSiteURLData: SiteURLData = {
+            site: siteURLData.site,
+            siteSection: siteURLData.siteSection,
+            siteSpace: siteURLData.siteSpace,
+            siteBasePath: siteURLData.siteBasePath,
+            basePath: siteURLData.basePath,
+            space: siteURLData.space,
+            organization: siteURLData.organization,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+            shareKey: siteURLData.shareKey,
+            apiToken: siteURLData.apiToken,
+            imagesContextId: imagesContextId,
+        };
+
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
         requestHeaders.set(MiddlewareHeaders.URLMode, mode);
@@ -174,7 +196,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             MiddlewareHeaders.SiteURL,
             `${siteCanonicalURL.origin}${siteURLData.basePath}`
         );
-        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(siteURLData));
+        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
 
         // Preview of customization/theme
         const customization = siteRequestURL.searchParams.get('customization');
@@ -203,23 +225,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             siteURLData.pathname
         );
         routeType = routeTypeFromPathname ?? routeType;
-
-        // We pick only stable data from the siteURL data to prevent re-rendering of
-        // the root layout when changing pages..
-        const stableSiteURLData: SiteURLData = {
-            site: siteURLData.site,
-            siteSection: siteURLData.siteSection,
-            siteSpace: siteURLData.siteSpace,
-            siteBasePath: siteURLData.siteBasePath,
-            basePath: siteURLData.basePath,
-            space: siteURLData.space,
-            organization: siteURLData.organization,
-            changeRequest: siteURLData.changeRequest,
-            revision: siteURLData.revision,
-            shareKey: siteURLData.shareKey,
-            apiToken: siteURLData.apiToken,
-            imagesContextId: imagesContextId,
-        };
 
         const route = [
             'sites',

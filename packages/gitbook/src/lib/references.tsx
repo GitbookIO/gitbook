@@ -15,8 +15,8 @@ import type React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
+import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
-import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
 import { findSiteSpaceById } from './sites';
 import type { ClassValue } from './tailwind';
@@ -194,7 +194,7 @@ export async function resolveContentRef(
 
             if (!targetSpace) {
                 return {
-                    href: getGitbookAppHref(`/s/${contentRef.space}`),
+                    href: getGitBookAppHref(`/s/${contentRef.space}`),
                     text: 'space',
                     active: false,
                 };
@@ -224,7 +224,7 @@ export async function resolveContentRef(
 
         case 'collection': {
             return {
-                href: getGitbookAppHref('/home'),
+                href: getGitBookAppHref('/home'),
                 text: 'collection',
                 active: false,
             };
@@ -242,7 +242,7 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: getGitbookAppHref(`/s/${space.id}`),
+                href: getGitBookAppHref(`/s/${space.id}`),
                 text: reusableContent.title,
                 active: false,
                 reusableContent,

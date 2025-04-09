@@ -3,7 +3,8 @@ import clsx from 'clsx';
 import { useCallback } from 'react';
 import { useStore } from 'zustand';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
-import { getOrCreateTabStoreByKey } from './useSyncedTabsGlobalState';
+import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
+import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 
 type MediaTypeState = {
     mediaType: string;
@@ -15,27 +16,27 @@ function useMediaTypeState(
     defaultKey: string
 ): MediaTypeState {
     const { method, path } = data;
-    const store = useStore(getOrCreateTabStoreByKey(`media-type-${method}-${path}`, defaultKey));
-    if (typeof store.tabKey !== 'string') {
+    const store = useStore(getOrCreateStoreByKey(`media-type-${method}-${path}`, defaultKey));
+    if (typeof store.key !== 'string') {
         throw new Error('Media type key is not a string');
     }
     return {
-        mediaType: store.tabKey,
-        setMediaType: useCallback((index: string) => store.setTabKey(index), [store.setTabKey]),
+        mediaType: store.key,
+        setMediaType: useCallback((index: string) => store.setKey(index), [store.setKey]),
     };
 }
 
 function useMediaTypeSampleIndexState(data: { method: string; path: string }, mediaType: string) {
     const { method, path } = data;
     const store = useStore(
-        getOrCreateTabStoreByKey(`media-type-sample-${mediaType}-${method}-${path}`, 0)
+        getOrCreateStoreByKey(`media-type-sample-${mediaType}-${method}-${path}`, 0)
     );
-    if (typeof store.tabKey !== 'number') {
+    if (typeof store.key !== 'number') {
         throw new Error('Example key is not a number');
     }
     return {
-        index: store.tabKey,
-        setIndex: useCallback((index: number) => store.setTabKey(index), [store.setTabKey]),
+        index: store.key,
+        setIndex: useCallback((index: number) => store.setKey(index), [store.setKey]),
     };
 }
 
@@ -69,18 +70,28 @@ function MediaTypeSelector(props: {
         return null;
     }
 
+    const items = renderers.map((renderer) => ({
+        key: renderer.mediaType,
+        label: renderer.mediaType,
+    }));
+
     return (
-        <select
+        <OpenAPISelect
             className={clsx('openapi-select')}
-            value={state.mediaType}
-            onChange={(e) => state.setMediaType(e.target.value)}
+            selectedKey={state.mediaType}
+            items={renderers.map((renderer) => ({
+                key: renderer.mediaType,
+                label: renderer.mediaType,
+            }))}
+            onSelectionChange={(e) => state.setMediaType(String(e))}
+            placement="bottom start"
         >
-            {renderers.map((renderer) => (
-                <option key={renderer.mediaType} value={renderer.mediaType}>
-                    {renderer.mediaType}
-                </option>
+            {items.map((item) => (
+                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
+                    {item.label}
+                </OpenAPISelectItem>
             ))}
-        </select>
+        </OpenAPISelect>
     );
 }
 
@@ -95,18 +106,24 @@ function ExamplesSelector(props: {
         return null;
     }
 
+    const items = renderer.examples.map((example, index) => ({
+        key: index,
+        label: example.example.summary || `Example ${index + 1}`,
+    }));
+
     return (
-        <select
-            className={clsx('openapi-select')}
-            value={String(state.index)}
-            onChange={(e) => state.setIndex(Number(e.target.value))}
+        <OpenAPISelect
+            items={items}
+            selectedKey={state.index}
+            onSelectionChange={(e) => state.setIndex(Number(e))}
+            placement="bottom start"
         >
-            {renderer.examples.map((example, index) => (
-                <option key={index} value={index}>
-                    {example.example.summary || `Example ${index + 1}`}
-                </option>
+            {items.map((item) => (
+                <OpenAPISelectItem key={item.key} id={item.key} value={item}>
+                    {item.label}
+                </OpenAPISelectItem>
             ))}
-        </select>
+        </OpenAPISelect>
     );
 }
 

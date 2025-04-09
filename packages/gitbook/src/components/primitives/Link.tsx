@@ -50,7 +50,7 @@ export const Link = React.forwardRef(function Link(
 
         // When the page is embedded in an iframe, for security reasons other urls cannot be opened.
         // In this case, we open the link in a new tab.
-        if (isExternal && window.self !== window.top) {
+        if (window.self !== window.top && isExternalLink(href, window.location.origin)) {
             event.preventDefault();
             window.open(href, '_blank');
         }
@@ -58,7 +58,9 @@ export const Link = React.forwardRef(function Link(
         domProps.onClick?.(event);
     };
 
-    if (isExternal) {
+    // We test if the link is external, without comparing to the origin
+    // as this will be rendered on the server and it could result in a mismatch.
+    if (isExternalLink(href)) {
         return (
             <a ref={ref} {...domProps} href={href} onClick={onClick}>
                 {children}
@@ -72,3 +74,27 @@ export const Link = React.forwardRef(function Link(
         </NextLink>
     );
 });
+
+/**
+ * Check if a link is external, compared to an origin.
+ */
+function isExternalLink(href: string, origin: string | null = null) {
+    if (!URL.canParse) {
+        // If URL.canParse is not available, we quickly check if it looks like a URL
+        return href.startsWith('http');
+    }
+
+    if (!URL.canParse(href)) {
+        // If we can't parse the href, we consider it a relative path
+        return false;
+    }
+
+    if (!origin) {
+        // If origin is not provided, we consider the link external
+        return true;
+    }
+
+    // If the url points to the same origin, we consider it internal
+    const parsed = new URL(href);
+    return parsed.origin !== origin;
+}
