@@ -12,7 +12,6 @@
     },
     "env": {
         "preview": {
-            "name": "gitbook-open-v2-preview-test",
             "d1_databases": [
                 {
                     "binding": "NEXT_CACHE_D1",
