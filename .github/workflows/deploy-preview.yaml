@@ -199,7 +199,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
-        timeout-minutes: 10
+        timeout-minutes: 15
         if: startsWith(github.head_ref || github.ref_name, 'cloudflare/')
         steps:
             - name: Checkout
