@@ -30,7 +30,7 @@ export function PageAside(props: {
         props;
     const { customization, site, space } = context;
 
-    customization.ai.adaptivePane = true;
+    const useAdaptivePane = true;
 
     return (
         <aside
@@ -80,8 +80,8 @@ export function PageAside(props: {
                 'page-api-block:p-2'
             )}
         >
-            <div className='lg:top:0 sticky flex grow flex-col gap-6 overflow-y-auto overflow-x-visible border-none py-8 *:border-tint-subtle site-header-sections:lg:top-[6.75rem] site-header:lg:top-16 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:pt-6'>
-                {customization.ai.adaptivePane ? <AdaptivePane /> : null}
+            <div className="lg:top:0 sticky flex grow flex-col gap-6 overflow-y-auto overflow-x-visible border-none py-8 *:border-tint-subtle site-header-sections:lg:top-[6.75rem] site-header:lg:top-16 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:pt-6">
+                {useAdaptivePane ? <AdaptivePane /> : null}
                 {page.layout.outline ? (
                     <>
                         <PageOutline document={document} context={context} />

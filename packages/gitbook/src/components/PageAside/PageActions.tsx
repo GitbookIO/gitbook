@@ -4,6 +4,7 @@ import type { RevisionPageDocument, Space } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
+import urlJoin from 'url-join';
 import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
 
@@ -40,7 +41,7 @@ export function PageActions(props: {
                     <PageFeedbackForm pageId={page.id} />
                 </React.Suspense>
             ) : null}
-            {/* {customization.git.showEditLink && space.gitSync?.url && page.git ? (
+            {customization.git.showEditLink && space.gitSync?.url && page.git ? (
                 <div>
                     <a
                         href={urlJoin(space.gitSync.url, page.git.path)}
@@ -67,7 +68,7 @@ export function PageActions(props: {
                         {t(language, 'edit_on_git', getGitSyncName(space))}
                     </a>
                 </div>
-            ) : null} */}
+            ) : null}
             {customization.pdf.enabled ? (
                 <div>
                     <a
