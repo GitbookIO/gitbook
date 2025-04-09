@@ -9,8 +9,8 @@ describe('getVisitorAuthBasePath', () => {
                 {
                     site: 'site_foo',
                     siteSpace: 'sitesp_foo',
-                    basePath: '/foo',
-                    siteBasePath: '/foo',
+                    basePath: '/foo/',
+                    siteBasePath: '/foo/',
                     organization: 'org_foo',
                     space: 'space_foo',
                     pathname: '/hello/world',

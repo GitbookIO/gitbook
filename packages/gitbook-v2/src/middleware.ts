@@ -17,6 +17,7 @@ import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
     getPublishedContentByURL,
+    getSiteCanonicalURL,
     getVisitorAuthBasePath,
     normalizeURL,
     throwIfDataError,
@@ -146,20 +147,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         // We use the host/origin from the canonical URL to ensure the links are
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
-        const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
+        const siteCanonicalURL = getSiteCanonicalURL(siteURLData, visitorToken);
 
         //
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response
         //
         const incomingURL = mode === 'url' ? requestURL : siteCanonicalURL;
-        const requestURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
-        if (
-            requestURLWithoutToken !== incomingURL &&
-            requestURLWithoutToken.toString() !== incomingURL.toString()
-        ) {
+        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
+        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(requestURLWithoutToken.toString()),
+                NextResponse.redirect(incomingURLWithoutToken.toString()),
                 cookies
             );
         }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getURLLookupAlternatives, normalizeURL } from './urls';
+import { getSiteCanonicalURL, getURLLookupAlternatives, normalizeURL } from './urls';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -361,6 +361,78 @@ describe('getURLLookupAlternatives', () => {
                 },
             ],
         });
+    });
+});
+
+describe('getSiteCanonicalURL', () => {
+    it('should have the jwt token in canonical url if token was from the source url', () => {
+        expect(
+            getSiteCanonicalURL(
+                {
+                    site: 'site_foo',
+                    siteSpace: 'sitesp_foo',
+                    basePath: '/foo/',
+                    siteBasePath: '/foo/',
+                    organization: 'org_foo',
+                    space: 'space_foo',
+                    pathname: '/hello/world',
+                    complete: false,
+                    apiToken: 'api_token_foo',
+                    canonicalUrl: 'https://example.com/docs/foo/hello/world',
+                },
+                {
+                    source: 'url',
+                    token: 'jwt_foo',
+                }
+            ).toString()
+        ).toEqual('https://example.com/docs/foo/hello/world?jwt_token=jwt_foo');
+    });
+
+    it('should not have the jwt token in canonical url if token was NOT from the source url', () => {
+        // va cookie
+        expect(
+            getSiteCanonicalURL(
+                {
+                    site: 'site_foo',
+                    siteSpace: 'sitesp_foo',
+                    basePath: '/foo/',
+                    siteBasePath: '/foo/',
+                    organization: 'org_foo',
+                    space: 'space_foo',
+                    pathname: '/hello/world',
+                    complete: false,
+                    apiToken: 'api_token_foo',
+                    canonicalUrl: 'https://example.com/docs/foo/hello/world',
+                },
+                {
+                    source: 'visitor-auth-cookie',
+                    basePath: '/foo/',
+                    token: 'jwt_foo',
+                }
+            ).toString()
+        ).toEqual('https://example.com/docs/foo/hello/world');
+
+        // gitbook visitor cookie
+        expect(
+            getSiteCanonicalURL(
+                {
+                    site: 'site_foo',
+                    siteSpace: 'sitesp_foo',
+                    basePath: '/foo/',
+                    siteBasePath: '/foo/',
+                    organization: 'org_foo',
+                    space: 'space_foo',
+                    pathname: '/hello/world',
+                    complete: false,
+                    apiToken: 'api_token_foo',
+                    canonicalUrl: 'https://example.com/docs/foo/hello/world',
+                },
+                {
+                    source: 'gitbook-visitor-cookie',
+                    token: 'jwt_foo',
+                }
+            ).toString()
+        ).toEqual('https://example.com/docs/foo/hello/world');
     });
 });
 

@@ -1,3 +1,6 @@
+import { VISITOR_AUTH_PARAM, type VisitorTokenLookup } from '@/lib/visitor-token';
+import type { PublishedSiteContent } from '@gitbook/api';
+
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
@@ -108,6 +111,22 @@ export function getURLLookupAlternatives(input: URL) {
     }
 
     return { urls: alternatives, basePath, changeRequest, revision };
+}
+
+/**
+ * Get the canonical URL for a resolved site,
+ * including the visitor token if available.
+ */
+export function getSiteCanonicalURL(
+    siteURLData: PublishedSiteContent,
+    visitorToken: VisitorTokenLookup
+): URL {
+    const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
+    if (visitorToken?.source === 'url') {
+        siteCanonicalURL.searchParams.set(VISITOR_AUTH_PARAM, visitorToken.token);
+    }
+
+    return siteCanonicalURL;
 }
 
 /**

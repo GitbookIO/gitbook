@@ -2,7 +2,7 @@ import { type JwtPayload, jwtDecode } from 'jwt-decode';
 import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
-const VISITOR_AUTH_PARAM = 'jwt_token';
+export const VISITOR_AUTH_PARAM = 'jwt_token';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 
 /**
