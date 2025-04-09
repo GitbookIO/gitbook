@@ -82,7 +82,7 @@ jobs:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
-            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-url: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -98,9 +98,21 @@ jobs:
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
                   commitTag: ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
                   commitMessage: ${{ github.sha }}
+            - name: print wrangler command output
+              env:
+                CMD_OUTPUT: ${{ steps.deploy.outputs.command-output }}
+              run: echo $CMD_OUTPUT
+            - name: Extract Worker ID
+              id: extract-worker-id
+              if: ${{ !steps.deploy.outputs.deployment-url }}
+              run: |
+                if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
+                  WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
+                  echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
+                fi
             - name: Outputs
               run: |
-                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}"
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
