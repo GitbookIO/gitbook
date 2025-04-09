@@ -200,6 +200,7 @@ jobs:
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 10
+        if: startsWith(github.ref_name, 'cloudflare/')
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -220,7 +221,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v1
         needs: deploy-v1-cloudflare
-        timeout-minutes: 6
+        timeout-minutes: 8
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -240,7 +241,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
-        timeout-minutes: 6
+        timeout-minutes: 8
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -255,6 +256,28 @@ jobs:
               env:
                   BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: 'customers-v2'
+    visual-testing-customers-v2-cloudflare:
+        runs-on: ubuntu-latest
+        name: Visual Testing Customers v2 (Cloudflare)
+        needs: deploy-v2-cloudflare
+        timeout-minutes: 8
+        if: startsWith(github.ref_name, 'cloudflare/')
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - name: Setup Playwright
+              uses: ./.github/actions/setup-playwright
+            - name: Run Playwright tests
+              run: bun e2e-customers
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
     pagespeed-testing-v1:
