@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { getIncomingURL, getURLLookupAlternatives, normalizeURL } from './urls';
+import { getURLLookupAlternatives, normalizeURL } from './urls';
 
 describe('getURLLookupAlternatives', () => {
     it('should return all URLs up to the root', () => {
@@ -361,32 +361,6 @@ describe('getURLLookupAlternatives', () => {
                 },
             ],
         });
-    });
-});
-
-describe('getIncomingURL', () => {
-    it('should return the site canonical URL with all search params when request is proxied', () => {
-        const requestURL = new URL(
-            'https://proxy.gitbook.site/sites/site_foo/hello/world?jwt_token=123&q=GitBook'
-        );
-        const siteCanonicalURL = new URL('https://company.com/foo');
-
-        expect(getIncomingURL(requestURL, 'url-host', siteCanonicalURL).toString()).toEqual(
-            new URL('https://company.com/foo?jwt_token=123&q=GitBook').toString()
-        );
-    });
-
-    it('should return the request URL as is when request is not proxied', () => {
-        const requestURL = new URL(
-            'https://open.gitbook.com/url/docs.company.com?jwt_token=123&q=GitBook'
-        );
-        const siteCanonicalURL = new URL('https://docs.company.com');
-
-        expect(getIncomingURL(requestURL, 'url', siteCanonicalURL).toString()).toEqual(
-            new URL(
-                'https://open.gitbook.com/url/docs.company.com?jwt_token=123&q=GitBook'
-            ).toString()
-        );
     });
 });
 

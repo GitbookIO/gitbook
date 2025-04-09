@@ -17,7 +17,6 @@ import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
     type URLWithMode,
-    getIncomingURL,
     getPublishedContentByURL,
     getVisitorAuthBasePath,
     normalizeURL,
@@ -148,7 +147,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
 
-        const incomingURL = getIncomingURL(requestURL, mode, siteCanonicalURL);
+        let incomingURL = requestURL;
+        // For cases where the site is proxied, we use the canonical URL
+        // as the incoming URL along with all the search params from the request.
+        if (mode !== 'url') {
+            incomingURL = siteCanonicalURL;
+            incomingURL.search = requestURL.search;
+        }
         //
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response

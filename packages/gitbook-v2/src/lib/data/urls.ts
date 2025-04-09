@@ -113,26 +113,6 @@ export function getURLLookupAlternatives(input: URL) {
 }
 
 /**
- * Get the incoming URL for a request including requests
- * that may be proxied.
- */
-export function getIncomingURL(
-    requestURL: URL,
-    mode: URLWithMode['mode'],
-    siteCanonicalURL: URL
-): URL {
-    let incomingURL = requestURL;
-    // For cases where the site is proxied, we use the canonical URL
-    // as the incoming URL along with all the search params from the request.
-    if (mode !== 'url') {
-        incomingURL = siteCanonicalURL;
-        incomingURL.search = requestURL.search;
-    }
-
-    return incomingURL;
-}
-
-/**
  * Normalize a URL to remove duplicate slashes and trailing slashes
  * and transform the pathname to lowercase.
  */
