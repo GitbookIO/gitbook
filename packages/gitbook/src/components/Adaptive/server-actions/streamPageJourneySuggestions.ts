@@ -61,15 +61,15 @@ export async function* streamPageJourneySuggestions({
                                         })
                                     )
                                     .describe(
-                                        'A list of pages in the journey, starting with the current page.'
+                                        'A list of pages in the journey, excluding the current page.'
                                     )
                                     .min(5)
                                     .max(10),
                             })
                         )
                         .describe('The possible journeys to take through the documentation.')
-                        .min(4)
-                        .max(4),
+                        .min(count)
+                        .max(count),
                 }),
                 tools: {
                     getPages: true,

@@ -46,6 +46,7 @@ export function PageAside(props: {
 
                 'text-tint',
                 'contrast-more:text-tint-strong',
+                'text-sm',
                 'sticky',
 
                 // Without header
@@ -79,8 +80,8 @@ export function PageAside(props: {
                 'page-api-block:p-2'
             )}
         >
-            <div className='lg:top:0 sticky flex flex-col gap-6 overflow-y-auto overflow-x-visible border-none py-8 *:border-tint-subtle site-header-sections:lg:top-[6.75rem] site-header:lg:top-16 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:pt-6'>
-                {customization.ai.adaptivePane ? <AdaptivePane context={context} /> : null}
+            <div className='lg:top:0 sticky flex grow flex-col gap-6 overflow-y-auto overflow-x-visible border-none py-8 *:border-tint-subtle site-header-sections:lg:top-[6.75rem] site-header:lg:top-16 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:pt-6'>
+                {customization.ai.adaptivePane ? <AdaptivePane /> : null}
                 {page.layout.outline ? (
                     <>
                         <PageOutline document={document} context={context} />

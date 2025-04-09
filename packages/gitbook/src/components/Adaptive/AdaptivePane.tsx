@@ -1,40 +1,23 @@
-import type { SiteStructure } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { AIPageJourneySuggestions } from './AIPageJourneySuggestions';
+'use client';
 
-export function AdaptivePane(props: { context: GitBookSiteContext }) {
-    const { context } = props;
+import { tcls } from '@/lib/tailwind';
+import { AINextPageSuggestions } from './AINextPageSuggestions';
+import { AIPageJourneySuggestions } from './AIPageJourneySuggestions';
+import { useAdaptiveContext } from './AdaptiveContext';
+import { AdaptivePaneHeader } from './AdaptivePaneHeader';
+export function AdaptivePane() {
+    const { open } = useAdaptiveContext();
 
     return (
-        <>
-            <div>
-                <div className="mb-2 flex flex-row items-center gap-2 font-semibold text-xs uppercase tracking-wide">
-                    <Icon icon="map" className="size-3" />
-                    More to explore
-                </div>
-                <AIPageJourneySuggestions spaces={getSpaces(context.structure)} />
-            </div>
-        </>
-    );
-}
-
-function getSpaces(structure: SiteStructure) {
-    if (structure.type === 'siteSpaces') {
-        return structure.structure.map((siteSpace) => ({
-            id: siteSpace.space.id,
-            title: siteSpace.space.title,
-        }));
-    }
-
-    const sections = structure.structure.flatMap((item) =>
-        item.object === 'site-section-group' ? item.sections : item
-    );
-
-    return sections.flatMap((section) =>
-        section.siteSpaces.map((siteSpace) => ({
-            id: siteSpace.space.id,
-            title: siteSpace.space.title,
-        }))
+        <div
+            className={tcls(
+                'flex flex-col gap-4 rounded-md straight-corners:rounded-none bg-tint-subtle ring-1 ring-tint-subtle ring-inset transition-all duration-300',
+                open ? 'w-72 px-4 py-4' : 'w-56 p-3'
+            )}
+        >
+            <AdaptivePaneHeader />
+            <AIPageJourneySuggestions />
+            <AINextPageSuggestions />
+        </div>
     );
 }
