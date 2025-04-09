@@ -10,12 +10,6 @@
     "observability": {
         "enabled": true
     },
-    "migrations": [
-        {
-            "tag": "v1",
-            "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
-        }
-    ],
     "env": {
         "preview": {
             "name": "gitbook-open-v2-preview-test",
@@ -95,7 +89,13 @@
                         "class_name": "DOShardedTagCache"
                     }
                 ]
-            }
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
+                }
+            ]
         },
         "production": {
             "routes": [
@@ -147,7 +147,13 @@
                         "class_name": "DOShardedTagCache"
                     }
                 ]
-            }
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
+                }
+            ]
         }
     }
 }
