@@ -126,14 +126,14 @@ jobs:
                   body: |
                       Summary of the deployments:
 
-                      ### Version 1 (production)
+                      ### Version 1
 
                       | Version | URL | Status |
                       | --- | --- | --- |
                       | Latest commit | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v1-cloudflare.result == 'success' && '✅' || '❌' }} |
                       | PR | [${{ needs.deploy-v1-cloudflare.outputs.deployment-alias-url }}](${{ needs.deploy-v1-cloudflare.outputs.deployment-alias-url }}) | ${{ needs.deploy-v1-cloudflare.result == 'success' && '✅' || '❌' }} |
 
-                      ### Version 2 (experimental)
+                      ### Version 2
 
                       | Version | URL | Status |
                       | --- | --- | --- |
