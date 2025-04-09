@@ -31,7 +31,11 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
     const { items, children, className, placement } = props;
 
     return (
-        <Select {...props} className={clsx('openapi-select', className)}>
+        <Select
+            aria-label="OpenAPI Select"
+            {...props}
+            className={clsx('openapi-select', className)}
+        >
             <Button>
                 <SelectValue />
                 <span aria-hidden="true">

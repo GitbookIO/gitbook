@@ -48,7 +48,7 @@ function OpenAPIResponseExampleHeader(props: {
     const { items, blockKey } = props;
     const state = useResponseExamplesState(blockKey, items[0]?.key);
 
-    const selectedItem = items.find((item) => item.key === state.key);
+    const selectedItem = items.find((item) => item.key === state.key) ?? items[0];
 
     if (items.length === 1) {
         const item = items[0];

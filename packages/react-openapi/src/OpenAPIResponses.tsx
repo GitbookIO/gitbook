@@ -17,7 +17,6 @@ export function OpenAPIResponses(props: {
     context: OpenAPIClientContext;
 }) {
     const { responses, context } = props;
-    const state = useResponseExamplesState(context.blockKey, 'default');
 
     const groups = Object.entries(responses).map(
         ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
@@ -81,6 +80,8 @@ export function OpenAPIResponses(props: {
             };
         }
     );
+
+    const state = useResponseExamplesState(context.blockKey, groups[0]?.id);
 
     return (
         <StaticSection header="Responses" className="openapi-responses">
