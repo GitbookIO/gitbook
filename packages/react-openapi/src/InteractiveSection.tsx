@@ -1,11 +1,13 @@
 'use client';
 
 import clsx from 'clsx';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
+import { useStore } from 'zustand';
 import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
+import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 
 interface InteractiveSectionTab {
     key: string;
@@ -35,6 +37,9 @@ export function InteractiveSection(props: {
     header?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
+
+    /** State key to use with a store */
+    stateKey?: string;
 }) {
     const {
         id,
@@ -46,12 +51,8 @@ export function InteractiveSection(props: {
         header,
         overlay,
         toggleIcon = '▶',
+        stateKey = 'interactive-section',
     } = props;
-
-    const [selectedTabKey, setSelectedTab] = useState(defaultTab);
-    const selectedTab: InteractiveSectionTab | undefined =
-        tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
-
     const state = useDisclosureState({
         defaultExpanded: defaultOpened,
     });
@@ -60,6 +61,10 @@ export function InteractiveSection(props: {
     const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
+    const store = useStore(getOrCreateStoreByKey(stateKey, defaultTab));
+
+    const selectedTab: InteractiveSectionTab | undefined =
+        tabs.find((tab) => tab.key === store.key) ?? tabs[0];
 
     return (
         <Section
@@ -115,7 +120,7 @@ export function InteractiveSection(props: {
                                 items={tabs}
                                 selectedKey={selectedTab?.key ?? ''}
                                 onSelectionChange={(key) => {
-                                    setSelectedTab(String(key));
+                                    store.setKey(key);
                                     state.expand();
                                 }}
                                 placement="bottom end"

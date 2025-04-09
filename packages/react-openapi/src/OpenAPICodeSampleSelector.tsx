@@ -22,7 +22,7 @@ type CodeSampleItem = OpenAPISelectItem & {
     footer?: React.ReactNode;
 };
 
-export function OpenAPICodeSampleHeader(props: {
+function OpenAPICodeSampleHeader(props: {
     items: CodeSampleItem[];
     data: OpenAPIOperationData;
 }) {
