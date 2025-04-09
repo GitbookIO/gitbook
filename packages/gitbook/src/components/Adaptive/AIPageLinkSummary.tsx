@@ -3,11 +3,24 @@ import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
+import { create } from 'zustand';
 import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
-import { useSummaries } from './summariesStore';
+
+const useSummaries = create<{
+    cache: Map<string, string>;
+    setSummary: (key: string, summary: string) => void;
+}>((set) => ({
+    cache: new Map(),
+    setSummary: (key, summary) =>
+        set((state) => {
+            const newCache = new Map(state.cache);
+            newCache.set(key, summary);
+            return { cache: newCache };
+        }),
+}));
 
 /**
  * Get a unique cache key for a page summary
@@ -33,8 +46,12 @@ export function AIPageLinkSummary(props: {
     const visitedPages = useVisitedPages((state) => state.pages);
     const [summary, setSummary] = useState('');
     const cacheKey = getCacheKey(targetSpaceId, targetPageId);
-    const cachedSummary = useSummaries((state) => state.cache.get(cacheKey) ?? '');
-    const setCachedSummary = useSummaries((state) => state.setSummary);
+    const { cachedSummary, setCachedSummary } = useSummaries((state) => {
+        return {
+            cachedSummary: state.cache.get(cacheKey) ?? '',
+            setCachedSummary: state.setSummary,
+        };
+    });
 
     useEffect(() => {
         let canceled = false;
