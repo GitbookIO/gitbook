@@ -16,7 +16,6 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
-    type URLWithMode,
     getPublishedContentByURL,
     getVisitorAuthBasePath,
     normalizeURL,
@@ -31,6 +30,8 @@ export const config = {
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
     ],
 };
+
+type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {

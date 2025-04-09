@@ -1,5 +1,3 @@
-export type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
-
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
