@@ -411,6 +411,7 @@ const getRevisionPagesUncached = withoutConcurrentExecution(
                         params.revisionId,
                         {
                             metadata: params.metadata,
+                            computed: false,
                         }
                     );
                     return res.data.pages;
