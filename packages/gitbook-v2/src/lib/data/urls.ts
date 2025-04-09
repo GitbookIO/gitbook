@@ -1,3 +1,5 @@
+export type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
+
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
@@ -108,6 +110,26 @@ export function getURLLookupAlternatives(input: URL) {
     }
 
     return { urls: alternatives, basePath, changeRequest, revision };
+}
+
+/**
+ * Get the incoming URL for a request including requests
+ * that may be proxied.
+ */
+export function getIncomingURL(
+    requestURL: URL,
+    mode: URLWithMode['mode'],
+    siteCanonicalURL: URL
+): URL {
+    let incomingURL = requestURL;
+    // For cases where the site is proxied, we use the canonical URL
+    // as the incoming URL along with all the search params from the request.
+    if (mode !== 'url') {
+        incomingURL = siteCanonicalURL;
+        incomingURL.search = requestURL.search;
+    }
+
+    return incomingURL;
 }
 
 /**

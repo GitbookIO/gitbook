@@ -16,6 +16,8 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
+    type URLWithMode,
+    getIncomingURL,
     getPublishedContentByURL,
     getVisitorAuthBasePath,
     normalizeURL,
@@ -30,8 +32,6 @@ export const config = {
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
     ],
 };
-
-type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
 export async function middleware(request: NextRequest) {
     try {
@@ -148,18 +148,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
         const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
 
+        const incomingURL = getIncomingURL(requestURL, mode, siteCanonicalURL);
         //
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response
         //
-        const incomingURL = mode === 'url' ? requestURL : siteCanonicalURL;
-        const requestURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
-        if (
-            requestURLWithoutToken !== incomingURL &&
-            requestURLWithoutToken.toString() !== incomingURL.toString()
-        ) {
+        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
+        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(requestURLWithoutToken.toString()),
+                NextResponse.redirect(incomingURLWithoutToken.toString()),
                 cookies
             );
         }
