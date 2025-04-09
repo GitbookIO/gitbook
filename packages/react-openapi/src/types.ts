@@ -57,6 +57,8 @@ export interface OpenAPIContext extends OpenAPIClientContext {
     specUrl: string;
 }
 
+export type OpenAPISecurityWithRequired = OpenAPIV3.SecuritySchemeObject & { required?: boolean };
+
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;
     method: string;
@@ -68,5 +70,5 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
 
     /** Securities that should be used for this operation */
-    securities: [string, OpenAPIV3.SecuritySchemeObject][];
+    securities: [string, OpenAPISecurityWithRequired][];
 }
