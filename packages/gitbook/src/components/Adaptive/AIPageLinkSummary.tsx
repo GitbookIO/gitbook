@@ -4,6 +4,7 @@ import { t } from '@/intl/translate';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useState } from 'react';
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
 import { Loading } from '../primitives';
@@ -46,12 +47,14 @@ export function AIPageLinkSummary(props: {
     const visitedPages = useVisitedPages((state) => state.pages);
     const [summary, setSummary] = useState('');
     const cacheKey = getCacheKey(targetSpaceId, targetPageId);
-    const { cachedSummary, setCachedSummary } = useSummaries((state) => {
-        return {
-            cachedSummary: state.cache.get(cacheKey) ?? '',
-            setCachedSummary: state.setSummary,
-        };
-    });
+    const { cachedSummary, setCachedSummary } = useSummaries(
+        useShallow((state) => {
+            return {
+                cachedSummary: state.cache.get(cacheKey) ?? '',
+                setCachedSummary: state.setSummary,
+            };
+        })
+    );
 
     useEffect(() => {
         let canceled = false;
