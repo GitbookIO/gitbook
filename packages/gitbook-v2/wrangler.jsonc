@@ -10,12 +10,6 @@
     "observability": {
         "enabled": true
     },
-    "migrations": [
-        {
-            "tag": "v1",
-            "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
-        }
-    ],
     "env": {
         "preview": {
             "d1_databases": [
@@ -94,7 +88,13 @@
                         "class_name": "DOShardedTagCache"
                     }
                 ]
-            }
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
+                }
+            ]
         },
         "production": {
             "routes": [
@@ -146,7 +146,13 @@
                         "class_name": "DOShardedTagCache"
                     }
                 ]
-            }
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
+                }
+            ]
         }
     }
 }
