@@ -10,18 +10,6 @@
     "observability": {
         "enabled": true
     },
-    "durable_objects": {
-        "bindings": [
-            {
-                "name": "NEXT_CACHE_DO_QUEUE",
-                "class_name": "DOQueueHandler"
-            },
-            {
-                "name": "NEXT_TAG_CACHE_DO_SHARDED",
-                "class_name": "DOShardedTagCache"
-            }
-        ]
-    },
     "migrations": [
         {
             "tag": "v1",
@@ -52,19 +40,9 @@
                     "binding": "GITBOOK_API",
                     "service": "gitbook-x-prod-api-cache"
                 }
-            ],
-            "durable_objects": {
-                "bindings": [
-                    {
-                        "name": "NEXT_CACHE_DO_QUEUE",
-                        "class_name": "DOQueueHandler"
-                    },
-                    {
-                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
-                        "class_name": "DOShardedTagCache"
-                    }
-                ]
-            }
+            ]
+            // No durable objects on preview, as they block the generation of preview URLs
+            // and we don't need tags invalidation on preview
         },
         "staging": {
             "routes": [
