@@ -4,10 +4,8 @@ import clsx from 'clsx';
 import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
-import { useStore } from 'zustand';
-import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
+import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
-import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 
 interface InteractiveSectionTab {
     key: string;
@@ -61,7 +59,7 @@ export function InteractiveSection(props: {
     const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
-    const store = useStore(getOrCreateStoreByKey(stateKey, defaultTab));
+    const store = useSelectState(stateKey, defaultTab);
 
     const selectedTab: InteractiveSectionTab | undefined =
         tabs.find((tab) => tab.key === store.key) ?? tabs[0];
@@ -117,10 +115,9 @@ export function InteractiveSection(props: {
                                     'openapi-section-select',
                                     `${className}-tabs-select`
                                 )}
+                                stateKey={stateKey}
                                 items={tabs}
-                                selectedKey={selectedTab?.key ?? ''}
-                                onSelectionChange={(key) => {
-                                    store.setKey(key);
+                                onSelectionChange={() => {
                                     state.expand();
                                 }}
                                 placement="bottom end"

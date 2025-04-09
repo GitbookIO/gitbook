@@ -29,7 +29,8 @@ export function OpenAPIResponses(props: {
                 ) {
                     return [
                         {
-                            id: 'default',
+                            key: 'default',
+                            label: '',
                             body: (
                                 <OpenAPIResponse
                                     response={response}
@@ -42,7 +43,7 @@ export function OpenAPIResponses(props: {
                 }
 
                 return Object.entries(response.content ?? {}).map(([contentType, mediaType]) => ({
-                    id: contentType,
+                    key: contentType,
                     label: contentType,
                     body: (
                         <OpenAPIResponse
@@ -57,7 +58,7 @@ export function OpenAPIResponses(props: {
             const description = response.description;
 
             return {
-                id: statusCode,
+                key: statusCode,
                 label: (
                     <div className="openapi-response-tab-content">
                         <span
@@ -81,7 +82,7 @@ export function OpenAPIResponses(props: {
         }
     );
 
-    const state = useResponseExamplesState(context.blockKey, groups[0]?.id);
+    const state = useResponseExamplesState(context.blockKey, groups[0]?.key);
 
     return (
         <StaticSection header="Responses" className="openapi-responses">
@@ -89,11 +90,11 @@ export function OpenAPIResponses(props: {
                 icon={context.icons.chevronRight}
                 expandedKeys={state.key ? new Set([state.key]) : new Set()}
                 onExpandedChange={(keys) => {
-                    const key = keys.values().next().value;
-
-                    state.setKey(key ?? null);
+                    const key = keys.values().next().value ?? null;
+                    state.setKey(key);
                 }}
                 groups={groups}
+                selectStateKey="response-media-types"
             />
         </StaticSection>
     );

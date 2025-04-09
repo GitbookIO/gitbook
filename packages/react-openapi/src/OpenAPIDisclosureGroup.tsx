@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useRef, useState } from 'react';
+import { createContext, useContext, useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
 import {
     type DisclosureGroupProps,
@@ -8,18 +8,21 @@ import {
     useDisclosureGroupState,
     useDisclosureState,
 } from 'react-stately';
+import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 
 interface Props {
     groups: TDisclosureGroup[];
     icon?: React.ReactNode;
+    /** State key to use with a store */
+    selectStateKey?: string;
 }
 
 type TDisclosureGroup = {
-    id: string;
+    key: string;
     label: string | React.ReactNode;
     tabs?: {
-        id: string;
-        label?: string | React.ReactNode;
+        key: string;
+        label: string | React.ReactNode;
         body?: React.ReactNode;
     }[];
 };
@@ -30,24 +33,33 @@ const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(n
  * Display an interactive OpenAPI disclosure group.
  */
 export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
-    const { icon, groups } = props;
+    const { icon, groups, selectStateKey } = props;
 
     const state = useDisclosureGroupState(props);
 
     return (
         <DisclosureGroupStateContext.Provider value={state}>
             {groups.map((group) => (
-                <DisclosureItem icon={icon} key={group.id} group={group} />
+                <DisclosureItem
+                    selectStateKey={selectStateKey}
+                    icon={icon}
+                    key={group.key}
+                    group={group}
+                />
             ))}
         </DisclosureGroupStateContext.Provider>
     );
 }
 
-function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode }) {
-    const { icon, group } = props;
+function DisclosureItem(props: {
+    group: TDisclosureGroup;
+    icon?: React.ReactNode;
+    selectStateKey?: string;
+}) {
+    const { icon, group, selectStateKey } = props;
 
     const defaultId = useId();
-    const id = group.id || defaultId;
+    const id = group.key || defaultId;
     const groupState = useContext(DisclosureGroupStateContext);
     const isExpanded = groupState?.expandedKeys.has(id) || false;
     const state = useDisclosureState({
@@ -74,9 +86,9 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
 
-    const defaultTab = group.tabs?.[0]?.id || '';
-    const [selectedTabKey, setSelectedTabKey] = useState(defaultTab);
-    const selectedTab = group.tabs?.find((tab) => tab.id === selectedTabKey);
+    const defaultTab = group.tabs?.[0]?.key || '';
+    const store = useSelectState(selectStateKey, defaultTab);
+    const selectedTab = group.tabs?.find((tab) => tab.key === store.key) || group.tabs?.[0];
 
     return (
         <div className="openapi-disclosure-group" aria-expanded={state.isExpanded}>
@@ -106,21 +118,21 @@ function DisclosureItem(props: { group: TDisclosureGroup; icon?: React.ReactNode
                 {group.tabs ? (
                     <div className="openapi-disclosure-group-mediatype">
                         {group.tabs?.length > 1 ? (
-                            <select
+                            <OpenAPISelect
                                 className="openapi-section-select openapi-select openapi-disclosure-group-tabs-select"
-                                onClick={(event) => event.stopPropagation()}
-                                value={selectedTab?.id}
-                                onChange={(event) => {
-                                    setSelectedTabKey(event.target.value);
+                                // onClick={(event) => event.stopPropagation()}
+                                stateKey={selectStateKey}
+                                onSelectionChange={() => {
                                     state.expand();
                                 }}
+                                items={group.tabs}
                             >
                                 {group.tabs.map((tab) => (
-                                    <option key={tab.id} value={tab.id}>
+                                    <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
                                         {tab.label}
-                                    </option>
+                                    </OpenAPISelectItem>
                                 ))}
-                            </select>
+                            </OpenAPISelect>
                         ) : group.tabs[0]?.label ? (
                             <span>{group.tabs[0].label}</span>
                         ) : null}

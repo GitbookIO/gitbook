@@ -1,28 +1,24 @@
 'use client';
 
 import clsx from 'clsx';
-import { useCallback } from 'react';
 import type { Key } from 'react-aria';
-import { useStore } from 'zustand';
 import { getStatusCodeClassName } from './OpenAPIResponses';
-import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
+import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
-import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 
 type OpenAPIResponseExampleItem = OpenAPISelectItem & {
     statusCode: string;
     body: React.ReactNode;
 };
 
+/**
+ * Get the state of the response examples select.
+ */
 export function useResponseExamplesState(
     blockKey: string | undefined,
     initialKey: Key = 'default'
 ) {
-    const store = useStore(getOrCreateStoreByKey(`openapi-responses-${blockKey}`, initialKey));
-    return {
-        key: store.key,
-        setKey: useCallback((key: Key | null) => store.setKey(key), [store.setKey]),
-    };
+    return useSelectState(getResponseExampleStateKey(blockKey), initialKey);
 }
 
 export function OpenAPIResponseExampleContent(props: {
@@ -46,9 +42,6 @@ function OpenAPIResponseExampleHeader(props: {
     blockKey?: string;
 }) {
     const { items, blockKey } = props;
-    const state = useResponseExamplesState(blockKey, items[0]?.key);
-
-    const selectedItem = items.find((item) => item.key === state.key) ?? items[0];
 
     if (items.length === 1) {
         const item = items[0];
@@ -76,8 +69,8 @@ function OpenAPIResponseExampleHeader(props: {
     return (
         <OpenAPISelect
             items={items}
-            selectedKey={selectedItem?.key}
-            onSelectionChange={(key) => state.setKey(key)}
+            stateKey={getResponseExampleStateKey(blockKey)}
+            placement="bottom start"
         >
             {items.map((item) => (
                 <OpenAPISelectItem key={item.key} id={item.key} value={item}>
@@ -111,4 +104,11 @@ function OpenAPIResponseExampleBody(props: {
     }
 
     return <div className="openapi-response-examples-panel">{selectedItem.body}</div>;
+}
+
+/**
+ * Return the state key for the response examples.
+ */
+function getResponseExampleStateKey(blockKey: string | undefined) {
+    return `openapi-responses-${blockKey}`;
 }

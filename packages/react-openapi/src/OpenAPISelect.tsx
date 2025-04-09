@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
+import { useCallback } from 'react';
 import {
     Button,
     type Key,
@@ -13,6 +14,8 @@ import {
     type SelectProps,
     SelectValue,
 } from 'react-aria-components';
+import { useStore } from 'zustand';
+import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 
 export type OpenAPISelectItem = {
     key: Key;
@@ -22,18 +25,33 @@ export type OpenAPISelectItem = {
 interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectProps<T>, 'children'> {
     items: T[];
     children: React.ReactNode | ((item: T) => React.ReactNode);
-    selectedKey?: Key;
-    onChange?: (key: string | number) => void;
     placement?: PopoverProps['placement'];
+    stateKey?: string;
+}
+
+export function useSelectState(stateKey = 'select-state', initialKey?: Key) {
+    const store = useStore(getOrCreateStoreByKey(stateKey, initialKey));
+    return {
+        key: store.key,
+        setKey: useCallback((key: Key | null) => store.setKey(key), [store.setKey]),
+    };
 }
 
 export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectProps<T>) {
-    const { items, children, className, placement } = props;
+    const { items, children, className, placement, stateKey, selectedKey, onSelectionChange } =
+        props;
+
+    const state = useSelectState(stateKey, items[0]?.key);
 
     return (
         <Select
             aria-label="OpenAPI Select"
             {...props}
+            selectedKey={selectedKey ?? state.key}
+            onSelectionChange={(key) => {
+                onSelectionChange?.(key);
+                state.setKey(key);
+            }}
             className={clsx('openapi-select', className)}
         >
             <Button>

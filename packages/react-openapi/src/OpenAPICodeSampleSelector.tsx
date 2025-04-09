@@ -35,14 +35,7 @@ function OpenAPICodeSampleHeader(props: {
         <>
             <OpenAPIPath canCopy={false} withServer={false} data={data} />
             {items.length > 1 ? (
-                <OpenAPISelect
-                    selectedKey={selected?.key}
-                    onSelectionChange={(key) => {
-                        state.setKey(key);
-                    }}
-                    items={items}
-                    placement="bottom end"
-                >
+                <OpenAPISelect items={items} placement="bottom end">
                     {items.map((item) => (
                         <OpenAPISelectItem key={item.key} id={item.key} value={item}>
                             {item.label}
