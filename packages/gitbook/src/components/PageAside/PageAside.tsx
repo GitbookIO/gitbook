@@ -26,8 +26,7 @@ export function PageAside(props: {
     withFullPageCover: boolean;
     withPageFeedback: boolean;
 }) {
-    const { page, document, withPageFeedback, withFullPageCover, withHeaderOffset, context } =
-        props;
+    const { page, document, withPageFeedback, context } = props;
     const { customization, site, space } = context;
 
     const useAdaptivePane = true;

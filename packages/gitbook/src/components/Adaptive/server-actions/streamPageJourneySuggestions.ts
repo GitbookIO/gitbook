@@ -163,7 +163,7 @@ Feel free to create journeys across spaces.`,
             });
 
             // Deduplicate pages before yielding
-            const uniquePages = resolvedPages.filter(page => {
+            const uniquePages = resolvedPages.filter((page) => {
                 if (allEmittedPageIds.has(page.page.id)) {
                     return false;
                 }
