@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import type { Key } from 'react-aria';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
-import { getStatusCodeClassName } from './utils';
+import { createStateKey, getStatusCodeClassName } from './utils';
 
 type OpenAPIResponseExampleItem = OpenAPISelectItem & {
     statusCode: string;
@@ -110,5 +110,5 @@ function OpenAPIResponseExampleBody(props: {
  * Return the state key for the response examples.
  */
 function getResponseExampleStateKey(blockKey: string | undefined) {
-    return `openapi-responses-${blockKey}`;
+    return createStateKey('openapi-responses', blockKey);
 }
