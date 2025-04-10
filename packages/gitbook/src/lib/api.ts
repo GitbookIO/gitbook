@@ -427,7 +427,6 @@ export const getRevisionPages = cache({
             revisionId,
             {
                 metadata: fetchOptions.metadata,
-                computed: false,
             },
             {
                 ...noCacheFetchOptions,
