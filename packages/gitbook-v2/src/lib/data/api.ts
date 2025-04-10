@@ -1442,6 +1442,5 @@ export function apiClient(input: DataFetcherInput = { apiToken: null }) {
 function getCacheTagsFromResponse(response: HttpResponse<unknown, unknown>) {
     const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
     const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
-    console.log('getCacheTagsFromResponse', tags);
     return tags;
 }
