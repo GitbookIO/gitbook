@@ -9,6 +9,7 @@ import type {
 } from '@/lib/openapi/types';
 import { getCloudflareRequestGlobal } from '@v2/lib/data/cloudflare';
 import { withCacheKey, withoutConcurrentExecution } from '@v2/lib/data/memoize';
+import { GITBOOK_RUNTIME } from '@v2/lib/env';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
@@ -68,25 +69,26 @@ const fetchFilesystemV1 = cache({
     },
 });
 
-const fetchFilesystemV2 = withCacheKey(async (cacheKey, url: string) => {
-    const uncached = unstable_cache(
-        async () => fetchFilesystemV2Uncached(cacheKey, url),
-        [cacheKey],
-        {
-            revalidate: 60 * 60 * 24,
+const fetchFilesystemV2 = withCacheKey(
+    withoutConcurrentExecution(getCloudflareRequestGlobal, async (cacheKey, url: string) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return fetchFilesystemUseCache(url);
         }
-    );
 
-    const response = await uncached();
-    return response;
-});
-const fetchFilesystemV2Uncached = withoutConcurrentExecution(
-    getCloudflareRequestGlobal,
-    async function fetchFilesystemV2(url: string) {
-        const response = await fetchFilesystemUncached(url);
+        // FIXME: OpenNext doesn't support 'use cache' yet
+        const uncached = unstable_cache(async () => fetchFilesystemUncached(url), [cacheKey], {
+            revalidate: 60 * 60 * 24,
+        });
+
+        const response = await uncached();
         return response;
-    }
+    })
 );
+
+const fetchFilesystemUseCache = async (url: string) => {
+    'use cache';
+    return fetchFilesystemUncached(url);
+};
 
 async function fetchFilesystemUncached(
     url: string,

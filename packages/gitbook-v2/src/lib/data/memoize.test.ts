@@ -4,7 +4,7 @@ import { withCacheKey, withoutConcurrentExecution } from './memoize';
 
 describe('withoutConcurrentExecution', () => {
     it('should memoize the function based on the cache key', async () => {
-        const fn = mock(async (a: number, b: number) => a + b);
+        const fn = mock(async (_cacheKey: string, a: number, b: number) => a + b);
         const memoized = withoutConcurrentExecution(() => null, fn);
 
         const p1 = memoized('c1', 1, 2);
