@@ -4,7 +4,7 @@
  */
 export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
     getGlobalContext: () => object | null | undefined,
-    wrapped: (...args: ArgsType) => Promise<ReturnType>
+    wrapped: (key: string, ...args: ArgsType) => Promise<ReturnType>
 ): (cacheKey: string, ...args: ArgsType) => Promise<ReturnType> {
     const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
 
@@ -26,7 +26,7 @@ export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
 
         const promise = (async () => {
             try {
-                const result = await wrapped(...args);
+                const result = await wrapped(key, ...args);
                 return result;
             } finally {
                 promiseCache.delete(key);
