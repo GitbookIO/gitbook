@@ -38,21 +38,20 @@ export function useSelectState(stateKey = 'select-state', initialKey?: Key) {
 }
 
 export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectProps<T>) {
-    const { items, children, className, placement, stateKey, selectedKey, onSelectionChange } =
-        props;
+    const { items, children, className, placement, stateKey, onSelectionChange } = props;
 
     const state = useSelectState(stateKey, items[0]?.key);
 
     return (
         <Select
             aria-label="OpenAPI Select"
-            {...props}
-            selectedKey={selectedKey ?? state.key}
+            selectedKey={state.key ?? items[0]?.key}
             onSelectionChange={(key) => {
                 onSelectionChange?.(key);
                 state.setKey(key);
             }}
             className={clsx('openapi-select', className)}
+            {...props}
         >
             <Button>
                 <SelectValue />
