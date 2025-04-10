@@ -1,5 +1,18 @@
 # @gitbook/react-openapi
 
+## 1.1.10
+
+### Patch Changes
+
+- 70c4182: Improve OpenAPI schema style
+- 2b6c593: Remove stable from x-stability
+- cbd768a: Improve OpenAPI codesample (add OpenAPISelect component)
+- e59076a: Improve OpenAPI schemas block ungrouped style. Classnames have changed, please refer to this PR to update GBX.
+- eedefdd: Handle optional security headers
+- 23cedd2: Hide deprecated properties in examples
+- Updated dependencies [2b6c593]
+  - @gitbook/openapi-parser@2.1.3
+
 ## 1.1.9
 
 ### Patch Changes

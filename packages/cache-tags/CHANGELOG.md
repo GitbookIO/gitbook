@@ -1,5 +1,11 @@
 # @gitbook/cache-tags
 
+## 0.3.0
+
+### Minor Changes
+
+- 116575c: Improve typing of getComputedContentSourceCacheTags to match latest API specification
+
 ## 0.2.0
 
 ### Minor Changes
