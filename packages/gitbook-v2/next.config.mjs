@@ -7,10 +7,7 @@ const nextConfig = {
     experimental: {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
-
-        // We don't use 'use cache' as it's not supported in OpenNext yet
-        // and instead we scope `unstable_cache` to the parameters of the function
-        useCache: false,
+        useCache: true,
 
         // Content is fully static, we can cache it in the session memory cache for a long time
         staleTimes: {

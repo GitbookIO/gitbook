@@ -7,7 +7,13 @@ import {
     type RenderIntegrationUI,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
-import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
+import {
+    GITBOOK_API_TOKEN,
+    GITBOOK_API_URL,
+    GITBOOK_RUNTIME,
+    GITBOOK_USER_AGENT,
+} from '@v2/lib/env';
+import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { unstable_cache } from 'next/cache';
 import { getCloudflareContext, getCloudflareRequestGlobal } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
@@ -213,6 +219,11 @@ export function createDataFetcher(
 
 const getUserById = withCacheKey(
     async (cacheKey, input: DataFetcherInput, params: { userId: string }) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getUserByIdUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => {
                 return getUserByIdUncached(cacheKey, input, params);
@@ -231,11 +242,14 @@ const getUserById = withCacheKey(
 const getUserByIdUncached = withoutConcurrentExecution(
     getCloudflareRequestGlobal,
     async (input: DataFetcherInput, params: { userId: string }) => {
+        'use cache';
+
         return trace(`getUserById.uncached(${params.userId})`, async () => {
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.users.getUserById(params.userId);
-                await setCacheTagsFromResponse(res);
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('days');
                 return res.data;
             });
         });
@@ -251,6 +265,11 @@ const getSpace = withCacheKey(
             shareKey: string | undefined;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getSpaceUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => {
                 return getSpaceUncached(cacheKey, input, params);
@@ -274,13 +293,24 @@ const getSpace = withCacheKey(
 const getSpaceUncached = withoutConcurrentExecution(
     getCloudflareRequestGlobal,
     async (input: DataFetcherInput, params: { spaceId: string; shareKey: string | undefined }) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'space',
+                space: params.spaceId,
+            })
+        );
+
         return trace(`getSpace.uncached(${params.spaceId}, ${params.shareKey})`, async () => {
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getSpaceById(params.spaceId, {
                     shareKey: params.shareKey,
                 });
-                await setCacheTagsFromResponse(res);
+
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('days');
                 return res.data;
             });
         });
@@ -296,6 +326,11 @@ const getChangeRequest = withCacheKey(
             changeRequestId: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getChangeRequestUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getChangeRequestUncached(cacheKey, input, params),
             [cacheKey],
@@ -318,6 +353,16 @@ const getChangeRequest = withCacheKey(
 const getChangeRequestUncached = withoutConcurrentExecution(
     getCloudflareRequestGlobal,
     async (input: DataFetcherInput, params: { spaceId: string; changeRequestId: string }) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'change-request',
+                space: params.spaceId,
+                changeRequest: params.changeRequestId,
+            })
+        );
+
         return trace(
             `getChangeRequest.uncached(${params.spaceId}, ${params.changeRequestId})`,
             async () => {
@@ -327,7 +372,8 @@ const getChangeRequestUncached = withoutConcurrentExecution(
                         params.spaceId,
                         params.changeRequestId
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('minutes');
                     return res.data;
                 });
             }
@@ -345,6 +391,11 @@ const getRevision = withCacheKey(
             metadata: boolean;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getRevisionUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getRevisionUncached(cacheKey, input, params),
             [cacheKey],
@@ -364,13 +415,16 @@ const getRevisionUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; metadata: boolean }
     ) => {
+        'use cache';
+
         return trace(`getRevision.uncached(${params.spaceId}, ${params.revisionId})`, async () => {
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
                     metadata: params.metadata,
                 });
-                await setCacheTagsFromResponse(res);
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('max');
                 return res.data;
             });
         });
@@ -387,6 +441,11 @@ const getRevisionPages = withCacheKey(
             metadata: boolean;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getRevisionPagesUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getRevisionPagesUncached(cacheKey, input, params),
             [cacheKey],
@@ -406,6 +465,8 @@ const getRevisionPagesUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; metadata: boolean }
     ) => {
+        'use cache';
+
         return trace(
             `getRevisionPages.uncached(${params.spaceId}, ${params.revisionId})`,
             async () => {
@@ -418,7 +479,8 @@ const getRevisionPagesUncached = withoutConcurrentExecution(
                             metadata: params.metadata,
                         }
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
                     return res.data.pages;
                 });
             }
@@ -436,6 +498,11 @@ const getRevisionFile = withCacheKey(
             fileId: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getRevisionFileUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getRevisionFileUncached(cacheKey, input, params),
             [cacheKey],
@@ -455,6 +522,8 @@ const getRevisionFileUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; fileId: string }
     ) => {
+        'use cache';
+
         return trace(
             `getRevisionFile.uncached(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
             async () => {
@@ -466,7 +535,8 @@ const getRevisionFileUncached = withoutConcurrentExecution(
                         params.fileId,
                         {}
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
                     return res.data;
                 });
             }
@@ -484,6 +554,11 @@ const getRevisionPageMarkdown = withCacheKey(
             pageId: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getRevisionPageMarkdownUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getRevisionPageMarkdownUncached(cacheKey, input, params),
             [cacheKey],
@@ -503,6 +578,8 @@ const getRevisionPageMarkdownUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; pageId: string }
     ) => {
+        'use cache';
+
         return trace(
             `getRevisionPageMarkdown.uncached(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
             async () => {
@@ -516,7 +593,10 @@ const getRevisionPageMarkdownUncached = withoutConcurrentExecution(
                             format: 'markdown',
                         }
                     );
-                    await setCacheTagsFromResponse(res);
+
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+
                     if (!('markdown' in res.data)) {
                         throw new DataFetcherError('Page is not a document', 404);
                     }
@@ -537,6 +617,11 @@ const getRevisionPageByPath = withCacheKey(
             path: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getRevisionPageByPathUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getRevisionPageByPathUncached(cacheKey, input, params),
             [cacheKey, 'v2'],
@@ -556,6 +641,8 @@ const getRevisionPageByPathUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; path: string }
     ) => {
+        'use cache';
+
         return trace(
             `getRevisionPageByPath.uncached(${params.spaceId}, ${params.revisionId}, ${params.path})`,
             async () => {
@@ -568,7 +655,8 @@ const getRevisionPageByPathUncached = withoutConcurrentExecution(
                         encodedPath,
                         {}
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
                     return res.data;
                 });
             }
@@ -585,6 +673,11 @@ const getDocument = withCacheKey(
             documentId: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getDocumentUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getDocumentUncached(cacheKey, input, params),
             [cacheKey],
@@ -601,11 +694,14 @@ const getDocument = withCacheKey(
 const getDocumentUncached = withoutConcurrentExecution(
     getCloudflareRequestGlobal,
     async (input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
+        'use cache';
+
         return trace(`getDocument.uncached(${params.spaceId}, ${params.documentId})`, async () => {
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
-                await setCacheTagsFromResponse(res);
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('max');
                 return res.data;
             });
         });
@@ -623,6 +719,11 @@ const getComputedDocument = withCacheKey(
             seed: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getComputedDocumentUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getComputedDocumentUncached(cacheKey, input, params),
             [cacheKey],
@@ -653,6 +754,18 @@ const getComputedDocumentUncached = withoutConcurrentExecution(
             seed: string;
         }
     ) => {
+        'use cache';
+
+        cacheTag(
+            ...getComputedContentSourceCacheTags(
+                {
+                    spaceId: params.spaceId,
+                    organizationId: params.organizationId,
+                },
+                params.source
+            )
+        );
+
         return trace(
             `getComputedDocument.uncached(${params.spaceId}, ${params.organizationId}, ${params.source.type}, ${params.seed})`,
             async () => {
@@ -662,7 +775,8 @@ const getComputedDocumentUncached = withoutConcurrentExecution(
                         source: params.source,
                         seed: params.seed,
                     });
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
                     return res.data;
                 });
             }
@@ -680,6 +794,11 @@ const getReusableContent = withCacheKey(
             reusableContentId: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getReusableContentUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getReusableContentUncached(cacheKey, input, params),
             [cacheKey],
@@ -699,6 +818,8 @@ const getReusableContentUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; reusableContentId: string }
     ) => {
+        'use cache';
+
         return trace(
             `getReusableContent.uncached(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
             async () => {
@@ -709,7 +830,8 @@ const getReusableContentUncached = withoutConcurrentExecution(
                         params.revisionId,
                         params.reusableContentId
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
                     return res.data;
                 });
             }
@@ -726,6 +848,11 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
             slug: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getLatestOpenAPISpecVersionContentUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getLatestOpenAPISpecVersionContentUncached(cacheKey, input, params),
             [cacheKey],
@@ -748,6 +875,16 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
 const getLatestOpenAPISpecVersionContentUncached = withoutConcurrentExecution(
     getCloudflareRequestGlobal,
     async (input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'openapi',
+                organization: params.organizationId,
+                openAPISpec: params.slug,
+            })
+        );
+
         return trace(
             `getLatestOpenAPISpecVersionContent.uncached(${params.organizationId}, ${params.slug})`,
             async () => {
@@ -757,7 +894,8 @@ const getLatestOpenAPISpecVersionContentUncached = withoutConcurrentExecution(
                         params.organizationId,
                         params.slug
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
                     return res.data;
                 });
             }
@@ -775,6 +913,11 @@ const getPublishedContentSite = withCacheKey(
             siteShareKey: string | undefined;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getPublishedContentSiteUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getPublishedContentSiteUncached(cacheKey, input, params),
             [cacheKey],
@@ -799,6 +942,15 @@ const getPublishedContentSiteUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
     ) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'site',
+                site: params.siteId,
+            })
+        );
+
         return trace(
             `getPublishedContentSite.uncached(${params.organizationId}, ${params.siteId}, ${params.siteShareKey})`,
             async () => {
@@ -811,7 +963,8 @@ const getPublishedContentSiteUncached = withoutConcurrentExecution(
                             shareKey: params.siteShareKey,
                         }
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
                     return res.data;
                 });
             }
@@ -830,6 +983,11 @@ const getSiteRedirectBySource = withCacheKey(
             source: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getSiteRedirectBySourceUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getSiteRedirectBySourceUncached(cacheKey, input, params),
             [cacheKey],
@@ -859,6 +1017,15 @@ const getSiteRedirectBySourceUncached = withoutConcurrentExecution(
             source: string;
         }
     ) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'site',
+                site: params.siteId,
+            })
+        );
+
         return trace(
             `getSiteRedirectBySource.uncached(${params.organizationId}, ${params.siteId}, ${params.siteShareKey}, ${params.source})`,
             async () => {
@@ -872,7 +1039,8 @@ const getSiteRedirectBySourceUncached = withoutConcurrentExecution(
                             source: params.source,
                         }
                     );
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
                     return res.data;
                 });
             }
@@ -889,6 +1057,11 @@ const getEmbedByUrl = withCacheKey(
             spaceId: string;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return getEmbedByUrlUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => getEmbedByUrlUncached(cacheKey, input, params),
             [cacheKey],
@@ -905,13 +1078,23 @@ const getEmbedByUrl = withCacheKey(
 const getEmbedByUrlUncached = withoutConcurrentExecution(
     getCloudflareRequestGlobal,
     async (input: DataFetcherInput, params: { spaceId: string; url: string }) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'space',
+                space: params.spaceId,
+            })
+        );
+
         return trace(`getEmbedByUrl.uncached(${params.spaceId}, ${params.url})`, async () => {
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, {
                     url: params.url,
                 });
-                await setCacheTagsFromResponse(res);
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('weeks');
                 return res.data;
             });
         });
@@ -924,6 +1107,11 @@ const searchSiteContent = withCacheKey(
         input: DataFetcherInput,
         params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return searchSiteContentUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => searchSiteContentUncached(cacheKey, input, params),
             [cacheKey],
@@ -943,6 +1131,15 @@ const searchSiteContentUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
     ) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'site',
+                site: params.siteId,
+            })
+        );
+
         return trace(
             `searchSiteContent.uncached(${params.organizationId}, ${params.siteId}, ${params.query})`,
             async () => {
@@ -953,7 +1150,8 @@ const searchSiteContentUncached = withoutConcurrentExecution(
                         query,
                         ...scope,
                     });
-                    await setCacheTagsFromResponse(res);
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('hours');
                     return res.data.items;
                 });
             }
@@ -970,6 +1168,11 @@ const renderIntegrationUi = withCacheKey(
             request: RenderIntegrationUI;
         }
     ) => {
+        if (GITBOOK_RUNTIME !== 'cloudflare') {
+            return renderIntegrationUiUncached(cacheKey, input, params);
+        }
+
+        // FIX_ME: OpenNext doesn't support 'use cache' yet
         const uncached = unstable_cache(
             async () => renderIntegrationUiUncached(cacheKey, input, params),
             [cacheKey],
@@ -994,6 +1197,15 @@ const renderIntegrationUiUncached = withoutConcurrentExecution(
         input: DataFetcherInput,
         params: { integrationName: string; request: RenderIntegrationUI }
     ) => {
+        'use cache';
+
+        cacheTag(
+            getCacheTag({
+                tag: 'integration',
+                integration: params.integrationName,
+            })
+        );
+
         return trace(`renderIntegrationUi.uncached(${params.integrationName})`, async () => {
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
@@ -1001,7 +1213,8 @@ const renderIntegrationUiUncached = withoutConcurrentExecution(
                     params.integrationName,
                     params.request
                 );
-                await setCacheTagsFromResponse(res);
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('days');
                 return res.data;
             });
         });
@@ -1062,33 +1275,21 @@ export function apiClient(input: DataFetcherInput = { apiToken: null }) {
 /**
  * Set the cache tags using the ones generated by the API.
  */
-async function setCacheTagsFromResponse(response: HttpResponse<unknown, unknown>) {
+async function setCacheTagsFromResponse(response: HttpResponse<unknown, unknown>, enabled = false) {
     const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
     const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
 
-    if (tags.length > 0) {
-        await setCacheTags(tags);
+    if (tags.length > 0 && enabled) {
+        cacheTag(...tags);
     }
 }
 
 /**
- * HACK to dynamically set cache on unstable_cache based on a result within the callback.
- * The approach is based on the fact that `unstable_cache` collects all the tags of functions called within the callback.
- * https://github.com/vercel/next.js/blob/29836888857e3fd129d57df6ce975d0e8de5a134/packages/next/src/server/web/spec-extension/unstable-cache.ts#L182-L194
- *
- * Once we can migrate to `use cache`, it'll be better with the use of the `cacheTag` function.
+ * Get the tags from the API responses.
  */
-async function setCacheTags(tags: string[]) {
-    const callback = unstable_cache(
-        async () => {
-            console.log('set cache tags', tags);
-            return tags;
-        },
-        [],
-        {
-            tags,
-        }
-    );
-
-    await callback();
+function getCacheTagsFromResponse(response: HttpResponse<unknown, unknown>) {
+    const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
+    const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
+    console.log('getCacheTagsFromResponse', tags);
+    return tags;
 }

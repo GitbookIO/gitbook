@@ -98,6 +98,10 @@ export async function wrapDataFetcherError<T>(
  */
 export function getExposableError(error: Error): DataFetcherErrorData {
     if (error instanceof GitBookAPIError) {
+        if (error.code >= 500) {
+            throw error;
+        }
+
         return {
             code: error.code,
             message: error.errorMessage,
@@ -105,6 +109,10 @@ export function getExposableError(error: Error): DataFetcherErrorData {
     }
 
     if (error instanceof DataFetcherError) {
+        if (error.code >= 500) {
+            throw error;
+        }
+
         return {
             code: error.code,
             message: error.message,
