@@ -218,43 +218,54 @@ export function createDataFetcher(
  */
 
 const getUserById = withCacheKey(
-    async (cacheKey, input: DataFetcherInput, params: { userId: string }) => {
-        if (GITBOOK_RUNTIME !== 'cloudflare') {
-            return getUserByIdUncached(cacheKey, input, params);
-        }
-
-        // FIX_ME: OpenNext doesn't support 'use cache' yet
-        const uncached = unstable_cache(
-            async () => {
-                return getUserByIdUncached(cacheKey, input, params);
-            },
-            [cacheKey],
-            {
-                revalidate: RevalidationProfile.days,
-                tags: [],
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (cacheKey, input: DataFetcherInput, params: { userId: string }) => {
+            if (GITBOOK_RUNTIME !== 'cloudflare') {
+                return getUserByIdUseCache(input, params);
             }
-        );
 
-        return uncached();
-    }
+            // FIX_ME: OpenNext doesn't support 'use cache' yet
+            const uncached = unstable_cache(
+                async () => {
+                    return getUserByIdUncached(input, params);
+                },
+                [cacheKey],
+                {
+                    revalidate: RevalidationProfile.days,
+                    tags: [],
+                }
+            );
+
+            return uncached();
+        }
+    )
 );
 
-const getUserByIdUncached = withoutConcurrentExecution(
-    getCloudflareRequestGlobal,
-    async (input: DataFetcherInput, params: { userId: string }) => {
-        'use cache';
+const getUserByIdUseCache = (input: DataFetcherInput, params: { userId: string }) => {
+    'use cache';
+    return getUserByIdUncached(input, params, true);
+};
 
-        return trace(`getUserById.uncached(${params.userId})`, async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.users.getUserById(params.userId);
+const getUserByIdUncached = async (
+    input: DataFetcherInput,
+    params: { userId: string },
+    withUseCache = false
+) => {
+    'use cache';
+
+    return trace(`getUserById.uncached(${params.userId})`, async () => {
+        return wrapDataFetcherError(async () => {
+            const api = apiClient(input);
+            const res = await api.users.getUserById(params.userId);
+            if (withUseCache) {
                 cacheTag(...getCacheTagsFromResponse(res));
                 cacheLife('days');
-                return res.data;
-            });
+            }
+            return res.data;
         });
-    }
-);
+    });
+};
 
 const getSpace = withCacheKey(
     async (
