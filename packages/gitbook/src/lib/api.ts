@@ -242,7 +242,7 @@ export const getLatestOpenAPISpecVersionContent = cache({
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
-    name: 'api.getPublishedContentByUrl.v4',
+    name: 'api.getPublishedContentByUrl.v5',
     tag: (url) => getCacheTagForURL(url),
     get: async (
         url: string,
@@ -266,6 +266,10 @@ export const getPublishedContentByUrl = cache({
             );
 
             const parsed = parseCacheResponse(response);
+
+            console.log(
+                `Parsed ttl: ${parsed.ttl} at ${Date.now()}, for ${'apiToken' in response.data ? response.data.apiToken : '<no-token>'}`
+            );
 
             const data: PublishedContentWithCache = {
                 ...response.data,
