@@ -1,5 +1,20 @@
 # gitbook-v2
 
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [77397ca]
+  - @gitbook/cache-tags@0.3.1
+
+## 0.2.4
+
+### Patch Changes
+
+- 4234289: Fix incoming URL for requests that were proxied
+- Updated dependencies [116575c]
+  - @gitbook/cache-tags@0.3.0
+
 ## 0.2.3
 
 ### Patch Changes

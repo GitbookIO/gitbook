@@ -1,5 +1,48 @@
 # gitbook
 
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [77397ca]
+  - @gitbook/cache-tags@0.3.1
+
+## 0.10.0
+
+### Minor Changes
+
+- b62b101: Do not set cookie to identify visitor for insights when disabled.
+
+### Patch Changes
+
+- 95ea22d: Cache AI Page Link summary
+- daf41fc: Tweak footer design (and refactor)
+- de53946: Fix security issue with injection of "javacript:` url in the back button of PDFs
+- b92ecfa: Implement retry logic for the DO cache to prevent when revalidating content.
+- 528eee3: Add superscript and subscript text rendering
+- aa3357a: Fix OpenAPISchemas description padding
+- 168a4fa: Add support for buttons to GitBook.
+- 70c4182: Improve OpenAPI schema style
+- 2b6c593: Remove stable from x-stability
+- 580f7ad: Improve the error message returned by the revalidate endpoint.
+- cbd768a: Improve OpenAPI codesample (add OpenAPISelect component)
+- c765463: Fix ogimage generation crashing when site is using a custom WOFF2 font
+- e59076a: Improve OpenAPI schemas block ungrouped style. Classnames have changed, please refer to this PR to update GBX.
+- 29aaba5: Override Scalar's overscroll-behavior
+- 90ead98: Better error handling in cache revalidation.
+- Updated dependencies [116575c]
+- Updated dependencies [cdffd7c]
+- Updated dependencies [70c4182]
+- Updated dependencies [2b6c593]
+- Updated dependencies [cbd768a]
+- Updated dependencies [e59076a]
+- Updated dependencies [eedefdd]
+- Updated dependencies [23cedd2]
+  - @gitbook/cache-tags@0.3.0
+  - @gitbook/colors@0.3.2
+  - @gitbook/react-openapi@1.1.10
+  - @gitbook/openapi-parser@2.1.3
+
 ## 0.9.2
 
 ### Patch Changes

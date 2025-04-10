@@ -1,5 +1,11 @@
 # @gitbook/colors
 
+## 0.3.2
+
+### Patch Changes
+
+- cdffd7c: Desaturate text colors by decreasing chroma for the last steps of the color scale
+
 ## 0.3.1
 
 ### Patch Changes

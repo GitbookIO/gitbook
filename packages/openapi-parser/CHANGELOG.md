@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.1.3
+
+### Patch Changes
+
+- 2b6c593: Remove stable from x-stability
+
 ## 2.1.2
 
 ### Patch Changes
