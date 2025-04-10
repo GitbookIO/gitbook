@@ -1,5 +1,11 @@
 # @gitbook/cache-tags
 
+## 0.3.1
+
+### Patch Changes
+
+- 77397ca: Fix version of @gitbook/api referenced in package.json
+
 ## 0.3.0
 
 ### Minor Changes

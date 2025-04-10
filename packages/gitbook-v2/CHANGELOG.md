@@ -1,5 +1,12 @@
 # gitbook-v2
 
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [77397ca]
+  - @gitbook/cache-tags@0.3.1
+
 ## 0.2.4
 
 ### Patch Changes
