@@ -11,6 +11,11 @@ export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
     return (key: string, ...args: ArgsType) => {
         const globalContext = getGlobalContext() ?? globalThis;
 
+        if (globalContext !== globalThis) {
+            console.log('globalContext !== globalThis, direct use');
+            return wrapped(...args);
+        }
+
         /**
          * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
          * to avoid "Cannot perform I/O on behalf of a different request" errors.
