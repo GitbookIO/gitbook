@@ -68,16 +68,18 @@ export function SectionFooterContent(props: ComponentPropsWithoutRef<'div'>) {
 
 export function StaticSection(props: {
     className: string;
-    header: React.ReactNode;
+    header?: React.ReactNode;
     children: React.ReactNode;
     footer?: React.ReactNode;
 }) {
     const { className, header, children, footer } = props;
     return (
         <Section className={className}>
-            <SectionHeader className={className}>
-                <SectionHeaderContent className={className}>{header}</SectionHeaderContent>
-            </SectionHeader>
+            {header ? (
+                <SectionHeader className={className}>
+                    <SectionHeaderContent className={className}>{header}</SectionHeaderContent>
+                </SectionHeader>
+            ) : null}
             <SectionBody className={className}>{children}</SectionBody>
             {footer ? (
                 <SectionFooter className={className}>

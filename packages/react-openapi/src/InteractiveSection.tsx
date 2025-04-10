@@ -111,10 +111,6 @@ export function InteractiveSection(props: {
                     >
                         {tabs.length > 1 ? (
                             <OpenAPISelect
-                                className={clsx(
-                                    'openapi-section-select',
-                                    `${className}-tabs-select`
-                                )}
                                 stateKey={stateKey}
                                 items={tabs}
                                 onSelectionChange={() => {

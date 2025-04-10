@@ -116,11 +116,12 @@ function DisclosureItem(props: {
                     {group.label}
                 </button>
                 {group.tabs ? (
-                    <div className="openapi-disclosure-group-mediatype">
+                    <div
+                        className="openapi-disclosure-group-mediatype"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {group.tabs?.length > 1 ? (
                             <OpenAPISelect
-                                className="openapi-section-select openapi-select openapi-disclosure-group-tabs-select"
-                                // onClick={(event) => event.stopPropagation()}
                                 stateKey={selectStateKey}
                                 onSelectionChange={() => {
                                     state.expand();

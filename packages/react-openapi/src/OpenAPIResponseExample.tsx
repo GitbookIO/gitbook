@@ -7,10 +7,9 @@ import {
     getExamplesFromMediaTypeObject,
 } from './OpenAPIExample';
 import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
-import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
-import { StaticSection } from './StaticSection';
+import { OpenAPIResponseMediaTypeContent } from './OpenAPIResponseMediaType';
 import type { OpenAPIContext, OpenAPIOperationData } from './types';
-import { checkIsReference, createStateKey, resolveDescription } from './utils';
+import { checkIsReference, resolveDescription } from './utils';
 
 /**
  * Display an example of the response content.
@@ -127,13 +126,7 @@ function OpenAPIResponse(props: {
         };
     });
 
-    return (
-        <OpenAPITabs stateKey={createStateKey('response-media-types')} items={tabs}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-response-media-types">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
-    );
+    return <OpenAPIResponseMediaTypeContent blockKey={context.blockKey} items={tabs} />;
 }
 
 function OpenAPIResponseMediaType(props: {
@@ -170,16 +163,7 @@ function OpenAPIResponseMediaType(props: {
         };
     });
 
-    return (
-        <OpenAPITabs stateKey={createStateKey('response-media-type-examples')} items={tabs}>
-            <StaticSection
-                header={<OpenAPITabsList />}
-                className="openapi-response-media-type-examples"
-            >
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
-    );
+    return <OpenAPIResponseMediaTypeContent blockKey={props.context.blockKey} items={tabs} />;
 }
 
 /**

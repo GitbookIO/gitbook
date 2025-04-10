@@ -8,6 +8,7 @@ import { OpenAPIResponse } from './OpenAPIResponse';
 import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './types';
+import { createStateKey } from './utils';
 
 /**
  * Display an interactive response body.
@@ -94,7 +95,7 @@ export function OpenAPIResponses(props: {
                     state.setKey(key);
                 }}
                 groups={groups}
-                selectStateKey="response-media-types"
+                selectStateKey={createStateKey('response-media-types', context.blockKey)}
             />
         </StaticSection>
     );
