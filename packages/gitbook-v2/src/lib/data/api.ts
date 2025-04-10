@@ -3,6 +3,7 @@ import {
     type ComputedContentSource,
     GitBookAPI,
     type GitBookAPIServiceBinding,
+    type HttpResponse,
     type RenderIntegrationUI,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
@@ -234,6 +235,7 @@ const getUserByIdUncached = withoutConcurrentExecution(
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.users.getUserById(params.userId);
+                await setCacheTagsFromResponse(res);
                 return res.data;
             });
         });
@@ -278,6 +280,7 @@ const getSpaceUncached = withoutConcurrentExecution(
                 const res = await api.spaces.getSpaceById(params.spaceId, {
                     shareKey: params.shareKey,
                 });
+                await setCacheTagsFromResponse(res);
                 return res.data;
             });
         });
@@ -324,6 +327,7 @@ const getChangeRequestUncached = withoutConcurrentExecution(
                         params.spaceId,
                         params.changeRequestId
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -366,6 +370,7 @@ const getRevisionUncached = withoutConcurrentExecution(
                 const res = await api.spaces.getRevisionById(params.spaceId, params.revisionId, {
                     metadata: params.metadata,
                 });
+                await setCacheTagsFromResponse(res);
                 return res.data;
             });
         });
@@ -411,9 +416,9 @@ const getRevisionPagesUncached = withoutConcurrentExecution(
                         params.revisionId,
                         {
                             metadata: params.metadata,
-                            computed: false,
                         }
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data.pages;
                 });
             }
@@ -461,6 +466,7 @@ const getRevisionFileUncached = withoutConcurrentExecution(
                         params.fileId,
                         {}
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -510,6 +516,7 @@ const getRevisionPageMarkdownUncached = withoutConcurrentExecution(
                             format: 'markdown',
                         }
                     );
+                    await setCacheTagsFromResponse(res);
                     if (!('markdown' in res.data)) {
                         throw new DataFetcherError('Page is not a document', 404);
                     }
@@ -561,6 +568,7 @@ const getRevisionPageByPathUncached = withoutConcurrentExecution(
                         encodedPath,
                         {}
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -597,6 +605,7 @@ const getDocumentUncached = withoutConcurrentExecution(
             return wrapDataFetcherError(async () => {
                 const api = apiClient(input);
                 const res = await api.spaces.getDocumentById(params.spaceId, params.documentId, {});
+                await setCacheTagsFromResponse(res);
                 return res.data;
             });
         });
@@ -653,6 +662,7 @@ const getComputedDocumentUncached = withoutConcurrentExecution(
                         source: params.source,
                         seed: params.seed,
                     });
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -699,6 +709,7 @@ const getReusableContentUncached = withoutConcurrentExecution(
                         params.revisionId,
                         params.reusableContentId
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -746,6 +757,7 @@ const getLatestOpenAPISpecVersionContentUncached = withoutConcurrentExecution(
                         params.organizationId,
                         params.slug
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -799,6 +811,7 @@ const getPublishedContentSiteUncached = withoutConcurrentExecution(
                             shareKey: params.siteShareKey,
                         }
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -859,6 +872,7 @@ const getSiteRedirectBySourceUncached = withoutConcurrentExecution(
                             source: params.source,
                         }
                     );
+                    await setCacheTagsFromResponse(res);
                     return res.data;
                 });
             }
@@ -897,6 +911,7 @@ const getEmbedByUrlUncached = withoutConcurrentExecution(
                 const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, {
                     url: params.url,
                 });
+                await setCacheTagsFromResponse(res);
                 return res.data;
             });
         });
@@ -938,6 +953,7 @@ const searchSiteContentUncached = withoutConcurrentExecution(
                         query,
                         ...scope,
                     });
+                    await setCacheTagsFromResponse(res);
                     return res.data.items;
                 });
             }
@@ -985,6 +1001,7 @@ const renderIntegrationUiUncached = withoutConcurrentExecution(
                     params.integrationName,
                     params.request
                 );
+                await setCacheTagsFromResponse(res);
                 return res.data;
             });
         });
@@ -1040,4 +1057,38 @@ export function apiClient(input: DataFetcherInput = { apiToken: null }) {
     });
 
     return api;
+}
+
+/**
+ * Set the cache tags using the ones generated by the API.
+ */
+async function setCacheTagsFromResponse(response: HttpResponse<unknown, unknown>) {
+    const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
+    const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
+
+    if (tags.length > 0) {
+        await setCacheTags(tags);
+    }
+}
+
+/**
+ * HACK to dynamically set cache on unstable_cache based on a result within the callback.
+ * The approach is based on the fact that `unstable_cache` collects all the tags of functions called within the callback.
+ * https://github.com/vercel/next.js/blob/29836888857e3fd129d57df6ce975d0e8de5a134/packages/next/src/server/web/spec-extension/unstable-cache.ts#L182-L194
+ *
+ * Once we can migrate to `use cache`, it'll be better with the use of the `cacheTag` function.
+ */
+async function setCacheTags(tags: string[]) {
+    const callback = unstable_cache(
+        async () => {
+            console.log('set cache tags', tags);
+            return tags;
+        },
+        [],
+        {
+            tags,
+        }
+    );
+
+    await callback();
 }
