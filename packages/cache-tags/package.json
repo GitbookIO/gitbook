@@ -10,7 +10,7 @@
     },
     "version": "0.3.0",
     "dependencies": {
-        "@gitbook/api": "*",
+        "@gitbook/api": "^0.109.0",
         "assert-never": "^1.2.1"
     },
     "devDependencies": {
