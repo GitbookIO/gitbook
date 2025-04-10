@@ -9,6 +9,7 @@ import {
 import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
 import { OpenAPIResponseMediaTypeContent } from './OpenAPIResponseMediaType';
 import type { OpenAPIContext, OpenAPIOperationData } from './types';
+import { getStatusCodeDefaultLabel } from './utils';
 import { checkIsReference, resolveDescription } from './utils';
 
 /**
@@ -45,11 +46,16 @@ export function OpenAPIResponseExample(props: {
 
     const tabs = responses.map(([key, responseObject]) => {
         const description = resolveDescription(responseObject);
+        const label = description ? (
+            <Markdown source={description} />
+        ) : (
+            getStatusCodeDefaultLabel(key)
+        );
 
         if (checkIsReference(responseObject)) {
             return {
                 key: key,
-                label: description ? <Markdown source={description} /> : null,
+                label,
                 statusCode: key,
                 body: (
                     <OpenAPIExample
@@ -64,7 +70,7 @@ export function OpenAPIResponseExample(props: {
         if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
             return {
                 key: key,
-                label: description ? <Markdown source={description} /> : null,
+                label,
                 statusCode: key,
                 body: <OpenAPIEmptyExample />,
             };
@@ -72,7 +78,7 @@ export function OpenAPIResponseExample(props: {
 
         return {
             key: key,
-            label: description ? <Markdown source={description} /> : null,
+            label,
             statusCode: key,
             body: <OpenAPIResponse context={context} content={responseObject.content} />,
         };
@@ -100,36 +106,24 @@ function OpenAPIResponse(props: {
         throw new Error('One media type is required');
     }
 
-    if (entries.length === 1) {
-        const [mediaType, mediaTypeObject] = firstEntry;
-        return (
-            <OpenAPIResponseMediaType
-                context={context}
-                mediaType={mediaType}
-                mediaTypeObject={mediaTypeObject}
-            />
-        );
-    }
-
     const tabs = entries.map((entry) => {
         const [mediaType, mediaTypeObject] = entry;
         return {
             key: mediaType,
             label: mediaType,
-            body: (
-                <OpenAPIResponseMediaType
-                    context={context}
-                    mediaType={mediaType}
-                    mediaTypeObject={mediaTypeObject}
-                />
-            ),
+            body: <></>,
+            examples: getExamples({
+                mediaTypeObject,
+                mediaType,
+                context,
+            }),
         };
     });
 
     return <OpenAPIResponseMediaTypeContent blockKey={context.blockKey} items={tabs} />;
 }
 
-function OpenAPIResponseMediaType(props: {
+function getExamples(props: {
     mediaTypeObject: OpenAPIV3.MediaTypeObject;
     mediaType: string;
     context: OpenAPIContext;
@@ -137,23 +131,8 @@ function OpenAPIResponseMediaType(props: {
     const { mediaTypeObject, mediaType } = props;
     const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType });
     const syntax = getSyntaxFromMediaType(mediaType);
-    const firstExample = examples[0];
 
-    if (!firstExample) {
-        return <OpenAPIEmptyExample />;
-    }
-
-    if (examples.length === 1) {
-        return (
-            <OpenAPIExample
-                example={firstExample.example}
-                context={props.context}
-                syntax={syntax}
-            />
-        );
-    }
-
-    const tabs = examples.map((example) => {
+    return examples.map((example) => {
         return {
             key: example.key,
             label: example.example.summary || example.key,
@@ -162,8 +141,6 @@ function OpenAPIResponseMediaType(props: {
             ),
         };
     });
-
-    return <OpenAPIResponseMediaTypeContent blockKey={props.context.blockKey} items={tabs} />;
 }
 
 /**

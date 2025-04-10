@@ -43,11 +43,13 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
 
     const state = useSelectState(stateKey, items[0]?.key);
 
+    const selected = items.find((item) => item.key === state.key) || items[0];
+
     return (
         <Select
             aria-label="OpenAPI Select"
             {...props}
-            selectedKey={selectedKey ?? state.key ?? items[0]?.key}
+            selectedKey={selectedKey || selected?.key}
             onSelectionChange={(key) => {
                 onSelectionChange?.(key);
                 state.setKey(key);

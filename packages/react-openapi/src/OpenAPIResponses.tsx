@@ -8,7 +8,7 @@ import { OpenAPIResponse } from './OpenAPIResponse';
 import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './types';
-import { createStateKey } from './utils';
+import { createStateKey, getStatusCodeClassName, getStatusCodeDefaultLabel } from './utils';
 
 /**
  * Display an interactive response body.
@@ -75,7 +75,9 @@ export function OpenAPIResponses(props: {
                                 source={description}
                                 className="openapi-response-description"
                             />
-                        ) : null}
+                        ) : (
+                            getStatusCodeDefaultLabel(statusCode)
+                        )}
                     </div>
                 ),
                 tabs,
@@ -99,36 +101,4 @@ export function OpenAPIResponses(props: {
             />
         </StaticSection>
     );
-}
-
-/**
- * Get the class name for a status code.
- * 1xx: informational
- * 2xx: success
- * 3xx: redirect
- * 4xx, 5xx: error
- */
-export function getStatusCodeClassName(statusCode: number | string): string {
-    const code = typeof statusCode === 'string' ? Number.parseInt(statusCode, 10) : statusCode;
-
-    if (Number.isNaN(code) || code < 100 || code >= 600) {
-        return 'unknown';
-    }
-
-    // Determine the category of the status code based on the first digit
-    const category = Math.floor(code / 100);
-
-    switch (category) {
-        case 1:
-            return 'informational';
-        case 2:
-            return 'success';
-        case 3:
-            return 'redirect';
-        case 4:
-        case 5:
-            return 'error';
-        default:
-            return 'unknown';
-    }
 }

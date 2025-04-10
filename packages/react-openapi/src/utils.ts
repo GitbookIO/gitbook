@@ -149,3 +149,65 @@ function shouldDisplayExample(schema: OpenAPIV3.SchemaObject): boolean {
             Object.keys(schema.example).length > 0)
     );
 }
+
+/**
+ * Get the class name for a status code.
+ * 1xx: informational
+ * 2xx: success
+ * 3xx: redirect
+ * 4xx, 5xx: error
+ */
+export function getStatusCodeClassName(statusCode: number | string): string {
+    const category = getStatusCodeCategory(statusCode);
+    switch (category) {
+        case 1:
+            return 'informational';
+        case 2:
+            return 'success';
+        case 3:
+            return 'redirect';
+        case 4:
+        case 5:
+            return 'error';
+        default:
+            return 'unknown';
+    }
+}
+
+/**
+ * Get a default label for a status code.
+ * This is used when there is no label provided in the OpenAPI spec.
+ * 1xx: Information
+ * 2xx: Success
+ * 3xx: Redirect
+ * 4xx, 5xx: Error
+ */
+export function getStatusCodeDefaultLabel(statusCode: number | string): string {
+    const category = getStatusCodeCategory(statusCode);
+    switch (category) {
+        case 1:
+            return 'Information';
+        case 2:
+            return 'Success';
+        case 3:
+            return 'Redirect';
+        case 4:
+        case 5:
+            return 'Error';
+        default:
+            return '';
+    }
+}
+
+function getStatusCodeCategory(statusCode: number | string): number | string {
+    const code = typeof statusCode === 'string' ? Number.parseInt(statusCode, 10) : statusCode;
+
+    if (Number.isNaN(code) || code < 100 || code >= 600) {
+        return 'unknown';
+    }
+
+    // Determine the category of the status code based on the first digit
+    const category = Math.floor(code / 100);
+
+    return category;
+}

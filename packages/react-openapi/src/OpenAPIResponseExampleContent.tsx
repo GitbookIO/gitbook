@@ -2,9 +2,9 @@
 
 import clsx from 'clsx';
 import type { Key } from 'react-aria';
-import { getStatusCodeClassName } from './OpenAPIResponses';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
+import { getStatusCodeClassName } from './utils';
 
 type OpenAPIResponseExampleItem = OpenAPISelectItem & {
     statusCode: string;
