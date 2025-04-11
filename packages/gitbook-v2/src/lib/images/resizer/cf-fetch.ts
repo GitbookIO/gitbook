@@ -1,4 +1,5 @@
 import type { CloudflareImageOptions } from './types';
+import { copyImageResponse } from './utils';
 
 /**
  * Resize an image by doing a request to the image itself using the Cloudflare fetch.
@@ -17,15 +18,17 @@ export async function resizeImageWithCFFetch(
     // biome-ignore lint/suspicious/noConsole: this log is useful for debugging
     console.log(`resize image using cf-fetch: ${input}`);
 
-    return await fetch(input, {
-        headers: {
-            // Pass the `Accept` header, as Cloudflare uses this to validate the format.
-            Accept:
-                resizeOptions.format === 'json'
-                    ? 'application/json'
-                    : `image/${resizeOptions.format || 'jpeg'}`,
-        },
-        signal,
-        cf: { image: resizeOptions },
-    });
+    return copyImageResponse(
+        await fetch(input, {
+            headers: {
+                // Pass the `Accept` header, as Cloudflare uses this to validate the format.
+                Accept:
+                    resizeOptions.format === 'json'
+                        ? 'application/json'
+                        : `image/${resizeOptions.format || 'jpeg'}`,
+            },
+            signal,
+            cf: { image: resizeOptions },
+        })
+    );
 }
