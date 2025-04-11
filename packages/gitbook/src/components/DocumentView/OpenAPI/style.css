@@ -640,7 +640,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-section-footer {
-    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t;
+    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t border-tint-subtle;
 }
 
 .openapi-section-footer-content {
