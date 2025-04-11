@@ -34,10 +34,7 @@
                     "binding": "GITBOOK_API",
                     "service": "gitbook-x-prod-api-cache"
                 }
-            ],
-            "images": {
-                "binding": "IMAGES"
-            }
+            ]
             // No durable objects on preview, as they block the generation of preview URLs
             // and we don't need tags invalidation on preview
         },
@@ -97,10 +94,7 @@
                     "tag": "v1",
                     "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
                 }
-            ],
-            "images": {
-                "binding": "IMAGES"
-            }
+            ]
         },
         "production": {
             "routes": [
@@ -158,10 +152,7 @@
                     "tag": "v1",
                     "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
                 }
-            ],
-            "images": {
-                "binding": "IMAGES"
-            }
+            ]
         }
     }
 }
