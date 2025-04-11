@@ -42,6 +42,7 @@ export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAP
                     key="body"
                     requestBody={operation.requestBody}
                     context={context}
+                    data={data}
                 />
             ) : null}
             {operation.responses ? (

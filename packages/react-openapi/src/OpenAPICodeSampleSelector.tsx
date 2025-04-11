@@ -22,27 +22,17 @@ type CodeSampleItem = OpenAPISelectItem & {
     footer?: React.ReactNode;
 };
 
-export function OpenAPICodeSampleHeader(props: {
+function OpenAPICodeSampleHeader(props: {
     items: CodeSampleItem[];
     data: OpenAPIOperationData;
 }) {
     const { data, items } = props;
 
-    const state = useCodeSampleState(items[0]?.key ?? '');
-    const selected = items.find((item) => item.key === state.key) || items[0];
-
     return (
         <>
             <OpenAPIPath canCopy={false} withServer={false} data={data} />
             {items.length > 1 ? (
-                <OpenAPISelect
-                    selectedKey={selected?.key}
-                    onSelectionChange={(key) => {
-                        state.setKey(key);
-                    }}
-                    items={items}
-                    placement="bottom end"
-                >
+                <OpenAPISelect items={items} stateKey="codesample" placement="bottom end">
                     {items.map((item) => (
                         <OpenAPISelectItem key={item.key} id={item.key} value={item}>
                             {item.label}

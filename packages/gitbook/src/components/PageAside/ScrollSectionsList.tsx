@@ -123,7 +123,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                     >
                         {section.tag ? (
                             <span
-                                className={`-mt-0.5 openapi-method openapi-method-${section.tag.toLowerCase()}`}
+                                className={`-mt-0.5 openapi-method !text-xs openapi-method-${section.tag.toLowerCase()}`}
                             >
                                 {section.tag}
                             </span>

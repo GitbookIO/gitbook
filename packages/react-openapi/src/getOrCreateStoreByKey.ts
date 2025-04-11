@@ -1,5 +1,3 @@
-'use client';
-
 import { createStore } from 'zustand';
 
 type Key = string | number;
@@ -10,7 +8,7 @@ type State = {
 
 type Actions = { setKey: (key: Key | null) => void };
 
-type Store = State & Actions;
+export type Store = State & Actions;
 
 const createStateStore = (initial?: Key) => {
     return createStore<Store>()((set) => ({

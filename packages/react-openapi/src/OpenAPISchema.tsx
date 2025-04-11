@@ -54,7 +54,10 @@ function OpenAPISchemaProperty(props: {
                 const properties = getSchemaProperties(schema);
                 if (properties?.length) {
                     return (
-                        <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
+                        <OpenAPIDisclosure
+                            icon={context.icons.plus}
+                            label={(isExpanded) => getDisclosureLabel(schema, isExpanded)}
+                        >
                             <OpenAPISchemaProperties
                                 properties={properties}
                                 circularRefs={circularRefs}
@@ -208,7 +211,10 @@ function OpenAPISchemaAlternative(props: {
             {description ? (
                 <Markdown source={description} className="openapi-schema-description" />
             ) : null}
-            <OpenAPIDisclosure context={context} label={getDisclosureLabel(schema)}>
+            <OpenAPIDisclosure
+                icon={context.icons.plus}
+                label={(isExpanded) => getDisclosureLabel(schema, isExpanded)}
+            >
                 {properties?.length ? (
                     <OpenAPISchemaProperties
                         properties={properties}
@@ -502,19 +508,21 @@ function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     return type;
 }
 
-function getDisclosureLabel(schema: OpenAPIV3.SchemaObject): string {
+function getDisclosureLabel(schema: OpenAPIV3.SchemaObject, isExpanded: boolean) {
+    let label: string;
     if (schema.type === 'array' && !!schema.items) {
         if (schema.items.oneOf) {
-            return 'available items';
+            label = 'available items';
         }
-
         // Fallback to "child attributes" for enums and objects
-        if (schema.items.enum || schema.items.type === 'object') {
-            return 'child attributes';
+        else if (schema.items.enum || schema.items.type === 'object') {
+            label = 'child attributes';
+        } else {
+            label = schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
         }
-
-        return schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
+    } else {
+        label = schema.title || 'child attributes';
     }
 
-    return schema.title || 'child attributes';
+    return `${isExpanded ? 'Hide' : 'Show'} ${label}`;
 }

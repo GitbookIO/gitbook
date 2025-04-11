@@ -27,6 +27,52 @@ export interface CodeSampleGenerator {
 
 export const codeSampleGenerators: CodeSampleGenerator[] = [
     {
+        id: 'http',
+        label: 'HTTP',
+        syntax: 'bash',
+        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
+            const { host, path } = parseHostAndPath(url);
+
+            if (body) {
+                // if we had a body add a content length header
+                const bodyContent = body ? stringifyOpenAPI(body) : '';
+                // handle unicode chars with a text encoder
+                const encoder = new TextEncoder();
+
+                const bodyString = BodyGenerators.getHTTPBody(body, headers);
+
+                if (bodyString) {
+                    body = bodyString;
+                }
+
+                headers = {
+                    ...headers,
+                    'Content-Length': encoder.encode(bodyContent).length.toString(),
+                };
+            }
+
+            if (!headers.hasOwnProperty('Accept')) {
+                headers.Accept = '*/*';
+            }
+
+            const headerString = headers
+                ? `${Object.entries(headers)
+                      .map(([key, value]) =>
+                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
+                      )
+                      .join('\n')}\n`
+                : '';
+
+            const bodyString = body ? `\n${body}` : '';
+
+            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
+Host: ${host}
+${headerString}${bodyString}`;
+
+            return httpRequest;
+        },
+    },
+    {
         id: 'curl',
         label: 'cURL',
         syntax: 'bash',
@@ -138,52 +184,6 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             code += ')\n\n';
             code += 'data = response.json()';
             return code;
-        },
-    },
-    {
-        id: 'http',
-        label: 'HTTP',
-        syntax: 'bash',
-        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
-            const { host, path } = parseHostAndPath(url);
-
-            if (body) {
-                // if we had a body add a content length header
-                const bodyContent = body ? stringifyOpenAPI(body) : '';
-                // handle unicode chars with a text encoder
-                const encoder = new TextEncoder();
-
-                const bodyString = BodyGenerators.getHTTPBody(body, headers);
-
-                if (bodyString) {
-                    body = bodyString;
-                }
-
-                headers = {
-                    ...headers,
-                    'Content-Length': encoder.encode(bodyContent).length.toString(),
-                };
-            }
-
-            if (!headers.hasOwnProperty('Accept')) {
-                headers.Accept = '*/*';
-            }
-
-            const headerString = headers
-                ? `${Object.entries(headers)
-                      .map(([key, value]) =>
-                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
-                      )
-                      .join('\n')}\n`
-                : '';
-
-            const bodyString = body ? `\n${body}` : '';
-
-            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${host}
-${headerString}${bodyString}`;
-
-            return httpRequest;
         },
     },
 ];
