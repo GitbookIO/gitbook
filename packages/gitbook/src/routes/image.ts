@@ -111,8 +111,9 @@ export async function serveResizedImage(
         }
 
         return response;
-    } catch (_error) {
+    } catch (error) {
         // Redirect to the original image if resizing fails
+        console.error('Failed to resize image', error);
         return NextResponse.redirect(url, 302);
     }
 }

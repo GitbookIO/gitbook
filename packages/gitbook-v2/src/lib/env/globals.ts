@@ -86,6 +86,15 @@ export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
 
 /**
+ * Mode used for resizing images.
+ */
+export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
+    'GITBOOK_IMAGE_RESIZE_MODE',
+    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cdn-cgi',
+    ['cdn-cgi', 'cf-fetch']
+);
+
+/**
  * Endpoint where icons are served.
  */
 export const GITBOOK_ICONS_URL =
@@ -100,3 +109,12 @@ export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
  * Secret used to validate requests from the GitBook app.
  */
 export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
+
+function enforceEnum<T extends string>(key: string, value: string, enumValues: T[]): T {
+    if (!enumValues.includes(value as T)) {
+        throw new Error(
+            `Invalid value for ${key}: "${value}", expected one of: ${enumValues.join(', ')}`
+        );
+    }
+    return value as T;
+}

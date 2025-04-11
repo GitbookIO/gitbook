@@ -54,6 +54,9 @@ async function main() {
         writeDataFile('styles-map', JSON.stringify(onlyStyles, null, 2)),
         writeDataFile('icons', JSON.stringify(result, null, 2)),
     ]);
+
+    // biome-ignore lint/suspicious/noConsole: We want the CLI to log
+    console.log(`Generated ${result.length} icons`);
 }
 
 async function writeDataFile(name, content) {
@@ -74,6 +77,7 @@ async function writeDataFile(name, content) {
     ]);
 }
 
-main().catch((_error) => {
+main().catch((error) => {
+    console.error(`Error generating icons list: ${error}`);
     process.exit(1);
 });
