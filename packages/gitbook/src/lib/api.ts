@@ -394,7 +394,7 @@ const getAPIContextId = async () => {
  * Get a revision by its ID.
  */
 export const getRevision = cache({
-    name: 'api.getRevision.v3',
+    name: 'api.getRevision.v2',
     tag: (spaceId, revisionId, fetchOptions) =>
         // Temporary hack to make it work with OpenAPI on v1
         fetchOptions.tags?.[0] ??
@@ -427,19 +427,24 @@ export const getRevision = cache({
         return cacheResponse(response, {
             ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
             data: {
-                revision: response.data,
+                ...response.data,
                 tags: getResponseCacheTags(response),
             },
         });
     },
-    getKeyArgs: (args) => [args[0], args[1]],
+    getKeyArgs: ([spaceId, revisionId, fetchOptions]) => {
+        if (fetchOptions.computed === false) {
+            return [spaceId, revisionId, { computed: false }];
+        }
+        return [spaceId, revisionId];
+    },
 });
 
 /**
  * Get all the pages in a revision of a space.
  */
 export const getRevisionPages = cache({
-    name: 'api.getRevisionPages.v5',
+    name: 'api.getRevisionPages.v4',
     tag: (spaceId, revisionId, fetchOptions) =>
         // Temporary hack to make it work with OpenAPI on v1
         fetchOptions.tags?.[0] ??
@@ -471,10 +476,15 @@ export const getRevisionPages = cache({
 
         return cacheResponse(response, {
             ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
-            data: { pages: response.data.pages, tags: getResponseCacheTags(response) },
+            data: { ...response.data, tags: getResponseCacheTags(response) },
         });
     },
-    getKeyArgs: (args) => [args[0], args[1]],
+    getKeyArgs: ([spaceId, revisionId, fetchOptions]) => {
+        if (fetchOptions.computed === false) {
+            return [spaceId, revisionId, { computed: false }];
+        }
+        return [spaceId, revisionId];
+    },
 });
 
 /**
@@ -663,7 +673,7 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
             let files: Record<string, RevisionFile> = {};
 
             if (hasRevisionInMemory) {
-                const { revision } = await getRevision(spaceId, revisionId, { metadata: false });
+                const revision = await getRevision(spaceId, revisionId, { metadata: false });
                 files = {};
                 revision.files.forEach((file) => {
                     files[file.id] = file;
@@ -709,7 +719,7 @@ export const getReusableContent = async (
     });
 
     if (hasRevisionInMemory) {
-        const { revision } = await getRevision(spaceId, revisionId, { metadata: false });
+        const revision = await getRevision(spaceId, revisionId, { metadata: false });
         return (
             revision.reusableContents.find(
                 (reusableContent) => reusableContent.id === reusableContentId

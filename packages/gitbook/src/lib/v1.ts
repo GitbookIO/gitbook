@@ -135,7 +135,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getRevision(params) {
             return wrapDataFetcherError(async () => {
-                const { revision, tags } = await getRevision(params.spaceId, params.revisionId, {
+                const { tags, ...revision } = await getRevision(params.spaceId, params.revisionId, {
                     metadata: params.metadata,
                     computed: false,
                 });
@@ -145,11 +145,15 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                         (page) => page.type === RevisionPageType.Computed
                     )
                 ) {
-                    const { revision } = await getRevision(params.spaceId, params.revisionId, {
-                        metadata: params.metadata,
-                        computed: true,
-                        tags,
-                    });
+                    const { tags: _tags, ...revision } = await getRevision(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            metadata: params.metadata,
+                            computed: true,
+                            tags,
+                        }
+                    );
                     return revision;
                 }
 
