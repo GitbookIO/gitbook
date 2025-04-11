@@ -8,6 +8,7 @@ import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 
+import { RevisionPageType } from '@gitbook/api';
 import { DataFetcherError, wrapDataFetcherError } from '@v2/lib/data';
 import { headers } from 'next/headers';
 import {
@@ -134,9 +135,29 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getRevision(params) {
             return wrapDataFetcherError(async () => {
-                return getRevision(params.spaceId, params.revisionId, {
+                const { tags, ...revision } = await getRevision(params.spaceId, params.revisionId, {
                     metadata: params.metadata,
+                    computed: false,
                 });
+
+                if (
+                    Object.values(revision.pages).some(
+                        (page) => page.type === RevisionPageType.Computed
+                    )
+                ) {
+                    const { tags: _tags, ...revision } = await getRevision(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            metadata: params.metadata,
+                            computed: true,
+                            tags,
+                        }
+                    );
+                    return revision;
+                }
+
+                return revision;
             });
         },
 
@@ -183,9 +204,22 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getRevisionPages(params) {
             return wrapDataFetcherError(async () => {
-                return getRevisionPages(params.spaceId, params.revisionId, {
+                const { pages, tags } = await getRevisionPages(params.spaceId, params.revisionId, {
                     metadata: params.metadata,
+                    computed: false,
                 });
+
+                if (pages.some((page) => page.type === RevisionPageType.Computed)) {
+                    const { pages } = await getRevisionPages(params.spaceId, params.revisionId, {
+                        metadata: params.metadata,
+                        computed: true,
+                        tags,
+                    });
+
+                    return pages;
+                }
+
+                return pages;
             });
         },
 
