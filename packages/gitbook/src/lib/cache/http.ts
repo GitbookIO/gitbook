@@ -14,6 +14,14 @@ export const noCacheFetchOptions: Partial<RequestInit> = {
 };
 
 /**
+ * Return the cache tags from the response.
+ */
+export function getResponseCacheTags(response: Response): string[] {
+    const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
+    return !cacheTagHeader ? [] : cacheTagHeader.split(',');
+}
+
+/**
  * Parse an HTTP response into a cache entry.
  */
 export function parseCacheResponse(response: Response): {
@@ -26,8 +34,7 @@ export function parseCacheResponse(response: Response): {
     const cacheControlHeader = response.headers.get('cache-control');
     const cacheControl = cacheControlHeader ? parseCacheControl(cacheControlHeader) : null;
 
-    const cacheTagHeader = response.headers.get('x-gitbook-cache-tag');
-    const tags = !cacheTagHeader ? [] : cacheTagHeader.split(',');
+    const tags = getResponseCacheTags(response);
 
     const entry = {
         ttl: 60 * 60 * 24,
@@ -47,7 +54,7 @@ export function parseCacheResponse(response: Response): {
 export function cacheResponse<Result, DefaultData = Result>(
     response: Response & { data: Result },
     defaultEntry: Partial<CacheResult<DefaultData>> = {}
-): CacheResult<DefaultData extends Result ? Result : DefaultData> {
+): CacheResult<DefaultData extends undefined ? Result : DefaultData> {
     const parsed = parseCacheResponse(response);
 
     return {

@@ -26,6 +26,7 @@ import {
     type CacheFunctionOptions,
     cache,
     cacheResponse,
+    getResponseCacheTags,
     noCacheFetchOptions,
     parseCacheResponse,
 } from './cache';
@@ -370,6 +371,18 @@ interface GetRevisionOptions {
      * These options don't impact the cache key and it means revisions can be shared between different fetches with different metadata options.
      */
     metadata: boolean;
+
+    /**
+     * Whether to fetch the revision as a computed revision.
+     * @default true
+     */
+    computed?: boolean;
+
+    /**
+     * Additional tags to add to the cache entry.
+     * It's only used for v1, once in v2 we can get rid of it.
+     */
+    tags?: string[];
 }
 
 const getAPIContextId = async () => {
@@ -381,9 +394,15 @@ const getAPIContextId = async () => {
  * Get a revision by its ID.
  */
 export const getRevision = cache({
-    name: 'api.getRevision.v2',
-    tag: (spaceId, revisionId) =>
-        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    name: 'api.getRevision.v3',
+    tag: (spaceId, revisionId, fetchOptions) =>
+        // Temporary hack to make it work with OpenAPI on v1
+        fetchOptions.tags?.[0] ??
+        getCacheTag({
+            tag: 'revision',
+            space: spaceId,
+            revision: revisionId,
+        }),
     tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (
@@ -405,7 +424,13 @@ export const getRevision = cache({
             }
         );
 
-        return cacheResponse(response, fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day);
+        return cacheResponse(response, {
+            ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
+            data: {
+                revision: response.data,
+                tags: getResponseCacheTags(response),
+            },
+        });
     },
     getKeyArgs: (args) => [args[0], args[1]],
 });
@@ -414,9 +439,15 @@ export const getRevision = cache({
  * Get all the pages in a revision of a space.
  */
 export const getRevisionPages = cache({
-    name: 'api.getRevisionPages.v4',
-    tag: (spaceId, revisionId) =>
-        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    name: 'api.getRevisionPages.v5',
+    tag: (spaceId, revisionId, fetchOptions) =>
+        // Temporary hack to make it work with OpenAPI on v1
+        fetchOptions.tags?.[0] ??
+        getCacheTag({
+            tag: 'revision',
+            space: spaceId,
+            revision: revisionId,
+        }),
     tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (
@@ -440,7 +471,7 @@ export const getRevisionPages = cache({
 
         return cacheResponse(response, {
             ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
-            data: response.data.pages,
+            data: { pages: response.data.pages, tags: getResponseCacheTags(response) },
         });
     },
     getKeyArgs: (args) => [args[0], args[1]],
@@ -632,7 +663,7 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
             let files: Record<string, RevisionFile> = {};
 
             if (hasRevisionInMemory) {
-                const revision = await getRevision(spaceId, revisionId, { metadata: false });
+                const { revision } = await getRevision(spaceId, revisionId, { metadata: false });
                 files = {};
                 revision.files.forEach((file) => {
                     files[file.id] = file;
@@ -678,7 +709,7 @@ export const getReusableContent = async (
     });
 
     if (hasRevisionInMemory) {
-        const revision = await getRevision(spaceId, revisionId, { metadata: false });
+        const { revision } = await getRevision(spaceId, revisionId, { metadata: false });
         return (
             revision.reusableContents.find(
                 (reusableContent) => reusableContent.id === reusableContentId
