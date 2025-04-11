@@ -1,5 +1,6 @@
 import { GITBOOK_IMAGE_RESIZE_URL } from '@v2/lib/env';
 import type { CloudflareImageOptions } from './types';
+import { copyImageResponse } from './utils';
 
 /**
  * Resize an image by doing a request to a /cdn/cgi/ endpoint.
@@ -26,16 +27,18 @@ export async function resizeImageWithCDNCgi(
     // biome-ignore lint/suspicious/noConsole: this log is useful for debugging
     console.log(`resize image using cdn-cgi: ${resizeURL}`);
 
-    return await fetch(resizeURL, {
-        headers: {
-            // Pass the `Accept` header, as Cloudflare uses this to validate the format.
-            Accept:
-                resizeOptions.format === 'json'
-                    ? 'application/json'
-                    : `image/${resizeOptions.format || 'jpeg'}`,
-        },
-        signal,
-    });
+    return copyImageResponse(
+        await fetch(resizeURL, {
+            headers: {
+                // Pass the `Accept` header, as Cloudflare uses this to validate the format.
+                Accept:
+                    resizeOptions.format === 'json'
+                        ? 'application/json'
+                        : `image/${resizeOptions.format || 'jpeg'}`,
+            },
+            signal,
+        })
+    );
 }
 
 function stringifyOptions(options: CloudflareImageOptions): string {
