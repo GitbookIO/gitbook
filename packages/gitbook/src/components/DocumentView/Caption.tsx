@@ -3,12 +3,12 @@ import type {
     DocumentBlockEmbed,
     DocumentBlockFile,
     DocumentBlockImage,
-    JSONDocument,
 } from '@gitbook/api';
 
 import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import type { DocumentContextProps } from './DocumentView';
 import { Inlines } from './Inlines';
 
@@ -18,7 +18,7 @@ import { Inlines } from './Inlines';
 export function Caption(
     props: {
         children: React.ReactNode;
-        document: JSONDocument;
+        document: SlimJSONDocument;
         style?: ClassValue;
         fit?: boolean;
         wrapperStyle?: ClassValue;

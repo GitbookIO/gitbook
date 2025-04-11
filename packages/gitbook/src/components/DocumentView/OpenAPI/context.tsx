@@ -1,4 +1,3 @@
-import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import type { OpenAPIContext } from '@gitbook/react-openapi';
 
@@ -12,6 +11,7 @@ import { Heading } from '../Heading';
 import './scalar.css';
 import './style.css';
 import type { AnyOpenAPIOperationsBlock, OpenAPISchemasBlock } from '@/lib/openapi/types';
+import type { SlimJSONDocument } from '@/lib/slim-document';
 
 /**
  * Get the OpenAPI context to render a block.
@@ -32,7 +32,7 @@ export function getOpenAPIContext(args: {
         renderCodeBlock: (codeProps) => <PlainCodeBlock {...codeProps} />,
         renderDocument: (documentProps) => (
             <DocumentView
-                document={documentProps.document as JSONDocument}
+                document={documentProps.document as SlimJSONDocument}
                 context={props.context}
                 style="space-y-6"
                 blockStyle="max-w-full"
