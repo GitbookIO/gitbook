@@ -242,7 +242,7 @@ export const getLatestOpenAPISpecVersionContent = cache({
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
-    name: 'api.getPublishedContentByUrl.v5',
+    name: 'api.getPublishedContentByUrl.v6',
     tag: (url) => getCacheTagForURL(url),
     get: async (
         url: string,
