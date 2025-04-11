@@ -20,8 +20,6 @@ async function main() {
     // Create the output folder if it doesn't exist
     await fs.mkdir(outputFolder, { recursive: true });
 
-    const _printOutputFolder = path.relative(process.cwd(), outputFolder);
-
     // Copy the assets from
     // source/sprites to outputFolder/sprites
     // source/svgs to outputFolder/svgs
@@ -45,8 +43,12 @@ async function main() {
             }
         }),
     ]);
+
+    // biome-ignore lint/suspicious/noConsole: We want the CLI to log
+    console.log(`Copied ${stylesToCopy.length} styles to ${outputFolder}`);
 }
 
-main().catch((_error) => {
+main().catch((error) => {
+    console.error(`Error copying icons: ${error}`);
     process.exit(1);
 });
