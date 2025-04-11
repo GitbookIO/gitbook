@@ -30,8 +30,9 @@ function useResponseMediaTypeExamplesState(
 export function OpenAPIResponseMediaTypeContent(props: {
     items: OpenAPIResponseMediaTypeItem[];
     blockKey?: string;
+    selectIcon?: React.ReactNode;
 }) {
-    const { blockKey, items } = props;
+    const { blockKey, items, selectIcon } = props;
     const state = useResponseMediaTypesState(blockKey, items[0]?.key);
 
     const examples = items.find((item) => item.key === state.key)?.examples ?? [];
@@ -48,6 +49,7 @@ export function OpenAPIResponseMediaTypeContent(props: {
                         blockKey={blockKey}
                         items={items}
                         examples={examples}
+                        selectIcon={selectIcon}
                     />
                 ) : null
             }
@@ -62,13 +64,15 @@ function OpenAPIResponseMediaTypeFooter(props: {
     items: OpenAPIResponseMediaTypeItem[];
     examples?: OpenAPIResponseMediaTypeItem[];
     blockKey?: string;
+    selectIcon?: React.ReactNode;
 }) {
-    const { items, examples, blockKey } = props;
+    const { items, examples, blockKey, selectIcon } = props;
 
     return (
         <>
             {items.length > 1 && (
                 <OpenAPISelect
+                    icon={selectIcon}
                     items={items}
                     stateKey={getResponseMediaTypeStateKey(blockKey)}
                     placement="bottom start"
@@ -83,6 +87,7 @@ function OpenAPIResponseMediaTypeFooter(props: {
 
             {examples && examples.length > 1 ? (
                 <OpenAPISelect
+                    icon={selectIcon}
                     items={examples}
                     stateKey={getResponseMediaTypeExamplesStateKey(blockKey)}
                     placement="bottom start"

@@ -24,12 +24,19 @@ export function useResponseExamplesState(
 export function OpenAPIResponseExampleContent(props: {
     items: OpenAPIResponseExampleItem[];
     blockKey?: string;
+    selectIcon?: React.ReactNode;
 }) {
-    const { blockKey, items } = props;
+    const { blockKey, items, selectIcon } = props;
 
     return (
         <StaticSection
-            header={<OpenAPIResponseExampleHeader blockKey={blockKey} items={items} />}
+            header={
+                <OpenAPIResponseExampleHeader
+                    selectIcon={selectIcon}
+                    blockKey={blockKey}
+                    items={items}
+                />
+            }
             className="openapi-response-examples"
         >
             <OpenAPIResponseExampleBody blockKey={blockKey} items={items} />
@@ -40,8 +47,9 @@ export function OpenAPIResponseExampleContent(props: {
 function OpenAPIResponseExampleHeader(props: {
     items: OpenAPIResponseExampleItem[];
     blockKey?: string;
+    selectIcon?: React.ReactNode;
 }) {
-    const { items, blockKey } = props;
+    const { items, blockKey, selectIcon } = props;
 
     if (items.length === 1) {
         const item = items[0];
@@ -69,6 +77,7 @@ function OpenAPIResponseExampleHeader(props: {
     return (
         <OpenAPISelect
             items={items}
+            icon={selectIcon}
             stateKey={getResponseExampleStateKey(blockKey)}
             placement="bottom start"
         >

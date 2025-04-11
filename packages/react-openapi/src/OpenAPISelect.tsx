@@ -27,6 +27,10 @@ interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectPro
     children: React.ReactNode | ((item: T) => React.ReactNode);
     placement?: PopoverProps['placement'];
     stateKey?: string;
+    /**
+     * Icon to display in the select button.
+     */
+    icon?: React.ReactNode;
 }
 
 export function useSelectState(stateKey = 'select-state', initialKey?: Key) {
@@ -38,8 +42,16 @@ export function useSelectState(stateKey = 'select-state', initialKey?: Key) {
 }
 
 export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectProps<T>) {
-    const { items, children, className, placement, stateKey, selectedKey, onSelectionChange } =
-        props;
+    const {
+        icon = '▼',
+        items,
+        children,
+        className,
+        placement,
+        stateKey,
+        selectedKey,
+        onSelectionChange,
+    } = props;
 
     const state = useSelectState(stateKey, items[0]?.key);
 
@@ -58,17 +70,7 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
         >
             <Button>
                 <SelectValue />
-                <span aria-hidden="true">
-                    <svg
-                        className="gb-icon"
-                        style={{
-                            maskImage:
-                                "url('https://ka-p.fontawesome.com/releases/v6.6.0/svgs/regular/chevron-down.svg?v=2&token=a463935e93')",
-                            maskRepeat: 'no-repeat',
-                            maskPosition: 'center center',
-                        }}
-                    />
-                </span>
+                {icon}
             </Button>
             <Popover placement={placement} className="openapi-select-popover">
                 <ListBox className="openapi-select-listbox" items={items}>

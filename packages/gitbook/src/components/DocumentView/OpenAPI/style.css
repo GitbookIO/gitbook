@@ -429,11 +429,11 @@
 }
 
 .openapi-response-examples-header .openapi-select > button {
-    @apply max-w-fit shrink pl-0.5 py-0.5;
+    @apply max-w-full overflow-hidden shrink pl-0.5 py-0.5;
 }
 
-.openapi-response-examples-header .openapi-select > button > span.react-aria-SelectValue {
-    @apply h-fit;
+.openapi-response-examples-header .openapi-select > button .openapi-statuscode {
+    @apply h-full;
 }
 
 .openapi-codesample-header-content {
@@ -533,6 +533,10 @@
     @apply flex flex-row items-center p-2.5;
 }
 
+.openapi-response-examples-header-content {
+    @apply max-w-full overflow-hidden truncate;
+}
+
 .openapi-response-examples-statuscode-title {
     @apply flex items-center;
 }
@@ -555,7 +559,7 @@
 
 /* Common Elements */
 .openapi-select {
-    /* unstyled */
+    @apply w-auto max-w-full;
 }
 
 /* Prevent react-aria popover from setting overflow:auto on body */
@@ -564,24 +568,32 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button {
-    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 text-tint-strong max-w-60 rounded text-xs leading-6 px-1.5 border border-tint-subtle bg-tint;
+    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 text-tint-strong max-w-32 rounded text-xs p-1.5 leading-none border border-tint-subtle bg-tint;
     @apply hover:bg-tint-hover transition-all;
 }
 
+.openapi-select > button[data-focused="true"] {
+    @apply outline-primary -outline-offset-1 outline outline-1;
+}
+
 .openapi-select > button > span.react-aria-SelectValue {
-    @apply shrink *:truncate flex items-center;
+    @apply shrink truncate flex items-center;
 }
 
-.openapi-select > button > .gb-icon {
-    @apply shrink-0;
+.openapi-select > button > span.react-aria-SelectValue span:not(.openapi-statuscode) {
+    @apply truncate;
 }
 
-.openapi-select > button svg {
+.openapi-select > button .openapi-markdown {
+    @apply *:leading-none;
+}
+
+.openapi-select > button .gb-icon {
     @apply size-2.5 shrink-0;
 }
 
 .openapi-select-popover {
-    @apply min-w-32 max-w-72 overflow-x-hidden w-auto max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
+    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
@@ -698,7 +710,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-center transition-all hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex items-baseline transition-all hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {

@@ -7,8 +7,9 @@ export function OpenAPIMediaTypeExamplesSelector(props: {
     method: string;
     path: string;
     renderers: MediaTypeRenderer[];
+    selectIcon?: React.ReactNode;
 }) {
-    const { method, path, renderers } = props;
+    const { method, path, renderers, selectIcon } = props;
     if (!renderers[0]) {
         throw new Error('No renderers provided');
     }
@@ -18,8 +19,13 @@ export function OpenAPIMediaTypeExamplesSelector(props: {
 
     return (
         <div className="openapi-codesample-selectors">
-            <MediaTypeSelector stateKey={stateKey} renderers={renderers} />
-            <ExamplesSelector method={method} path={path} renderer={selected} />
+            <MediaTypeSelector selectIcon={selectIcon} stateKey={stateKey} renderers={renderers} />
+            <ExamplesSelector
+                selectIcon={selectIcon}
+                method={method}
+                path={path}
+                renderer={selected}
+            />
         </div>
     );
 }
@@ -27,8 +33,9 @@ export function OpenAPIMediaTypeExamplesSelector(props: {
 function MediaTypeSelector(props: {
     stateKey: string;
     renderers: MediaTypeRenderer[];
+    selectIcon?: React.ReactNode;
 }) {
-    const { renderers, stateKey } = props;
+    const { renderers, stateKey, selectIcon } = props;
 
     if (renderers.length < 2) {
         return null;
@@ -46,6 +53,7 @@ function MediaTypeSelector(props: {
                 key: renderer.mediaType,
                 label: renderer.mediaType,
             }))}
+            icon={selectIcon}
             stateKey={stateKey}
             placement="bottom start"
         >
@@ -62,8 +70,9 @@ function ExamplesSelector(props: {
     method: string;
     path: string;
     renderer: MediaTypeRenderer;
+    selectIcon?: React.ReactNode;
 }) {
-    const { method, path, renderer } = props;
+    const { method, path, renderer, selectIcon } = props;
     if (renderer.examples.length < 2) {
         return null;
     }
@@ -76,6 +85,7 @@ function ExamplesSelector(props: {
     return (
         <OpenAPISelect
             items={items}
+            icon={selectIcon}
             stateKey={`media-type-sample-${renderer.mediaType}-${method}-${path}`}
             placement="bottom start"
         >

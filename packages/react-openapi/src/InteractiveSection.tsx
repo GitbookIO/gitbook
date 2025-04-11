@@ -35,9 +35,10 @@ export function InteractiveSection(props: {
     header?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
-
     /** State key to use with a store */
     stateKey?: string;
+    /** Icon for the tabs select */
+    selectIcon?: React.ReactNode;
 }) {
     const {
         id,
@@ -49,6 +50,7 @@ export function InteractiveSection(props: {
         header,
         overlay,
         toggleIcon = '▶',
+        selectIcon,
         stateKey = 'interactive-section',
     } = props;
     const state = useDisclosureState({
@@ -116,6 +118,7 @@ export function InteractiveSection(props: {
                                 onSelectionChange={() => {
                                     state.expand();
                                 }}
+                                icon={selectIcon}
                                 placement="bottom end"
                             >
                                 {tabs.map((tab) => (

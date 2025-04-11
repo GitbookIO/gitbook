@@ -88,7 +88,13 @@ export function OpenAPIResponseExample(props: {
         return null;
     }
 
-    return <OpenAPIResponseExampleContent blockKey={context.blockKey} items={tabs} />;
+    return (
+        <OpenAPIResponseExampleContent
+            selectIcon={context.icons.chevronDown}
+            blockKey={context.blockKey}
+            items={tabs}
+        />
+    );
 }
 
 function OpenAPIResponse(props: {
@@ -120,7 +126,13 @@ function OpenAPIResponse(props: {
         };
     });
 
-    return <OpenAPIResponseMediaTypeContent blockKey={context.blockKey} items={tabs} />;
+    return (
+        <OpenAPIResponseMediaTypeContent
+            selectIcon={context.icons.chevronDown}
+            blockKey={context.blockKey}
+            items={tabs}
+        />
+    );
 }
 
 function getExamples(props: {

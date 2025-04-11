@@ -15,6 +15,8 @@ interface Props {
     icon?: React.ReactNode;
     /** State key to use with a store */
     selectStateKey?: string;
+    /** Icon to display for the select */
+    selectIcon?: React.ReactNode;
 }
 
 type TDisclosureGroup = {
@@ -33,7 +35,7 @@ const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(n
  * Display an interactive OpenAPI disclosure group.
  */
 export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
-    const { icon, groups, selectStateKey } = props;
+    const { icon, groups, selectStateKey, selectIcon } = props;
 
     const state = useDisclosureGroupState(props);
 
@@ -42,6 +44,7 @@ export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
             {groups.map((group) => (
                 <DisclosureItem
                     selectStateKey={selectStateKey}
+                    selectIcon={selectIcon}
                     icon={icon}
                     key={group.key}
                     group={group}
@@ -55,8 +58,9 @@ function DisclosureItem(props: {
     group: TDisclosureGroup;
     icon?: React.ReactNode;
     selectStateKey?: string;
+    selectIcon?: React.ReactNode;
 }) {
-    const { icon, group, selectStateKey } = props;
+    const { icon, group, selectStateKey, selectIcon } = props;
 
     const defaultId = useId();
     const id = group.key || defaultId;
@@ -122,6 +126,7 @@ function DisclosureItem(props: {
                     >
                         {group.tabs?.length > 1 ? (
                             <OpenAPISelect
+                                icon={selectIcon}
                                 stateKey={selectStateKey}
                                 onSelectionChange={() => {
                                     state.expand();

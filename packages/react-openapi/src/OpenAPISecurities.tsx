@@ -28,6 +28,7 @@ export function OpenAPISecurities(props: {
             toggeable
             defaultOpened={false}
             toggleIcon={context.icons.chevronRight}
+            selectIcon={context.icons.chevronDown}
             className="openapi-securities"
             tabs={securities.map(([key, security]) => {
                 const description = resolveDescription(security);

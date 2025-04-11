@@ -206,6 +206,7 @@ function OpenAPICodeSampleFooter(props: {
                     method={data.method}
                     path={data.path}
                     renderers={renderers}
+                    selectIcon={context.icons.chevronDown}
                 />
             ) : (
                 <span />

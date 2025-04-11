@@ -24,6 +24,7 @@ export function OpenAPIRequestBody(props: {
             header="Body"
             className="openapi-requestbody"
             stateKey={`media-type-${method}-${path}`}
+            selectIcon={context.icons.chevronDown}
             tabs={Object.entries(requestBody.content ?? {}).map(
                 ([contentType, mediaTypeObject]) => {
                     return {
