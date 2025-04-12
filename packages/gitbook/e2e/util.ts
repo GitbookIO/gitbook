@@ -399,7 +399,9 @@ async function waitForIcons(page: Page) {
                     icon.style.maskImage = '';
                     requestAnimationFrame(() => {
                         icon.style.maskImage = bck;
-                        icon.setAttribute('data-argos-state', 'loaded');
+                        requestAnimationFrame(() => {
+                            icon.setAttribute('data-argos-state', 'loaded');
+                        });
                     });
                     return false;
                 }
