@@ -219,10 +219,10 @@ export function runTestCases(testCases: TestsCase[]) {
                                 fullPage: testEntry.fullPage ?? false,
                                 beforeScreenshot: async ({ runStabilization }) => {
                                     await runStabilization();
-                                    await waitForIcons(page);
                                     if (screenshotOptions?.waitForTOCScrolling !== false) {
                                         await waitForTOCScrolling(page);
                                     }
+                                    await waitForIcons(page);
                                 },
                             });
                         }
