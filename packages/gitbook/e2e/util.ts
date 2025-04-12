@@ -384,9 +384,13 @@ async function waitForIcons(page: Page) {
             // If the URL is already queued for loading, we return the state.
             if (urlStates[url]) {
                 if (urlStates[url] === 'loaded') {
-                    const bck = icon.style.maskImage;
-                    icon.style.maskImage = '';
-                    icon.style.maskImage = bck;
+                    // Force a re-render of the icon.
+                    const parent = icon.parentNode;
+                    if (!parent) {
+                        throw new Error('No parent node');
+                    }
+                    const clone = icon.cloneNode(true);
+                    parent.replaceChild(clone, icon);
                     return true;
                 }
 
