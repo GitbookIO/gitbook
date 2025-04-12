@@ -395,13 +395,16 @@ async function waitForIcons(page: Page) {
             if (urlStates[url]) {
                 if (urlStates[url] === 'loaded') {
                     icon.setAttribute('data-argos-state', 'pending');
-                    const bck = icon.style.maskImage;
+                    const bckMaskImage = icon.style.maskImage;
+                    const bckDisplay = icon.style.maskImage;
                     icon.style.maskImage = '';
+                    icon.style.display = 'none';
+                    // Force re-rendering
+                    icon.getBoundingClientRect();
+                    icon.style.maskImage = bckMaskImage;
+                    icon.style.display = bckDisplay;
                     requestAnimationFrame(() => {
-                        icon.style.maskImage = bck;
-                        requestAnimationFrame(() => {
-                            icon.setAttribute('data-argos-state', 'loaded');
-                        });
+                        icon.setAttribute('data-argos-state', 'loaded');
                     });
                     return false;
                 }
