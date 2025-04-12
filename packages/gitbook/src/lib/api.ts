@@ -693,7 +693,7 @@ export const getReusableContent = async (
  * Get a document by its ID.
  */
 export const getDocument = cache({
-    name: 'api.getDocument.v2',
+    name: 'api.getDocument.v3',
     tag: (spaceId, documentId) =>
         getCacheTag({ tag: 'document', space: spaceId, document: documentId }),
     tagImmutable: true,
@@ -725,7 +725,7 @@ export const getDocument = cache({
  * Get a computed document.
  */
 export const getComputedDocument = cache({
-    name: 'api.getComputedDocument',
+    name: 'api.getComputedDocument.v2',
     tag: (organizationId, spaceId, source) =>
         getComputedContentSourceCacheTags(
             {
