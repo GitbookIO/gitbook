@@ -219,10 +219,10 @@ export function runTestCases(testCases: TestsCase[]) {
                                 fullPage: testEntry.fullPage ?? false,
                                 beforeScreenshot: async ({ runStabilization }) => {
                                     await runStabilization();
-                                    await waitForIcons(page);
                                     if (screenshotOptions?.waitForTOCScrolling !== false) {
                                         await waitForTOCScrolling(page);
                                     }
+                                    await waitForIcons(page);
                                 },
                             });
                         }
@@ -345,21 +345,25 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urls = new Set<string>();
+        const urlStates: Record<string, 'pending' | 'loaded'> =
+            (window as any).__ICONS_STATES__ || {};
+        (window as any).__ICONS_STATES__ = urlStates;
+
+        const loadUrl = (url: string) => {
+            // Mark the URL as pending.
+            urlStates[url] = 'pending';
+
+            const img = new Image();
+            img.onload = () => {
+                urlStates[url] = 'loaded';
+            };
+            img.src = url;
+        };
+
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
         const results = icons.map((icon) => {
             if (!(icon instanceof SVGElement)) {
                 throw new Error('Icon is not an SVGElement');
-            }
-
-            // If loaded, good it passes the test.
-            if (icon.dataset.loadingState === 'loaded') {
-                return true;
-            }
-
-            // If not loaded yet, we need to load it.
-            if (icon.dataset.loadingState === 'pending') {
-                return false;
             }
 
             // Ignore icons that are not visible.
@@ -367,39 +371,48 @@ async function waitForIcons(page: Page) {
                 return true;
             }
 
+            const state = icon.getAttribute('data-argos-state');
+
+            if (state === 'pending') {
+                return false;
+            }
+
+            if (state === 'loaded') {
+                return true;
+            }
+
             // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
             const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
             const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
-            const url = urlMatch ? urlMatch[1] : null;
+            const url = urlMatch?.[1];
 
             // If URL is invalid we throw an error.
             if (!url) {
                 throw new Error('No mask-image');
             }
 
-            // If the URL is already loaded, we just mark it as loaded.
-            if (urls.has(url)) {
-                icon.dataset.loadingState = 'loaded';
-                return true;
+            // If the URL is already queued for loading, we return the state.
+            if (urlStates[url]) {
+                if (urlStates[url] === 'loaded') {
+                    icon.setAttribute('data-argos-state', 'pending');
+                    const bckMaskImage = icon.style.maskImage;
+                    const bckDisplay = icon.style.display;
+                    icon.style.maskImage = '';
+                    icon.style.display = 'none';
+                    // Force re-rendering
+                    icon.getBoundingClientRect();
+                    icon.style.maskImage = bckMaskImage;
+                    icon.style.display = bckDisplay;
+                    requestAnimationFrame(() => {
+                        icon.setAttribute('data-argos-state', 'loaded');
+                    });
+                    return false;
+                }
+
+                return false;
             }
 
-            // Mark the icon as pending and load the image.
-            icon.dataset.loadingState = 'pending';
-
-            // Mark the URL as seen.
-            urls.add(url);
-
-            const img = new Image();
-            img.src = url;
-            img.decode().then(() => {
-                // Wait two frames to let the time to the icon to repaint.
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        icon.dataset.loadingState = 'loaded';
-                    });
-                });
-            });
-
+            loadUrl(url);
             return false;
         });
 
