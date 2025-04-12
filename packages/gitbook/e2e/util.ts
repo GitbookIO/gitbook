@@ -385,7 +385,8 @@ async function waitForIcons(page: Page) {
             if (urlStates[url]) {
                 if (urlStates[url] === 'loaded') {
                     // Trigger the icon to re-render.
-                    icon.style.maskImage = `url(${url})`;
+                    icon.style.maskImage = '';
+                    icon.style.maskImage = `url(${url}) !important`;
                     return true;
                 }
 
