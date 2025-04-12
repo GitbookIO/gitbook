@@ -371,6 +371,16 @@ async function waitForIcons(page: Page) {
                 return true;
             }
 
+            const state = icon.getAttribute('data-argos-state');
+
+            if (state === 'pending') {
+                return false;
+            }
+
+            if (state === 'loaded') {
+                return true;
+            }
+
             // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
             const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
             const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
@@ -384,8 +394,14 @@ async function waitForIcons(page: Page) {
             // If the URL is already queued for loading, we return the state.
             if (urlStates[url]) {
                 if (urlStates[url] === 'loaded') {
-                    icon.setAttribute('data-bust', String(Date.now()));
-                    return true;
+                    icon.setAttribute('data-argos-state', 'pending');
+                    const bck = icon.style.maskImage;
+                    icon.style.maskImage = '';
+                    requestAnimationFrame(() => {
+                        icon.style.maskImage = bck;
+                        icon.setAttribute('data-argos-state', 'loaded');
+                    });
+                    return false;
                 }
 
                 return false;
