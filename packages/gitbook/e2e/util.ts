@@ -384,9 +384,9 @@ async function waitForIcons(page: Page) {
             // If the URL is already queued for loading, we return the state.
             if (urlStates[url]) {
                 if (urlStates[url] === 'loaded') {
-                    // Trigger the icon to re-render.
+                    const bck = icon.style.maskImage;
                     icon.style.maskImage = '';
-                    icon.style.maskImage = `url(${url}) !important`;
+                    icon.style.maskImage = bck;
                     return true;
                 }
 
