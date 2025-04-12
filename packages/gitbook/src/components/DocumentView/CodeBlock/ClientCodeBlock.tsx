@@ -26,6 +26,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const [isInViewport, setIsInViewport] = useState(false);
     const plainLines = useMemo(() => plainHighlight(block, []), [block]);
     const [lines, setLines] = useState<null | HighlightLine[]>(null);
+    const [highlighting, setHighlighting] = useState(false);
 
     // Preload the highlighter when the block is mounted.
     useEffect(() => {
@@ -77,6 +78,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             let cancelled = false;
 
             if (typeof window !== 'undefined') {
+                setHighlighting(true);
                 import('./highlight').then(({ highlight }) => {
                     highlight(block, inlines).then((lines) => {
                         if (cancelled) {
@@ -84,6 +86,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
                         }
 
                         setLines(lines);
+                        setHighlighting(false);
                     });
                 });
             }
@@ -98,6 +101,12 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     }, [isInViewport, block, inlines]);
 
     return (
-        <CodeBlockRenderer ref={blockRef} block={block} style={style} lines={lines ?? plainLines} />
+        <CodeBlockRenderer
+            ref={blockRef}
+            aria-busy={highlighting}
+            block={block}
+            style={style}
+            lines={lines ?? plainLines}
+        />
     );
 }

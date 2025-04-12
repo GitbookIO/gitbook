@@ -14,6 +14,7 @@ import './CodeBlockRenderer.css';
 
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     lines: HighlightLine[];
+    'aria-busy'?: boolean;
 };
 
 /**
@@ -23,7 +24,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
-    const { block, style, lines } = props;
+    const { block, style, lines, 'aria-busy': ariaBusy } = props;
 
     const id = useId();
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
@@ -31,7 +32,11 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     const title = block.data.title;
 
     return (
-        <div ref={ref} className={tcls('group/codeblock grid grid-flow-col', style)}>
+        <div
+            ref={ref}
+            aria-busy={ariaBusy}
+            className={tcls('group/codeblock grid grid-flow-col', style)}
+        >
             <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
                 {title ? (
                     <div className="inline-flex items-center justify-center rounded-t straight-corners:rounded-t-s bg-tint px-3 py-2 text-tint text-xs leading-none tracking-wide">
