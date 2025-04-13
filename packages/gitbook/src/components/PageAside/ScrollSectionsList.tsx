@@ -1,18 +1,19 @@
 'use client';
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useRef } from 'react';
 
-import { useScrollActiveId } from '@/components/hooks';
+// import { useScrollActiveId } from '@/components/hooks';
 import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
-import { HEADER_HEIGHT_DESKTOP } from '../layout';
+import { usePageActiveSections } from '../hooks/usePageActiveSections';
+// import { HEADER_HEIGHT_DESKTOP } from '../layout';
 import { AsideSectionHighlight } from './AsideSectionHighlight';
 
 /**
  * The threshold at which we consider a section as intersecting the viewport.
  */
-const SECTION_INTERSECTING_THRESHOLD = 0.9;
+// const SECTION_INTERSECTING_THRESHOLD = 0.9;
 
 const springCurve = {
     type: 'spring',
@@ -30,10 +31,13 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
         });
     }, [sections]);
 
-    const activeId = useScrollActiveId(ids, {
-        rootMargin: `-${HEADER_HEIGHT_DESKTOP}px 0px -40% 0px`,
-        threshold: SECTION_INTERSECTING_THRESHOLD,
-    });
+    const windowRef = useRef(typeof window === 'undefined' ? null : window);
+    const activeIds = usePageActiveSections(ids, windowRef);
+
+    // const activeId = useScrollActiveId(ids, {
+    //     rootMargin: `-${HEADER_HEIGHT_DESKTOP}px 0px -40% 0px`,
+    //     threshold: SECTION_INTERSECTING_THRESHOLD,
+    // });
 
     return (
         <ul className={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}>
@@ -49,7 +53,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
                     )}
                 >
-                    {activeId === section.id ? (
+                    {activeIds.includes(section.id) ? (
                         <AsideSectionHighlight
                             transition={springCurve}
                             className={tcls(
@@ -102,7 +106,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                 'sidebar-list-default:border-tint',
                             ],
 
-                            activeId === section.id && [
+                            activeIds.includes(section.id) && [
                                 'text-primary-subtle',
                                 'hover:text-primary',
                                 'contrast-more:text-primary',

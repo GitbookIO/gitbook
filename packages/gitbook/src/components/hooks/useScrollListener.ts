@@ -17,7 +17,7 @@ import { type RefObject, useEffect, useLayoutEffect, useRef } from 'react';
  */
 export function useScrollListener(
     listener: (event: Event) => void,
-    elementRef: RefObject<HTMLElement | Window> | null
+    elementRef: RefObject<HTMLElement | Window | null> | null
 ) {
     const listenerRef = useRef(listener);
     useLayoutEffect(() => {

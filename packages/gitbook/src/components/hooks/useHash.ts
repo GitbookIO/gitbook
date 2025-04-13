@@ -1,24 +1,26 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-function getHash(): string | null {
-    if (typeof window === 'undefined') {
-        return null;
-    }
-    return window.location.hash.slice(1);
-}
-
-/**
- * Hook to get the current hash from the URL.
- * @see https://github.com/vercel/next.js/discussions/49465
- */
+// How do I get the pathname with hash.
+// source: https://github.com/vercel/next.js/discussions/49465
 export function useHash() {
-    const params = useParams();
-    const [hash, setHash] = React.useState<string | null>(getHash);
-    React.useEffect(() => {
-        setHash(getHash());
-    }, [params]);
+    const getCurrentHash = useCallback(
+        () => (typeof window !== 'undefined' ? window.location.hash.replace(/^#!?/, '') : ''),
+        []
+    );
+    const [hash, setHash] = useState<string>(getCurrentHash());
+
+    useEffect(() => {
+        const handleHashChange = () => {
+            setHash(getCurrentHash());
+        };
+        window.addEventListener('hashchange', handleHashChange);
+
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    }, [getCurrentHash]);
+
     return hash;
 }

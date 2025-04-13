@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { useHash } from './useHash';
+import { usePrevious } from './usePrevious';
 
 /**
  * Scroll the page to an anchor point or
@@ -13,28 +14,29 @@ import { useHash } from './useHash';
 export function useScrollPage(props: { scrollMarginTop?: number }) {
     const hash = useHash();
     const pathname = usePathname();
+    const prevPathname = usePrevious(pathname);
+    const scrollMarginTopRef = React.useRef(props.scrollMarginTop);
     React.useLayoutEffect(() => {
         if (hash) {
             const element = document.getElementById(hash);
             if (element) {
-                if (props.scrollMarginTop) {
-                    element.style.scrollMarginTop = `${props.scrollMarginTop}px`;
+                const originalScrollMarginTop = element.style.scrollMarginTop;
+                if (scrollMarginTopRef.current) {
+                    element.style.scrollMarginTop = `${scrollMarginTopRef.current}px`;
                 }
-                element.scrollIntoView({
-                    block: 'start',
-                    behavior: 'smooth',
-                });
+                element.scrollIntoView({ block: 'start', behavior: 'smooth' });
+                return () => {
+                    const element = document.getElementById(hash);
+                    if (element) {
+                        element.style.scrollMarginTop = originalScrollMarginTop;
+                    }
+                };
             }
-        } else {
+            return;
+        }
+
+        if (prevPathname && pathname !== prevPathname) {
             window.scrollTo(0, 0);
         }
-        return () => {
-            if (hash) {
-                const element = document.getElementById(hash);
-                if (element) {
-                    element.style.scrollMarginTop = '';
-                }
-            }
-        };
-    }, [hash, pathname, props.scrollMarginTop]);
+    }, [hash, pathname, prevPathname]);
 }
