@@ -107,13 +107,13 @@ export async function serveResizedImage(
     try {
         const response = await resizeImage(url, options);
         if (!response.ok) {
-            throw new Error('Failed to resize image');
+            throw new Error(`Failed to resize image, received status code ${response.status}`);
         }
 
         return response;
     } catch (error) {
         // Redirect to the original image if resizing fails
-        console.error('Failed to resize image', error);
+        console.warn('Error while resizing image, redirecting to original', error);
         return NextResponse.redirect(url, 302);
     }
 }
