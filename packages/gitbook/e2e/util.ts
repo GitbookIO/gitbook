@@ -399,12 +399,12 @@ async function waitForIcons(page: Page) {
                     const bckDisplay = icon.style.display;
                     icon.style.maskImage = '';
                     icon.style.display = 'none';
-                    // Force re-rendering
-                    icon.getBoundingClientRect();
-                    icon.style.maskImage = bckMaskImage;
-                    icon.style.display = bckDisplay;
                     requestAnimationFrame(() => {
-                        icon.setAttribute('data-argos-state', 'loaded');
+                        icon.style.maskImage = bckMaskImage;
+                        icon.style.display = bckDisplay;
+                        requestAnimationFrame(() => {
+                            icon.setAttribute('data-argos-state', 'loaded');
+                        });
                     });
                     return false;
                 }
