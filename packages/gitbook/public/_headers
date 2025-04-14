@@ -1,2 +1,6 @@
-/*
+# GitBook immutable static assets
+/~gitbook/static/*
+  cache-control: public,max-age=31536000,immutable
   Access-Control-Allow-Origin: *
+/BUILD_ID
+  x-gitbook-test: works
