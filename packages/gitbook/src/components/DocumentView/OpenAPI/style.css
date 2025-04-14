@@ -116,7 +116,7 @@
 
 .openapi-method-delete,
 .openapi-statuscode-error {
-    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-900 dark:text-pomegranate-100;
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100;
 }
 
 .openapi-method-head,
