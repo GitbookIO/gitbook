@@ -53,6 +53,24 @@ const nextConfig = {
             },
         ],
     },
+
+    async headers() {
+        return [
+            {
+                source: '/~gitbook/static/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                    {
+                        key: 'access-control-allow-origin',
+                        value: '*',
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 export default nextConfig;
