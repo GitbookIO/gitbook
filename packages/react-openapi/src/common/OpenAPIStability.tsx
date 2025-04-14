@@ -1,12 +1,12 @@
-import type { OpenAPIStability } from '@gitbook/openapi-parser';
+import type { OpenAPIStability as OpenAPIStabilityType } from '@gitbook/openapi-parser';
 
-const stabilityEnum = {
+const stabilityEnum: Record<OpenAPIStabilityType, string> = {
     experimental: 'Experimental',
     alpha: 'Alpha',
     beta: 'Beta',
 } as const;
 
-export function OpenAPIStability(props: { stability: OpenAPIStability }) {
+export function OpenAPIStability(props: { stability: OpenAPIStabilityType }) {
     const { stability } = props;
 
     const foundStability = stabilityEnum[stability];
