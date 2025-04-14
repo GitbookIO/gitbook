@@ -1,10 +1,10 @@
 'use client';
 
 import clsx from 'clsx';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
-import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
+import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
 
 interface InteractiveSectionTab {
@@ -35,6 +35,10 @@ export function InteractiveSection(props: {
     header?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
+    /** State key to use with a store */
+    stateKey?: string;
+    /** Icon for the tabs select */
+    selectIcon?: React.ReactNode;
 }) {
     const {
         id,
@@ -46,12 +50,9 @@ export function InteractiveSection(props: {
         header,
         overlay,
         toggleIcon = '▶',
+        selectIcon,
+        stateKey = 'interactive-section',
     } = props;
-
-    const [selectedTabKey, setSelectedTab] = useState(defaultTab);
-    const selectedTab: InteractiveSectionTab | undefined =
-        tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
-
     const state = useDisclosureState({
         defaultExpanded: defaultOpened,
     });
@@ -60,6 +61,10 @@ export function InteractiveSection(props: {
     const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
+    const store = useSelectState(stateKey, defaultTab);
+
+    const selectedTab: InteractiveSectionTab | undefined =
+        tabs.find((tab) => tab.key === store.key) ?? tabs[0];
 
     return (
         <Section
@@ -108,16 +113,12 @@ export function InteractiveSection(props: {
                     >
                         {tabs.length > 1 ? (
                             <OpenAPISelect
-                                className={clsx(
-                                    'openapi-section-select',
-                                    `${className}-tabs-select`
-                                )}
+                                stateKey={stateKey}
                                 items={tabs}
-                                selectedKey={selectedTab?.key ?? ''}
-                                onSelectionChange={(key) => {
-                                    setSelectedTab(String(key));
+                                onSelectionChange={() => {
                                     state.expand();
                                 }}
+                                icon={selectIcon}
                                 placement="bottom end"
                             >
                                 {tabs.map((tab) => (

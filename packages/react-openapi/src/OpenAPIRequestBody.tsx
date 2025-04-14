@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRootSchema } from './OpenAPISchemaServer';
-import type { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
 import { checkIsReference } from './utils';
 
 /**
@@ -10,8 +10,10 @@ import { checkIsReference } from './utils';
 export function OpenAPIRequestBody(props: {
     requestBody: OpenAPIV3.RequestBodyObject | OpenAPIV3.ReferenceObject;
     context: OpenAPIClientContext;
+    data: OpenAPIOperationData;
 }) {
-    const { requestBody, context } = props;
+    const { requestBody, context, data } = props;
+    const { method, path } = data;
 
     if (checkIsReference(requestBody)) {
         return null;
@@ -21,6 +23,8 @@ export function OpenAPIRequestBody(props: {
         <InteractiveSection
             header="Body"
             className="openapi-requestbody"
+            stateKey={`media-type-${method}-${path}`}
+            selectIcon={context.icons.chevronDown}
             tabs={Object.entries(requestBody.content ?? {}).map(
                 ([contentType, mediaTypeObject]) => {
                     return {

@@ -6,7 +6,7 @@ import type {
     OpenAPIOperationData,
     OpenAPISecurityWithRequired,
 } from './types';
-import { resolveDescription } from './utils';
+import { createStateKey, resolveDescription } from './utils';
 
 /**
  * Present securities authorization that can be used for this operation.
@@ -24,9 +24,11 @@ export function OpenAPISecurities(props: {
     return (
         <InteractiveSection
             header="Authorizations"
+            stateKey={createStateKey('securities', context.blockKey)}
             toggeable
             defaultOpened={false}
             toggleIcon={context.icons.chevronRight}
+            selectIcon={context.icons.chevronDown}
             className="openapi-securities"
             tabs={securities.map(([key, security]) => {
                 const description = resolveDescription(security);

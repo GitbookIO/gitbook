@@ -6,10 +6,11 @@ import {
     getExampleFromReference,
     getExamplesFromMediaTypeObject,
 } from './OpenAPIExample';
-import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
-import { StaticSection } from './StaticSection';
+import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
+import { OpenAPIResponseMediaTypeContent } from './OpenAPIResponseMediaType';
 import type { OpenAPIContext, OpenAPIOperationData } from './types';
-import { checkIsReference, createStateKey, resolveDescription } from './utils';
+import { getStatusCodeDefaultLabel } from './utils';
+import { checkIsReference, resolveDescription } from './utils';
 
 /**
  * Display an example of the response content.
@@ -45,11 +46,17 @@ export function OpenAPIResponseExample(props: {
 
     const tabs = responses.map(([key, responseObject]) => {
         const description = resolveDescription(responseObject);
+        const label = description ? (
+            <Markdown source={description} />
+        ) : (
+            getStatusCodeDefaultLabel(key)
+        );
 
         if (checkIsReference(responseObject)) {
             return {
                 key: key,
-                label: key,
+                label,
+                statusCode: key,
                 body: (
                     <OpenAPIExample
                         example={getExampleFromReference(responseObject)}
@@ -57,24 +64,23 @@ export function OpenAPIResponseExample(props: {
                         syntax="json"
                     />
                 ),
-                footer: description ? <Markdown source={description} /> : undefined,
             };
         }
 
         if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
             return {
                 key: key,
-                label: key,
+                label,
+                statusCode: key,
                 body: <OpenAPIEmptyExample />,
-                footer: description ? <Markdown source={description} /> : undefined,
             };
         }
 
         return {
             key: key,
-            label: key,
+            label,
+            statusCode: key,
             body: <OpenAPIResponse context={context} content={responseObject.content} />,
-            footer: description ? <Markdown source={description} /> : undefined,
         };
     });
 
@@ -83,11 +89,11 @@ export function OpenAPIResponseExample(props: {
     }
 
     return (
-        <OpenAPITabs stateKey={createStateKey('response-example')} items={tabs}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-panel">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
+        <OpenAPIResponseExampleContent
+            selectIcon={context.icons.chevronDown}
+            blockKey={context.blockKey}
+            items={tabs}
+        />
     );
 }
 
@@ -106,42 +112,30 @@ function OpenAPIResponse(props: {
         throw new Error('One media type is required');
     }
 
-    if (entries.length === 1) {
-        const [mediaType, mediaTypeObject] = firstEntry;
-        return (
-            <OpenAPIResponseMediaType
-                context={context}
-                mediaType={mediaType}
-                mediaTypeObject={mediaTypeObject}
-            />
-        );
-    }
-
     const tabs = entries.map((entry) => {
         const [mediaType, mediaTypeObject] = entry;
         return {
             key: mediaType,
             label: mediaType,
-            body: (
-                <OpenAPIResponseMediaType
-                    context={context}
-                    mediaType={mediaType}
-                    mediaTypeObject={mediaTypeObject}
-                />
-            ),
+            body: <></>,
+            examples: getExamples({
+                mediaTypeObject,
+                mediaType,
+                context,
+            }),
         };
     });
 
     return (
-        <OpenAPITabs stateKey={createStateKey('response-media-types')} items={tabs}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-response-media-types">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
+        <OpenAPIResponseMediaTypeContent
+            selectIcon={context.icons.chevronDown}
+            blockKey={context.blockKey}
+            items={tabs}
+        />
     );
 }
 
-function OpenAPIResponseMediaType(props: {
+function getExamples(props: {
     mediaTypeObject: OpenAPIV3.MediaTypeObject;
     mediaType: string;
     context: OpenAPIContext;
@@ -149,23 +143,8 @@ function OpenAPIResponseMediaType(props: {
     const { mediaTypeObject, mediaType } = props;
     const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType });
     const syntax = getSyntaxFromMediaType(mediaType);
-    const firstExample = examples[0];
 
-    if (!firstExample) {
-        return <OpenAPIEmptyExample />;
-    }
-
-    if (examples.length === 1) {
-        return (
-            <OpenAPIExample
-                example={firstExample.example}
-                context={props.context}
-                syntax={syntax}
-            />
-        );
-    }
-
-    const tabs = examples.map((example) => {
+    return examples.map((example) => {
         return {
             key: example.key,
             label: example.example.summary || example.key,
@@ -174,17 +153,6 @@ function OpenAPIResponseMediaType(props: {
             ),
         };
     });
-
-    return (
-        <OpenAPITabs stateKey={createStateKey('response-media-type-examples')} items={tabs}>
-            <StaticSection
-                header={<OpenAPITabsList />}
-                className="openapi-response-media-type-examples"
-            >
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
-    );
 }
 
 /**

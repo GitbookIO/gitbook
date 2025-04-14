@@ -1,41 +1,39 @@
 'use client';
+import clsx from 'clsx';
+import type React from 'react';
 import { useState } from 'react';
-import { Button, Disclosure, DisclosurePanel, Heading } from 'react-aria-components';
-import type { OpenAPIClientContext } from './types';
+import { Button, Disclosure, DisclosurePanel } from 'react-aria-components';
 
 /**
  * Display an interactive OpenAPI disclosure.
  */
 export function OpenAPIDisclosure(props: {
-    context: OpenAPIClientContext;
+    icon: React.ReactNode;
     children: React.ReactNode;
-    label: string;
+    label: string | ((isExpanded: boolean) => string);
+    className?: string;
 }): React.JSX.Element {
-    const { context, children, label } = props;
+    const { icon, children, label, className } = props;
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
         <Disclosure
-            className="openapi-disclosure"
+            className={clsx('openapi-disclosure', className)}
             isExpanded={isExpanded}
             onExpandedChange={setIsExpanded}
         >
-            <Heading>
-                <Button
-                    slot="trigger"
-                    className="openapi-disclosure-trigger"
-                    style={({ isFocusVisible }) => ({
-                        outline: isFocusVisible
-                            ? '2px solid rgb(var(--primary-color-500) / 0.4)'
-                            : 'none',
-                    })}
-                >
-                    {context.icons.plus}
-                    <span>
-                        {isExpanded ? 'Hide' : 'Show'} {label}
-                    </span>
-                </Button>
-            </Heading>
+            <Button
+                slot="trigger"
+                className="openapi-disclosure-trigger"
+                style={({ isFocusVisible }) => ({
+                    outline: isFocusVisible
+                        ? '2px solid rgb(var(--primary-color-500) / 0.4)'
+                        : 'none',
+                })}
+            >
+                {icon}
+                <span>{typeof label === 'function' ? label(isExpanded) : label}</span>
+            </Button>
             <DisclosurePanel className="openapi-disclosure-panel">
                 {isExpanded ? children : null}
             </DisclosurePanel>

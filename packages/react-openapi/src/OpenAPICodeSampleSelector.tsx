@@ -22,25 +22,21 @@ type CodeSampleItem = OpenAPISelectItem & {
     footer?: React.ReactNode;
 };
 
-export function OpenAPICodeSampleHeader(props: {
+function OpenAPICodeSampleHeader(props: {
     items: CodeSampleItem[];
     data: OpenAPIOperationData;
+    selectIcon?: React.ReactNode;
 }) {
-    const { data, items } = props;
-
-    const state = useCodeSampleState(items[0]?.key ?? '');
-    const selected = items.find((item) => item.key === state.key) || items[0];
+    const { data, items, selectIcon } = props;
 
     return (
         <>
             <OpenAPIPath canCopy={false} withServer={false} data={data} />
             {items.length > 1 ? (
                 <OpenAPISelect
-                    selectedKey={selected?.key}
-                    onSelectionChange={(key) => {
-                        state.setKey(key);
-                    }}
+                    icon={selectIcon}
                     items={items}
+                    stateKey="codesample"
                     placement="bottom end"
                 >
                     {items.map((item) => (
@@ -59,8 +55,9 @@ export function OpenAPICodeSampleHeader(props: {
 export function OpenAPICodeSampleBody(props: {
     items: CodeSampleItem[];
     data: OpenAPIOperationData;
+    selectIcon?: React.ReactNode;
 }) {
-    const { items, data } = props;
+    const { items, data, selectIcon } = props;
     if (!items[0]) {
         throw new Error('No items provided');
     }
@@ -75,7 +72,7 @@ export function OpenAPICodeSampleBody(props: {
 
     return (
         <StaticSection
-            header={<OpenAPICodeSampleHeader data={data} items={items} />}
+            header={<OpenAPICodeSampleHeader selectIcon={selectIcon} data={data} items={items} />}
             className="openapi-codesample"
         >
             <div id={selected.key as string} className="openapi-codesample-panel">
