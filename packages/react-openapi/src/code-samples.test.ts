@@ -413,13 +413,15 @@ describe('python code sample generator', () => {
             },
             body: {
                 key: 'value',
+                truethy: true,
+                falsey: false,
             },
         };
 
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data={"key":"value"}\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data=json.dumps({"key":"value","truethy":True,"falsey":False})\n)\n\ndata = response.json()'
         );
     });
 

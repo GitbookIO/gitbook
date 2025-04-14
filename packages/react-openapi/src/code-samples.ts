@@ -3,6 +3,7 @@ import {
     isFormData,
     isFormUrlEncoded,
     isGraphQL,
+    isJSON,
     isPDF,
     isPlainObject,
     isText,
@@ -173,11 +174,14 @@ ${headerString}${bodyString}`;
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
 
+            const contentType = headers?.['Content-Type'];
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
+                } else if (isJSON(contentType)) {
+                    code += indent(`data=json.dumps(${body})\n`, 4);
                 } else {
-                    code += indent(`data=${stringifyOpenAPI(body)}\n`, 4);
+                    code += indent(`data=${body}\n`, 4);
                 }
             }
 
@@ -343,18 +347,27 @@ const BodyGenerators = {
             }
             code += '}\n\n';
             body = 'files';
-        }
-
-        if (isPDF(contentType)) {
+        } else if (isPDF(contentType)) {
             code += 'files = {\n';
             code += `${indent(`"file": "${body}",`, 4)}\n`;
             code += '}\n\n';
             body = 'files';
-        }
-
-        if (isXML(contentType)) {
+        } else if (isXML(contentType)) {
             // Convert JSON to XML if needed
-            body = convertBodyToXML(body);
+            body = JSON.stringify(convertBodyToXML(body));
+        } else {
+            body = stringifyOpenAPI(body, (_key, value) => {
+                switch (value) {
+                    case true:
+                        return '$$__TRUE__$$';
+                    case false:
+                        return '$$__FALSE__$$';
+                    default:
+                        return value;
+                }
+            })
+                .replaceAll('"$$__TRUE__$$"', 'True')
+                .replaceAll('"$$__FALSE__$$"', 'False');
         }
 
         return { body, code, headers };
