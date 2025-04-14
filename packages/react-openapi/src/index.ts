@@ -1,5 +1,7 @@
 export * from './schemas';
 export * from './OpenAPIOperation';
+export * from './OpenAPIWebhook';
 export * from './OpenAPIOperationContext';
 export * from './resolveOpenAPIOperation';
-export type { OpenAPIOperationData, OpenAPIContext } from './types';
+export * from './resolveOpenAPIWebhook';
+export type { OpenAPIOperationData, OpenAPIContext, OpenAPIWebhookData } from './types';

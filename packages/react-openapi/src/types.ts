@@ -72,3 +72,14 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     /** Securities that should be used for this operation */
     securities: [string, OpenAPISecurityWithRequired][];
 }
+
+export interface OpenAPIWebhookData extends OpenAPICustomSpecProperties {
+    name: string;
+    method: string;
+
+    /** Servers to be used for this operation */
+    servers: OpenAPIV3.ServerObject[];
+
+    /** Spec of the webhook */
+    operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
+}
