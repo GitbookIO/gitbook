@@ -215,7 +215,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     />
                                 </div>
                             )}
-                            {sections && (
+                            {sections && sections.list.length > 1 && (
                                 <SiteSectionTabs
                                     sections={encodeClientSiteSections(context, sections)}
                                 />
