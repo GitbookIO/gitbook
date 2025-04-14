@@ -36,7 +36,7 @@ export const en = {
     table_of_contents_button_label: 'Open table of contents',
     cookies_title: 'Cookies',
     cookies_prompt:
-        'This site uses cookies to deliver its service and to analyse traffic. By browsing this site, you accept the ${1}.',
+        'This site uses cookies to deliver its service and to analyze traffic. By browsing this site, you accept the ${1}.',
     cookies_prompt_privacy: 'privacy policy',
     cookies_accept: 'Accept',
     cookies_reject: 'Reject',
