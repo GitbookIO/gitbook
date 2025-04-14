@@ -70,7 +70,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '3.112.0'
+              wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
               command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/wrangler.jsonc
         - name: Outputs
