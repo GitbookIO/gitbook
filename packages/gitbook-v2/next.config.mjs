@@ -64,7 +64,7 @@ const nextConfig = {
                         value: 'public, max-age=31536000, immutable',
                     },
                     {
-                        key: 'access-control-allow-origin',
+                        key: 'Access-Control-Allow-Origin',
                         value: '*',
                     },
                 ],
