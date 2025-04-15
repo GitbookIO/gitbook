@@ -1,11 +1,12 @@
 import type { OpenAPISchema } from '@gitbook/openapi-parser';
 import clsx from 'clsx';
 import { OpenAPIDisclosure } from '../OpenAPIDisclosure';
-import { OpenAPIExample, getExampleFromSchema } from '../OpenAPIExample';
+import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
 import { Section, SectionBody, StaticSection } from '../StaticSection';
 import { getOpenAPIClientContext } from '../context';
 import type { OpenAPIContext } from '../types';
+import { getExampleFromSchema } from '../util/example';
 
 /**
  * OpenAPI Schemas component.

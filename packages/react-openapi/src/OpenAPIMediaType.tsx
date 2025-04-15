@@ -1,39 +1,32 @@
 'use client';
 import type { Key } from 'react-aria';
-import { OpenAPIEmptyExample } from '../OpenAPIExample';
-import { OpenAPISelect, OpenAPISelectItem, useSelectState } from '../OpenAPISelect';
-import { StaticSection } from '../StaticSection';
-import { createStateKey } from '../utils';
+import { OpenAPIEmptyExample } from './OpenAPIExample';
+import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { StaticSection } from './StaticSection';
 
-type OpenAPIWebhookMediaTypeItem = OpenAPISelectItem & {
+type OpenAPIMediaTypeItem = OpenAPISelectItem & {
     body: React.ReactNode;
-    examples?: OpenAPIWebhookMediaTypeItem[];
+    examples?: OpenAPIMediaTypeItem[];
 };
 
 /**
  * Get the state of the response examples select.
  */
-export function useWebhookMediaTypesState(
-    blockKey: string | undefined,
-    initialKey: Key = 'default'
-) {
-    return useSelectState(getWebhookMediaTypeStateKey(blockKey), initialKey);
+export function useMediaTypesState(stateKey: string | undefined, initialKey: Key = 'default') {
+    return useSelectState(stateKey, initialKey);
 }
 
-function useWebhookMediaTypeExamplesState(
-    blockKey: string | undefined,
-    initialKey: Key = 'default'
-) {
-    return useSelectState(getWebhookMediaTypeExamplesStateKey(blockKey), initialKey);
+function useMediaTypeExamplesState(stateKey: string | undefined, initialKey: Key = 'default') {
+    return useSelectState(stateKey, initialKey);
 }
 
-export function OpenAPIResponseMediaTypeContent(props: {
-    items: OpenAPIWebhookMediaTypeItem[];
-    blockKey?: string;
+export function OpenAPIMediaTypeContent(props: {
+    items: OpenAPIMediaTypeItem[];
     selectIcon?: React.ReactNode;
+    stateKey: string;
 }) {
-    const { blockKey, items, selectIcon } = props;
-    const state = useWebhookMediaTypesState(blockKey, items[0]?.key);
+    const { stateKey, items, selectIcon } = props;
+    const state = useMediaTypesState(stateKey, items[0]?.key);
 
     const examples = items.find((item) => item.key === state.key)?.examples ?? [];
 
@@ -45,28 +38,28 @@ export function OpenAPIResponseMediaTypeContent(props: {
         <StaticSection
             footer={
                 items.length > 1 || examples.length > 1 ? (
-                    <OpenAPIResponseMediaTypeFooter
-                        blockKey={blockKey}
+                    <OpenAPIMediaTypeFooter
                         items={items}
                         examples={examples}
                         selectIcon={selectIcon}
+                        stateKey={stateKey}
                     />
                 ) : null
             }
             className="openapi-response-media-types-examples"
         >
-            <OpenAPIResponseMediaTypeBody blockKey={blockKey} items={items} examples={examples} />
+            <OpenAPIMediaTypeBody stateKey={stateKey} items={items} examples={examples} />
         </StaticSection>
     );
 }
 
-function OpenAPIResponseMediaTypeFooter(props: {
-    items: OpenAPIWebhookMediaTypeItem[];
-    examples?: OpenAPIWebhookMediaTypeItem[];
-    blockKey?: string;
+function OpenAPIMediaTypeFooter(props: {
+    items: OpenAPIMediaTypeItem[];
+    examples?: OpenAPIMediaTypeItem[];
     selectIcon?: React.ReactNode;
+    stateKey: string;
 }) {
-    const { items, examples, blockKey, selectIcon } = props;
+    const { items, examples, stateKey, selectIcon } = props;
 
     return (
         <>
@@ -74,7 +67,7 @@ function OpenAPIResponseMediaTypeFooter(props: {
                 <OpenAPISelect
                     icon={selectIcon}
                     items={items}
-                    stateKey={getWebhookMediaTypeStateKey(blockKey)}
+                    stateKey={stateKey}
                     placement="bottom start"
                 >
                     {items.map((item) => (
@@ -89,7 +82,7 @@ function OpenAPIResponseMediaTypeFooter(props: {
                 <OpenAPISelect
                     icon={selectIcon}
                     items={examples}
-                    stateKey={getWebhookMediaTypeExamplesStateKey(blockKey)}
+                    stateKey={`${stateKey}-examples`}
                     placement="bottom start"
                 >
                     {examples.map((example) => (
@@ -103,18 +96,18 @@ function OpenAPIResponseMediaTypeFooter(props: {
     );
 }
 
-function OpenAPIResponseMediaTypeBody(props: {
-    items: OpenAPIWebhookMediaTypeItem[];
-    examples?: OpenAPIWebhookMediaTypeItem[];
-    blockKey?: string;
+function OpenAPIMediaTypeBody(props: {
+    items: OpenAPIMediaTypeItem[];
+    examples?: OpenAPIMediaTypeItem[];
+    stateKey: string;
 }) {
-    const { blockKey, items, examples } = props;
-    const state = useWebhookMediaTypesState(blockKey, items[0]?.key);
+    const { stateKey, items, examples } = props;
+    const state = useMediaTypesState(stateKey, items[0]?.key);
 
     const selectedItem = items.find((item) => item.key === state.key) ?? items[0];
 
-    const exampleState = useWebhookMediaTypeExamplesState(
-        blockKey,
+    const exampleState = useMediaTypeExamplesState(
+        `${stateKey}-examples`,
         selectedItem?.examples?.[0]?.key
     );
 
@@ -122,7 +115,7 @@ function OpenAPIResponseMediaTypeBody(props: {
         return null;
     }
 
-    if (examples?.length) {
+    if (examples) {
         const selectedExample =
             examples.find((example) => example.key === exampleState.key) ?? examples[0];
 
@@ -134,15 +127,4 @@ function OpenAPIResponseMediaTypeBody(props: {
     }
 
     return selectedItem.body;
-}
-
-/**
- * Return the state key for the response media types.
- */
-function getWebhookMediaTypeStateKey(blockKey: string | undefined) {
-    return createStateKey('request-body-media-type', blockKey);
-}
-
-function getWebhookMediaTypeExamplesStateKey(blockKey: string | undefined) {
-    return createStateKey('request-media-types-examples', blockKey);
 }

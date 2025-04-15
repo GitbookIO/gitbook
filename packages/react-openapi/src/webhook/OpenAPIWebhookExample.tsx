@@ -1,9 +1,10 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { OpenAPIEmptyExample, OpenAPIExample, getExampleFromSchema } from '../OpenAPIExample';
+import { OpenAPIEmptyExample } from '../OpenAPIExample';
+import { OpenAPIMediaTypeContent } from '../OpenAPIMediaType';
 import type { OpenAPIContext } from '../types';
 import type { OpenAPIWebhookData } from '../types';
-import { getSyntaxFromMediaType } from '../utils';
-import { OpenAPIResponseMediaTypeContent } from './OpenAPIWebhookExampleContent';
+import { getExamples } from '../util/example';
+import { createStateKey } from '../utils';
 
 export function OpenAPIWebhookExample(props: {
     data: OpenAPIWebhookData;
@@ -21,7 +22,6 @@ export function OpenAPIWebhookExample(props: {
             operation.requestBody.content as Record<string, OpenAPIV3.MediaTypeObject>
         ).map(([key, value]) => {
             const schema = value.schema;
-            const syntax = getSyntaxFromMediaType(key);
 
             if (!schema) {
                 return {
@@ -34,13 +34,12 @@ export function OpenAPIWebhookExample(props: {
             return {
                 key,
                 label: key,
-                body: (
-                    <OpenAPIExample
-                        context={context}
-                        example={getExampleFromSchema({ schema })}
-                        syntax={syntax}
-                    />
-                ),
+                body: <></>,
+                examples: getExamples({
+                    mediaTypeObject: value,
+                    mediaType: key,
+                    context,
+                }),
             };
         });
     })();
@@ -49,10 +48,10 @@ export function OpenAPIWebhookExample(props: {
         <div className="openapi-panel">
             <h4 className="openapi-panel-heading">Payload</h4>
             <div className="openapi-panel-body">
-                <OpenAPIResponseMediaTypeContent
-                    items={items}
+                <OpenAPIMediaTypeContent
                     selectIcon={context.icons.chevronDown}
-                    blockKey={context.blockKey}
+                    stateKey={createStateKey('request-body-media-type', context.blockKey)}
+                    items={items}
                 />
             </div>
         </div>
