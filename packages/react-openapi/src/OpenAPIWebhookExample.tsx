@@ -1,10 +1,10 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
-import { OpenAPIEmptyExample } from '../OpenAPIExample';
-import { OpenAPIMediaTypeContent } from '../OpenAPIMediaType';
-import type { OpenAPIContext } from '../types';
-import type { OpenAPIWebhookData } from '../types';
-import { getExamples } from '../util/example';
-import { createStateKey } from '../utils';
+import { OpenAPIEmptyExample } from './OpenAPIExample';
+import { OpenAPIMediaTypeContent } from './OpenAPIMediaType';
+import type { OpenAPIContext } from './types';
+import type { OpenAPIWebhookData } from './types';
+import { getExamples } from './util/example';
+import { createStateKey } from './utils';
 
 export function OpenAPIWebhookExample(props: {
     data: OpenAPIWebhookData;
