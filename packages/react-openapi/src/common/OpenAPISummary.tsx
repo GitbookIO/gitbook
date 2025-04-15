@@ -9,6 +9,8 @@ export function OpenAPISummary(props: {
     const { data, context } = props;
     const { operation } = data;
 
+    const title = 'name' in data ? data.name : operation.summary;
+
     return (
         <div className="openapi-summary" id={operation.summary ? undefined : context.id}>
             {(operation.deprecated || operation['x-stability']) && (
@@ -19,11 +21,11 @@ export function OpenAPISummary(props: {
                     )}
                 </div>
             )}
-            {operation.summary
+            {title
                 ? context.renderHeading({
                       deprecated: operation.deprecated ?? false,
                       stability: operation['x-stability'],
-                      title: operation.summary,
+                      title: title,
                   })
                 : null}
             {'path' in data ? <OpenAPIPath data={data} /> : null}

@@ -2,7 +2,7 @@ import type {
     DocumentBlockOpenAPI,
     DocumentBlockOpenAPIOperation,
     DocumentBlockOpenAPISchemas,
-    // DocumentBlockOpenAPIWebhook,
+    DocumentBlockOpenAPIWebhook,
 } from '@gitbook/api';
 import type { Filesystem, OpenAPIParseError, OpenAPIV3xDocument } from '@gitbook/openapi-parser';
 import type { GitBookAnyContext } from '@v2/lib/context';
@@ -20,7 +20,7 @@ export type OpenAPISchemasBlock = DocumentBlockOpenAPISchemas;
 /**
  * Type for OpenAPI Webhook block
  */
-export type OpenAPIWebhookBlock = any; //DocumentBlockOpenAPIWebhook
+export type OpenAPIWebhookBlock = DocumentBlockOpenAPIWebhook;
 
 /**
  * Arguments for resolving OpenAPI block.

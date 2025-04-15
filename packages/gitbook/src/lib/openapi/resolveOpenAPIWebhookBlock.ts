@@ -34,7 +34,7 @@ async function baseResolveOpenAPIWebhookBlock(
     args: ResolveOpenAPIBlockArgs<OpenAPIWebhookBlock>
 ): Promise<ResolveOpenAPIWebhookBlockResult> {
     const { context, block } = args;
-    if (!block.data.path || !block.data.method) {
+    if (!block.data.name || !block.data.method) {
         return { data: null, specUrl: null };
     }
 

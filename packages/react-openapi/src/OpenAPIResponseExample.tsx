@@ -8,15 +8,15 @@ import {
 } from './OpenAPIExample';
 import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
 import { OpenAPIResponseMediaTypeContent } from './OpenAPIResponseMediaType';
-import type { OpenAPIContext, OpenAPIOperationData } from './types';
-import { getStatusCodeDefaultLabel } from './utils';
+import type { OpenAPIContext, OpenAPIOperationData, OpenAPIWebhookData } from './types';
+import { getStatusCodeDefaultLabel, getSyntaxFromMediaType } from './utils';
 import { checkIsReference, resolveDescription } from './utils';
 
 /**
  * Display an example of the response content.
  */
 export function OpenAPIResponseExample(props: {
-    data: OpenAPIOperationData;
+    data: OpenAPIOperationData | OpenAPIWebhookData;
     context: OpenAPIContext;
 }) {
     const { data, context } = props;
@@ -153,19 +153,4 @@ function getExamples(props: {
             ),
         };
     });
-}
-
-/**
- * Get the syntax from a media type.
- */
-function getSyntaxFromMediaType(mediaType: string): string {
-    if (mediaType.includes('json')) {
-        return 'json';
-    }
-
-    if (mediaType === 'application/xml') {
-        return 'xml';
-    }
-
-    return 'text';
 }

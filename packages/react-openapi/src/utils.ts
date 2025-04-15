@@ -211,3 +211,18 @@ function getStatusCodeCategory(statusCode: number | string): number | string {
 
     return category;
 }
+
+/**
+ * Get the syntax from a media type.
+ */
+export function getSyntaxFromMediaType(mediaType: string): string {
+    if (mediaType.includes('json')) {
+        return 'json';
+    }
+
+    if (mediaType === 'application/xml') {
+        return 'xml';
+    }
+
+    return 'text';
+}
