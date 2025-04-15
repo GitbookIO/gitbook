@@ -161,6 +161,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'swagger':
         case 'openapi-operation':
         case 'openapi-schemas':
+        case 'openapi-webhook':
         case 'math':
         case 'divider':
         case 'content-ref':
