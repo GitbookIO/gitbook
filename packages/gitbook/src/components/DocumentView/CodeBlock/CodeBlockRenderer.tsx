@@ -12,10 +12,13 @@ import type { HighlightLine, HighlightToken } from './highlight';
 import './theme.css';
 import './CodeBlockRenderer.css';
 
-type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
+export interface CodeBlockRendererProps extends Pick<BlockProps<DocumentBlockCode>, 'style'> {
     lines: HighlightLine[];
     'aria-busy'?: boolean;
-};
+    withLineNumbers: boolean;
+    withWrap: boolean;
+    title: string;
+}
 
 /**
  * The logic of rendering a code block from lines.
@@ -24,12 +27,8 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
     props: CodeBlockRendererProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
-    const { block, style, lines, 'aria-busy': ariaBusy } = props;
-
+    const { style, lines, withLineNumbers, withWrap, title, 'aria-busy': ariaBusy } = props;
     const id = useId();
-    const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
-    const withWrap = block.data.overflow === 'wrap';
-    const title = block.data.title;
 
     return (
         <div

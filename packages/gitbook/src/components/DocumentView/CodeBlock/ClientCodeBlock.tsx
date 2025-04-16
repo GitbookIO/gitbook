@@ -1,19 +1,19 @@
 'use client';
 
-import type { DocumentBlockCode } from '@gitbook/api';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
+import type { SlimDocumentBlockCode } from '@/lib/slim-document';
 import { useDebounceCallback } from 'usehooks-ts';
-import type { BlockProps } from '../Block';
-import { CodeBlockRenderer } from './CodeBlockRenderer';
+import { CodeBlockRenderer, type CodeBlockRendererProps } from './CodeBlockRenderer';
 import type { HighlightLine, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
 
-type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
+interface ClientBlockProps extends Omit<CodeBlockRendererProps, 'lines'> {
+    block: SlimDocumentBlockCode;
     inlines: RenderedInline[];
-};
+}
 
 /**
  * Render a code-block client-side by loading the highlighter asynchronously.
@@ -24,14 +24,14 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
-    const plainLines = useMemo(() => plainHighlight(block, []), [block]);
+    const plainLines = useMemo(() => plainHighlight({ block, inlines: [] }), [block]);
     const [lines, setLines] = useState<null | HighlightLine[]>(null);
     const [highlighting, setHighlighting] = useState(false);
 
     // Preload the highlighter when the block is mounted.
     useEffect(() => {
-        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block));
-    }, [block]);
+        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block.data.syntax));
+    }, [block.data.syntax]);
 
     // When user scrolls, we need to wait for the scroll to finish before running the highlight
     const isScrollingRef = useRef(false);
@@ -80,7 +80,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             if (typeof window !== 'undefined') {
                 setHighlighting(true);
                 import('./highlight').then(({ highlight }) => {
-                    highlight(block, inlines).then((lines) => {
+                    highlight({ block, inlines }).then((lines) => {
                         if (cancelled) {
                             return;
                         }
@@ -104,7 +104,9 @@ export function ClientCodeBlock(props: ClientBlockProps) {
         <CodeBlockRenderer
             ref={blockRef}
             aria-busy={highlighting}
-            block={block}
+            title={props.title}
+            withLineNumbers={props.withLineNumbers}
+            withWrap={props.withWrap}
             style={style}
             lines={lines ?? plainLines}
         />

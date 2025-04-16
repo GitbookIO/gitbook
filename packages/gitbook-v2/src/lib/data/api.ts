@@ -1,3 +1,4 @@
+import { getSlimJSONDocument } from '@/lib/slim-document';
 import { trace } from '@/lib/tracing';
 import {
     type ComputedContentSource,
@@ -779,7 +780,7 @@ const getDocumentUncached = async (
                 cacheTag(...getCacheTagsFromResponse(res));
                 cacheLife('max');
             }
-            return res.data;
+            return getSlimJSONDocument(res.data);
         });
     });
 };
@@ -872,7 +873,7 @@ const getComputedDocumentUncached = async (
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('max');
                 }
-                return res.data;
+                return getSlimJSONDocument(res.data);
             });
         }
     );

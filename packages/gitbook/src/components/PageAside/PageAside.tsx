@@ -1,5 +1,4 @@
 import {
-    type JSONDocument,
     type RevisionPageDocument,
     SiteAdsStatus,
     SiteInsightsAdPlacement,
@@ -14,6 +13,7 @@ import { getSpaceLanguage, t } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import { Ad } from '../Ads';
 import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
@@ -25,7 +25,7 @@ import { ScrollSectionsList } from './ScrollSectionsList';
  */
 export function PageAside(props: {
     page: RevisionPageDocument;
-    document: JSONDocument | null;
+    document: SlimJSONDocument | null;
     context: GitBookSiteContext;
     withHeaderOffset: { sectionsHeader: boolean; topHeader: boolean };
     withFullPageCover: boolean;
@@ -255,7 +255,10 @@ export function PageAside(props: {
     );
 }
 
-async function PageAsideSections(props: { document: JSONDocument; context: GitBookSiteContext }) {
+async function PageAsideSections(props: {
+    document: SlimJSONDocument;
+    context: GitBookSiteContext;
+}) {
     const { document, context } = props;
 
     const sections = await getDocumentSections(context, document);

@@ -1,6 +1,6 @@
-import type { DocumentBlockCode, JSONDocument } from '@gitbook/api';
 import { useId } from 'react';
 
+import type { SlimDocumentBlockCode, SlimJSONDocument } from '@/lib/slim-document';
 import { CodeBlock } from './CodeBlock';
 
 /**
@@ -11,7 +11,7 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
     const { code, syntax } = props;
     const id = useId();
 
-    const block: DocumentBlockCode = {
+    const block: SlimDocumentBlockCode = {
         key: id,
         object: 'block',
         type: 'code',
@@ -37,7 +37,7 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
         })),
     };
 
-    const document: JSONDocument = {
+    const document: SlimJSONDocument = {
         object: 'document',
         data: {},
         nodes: [block],

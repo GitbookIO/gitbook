@@ -2,13 +2,13 @@ import type {
     DocumentBlockImage,
     DocumentBlockImageDimension,
     DocumentBlockImages,
-    JSONDocument,
 } from '@gitbook/api';
 
 import { Image, type ImageResponsiveSize } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import type { SlimJSONDocument } from '@/lib/slim-document';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import type { DocumentContext } from './DocumentView';
@@ -62,7 +62,7 @@ export const imageBlockSizes: ImageResponsiveSize[] = [
 
 async function ImageBlock(props: {
     block: DocumentBlockImage;
-    document: JSONDocument;
+    document: SlimJSONDocument;
     style: ClassValue;
     context: DocumentContext;
     siblings: number;
