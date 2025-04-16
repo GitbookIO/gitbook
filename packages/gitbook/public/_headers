@@ -1,3 +1,7 @@
 # GitBook immutable static assets
+# Duplicated from next.config.mjs until OpenNext supports generating static headers
 /~gitbook/static/*
   cache-control: public,max-age=31536000,immutable
+  Access-Control-Allow-Origin: *
+/_next/static/*
+  Access-Control-Allow-Origin: *

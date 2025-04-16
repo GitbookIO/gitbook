@@ -14,7 +14,7 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "incremental": true,
-        "types": ["./.wrangler/types/runtime.d.ts"]
+        "types": ["./worker-configuration.d.ts"]
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"]

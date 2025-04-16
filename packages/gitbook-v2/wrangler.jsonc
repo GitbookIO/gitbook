@@ -1,7 +1,7 @@
 {
     "main": ".open-next/worker.js",
     "name": "gitbook-open-v2",
-    "compatibility_date": "2025-03-11",
+    "compatibility_date": "2025-04-14",
     "compatibility_flags": ["nodejs_compat", "allow_importable_env"],
     "assets": {
         "directory": ".open-next/assets",
@@ -12,13 +12,6 @@
     },
     "env": {
         "preview": {
-            "d1_databases": [
-                {
-                    "binding": "NEXT_CACHE_D1",
-                    "database_id": "f59ddb40-ad72-4312-9395-0ac6a129af8e",
-                    "database_name": "gitbook-open-v2-tags-preview"
-                }
-            ],
             "r2_buckets": [
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
@@ -53,13 +46,6 @@
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
                     "bucket_name": "gitbook-open-v2-cache-staging"
-                }
-            ],
-            "d1_databases": [
-                {
-                    "binding": "NEXT_CACHE_D1",
-                    "database_id": "9df62e39-1f35-4066-83aa-e9b8ed3ac8d5",
-                    "database_name": "gitbook-open-v2-tags-staging"
                 }
             ],
             "services": [
@@ -111,13 +97,6 @@
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
                     "bucket_name": "gitbook-open-v2-cache-production"
-                }
-            ],
-            "d1_databases": [
-                {
-                    "binding": "NEXT_CACHE_D1",
-                    "database_id": "a6f16fce-5f45-43a9-89a4-7b83ddf25b77",
-                    "database_name": "gitbook-open-v2-tags-production"
                 }
             ],
             "services": [
