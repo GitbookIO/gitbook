@@ -59,10 +59,7 @@ function ScalarModal(props: {
 }) {
     const { method, path, specUrl, controllerRef } = props;
     return (
-        <ApiClientModalProvider
-            configuration={{ spec: { url: specUrl } }}
-            initialRequest={{ method, path }}
-        >
+        <ApiClientModalProvider configuration={{ url: specUrl }} initialRequest={{ method, path }}>
             <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
         </ApiClientModalProvider>
     );

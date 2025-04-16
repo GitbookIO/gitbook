@@ -20,7 +20,8 @@
             "**/.wrangler/**/*",
             "packages/openapi-parser/src/fixtures/**/*",
             "packages/emoji-codepoints/index.ts",
-            "packages/icons/src/data/*.json"
+            "packages/icons/src/data/*.json",
+            "packages/cache-do/worker-configuration.d.ts"
         ]
     },
     "formatter": {
