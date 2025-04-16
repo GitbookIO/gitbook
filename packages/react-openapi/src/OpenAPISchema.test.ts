@@ -35,6 +35,86 @@ describe('getSchemaAlternatives', () => {
         ]);
     });
 
+    it('merges string enum', () => {
+        expect(
+            getSchemaAlternatives({
+                oneOf: [
+                    {
+                        oneOf: [
+                            {
+                                type: 'string',
+                                enum: ['a', 'b'],
+                            },
+                            {
+                                type: 'string',
+                                enum: ['c', 'd'],
+                                nullable: true,
+                            },
+                        ],
+                    },
+                ],
+            })
+        ).toEqual([
+            {
+                type: 'string',
+                enum: ['a', 'b', 'c', 'd'],
+                nullable: true,
+            },
+        ]);
+    });
+
+    it('merges objects with allOf', () => {
+        expect(
+            getSchemaAlternatives({
+                allOf: [
+                    {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                            },
+                            map: {
+                                type: 'string',
+                            },
+                            description: {
+                                type: 'string',
+                            },
+                        },
+                        required: ['name'],
+                    },
+                    {
+                        type: 'object',
+                        properties: {
+                            externalId: {
+                                type: 'string',
+                            },
+                        },
+                        required: ['map', 'externalId'],
+                    },
+                ],
+            })
+        ).toEqual([
+            {
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string',
+                    },
+                    map: {
+                        type: 'string',
+                    },
+                    description: {
+                        type: 'string',
+                    },
+                    externalId: {
+                        type: 'string',
+                    },
+                },
+                required: ['name', 'map', 'externalId'],
+            },
+        ]);
+    });
+
     it('should not flatten oneOf and allOf', () => {
         expect(
             getSchemaAlternatives({

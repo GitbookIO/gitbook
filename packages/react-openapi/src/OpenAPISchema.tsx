@@ -450,7 +450,91 @@ export function getSchemaAlternatives(
     }
 
     const [type, schemas] = alternatives;
-    return flattenAlternatives(type, schemas, new Set(ancestors).add(schema));
+    return mergeAlternatives(
+        type,
+        flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
+    );
+}
+
+/**
+ * Merge alternatives of the same type into a single schema.
+ * - Merge string enums
+ */
+function mergeAlternatives(
+    alternativeType: AlternativeType,
+    schemasOrRefs: OpenAPIV3.SchemaObject[]
+): OpenAPIV3.SchemaObject[] | null {
+    switch (alternativeType) {
+        case 'oneOf': {
+            return schemasOrRefs.reduce<OpenAPIV3.SchemaObject[]>((acc, schemaOrRef) => {
+                const latest = acc.at(-1);
+
+                if (
+                    latest &&
+                    latest.type === 'string' &&
+                    latest.enum &&
+                    schemaOrRef.type === 'string' &&
+                    schemaOrRef.enum
+                ) {
+                    latest.enum = Array.from(new Set([...latest.enum, ...schemaOrRef.enum]));
+                    latest.nullable = latest.nullable || schemaOrRef.nullable;
+                    return acc;
+                }
+
+                acc.push(schemaOrRef);
+                return acc;
+            }, []);
+        }
+        case 'allOf': {
+            return schemasOrRefs.reduce<OpenAPIV3.SchemaObject[]>((acc, schemaOrRef) => {
+                const latest = acc.at(-1);
+
+                if (
+                    latest &&
+                    latest.type === 'string' &&
+                    latest.enum &&
+                    schemaOrRef.type === 'string' &&
+                    schemaOrRef.enum
+                ) {
+                    const keys = Object.keys(schemaOrRef);
+                    if (keys.every((key) => ['type', 'enum', 'nullable'].includes(key))) {
+                        latest.enum = Array.from(new Set([...latest.enum, ...schemaOrRef.enum]));
+                        latest.nullable = latest.nullable || schemaOrRef.nullable;
+                        return acc;
+                    }
+                }
+
+                if (latest && latest.type === 'object' && schemaOrRef.type === 'object') {
+                    const keys = Object.keys(schemaOrRef);
+                    if (
+                        keys.every((key) =>
+                            ['type', 'properties', 'required', 'nullable'].includes(key)
+                        )
+                    ) {
+                        latest.properties = {
+                            ...latest.properties,
+                            ...schemaOrRef.properties,
+                        };
+                        latest.required = Array.from(
+                            new Set([
+                                ...(Array.isArray(latest.required) ? latest.required : []),
+                                ...(Array.isArray(schemaOrRef.required)
+                                    ? schemaOrRef.required
+                                    : []),
+                            ])
+                        );
+                        latest.nullable = latest.nullable || schemaOrRef.nullable;
+                        return acc;
+                    }
+                }
+
+                acc.push(schemaOrRef);
+                return acc;
+            }, []);
+        }
+        default:
+            return schemasOrRefs;
+    }
 }
 
 function flattenAlternatives(
