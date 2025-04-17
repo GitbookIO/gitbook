@@ -172,8 +172,12 @@
     @apply py-2.5 flex flex-col gap-2;
 }
 
+/* .openapi-schema-properties .openapi-disclosure {
+    @apply bg-red-500;
+} */
+
 .openapi-section-body .openapi-schema-properties {
-    @apply divide-y divide-tint-subtle;
+    /* @apply divide-y divide-tint-subtle; */
 }
 
 .openapi-disclosure-group-panel > .openapi-schema-properties > *:first-child > .openapi-schema {
@@ -202,7 +206,7 @@
 
 /* Schema Presentation */
 .openapi-schema-presentation {
-    @apply flex flex-col gap-1.5 font-normal;
+    @apply flex flex-col gap-1 font-normal;
 }
 
 .openapi-schema-properties:last-child {
@@ -220,7 +224,7 @@
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-mono font-normal text-tint-strong;
+    @apply select-all font-mono font-semibold text-tint-strong;
 }
 
 .openapi-schema-propertyname[data-deprecated="true"] {
@@ -241,6 +245,10 @@
 
 .openapi-schema-writeonly {
     @apply text-success dark:text-success-subtle/9 text-[0.813rem];
+}
+
+.openapi-schema-types {
+    @apply flex items-baseline flex-wrap gap-1;
 }
 
 .openapi-schema-type {
@@ -320,7 +328,7 @@
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code,
 .openapi-schema-default code {
-    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 /* Authentication */
@@ -416,16 +424,18 @@
 }
 
 /* Code Sample */
-.openapi-codesample {
-    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
-}
-
 .openapi-codesample-header {
     @apply flex flex-row items-center;
 }
 
 .openapi-response-media-types-examples-footer-content {
     @apply flex flex-row items-center gap-2.5;
+}
+
+.openapi-panel-heading,
+.openapi-codesample-header,
+.openapi-response-examples-header {
+    @apply border-b border-tint-subtle;
 }
 
 .openapi-response-examples-header .openapi-select > button {
@@ -502,8 +512,16 @@
 }
 
 /* Panel */
-.openapi-panel {
-    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
+.openapi-panel,
+.openapi-codesample,
+.openapi-response-examples {
+    @apply border rounded-md straight-corners:rounded-none bg-tint-subtle border-tint-subtle shadow-sm;
+}
+
+.openapi-panel pre,
+.openapi-codesample pre,
+.openapi-response-examples pre {
+    @apply bg-transparent;
 }
 
 .openapi-panel-heading {
@@ -512,7 +530,7 @@
 
 .openapi-panel-body {
     @apply relative;
-    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
+    /* @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10; */
 }
 
 .openapi-panel-footer,
@@ -525,10 +543,6 @@
 }
 
 /* Example */
-.openapi-response-examples {
-    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
-}
-
 .openapi-response-examples-header {
     @apply flex flex-row items-center p-2.5;
 }
@@ -550,7 +564,7 @@
 .openapi-response-examples-panel,
 .openapi-codesample-panel {
     @apply flex-1 text-sm relative focus-visible:outline-none;
-    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
+    /* @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10; */
 }
 
 .openapi-example-empty {
@@ -747,11 +761,11 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-mediatype {
-    @apply opacity-0 invisible text-xs transition-opacity duration-300 shrink-0 absolute right-2.5 top-2.5;
+    @apply opacity-0 invisible text-xs transition-opacity duration-300 shrink-0 absolute right-2.5 h-full flex items-center;
 }
 
 .openapi-disclosure-group-mediatype > span {
-    @apply px-1 bg-tint-6 text-tint-12 rounded-full straight-corners:rounded-md;
+    @apply px-2 bg-tint-base ring-1 ring-tint-subtle text-tint-subtle contrast-more:text-tint rounded-full straight-corners:rounded-md;
 }
 
 /* Disclosure */
