@@ -1,4 +1,5 @@
 import { OpenAPICopyButton } from './OpenAPICopyButton';
+import { type OpenAPIUniversalContext, getOpenAPIClientContext } from './context';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 
@@ -7,6 +8,7 @@ import { getDefaultServerURL } from './util/server';
  */
 export function OpenAPIPath(props: {
     data: OpenAPIOperationData;
+    context: OpenAPIUniversalContext;
     /** Whether to show the server URL.
      * @default true
      */
@@ -17,7 +19,7 @@ export function OpenAPIPath(props: {
      */
     canCopy?: boolean;
 }) {
-    const { data, withServer = true, canCopy = true } = props;
+    const { data, context, withServer = true, canCopy = true } = props;
     const { method, path, operation } = data;
 
     const server = getDefaultServerURL(data.servers);
@@ -41,6 +43,7 @@ export function OpenAPIPath(props: {
                 className="openapi-path-title"
                 data-deprecated={operation.deprecated}
                 isDisabled={!canCopy}
+                context={getOpenAPIClientContext(context)}
             >
                 {element}
             </OpenAPICopyButton>

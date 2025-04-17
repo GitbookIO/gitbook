@@ -1,7 +1,8 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import type { OpenAPIContext, OpenAPIUniversalContext } from './context';
 import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import type { OpenAPIContext } from './types';
+import { t } from './translate';
 
 /**
  * Display an example.
@@ -15,7 +16,7 @@ export function OpenAPIExample(props: {
     const code = stringifyExample({ example, xml: syntax === 'xml' });
 
     if (code === null) {
-        return <OpenAPIEmptyExample />;
+        return <OpenAPIEmptyExample context={context} />;
     }
 
     return context.renderCodeBlock({ code, syntax });
@@ -42,10 +43,13 @@ function stringifyExample(args: { example: OpenAPIV3.ExampleObject; xml: boolean
 /**
  * Empty response example.
  */
-export function OpenAPIEmptyExample() {
+export function OpenAPIEmptyExample(props: {
+    context: OpenAPIUniversalContext;
+}) {
+    const { context } = props;
     return (
         <pre className="openapi-example-empty">
-            <p>No Content</p>
+            <p>{t(context.translation, 'no_content')}</p>
         </pre>
     );
 }

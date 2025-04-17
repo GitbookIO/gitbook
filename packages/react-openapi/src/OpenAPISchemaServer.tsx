@@ -4,8 +4,8 @@ import {
     OpenAPISchemaPropertiesFromServer,
     type OpenAPISchemaPropertyEntry,
 } from './OpenAPISchema';
+import type { OpenAPIClientContext } from './context';
 import { decycle } from './decycle';
-import type { OpenAPIClientContext } from './types';
 
 export function OpenAPISchemaProperties(props: {
     id?: string;

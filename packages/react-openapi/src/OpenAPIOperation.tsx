@@ -3,7 +3,8 @@ import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPIColumnSpec } from './common/OpenAPIColumnSpec';
 import { OpenAPISummary } from './common/OpenAPISummary';
-import type { OpenAPIContext, OpenAPIOperationData } from './types';
+import { type OpenAPIContextInput, resolveOpenAPIContext } from './context';
+import type { OpenAPIOperationData } from './types';
 
 /**
  * Display an interactive OpenAPI operation.
@@ -11,9 +12,11 @@ import type { OpenAPIContext, OpenAPIOperationData } from './types';
 export function OpenAPIOperation(props: {
     className?: string;
     data: OpenAPIOperationData;
-    context: OpenAPIContext;
+    context: OpenAPIContextInput;
 }) {
-    const { className, data, context } = props;
+    const { className, data, context: contextInput } = props;
+
+    const context = resolveOpenAPIContext(contextInput);
 
     return (
         <div className={clsx('openapi-operation', className)}>
@@ -22,8 +25,8 @@ export function OpenAPIOperation(props: {
                 <OpenAPIColumnSpec data={data} context={context} />
                 <div className="openapi-column-preview">
                     <div className="openapi-column-preview-body">
-                        <OpenAPICodeSample {...props} />
-                        <OpenAPIResponseExample {...props} />
+                        <OpenAPICodeSample data={data} context={context} />
+                        <OpenAPIResponseExample data={data} context={context} />
                     </div>
                 </div>
             </div>

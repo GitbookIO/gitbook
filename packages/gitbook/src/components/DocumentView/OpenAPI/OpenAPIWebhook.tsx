@@ -51,7 +51,7 @@ async function OpenAPIWebhookBody(props: BlockProps<OpenAPIWebhookBlock>) {
     return (
         <BaseOpenAPIWebhook
             data={data}
-            context={getOpenAPIContext({ props, specUrl })}
+            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
             className="openapi-block"
         />
     );

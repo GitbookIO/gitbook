@@ -102,6 +102,7 @@ export function InteractiveSection(props: {
                         ) : null}
                         {header}
                     </SectionHeaderContent>
+                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: we prevent default here */}
                     <div
                         className={clsx(
                             'openapi-section-header-controls',

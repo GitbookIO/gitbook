@@ -51,7 +51,7 @@ async function OpenAPISchemasBody(props: BlockProps<OpenAPISchemasBlock>) {
         <BaseOpenAPISchemas
             schemas={data.schemas}
             grouped={block.data.grouped}
-            context={getOpenAPIContext({ props, specUrl })}
+            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
             className="openapi-block"
         />
     );

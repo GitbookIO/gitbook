@@ -5,7 +5,9 @@ import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext, OpenAPIOperationData, OpenAPIWebhookData } from './types';
+import type { OpenAPIClientContext } from './context';
+import { tString } from './translate';
+import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { parameterToProperty } from './utils';
 
 export function OpenAPISpec(props: {
@@ -17,7 +19,7 @@ export function OpenAPISpec(props: {
     const { operation } = data;
 
     const parameters = operation.parameters ?? [];
-    const parameterGroups = groupParameters(parameters);
+    const parameterGroups = groupParameters(parameters, context);
 
     const securities = 'securities' in data ? data.securities : [];
 
@@ -61,7 +63,10 @@ export function OpenAPISpec(props: {
     );
 }
 
-function groupParameters(parameters: OpenAPI.Parameters): Array<{
+function groupParameters(
+    parameters: OpenAPI.Parameters,
+    context: OpenAPIClientContext
+): Array<{
     key: string;
     label: string;
     parameters: OpenAPI.Parameters;
@@ -78,7 +83,7 @@ function groupParameters(parameters: OpenAPI.Parameters): Array<{
         .filter((parameter) => parameter.in)
         .forEach((parameter) => {
             const key = parameter.in;
-            const label = getParameterGroupName(parameter.in);
+            const label = getParameterGroupName(parameter.in, context);
             const group = groups.find((group) => group.key === key);
             if (group) {
                 group.parameters.push(parameter);
@@ -96,14 +101,14 @@ function groupParameters(parameters: OpenAPI.Parameters): Array<{
     return groups;
 }
 
-function getParameterGroupName(paramIn: string): string {
+function getParameterGroupName(paramIn: string, context: OpenAPIClientContext): string {
     switch (paramIn) {
         case 'path':
-            return 'Path parameters';
+            return tString(context.translation, 'path_parameters');
         case 'query':
-            return 'Query parameters';
+            return tString(context.translation, 'query_parameters');
         case 'header':
-            return 'Header parameters';
+            return tString(context.translation, 'header_parameters');
         default:
             return paramIn;
     }
