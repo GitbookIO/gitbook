@@ -11,13 +11,17 @@ import { Heading } from '../Heading';
 
 import './scalar.css';
 import './style.css';
-import type { AnyOpenAPIOperationsBlock, OpenAPISchemasBlock } from '@/lib/openapi/types';
+import type {
+    AnyOpenAPIOperationsBlock,
+    OpenAPISchemasBlock,
+    OpenAPIWebhookBlock,
+} from '@/lib/openapi/types';
 
 /**
  * Get the OpenAPI context to render a block.
  */
 export function getOpenAPIContext(args: {
-    props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock>;
+    props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
     specUrl: string;
 }): OpenAPIContext {
     const { props, specUrl } = args;

@@ -5,16 +5,21 @@ import { OpenAPIResponses } from './OpenAPIResponses';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import { OpenAPISecurities } from './OpenAPISecurities';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext, OpenAPIOperationData } from './types';
+import type { OpenAPIClientContext, OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { parameterToProperty } from './utils';
 
-export function OpenAPISpec(props: { data: OpenAPIOperationData; context: OpenAPIClientContext }) {
+export function OpenAPISpec(props: {
+    data: OpenAPIOperationData | OpenAPIWebhookData;
+    context: OpenAPIClientContext;
+}) {
     const { data, context } = props;
 
-    const { operation, securities } = data;
+    const { operation } = data;
 
     const parameters = operation.parameters ?? [];
     const parameterGroups = groupParameters(parameters);
+
+    const securities = 'securities' in data ? data.securities : [];
 
     return (
         <>

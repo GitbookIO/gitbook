@@ -2,18 +2,20 @@
 import clsx from 'clsx';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { createStateKey } from './utils';
 
 export function OpenAPIMediaTypeExamplesSelector(props: {
     method: string;
     path: string;
     renderers: MediaTypeRenderer[];
     selectIcon?: React.ReactNode;
+    blockKey?: string;
 }) {
-    const { method, path, renderers, selectIcon } = props;
+    const { method, path, renderers, selectIcon, blockKey } = props;
     if (!renderers[0]) {
         throw new Error('No renderers provided');
     }
-    const stateKey = `media-type-${method}-${path}`;
+    const stateKey = createStateKey('request-body-media-type', blockKey);
     const state = useSelectState(stateKey, renderers[0].mediaType);
     const selected = renderers.find((r) => r.mediaType === state.key) || renderers[0];
 
@@ -102,13 +104,17 @@ export function OpenAPIMediaTypeExamplesBody(props: {
     method: string;
     path: string;
     renderers: MediaTypeRenderer[];
+    blockKey?: string;
 }) {
-    const { renderers, method, path } = props;
+    const { renderers, method, path, blockKey } = props;
     if (!renderers[0]) {
         throw new Error('No renderers provided');
     }
 
-    const mediaTypeState = useSelectState(`media-type-${method}-${path}`, renderers[0].mediaType);
+    const mediaTypeState = useSelectState(
+        createStateKey('request-body-media-type', blockKey),
+        renderers[0].mediaType
+    );
     const selected = renderers.find((r) => r.mediaType === mediaTypeState.key) ?? renderers[0];
     if (selected.examples.length === 0) {
         return selected.element;
