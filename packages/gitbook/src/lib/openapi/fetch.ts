@@ -5,6 +5,7 @@ import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cac
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
+    OpenAPIWebhookBlock,
     ResolveOpenAPIBlockArgs,
 } from '@/lib/openapi/types';
 import { getCloudflareRequestGlobal } from '@v2/lib/data/cloudflare';
@@ -16,7 +17,7 @@ import { isV2 } from '../v2';
 import { enrichFilesystem } from './enrich';
 import type { FetchOpenAPIFilesystemResult } from './types';
 
-type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock;
+type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock;
 
 /**
  * Fetch OpenAPI block.

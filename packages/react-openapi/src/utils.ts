@@ -1,5 +1,7 @@
 import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
+import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { tString } from './translate';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
@@ -182,18 +184,21 @@ export function getStatusCodeClassName(statusCode: number | string): string {
  * 3xx: Redirect
  * 4xx, 5xx: Error
  */
-export function getStatusCodeDefaultLabel(statusCode: number | string): string {
+export function getStatusCodeDefaultLabel(
+    statusCode: number | string,
+    context: OpenAPIUniversalContext
+): string {
     const category = getStatusCodeCategory(statusCode);
     switch (category) {
         case 1:
-            return 'Information';
+            return tString(context.translation, 'information');
         case 2:
-            return 'Success';
+            return tString(context.translation, 'success');
         case 3:
-            return 'Redirect';
+            return tString(context.translation, 'redirect');
         case 4:
         case 5:
-            return 'Error';
+            return tString(context.translation, 'error');
         default:
             return '';
     }

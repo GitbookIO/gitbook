@@ -1,4 +1,11 @@
+import { type Translation, type TranslationLocale, translations } from './translations';
+
 export interface OpenAPIClientContext {
+    /**
+     * The translation language to use.
+     */
+    translation: Translation;
+
     /**
      * Icons used in the block.
      */
@@ -23,9 +30,14 @@ export interface OpenAPIClientContext {
      * Optional id attached to the heading and used as an anchor.
      */
     id?: string;
+
+    /**
+     * Mark the context as a client context.
+     */
+    $$isClientContext$$: true;
 }
 
-export interface OpenAPIContext extends OpenAPIClientContext {
+export interface OpenAPIContext extends Omit<OpenAPIClientContext, '$$isClientContext$$'> {
     /**
      * Render a code block.
      */
@@ -51,14 +63,37 @@ export interface OpenAPIContext extends OpenAPIClientContext {
     specUrl: string;
 }
 
+export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;
+
+export interface OpenAPIContextInput extends Omit<OpenAPIContext, 'translation'> {
+    /**
+     * The translation language to use.
+     * @default 'en'
+     */
+    locale?: TranslationLocale | undefined;
+}
+
+/**
+ * Resolve OpenAPI context from the input.
+ */
+export function resolveOpenAPIContext(context: OpenAPIContextInput): OpenAPIContext {
+    const { locale, ...rest } = context;
+    return {
+        ...rest,
+        translation: translations[locale ?? 'en'],
+    };
+}
+
 /**
  * Get the client context from the OpenAPI context.
  */
-export function getOpenAPIClientContext(context: OpenAPIContext): OpenAPIClientContext {
+export function getOpenAPIClientContext(context: OpenAPIUniversalContext): OpenAPIClientContext {
     return {
+        translation: context.translation,
         icons: context.icons,
         defaultInteractiveOpened: context.defaultInteractiveOpened,
         blockKey: context.blockKey,
         id: context.id,
+        $$isClientContext$$: true,
     };
 }

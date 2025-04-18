@@ -1,6 +1,7 @@
 /* Layout Components */
 .openapi-operation,
-.openapi-schemas {
+.openapi-schemas,
+.openapi-webhook {
     @apply flex-1 flex flex-col gap-8 mb-14 min-w-0;
 }
 
@@ -233,19 +234,19 @@
 }
 
 .openapi-schema-required {
-    @apply text-warning-subtle text-[0.813rem];
+    @apply text-warning-subtle text-[0.813rem] lowercase;
 }
 
 .openapi-schema-optional {
-    @apply text-info-subtle text-[0.813rem];
+    @apply text-info-subtle text-[0.813rem] lowercase;
 }
 
 .openapi-schema-readonly {
-    @apply text-primary-subtle/9 text-[0.813rem];
+    @apply text-primary-subtle/9 text-[0.813rem] lowercase;
 }
 
 .openapi-schema-writeonly {
-    @apply text-success dark:text-success-subtle/9 text-[0.813rem];
+    @apply text-success dark:text-success-subtle/9 text-[0.813rem] lowercase;
 }
 
 .openapi-schema-types {

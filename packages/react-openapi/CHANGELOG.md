@@ -1,5 +1,19 @@
 # @gitbook/react-openapi
 
+## 1.2.0
+
+### Minor Changes
+
+- d67699a: Add OpenAPI Webhook block
+
+### Patch Changes
+
+- eeb977f: Fix Python code example for JSON payload
+- 3363a18: Merge simple alternatives
+- 8ed1bda: Translate OpenAPI blocks
+- 7588cfe: Improve OpenAPIResponses examples and schemas
+- ad1dc0b: Bump scalar packages
+
 ## 1.1.10
 
 ### Patch Changes

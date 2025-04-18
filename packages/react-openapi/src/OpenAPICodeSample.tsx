@@ -6,9 +6,10 @@ import {
 import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
 import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import type { OpenAPIContext, OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 import { checkIsReference } from './utils';
 
@@ -22,7 +23,7 @@ export function OpenAPICodeSample(props: {
     data: OpenAPIOperationData;
     context: OpenAPIContext;
 }) {
-    const { data } = props;
+    const { data, context } = props;
 
     // If code samples are disabled at operation level, we don't display the code samples.
     if (data.operation['x-codeSamples'] === false) {
@@ -43,7 +44,14 @@ export function OpenAPICodeSample(props: {
         return null;
     }
 
-    return <OpenAPICodeSampleBody data={data} items={samples} />;
+    return (
+        <OpenAPICodeSampleBody
+            context={getOpenAPIClientContext(context)}
+            data={data}
+            items={samples}
+            selectIcon={context.icons.chevronDown}
+        />
+    );
 }
 
 /**
@@ -146,6 +154,7 @@ function generateCodeSamples(props: {
                         method={data.method}
                         path={data.path}
                         renderers={renderers}
+                        blockKey={context.blockKey}
                     />
                 ),
                 footer: (
@@ -207,11 +216,19 @@ function OpenAPICodeSampleFooter(props: {
                     path={data.path}
                     renderers={renderers}
                     selectIcon={context.icons.chevronDown}
+                    blockKey={context.blockKey}
                 />
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && <ScalarApiButton method={method} path={path} specUrl={specUrl} />}
+            {!hideTryItPanel && (
+                <ScalarApiButton
+                    context={getOpenAPIClientContext(context)}
+                    method={method}
+                    path={path}
+                    specUrl={specUrl}
+                />
+            )}
         </div>
     );
 }

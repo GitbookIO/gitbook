@@ -1,6 +1,6 @@
 import type { JSONDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { OpenAPIContext } from '@gitbook/react-openapi';
+import { type OpenAPIContextInput, checkIsValidLocale } from '@gitbook/react-openapi';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -11,17 +11,31 @@ import { Heading } from '../Heading';
 
 import './scalar.css';
 import './style.css';
-import type { AnyOpenAPIOperationsBlock, OpenAPISchemasBlock } from '@/lib/openapi/types';
+import { DEFAULT_LOCALE, getCustomizationLocale } from '@/intl/server';
+import type {
+    AnyOpenAPIOperationsBlock,
+    OpenAPISchemasBlock,
+    OpenAPIWebhookBlock,
+} from '@/lib/openapi/types';
+import type { GitBookAnyContext } from '@v2/lib/context';
 
 /**
  * Get the OpenAPI context to render a block.
  */
 export function getOpenAPIContext(args: {
-    props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock>;
+    props: BlockProps<AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock>;
     specUrl: string;
-}): OpenAPIContext {
-    const { props, specUrl } = args;
+    context: GitBookAnyContext | undefined;
+}): OpenAPIContextInput {
+    const { props, specUrl, context } = args;
     const { block } = props;
+
+    const customization = context && 'customization' in context ? context.customization : null;
+    const customizationLocale = customization
+        ? getCustomizationLocale(customization)
+        : DEFAULT_LOCALE;
+    const locale = checkIsValidLocale(customizationLocale) ? customizationLocale : DEFAULT_LOCALE;
+
     return {
         specUrl,
         icons: {
@@ -69,5 +83,6 @@ export function getOpenAPIContext(args: {
         defaultInteractiveOpened: props.context.mode === 'print',
         id: block.meta?.id,
         blockKey: block.key,
+        locale,
     };
 }

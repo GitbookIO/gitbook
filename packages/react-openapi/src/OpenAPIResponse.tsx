@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
-import type { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext } from './context';
 import { parameterToProperty, resolveDescription } from './utils';
 
 /**

@@ -1,11 +1,9 @@
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
-import type {
-    OpenAPIClientContext,
-    OpenAPIOperationData,
-    OpenAPISecurityWithRequired,
-} from './types';
+import type { OpenAPIClientContext } from './context';
+import { t } from './translate';
+import type { OpenAPIOperationData, OpenAPISecurityWithRequired } from './types';
 import { createStateKey, resolveDescription } from './utils';
 
 /**
@@ -23,7 +21,7 @@ export function OpenAPISecurities(props: {
 
     return (
         <InteractiveSection
-            header="Authorizations"
+            header={t(context.translation, 'authorizations')}
             stateKey={createStateKey('securities', context.blockKey)}
             toggeable
             defaultOpened={false}
@@ -38,7 +36,7 @@ export function OpenAPISecurities(props: {
                     body: (
                         <div className="openapi-schema">
                             <div className="openapi-schema-presentation">
-                                {getLabelForType(security)}
+                                {getLabelForType(security, context)}
 
                                 {description ? (
                                     <Markdown
@@ -55,11 +53,12 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(security: OpenAPISecurityWithRequired) {
+function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPIClientContext) {
     switch (security.type) {
         case 'apiKey':
             return (
                 <OpenAPISchemaName
+                    context={context}
                     propertyName={security.name ?? 'apiKey'}
                     type="string"
                     required={security.required}
@@ -69,6 +68,7 @@ function getLabelForType(security: OpenAPISecurityWithRequired) {
             if (security.scheme === 'basic') {
                 return (
                     <OpenAPISchemaName
+                        context={context}
                         propertyName="Authorization"
                         type="string"
                         required={security.required}
@@ -81,6 +81,7 @@ function getLabelForType(security: OpenAPISecurityWithRequired) {
                 return (
                     <>
                         <OpenAPISchemaName
+                            context={context}
                             propertyName="Authorization"
                             type="string"
                             required={security.required}
@@ -96,11 +97,29 @@ function getLabelForType(security: OpenAPISecurityWithRequired) {
                 );
             }
 
-            return <OpenAPISchemaName propertyName="HTTP" required={security.required} />;
+            return (
+                <OpenAPISchemaName
+                    context={context}
+                    propertyName="HTTP"
+                    required={security.required}
+                />
+            );
         case 'oauth2':
-            return <OpenAPISchemaName propertyName="OAuth2" required={security.required} />;
+            return (
+                <OpenAPISchemaName
+                    context={context}
+                    propertyName="OAuth2"
+                    required={security.required}
+                />
+            );
         case 'openIdConnect':
-            return <OpenAPISchemaName propertyName="OpenID Connect" required={security.required} />;
+            return (
+                <OpenAPISchemaName
+                    context={context}
+                    propertyName="OpenID Connect"
+                    required={security.required}
+                />
+            );
         default:
             // @ts-ignore
             return security.type;

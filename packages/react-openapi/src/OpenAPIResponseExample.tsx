@@ -1,22 +1,19 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { Markdown } from './Markdown';
-import {
-    OpenAPIEmptyExample,
-    OpenAPIExample,
-    getExampleFromReference,
-    getExamplesFromMediaTypeObject,
-} from './OpenAPIExample';
+import { OpenAPIEmptyExample, OpenAPIExample } from './OpenAPIExample';
+import { OpenAPIMediaTypeContent } from './OpenAPIMediaType';
 import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
-import { OpenAPIResponseMediaTypeContent } from './OpenAPIResponseMediaType';
-import type { OpenAPIContext, OpenAPIOperationData } from './types';
-import { getStatusCodeDefaultLabel } from './utils';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
+import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
+import { getExampleFromReference, getExamples } from './util/example';
+import { createStateKey, getStatusCodeDefaultLabel } from './utils';
 import { checkIsReference, resolveDescription } from './utils';
 
 /**
  * Display an example of the response content.
  */
 export function OpenAPIResponseExample(props: {
-    data: OpenAPIOperationData;
+    data: OpenAPIOperationData | OpenAPIWebhookData;
     context: OpenAPIContext;
 }) {
     const { data, context } = props;
@@ -49,7 +46,7 @@ export function OpenAPIResponseExample(props: {
         const label = description ? (
             <Markdown source={description} />
         ) : (
-            getStatusCodeDefaultLabel(key)
+            getStatusCodeDefaultLabel(key, context)
         );
 
         if (checkIsReference(responseObject)) {
@@ -59,7 +56,7 @@ export function OpenAPIResponseExample(props: {
                 statusCode: key,
                 body: (
                     <OpenAPIExample
-                        example={getExampleFromReference(responseObject)}
+                        example={getExampleFromReference(responseObject, context)}
                         context={context}
                         syntax="json"
                     />
@@ -72,7 +69,7 @@ export function OpenAPIResponseExample(props: {
                 key: key,
                 label,
                 statusCode: key,
-                body: <OpenAPIEmptyExample />,
+                body: <OpenAPIEmptyExample context={context} />,
             };
         }
 
@@ -127,45 +124,11 @@ function OpenAPIResponse(props: {
     });
 
     return (
-        <OpenAPIResponseMediaTypeContent
+        <OpenAPIMediaTypeContent
             selectIcon={context.icons.chevronDown}
-            blockKey={context.blockKey}
+            stateKey={createStateKey('response-media-types', context.blockKey)}
             items={tabs}
+            context={getOpenAPIClientContext(context)}
         />
     );
-}
-
-function getExamples(props: {
-    mediaTypeObject: OpenAPIV3.MediaTypeObject;
-    mediaType: string;
-    context: OpenAPIContext;
-}) {
-    const { mediaTypeObject, mediaType } = props;
-    const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType });
-    const syntax = getSyntaxFromMediaType(mediaType);
-
-    return examples.map((example) => {
-        return {
-            key: example.key,
-            label: example.example.summary || example.key,
-            body: (
-                <OpenAPIExample example={example.example} context={props.context} syntax={syntax} />
-            ),
-        };
-    });
-}
-
-/**
- * Get the syntax from a media type.
- */
-function getSyntaxFromMediaType(mediaType: string): string {
-    if (mediaType.includes('json')) {
-        return 'json';
-    }
-
-    if (mediaType === 'application/xml') {
-        return 'xml';
-    }
-
-    return 'text';
 }
