@@ -33,5 +33,5 @@ export const de = {
     show: 'Anzeigen',
     hide: 'Verstecken',
     available_items: 'Verfügbare Elemente',
-    child_attributes: 'Unterattribute',
+    properties: 'Eigenschaften',
 };

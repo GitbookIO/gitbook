@@ -33,5 +33,5 @@ export const fr = {
     show: 'Afficher',
     hide: 'Masquer',
     available_items: 'Éléments disponibles',
-    child_attributes: 'Attributs enfants',
+    properties: 'Propriétés',
 };

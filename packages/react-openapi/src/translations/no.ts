@@ -33,5 +33,5 @@ export const no = {
     show: 'Vis',
     hide: 'Skjul',
     available_items: 'Tilgjengelige elementer',
-    child_attributes: 'Barneattributter',
+    properties: 'Egenskaper',
 };

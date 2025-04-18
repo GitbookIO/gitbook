@@ -33,5 +33,5 @@ export const nl = {
     show: 'Toon',
     hide: 'Verbergen',
     available_items: 'Beschikbare items',
-    child_attributes: 'Kindattributen',
+    properties: 'Eigenschappen',
 };
