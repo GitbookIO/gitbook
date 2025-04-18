@@ -9,7 +9,7 @@ import {
     getOpenAPIClientContext,
     resolveOpenAPIContext,
 } from '../context';
-import { t } from '../translate';
+import { t, tString } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 
 /**
@@ -85,21 +85,23 @@ export function OpenAPISchemas(props: {
         <div className={clsx('openapi-schemas', className)}>
             {schemas.map(({ name, schema }) => {
                 return (
-                    <>
-                        OpenAPISchemas
-                        <OpenAPIDisclosure
-                            className="openapi-schemas-disclosure"
-                            key={name}
-                            icon={context.icons.chevronRight}
-                            label={name}
-                        >
-                            <Section className="openapi-section-schemas">
-                                <SectionBody>
-                                    <OpenAPIRootSchema schema={schema} context={clientContext} />
-                                </SectionBody>
-                            </Section>
-                        </OpenAPIDisclosure>
-                    </>
+                    <OpenAPIDisclosure
+                        className="openapi-schemas-disclosure"
+                        key={name}
+                        icon={context.icons.chevronRight}
+                        header={name}
+                        label={(isExpanded) =>
+                            isExpanded
+                                ? tString(context.translation, 'hide')
+                                : tString(context.translation, 'show')
+                        }
+                    >
+                        <Section className="openapi-section-schemas">
+                            <SectionBody>
+                                <OpenAPIRootSchema schema={schema} context={clientContext} />
+                            </SectionBody>
+                        </Section>
+                    </OpenAPIDisclosure>
                 );
             })}
         </div>
