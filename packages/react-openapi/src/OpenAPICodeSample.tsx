@@ -6,9 +6,10 @@ import {
 import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
 import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import type { OpenAPIContext, OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 import { checkIsReference } from './utils';
 
@@ -44,7 +45,12 @@ export function OpenAPICodeSample(props: {
     }
 
     return (
-        <OpenAPICodeSampleBody data={data} items={samples} selectIcon={context.icons.chevronDown} />
+        <OpenAPICodeSampleBody
+            context={getOpenAPIClientContext(context)}
+            data={data}
+            items={samples}
+            selectIcon={context.icons.chevronDown}
+        />
     );
 }
 
@@ -215,7 +221,14 @@ function OpenAPICodeSampleFooter(props: {
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && <ScalarApiButton method={method} path={path} specUrl={specUrl} />}
+            {!hideTryItPanel && (
+                <ScalarApiButton
+                    context={getOpenAPIClientContext(context)}
+                    method={method}
+                    path={path}
+                    specUrl={specUrl}
+                />
+            )}
         </div>
     );
 }

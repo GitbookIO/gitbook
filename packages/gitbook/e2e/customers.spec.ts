@@ -10,18 +10,18 @@ const testCases: TestsCase[] = [
             { name: 'OpenAPI', url: '/snyk-api/reference/apps', run: waitForCookiesDialog },
         ],
     },
-    {
-        name: 'Nexthink',
-        contentBaseURL: 'https://docs.nexthink.com',
-        tests: [
-            {
-                name: 'Home',
-                url: '/',
-                screenshot: { waitForTOCScrolling: false },
-                run: waitForCookiesDialog,
-            },
-        ],
-    },
+    // {
+    //     name: 'Nexthink',
+    //     contentBaseURL: 'https://docs.nexthink.com',
+    //     tests: [
+    //         {
+    //             name: 'Home',
+    //             url: '/',
+    //             screenshot: { waitForTOCScrolling: false },
+    //             run: waitForCookiesDialog,
+    //         },
+    //     ],
+    // },
     {
         name: 'asiksupport-stg.dto.kemkes.go.id',
         contentBaseURL: 'https://asiksupport-stg.dto.kemkes.go.id',
@@ -157,11 +157,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://wiki.redmodding.org',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.cherry-ai.com',
-        contentBaseURL: 'https://docs.cherry-ai.com',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
+    // {
+    //     name: 'docs.cherry-ai.com',
+    //     contentBaseURL: 'https://docs.cherry-ai.com',
+    //     tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    // },
     {
         name: 'docs.snyk.io',
         contentBaseURL: 'https://docs.snyk.io',

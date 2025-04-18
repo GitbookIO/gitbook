@@ -1,8 +1,11 @@
 import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
-import { Markdown } from '../Markdown';
-import type { OpenAPIContext } from '../context';
-import { resolveDescription } from '../utils';
+import { Markdown } from './Markdown';
+import type { OpenAPIContext } from './context';
+import { resolveDescription } from './utils';
 
+/**
+ * Display the description of an OpenAPI operation.
+ */
 export function OpenAPIOperationDescription(props: {
     operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
     context: OpenAPIContext;

@@ -1,5 +1,6 @@
 import { OpenAPIPath } from '../OpenAPIPath';
-import type { OpenAPIContext, OpenAPIOperationData, OpenAPIWebhookData } from '../types';
+import type { OpenAPIContext } from '../context';
+import type { OpenAPIOperationData, OpenAPIWebhookData } from '../types';
 import { OpenAPIStability } from './OpenAPIStability';
 
 export function OpenAPISummary(props: {
@@ -38,7 +39,7 @@ export function OpenAPISummary(props: {
                       title,
                   })
                 : null}
-            {'path' in data ? <OpenAPIPath data={data} /> : null}
+            {'path' in data ? <OpenAPIPath data={data} context={context} /> : null}
         </div>
     );
 }

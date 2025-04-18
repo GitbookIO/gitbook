@@ -1,8 +1,10 @@
 'use client';
+
 import type { Key } from 'react-aria';
 import { OpenAPIEmptyExample } from './OpenAPIExample';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
+import type { OpenAPIClientContext } from './context';
 
 type OpenAPIMediaTypeItem = OpenAPISelectItem & {
     body: React.ReactNode;
@@ -24,8 +26,9 @@ export function OpenAPIMediaTypeContent(props: {
     items: OpenAPIMediaTypeItem[];
     selectIcon?: React.ReactNode;
     stateKey: string;
+    context: OpenAPIClientContext;
 }) {
-    const { stateKey, items, selectIcon } = props;
+    const { stateKey, items, selectIcon, context } = props;
     const state = useMediaTypesState(stateKey, items[0]?.key);
 
     const examples = items.find((item) => item.key === state.key)?.examples ?? [];
@@ -48,7 +51,12 @@ export function OpenAPIMediaTypeContent(props: {
             }
             className="openapi-response-media-types-examples"
         >
-            <OpenAPIMediaTypeBody stateKey={stateKey} items={items} examples={examples} />
+            <OpenAPIMediaTypeBody
+                context={context}
+                stateKey={stateKey}
+                items={items}
+                examples={examples}
+            />
         </StaticSection>
     );
 }
@@ -100,8 +108,9 @@ function OpenAPIMediaTypeBody(props: {
     items: OpenAPIMediaTypeItem[];
     examples?: OpenAPIMediaTypeItem[];
     stateKey: string;
+    context: OpenAPIClientContext;
 }) {
-    const { stateKey, items, examples } = props;
+    const { stateKey, items, examples, context } = props;
     const state = useMediaTypesState(stateKey, items[0]?.key);
 
     const selectedItem = items.find((item) => item.key === state.key) ?? items[0];
@@ -120,7 +129,7 @@ function OpenAPIMediaTypeBody(props: {
             examples.find((example) => example.key === exampleState.key) ?? examples[0];
 
         if (!selectedExample) {
-            return <OpenAPIEmptyExample />;
+            return <OpenAPIEmptyExample context={context} />;
         }
 
         return selectedExample.body;

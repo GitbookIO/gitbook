@@ -1,7 +1,9 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { InteractiveSection } from './InteractiveSection';
 import { OpenAPIRootSchema } from './OpenAPISchemaServer';
-import type { OpenAPIClientContext, OpenAPIOperationData, OpenAPIWebhookData } from './types';
+import type { OpenAPIClientContext } from './context';
+import { t } from './translate';
+import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { checkIsReference, createStateKey } from './utils';
 
 /**
@@ -18,11 +20,9 @@ export function OpenAPIRequestBody(props: {
         return null;
     }
 
-    const header = 'name' in data ? 'Payload' : 'Body';
-
     return (
         <InteractiveSection
-            header={header}
+            header={t(context.translation, 'name' in data ? 'payload' : 'body')}
             className="openapi-requestbody"
             stateKey={createStateKey('request-body-media-type', context.blockKey)}
             selectIcon={context.icons.chevronDown}

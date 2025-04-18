@@ -3,7 +3,8 @@ import { Markdown } from './Markdown';
 import { OpenAPIEmptyExample, OpenAPIExample } from './OpenAPIExample';
 import { OpenAPIMediaTypeContent } from './OpenAPIMediaType';
 import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
-import type { OpenAPIContext, OpenAPIOperationData, OpenAPIWebhookData } from './types';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
+import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { getExampleFromReference, getExamples } from './util/example';
 import { createStateKey, getStatusCodeDefaultLabel } from './utils';
 import { checkIsReference, resolveDescription } from './utils';
@@ -45,7 +46,7 @@ export function OpenAPIResponseExample(props: {
         const label = description ? (
             <Markdown source={description} />
         ) : (
-            getStatusCodeDefaultLabel(key)
+            getStatusCodeDefaultLabel(key, context)
         );
 
         if (checkIsReference(responseObject)) {
@@ -55,7 +56,7 @@ export function OpenAPIResponseExample(props: {
                 statusCode: key,
                 body: (
                     <OpenAPIExample
-                        example={getExampleFromReference(responseObject)}
+                        example={getExampleFromReference(responseObject, context)}
                         context={context}
                         syntax="json"
                     />
@@ -68,7 +69,7 @@ export function OpenAPIResponseExample(props: {
                 key: key,
                 label,
                 statusCode: key,
-                body: <OpenAPIEmptyExample />,
+                body: <OpenAPIEmptyExample context={context} />,
             };
         }
 
@@ -127,6 +128,7 @@ function OpenAPIResponse(props: {
             selectIcon={context.icons.chevronDown}
             stateKey={createStateKey('response-media-types', context.blockKey)}
             items={tabs}
+            context={getOpenAPIClientContext(context)}
         />
     );
 }

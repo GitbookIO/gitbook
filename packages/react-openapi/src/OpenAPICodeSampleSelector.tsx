@@ -6,6 +6,7 @@ import { useStore } from 'zustand';
 import { OpenAPIPath } from './OpenAPIPath';
 import { OpenAPISelect, OpenAPISelectItem } from './OpenAPISelect';
 import { StaticSection } from './StaticSection';
+import type { OpenAPIClientContext } from './context';
 import { getOrCreateStoreByKey } from './getOrCreateStoreByKey';
 import type { OpenAPIOperationData } from './types';
 
@@ -26,12 +27,13 @@ function OpenAPICodeSampleHeader(props: {
     items: CodeSampleItem[];
     data: OpenAPIOperationData;
     selectIcon?: React.ReactNode;
+    context: OpenAPIClientContext;
 }) {
-    const { data, items, selectIcon } = props;
+    const { data, items, selectIcon, context } = props;
 
     return (
         <>
-            <OpenAPIPath canCopy={false} withServer={false} data={data} />
+            <OpenAPIPath context={context} canCopy={false} withServer={false} data={data} />
             {items.length > 1 ? (
                 <OpenAPISelect
                     icon={selectIcon}
@@ -56,8 +58,9 @@ export function OpenAPICodeSampleBody(props: {
     items: CodeSampleItem[];
     data: OpenAPIOperationData;
     selectIcon?: React.ReactNode;
+    context: OpenAPIClientContext;
 }) {
-    const { items, data, selectIcon } = props;
+    const { items, data, selectIcon, context } = props;
     if (!items[0]) {
         throw new Error('No items provided');
     }
@@ -72,7 +75,14 @@ export function OpenAPICodeSampleBody(props: {
 
     return (
         <StaticSection
-            header={<OpenAPICodeSampleHeader selectIcon={selectIcon} data={data} items={items} />}
+            header={
+                <OpenAPICodeSampleHeader
+                    context={context}
+                    selectIcon={selectIcon}
+                    data={data}
+                    items={items}
+                />
+            }
             className="openapi-codesample"
         >
             <div id={selected.key as string} className="openapi-codesample-panel">

@@ -7,7 +7,8 @@ import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
 import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
 import { StaticSection } from './StaticSection';
-import type { OpenAPIClientContext } from './types';
+import type { OpenAPIClientContext } from './context';
+import { t } from './translate';
 import { createStateKey, getStatusCodeClassName, getStatusCodeDefaultLabel } from './utils';
 
 /**
@@ -76,7 +77,7 @@ export function OpenAPIResponses(props: {
                                 className="openapi-response-description"
                             />
                         ) : (
-                            getStatusCodeDefaultLabel(statusCode)
+                            getStatusCodeDefaultLabel(statusCode, context)
                         )}
                     </div>
                 ),
@@ -88,7 +89,7 @@ export function OpenAPIResponses(props: {
     const state = useResponseExamplesState(context.blockKey, groups[0]?.key);
 
     return (
-        <StaticSection header="Responses" className="openapi-responses">
+        <StaticSection header={t(context.translation, 'responses')} className="openapi-responses">
             <OpenAPIDisclosureGroup
                 icon={context.icons.chevronRight}
                 expandedKeys={state.key ? new Set([state.key]) : new Set()}

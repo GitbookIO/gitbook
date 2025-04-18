@@ -1,6 +1,7 @@
 import { OpenAPISpec } from '../OpenAPISpec';
-import { getOpenAPIClientContext } from '../context';
-import type { OpenAPIContext, OpenAPIOperationData, OpenAPIWebhookData } from '../types';
+import { type OpenAPIContext, getOpenAPIClientContext } from '../context';
+import { t } from '../translate';
+import type { OpenAPIOperationData, OpenAPIWebhookData } from '../types';
 import { OpenAPIOperationDescription } from './OpenAPIOperationDescription';
 
 export function OpenAPIColumnSpec(props: {
@@ -16,11 +17,11 @@ export function OpenAPIColumnSpec(props: {
         <div className="openapi-column-spec">
             {operation['x-deprecated-sunset'] ? (
                 <div className="openapi-deprecated-sunset openapi-description openapi-markdown">
-                    This operation is deprecated and will be sunset on{' '}
-                    <span className="openapi-deprecated-sunset-date">
-                        {operation['x-deprecated-sunset']}
-                    </span>
-                    {'.'}
+                    {t(context.translation, 'deprecated_and_sunset_on', [
+                        <span key="date" className="openapi-deprecated-sunset-date">
+                            {operation['x-deprecated-sunset']}
+                        </span>,
+                    ])}
                 </div>
             ) : null}
             <OpenAPIOperationDescription operation={operation} context={context} />

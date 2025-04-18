@@ -10,9 +10,10 @@ import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
+import type { OpenAPIClientContext } from './context';
 import { retrocycle } from './decycle';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import type { OpenAPIClientContext } from './types';
+import { tString } from './translate';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
@@ -40,7 +41,7 @@ function OpenAPISchemaProperty(props: {
 
     return (
         <div id={id} className={clsx('openapi-schema', className)}>
-            <OpenAPISchemaPresentation property={property} />
+            <OpenAPISchemaPresentation context={context} property={property} />
             {(() => {
                 const circularRefId = parentCircularRefs.get(schema);
                 // Avoid recursing infinitely, and instead render a link to the parent schema
@@ -56,7 +57,9 @@ function OpenAPISchemaProperty(props: {
                     return (
                         <OpenAPIDisclosure
                             icon={context.icons.plus}
-                            label={(isExpanded) => getDisclosureLabel(schema, isExpanded)}
+                            label={(isExpanded) =>
+                                getDisclosureLabel({ schema, isExpanded, context })
+                            }
                         >
                             <OpenAPISchemaProperties
                                 properties={properties}
@@ -213,7 +216,7 @@ function OpenAPISchemaAlternative(props: {
             ) : null}
             <OpenAPIDisclosure
                 icon={context.icons.plus}
-                label={(isExpanded) => getDisclosureLabel(schema, isExpanded)}
+                label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
             >
                 {properties?.length ? (
                     <OpenAPISchemaProperties
@@ -252,8 +255,9 @@ function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaO
  */
 function OpenAPISchemaEnum(props: {
     schema: OpenAPIV3.SchemaObject & OpenAPICustomOperationProperties;
+    context: OpenAPIClientContext;
 }) {
-    const { schema } = props;
+    const { schema, context } = props;
 
     const enumValues = (() => {
         // Render x-gitbook-enum first, as it has a different format
@@ -296,6 +300,7 @@ function OpenAPISchemaEnum(props: {
                         value={item.value}
                         label={item.description}
                         withTooltip={!!item.description}
+                        context={context}
                     >
                         <code>{`${item.value}`}</code>
                     </OpenAPICopyButton>
@@ -308,9 +313,13 @@ function OpenAPISchemaEnum(props: {
 /**
  * Render the top row of a schema. e.g: name, type, and required status.
  */
-function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry }) {
+function OpenAPISchemaPresentation(props: {
+    property: OpenAPISchemaPropertyEntry;
+    context: OpenAPIClientContext;
+}) {
     const {
         property: { schema, propertyName, required },
+        context,
     } = props;
 
     const description = resolveDescription(schema);
@@ -323,6 +332,7 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
                 required={required}
+                context={context}
             />
             {typeof schema['x-deprecated-sunset'] === 'string' ? (
                 <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
@@ -355,7 +365,7 @@ function OpenAPISchemaPresentation(props: { property: OpenAPISchemaPropertyEntry
                     Pattern: <code>{schema.pattern}</code>
                 </span>
             ) : null}
-            <OpenAPISchemaEnum schema={schema} />
+            <OpenAPISchemaEnum schema={schema} context={context} />
         </div>
     );
 }
@@ -592,21 +602,26 @@ function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     return type;
 }
 
-function getDisclosureLabel(schema: OpenAPIV3.SchemaObject, isExpanded: boolean) {
+function getDisclosureLabel(props: {
+    schema: OpenAPIV3.SchemaObject;
+    isExpanded: boolean;
+    context: OpenAPIClientContext;
+}) {
+    const { schema, isExpanded, context } = props;
     let label: string;
     if (schema.type === 'array' && !!schema.items) {
         if (schema.items.oneOf) {
-            label = 'available items';
+            label = tString(context.translation, 'available_items').toLowerCase();
         }
         // Fallback to "child attributes" for enums and objects
         else if (schema.items.enum || schema.items.type === 'object') {
-            label = 'child attributes';
+            label = tString(context.translation, 'child_attributes').toLowerCase();
         } else {
             label = schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
         }
     } else {
-        label = schema.title || 'child attributes';
+        label = schema.title || tString(context.translation, 'child_attributes').toLowerCase();
     }
 
-    return `${isExpanded ? 'Hide' : 'Show'} ${label}`;
+    return `${isExpanded ? tString(context.translation, 'hide') : tString(context.translation, 'show')} ${label}`;
 }

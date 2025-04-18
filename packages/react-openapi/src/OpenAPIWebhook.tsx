@@ -2,7 +2,8 @@ import clsx from 'clsx';
 import { OpenAPIWebhookExample } from './OpenAPIWebhookExample';
 import { OpenAPIColumnSpec } from './common/OpenAPIColumnSpec';
 import { OpenAPISummary } from './common/OpenAPISummary';
-import type { OpenAPIContext, OpenAPIWebhookData } from './types';
+import { type OpenAPIContextInput, resolveOpenAPIContext } from './context';
+import type { OpenAPIWebhookData } from './types';
 
 /**
  * Display an interactive OpenAPI webhook.
@@ -10,9 +11,11 @@ import type { OpenAPIContext, OpenAPIWebhookData } from './types';
 export function OpenAPIWebhook(props: {
     className?: string;
     data: OpenAPIWebhookData;
-    context: OpenAPIContext;
+    context: OpenAPIContextInput;
 }) {
-    const { className, data, context } = props;
+    const { className, data, context: contextInput } = props;
+
+    const context = resolveOpenAPIContext(contextInput);
 
     return (
         <div className={clsx('openapi-webhook', className)}>

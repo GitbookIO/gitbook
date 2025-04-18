@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIEmptyExample } from './OpenAPIExample';
 import { OpenAPIMediaTypeContent } from './OpenAPIMediaType';
-import type { OpenAPIContext } from './types';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import type { OpenAPIWebhookData } from './types';
 import { getExamples } from './util/example';
 import { createStateKey } from './utils';
@@ -27,7 +27,7 @@ export function OpenAPIWebhookExample(props: {
                 return {
                     key,
                     label: key,
-                    body: <OpenAPIEmptyExample />,
+                    body: <OpenAPIEmptyExample context={context} />,
                 };
             }
 
@@ -52,6 +52,7 @@ export function OpenAPIWebhookExample(props: {
                     selectIcon={context.icons.chevronDown}
                     stateKey={createStateKey('request-body-media-type', context.blockKey)}
                     items={items}
+                    context={getOpenAPIClientContext(context)}
                 />
             </div>
         </div>

@@ -1,14 +1,21 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIExample } from '../OpenAPIExample';
+import type { OpenAPIContext } from '../context';
 import { generateSchemaExample } from '../generateSchemaExample';
-import type { OpenAPIContext } from '../types';
+import { tString } from '../translate';
 import { checkIsReference } from '../utils';
 
 /**
  * Generate an example from a reference object.
  */
-export function getExampleFromReference(ref: OpenAPIV3.ReferenceObject): OpenAPIV3.ExampleObject {
-    return { summary: 'Unresolved reference', value: { $ref: ref.$ref } };
+export function getExampleFromReference(
+    ref: OpenAPIV3.ReferenceObject,
+    context: OpenAPIContext
+): OpenAPIV3.ExampleObject {
+    return {
+        summary: tString(context.translation, 'unresolved_reference'),
+        value: { $ref: ref.$ref },
+    };
 }
 
 /**
@@ -17,13 +24,16 @@ export function getExampleFromReference(ref: OpenAPIV3.ReferenceObject): OpenAPI
 export function getExamplesFromMediaTypeObject(args: {
     mediaType: string;
     mediaTypeObject: OpenAPIV3.MediaTypeObject;
+    context: OpenAPIContext;
 }): { key: string; example: OpenAPIV3.ExampleObject }[] {
-    const { mediaTypeObject, mediaType } = args;
+    const { mediaTypeObject, mediaType, context } = args;
     if (mediaTypeObject.examples) {
         return Object.entries(mediaTypeObject.examples).map(([key, example]) => {
             return {
                 key,
-                example: checkIsReference(example) ? getExampleFromReference(example) : example,
+                example: checkIsReference(example)
+                    ? getExampleFromReference(example, context)
+                    : example,
             };
         });
     }
@@ -88,8 +98,8 @@ export function getExamples(props: {
     mediaType: string;
     context: OpenAPIContext;
 }) {
-    const { mediaTypeObject, mediaType } = props;
-    const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType });
+    const { mediaTypeObject, mediaType, context } = props;
+    const examples = getExamplesFromMediaTypeObject({ mediaTypeObject, mediaType, context });
     const syntax = getSyntaxFromMediaType(mediaType);
 
     return examples.map((example) => {

@@ -51,7 +51,7 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
     return (
         <BaseOpenAPIOperation
             data={data}
-            context={getOpenAPIContext({ props, specUrl })}
+            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
             className="openapi-block"
         />
     );

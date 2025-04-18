@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { Button, type ButtonProps, Tooltip, TooltipTrigger } from 'react-aria-components';
+import type { OpenAPIClientContext } from './context';
+import { t } from './translate';
 
 export function OpenAPICopyButton(
     props: ButtonProps & {
         value: string;
         children: React.ReactNode;
+        context: OpenAPIClientContext;
         label?: string;
         /**
          * Whether to show a tooltip.
@@ -15,7 +18,7 @@ export function OpenAPICopyButton(
         withTooltip?: boolean;
     }
 ) {
-    const { value, label, children, onPress, className, withTooltip = true } = props;
+    const { value, label, children, onPress, className, context, withTooltip = true } = props;
     const [copied, setCopied] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -60,7 +63,9 @@ export function OpenAPICopyButton(
                 offset={4}
                 className="openapi-tooltip"
             >
-                {copied ? 'Copied' : label || 'Copy to clipboard'}
+                {copied
+                    ? t(context.translation, 'copied')
+                    : label || t(context.translation, 'copy_to_clipboard')}
             </Tooltip>
         </TooltipTrigger>
     );

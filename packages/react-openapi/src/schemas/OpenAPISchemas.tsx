@@ -4,8 +4,12 @@ import { OpenAPIDisclosure } from '../OpenAPIDisclosure';
 import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
 import { Section, SectionBody, StaticSection } from '../StaticSection';
-import { getOpenAPIClientContext } from '../context';
-import type { OpenAPIContext } from '../types';
+import {
+    type OpenAPIContextInput,
+    getOpenAPIClientContext,
+    resolveOpenAPIContext,
+} from '../context';
+import { t } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 
 /**
@@ -14,13 +18,13 @@ import { getExampleFromSchema } from '../util/example';
 export function OpenAPISchemas(props: {
     className?: string;
     schemas: OpenAPISchema[];
-    context: OpenAPIContext;
+    context: OpenAPIContextInput;
     /**
      * Whether to show the schema directly if there is only one.
      */
     grouped?: boolean;
 }) {
-    const { schemas, context, grouped, className } = props;
+    const { schemas, context: contextInput, grouped, className } = props;
 
     const firstSchema = schemas[0];
 
@@ -28,6 +32,7 @@ export function OpenAPISchemas(props: {
         return null;
     }
 
+    const context = resolveOpenAPIContext(contextInput);
     const clientContext = getOpenAPIClientContext(context);
 
     // If there is only one model and we are not grouping, we show it directly.
@@ -38,11 +43,16 @@ export function OpenAPISchemas(props: {
                 <div className="openapi-summary" id={context.id}>
                     {context.renderHeading({
                         title,
+                        deprecated: Boolean(firstSchema.schema.deprecated),
+                        stability: firstSchema.schema['x-stability'],
                     })}
                 </div>
                 <div className="openapi-columns">
                     <div className="openapi-column-spec">
-                        <StaticSection className="openapi-parameters" header="Attributes">
+                        <StaticSection
+                            className="openapi-parameters"
+                            header={t(context.translation, 'attributes')}
+                        >
                             <OpenAPIRootSchema
                                 schema={firstSchema.schema}
                                 context={clientContext}
