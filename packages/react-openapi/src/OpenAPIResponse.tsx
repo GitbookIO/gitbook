@@ -25,9 +25,13 @@ export function OpenAPIResponse(props: {
     }
 
     return (
-        <div className="openapi-response-body">
+        <div className="openapi-response-body text-sm">
             {headers.length > 0 ? (
-                <OpenAPIDisclosure icon={context.icons.plus} label="Headers">
+                <OpenAPIDisclosure
+                    header="Headers"
+                    icon={context.icons.plus}
+                    label={(isExpanded) => (isExpanded ? 'Hide headers' : 'Show headers')}
+                >
                     <OpenAPISchemaProperties
                         properties={headers.map(([name, header]) =>
                             parameterToProperty({ name, ...header })

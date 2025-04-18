@@ -168,7 +168,8 @@
     @apply flex flex-col;
 }
 
-.openapi-schema, .openapi-disclosure {
+.openapi-schema,
+.openapi-disclosure {
     @apply py-2.5 flex flex-col gap-2;
 }
 
@@ -189,7 +190,7 @@
 }
 
 .openapi-responsebody > .openapi-schema-properties > .openapi-schema:only-child {
-    @apply -my-3;
+    /* @apply -my-3; */
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -401,7 +402,7 @@
 }
 
 .openapi-response-body {
-    @apply flex flex-col gap-3;
+    @apply flex flex-col;
 }
 
 /* Response Body and Headers */
@@ -752,7 +753,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-panel {
-    @apply p-3 transition-all;
+    @apply p-3 pt-0 transition-all;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
@@ -804,7 +805,8 @@ body:has(.openapi-select-popover) {
     @apply bg-tint-subtle;
 }
 
-.openapi-disclosure:has(> .openapi-disclosure-trigger:hover), .openapi-disclosure[data-expanded="true"] {
+.openapi-disclosure:has(> .openapi-disclosure-trigger:hover),
+.openapi-disclosure[data-expanded="true"] {
     @apply ring-1 shadow-sm;
 }
 
@@ -831,12 +833,17 @@ body:has(.openapi-select-popover) {
     }
 
     .openapi-securities > .openapi-disclosure > .openapi-disclosure-trigger svg,
-    .openapi-parameters-body > .openapi-schema-properties > .openapi-disclosure > .openapi-disclosure-trigger svg {
+    .openapi-parameters-body
+        > .openapi-schema-properties
+        > .openapi-disclosure
+        > .openapi-disclosure-trigger
+        svg {
         @apply -ml-5;
     }
 }
 
-.openapi-disclosure-trigger svg, .openapi-disclosure-trigger-label svg {
+.openapi-disclosure-trigger svg,
+.openapi-disclosure-trigger-label svg {
     @apply size-3 shrink-0 transition-transform duration-300 text-tint-subtle;
 }
 
@@ -855,20 +862,6 @@ body:has(.openapi-select-popover) {
 .openapi-disclosure-trigger[aria-expanded="false"] {
     @apply w-auto;
 }
-
-.openapi-disclosure-panel[aria-hidden="false"] {
-    @apply border-l border-tint-subtle ml-1.5 pl-3
-    /* @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b; */
-}
-
-.openapi-disclosure-panel .openapi-schema {
-    /* @apply p-2.5; */
-}
-
-/* .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
-.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child .openapi-schema-name {
-    @apply !m-0;
-} */
 
 .openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
     @apply pt-0 mt-0;
