@@ -73,21 +73,23 @@ export function OpenAPISchemas(props: {
     return (
         <div className={clsx('openapi-schemas', className)}>
             {schemas.map(({ name, schema }) => {
-                return <>
-                OpenAPISchemas
-                    <OpenAPIDisclosure
-                        className="openapi-schemas-disclosure"
-                        key={name}
-                        icon={context.icons.chevronRight}
-                        label={name}
-                    >
-                        <Section className="openapi-section-schemas">
-                            <SectionBody>
-                                <OpenAPIRootSchema schema={schema} context={clientContext} />
-                            </SectionBody>
-                        </Section>
-                    </OpenAPIDisclosure>
-                    </>;
+                return (
+                    <>
+                        OpenAPISchemas
+                        <OpenAPIDisclosure
+                            className="openapi-schemas-disclosure"
+                            key={name}
+                            icon={context.icons.chevronRight}
+                            label={name}
+                        >
+                            <Section className="openapi-section-schemas">
+                                <SectionBody>
+                                    <OpenAPIRootSchema schema={schema} context={clientContext} />
+                                </SectionBody>
+                            </Section>
+                        </OpenAPIDisclosure>
+                    </>
+                );
             })}
         </div>
     );

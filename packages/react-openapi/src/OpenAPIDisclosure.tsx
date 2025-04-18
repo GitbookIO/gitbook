@@ -32,7 +32,7 @@ export function OpenAPIDisclosure(props: {
                         : 'none',
                 })}
             >
-                <div className='openapi-disclosure-trigger-content'>
+                <div className="openapi-disclosure-trigger-content">
                     {icon}
                     {header}
                 </div>
