@@ -2,9 +2,9 @@ import {
     CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
-    type CustomizationSettings,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
+    CustomizationThemeMode,
     type CustomizationThemedColor,
     type CustomizationTint,
     type SiteCustomizationSettings,
@@ -21,8 +21,10 @@ import {
     hexToRgb,
 } from '@gitbook/colors';
 import { IconStyle, IconsProvider } from '@gitbook/icons';
+import * as ReactDOM from 'react-dom';
 
-import { fontNotoColorEmoji, fonts, ibmPlexMono } from '@/fonts';
+import { getFontData } from '@/fonts';
+import { fontNotoColorEmoji, ibmPlexMono } from '@/fonts/default';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -31,23 +33,41 @@ import { ClientContexts } from './ClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
-import { GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
+import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
+import { AnnouncementDismissedScript } from '../Announcement';
 
 /**
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
-    customization: SiteCustomizationSettings | CustomizationSettings;
+    forcedTheme?: CustomizationThemeMode | null;
+    customization: SiteCustomizationSettings;
     children: React.ReactNode;
 }) {
-    const { customization, children } = props;
+    const { customization, forcedTheme, children } = props;
 
     const language = getSpaceLanguage(customization);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
+    const fontData = getFontData(customization.styling.font);
+
+    // Preconnect and preload custom fonts if needed
+    if (fontData.type === 'custom') {
+        ReactDOM.preconnect(GITBOOK_FONTS_URL);
+        fontData.preloadSources
+            .flatMap((face) => face.sources)
+            .forEach(({ url, format }) => {
+                ReactDOM.preload(url, {
+                    as: 'font',
+                    crossOrigin: 'anonymous',
+                    fetchPriority: 'high',
+                    type: format ? `font/${format}` : undefined,
+                });
+            });
+    }
 
     return (
         <html
@@ -55,7 +75,7 @@ export async function CustomizationRootLayout(props: {
             lang={customization.internationalization.locale}
             className={tcls(
                 customization.header.preset === CustomizationHeaderPreset.None
-                    ? null
+                    ? 'site-header-none'
                     : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
@@ -66,14 +86,28 @@ export async function CustomizationRootLayout(props: {
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 fontNotoColorEmoji.variable,
-                fonts[customization.styling.font].variable,
-                ibmPlexMono.variable
+                ibmPlexMono.variable,
+                fontData.type === 'default' ? fontData.variable : 'font-custom',
+
+                // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
+                (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
+                    ? 'dark'
+                    : ''
             )}
         >
             <head>
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+
+                {/* Inject custom font @font-face rules */}
+                {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
+
+                {/* Inject a script to detect if the announcmeent banner has been dismissed */}
+                {'announcement' in customization && customization.announcement?.enabled ? (
+                    <AnnouncementDismissedScript />
+                ) : null}
+
                 <style
                     nonce={
                         //Since I can't get the nonce to work for inline styles, we need to allow unsafe-inline
@@ -119,9 +153,9 @@ export async function CustomizationRootLayout(props: {
             </head>
             <body
                 className={tcls(
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'bg-tint-base',
                     'theme-muted:bg-tint-subtle',
-                    'theme-bold-tint:bg-tint-subtle',
 
                     'theme-gradient:bg-gradient-primary',
                     'theme-gradient-tint:bg-gradient-tint'
@@ -153,7 +187,7 @@ export async function CustomizationRootLayout(props: {
  * If the tint color is not set or it is a space customization, it will return the default color.
  */
 function getTintColor(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: SiteCustomizationSettings
 ): CustomizationTint['color'] | undefined {
     if ('tint' in customization.styling && customization.styling.tint) {
         return {
@@ -200,7 +234,7 @@ function getTintMixColor(
  * If it is a space customization, it will return the default styles.
  */
 function getSidebarStyles(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: SiteCustomizationSettings
 ): SiteCustomizationSettings['styling']['sidebar'] {
     if ('sidebar' in customization.styling) {
         return {
@@ -220,7 +254,7 @@ function getSidebarStyles(
  * If it is a space customization, it will return the default styles.
  */
 function getSemanticColors(
-    customization: CustomizationSettings | SiteCustomizationSettings
+    customization: SiteCustomizationSettings
 ): Pick<
     SiteCustomizationSettings['styling'],
     'infoColor' | 'successColor' | 'warningColor' | 'dangerColor'

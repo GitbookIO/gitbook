@@ -58,4 +58,10 @@ export const ja: TranslationLanguage = {
     pdf_limit_reached: '${1}ページのPDFを生成できませんでした、${2}で生成が停止しました。',
     pdf_limit_reached_continue: 'さらに${1}ページで拡張',
     more: '詳細',
+    link_tooltip_external_link: '外部リンク先',
+    link_tooltip_page_anchor: 'ページ内リンク先',
+    link_tooltip_ai_summary: 'ページのハイライト',
+    link_tooltip_ai_summary_description:
+        'あなたのコンテキストに基づいています。間違いが含まれる可能性があります。',
+    open_in_new_tab: '新しいタブで開く',
 };

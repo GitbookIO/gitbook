@@ -58,4 +58,9 @@ export const nl: TranslationLanguage = {
     pdf_limit_reached: "Kon de PDF niet genereren voor ${1} pagina's, generatie gestopt bij ${2}.",
     pdf_limit_reached_continue: 'Verleng met ${1} extra pagina’s.',
     more: 'Meer',
+    link_tooltip_external_link: 'Externe link naar',
+    link_tooltip_page_anchor: 'Spring naar sectie',
+    link_tooltip_ai_summary: 'Pagina-samenvatting',
+    link_tooltip_ai_summary_description: 'Gebaseerd op je context. Kan fouten bevatten.',
+    open_in_new_tab: 'Open in nieuw tabblad',
 };

@@ -84,7 +84,7 @@ export function SearchModal(props: SearchModalProps) {
                             'bg-tint-12/4',
                             'dark:bg-tint-1/6',
                             'backdrop-blur-2xl',
-                            'z-30',
+                            'z-50',
                             'px-4',
                             'pt-4',
                             'md:pt-[min(8vh,6rem)]'
@@ -189,6 +189,9 @@ function SearchModalBody(
         setSearchState((state) => (state ? { ...state, ask: true } : null));
     };
 
+    // We trim the query to avoid invalidating the search when the user is typing between words.
+    const normalizedQuery = state.query.trim();
+
     return (
         <motion.div
             transition={{
@@ -288,12 +291,14 @@ function SearchModalBody(
                 <SearchResults
                     ref={resultsRef}
                     global={isMultiVariants && state.global}
-                    query={state.query}
+                    query={normalizedQuery}
                     withAsk={withAsk}
                     onSwitchToAsk={onSwitchToAsk}
                 />
             ) : null}
-            {state.query && state.ask && withAsk ? <SearchAskAnswer query={state.query} /> : null}
+            {normalizedQuery && state.ask && withAsk ? (
+                <SearchAskAnswer query={normalizedQuery} />
+            ) : null}
         </motion.div>
     );
 }

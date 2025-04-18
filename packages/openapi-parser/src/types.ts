@@ -47,7 +47,30 @@ export interface OpenAPICustomOperationProperties {
      * Description in Document format.
      */
     'x-gitbook-description-document'?: object;
+
+    /**
+     * Enums with name and description
+     */
+    'x-enumDescriptions'?: object;
+
+    /**
+     * Enums with name and description
+     */
+    'x-gitbook-enum'?: {
+        [key: string]: {
+            description?: string;
+            name?: string;
+        };
+    };
+
+    /**
+     * Stability of the operation.
+     * @enum 'experimental' | 'alpha' | 'beta'
+     */
+    'x-stability'?: OpenAPIStability;
 }
+
+export type OpenAPIStability = 'experimental' | 'alpha' | 'beta';
 
 /**
  * Custom code samples that can be defined at the operation level.
@@ -78,4 +101,9 @@ export type FilesystemEntry<T extends AnyObject> = {
     references: string[];
     filename: string;
     specification: T;
+};
+
+export type OpenAPISchema = {
+    name: string;
+    schema: OpenAPIV3.SchemaObject;
 };

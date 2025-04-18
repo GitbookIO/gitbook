@@ -7,6 +7,14 @@ import 'server-only';
  */
 
 /**
+ * Runtime environment.
+ */
+export const GITBOOK_RUNTIME = (process.env.GITBOOK_RUNTIME ?? 'unknown') as
+    | 'vercel'
+    | 'cloudflare'
+    | 'unknown';
+
+/**
  * Main host on which GitBook is running.
  */
 export const GITBOOK_URL =
@@ -65,12 +73,26 @@ export const GITBOOK_INTEGRATIONS_HOST =
     process.env.GITBOOK_INTEGRATIONS_HOST || 'integrations.gitbook.com';
 
 /**
+ * Hostname for fonts.
+ */
+export const GITBOOK_FONTS_URL = process.env.GITBOOK_FONTS_URL || 'https://fonts.gitbook.com';
+
+/**
  * Endpoint to use for resizing images.
  * It should be a Cloudflare domain with image resizing enabled.
  */
 export const GITBOOK_IMAGE_RESIZE_URL = process.env.GITBOOK_IMAGE_RESIZE_URL ?? null;
 export const GITBOOK_IMAGE_RESIZE_SIGNING_KEY =
     process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY ?? null;
+
+/**
+ * Mode used for resizing images.
+ */
+export const GITBOOK_IMAGE_RESIZE_MODE = enforceEnum(
+    'GITBOOK_IMAGE_RESIZE_MODE',
+    process.env.GITBOOK_IMAGE_RESIZE_MODE || 'cdn-cgi',
+    ['cdn-cgi', 'cf-fetch']
+);
 
 /**
  * Endpoint where icons are served.
@@ -87,3 +109,12 @@ export const GITBOOK_ICONS_TOKEN = process.env.GITBOOK_ICONS_TOKEN;
  * Secret used to validate requests from the GitBook app.
  */
 export const GITBOOK_SECRET = process.env.GITBOOK_SECRET ?? null;
+
+function enforceEnum<T extends string>(key: string, value: string, enumValues: T[]): T {
+    if (!enumValues.includes(value as T)) {
+        throw new Error(
+            `Invalid value for ${key}: "${value}", expected one of: ${enumValues.join(', ')}`
+        );
+    }
+    return value as T;
+}

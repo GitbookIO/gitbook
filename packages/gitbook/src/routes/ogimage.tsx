@@ -4,9 +4,13 @@ import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { type PageParams, fetchPageData } from '@/components/SitePage';
+import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
+import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { getCloudflareContext } from '@v2/lib/data/cloudflare';
+import { getResizedImageURL } from '@v2/lib/images';
 
 const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
     [CustomizationDefaultFont.Inter]: 'Inter',
@@ -31,12 +35,17 @@ const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
  */
 export async function serveOGImage(baseContext: GitBookSiteContext, params: PageParams) {
     const { context, pageTarget } = await fetchPageData(baseContext, params);
-    const { customization, site, linker } = context;
+    const { customization, site, linker, imageResizer } = context;
     const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
     if (customization.socialPreview.url) {
-        redirect(customization.socialPreview.url);
+        redirect(
+            await getResizedImageURL(imageResizer, customization.socialPreview.url, {
+                width: 1200,
+                height: 630,
+            })
+        );
     }
 
     // Compute all text to load only the necessary fonts
@@ -53,17 +62,48 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 : page.description
             : '';
 
-    const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
+    // Load the fonts
+    const { fontFamily, fonts } = await (async () => {
+        // google fonts
+        if (typeof customization.styling.font === 'string') {
+            const fontFamily = googleFontsMap[customization.styling.font] ?? 'Inter';
 
-    const regularText = pageDescription;
-    const boldText = `${contentTitle}${pageTitle}`;
+            const regularText = pageDescription;
+            const boldText = `${contentTitle}${pageTitle}`;
 
-    const fonts = (
-        await Promise.all([
-            loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
-            loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
-        ])
-    ).filter(filterOutNullable);
+            const fonts = (
+                await Promise.all([
+                    loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
+                    loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
+                ])
+            ).filter(filterOutNullable);
+
+            return { fontFamily, fonts };
+        }
+
+        // custom fonts
+        // We only load the primary font weights for now
+        const primaryFontWeights = getFontSourcesToPreload(customization.styling.font);
+
+        const fonts = (
+            await Promise.all(
+                primaryFontWeights.map((face) => {
+                    const { weight, sources } = face;
+                    const source = sources[0];
+
+                    // Satori doesn't support WOFF2, so we skip it
+                    // https://github.com/vercel/satori?tab=readme-ov-file#fonts
+                    if (!source || source.format === 'woff2' || source.url.endsWith('.woff2')) {
+                        return null;
+                    }
+
+                    return loadCustomFont({ url: source.url, weight });
+                })
+            )
+        ).filter(filterOutNullable);
+
+        return { fontFamily: 'CustomFont', fonts };
+    })();
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -134,9 +174,11 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
                 </span>
             );
-        const src = linker.toAbsoluteURL(
-            linker.toPathInContent(
-                `~gitbook/icon?size=medium&theme=${customization.themes.default}`
+        const src = await readSelfImage(
+            linker.toAbsoluteURL(
+                linker.toPathInSpace(
+                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`
+                )
             )
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
@@ -159,7 +201,11 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             />
 
             {/* Grid */}
-            <img tw="absolute inset-0 w-[100vw] h-[100vh]" src={gridAsset} alt="Grid" />
+            <img
+                tw="absolute inset-0 w-[100vw] h-[100vh]"
+                src={await readStaticImage(gridAsset)}
+                alt="Grid"
+            />
 
             {/* Logo */}
             {customization.header.logo ? (
@@ -195,6 +241,18 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             width: 1200,
             height: 630,
             fonts: fonts.length ? fonts : undefined,
+            headers: {
+                'cache-tag': [
+                    getCacheTag({
+                        tag: 'site',
+                        site: baseContext.site.id,
+                    }),
+                    getCacheTag({
+                        tag: 'space',
+                        space: baseContext.space.id,
+                    }),
+                ].join(','),
+            },
         }
     );
 }
@@ -211,7 +269,6 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
     url.searchParams.set('text', text);
 
     const result = await fetch(url.href);
-
     if (!result.ok) {
         return null;
     }
@@ -235,4 +292,77 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
 
     // If for some reason we can't load the font, we'll just use the default one
     return null;
+}
+
+async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
+    const { url, weight } = input;
+    const response = await fetch(url);
+    if (!response.ok) {
+        return null;
+    }
+
+    const data = await response.arrayBuffer();
+
+    return {
+        name: 'CustomFont',
+        data,
+        style: 'normal' as const,
+        weight,
+    };
+}
+
+/**
+ * Fetch a resource from the function itself.
+ * To avoid error with worker to worker requests in the same zone, we use the `WORKER_SELF_REFERENCE` binding.
+ */
+async function fetchSelf(url: string) {
+    const cloudflare = getCloudflareContext();
+    if (cloudflare?.env.WORKER_SELF_REFERENCE) {
+        return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(
+            // `getAssetURL` can return a relative URL, so we need to make it absolute
+            // the URL doesn't matter, as we're using the worker-self-reference binding
+            new URL(url, 'https://worker-self-reference/')
+        );
+    }
+
+    return await fetch(url);
+}
+
+/**
+ * Read an image from a response as a base64 encoded string.
+ */
+async function readImage(response: Response) {
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.startsWith('image/')) {
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString('base64');
+    return `data:${contentType};base64,${base64}`;
+}
+
+const staticImagesCache = new Map<string, string>();
+
+/**
+ * Read a static image and cache it in memory.
+ */
+async function readStaticImage(url: string) {
+    const cached = staticImagesCache.get(url);
+    if (cached) {
+        return cached;
+    }
+
+    const image = await readSelfImage(url);
+    staticImagesCache.set(url, image);
+    return image;
+}
+
+/**
+ * Read an image from GitBook itself.
+ */
+async function readSelfImage(url: string) {
+    const response = await fetchSelf(url);
+    const image = await readImage(response);
+    return image;
 }

@@ -1,4 +1,4 @@
-import type { AnyApiDefinitionFormat } from '@scalar/openapi-parser';
+import type { AnyApiDefinitionFormat, LoadPlugin } from '@scalar/openapi-parser';
 import { OpenAPIParseError } from './error';
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';
 import { parseOpenAPIV3 } from './v3';
@@ -16,6 +16,12 @@ export interface ParseOpenAPIInput {
      * Trust the input. This will skip advanced validation.
      */
     trust?: boolean;
+    /**
+     * Options for the parser.
+     */
+    options?: {
+        plugins?: LoadPlugin[];
+    };
 }
 
 /**

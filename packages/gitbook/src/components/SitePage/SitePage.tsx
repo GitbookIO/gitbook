@@ -10,11 +10,10 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
+import { getResizedImageURL } from '@v2/lib/images';
+import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
-import { type PagePathParams, fetchPageData, getPathnameParam, normalizePathname } from './fetch';
-
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
@@ -32,11 +31,11 @@ export async function SitePage(props: SitePageProps) {
 
     const rawPathname = getPathnameParam(props.pageParams);
     if (!pageTarget) {
-        const pathname = normalizePathname(rawPathname);
+        const pathname = rawPathname.toLowerCase();
         if (pathname !== rawPathname) {
             // If the pathname was not normalized, redirect to the normalized version
             // before trying to resolve the page again
-            redirect(context.linker.toPathInContent(pathname));
+            redirect(context.linker.toPathInSpace(pathname));
         } else {
             notFound();
         }
@@ -66,7 +65,7 @@ export async function SitePage(props: SitePageProps) {
     const document = await getPageDocument(context.dataFetcher, context.space, page);
 
     return (
-        <>
+        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
@@ -91,7 +90,7 @@ export async function SitePage(props: SitePageProps) {
             <React.Suspense fallback={null}>
                 <PageClientLayout withSections={withSections} />
             </React.Suspense>
-        </>
+        </PageContextProvider>
     );
 }
 
@@ -118,7 +117,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, pages, linker } = context;
+    const { site, customization, pages, linker, imageResizer } = context;
 
     return {
         title: [page.title, site.title].filter(Boolean).join(' | '),
@@ -131,8 +130,12 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         },
         openGraph: {
             images: [
-                customization.socialPreview.url ??
-                    linker.toAbsoluteURL(linker.toPathInContent(`~gitbook/ogimage/${page.id}`)),
+                customization.socialPreview.url
+                    ? await getResizedImageURL(imageResizer, customization.socialPreview.url, {
+                          width: 1200,
+                          height: 630,
+                      })
+                    : linker.toAbsoluteURL(linker.toPathInSpace(`~gitbook/ogimage/${page.id}`)),
             ],
         },
         robots:

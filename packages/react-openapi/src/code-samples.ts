@@ -3,11 +3,13 @@ import {
     isFormData,
     isFormUrlEncoded,
     isGraphQL,
+    isJSON,
     isPDF,
     isPlainObject,
     isText,
     isXML,
 } from './contentTypeChecks';
+import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 export interface CodeSampleInput {
@@ -17,7 +19,7 @@ export interface CodeSampleInput {
     body?: any;
 }
 
-interface CodeSampleGenerator {
+export interface CodeSampleGenerator {
     id: string;
     label: string;
     syntax: string;
@@ -25,6 +27,52 @@ interface CodeSampleGenerator {
 }
 
 export const codeSampleGenerators: CodeSampleGenerator[] = [
+    {
+        id: 'http',
+        label: 'HTTP',
+        syntax: 'bash',
+        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
+            const { host, path } = parseHostAndPath(url);
+
+            if (body) {
+                // if we had a body add a content length header
+                const bodyContent = body ? stringifyOpenAPI(body) : '';
+                // handle unicode chars with a text encoder
+                const encoder = new TextEncoder();
+
+                const bodyString = BodyGenerators.getHTTPBody(body, headers);
+
+                if (bodyString) {
+                    body = bodyString;
+                }
+
+                headers = {
+                    ...headers,
+                    'Content-Length': encoder.encode(bodyContent).length.toString(),
+                };
+            }
+
+            if (!headers.hasOwnProperty('Accept')) {
+                headers.Accept = '*/*';
+            }
+
+            const headerString = headers
+                ? `${Object.entries(headers)
+                      .map(([key, value]) =>
+                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
+                      )
+                      .join('\n')}\n`
+                : '';
+
+            const bodyString = body ? `\n${body}` : '';
+
+            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
+Host: ${host}
+${headerString}${bodyString}`;
+
+            return httpRequest;
+        },
+    },
     {
         id: 'curl',
         label: 'cURL',
@@ -126,63 +174,20 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
 
+            const contentType = headers?.['Content-Type'];
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
+                } else if (isJSON(contentType)) {
+                    code += indent(`data=json.dumps(${body})\n`, 4);
                 } else {
-                    code += indent(`data=${stringifyOpenAPI(body)}\n`, 4);
+                    code += indent(`data=${body}\n`, 4);
                 }
             }
 
             code += ')\n\n';
             code += 'data = response.json()';
             return code;
-        },
-    },
-    {
-        id: 'http',
-        label: 'HTTP',
-        syntax: 'bash',
-        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
-            const { host, path } = parseHostAndPath(url);
-
-            if (body) {
-                // if we had a body add a content length header
-                const bodyContent = body ? stringifyOpenAPI(body) : '';
-                // handle unicode chars with a text encoder
-                const encoder = new TextEncoder();
-
-                const bodyString = BodyGenerators.getHTTPBody(body, headers);
-
-                if (bodyString) {
-                    body = bodyString;
-                }
-
-                headers = {
-                    ...headers,
-                    'Content-Length': encoder.encode(bodyContent).length.toString(),
-                };
-            }
-
-            if (!headers.hasOwnProperty('Accept')) {
-                headers.Accept = '*/*';
-            }
-
-            const headerString = headers
-                ? `${Object.entries(headers)
-                      .map(([key, value]) =>
-                          key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
-                      )
-                      .join('\n')}\n`
-                : '';
-
-            const bodyString = body ? `\n${body}` : '';
-
-            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${host}
-${headerString}${bodyString}`;
-
-            return httpRequest;
         },
     },
 ];
@@ -238,9 +243,12 @@ const BodyGenerators = {
                 : String(body);
         } else if (isText(contentType)) {
             body = `--data '${String(body).replace(/"/g, '')}'`;
-        } else if (isXML(contentType) || isCSV(contentType)) {
+        } else if (isXML(contentType)) {
+            // Convert to XML and ensure proper formatting
+            body = `--data-binary $'${convertBodyToXML(body)}'`;
+        } else if (isCSV(contentType)) {
             // We use --data-binary to avoid cURL converting newlines to \r\n
-            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '')}'`;
+            body = `--data-binary $'${stringifyOpenAPI(body).replace(/"/g, '').replace(/\\n/g, '\n')}'`;
         } else if (isGraphQL(contentType)) {
             body = `--data '${stringifyOpenAPI(body)}'`;
             // Set Content-Type to application/json for GraphQL, recommended by GraphQL spec
@@ -249,7 +257,7 @@ const BodyGenerators = {
             // We use --data-binary to avoid cURL converting newlines to \r\n
             body = `--data-binary '@${String(body)}'`;
         } else {
-            body = `--data '${stringifyOpenAPI(body, null, 2)}'`;
+            body = `--data '${stringifyOpenAPI(body, null, 2).replace(/\\n/g, '\n')}'`;
         }
 
         return {
@@ -312,7 +320,9 @@ const BodyGenerators = {
             body = 'formData';
         } else if (isXML(contentType)) {
             code += 'const xml = `\n';
-            code += indent(String(body), 4);
+
+            // Convert JSON to XML if needed
+            code += indent(convertBodyToXML(body), 4);
             code += '`;\n\n';
             body = 'xml';
         } else if (isText(contentType)) {
@@ -337,13 +347,27 @@ const BodyGenerators = {
             }
             code += '}\n\n';
             body = 'files';
-        }
-
-        if (isPDF(contentType)) {
+        } else if (isPDF(contentType)) {
             code += 'files = {\n';
             code += `${indent(`"file": "${body}",`, 4)}\n`;
             code += '}\n\n';
             body = 'files';
+        } else if (isXML(contentType)) {
+            // Convert JSON to XML if needed
+            body = JSON.stringify(convertBodyToXML(body));
+        } else {
+            body = stringifyOpenAPI(body, (_key, value) => {
+                switch (value) {
+                    case true:
+                        return '$$__TRUE__$$';
+                    case false:
+                        return '$$__FALSE__$$';
+                    default:
+                        return value;
+                }
+            })
+                .replaceAll('"$$__TRUE__$$"', 'True')
+                .replaceAll('"$$__FALSE__$$"', 'False');
         }
 
         return { body, code, headers };
@@ -358,23 +382,48 @@ const BodyGenerators = {
             formUrlEncoded: () => {
                 const encoded = isPlainObject(body)
                     ? Object.entries(body)
-                          .map(([key, value]) => `${key}=${String(value)}`)
+                          .map(([key, value]) => `${key}=${stringifyOpenAPI(value)}`)
                           .join('&')
-                    : String(body);
-                return `"${encoded}"`;
+                    : stringifyOpenAPI(body);
+                return `"${encoded.replace(/"/g, "'")}"`;
             },
             text: () => `"${String(body)}"`,
-            xmlOrCsv: () => `"${stringifyOpenAPI(body).replace(/"/g, '')}"`,
+            xml: () => {
+                // Convert JSON to XML if needed
+                return `"${convertBodyToXML(body)}"`;
+            },
+            csv: () => `"${stringifyOpenAPI(body).replace(/"/g, '')}"`,
             default: () => `${stringifyOpenAPI(body, null, 2)}`,
         };
 
         if (isPDF(contentType)) return typeHandlers.pdf();
         if (isFormUrlEncoded(contentType)) return typeHandlers.formUrlEncoded();
         if (isText(contentType)) return typeHandlers.text();
-        if (isXML(contentType) || isCSV(contentType)) {
-            return typeHandlers.xmlOrCsv();
-        }
+        if (isXML(contentType)) return typeHandlers.xml();
+        if (isCSV(contentType)) return typeHandlers.csv();
 
         return typeHandlers.default();
     },
 };
+
+/**
+ * Converts a body to XML format
+ */
+function convertBodyToXML(body: any): string {
+    // If body is already a string and looks like XML, return it as is
+    if (typeof body === 'string' && body.trim().startsWith('<')) {
+        return body;
+    }
+
+    // If body is not an object, try to parse it as JSON
+    if (typeof body !== 'object' || body === null) {
+        try {
+            body = JSON.parse(body);
+        } catch {
+            // If parsing fails, return the original body
+            return body;
+        }
+    }
+
+    return json2xml(body).replace(/"/g, '').replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+}

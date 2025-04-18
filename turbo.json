@@ -7,7 +7,6 @@
         "ARGOS_*",
         "GITHUB_*",
         "GITBOOK_*",
-        "SENTRY_*",
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"
     ],
     "tasks": {

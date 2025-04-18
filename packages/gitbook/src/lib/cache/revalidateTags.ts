@@ -36,18 +36,25 @@ export async function revalidateTags(tags: string[]): Promise<{
 
     await Promise.all(
         cacheBackends.map(async (backend, backendIndex) => {
-            const { entries: addedEntries } = await backend.revalidateTags(tags);
+            try {
+                const { entries: addedEntries } = await backend.revalidateTags(tags);
 
-            addedEntries.forEach(({ key, tag }) => {
-                stats[key] = stats[key] ?? {
-                    tag,
-                    backends: {},
-                };
-                stats[key].backends[backend.name] = { set: true };
+                addedEntries.forEach(({ key, tag }) => {
+                    stats[key] = stats[key] ?? {
+                        tag,
+                        backends: {},
+                    };
+                    stats[key].backends[backend.name] = { set: true };
 
-                entries.set(key, { tag, key });
-                keysByBackend.set(backendIndex, [...(keysByBackend.get(backendIndex) ?? []), key]);
-            });
+                    entries.set(key, { tag, key });
+                    keysByBackend.set(backendIndex, [
+                        ...(keysByBackend.get(backendIndex) ?? []),
+                        key,
+                    ]);
+                });
+            } catch (err) {
+                throw new Error(`error revalidating tags on backend ${backend.name}: ${err}`);
+            }
         })
     );
 
@@ -71,7 +78,8 @@ export async function revalidateTags(tags: string[]): Promise<{
                             return;
                         }
                     }
-                    throw error;
+
+                    throw new Error(`error deleting entries on backend ${backend.name}: ${error}`);
                 }
             }
         })

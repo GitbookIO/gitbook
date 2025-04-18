@@ -36,7 +36,7 @@ export const en = {
     table_of_contents_button_label: 'Open table of contents',
     cookies_title: 'Cookies',
     cookies_prompt:
-        'This site uses cookies to deliver its service and to analyse traffic. By browsing this site, you accept the ${1}.',
+        'This site uses cookies to deliver its service and to analyze traffic. By browsing this site, you accept the ${1}.',
     cookies_prompt_privacy: 'privacy policy',
     cookies_accept: 'Accept',
     cookies_reject: 'Reject',
@@ -56,4 +56,9 @@ export const en = {
     pdf_limit_reached: "Couldn't generate the PDF for ${1} pages, generation stopped at ${2}.",
     pdf_limit_reached_continue: 'Extend with ${1} more pages.',
     more: 'More',
+    link_tooltip_external_link: 'External link to',
+    link_tooltip_page_anchor: 'Jump to section',
+    link_tooltip_ai_summary: 'Page highlight',
+    link_tooltip_ai_summary_description: 'Based on your context. May contain mistakes.',
+    open_in_new_tab: 'Open in new tab',
 };

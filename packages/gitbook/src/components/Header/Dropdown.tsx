@@ -44,7 +44,6 @@ export function Dropdown<E extends HTMLElement>(props: {
                     'absolute',
                     'top-full',
                     'left-0',
-                    'z-20',
                     'origin-top-left',
                     'invisible',
                     'transition-opacity',
@@ -54,22 +53,25 @@ export function Dropdown<E extends HTMLElement>(props: {
                     className
                 )}
             >
-                <div
-                    className={tcls(
-                        'mt-2',
-                        'w-full',
-                        'bg-tint-base',
-                        'rounded-lg',
-                        'straight-corners:rounded-sm',
-                        'p-2',
-                        'shadow-1xs',
-                        'overflow-auto',
-                        'ring-1',
-                        'ring-tint-subtle',
-                        'focus:outline-none'
-                    )}
-                >
-                    {children}
+                <div className="fixed z-50 w-52">
+                    <div
+                        className={tcls(
+                            'mt-2',
+                            'w-full',
+                            'max-h-80',
+                            'bg-tint-base',
+                            'rounded-lg',
+                            'straight-corners:rounded-sm',
+                            'p-2',
+                            'shadow-1xs',
+                            'overflow-auto',
+                            'ring-1',
+                            'ring-tint-subtle',
+                            'focus:outline-none'
+                        )}
+                    >
+                        {children}
+                    </div>
                 </div>
             </div>
         </div>
@@ -122,7 +124,6 @@ export function DropdownMenuItem(
         return (
             <Link
                 href={href}
-                prefetch={false}
                 insights={insights}
                 className={tcls(
                     'rounded straight-corners:rounded-sm px-3 py-1 text-sm',

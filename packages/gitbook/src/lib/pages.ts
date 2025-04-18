@@ -104,7 +104,7 @@ export function resolvePrevNextPages(
 }
 
 /**
- * Resolve a page to its canonical path.
+ * Resolve a page to its canonical path. The first page of the site will return "".
  * The path will NOT start with "/".
  */
 export function getPagePath(

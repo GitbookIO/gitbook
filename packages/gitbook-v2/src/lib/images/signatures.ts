@@ -18,7 +18,7 @@ export const CURRENT_SIGNATURE_VERSION: SignatureVersion = '2';
 
 type SignFnInput = {
     url: string;
-    host: string;
+    imagesContextId: string;
 };
 
 type SignFn = (input: SignFnInput) => MaybePromise<string>;
@@ -32,6 +32,11 @@ export async function verifyImageSignature(
 ): Promise<boolean> {
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);
+
+    // biome-ignore lint/suspicious/noConsole: we want to log the signature comparison
+    console.log(
+        `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
+    );
     return generated === signature;
 }
 
@@ -60,12 +65,14 @@ const generateSignatureV2: SignFn = async (input) => {
     assert(GITBOOK_IMAGE_RESIZE_SIGNING_KEY, 'GITBOOK_IMAGE_RESIZE_SIGNING_KEY is not set');
     const all = [
         input.url,
-        input.host, // The hostname is used to avoid serving images from other sites on the same domain
+        input.imagesContextId, // The hostname is used to avoid serving images from other sites on the same domain
         GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
     ]
         .filter(Boolean)
         .join(':');
-    return fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+
+    const signature = fnv1a(all, { utf8Buffer: fnv1aUtf8Buffer }).toString(16);
+    return signature;
 };
 
 // Reused buffer for FNV-1a hashing in the v1 algorithm

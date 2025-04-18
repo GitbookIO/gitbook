@@ -1,5 +1,6 @@
-import { CustomizationThemeMode, type PublishedSiteContent } from '@gitbook/api';
+import { CustomizationThemeMode } from '@gitbook/api';
 import { headers } from 'next/headers';
+import type { SiteURLData } from './context';
 
 export enum MiddlewareHeaders {
     /**
@@ -33,11 +34,6 @@ export enum MiddlewareHeaders {
     Customization = 'x-gitbook-customization',
 
     /**
-     * The visitor token used to access this content
-     */
-    VisitorAuthToken = 'x-gitbook-visitor-token',
-
-    /**
      * The API token used to fetch the content.
      * This should only be passed for non-site dynamic routes.
      */
@@ -62,7 +58,7 @@ export async function getURLModeFromMiddleware(): Promise<'url' | 'url-host'> {
  * Get the site URL data from the middleware headers.
  * This function should only be called in a server action or a dynamic route.
  */
-export async function getSiteURLDataFromMiddleware(): Promise<PublishedSiteContent> {
+export async function getSiteURLDataFromMiddleware(): Promise<SiteURLData> {
     const headersList = await headers();
     const siteURLData = headersList.get(MiddlewareHeaders.SiteURLData);
 
@@ -103,20 +99,6 @@ export async function getThemeFromMiddleware() {
     return queryStringTheme === 'light'
         ? CustomizationThemeMode.Light
         : CustomizationThemeMode.Dark;
-}
-
-/**
- * Get the visitor auth token from the middleware headers.
- * This function should only be called in a dynamic route.
- */
-export async function getVisitorAuthTokenFromMiddleware(): Promise<string | null> {
-    const headersList = await headers();
-    const visitorAuthToken = headersList.get(MiddlewareHeaders.VisitorAuthToken);
-    if (!visitorAuthToken) {
-        return null;
-    }
-
-    return visitorAuthToken;
 }
 
 /**

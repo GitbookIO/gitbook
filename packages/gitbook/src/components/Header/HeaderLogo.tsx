@@ -20,7 +20,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 
     return (
         <Link
-            href={linker.toAbsoluteURL(linker.toPathInContent(''))}
+            href={linker.toAbsoluteURL(linker.toPathInSpace(''))}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
@@ -55,6 +55,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         'min-w-0',
                         'max-w-40',
                         'lg:max-w-64',
+                        'site-header-none:page-no-toc:lg:max-w-56',
                         'max-h-10',
                         'lg:max-h-12',
                         'h-full',
@@ -84,7 +85,7 @@ function LogoFallback(props: HeaderLogoProps) {
             <div
                 className={tcls(
                     'text-pretty',
-                    'line-clamp-3',
+                    'line-clamp-2',
                     'tracking-tight',
                     'max-w-[18ch]',
                     'lg:max-w-[24ch]',

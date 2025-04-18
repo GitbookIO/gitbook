@@ -1,22 +1,33 @@
 import * as api from '@gitbook/api';
 
 /**
- * Return the customizations with the default values for a space.
+ * Return the default customization settings for a site.
  */
-export function defaultCustomizationForSpace(): api.CustomizationSettings {
+export function defaultCustomization(): api.SiteCustomizationSettings {
     return {
-        internationalization: {
-            inherit: false,
-            locale: api.CustomizationLocale.En,
-        },
         styling: {
-            primaryColor: {
-                dark: '#346DDB',
-                light: '#346DDB',
-            },
+            theme: api.CustomizationTheme.Clean,
+            primaryColor: { light: '#346DDB', dark: '#346DDB' },
+            infoColor: { light: '#787878', dark: '#787878' },
+            warningColor: { light: '#FE9A00', dark: '#FE9A00' },
+            dangerColor: { light: '#FB2C36', dark: '#FB2C36' },
+            successColor: { light: '#00C950', dark: '#00C950' },
             corners: api.CustomizationCorners.Rounded,
             font: api.CustomizationDefaultFont.Inter,
             background: api.CustomizationBackground.Plain,
+            icons: api.CustomizationIconsStyle.Regular,
+            links: api.CustomizationLinksStyle.Default,
+            sidebar: {
+                background: api.CustomizationSidebarBackgroundStyle.Default,
+                list: api.CustomizationSidebarListStyle.Default,
+            },
+            search: api.CustomizationSearchStyle.Subtle,
+        },
+        internationalization: {
+            locale: api.CustomizationLocale.En,
+        },
+        insights: {
+            trackingCookie: true,
         },
         favicon: {},
         header: {
@@ -28,28 +39,32 @@ export function defaultCustomizationForSpace(): api.CustomizationSettings {
         },
         themes: {
             default: api.CustomizationThemeMode.Light,
-            toggeable: false,
+            toggeable: true,
         },
-        trademark: {
+        pdf: {
             enabled: true,
         },
         feedback: {
             enabled: false,
         },
-        pdf: {
-            enabled: true,
-        },
         aiSearch: {
             enabled: true,
+        },
+        advancedCustomization: {
+            enabled: true,
+        },
+        git: {
+            showEditLink: false,
         },
         pagination: {
             enabled: true,
         },
-        privacyPolicy: {},
-        socialPreview: {},
-        git: {
-            showEditLink: false,
+        trademark: {
+            enabled: true,
         },
-        inherit: false,
+        privacyPolicy: {
+            url: 'https://www.gitbook.com/privacy',
+        },
+        socialPreview: {},
     };
 }

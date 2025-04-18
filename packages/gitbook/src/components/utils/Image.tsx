@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { type ImageResizer, checkIsHttpURL } from '@v2/lib/images';
+import type { ImageResizer } from '@v2/lib/images';
 import ReactDOM from 'react-dom';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { checkIsHttpURL } from '@/lib/urls';
 import { ZoomImage } from './ZoomImage';
 import type { PolymorphicComponentProp } from './types';
 

@@ -1,11 +1,19 @@
-import { OpenAPITabs, OpenAPITabsList, OpenAPITabsPanels } from './OpenAPITabs';
-import { StaticSection } from './StaticSection';
-import { type CodeSampleInput, codeSampleGenerators } from './code-samples';
-import { generateMediaTypeExample, generateSchemaExample } from './generateSchemaExample';
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import {
+    OpenAPIMediaTypeExamplesBody,
+    OpenAPIMediaTypeExamplesSelector,
+} from './OpenAPICodeSampleInteractive';
+import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
+import { ScalarApiButton } from './ScalarApiButton';
+import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
+import { type OpenAPIContext, getOpenAPIClientContext } from './context';
+import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
-import type { OpenAPIContextProps, OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
-import { checkIsReference, createStateKey } from './utils';
+import { checkIsReference } from './utils';
+
+const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
 
 /**
  * Display code samples to execute the operation.
@@ -13,7 +21,45 @@ import { checkIsReference, createStateKey } from './utils';
  */
 export function OpenAPICodeSample(props: {
     data: OpenAPIOperationData;
-    context: OpenAPIContextProps;
+    context: OpenAPIContext;
+}) {
+    const { data, context } = props;
+
+    // If code samples are disabled at operation level, we don't display the code samples.
+    if (data.operation['x-codeSamples'] === false) {
+        return null;
+    }
+
+    const customCodeSamples = getCustomCodeSamples(props);
+
+    // If code samples are disabled at the top-level and not custom code samples are defined,
+    // we don't display the code samples.
+    if (data['x-codeSamples'] === false && !customCodeSamples) {
+        return null;
+    }
+
+    const samples = customCodeSamples ?? generateCodeSamples(props);
+
+    if (samples.length === 0) {
+        return null;
+    }
+
+    return (
+        <OpenAPICodeSampleBody
+            context={getOpenAPIClientContext(context)}
+            data={data}
+            items={samples}
+            selectIcon={context.icons.chevronDown}
+        />
+    );
+}
+
+/**
+ * Generate code samples for the operation.
+ */
+function generateCodeSamples(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContext;
 }) {
     const { data, context } = props;
 
@@ -49,45 +95,160 @@ export function OpenAPICodeSample(props: {
     const requestBody = !checkIsReference(data.operation.requestBody)
         ? data.operation.requestBody
         : undefined;
-    const requestBodyContentEntries = requestBody?.content
-        ? Object.entries(requestBody.content)
-        : undefined;
-    const requestBodyContent = requestBodyContentEntries?.[0];
 
-    const input: CodeSampleInput = {
-        url:
-            getDefaultServerURL(data.servers) +
-            data.path +
-            (searchParams.size ? `?${searchParams.toString()}` : ''),
-        method: data.method,
-        body: requestBodyContent ? generateMediaTypeExample(requestBodyContent[1]) : undefined,
-        headers: {
-            ...getSecurityHeaders(data.securities),
-            ...headersObject,
-            ...(requestBodyContent
-                ? {
-                      'Content-Type': requestBodyContent[0],
-                  }
-                : undefined),
-        },
+    const url =
+        getDefaultServerURL(data.servers) +
+        data.path +
+        (searchParams.size ? `?${searchParams.toString()}` : '');
+
+    const genericHeaders = {
+        ...getSecurityHeaders(data.securities),
+        ...headersObject,
     };
 
-    const autoCodeSamples = codeSampleGenerators.map((generator) => ({
-        key: `default-${generator.id}`,
-        label: generator.label,
-        body: context.renderCodeBlock({
-            code: generator.generate(input),
-            syntax: generator.syntax,
-        }),
-    }));
+    const mediaTypeRendererFactories = Object.entries(requestBody?.content ?? {}).map(
+        ([mediaType, mediaTypeObject]) => {
+            return (generator: CodeSampleGenerator) => {
+                const mediaTypeHeaders = {
+                    ...genericHeaders,
+                    'Content-Type': mediaType,
+                };
+                return {
+                    mediaType,
+                    element: context.renderCodeBlock({
+                        code: generator.generate({
+                            url,
+                            method: data.method,
+                            body: undefined,
+                            headers: mediaTypeHeaders,
+                        }),
+                        syntax: generator.syntax,
+                    }),
+                    examples: generateMediaTypeExamples(mediaTypeObject, {
+                        mode: 'write',
+                    }).map((example) => ({
+                        example,
+                        element: context.renderCodeBlock({
+                            code: generator.generate({
+                                url,
+                                method: data.method,
+                                body: example.value,
+                                headers: mediaTypeHeaders,
+                            }),
+                            syntax: generator.syntax,
+                        }),
+                    })),
+                } satisfies MediaTypeRenderer;
+            };
+        }
+    );
 
-    // Use custom samples if defined
+    return codeSampleGenerators.map((generator) => {
+        if (mediaTypeRendererFactories.length > 0) {
+            const renderers = mediaTypeRendererFactories.map((generate) => generate(generator));
+            return {
+                key: `default-${generator.id}`,
+                label: generator.label,
+                body: (
+                    <OpenAPIMediaTypeExamplesBody
+                        method={data.method}
+                        path={data.path}
+                        renderers={renderers}
+                        blockKey={context.blockKey}
+                    />
+                ),
+                footer: (
+                    <OpenAPICodeSampleFooter renderers={renderers} data={data} context={context} />
+                ),
+            };
+        }
+        return {
+            key: `default-${generator.id}`,
+            label: generator.label,
+            body: context.renderCodeBlock({
+                code: generator.generate({
+                    url,
+                    method: data.method,
+                    body: undefined,
+                    headers: genericHeaders,
+                }),
+                syntax: generator.syntax,
+            }),
+            footer: <OpenAPICodeSampleFooter data={data} renderers={[]} context={context} />,
+        };
+    });
+}
+
+export interface MediaTypeRenderer {
+    mediaType: string;
+    element: React.ReactNode;
+    examples: Array<{
+        example: OpenAPIV3.ExampleObject;
+        element: React.ReactNode;
+    }>;
+}
+
+function OpenAPICodeSampleFooter(props: {
+    data: OpenAPIOperationData;
+    renderers: MediaTypeRenderer[];
+    context: OpenAPIContext;
+}) {
+    const { data, context, renderers } = props;
+    const { method, path } = data;
+    const { specUrl } = context;
+    const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
+    const hasMultipleMediaTypes =
+        renderers.length > 1 || renderers.some((renderer) => renderer.examples.length > 0);
+
+    if (hideTryItPanel && !hasMultipleMediaTypes) {
+        return null;
+    }
+
+    if (!validateHttpMethod(method)) {
+        return null;
+    }
+
+    return (
+        <div className="openapi-codesample-footer">
+            {hasMultipleMediaTypes ? (
+                <OpenAPIMediaTypeExamplesSelector
+                    method={data.method}
+                    path={data.path}
+                    renderers={renderers}
+                    selectIcon={context.icons.chevronDown}
+                    blockKey={context.blockKey}
+                />
+            ) : (
+                <span />
+            )}
+            {!hideTryItPanel && (
+                <ScalarApiButton
+                    context={getOpenAPIClientContext(context)}
+                    method={method}
+                    path={path}
+                    specUrl={specUrl}
+                />
+            )}
+        </div>
+    );
+}
+
+/**
+ * Get custom code samples for the operation.
+ */
+function getCustomCodeSamples(props: {
+    data: OpenAPIOperationData;
+    context: OpenAPIContext;
+}) {
+    const { data, context } = props;
+
     let customCodeSamples: null | Array<{
         key: string;
         label: string;
         body: React.ReactNode;
     }> = null;
-    (['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const).forEach((key) => {
+
+    CUSTOM_CODE_SAMPLES_KEYS.forEach((key) => {
         const customSamples = data.operation[key];
         if (customSamples && Array.isArray(customSamples)) {
             customCodeSamples = customSamples
@@ -99,33 +260,20 @@ export function OpenAPICodeSample(props: {
                     );
                 })
                 .map((sample, index) => ({
-                    key: `redocly-${sample.lang}-${index}`,
+                    key: `custom-sample-${sample.lang}-${index}`,
                     label: sample.label,
                     body: context.renderCodeBlock({
                         code: sample.source,
                         syntax: sample.lang,
                     }),
+                    footer: (
+                        <OpenAPICodeSampleFooter renderers={[]} data={data} context={context} />
+                    ),
                 }));
         }
     });
 
-    // Code samples can be disabled at the top-level or at the operation level
-    // If code samples are defined at the operation level, it will override the top-level setting
-    const codeSamplesDisabled =
-        data['x-codeSamples'] === false || data.operation['x-codeSamples'] === false;
-    const samples = customCodeSamples ?? (!codeSamplesDisabled ? autoCodeSamples : []);
-
-    if (samples.length === 0) {
-        return null;
-    }
-
-    return (
-        <OpenAPITabs stateKey={createStateKey('codesample')} items={samples}>
-            <StaticSection header={<OpenAPITabsList />} className="openapi-codesample">
-                <OpenAPITabsPanels />
-            </StaticSection>
-        </OpenAPITabs>
-    );
+    return customCodeSamples;
 }
 
 function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
@@ -168,4 +316,8 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
             return {};
         }
     }
+}
+
+function validateHttpMethod(method: string): method is OpenAPIV3.HttpMethods {
+    return ['get', 'post', 'put', 'delete', 'patch', 'head', 'options', 'trace'].includes(method);
 }

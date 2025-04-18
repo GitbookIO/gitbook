@@ -184,6 +184,7 @@ export function colorScale(
     const mixColor = mix?.color ? rgbToOklch(hexToRgbArray(mix.color)) : null;
     const foregroundColor = rgbToOklch(hexToRgbArray(foreground));
     const backgroundColor = rgbToOklch(hexToRgbArray(background));
+    let mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
 
     if (mixColor && mix?.ratio && mix.ratio > 0) {
         // If defined, we mix in a (tiny) bit of the mix color with the base color.
@@ -192,7 +193,20 @@ export function colorScale(
         baseColor.H = mix.color === DEFAULT_TINT_COLOR ? baseColor.H : mixColor.H;
     }
 
-    const mapping = darkMode ? colorMixMapping.dark : colorMixMapping.light;
+    if (
+        (darkMode && baseColor.L < backgroundColor.L) ||
+        (!darkMode && baseColor.L > backgroundColor.L)
+    ) {
+        // If the supplied color is outside of our lightness bounds, use the supplied color's lightness.
+        // This is mostly used to allow darker-than-dark backgrounds for brands that specifically want that look.
+        const difference = (backgroundColor.L - baseColor.L) / backgroundColor.L;
+        backgroundColor.L = baseColor.L;
+        // At the edges of the scale, the subtle lightness changes stop being perceptible. We need to amp up our mapping to still stand out.
+        const amplifier = 1;
+        mapping = mapping.map((step, index) =>
+            index < 9 ? step + step * amplifier * difference : step
+        );
+    }
 
     const result = [];
 
@@ -206,7 +220,7 @@ export function colorScale(
             continue;
         }
 
-        const chromaRatio = index < 8 ? (index + 1) * 0.05 : 1;
+        const chromaRatio = index === 8 || index === 9 ? 1 : index * 0.05;
 
         const shade = {
             L: targetL, // Blend lightness

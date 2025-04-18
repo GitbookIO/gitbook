@@ -1,12 +1,14 @@
 import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
+import type { StaticImageData } from 'next/image';
 
 import { Image, type ImageSize } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import defaultPageCover from './default-page-cover.svg';
+import defaultPageCoverSVG from './default-page-cover.svg';
 
+const defaultPageCover = defaultPageCoverSVG as StaticImageData;
 const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
 /**
@@ -32,7 +34,11 @@ export async function PageCover(props: {
                           'sm:-mx-6',
                           'md:-mx-8',
                           '-lg:mr-8',
-                          page.layout.tableOfContents ? 'lg:ml-0' : null,
+                          'lg:ml-0',
+                          !page.layout.tableOfContents &&
+                          context.customization.header.preset !== 'none'
+                              ? 'lg:-ml-64'
+                              : null,
                       ]
                     : ['sm:mx-auto', 'max-w-3xl', 'sm:rounded-md', 'mb-8']
             )}

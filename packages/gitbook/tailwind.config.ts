@@ -77,9 +77,10 @@ const config: Config = {
                 emoji: [
                     'Apple Color Emoji',
                     'Noto Color Emoji',
-                    '--font-noto-color-emoji',
+                    'var(--font-noto-color-emoji)',
                     'sans-serif',
                 ],
+                custom: ['var(--font-custom)'],
                 var: ['var(--font-family)'],
             },
             colors: {
@@ -294,11 +295,11 @@ const config: Config = {
                 ),
             },
             animation: {
-                present: 'present .5s ease-out both',
+                present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
                 scaleIn: 'scaleIn 200ms ease',
                 scaleOut: 'scaleOut 200ms ease',
-                fadeIn: 'fadeIn 200ms ease',
-                fadeOut: 'fadeOut 200ms ease',
+                fadeIn: 'fadeIn 200ms ease forwards',
+                fadeOut: 'fadeOut 200ms ease forwards',
                 enterFromLeft: 'enterFromLeft 250ms ease',
                 enterFromRight: 'enterFromRight 250ms ease',
                 exitToLeft: 'exitToLeft 250ms ease',
@@ -329,7 +330,7 @@ const config: Config = {
                 present: {
                     from: {
                         opacity: '0',
-                        transform: 'translateY(2rem) scale(0.9)',
+                        transform: 'translateY(1rem) scale(90%)',
                     },
                     to: {
                         opacity: '1',
@@ -456,8 +457,12 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
+            addVariant('site-header-none', 'html.site-header-none &');
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
-            addVariant('site-header-sections', 'body:has(#site-header:not(.mobile-only) > nav) &');
+            addVariant('site-header-sections', [
+                'body:has(#site-header:not(.mobile-only) #sections) &',
+                'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
+            ]);
 
             const customisationVariants = {
                 // Sidebar styles
@@ -502,12 +507,14 @@ const config: Config = {
              * Variant when the page contains a block that will be rendered in full-width mode.
              */
             addVariant('page-full-width', 'body:has(.page-full-width) &');
+            addVariant('page-default-width', 'body:has(.page-default-width) &');
 
             /**
              * Variant when the page is configured to hide the table of content.
              * `page.layout.tableOfContents` is set to false.
              */
             addVariant('page-no-toc', 'body:has(.page-no-toc) &');
+            addVariant('page-has-toc', 'body:has(.page-has-toc) &');
 
             /**
              * Variant when the page contains an OpenAPI block.

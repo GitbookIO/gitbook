@@ -3,15 +3,6 @@ description: 'Install Bun and cache dependencies'
 runs:
     using: 'composite'
     steps:
-        # We cache dependencies even if Bun is fast to avoid downloading fontawesome too many times
-        # and impacting bandwidth there.
-        - name: Cache bun
-          uses: actions/cache@v4
-          with:
-              path: ~/.bun/install/cache
-              key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('**/bun.lock') }}
-              restore-keys: |
-                  ${{ runner.os }}-bun-
         - name: Setup bun
           uses: oven-sh/setup-bun@v2
           with:

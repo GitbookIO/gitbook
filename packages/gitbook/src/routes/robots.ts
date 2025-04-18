@@ -10,11 +10,12 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const isRoot = checkIsRootSiteContext(context);
     const lines = [
         'User-agent: *',
-        'Disallow: /~gitbook/',
+        // Disallow dynamic routes / search queries
+        'Disallow: /*?',
         ...((await isSiteIndexable(context))
             ? [
                   'Allow: /',
-                  `Sitemap: ${linker.toAbsoluteURL(linker.toPathInContent(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml'))}`,
+                  `Sitemap: ${linker.toAbsoluteURL(linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml'))}`,
               ]
             : ['Disallow: /']),
     ];

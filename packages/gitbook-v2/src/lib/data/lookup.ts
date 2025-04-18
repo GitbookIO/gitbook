@@ -1,5 +1,5 @@
 import { race, tryCatch } from '@/lib/async';
-import { joinPath } from '@/lib/paths';
+import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 import { trace } from '@/lib/tracing';
 import type { PublishedSiteContentLookup } from '@gitbook/api';
 import { apiClient } from './api';
@@ -15,13 +15,14 @@ export async function getPublishedContentByURL(input: {
     url: string;
     visitorAuthToken: string | null;
     redirectOnError: boolean;
+    apiToken: string | null;
 }): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = await apiClient();
+        const api = await apiClient({ apiToken: input.apiToken });
 
         const callResult = await trace(
             {
@@ -35,6 +36,13 @@ export async function getPublishedContentByURL(input: {
                             url: alternative.url,
                             visitorAuthToken: input.visitorAuthToken ?? undefined,
                             redirectOnError: input.redirectOnError,
+
+                            // As this endpoint is cached by our API, we version the request
+                            // to void getting stale data with missing properties.
+                            // this could be improved by ensuring our API cache layer is versioned
+                            // or invalidated when needed
+                            // @ts-expect-error - cacheVersion is not a real query param
+                            cacheVersion: 'v2',
                         },
                         {
                             signal,
@@ -94,12 +102,16 @@ export async function getPublishedContentByURL(input: {
          * In both cases, the idea is to use the deepest/longest/most inclusive path to resolve the content.
          */
         if (alternative.primary || ('site' in data && data.complete)) {
+            const changeRequest = data.changeRequest ?? lookup.changeRequest;
+            const revision = data.revision ?? lookup.revision;
+
             const siteResult: PublishedSiteContentLookup = {
                 ...data,
-                changeRequest: data.changeRequest ?? lookup.changeRequest,
-                revision: data.revision ?? lookup.revision,
+                canonicalUrl: joinPathWithBaseURL(data.canonicalUrl, alternative.extraPath),
                 basePath: joinPath(data.basePath, lookup.basePath ?? ''),
                 pathname: joinPath(data.pathname, alternative.extraPath),
+                ...(changeRequest ? { changeRequest } : {}),
+                ...(revision ? { revision } : {}),
             };
             return { data: siteResult };
         }

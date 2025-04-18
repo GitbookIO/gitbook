@@ -8,9 +8,9 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.1.0",
+    "version": "0.3.1",
     "dependencies": {
-        "@gitbook/api": "*",
+        "@gitbook/api": "^0.111.0",
         "assert-never": "^1.2.1"
     },
     "devDependencies": {

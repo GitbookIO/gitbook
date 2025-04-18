@@ -143,6 +143,10 @@
             margin-right: 0;
             width: calc(100% - var(--scrollbar-width));
         }
+        body:has(.page-full-width) .scroll-nojump {
+            margin-left: 0;
+            width: 100%;
+        }
     }
 }
 
@@ -155,4 +159,8 @@ html {
 }
 html.dark {
     color-scheme: dark light;
+}
+
+html.announcement-hidden .announcement-banner {
+    @apply hidden;
 }

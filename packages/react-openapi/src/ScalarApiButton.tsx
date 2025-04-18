@@ -6,6 +6,8 @@ import { createPortal } from 'react-dom';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
+import type { OpenAPIClientContext } from './context';
+import { t } from './translate';
 
 /**
  * Button which launches the Scalar API Client
@@ -14,8 +16,9 @@ export function ScalarApiButton(props: {
     method: OpenAPIV3_1.HttpMethods;
     path: string;
     specUrl: string;
+    context: OpenAPIClientContext;
 }) {
-    const { method, path, specUrl } = props;
+    const { method, path, specUrl, context } = props;
     const [isOpen, setIsOpen] = useState(false);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
     return (
@@ -27,14 +30,14 @@ export function ScalarApiButton(props: {
                     setIsOpen(true);
                 }}
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" fill="none">
+                {t(context.translation, 'test_it')}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" fill="currentColor">
                     <path
                         stroke="currentColor"
                         strokeWidth="1.5"
                         d="M1 10.05V1.43c0-.2.2-.31.37-.22l7.26 4.08c.17.1.17.33.01.43l-7.26 4.54a.25.25 0 0 1-.38-.21Z"
                     />
                 </svg>
-                Test it
             </button>
 
             {isOpen &&
@@ -59,10 +62,7 @@ function ScalarModal(props: {
 }) {
     const { method, path, specUrl, controllerRef } = props;
     return (
-        <ApiClientModalProvider
-            configuration={{ spec: { url: specUrl } }}
-            initialRequest={{ method, path }}
-        >
+        <ApiClientModalProvider configuration={{ url: specUrl }} initialRequest={{ method, path }}>
             <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
         </ApiClientModalProvider>
     );

@@ -2,7 +2,8 @@
     "extends": ["//"],
     "tasks": {
         "generate": {
-            "outputs": ["data/*.json"]
+            "inputs": ["bin/**/*", "package.json"],
+            "outputs": ["src/data/*.json", "dist/data/*.json"]
         }
     }
 }

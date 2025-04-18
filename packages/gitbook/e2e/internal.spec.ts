@@ -19,6 +19,7 @@ import {
     type TestsCase,
     allDeprecatedThemePresets,
     allLocales,
+    allSearchStyles,
     allSidebarBackgroundStyles,
     allThemeModes,
     allThemes,
@@ -27,6 +28,7 @@ import {
     headerLinks,
     runTestCases,
     waitForCookiesDialog,
+    waitForNotFound,
 } from './util';
 
 const testCases: TestsCase[] = [
@@ -307,6 +309,18 @@ const testCases: TestsCase[] = [
                 url: '~/revisions/S55pwsEr5UVoroaOiWnP/blocks/headings',
                 run: waitForCookiesDialog,
             },
+            {
+                name: 'Invalid revision',
+                url: '~/revisions/idnotfound/blocks/headings',
+                run: waitForNotFound,
+                screenshot: false,
+            },
+            {
+                name: 'Invalid change request',
+                url: '~/changes/idnotfound/blocks/headings',
+                run: waitForNotFound,
+                screenshot: false,
+            },
         ],
     },
     {
@@ -367,6 +381,82 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Site Preview',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        tests: [
+            {
+                name: 'Main content',
+                url: async () => {
+                    const data = await getSiteAPIToken(
+                        'https://gitbook.gitbook.io/test-gitbook-open/'
+                    );
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
+                },
+            },
+        ],
+    },
+    {
+        name: 'Markdown page',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Text page',
+                url: 'text-page.md',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
+        name: 'Site subdirectory (proxy)',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://nextjs-gbo-proxy.vercel.app/documentation/',
+        tests: [
+            {
+                name: 'Main',
+                url: '',
+                fullPage: true,
+            },
+        ],
+    },
+    {
+        name: 'Site subdirectory (proxy) with VA',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://nextjs-gbo-proxy-va.vercel.app/va/docs/',
+        tests: [
+            {
+                name: 'Main',
+                url: () => {
+                    const privateKey =
+                        'rqSfA6x7eAKx1qDRCDq9aCXwivpUvQ8YkXeDdFvCCUa9QchIcM7pF1iJ4o7AGOU49spmOWjKoIPtX0pVUVQ81w==';
+                    const token = jwt.sign(
+                        {
+                            name: 'gitbook-open-tests',
+                        },
+                        privateKey,
+                        {
+                            expiresIn: '24h',
+                        }
+                    );
+                    return `?jwt_token=${token}`;
+                },
+                fullPage: true,
+            },
+        ],
+    },
+    {
         name: 'Content tests',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
@@ -385,7 +475,7 @@ const testCases: TestsCase[] = [
                 url: 'blocks/block-images',
                 run: waitForCookiesDialog,
                 fullPage: true,
-                screenshot: { threshold: 0.8 },
+                screenshot: { threshold: 0.9 },
             },
             {
                 name: 'Images (with zoom)',
@@ -396,7 +486,6 @@ const testCases: TestsCase[] = [
                     await zoomImage.first().click();
                     await expect(page.getByTestId('zoom-image-modal')).toBeVisible();
                 },
-                fullPage: true,
                 screenshot: { threshold: 0.8 },
             },
             {
@@ -431,7 +520,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'Integration Blocks',
                 url: 'blocks/integrations',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    const mermaidIframe = page.locator('iframe[title*="mermaid"]').contentFrame();
+                    await expect(mermaidIframe.getByText('Mermaid', { exact: true })).toBeVisible();
+                    await expect(mermaidIframe.getByText('Diagram', { exact: true })).toBeVisible();
+                },
             },
             {
                 name: 'Tables',
@@ -647,6 +741,23 @@ const testCases: TestsCase[] = [
                         run: waitForCookiesDialog,
                     })),
                 ]),
+                ...allSearchStyles.flatMap((searchStyle) => ({
+                    name: `Theme ${theme} – Search ${searchStyle} – Mode ${themeMode}`,
+                    url: getCustomizationURL({
+                        styling: {
+                            theme,
+                            search: searchStyle,
+                        },
+                        header: {
+                            links: headerLinks,
+                        },
+                        themes: {
+                            default: themeMode,
+                            toggeable: false,
+                        },
+                    }),
+                    run: waitForCookiesDialog,
+                })),
             ]),
             // Deprecated header themes
             ...allDeprecatedThemePresets.flatMap((preset) => [
@@ -758,6 +869,35 @@ const testCases: TestsCase[] = [
                 url: 'a/redirect/to/sso',
                 run: async (page) => {
                     await expect(page.locator('h1')).toHaveText('SSO');
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
+        name: 'Content Redirects',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/',
+        tests: [
+            {
+                name: 'Redirect to new location',
+                url: '/content-editor/editing-content/inline/redirect-test',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('Redirect test');
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
+        name: 'Site Redirects with sections',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/sections/',
+        tests: [
+            {
+                // This test that a redirect that incudes a section path works
+                name: 'Redirect to Quickstart page',
+                url: 'sections-2/redirect-test',
+                run: async (page) => {
+                    await expect(page.locator('h1')).toHaveText('Quickstart');
                 },
                 screenshot: false,
             },

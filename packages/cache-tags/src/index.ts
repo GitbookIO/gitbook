@@ -60,7 +60,7 @@ export function getCacheTag(
         | {
               tag: 'computed-document';
               space: string;
-              integration: string;
+              sourceType: string;
           }
         /**
          * All data related to the URL of a content
@@ -84,6 +84,14 @@ export function getCacheTag(
               organization: string;
               openAPISpec: string;
           }
+        /**
+         * All data related to a translation
+         */
+        | {
+              tag: 'translation';
+              organization: string;
+              translationSettings: string;
+          }
 ): string {
     switch (spec.tag) {
         case 'user':
@@ -99,13 +107,15 @@ export function getCacheTag(
         case 'document':
             return `space:${spec.space}:document:${spec.document}`;
         case 'computed-document':
-            return `space:${spec.space}:computed-document:${spec.integration}`;
+            return `space:${spec.space}:computed-document:${spec.sourceType}`;
         case 'site':
             return `site:${spec.site}`;
         case 'integration':
             return `integration:${spec.integration}`;
         case 'openapi':
             return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
+        case 'translation':
+            return `organization:${spec.organization}:translation:${spec.translationSettings}`;
         default:
             assertNever(spec);
     }
@@ -157,6 +167,15 @@ export function getComputedContentSourceCacheTags(
                         })
                     );
                     break;
+                case 'translation-language':
+                    tags.push(
+                        getCacheTag({
+                            tag: 'translation',
+                            organization: inContext.organizationId,
+                            translationSettings: dependency.ref.translationSettings,
+                        })
+                    );
+                    break;
                 default:
                     // Do not throw for unknown dependency types
                     // as it might mean we are lacking behind the API version
@@ -169,18 +188,22 @@ export function getComputedContentSourceCacheTags(
             getCacheTag({
                 tag: 'computed-document',
                 space: inContext.spaceId,
-                integration: source.integration,
+                sourceType: source.type,
             })
         );
     }
 
     // We invalidate the computed content when a new version of the integration is deployed.
-    tags.push(
-        getCacheTag({
-            tag: 'integration',
-            integration: source.integration,
-        })
-    );
+
+    if (source.type.startsWith('integration:')) {
+        const integration = source.type.split(':')[1];
+        tags.push(
+            getCacheTag({
+                tag: 'integration',
+                integration,
+            })
+        );
+    }
 
     return tags;
 }

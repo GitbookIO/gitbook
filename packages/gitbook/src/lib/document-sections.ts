@@ -3,6 +3,7 @@ import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { getNodeText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
+import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock';
 
 export interface DocumentSection {
     id: string;
@@ -49,6 +50,26 @@ export async function getDocumentSections(
                     title: operation.operation.summary || operation.path,
                     depth: 1,
                     deprecated: operation.operation.deprecated,
+                });
+            }
+        }
+
+        if (
+            block.type === 'openapi-schemas' &&
+            !block.data.grouped &&
+            block.meta?.id &&
+            block.data.schemas.length === 1
+        ) {
+            const { data } = await resolveOpenAPISchemasBlock({
+                block,
+                context,
+            });
+            const schema = data?.schemas[0];
+            if (schema) {
+                sections.push({
+                    id: block.meta.id,
+                    title: `The ${schema.name} object`,
+                    depth: 1,
                 });
             }
         }

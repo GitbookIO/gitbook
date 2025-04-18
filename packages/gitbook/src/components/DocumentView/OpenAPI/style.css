@@ -1,10 +1,16 @@
 /* Layout Components */
-.openapi-operation {
-    @apply flex-1 flex flex-col gap-4 mb-14;
+.openapi-operation,
+.openapi-schemas,
+.openapi-webhook {
+    @apply flex-1 flex flex-col gap-8 mb-14 min-w-0;
 }
 
 .openapi-schemas {
     @apply flex flex-col mb-14 flex-1;
+}
+
+.openapi-schemas-title {
+    @apply tabular-nums text-[0.813rem] leading-4 font-mono shrink-0 font-medium text-tint-strong;
 }
 
 .openapi-columns {
@@ -17,21 +23,35 @@
 }
 
 .openapi-summary {
-    @apply flex flex-col items-start justify-start gap-2;
+    @apply flex flex-col items-start justify-start gap-3 scroll-m-12;
 }
 
-.openapi-deprecated {
+.openapi-summary-tags {
+    @apply flex flex-row gap-2 mt-[0.75em];
+}
+
+.openapi-deprecated,
+.openapi-stability {
     @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+}
+
+.openapi-stability-alpha {
+    @apply text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/6 ring-amber-500/5;
+}
+
+.openapi-stability-beta {
+    @apply text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/6 ring-blue-500/5;
+}
+
+.openapi-stability-experimental {
+    @apply text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/6 ring-violet-500/5;
 }
 
 .openapi-deprecated-sunset-date {
     @apply font-semibold font-mono truncate;
 }
 
-.openapi-description.openapi-markdown {
-    @apply prose-sm text-[0.938rem];
-}
-
+.openapi-description.openapi-markdown,
 .openapi-description.openapi-markdown code {
     @apply prose-sm;
 }
@@ -71,21 +91,23 @@
 }
 
 /* Method Tags */
-.openapi-method {
-    @apply rounded uppercase font-mono font-bold text-xs px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+.openapi-method,
+.openapi-statuscode {
+    @apply rounded uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
 
-.openapi-method-get {
-    /* @apply bg-[hsl(215,54%,86%)] dark:bg-[hsla(215,54%,45%,0.24)] dark:text-[hsl(215,54%,86%)]; */
+.openapi-method-get,
+.openapi-statuscode-success {
     @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
 }
 
-.openapi-method-post {
-    /* @apply bg-[hsl(120,25%,80%)] dark:bg-[hsla(120,54%,32%,0.24)] dark:text-[hsl(120,25%,80%)]; */
+.openapi-method-post,
+.openapi-statuscode-redirection {
     @apply bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100;
 }
 
-.openapi-method-put {
+.openapi-method-put,
+.openapi-statuscode-informational {
     @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
 }
 
@@ -93,8 +115,9 @@
     @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100;
 }
 
-.openapi-method-delete {
-    @apply bg-pomegranate-100 text-pomegranate-800 dark:bg-pomegranate-900 dark:text-pomegranate-100;
+.openapi-method-delete,
+.openapi-statuscode-error {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100;
 }
 
 .openapi-method-head,
@@ -131,7 +154,15 @@
 
 /* Schema Structure */
 .openapi-schema-root {
-    @apply mt-2;
+    /* unstyled */
+}
+
+.openapi-schema-root-description.openapi-markdown {
+    @apply prose-sm text-balance mt-1.5 !text-[0.813rem] text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+}
+
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-root-description {
+    @apply px-2.5 pt-2.5 mt-0 !text-sm;
 }
 
 .openapi-schema-properties {
@@ -182,7 +213,7 @@
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none flex gap-x-2.5 items-baseline text-sm flex-wrap;
+    @apply select-none text-sm text-balance *:whitespace-nowrap flex flex-wrap gap-y-1.5 gap-x-2.5;
 }
 
 .openapi-schema-name .openapi-deprecated {
@@ -198,11 +229,19 @@
 }
 
 .openapi-schema-required {
-    @apply text-warning-subtle text-[0.813rem];
+    @apply text-warning-subtle text-[0.813rem] lowercase;
+}
+
+.openapi-schema-optional {
+    @apply text-info-subtle text-[0.813rem] lowercase;
 }
 
 .openapi-schema-readonly {
-    @apply text-primary-subtle/9 text-[0.813rem];
+    @apply text-primary-subtle/9 text-[0.813rem] lowercase;
+}
+
+.openapi-schema-writeonly {
+    @apply text-success dark:text-success-subtle/9 text-[0.813rem] lowercase;
 }
 
 .openapi-schema-type {
@@ -236,11 +275,11 @@
 
 /* Schema Enum */
 .openapi-schema-enum {
-    @apply flex flex-row text-sm leading-relaxed flex-wrap text-tint;
+    @apply text-sm leading-relaxed max-w-full text-tint;
 }
 
 .openapi-schema-enum-value {
-    @apply text-sm;
+    @apply text-sm mr-1.5;
 }
 
 .openapi-schema-enum-value:first-child {
@@ -253,7 +292,7 @@
 
 /* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint overflow-hidden text-pretty !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre:has(code) {
@@ -273,13 +312,15 @@
 
 /* Schema Examples */
 .openapi-schema-example,
-.openapi-schema-pattern {
+.openapi-schema-pattern,
+.openapi-schema-default {
     @apply prose-sm text-tint;
 }
 
 .openapi-schema-example code,
 .openapi-schema-pattern code,
-.openapi-schema-enum-value code {
+.openapi-schema-enum-value code,
+.openapi-schema-default code {
     @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
@@ -293,7 +334,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint !font-normal select-text text-pretty prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
@@ -319,12 +360,12 @@
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply prose-sm text-tint !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint !font-normal text-pretty select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 /* Responses */
 .openapi-responses-header {
-    @apply py-2 border-b border-tint-subtle max-w-full flex-1;
+    @apply py-2 max-w-full flex-1;
 }
 
 .openapi-responses-header-content {
@@ -332,11 +373,12 @@
 }
 
 .openapi-response-tab-content {
-    @apply overflow-hidden max-w-full flex items-baseline gap-2;
+    @apply overflow-hidden max-w-full flex items-baseline;
+    @apply text-left text-pretty relative leading-[1.125rem] text-tint !font-normal truncate select-text;
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply text-left prose-sm text-[0.813rem] h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply text-left prose-sm text-[0.813rem] text-pretty h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-response-description.openapi-markdown::-webkit-scrollbar {
@@ -345,10 +387,6 @@
 
 .openapi-response-description p {
     @apply truncate max-w-full inline pr-1;
-}
-
-.openapi-response-statuscode {
-    @apply tabular-nums text-sm font-normal font-mono shrink-0;
 }
 
 .openapi-response-content-type {
@@ -380,30 +418,68 @@
 
 /* Code Sample */
 .openapi-codesample {
-    @apply border rounded bg-tint border-tint-subtle;
+    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
 }
 
 .openapi-codesample-header {
     @apply flex flex-row items-center;
 }
 
+.openapi-response-media-types-examples-footer-content {
+    @apply flex flex-row items-center gap-2.5;
+}
+
+.openapi-response-examples-header .openapi-select > button {
+    @apply max-w-full overflow-hidden shrink pl-0.5 py-0.5;
+}
+
+.openapi-response-examples-header .openapi-select > button .openapi-statuscode {
+    @apply h-full;
+}
+
 .openapi-codesample-header-content {
-    @apply flex flex-row items-center h-fit;
+    @apply flex flex-row items-center justify-between h-fit p-2.5;
+}
+
+.openapi-codesample-header-content .openapi-path {
+    @apply flex items-center font-mono text-[0.813rem] gap-1 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
+}
+
+.openapi-codesample-header-content .openapi-path .openapi-path-variable {
+    @apply text-[0.813rem];
+}
+
+.openapi-codesample-footer {
+    @apply flex gap-3 w-full justify-between flex-wrap;
+}
+
+.openapi-codesample-selectors {
+    @apply flex flex-row items-center gap-3 flex-wrap;
 }
 
 /* Path */
 .openapi-path {
-    @apply flex items-center bg-transparent text-sm gap-2 p-2 border rounded-md border-tint-subtle;
+    @apply flex items-center text-sm gap-2 h-fit overflow-x-auto min-w-0 max-w-full;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-path-variable {
+    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-none before:!content-none after:!content-none;
+}
+
+.openapi-path-server {
+    @apply text-tint hidden md:inline;
 }
 
 .openapi-path .openapi-method {
-    @apply text-[0.813rem] m-0 px-1;
+    @apply m-0 mt-0.5 items-center flex px-1;
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal whitespace-nowrap overflow-x-auto font-mono text-tint-strong;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    @apply flex-1 relative font-normal text-left font-mono text-tint-strong/10;
+    @apply py-0.5 px-1 rounded hover:bg-tint transition-colors;
+    @apply whitespace-nowrap md:whitespace-normal;
 }
 
 .openapi-path-title[data-deprecated="true"] {
@@ -413,14 +489,6 @@
 .openapi-path-title::-webkit-scrollbar {
     display: none;
 }
-
-/* .openapi-path-copy {
-    @apply absolute opacity-0 h-fit right-0 top-1/2 -translate-y-1/2 bg-light dark:bg-dark border rounded-md border-tint-subtle px-1.5 py-0;
-}
-
-.openapi-path-title:hover .openapi-path-copy {
-    @apply opacity-11;
-} */
 
 .openapi-path-title em {
     @apply not-italic text-primary font-medium;
@@ -434,24 +502,131 @@
     @apply flex flex-row items-center py-2 px-3 justify-end border-t border-tint-subtle;
 }
 
-/* Response Example */
-.openapi-response-example {
-    @apply border rounded bg-tint border-tint-subtle;
+/* Panel */
+.openapi-panel {
+    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
 }
 
-.openapi-response-example-empty {
+.openapi-panel-heading {
+    @apply font-medium px-4 py-2 text-xs uppercase;
+}
+
+.openapi-panel-body {
+    @apply relative;
+    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
+}
+
+.openapi-panel-footer,
+.openapi-codesample-footer {
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
+}
+
+.openapi-panel-footer .openapi-markdown {
+    @apply text-[0.813rem] text-tint;
+}
+
+/* Example */
+.openapi-response-examples {
+    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
+}
+
+.openapi-response-examples-header {
+    @apply flex flex-row items-center p-2.5;
+}
+
+.openapi-response-examples-header-content {
+    @apply max-w-full overflow-hidden truncate;
+}
+
+.openapi-response-examples-statuscode-title {
+    @apply flex items-center;
+}
+
+.openapi-response-examples-header .openapi-select > button,
+.openapi-response-examples-header .openapi-markdown,
+.openapi-response-examples-statuscode-title {
+    @apply text-[0.813rem] truncate text-tint font-normal;
+}
+
+.openapi-response-examples-panel,
+.openapi-codesample-panel {
+    @apply flex-1 text-sm relative focus-visible:outline-none;
+    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
+}
+
+.openapi-example-empty {
     @apply relative text-tint bg-tint min-h-20 flex flex-col justify-center items-center;
 }
 
 /* Common Elements */
 .openapi-select {
-    @apply max-w-60 rounded font-mono text-xs leading-6 px-1 py-0.5 border border-tint-subtle bg-tint;
+    @apply w-auto max-w-full;
 }
 
-.openapi-select {
-    min-width: fit-content;
-    max-width: fit-content;
+/* Prevent react-aria popover from setting overflow:auto on body */
+body:has(.openapi-select-popover) {
+    overflow: unset !important;
 }
+
+.openapi-select > button {
+    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 text-tint-strong max-w-32 rounded text-xs p-1.5 leading-none border border-tint-subtle bg-tint;
+    @apply hover:bg-tint-hover transition-all;
+}
+
+.openapi-select > button[data-focused="true"] {
+    @apply outline-primary -outline-offset-1 outline outline-1;
+}
+
+.openapi-select > button > span.react-aria-SelectValue {
+    @apply shrink truncate flex items-center;
+}
+
+.openapi-select > button > span.react-aria-SelectValue span:not(.openapi-statuscode) {
+    @apply truncate;
+}
+
+.openapi-select > button .openapi-markdown {
+    @apply *:leading-none;
+}
+
+.openapi-select > button .gb-icon {
+    @apply size-2.5 shrink-0;
+}
+
+.openapi-select-popover {
+    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
+    @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
+}
+
+.openapi-select-popover[data-entering] {
+    animation: popover-enter 0.2s ease-in-out;
+}
+
+.openapi-select-popover[data-exiting] {
+    animation: popover-leave 0.2s ease-in-out;
+}
+
+.openapi-select-item {
+    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 *:truncate text-tint ring-0 border-none rounded !outline-none;
+    @apply hover:bg-tint-hover theme-gradient:hover:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
+}
+
+.openapi-select button .openapi-markdown,
+.openapi-select-item .openapi-markdown {
+    @apply text-[0.813rem] *:truncate;
+}
+
+.openapi-select-item-selected,
+.openapi-select-item-selected .openapi-markdown {
+    @apply text-primary-subtle hover:text-primary hover:bg-primary-hover;
+    @apply theme-muted:hover:bg-primary-active theme-gradient:hover:bg-primary-active tint:font-semibold;
+    @apply contrast-more:text-primary contrast-more:hover:text-primary-strong contrast-more:font-semibold;
+}
+
+.openapi-select-listbox {
+    @apply flex flex-col gap-1 focus:ring-0 focus:outline-none;
+}
+
 .openapi-select:focus {
     width: auto;
 }
@@ -477,6 +652,14 @@
     @apply text-tint;
 }
 
+.openapi-section-footer {
+    @apply flex flex-row items-center p-2.5 gap-2.5 text-sm text-tint-strong border-t border-tint-subtle;
+}
+
+.openapi-section-footer-content {
+    @apply text-sm text-tint-strong;
+}
+
 .openapi-section-toggle {
     @apply text-tint-subtle contrast-more:text-tint-strong;
 }
@@ -498,8 +681,9 @@
 }
 
 /* Tabs */
+.openapi-panel-header,
 .openapi-tabs-list {
-    @apply flex flex-row gap-1.5 py-1.5 px-2.5 border-b border-tint-subtle w-full overflow-x-scroll;
+    @apply flex flex-row gap-1.5 py-1.5 px-2.5 w-full overflow-x-scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -509,20 +693,17 @@
 }
 
 .openapi-tabs-tab[aria-selected="true"] {
-    @apply text-primary after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
+    @apply !text-primary-subtle after:absolute after:-bottom-[calc(0.375rem_+_1px)] after:z-20 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
 }
 
 .openapi-tabs-panel {
-    @apply flex-1 text-sm focus-visible:outline-none;
-}
-
-.openapi-tabs-footer {
-    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
+    @apply flex-1 text-sm relative focus-visible:outline-none;
+    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
 }
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-b border-tint-subtle relative;
+    @apply border-tint-subtle border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
 }
 
 .openapi-disclosure-group-header {
@@ -530,16 +711,11 @@
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-baseline relative flex-1 gap-2.5 py-2 truncate -outline-offset-1;
+    @apply flex items-baseline transition-all hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {
-    @apply cursor-default;
-}
-
-.openapi-disclosure-group:only-child,
-.openapi-disclosure-group:last-child {
-    @apply border-b-0;
+    @apply cursor-default hover:bg-inherit;
 }
 
 .openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
@@ -559,28 +735,42 @@
 }
 
 .openapi-disclosure-group-panel {
-    @apply pb-2.5;
+    @apply p-3 pt-1 transition-all;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
     @apply rotate-90;
 }
 
-.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype {
-    @apply opacity-11 flex;
+.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype,
+.openapi-disclosure-group-mediatype:has(> .openapi-select[data-open="true"]) {
+    @apply opacity-11 visible flex;
 }
 
 .openapi-disclosure-group-mediatype {
-    @apply opacity-0 hidden text-xs transition-all duration-200 shrink-0 absolute right-0 top-2.5;
+    @apply opacity-0 invisible text-xs transition-opacity duration-300 shrink-0 absolute right-2.5 top-2.5;
 }
 
 .openapi-disclosure-group-mediatype > span {
-    @apply px-1 bg-tint-6 text-tint-12 rounded-full;
+    @apply px-1 bg-tint-6 text-tint-12 rounded-full straight-corners:rounded-md;
 }
 
 /* Disclosure */
+.openapi-schemas-disclosure > .openapi-disclosure-trigger {
+    @apply flex items-center font-mono !w-full transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+}
+
+.openapi-schemas-disclosure > .openapi-disclosure-trigger,
+.openapi-schemas-disclosure .openapi-disclosure-panel {
+    @apply straight-corners:!rounded-none;
+}
+
+.openapi-schemas-disclosure > .openapi-disclosure-trigger[aria-expanded="true"] > svg {
+    @apply rotate-90;
+}
+
 .openapi-disclosure-trigger {
-    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
 }
 
 .openapi-disclosure-trigger span {
@@ -596,7 +786,7 @@
 }
 
 .openapi-disclosure-trigger[aria-expanded="true"] {
-    @apply w-full rounded-lg border-b rounded-b-none;
+    @apply w-full rounded-lg border-b rounded-b-none straight-corners:rounded-b-none;
 }
 
 .openapi-disclosure-trigger[aria-expanded="false"] {
@@ -604,7 +794,7 @@
 }
 
 .openapi-disclosure-panel[aria-hidden="false"] {
-    @apply border-b border-x border-tint-subtle rounded-b-lg;
+    @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b;
 }
 
 .openapi-disclosure-panel .openapi-schema {
@@ -624,10 +814,71 @@
     @apply space-y-2.5;
 }
 
-.openapi-section-schemas {
-    @apply border border-tint-subtle rounded-lg;
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema,
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-root {
+    @apply p-2.5;
 }
 
-.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema {
-    @apply p-2.5;
+.openapi-tooltip {
+    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+}
+
+.openapi-tooltip svg {
+    @apply size-3 text-tint-strong;
+}
+
+.openapi-tooltip[data-entering] {
+    animation: tooltip-enter 0.2s ease-in-out forwards;
+}
+
+.openapi-tooltip[data-exiting] {
+    animation: tooltip-leave 0.2s ease-in-out forwards;
+}
+
+@keyframes tooltip-enter {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes tooltip-leave {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes popover-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(4px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes popover-leave {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(4px) scale(0.95);
+    }
+}
+
+.openapi-copy-button {
+    @apply hover:brightness-95 cursor-pointer;
+}
+
+.openapi-copy-button[data-disabled="true"] {
+    @apply cursor-default;
 }

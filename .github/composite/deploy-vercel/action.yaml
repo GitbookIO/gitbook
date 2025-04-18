@@ -54,13 +54,16 @@ runs:
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
             GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
+            GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
+            GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Build Project Artifacts
           run: bun run vercel build --target=${{ inputs.environment }} --token=${{ inputs.vercelToken }}
           shell: bash
           env:
             VERCEL_ORG_ID: ${{ inputs.vercelOrg }}
             VERCEL_PROJECT_ID: ${{ inputs.vercelProject }}
+            GITBOOK_RUNTIME: vercel
         - name: Deploy Project Artifacts to Vercel
           id: deploy
           shell: bash
@@ -74,3 +77,4 @@ runs:
           shell: bash
           run: |
               echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+

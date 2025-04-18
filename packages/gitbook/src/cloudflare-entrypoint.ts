@@ -1,6 +1,7 @@
 // @ts-ignore
 import nextOnPagesHandler from '@cloudflare/next-on-pages/fetch-handler';
 
+import { withResponseCacheTags } from './lib/cache/response';
 import { withMiddlewareHeadersStorage } from './lib/middleware';
 
 /**
@@ -9,8 +10,8 @@ import { withMiddlewareHeadersStorage } from './lib/middleware';
  */
 export default {
     async fetch(request, env, ctx) {
-        const response = await withMiddlewareHeadersStorage(() =>
-            nextOnPagesHandler.fetch(request, env, ctx)
+        const response = await withResponseCacheTags(() =>
+            withMiddlewareHeadersStorage(() => nextOnPagesHandler.fetch(request, env, ctx))
         );
 
         return response;

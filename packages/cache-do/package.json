@@ -21,10 +21,10 @@
     },
     "devDependencies": {
         "typescript": "^5.5.3",
-        "wrangler": "^3.112.0"
+        "wrangler": "^4.10.0"
     },
     "scripts": {
-        "generate": "wrangler types --experimental-include-runtime",
+        "generate": "wrangler types",
         "build": "tsc",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w",

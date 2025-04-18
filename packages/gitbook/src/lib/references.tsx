@@ -1,6 +1,7 @@
 import type {
     ContentRef,
     RevisionFile,
+    RevisionPageDocument,
     RevisionReusableContent,
     SiteSpace,
     Space,
@@ -14,11 +15,12 @@ import type React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
 
+import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
-import { getGitbookAppHref } from './links';
 import { resolvePageId } from './pages';
 import { findSiteSpaceById } from './sites';
 import type { ClassValue } from './tailwind';
+import { filterOutNullable } from './typescript';
 
 export interface ResolvedContentRef {
     /** Text to render in the content ref */
@@ -29,12 +31,16 @@ export interface ResolvedContentRef {
     icon?: React.ReactNode;
     /** Emoji associated with the reference */
     emoji?: string;
+    /** The content ref's ancestors */
+    ancestors?: { icon?: React.ReactNode; label: string; href?: string }[];
     /** URL to open for the content ref */
     href: string;
     /** True if the content ref is active */
     active: boolean;
     /** File, if the reference is a file */
     file?: RevisionFile;
+    /** Page document resolved from the content ref */
+    page?: RevisionPageDocument;
     /** Resolved reusable content, if the ref points to reusable content on a revision. */
     reusableContent?: RevisionReusableContent;
     /** Resolve OpenAPI spec filesystem. */
@@ -115,6 +121,14 @@ export async function resolveContentRef(
                     : resolvePageId(pages, contentRef.page);
 
             const page = resolvePageResult?.page;
+            const ancestors =
+                resolvePageResult?.ancestors.map((ancestor) => ({
+                    label: ancestor.title,
+                    icon: <PageIcon page={ancestor} style={iconStyle} />,
+                    href: resolveAsAbsoluteURL
+                        ? linker.toAbsoluteURL(linker.toPathForPage({ page: ancestor, pages }))
+                        : linker.toPathForPage({ page: ancestor, pages }),
+                })) ?? [];
             if (!page) {
                 return null;
             }
@@ -125,10 +139,16 @@ export async function resolveContentRef(
             let text = '';
             let icon: React.ReactNode | undefined = undefined;
             let emoji: string | undefined = undefined;
+            const href = linker.toPathForPage({ page, pages, anchor });
 
             // Compute the text to display for the link
             if (anchor) {
                 text = `#${anchor}`;
+                ancestors.push({
+                    label: page.title,
+                    icon: <PageIcon page={page} style={iconStyle} />,
+                    href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
+                });
 
                 if (resolveAnchorText) {
                     const document = await getPageDocument(dataFetcher, space, page);
@@ -151,13 +171,14 @@ export async function resolveContentRef(
                 icon = <PageIcon page={page} style={iconStyle} />;
             }
 
-            const href = linker.toPathForPage({ page, pages, anchor });
-
             return {
                 href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
                 text,
+                subText: page.description,
+                ancestors: ancestors,
                 emoji,
                 icon,
+                page,
                 active: !anchor && page.id === activePage?.id,
             };
         }
@@ -173,7 +194,7 @@ export async function resolveContentRef(
 
             if (!targetSpace) {
                 return {
-                    href: getGitbookAppHref(`/s/${contentRef.space}`),
+                    href: getGitBookAppHref(`/s/${contentRef.space}`),
                     text: 'space',
                     active: false,
                 };
@@ -203,7 +224,7 @@ export async function resolveContentRef(
 
         case 'collection': {
             return {
-                href: getGitbookAppHref('/home'),
+                href: getGitBookAppHref('/home'),
                 text: 'collection',
                 active: false,
             };
@@ -221,7 +242,7 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: getGitbookAppHref(`/s/${space.id}`),
+                href: getGitBookAppHref(`/s/${space.id}`),
                 text: reusableContent.title,
                 active: false,
                 reusableContent,
@@ -323,7 +344,8 @@ async function resolveContentRefInSpace(
     );
     const linker = createLinker({
         host: baseURL.host,
-        pathname: baseURL.pathname,
+        spaceBasePath: baseURL.pathname,
+        siteBasePath: baseURL.pathname,
     });
 
     const resolved = await resolveContentRef(
@@ -345,6 +367,12 @@ async function resolveContentRefInSpace(
 
     return {
         ...resolved,
-        subText: space.title,
+        ancestors: [
+            {
+                label: space.title,
+                href: baseURL.toString(),
+            },
+            ...(resolved.ancestors ?? []),
+        ].filter(filterOutNullable),
     };
 }

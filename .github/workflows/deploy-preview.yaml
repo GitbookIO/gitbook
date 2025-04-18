@@ -10,7 +10,7 @@ jobs:
     deploy-v1-cloudflare:
         name: Deploy v1 to Cloudflare Pages
         runs-on: ubuntu-latest
-        environment: 
+        environment:
           name: ${{ github.ref == 'refs/heads/main' && '1c-production' || '1c-preview' }}
           url: ${{ steps.deploy.outputs.deployment-url }}
         permissions:
@@ -35,21 +35,12 @@ jobs:
             - name: Sets env vars for production
               if: github.ref == 'refs/heads/main'
               run: |
-                echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
                 echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
-            - name: Sets env vars for preview
-              if: github.ref != 'refs/heads/main'
-              run: |
-                  echo "SENTRY_ENVIRONMENT=preview" >> $GITHUB_ENV
             - name: Build Next.js with next-on-pages
               run: bun run turbo gitbook#build:cloudflare
               env:
-                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
                   NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-                  SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-                  SENTRY_DSN: ${{ vars.SENTRY_DSN }}
-                  SENTRY_RELEASE: ${{ github.sha }}
+                  GITBOOK_RUNTIME: cloudflare
             - id: deploy
               name: Deploy to Cloudflare
               uses: cloudflare/wrangler-action@v3.14.0
@@ -66,7 +57,7 @@ jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
-        environment: 
+        environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
@@ -87,11 +78,11 @@ jobs:
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
-        environment: 
+        environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
         outputs:
-            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+            deployment-url: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -105,9 +96,19 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   opItem: op://gitbook-open/2c-preview
                   opServiceAccount: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+                  commitTag: ${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
+                  commitMessage: ${{ github.sha }}
+            - name: Extract Worker ID
+              id: extract-worker-id
+              if: ${{ !steps.deploy.outputs.deployment-url }}
+              run: |
+                if [[ "${{ steps.deploy.outputs.command-output }}" =~ Worker\ Version\ ID:\ ([0-9a-f]{8})-([0-9a-f-]+) ]]; then
+                  WORKER_ID_FIRST_PART="${BASH_REMATCH[1]}"
+                  echo "worker-url=https://${WORKER_ID_FIRST_PART}-gitbook-open-v2-preview.gitbook.workers.dev/" >> $GITHUB_OUTPUT
+                fi
             - name: Outputs
               run: |
-                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
+                  echo "URL: ${{ steps.deploy.outputs.deployment-url || steps.extract-worker-id.outputs.worker-url }}"
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
@@ -133,14 +134,14 @@ jobs:
                   body: |
                       Summary of the deployments:
 
-                      ### Version 1 (production)
+                      ### Version 1
 
                       | Version | URL | Status |
                       | --- | --- | --- |
                       | Latest commit | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v1-cloudflare.result == 'success' && '✅' || '❌' }} |
                       | PR | [${{ needs.deploy-v1-cloudflare.outputs.deployment-alias-url }}](${{ needs.deploy-v1-cloudflare.outputs.deployment-alias-url }}) | ${{ needs.deploy-v1-cloudflare.result == 'success' && '✅' || '❌' }} |
 
-                      ### Version 2 (experimental)
+                      ### Version 2
 
                       | Version | URL | Status |
                       | --- | --- | --- |
@@ -149,10 +150,10 @@ jobs:
 
                       ### Test content
 
-                      | Site | v1 | v2 |
-                      | --- | --- | --- |
-                      | GitBook | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com) |
-                      | E2E | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
+                      | Site | `v1` | `2v` | `2c` |
+                      | --- | --- | --- | --- |
+                      | GitBook | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/docs.gitbook.com](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/docs.gitbook.com) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/docs.gitbook.com) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/docs.gitbook.com](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/docs.gitbook.com) |
+                      | E2E | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
                   edit-mode: replace
     visual-testing-v1:
         runs-on: ubuntu-latest
@@ -194,11 +195,33 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'v2-vercel'
+    visual-testing-v2-cloudflare:
+        runs-on: ubuntu-latest
+        name: Visual Testing v2 (Cloudflare)
+        needs: deploy-v2-cloudflare
+        timeout-minutes: 10
+        if: startsWith(github.head_ref || github.ref_name, 'cloudflare/') || github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - name: Setup Playwright
+              uses: ./.github/actions/setup-playwright
+            - name: Run Playwright tests
+              run: bun e2e
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: 'v2-cloudflare'
     visual-testing-customers-v1:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v1
         needs: deploy-v1-cloudflare
-        timeout-minutes: 6
+        timeout-minutes: 8
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -218,7 +241,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
-        timeout-minutes: 6
+        timeout-minutes: 8
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -233,6 +256,28 @@ jobs:
               env:
                   BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}
                   SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
+                  ARGOS_BUILD_NAME: 'customers-v2'
+    visual-testing-customers-v2-cloudflare:
+        runs-on: ubuntu-latest
+        name: Visual Testing Customers v2 (Cloudflare)
+        needs: deploy-v2-cloudflare
+        timeout-minutes: 8
+        if: startsWith(github.head_ref || github.ref_name, 'cloudflare/') || github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: ./.github/composite/setup-bun
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - name: Setup Playwright
+              uses: ./.github/actions/setup-playwright
+            - name: Run Playwright tests
+              run: bun e2e-customers
+              env:
+                  BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
     pagespeed-testing-v1:

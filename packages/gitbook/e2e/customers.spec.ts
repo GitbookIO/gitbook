@@ -1,4 +1,4 @@
-import { type TestsCase, runTestCases } from './util';
+import { type TestsCase, runTestCases, waitForCookiesDialog } from './util';
 
 /** A list of test cases to run on the customers' docs sites. */
 const testCases: TestsCase[] = [
@@ -6,15 +6,22 @@ const testCases: TestsCase[] = [
         name: 'Snyk',
         contentBaseURL: 'https://docs.snyk.io',
         tests: [
-            { name: 'Home', url: '/' },
-            { name: 'OpenAPI', url: '/snyk-api/reference/apps' },
+            { name: 'Home', url: '/', run: waitForCookiesDialog },
+            { name: 'OpenAPI', url: '/snyk-api/reference/apps', run: waitForCookiesDialog },
         ],
     },
-    {
-        name: 'Nexthink',
-        contentBaseURL: 'https://docs.nexthink.com',
-        tests: [{ name: 'Home', url: '/', screenshot: { waitForTOCScrolling: false } }],
-    },
+    // {
+    //     name: 'Nexthink',
+    //     contentBaseURL: 'https://docs.nexthink.com',
+    //     tests: [
+    //         {
+    //             name: 'Home',
+    //             url: '/',
+    //             screenshot: { waitForTOCScrolling: false },
+    //             run: waitForCookiesDialog,
+    //         },
+    //     ],
+    // },
     {
         name: 'asiksupport-stg.dto.kemkes.go.id',
         contentBaseURL: 'https://asiksupport-stg.dto.kemkes.go.id',
@@ -33,7 +40,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.dify.ai',
         contentBaseURL: 'https://docs.dify.ai',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'seeddao.gitbook.io',
@@ -63,32 +70,27 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.portainer.io',
         contentBaseURL: 'https://docs.portainer.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.chirptoken.io',
         contentBaseURL: 'https://docs.chirptoken.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.dexscreener.com',
         contentBaseURL: 'https://docs.dexscreener.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.pancakeswap.finance',
         contentBaseURL: 'https://docs.pancakeswap.finance',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'book.character.ai',
         contentBaseURL: 'https://book.character.ai',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
-        name: 'docs.tradeonnova.io',
-        contentBaseURL: 'https://docs.tradeonnova.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'azcoiner.gitbook.io',
@@ -103,7 +105,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.keeper.io',
         contentBaseURL: 'https://docs.keeper.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'adiblar.gitbook.io',
@@ -138,12 +140,12 @@ const testCases: TestsCase[] = [
     {
         name: 'meshnet.nordvpn.com',
         contentBaseURL: 'https://meshnet.nordvpn.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'manual.bubble.io',
         contentBaseURL: 'https://manual.bubble.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.tickettool.xyz',
@@ -155,15 +157,15 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://wiki.redmodding.org',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.cherry-ai.com',
-        contentBaseURL: 'https://docs.cherry-ai.com',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // {
+    //     name: 'docs.cherry-ai.com',
+    //     contentBaseURL: 'https://docs.cherry-ai.com',
+    //     tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    // },
     {
         name: 'docs.snyk.io',
         contentBaseURL: 'https://docs.snyk.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.realapp.link',
@@ -188,7 +190,14 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.umbraco.com',
         contentBaseURL: 'https://docs.umbraco.com',
-        tests: [{ name: 'Home', url: '/welcome', screenshot: { waitForTOCScrolling: false } }],
+        tests: [
+            {
+                name: 'Home',
+                url: '/welcome',
+                run: waitForCookiesDialog,
+                screenshot: { waitForTOCScrolling: false },
+            },
+        ],
     },
     {
         name: 'sosovalue-white-paper.gitbook.io',
@@ -198,12 +207,12 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.revrobotics.com',
         contentBaseURL: 'https://docs.revrobotics.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'chartschool.stockcharts.com',
         contentBaseURL: 'https://chartschool.stockcharts.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.soniclabs.com',
@@ -218,7 +227,7 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.thousandeyes.com',
         contentBaseURL: 'https://docs.thousandeyes.com',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'docs.raydium.io',
@@ -228,7 +237,16 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.fluentbit.io',
         contentBaseURL: 'https://docs.fluentbit.io',
-        tests: [{ name: 'Home', url: '/' }],
+        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    },
+    {
+        name: 'run-ai-docs.nvidia.com',
+        contentBaseURL: 'https://run-ai-docs.nvidia.com',
+        skip: process.env.ARGOS_BUILD_NAME !== 'customers-v2',
+        tests: [
+            { name: 'Home', url: '/' },
+            { name: 'OG Image', url: '/~gitbook/ogimage/h17zQIFwy3MaafVNmItO', mode: 'image' },
+        ],
     },
 ];
 

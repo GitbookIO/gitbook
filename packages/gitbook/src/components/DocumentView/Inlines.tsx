@@ -24,14 +24,16 @@ export function Inlines<T extends DocumentInline | DocumentText>(
 ) {
     const { nodes, document, ancestorInlines, ...contextProps } = props;
 
-    return nodes.map((node) => {
+    return nodes.map((node, index) => {
+        const key = node.key || `key-${index}`;
+
         if (node.object === 'text') {
-            return <Text key={node.key} text={node} />;
+            return <Text key={key} text={node} />;
         }
 
         return (
             <Inline
-                key={node.key}
+                key={key}
                 inline={node}
                 document={document}
                 ancestorInlines={ancestorInlines}

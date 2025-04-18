@@ -27,7 +27,7 @@ export async function PageHeader(props: {
         >
             {ancestors.length > 0 && (
                 <nav>
-                    <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2')}>
+                    <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
                         {ancestors.map((breadcrumb, index) => {
                             const href = linker.toPathForPage({ pages, page: breadcrumb });
                             return (
@@ -35,7 +35,7 @@ export async function PageHeader(props: {
                                     <li key={breadcrumb.id}>
                                         <StyledLink
                                             href={href}
-                                            style={tcls(
+                                            className={tcls(
                                                 'no-underline',
                                                 'hover:underline',
                                                 'text-xs',

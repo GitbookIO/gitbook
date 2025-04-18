@@ -19,6 +19,12 @@ inputs:
   deploy:
     description: 'Deploy as main version for all traffic instead of uploading versions'
     required: true
+  commitTag:
+    description: 'Commit branch to associate with the deployment'
+    required: true
+  commitMessage:
+    description: 'Commit message to associate with the deployment'
+    required: true
 outputs:
     deployment-url: 
       description: "Deployment URL"
@@ -49,9 +55,13 @@ runs:
             GITBOOK_INTEGRATIONS_HOST: ${{ inputs.opItem }}/GITBOOK_INTEGRATIONS_HOST
             GITBOOK_IMAGE_RESIZE_SIGNING_KEY: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_SIGNING_KEY
             GITBOOK_IMAGE_RESIZE_URL: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_URL
+            GITBOOK_IMAGE_RESIZE_MODE: ${{ inputs.opItem }}/GITBOOK_IMAGE_RESIZE_MODE
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
+            GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Build worker
           run: bun run turbo build:v2:cloudflare
+          env:
+            GITBOOK_RUNTIME: cloudflare
           shell: bash
         - id: deploy
           name: Deploy to Cloudflare
@@ -60,9 +70,9 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '3.112.0'
+              wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
-              command: ${{ fromJSON(inputs.deploy) == true && 'deploy' || 'versions upload' }} --config ./packages/gitbook-v2/wrangler.toml
+              command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/wrangler.jsonc
         - name: Outputs
           shell: bash
           env:

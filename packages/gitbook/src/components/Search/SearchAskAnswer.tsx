@@ -236,7 +236,6 @@ function AnswerSources(props: {
                             'focus-within:text-primary'
                         )}
                         href={source.href}
-                        prefetch={false}
                     >
                         <Icon
                             icon="arrow-up-right"

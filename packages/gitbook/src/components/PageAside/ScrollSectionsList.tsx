@@ -70,9 +70,6 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         href={`#${section.id}`}
                         className={tcls(
                             'relative',
-                            'flex',
-                            'flex-row',
-                            'items-baseline',
                             'z-10',
                             'text-sm',
 
@@ -114,7 +111,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
 
                                 'hover:bg-primary-hover',
                                 'theme-muted:hover:bg-primary-active',
-                                'theme-bold-tint:hover:bg-primary-active',
+                                '[html.sidebar-filled.theme-bold.tint_&]:hover:bg-primary-active',
                                 'theme-gradient:hover:bg-primary-active',
 
                                 'tint:font-semibold',
@@ -126,7 +123,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                     >
                         {section.tag ? (
                             <span
-                                className={`openapi-method openapi-method-${section.tag.toLowerCase()}`}
+                                className={`-mt-0.5 openapi-method !text-xs openapi-method-${section.tag.toLowerCase()}`}
                             >
                                 {section.tag}
                             </span>

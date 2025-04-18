@@ -35,7 +35,7 @@ export function PageAside(props: {
     const { customization, site, space } = context;
     const language = getSpaceLanguage(customization);
 
-    const pdfHref = context.linker.toPathInContent(
+    const pdfHref = context.linker.toPathInSpace(
         `~gitbook/pdf?${getPDFURLSearchParams({
             page: page.id,
             only: true,
@@ -48,8 +48,11 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
+                // 'page-no-toc:lg:flex',
                 'flex-col',
                 'basis-56',
+                // 'page-no-toc:basis-40',
+                // 'page-no-toc:xl:basis-56',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
@@ -225,7 +228,7 @@ export function PageAside(props: {
             ) : null}
             <div
                 className={tcls(
-                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-bold-tint:bg-tint-subtle theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:group-hover/aside:flex',
+                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:group-hover/aside:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'page-api-block:xl:max-2xl:bg-transparent'
                 )}
             >

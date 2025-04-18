@@ -1,9 +1,10 @@
 'use client';
 
 import clsx from 'clsx';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';
+import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { Section, SectionBody, SectionHeader, SectionHeaderContent } from './StaticSection';
 
 interface InteractiveSectionTab {
@@ -32,10 +33,12 @@ export function InteractiveSection(props: {
     defaultTab?: string;
     /** Content of the header */
     header?: React.ReactNode;
-    /** Body of the section */
-    children?: React.ReactNode;
     /** Children to display within the container */
     overlay?: React.ReactNode;
+    /** State key to use with a store */
+    stateKey?: string;
+    /** Icon for the tabs select */
+    selectIcon?: React.ReactNode;
 }) {
     const {
         id,
@@ -45,15 +48,11 @@ export function InteractiveSection(props: {
         tabs = [],
         defaultTab = tabs[0]?.key,
         header,
-        children,
         overlay,
         toggleIcon = '▶',
+        selectIcon,
+        stateKey = 'interactive-section',
     } = props;
-
-    const [selectedTabKey, setSelectedTab] = useState(defaultTab);
-    const selectedTab: InteractiveSectionTab | undefined =
-        tabs.find((tab) => tab.key === selectedTabKey) ?? tabs[0];
-
     const state = useDisclosureState({
         defaultExpanded: defaultOpened,
     });
@@ -62,6 +61,10 @@ export function InteractiveSection(props: {
     const { buttonProps: triggerProps, panelProps } = useDisclosure({}, state, panelRef);
     const { buttonProps } = useButton(triggerProps, triggerRef);
     const { isFocusVisible, focusProps } = useFocusRing();
+    const store = useSelectState(stateKey, defaultTab);
+
+    const selectedTab: InteractiveSectionTab | undefined =
+        tabs.find((tab) => tab.key === store.key) ?? tabs[0];
 
     return (
         <Section
@@ -83,7 +86,7 @@ export function InteractiveSection(props: {
                     className={className}
                 >
                     <SectionHeaderContent className={className}>
-                        {(children || selectedTab?.body) && toggeable ? (
+                        {selectedTab?.body && toggeable ? (
                             <button
                                 {...mergeProps(buttonProps, focusProps)}
                                 ref={triggerRef}
@@ -99,6 +102,7 @@ export function InteractiveSection(props: {
                         ) : null}
                         {header}
                     </SectionHeaderContent>
+                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: we prevent default here */}
                     <div
                         className={clsx(
                             'openapi-section-header-controls',
@@ -109,31 +113,27 @@ export function InteractiveSection(props: {
                         }}
                     >
                         {tabs.length > 1 ? (
-                            <select
-                                className={clsx(
-                                    'openapi-section-select',
-                                    'openapi-select',
-                                    `${className}-tabs-select`
-                                )}
-                                value={selectedTab?.key ?? ''}
-                                onChange={(event) => {
-                                    setSelectedTab(event.target.value);
+                            <OpenAPISelect
+                                stateKey={stateKey}
+                                items={tabs}
+                                onSelectionChange={() => {
                                     state.expand();
                                 }}
+                                icon={selectIcon}
+                                placement="bottom end"
                             >
                                 {tabs.map((tab) => (
-                                    <option key={tab.key} value={tab.key}>
+                                    <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
                                         {tab.label}
-                                    </option>
+                                    </OpenAPISelectItem>
                                 ))}
-                            </select>
+                            </OpenAPISelect>
                         ) : null}
                     </div>
                 </SectionHeader>
             ) : null}
-            {(!toggeable || state.isExpanded) && (children || selectedTab?.body) ? (
+            {(!toggeable || state.isExpanded) && selectedTab?.body ? (
                 <SectionBody ref={panelRef} {...panelProps} className={className}>
-                    {children}
                     {selectedTab?.body}
                 </SectionBody>
             ) : null}

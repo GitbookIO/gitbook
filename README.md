@@ -59,15 +59,15 @@ bun install
 4. Start your local development server.
 
 ```
-bun dev
+bun dev:v2
 ```
 
 5. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
 
 examples:
 
--   http://localhost:3000/docs.gitbook.com
--   http://localhost:3000/open-source.gitbook.io/midjourney
+-   http://localhost:3000/url/docs.gitbook.com
+-   http://localhost:3000/url/open-source.gitbook.io/midjourney
 
 Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
 

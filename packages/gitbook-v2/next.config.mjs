@@ -5,7 +5,15 @@
  */
 const nextConfig = {
     experimental: {
+        // This is needed to throw "forbidden" when the api token expired during revalidation
+        authInterrupts: true,
         useCache: true,
+
+        // Content is fully static, we can cache it in the session memory cache for a long time
+        staleTimes: {
+            dynamic: 3600, // 1 hour
+            static: 3600, // 1 hour
+        },
     },
 
     env: {
@@ -23,6 +31,9 @@ const nextConfig = {
         GITBOOK_ASSETS_PREFIX: process.env.GITBOOK_ASSETS_PREFIX,
         GITBOOK_SECRET: process.env.GITBOOK_SECRET,
         GITBOOK_IMAGE_RESIZE_SIGNING_KEY: process.env.GITBOOK_IMAGE_RESIZE_SIGNING_KEY,
+        GITBOOK_IMAGE_RESIZE_MODE: process.env.GITBOOK_IMAGE_RESIZE_MODE,
+        GITBOOK_FONTS_URL: process.env.GITBOOK_FONTS_URL,
+        GITBOOK_RUNTIME: process.env.GITBOOK_RUNTIME,
 
         // Next.js envs
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,
@@ -41,6 +52,24 @@ const nextConfig = {
                 hostname: '*.gitbook.io',
             },
         ],
+    },
+
+    async headers() {
+        return [
+            {
+                source: '/~gitbook/static/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                    {
+                        key: 'Access-Control-Allow-Origin',
+                        value: '*',
+                    },
+                ],
+            },
+        ];
     },
 };
 

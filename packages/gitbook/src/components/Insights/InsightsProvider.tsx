@@ -5,9 +5,10 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import * as cookies from '@/lib/cookies';
-
+import type { VisitorAuthClaims } from '@/lib/adaptive';
+import { getAllBrowserCookiesMap } from '@/lib/browser-cookies';
 import { getSession } from './sessions';
+import { useVisitedPages } from './useVisitedPages';
 import { getVisitorId } from './visitorId';
 
 export type InsightsEventName = api.SiteInsightsEvent['type'];
@@ -23,6 +24,7 @@ type InsightsEventContext = {
     siteShareKey: string | null;
     spaceId: string;
     revisionId: string;
+    visitorAuthClaims: VisitorAuthClaims;
 };
 
 /**
@@ -62,10 +64,19 @@ type TrackEventCallback = <EventName extends InsightsEventName>(
 const InsightsContext = React.createContext<TrackEventCallback>(() => {});
 
 interface InsightsProviderProps extends InsightsEventContext {
+    /** If true, the events will be sent to the server. */
     enabled: boolean;
+
+    /** If true, the visitor cookie tracking will be used */
+    visitorCookieTrackingEnabled: boolean;
+
+    /** The URL of the app. */
     appURL: string;
+
+    /** The host of the API. */
     apiHost: string;
-    visitorAuthToken: string | null;
+
+    /** The children of the provider. */
     children: React.ReactNode;
 }
 
@@ -73,8 +84,9 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, visitorAuthToken, children, ...context } = props;
+    const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled, ...context } = props;
 
+    const addVisitedPage = useVisitedPages((state) => state.addPage);
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
         [pathname: string]:
@@ -116,7 +128,6 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     pageContext: eventsForPathname.pageContext,
                     visitorId,
                     sessionId: session.id,
-                    visitorAuthToken,
                 })
             );
 
@@ -125,6 +136,14 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 ...eventsForPathname,
                 events: [],
             };
+
+            // Mark the page as visited in our local state
+            if (eventsForPathname.pageContext.pageId) {
+                addVisitedPage({
+                    spaceId: context.spaceId,
+                    pageId: eventsForPathname.pageContext.pageId,
+                });
+            }
         }
 
         if (allEvents.length > 0) {
@@ -141,7 +160,8 @@ export function InsightsProvider(props: InsightsProviderProps) {
     });
 
     const flushBatchedEvents = useDebounceCallback(async () => {
-        const visitorId = visitorIdRef.current ?? (await getVisitorId(appURL));
+        const visitorId =
+            visitorIdRef.current ?? (await getVisitorId(appURL, visitorCookieTrackingEnabled));
         visitorIdRef.current = visitorId;
 
         flushEventsSync();
@@ -185,7 +205,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
      * Get the visitor ID and store it in a ref.
      */
     React.useEffect(() => {
-        getVisitorId(appURL).then((visitorId) => {
+        getVisitorId(appURL, visitorCookieTrackingEnabled).then((visitorId) => {
             visitorIdRef.current = visitorId;
             // When the page is unloaded, flush all events, but only if the visitor ID is set
             window.addEventListener('beforeunload', flushEventsSync);
@@ -193,7 +213,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync, appURL]);
+    }, [flushEventsSync, appURL, visitorCookieTrackingEnabled]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
@@ -253,16 +273,15 @@ function transformEvents(input: {
     pageContext: InsightsEventPageContext;
     visitorId: string;
     sessionId: string;
-    visitorAuthToken: string | null;
 }): api.SiteInsightsEvent[] {
     const session: api.SiteInsightsEventSession = {
         sessionId: input.sessionId,
         visitorId: input.visitorId,
         userAgent: window.navigator.userAgent,
         language: window.navigator.language,
-        cookies: cookies.getAll(),
+        cookies: getAllBrowserCookiesMap(),
         referrer: document.referrer || null,
-        visitorAuthToken: input.visitorAuthToken ?? null,
+        visitorAuthClaims: input.context.visitorAuthClaims,
     };
 
     const location: api.SiteInsightsEventLocation = {

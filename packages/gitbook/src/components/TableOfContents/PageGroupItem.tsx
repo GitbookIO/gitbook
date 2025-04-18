@@ -40,7 +40,7 @@ export function PageGroupItem(props: {
                     'bg-tint-base',
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
-                    'theme-bold-tint:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
