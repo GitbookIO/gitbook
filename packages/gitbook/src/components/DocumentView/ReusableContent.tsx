@@ -13,7 +13,10 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         throw new Error('Expected a content context to render a reusable content block');
     }
 
-    const resolved = await resolveContentRef(block.data.ref, context.contentContext);
+    const resolved = await resolveContentRef(block.data.ref, context.contentContext, {
+        apiToken: block.meta?.token,
+    });
+
     if (!resolved?.reusableContent?.document) {
         return null;
     }
@@ -22,6 +25,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         context.contentContext.dataFetcher.getDocument({
             spaceId: context.contentContext.space.id,
             documentId: resolved.reusableContent.document,
+            apiToken: block.meta?.token,
         })
     );
 

@@ -210,7 +210,8 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                 const reusableContent = await getReusableContent(
                     params.spaceId,
                     params.revisionId,
-                    params.reusableContentId
+                    params.reusableContentId,
+                    params.apiToken
                 );
 
                 if (!reusableContent) {

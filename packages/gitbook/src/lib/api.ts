@@ -671,8 +671,10 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
 export const getReusableContent = async (
     spaceId: string,
     revisionId: string,
-    reusableContentId: string
+    reusableContentId: string,
+    apiToken?: string
 ): Promise<RevisionReusableContent | null> => {
+    ishouldbeimplmeneted;
     const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
         metadata: false,
     });

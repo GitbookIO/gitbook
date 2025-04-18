@@ -125,13 +125,14 @@ export function createDataFetcher(
             );
         },
         getReusableContent(params) {
-            return trace('getReusableContent', () =>
-                getReusableContent(input, {
+            return trace('getReusableContent', () => {
+                const withToken = params.apiToken ? { ...input, apiToken: params.apiToken } : input;
+                return getReusableContent(withToken, {
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
                     reusableContentId: params.reusableContentId,
-                })
-            );
+                });
+            });
         },
         getLatestOpenAPISpecVersionContent(params) {
             return trace('getLatestOpenAPISpecVersionContent', () =>
@@ -158,12 +159,14 @@ export function createDataFetcher(
             );
         },
         getDocument(params) {
-            return trace('getDocument', () =>
-                getDocument(input, {
+            return trace('getDocument', () => {
+                const withToken = params.apiToken ? { ...input, apiToken: params.apiToken } : input;
+
+                return getDocument(withToken, {
                     spaceId: params.spaceId,
                     documentId: params.documentId,
-                })
-            );
+                });
+            });
         },
         getComputedDocument(params) {
             return trace('getComputedDocument', () =>
