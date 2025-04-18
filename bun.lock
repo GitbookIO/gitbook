@@ -49,7 +49,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "dependencies": {
         "@gitbook/api": "*",
         "@gitbook/cache-do": "workspace:*",
@@ -231,7 +231,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.1.10",
+      "version": "1.2.0",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.2.19",
