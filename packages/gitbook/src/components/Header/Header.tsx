@@ -212,6 +212,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
                                         className="w-full grow py-1"
+                                        useFixedPosition={true}
                                     />
                                 </div>
                             )}

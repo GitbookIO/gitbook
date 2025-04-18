@@ -3,15 +3,17 @@ import type { SiteSpace } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSiteContext } from '@v2/lib/context';
-import { Dropdown, DropdownChevron, DropdownMenu } from './Dropdown';
+import { Dropdown, DropdownChevron, DropdownMenu, type DropdownProps } from './Dropdown';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
-export function SpacesDropdown(props: {
-    context: GitBookSiteContext;
-    siteSpace: SiteSpace;
-    siteSpaces: SiteSpace[];
-    className?: string;
-}) {
+export function SpacesDropdown(
+    props: {
+        context: GitBookSiteContext;
+        siteSpace: SiteSpace;
+        siteSpaces: SiteSpace[];
+        className?: string;
+    } & Partial<DropdownProps>
+) {
     const { context, siteSpace, siteSpaces, className } = props;
     const { linker } = context;
 
@@ -67,6 +69,7 @@ export function SpacesDropdown(props: {
                     <DropdownChevron />
                 </div>
             )}
+            {...props}
         >
             <DropdownMenu>
                 {siteSpaces.map((otherSiteSpace, index) => (

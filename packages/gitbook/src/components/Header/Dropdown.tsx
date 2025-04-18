@@ -10,18 +10,22 @@ export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     'ref'
 >;
 
-/**
- * Button with a dropdown.
- */
-export function Dropdown<E extends HTMLElement>(props: {
+export type DropdownProps<E extends HTMLElement = HTMLElement> = {
     /** Content of the button */
     button: (buttonProps: DropdownButtonProps<E>) => React.ReactNode;
     /** Content of the dropdown */
     children: React.ReactNode;
     /** Custom styles */
     className?: ClassValue;
-}) {
-    const { button, children, className } = props;
+    /** Whether to use fixed positioning (for fixed navbars) */
+    useFixedPosition?: boolean;
+};
+
+/**
+ * Button with a dropdown.
+ */
+export function Dropdown<E extends HTMLElement = HTMLElement>(props: DropdownProps<E>) {
+    const { button, children, className, useFixedPosition = false } = props;
     const dropdownId = useId();
 
     return (
@@ -53,7 +57,7 @@ export function Dropdown<E extends HTMLElement>(props: {
                     className
                 )}
             >
-                <div className="fixed z-50 w-52">
+                <div className={tcls(useFixedPosition ? 'fixed' : 'absolute', 'z-50 w-52')}>
                     <div
                         className={tcls(
                             'mt-2',
@@ -92,6 +96,7 @@ export function DropdownChevron() {
                 'ms-1',
                 'transition-all',
                 'group-hover/dropdown:opacity-11',
+                'group-hover/dropdown:rotate-180',
                 'group-focus-within/dropdown:rotate-180'
             )}
         />
