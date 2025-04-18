@@ -64,6 +64,11 @@ export interface ResolveContentRefOptions {
      * @default false
      */
     resolveAsAbsoluteURL?: boolean;
+
+    /**
+     * Override the API token used to fetch any content.
+     */
+    apiToken?: string;
 }
 
 /**
@@ -233,9 +238,10 @@ export async function resolveContentRef(
         case 'reusable-content': {
             const reusableContent = await getDataOrNull(
                 dataFetcher.getReusableContent({
-                    spaceId: space.id,
+                    spaceId: contentRef.space ?? space.id,
                     revisionId,
                     reusableContentId: contentRef.reusableContent,
+                    apiToken: options.apiToken,
                 })
             );
             if (!reusableContent) {
