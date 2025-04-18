@@ -33,5 +33,5 @@ export const ja = {
     show: '表示',
     hide: '非表示',
     available_items: '利用可能なアイテム',
-    child_attributes: '子属性',
+    properties: 'プロパティ',
 };

@@ -33,5 +33,5 @@ export const en = {
     show: 'Show',
     hide: 'Hide',
     available_items: 'Available items',
-    child_attributes: 'Child attributes',
+    properties: 'Properties',
 };

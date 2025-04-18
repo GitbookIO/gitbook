@@ -33,5 +33,5 @@ export const zh = {
     show: '显示',
     hide: '隐藏',
     available_items: '可用项',
-    child_attributes: '子属性',
+    properties: '属性',
 };

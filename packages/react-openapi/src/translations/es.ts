@@ -33,5 +33,5 @@ export const es = {
     show: 'Mostrar',
     hide: 'Ocultar',
     available_items: 'Elementos disponibles',
-    child_attributes: 'Atributos secundarios',
+    properties: 'Propiedades',
 };

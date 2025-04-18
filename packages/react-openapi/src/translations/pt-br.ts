@@ -33,5 +33,5 @@ export const pt_br = {
     show: 'Mostrar',
     hide: 'Ocultar',
     available_items: 'Itens disponíveis',
-    child_attributes: 'Atributos filhos',
+    properties: 'Propriedades',
 };
