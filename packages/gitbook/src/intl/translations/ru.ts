@@ -2,8 +2,8 @@ import type { TranslationLanguage } from './types';
 
 export const ru = {
     locale: 'ru',
-    powered_by_gitbook: 'При поддержке GitBook',
-    sponsored_via_gitbook: 'При спонсировании GitBook',
+    powered_by_gitbook: 'Создано на GitBook',
+    sponsored_via_gitbook: 'При поддержке GitBook',
     switch_to_dark_theme: 'Переключиться на тёмную тему',
     switch_to_light_theme: 'Переключиться на светлую тему',
     switch_to_system_theme: 'Переключиться на системную тему',
@@ -58,4 +58,9 @@ export const ru = {
     pdf_limit_reached: "Не удалось создать PDF для ${1} страниц, создание остановилось на ${2}.",
     pdf_limit_reached_continue: 'Увеличить ещё на ${1} страниц.',
     more: 'Больше',
+    link_tooltip_external_link: 'Внешняя ссылка',
+    link_tooltip_page_anchor: 'Перейти к разделу',
+    link_tooltip_ai_summary: 'Краткое содержание',
+    link_tooltip_ai_summary_description: 'На основе вашего контекста. Могут быть неточности.',
+    open_in_new_tab: 'Открыть в новой вкладке',
 };
