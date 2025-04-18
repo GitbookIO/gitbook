@@ -98,6 +98,7 @@ export function OpenAPIResponses(props: {
                     state.setKey(key);
                 }}
                 groups={groups}
+                selectIcon={context.icons.chevronRight}
                 selectStateKey={createStateKey('response-media-types', context.blockKey)}
             />
         </StaticSection>
