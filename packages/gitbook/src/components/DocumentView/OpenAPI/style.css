@@ -793,9 +793,10 @@ body:has(.openapi-select-popover) {
     @apply px-3 -mx-3 transition-all flex flex-col ring-tint-subtle;
 }
 
-.openapi-parameters-body > .openapi-schema-properties > .openapi-disclosure,
-.openapi-requestbody-body > .openapi-schema-properties > .openapi-disclosure,
-.openapi-securities-body > .openapi-disclosure {
+.openapi-disclosure:not(
+        .openapi-disclosure-group .openapi-disclosure,
+        .openapi-schema-alternatives .openapi-disclosure
+    ) {
     @apply rounded-xl;
 }
 
@@ -829,20 +830,17 @@ body:has(.openapi-select-popover) {
 }
 
 @media (min-width: 768px) {
-    .openapi-securities > .openapi-disclosure,
-    .openapi-parameters-body > .openapi-schema-properties > .openapi-disclosure,
-    .openapi-requestbody-body > .openapi-schema-properties > .openapi-disclosure {
+    .openapi-disclosure:not(
+            .openapi-disclosure-group .openapi-disclosure,
+            .openapi-schema-alternatives .openapi-disclosure
+        ) {
         @apply -ml-8 pl-8;
     }
 
-    .openapi-securities > .openapi-disclosure > .openapi-disclosure-trigger svg,
-    .openapi-requestbody-body
-        > .openapi-schema-properties
-        > .openapi-disclosure
-        > .openapi-disclosure-trigger,
-    .openapi-parameters-body
-        > .openapi-schema-properties
-        > .openapi-disclosure
+    .openapi-disclosure:not(
+            .openapi-disclosure-group .openapi-disclosure,
+            .openapi-schema-alternatives .openapi-disclosure
+        )
         > .openapi-disclosure-trigger
         svg {
         @apply -ml-5;
