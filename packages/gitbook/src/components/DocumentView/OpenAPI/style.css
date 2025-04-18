@@ -168,7 +168,7 @@
     @apply flex flex-col;
 }
 
-.openapi-schema {
+.openapi-schema, .openapi-disclosure {
     @apply py-2.5 flex flex-col gap-2;
 }
 
@@ -185,11 +185,11 @@
 }
 
 .openapi-responsebody > .openapi-schema-properties > .openapi-schema:last-child {
-    @apply pb-0;
+    @apply -mb-3;
 }
 
 .openapi-responsebody > .openapi-schema-properties > .openapi-schema:only-child {
-    @apply py-0;
+    @apply -my-3;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -716,7 +716,11 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-tint-subtle border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
+    @apply border-tint-subtle transition-all border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
+}
+
+.openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover) {
+    @apply bg-tint-subtle;
 }
 
 .openapi-disclosure-group-header {
@@ -724,7 +728,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-baseline transition-all hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex items-baseline transition-all relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-disclosure-group-trigger:disabled {
@@ -748,7 +752,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-panel {
-    @apply p-3 pt-1 transition-all;
+    @apply p-3 transition-all;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
@@ -761,16 +765,12 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-mediatype {
-    @apply opacity-0 invisible text-xs transition-opacity duration-300 shrink-0 absolute right-2.5 h-full flex items-center;
-}
-
-.openapi-disclosure-group-mediatype > span {
-    @apply px-2 bg-tint-base ring-1 ring-tint-subtle text-tint-subtle contrast-more:text-tint rounded-full straight-corners:rounded-md;
+    @apply text-xs font-mono shrink-0 mr-3 text-tint-subtle contrast-more:text-tint;
 }
 
 /* Disclosure */
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
-    @apply flex items-center font-mono !w-full transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex items-center font-mono  transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger,
@@ -783,23 +783,73 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply flex flex-row flex-wrap relative items-start gap-2 text-left;
+    /* @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1; */
 }
 
-.openapi-disclosure-trigger span {
-    @apply truncate;
+.openapi-disclosure {
+    @apply px-3 -mx-3 transition-all flex flex-col ring-tint-subtle;
 }
 
-.openapi-disclosure svg {
-    @apply size-3 shrink-0 transition-transform duration-300;
+.openapi-parameters-body > .openapi-schema-properties > .openapi-disclosure,
+.openapi-securities-body > .openapi-disclosure {
+    @apply rounded-xl;
 }
+
+.openapi-disclosure-trigger-content {
+    @apply flex items-start gap-2 grow;
+}
+
+.openapi-disclosure:has(> .openapi-disclosure-trigger:hover) {
+    @apply bg-tint-subtle;
+}
+
+.openapi-disclosure:has(> .openapi-disclosure-trigger:hover), .openapi-disclosure[data-expanded="true"] {
+    @apply ring-1 shadow-sm;
+}
+
+.openapi-disclosure[data-expanded="true"]:not(:last-child) {
+    @apply mb-3;
+}
+
+.openapi-disclosure-trigger-label {
+    @apply px-2 h-5 min-w-5 justify-end shrink-0 bg-tint-base ring-1 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none flex flex-row gap-1 items-center text-xs;
+}
+
+.openapi-disclosure-trigger-label span {
+    @apply truncate shrink-0;
+}
+
+.openapi-disclosure-trigger svg {
+    @apply mt-1;
+}
+
+@media (min-width: 768px) {
+    .openapi-securities > .openapi-disclosure,
+    .openapi-parameters-body > .openapi-schema-properties > .openapi-disclosure {
+        @apply -ml-8 pl-8;
+    }
+
+    .openapi-securities > .openapi-disclosure > .openapi-disclosure-trigger svg,
+    .openapi-parameters-body > .openapi-schema-properties > .openapi-disclosure > .openapi-disclosure-trigger svg {
+        @apply -ml-5;
+    }
+}
+
+.openapi-disclosure-trigger svg, .openapi-disclosure-trigger-label svg {
+    @apply size-3 shrink-0 transition-transform duration-300 text-tint-subtle;
+}
+
+.openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label {
+    @apply shadow;
+}
+/* .openapi-disclosure:hover > .openapi-disclosure-trigger > .openapi-disclosure-trigger-label span,
+.openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label span {
+    @apply block;
+} */
 
 .openapi-disclosure-trigger[aria-expanded="true"] svg {
     @apply rotate-45;
-}
-
-.openapi-disclosure-trigger[aria-expanded="true"] {
-    @apply w-full rounded-lg border-b rounded-b-none straight-corners:rounded-b-none;
 }
 
 .openapi-disclosure-trigger[aria-expanded="false"] {
@@ -807,17 +857,18 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-panel[aria-hidden="false"] {
-    @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b;
+    @apply border-l border-tint-subtle ml-1.5 pl-3
+    /* @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b; */
 }
 
 .openapi-disclosure-panel .openapi-schema {
-    @apply p-2.5;
+    /* @apply p-2.5; */
 }
 
-.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
+/* .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
 .openapi-disclosure .openapi-schema-properties .openapi-schema:only-child .openapi-schema-name {
     @apply !m-0;
-}
+} */
 
 .openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
     @apply pt-0 mt-0;
@@ -830,6 +881,10 @@ body:has(.openapi-select-popover) {
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema,
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-root {
     @apply p-2.5;
+}
+
+.openapi-schema-alternatives {
+    @apply ml-1.5 pl-3 border-l border-tint-subtle;
 }
 
 .openapi-tooltip {

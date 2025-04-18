@@ -73,7 +73,8 @@ export function OpenAPISchemas(props: {
     return (
         <div className={clsx('openapi-schemas', className)}>
             {schemas.map(({ name, schema }) => {
-                return (
+                return <>
+                OpenAPISchemas
                     <OpenAPIDisclosure
                         className="openapi-schemas-disclosure"
                         key={name}
@@ -86,7 +87,7 @@ export function OpenAPISchemas(props: {
                             </SectionBody>
                         </Section>
                     </OpenAPIDisclosure>
-                );
+                    </>;
             })}
         </div>
     );
