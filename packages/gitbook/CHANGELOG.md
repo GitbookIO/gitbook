@@ -1,5 +1,24 @@
 # gitbook
 
+## 0.11.0
+
+### Minor Changes
+
+- d67699a: Add OpenAPI Webhook block
+
+### Patch Changes
+
+- 4b8a621: Show sections tabs only if there is at least two sections
+- 8ed1bda: Translate OpenAPI blocks
+- 7588cfe: Improve OpenAPIResponses examples and schemas
+- Updated dependencies [eeb977f]
+- Updated dependencies [3363a18]
+- Updated dependencies [d67699a]
+- Updated dependencies [8ed1bda]
+- Updated dependencies [7588cfe]
+- Updated dependencies [ad1dc0b]
+  - @gitbook/react-openapi@1.2.0
+
 ## 0.10.1
 
 ### Patch Changes
