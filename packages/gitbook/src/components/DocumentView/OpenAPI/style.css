@@ -800,9 +800,9 @@ body:has(.openapi-select-popover) {
     @apply rounded-xl;
 }
 
-.openapi-disclosure-trigger-content {
-    @apply flex items-start gap-2 grow;
-}
+/* .openapi-disclosure-trigger-content {
+    @apply grow;
+} */
 
 .openapi-disclosure:has(> .openapi-disclosure-trigger:hover) {
     @apply bg-tint-subtle;
@@ -814,51 +814,30 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure[data-expanded="true"]:not(:last-child) {
-    @apply mb-3;
+    @apply my-2;
 }
 
 .openapi-disclosure-trigger-label {
-    @apply px-2 h-5 min-w-5 justify-end shrink-0 bg-tint-base ring-1 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none flex flex-row gap-1 items-center text-xs;
+    @apply absolute top-0 right-0 px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none flex flex-row gap-1 items-center text-xs;
 }
 
 .openapi-disclosure-trigger-label span {
-    @apply truncate shrink-0;
+    @apply hidden;
 }
 
-.openapi-disclosure-trigger svg {
-    @apply mt-1;
-}
-
-@media (min-width: 768px) {
-    .openapi-disclosure:not(
-            .openapi-disclosure-group .openapi-disclosure,
-            .openapi-schema-alternatives .openapi-disclosure
-        ) {
-        @apply -ml-8 pl-8;
-    }
-
-    .openapi-disclosure:not(
-            .openapi-disclosure-group .openapi-disclosure,
-            .openapi-schema-alternatives .openapi-disclosure
-        )
-        > .openapi-disclosure-trigger
-        svg {
-        @apply -ml-5;
-    }
-}
-
-.openapi-disclosure-trigger svg,
 .openapi-disclosure-trigger-label svg {
     @apply size-3 shrink-0 transition-transform duration-300 text-tint-subtle;
 }
 
-.openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label {
-    @apply shadow;
+.openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label,
+.openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label {
+    @apply shadow ring-1 bg-tint-base;
 }
-/* .openapi-disclosure:hover > .openapi-disclosure-trigger > .openapi-disclosure-trigger-label span,
+
+.openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label span,
 .openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label span {
-    @apply block;
-} */
+    @apply block animate-fadeIn;
+}
 
 .openapi-disclosure-trigger[aria-expanded="true"] svg {
     @apply rotate-45;

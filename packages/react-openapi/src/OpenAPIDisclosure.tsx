@@ -32,12 +32,10 @@ export function OpenAPIDisclosure(props: {
                         : 'none',
                 })}
             >
-                <div className="openapi-disclosure-trigger-content">
-                    {icon}
-                    {header}
-                </div>
+                {header}
                 <div className="openapi-disclosure-trigger-label">
                     <span>{typeof label === 'function' ? label(isExpanded) : label}</span>
+                    {icon}
                 </div>
             </Button>
             <DisclosurePanel className="openapi-disclosure-panel">
