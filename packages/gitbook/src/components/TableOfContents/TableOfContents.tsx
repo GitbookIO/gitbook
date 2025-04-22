@@ -66,12 +66,7 @@ export function TableOfContents(props: {
             <div // The actual sidebar, either shown with a filled bg or transparent.
                 className={tcls(
                     'lg:-ms-5',
-                    'overflow-hidden',
-                    'relative',
-
-                    'flex',
-                    'flex-col',
-                    'flex-grow',
+                    'relative flex flex-grow flex-col overflow-hidden',
 
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
@@ -84,18 +79,12 @@ export function TableOfContents(props: {
                     'straight-corners:rounded-none'
                 )}
             >
-                {innerHeader && <div className={tcls('px-5 *:my-4')}>{innerHeader}</div>}
+                {innerHeader && <div className="px-5 *:my-4">{innerHeader}</div>}
                 <TOCScrollContainer // The scrollview inside the sidebar
                     className={tcls(
-                        'flex',
-                        'flex-grow',
-                        'flex-col',
-
-                        'p-2',
+                        'flex flex-grow flex-col p-2',
                         customization.trademark.enabled && 'lg:pb-20',
-
-                        'overflow-y-auto',
-                        'lg:gutter-stable',
+                        'lg:gutter-stable overflow-y-auto',
                         '[&::-webkit-scrollbar]:bg-transparent',
                         '[&::-webkit-scrollbar-thumb]:bg-transparent',
                         'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
@@ -107,11 +96,7 @@ export function TableOfContents(props: {
                         rootPages={pages}
                         pages={pages}
                         context={context}
-                        style={tcls(
-                            'page-no-toc:hidden',
-                            'sidebar-list-line:border-l',
-                            'border-tint-subtle'
-                        )}
+                        style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                     />
                     {customization.trademark.enabled ? (
                         <Trademark
