@@ -1,5 +1,12 @@
 # @gitbook/react-openapi
 
+## 1.2.1
+
+### Patch Changes
+
+- ebc39e9: Missing select icon
+- b6b09d4: Fix OpenAPI responses select placement and icon
+
 ## 1.2.0
 
 ### Minor Changes
