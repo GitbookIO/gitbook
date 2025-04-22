@@ -2,6 +2,7 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import type { OpenAPIClientContext } from './context';
+import { tString } from './translate';
 import { parameterToProperty, resolveDescription } from './utils';
 
 /**
@@ -28,7 +29,17 @@ export function OpenAPIResponse(props: {
         <div className="openapi-response-body text-sm">
             {headers.length > 0 ? (
                 <OpenAPIDisclosure
-                    header="Headers"
+                    header={
+                        <div className="openapi-schema-name">
+                            <span className="openapi-schema-propertyname">
+                                {tString(context.translation, 'headers')}
+                            </span>
+                            <span className="openapi-schema-type">
+                                {headers.length}{' '}
+                                {tString(context.translation, 'headers').toLowerCase()}
+                            </span>
+                        </div>
+                    }
                     icon={context.icons.plus}
                     label={(isExpanded) => (isExpanded ? 'Hide headers' : 'Show headers')}
                 >

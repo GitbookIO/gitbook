@@ -39,7 +39,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
         >
             <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
                 {title ? (
-                    <div className="inline-flex items-center justify-center rounded-t straight-corners:rounded-t-s bg-tint px-3 py-2 text-tint text-xs leading-none tracking-wide">
+                    <div className="relative top-px z-20 inline-flex items-center justify-center rounded-t straight-corners:rounded-t-s border border-tint-subtle border-b-transparent bg-tint-subtle theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide [html.theme-bold.sidebar-filled_&]:bg-tint-base">
                         {title}
                     </div>
                 ) : null}
@@ -50,8 +50,8 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             />
             <pre
                 className={tcls(
-                    'hide-scroll relative overflow-auto bg-tint-subtle ring-tint-subtle [grid-area:2/1]',
-                    'rounded-md straight-corners:rounded-sm',
+                    'hide-scroll relative overflow-auto border border-tint-subtle bg-tint-subtle theme-muted:bg-tint-base [grid-area:2/1] [html.theme-bold.sidebar-filled_&]:bg-tint-base',
+                    'rounded-md straight-corners:rounded-sm shadow-sm',
                     title && 'rounded-ss-none'
                 )}
             >

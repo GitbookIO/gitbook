@@ -4,6 +4,7 @@
 
 import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/openapi-parser';
 import { useId } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import clsx from 'clsx';
 import { Markdown } from './Markdown';
@@ -27,13 +28,15 @@ export interface OpenAPISchemaPropertyEntry {
 /**
  * Render a property of an OpenAPI schema.
  */
-function OpenAPISchemaProperty(props: {
-    property: OpenAPISchemaPropertyEntry;
-    context: OpenAPIClientContext;
-    circularRefs: CircularRefsIds;
-    className?: string;
-}) {
-    const { circularRefs: parentCircularRefs, context, className, property } = props;
+function OpenAPISchemaProperty(
+    props: {
+        property: OpenAPISchemaPropertyEntry;
+        context: OpenAPIClientContext;
+        circularRefs: CircularRefsIds;
+        className?: string;
+    } & Omit<ComponentPropsWithoutRef<'div'>, 'property' | 'context' | 'circularRefs' | 'className'>
+) {
+    const { circularRefs: parentCircularRefs, context, className, property, ...rest } = props;
 
     const { schema } = property;
 
@@ -90,6 +93,7 @@ function OpenAPISchemaProperty(props: {
                 className={clsx('openapi-schema', className)}
                 header={header}
                 label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+                {...rest}
             >
                 {content}
             </OpenAPIDisclosure>
@@ -97,7 +101,7 @@ function OpenAPISchemaProperty(props: {
     }
 
     return (
-        <div id={id} className={clsx('openapi-schema', className)}>
+        <div id={id} {...rest} className={clsx('openapi-schema', className)}>
             {header}
             {content}
         </div>
@@ -129,6 +133,7 @@ function OpenAPISchemaProperties(props: {
                         circularRefs={circularRefs}
                         property={property}
                         context={context}
+                        style={{ animationDelay: `${index * 0.02}s` }}
                     />
                 );
             })}
