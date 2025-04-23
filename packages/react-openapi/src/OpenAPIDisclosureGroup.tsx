@@ -132,6 +132,7 @@ function DisclosureItem(props: {
                                     state.expand();
                                 }}
                                 items={group.tabs}
+                                placement="bottom end"
                             >
                                 {group.tabs.map((tab) => (
                                     <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
