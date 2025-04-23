@@ -5,7 +5,7 @@
     --shiki-token-link: theme("colors.primary.10");
 
     --shiki-token-constant: theme("colors.warning.10");
-    --shiki-token-string: theme("colors.info.11");
+    --shiki-token-string: theme("colors.success.10");
     --shiki-token-string-expression: theme("colors.success.10");
     --shiki-token-keyword: theme("colors.danger.10");
     --shiki-token-parameter: theme("colors.warning.10");
@@ -17,27 +17,31 @@
 }
 
 html.dark {
-    /* Keep most colors the same, since theme colors already change from light to dark */
+    /* Override select colors to have more contrast */
     --shiki-token-comment: theme("colors.neutral.9");
 
     --shiki-token-constant: theme("colors.warning.11");
-    --shiki-token-string: theme("colors.info.12");
+    --shiki-token-string: theme("colors.success.11");
     --shiki-token-string-expression: theme("colors.success.11");
     --shiki-token-keyword: theme("colors.danger.11");
     --shiki-token-parameter: theme("colors.warning.11");
     --shiki-token-function: theme("colors.primary.11");
 }
 
-/* XXX --shiki-color-text: #24292eff; */
-/* --shiki-token-constant: #1976d2; */
-/* --shiki-token-string: #2b5581; */
-/* XXX --shiki-token-comment: #c2c3c5; */
-/* XXX --shiki-token-keyword: #d32f2f; */
-/* XXX --shiki-token-parameter: #ff9800; */
-/* XXX --shiki-token-function: #6f42c1; */
-/* XXX --shiki-token-string-expression: #22863a; */
-/* XXX --shiki-token-punctuation: #212121; */
-/* --shiki-token-link: #22863a; */
-/* --shiki-token-inserted: #b7e7a44b; */
-/* --shiki-token-deleted: #e597af52; */
-/* --shiki-token-changed: #0000001a; */
+.code-monochrome {
+    --shiki-token-constant: theme("colors.tint.11");
+    --shiki-token-string: theme("colors.tint.12");
+    --shiki-token-string-expression: theme("colors.tint.12");
+    --shiki-token-keyword: theme("colors.primary.10");
+    --shiki-token-parameter: theme("colors.tint.9");
+    --shiki-token-function: theme("colors.primary.9");
+}
+
+html.dark.code-monochrome {
+    --shiki-token-constant: theme("colors.tint.11");
+    --shiki-token-string: theme("colors.tint.12");
+    --shiki-token-string-expression: theme("colors.tint.12");
+    --shiki-token-keyword: theme("colors.primary.11");
+    --shiki-token-parameter: theme("colors.tint.10");
+    --shiki-token-function: theme("colors.primary.10");
+}
