@@ -64,6 +64,8 @@ export async function getPublishedContentByURL(input: {
             data: { data },
         } = callResult;
 
+        console.log('getPublishedContentByUrl', data);
+        
         if ('redirect' in data) {
             if (alternative.primary) {
                 // Append the path to the redirect URL

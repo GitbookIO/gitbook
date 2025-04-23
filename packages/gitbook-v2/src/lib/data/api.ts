@@ -1401,7 +1401,7 @@ async function* streamAIResponse(
     }
 }
 
-let loggedServiceBinding = false;
+// let loggedServiceBinding = false;
 
 /**
  * Create a new API client.
@@ -1414,8 +1414,8 @@ export function apiClient(input: DataFetcherInput = { apiToken: null }) {
     if (cloudflareContext) {
         // @ts-expect-error
         serviceBinding = cloudflareContext.env.GITBOOK_API as GitBookAPIServiceBinding | undefined;
-        if (!loggedServiceBinding) {
-            loggedServiceBinding = true;
+        // if (!loggedServiceBinding) {
+        //     loggedServiceBinding = true;
             if (serviceBinding) {
                 // biome-ignore lint/suspicious/noConsole: we want to log here
                 console.log(`using service binding for the API (${GITBOOK_API_URL})`);
@@ -1423,7 +1423,7 @@ export function apiClient(input: DataFetcherInput = { apiToken: null }) {
                 // biome-ignore lint/suspicious/noConsole: we want to log here
                 console.warn(`no service binding for the API (${GITBOOK_API_URL})`);
             }
-        }
+        // }
     }
 
     const api = new GitBookAPI({
