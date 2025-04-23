@@ -674,6 +674,9 @@ async function lookupSiteByAPI(
             }
         );
 
+        alternative.url.includes('minas-tirith') &&
+            console.log(`resolved ${alternative.url} -> ${JSON.stringify(data)}`);
+
         if ('error' in data) {
             if (alternative.primary) {
                 // We only return an error for the primary alternative (full URL),
