@@ -243,27 +243,37 @@ export async function fetchSiteContextByIds(
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
         : null;
 
+    // Parse the current siteSpace and siteSpaces based on the site structure type.
     const { siteSpaces, siteSpace }: { siteSpaces: SiteSpace[]; siteSpace: SiteSpace } = (() => {
         if (siteStructure.type === 'siteSpaces') {
             const siteSpaces = siteStructure.structure;
             const siteSpace = siteSpaces.find((siteSpace) => siteSpace.id === ids.siteSpace);
 
             if (!siteSpace) {
-                throw new Error(`Site space "${ids.siteSpace}" not found in structure type="siteSpaces"`);
+                throw new Error(
+                    `Site space "${ids.siteSpace}" not found in structure type="siteSpaces"`
+                );
             }
 
             return { siteSpaces, siteSpace };
         }
 
         if (siteStructure.type === 'sections') {
-            assert(sections, `missing parsed sections siteStructure.type="sections" siteSection="${ids.siteSection}"`);
+            assert(
+                sections,
+                `cannot find site space "${ids.siteSpace}" because parsed sections are missing siteStructure.type="sections" siteSection="${ids.siteSection}"`
+            );
 
             const currentSection = sections.current;
             const siteSpaces = currentSection.siteSpaces;
-            const siteSpace = currentSection.siteSpaces.find((siteSpace) => siteSpace.id === ids.siteSpace);
+            const siteSpace = currentSection.siteSpaces.find(
+                (siteSpace) => siteSpace.id === ids.siteSpace
+            );
 
             if (!siteSpace) {
-                throw new Error(`Site space "${ids.siteSpace}" not found in structure type="sections" currentSection="${currentSection.id}"`);
+                throw new Error(
+                    `Site space "${ids.siteSpace}" not found in structure type="sections" currentSection="${currentSection.id}"`
+                );
             }
 
             return { siteSpaces, siteSpace };
