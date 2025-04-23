@@ -1,40 +1,64 @@
 'use client';
 
-import React from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    type ComponentPropsWithoutRef,
+} from 'react';
+import { assert } from 'ts-essentials';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+interface TOCScrollContainerContextType {
+    onContainerMount: (listener: (element: HTMLDivElement) => void) => () => void;
+}
 
-const TOCScrollContainerRefContext = React.createContext<React.RefObject<HTMLDivElement> | null>(
-    null
-);
+const TOCScrollContainerContext = React.createContext<TOCScrollContainerContextType | null>(null);
 
-function useTOCScrollContainerRefContext() {
-    const ctx = React.useContext(TOCScrollContainerRefContext);
-    if (!ctx) {
-        throw new Error('Context `TOCScrollContainerRefContext` must be used within Provider');
-    }
+function useTOCScrollContainerContext() {
+    const ctx = React.useContext(TOCScrollContainerContext);
+    assert(ctx);
     return ctx;
 }
 
-export function TOCScrollContainer(props: {
-    children: React.ReactNode;
-    className?: ClassValue;
-    style?: React.CSSProperties;
-}) {
-    const { children, className, style } = props;
-    const scrollContainerRef = React.createRef<HTMLDivElement>();
+/**
+ * Table of contents scroll container.
+ */
+export function TOCScrollContainer(props: ComponentPropsWithoutRef<'div'>) {
+    const ref = useRef<HTMLDivElement>(null);
+    const listeners = useRef<((element: HTMLDivElement) => void)[]>([]);
+    const onContainerMount: TOCScrollContainerContextType['onContainerMount'] = useCallback(
+        (listener) => {
+            if (ref.current) {
+                listener(ref.current);
+                return () => {};
+            }
+            listeners.current.push(listener);
+            return () => {
+                listeners.current = listeners.current.filter((l) => l !== listener);
+            };
+        },
+        []
+    );
+    const value: TOCScrollContainerContextType = useMemo(
+        () => ({ onContainerMount }),
+        [onContainerMount]
+    );
+    useEffect(() => {
+        const element = ref.current;
+        if (!element) {
+            return;
+        }
+        listeners.current.forEach((listener) => listener(element));
+        return () => {
+            listeners.current = [];
+        };
+    }, []);
 
     return (
-        <TOCScrollContainerRefContext.Provider value={scrollContainerRef}>
-            <div
-                ref={scrollContainerRef}
-                data-testid="toc-scroll-container"
-                className={tcls(className)}
-                style={style}
-            >
-                {children}
-            </div>
-        </TOCScrollContainerRefContext.Provider>
+        <TOCScrollContainerContext.Provider value={value}>
+            <div ref={ref} data-testid="toc-scroll-container" {...props} />
+        </TOCScrollContainerContext.Provider>
     );
 }
 
@@ -42,39 +66,31 @@ export function TOCScrollContainer(props: {
 const TOC_ITEM_OFFSET = 100;
 
 /**
- * Scrolls the table of contents container to the page item when it becomes active
+ * Scrolls the table of contents container to the page item when it's initially active.
  */
 export function useScrollToActiveTOCItem(props: {
+    anchorRef: React.RefObject<HTMLAnchorElement>;
     isActive: boolean;
-    linkRef: React.RefObject<HTMLAnchorElement>;
 }) {
-    const { isActive, linkRef } = props;
-    const scrollContainerRef = useTOCScrollContainerRefContext();
-    const isScrolled = React.useRef(false);
-    React.useLayoutEffect(() => {
-        if (!isActive) {
-            isScrolled.current = false;
-            return;
+    const { isActive, anchorRef } = props;
+    const isInitialActiveRef = useRef(isActive);
+    const { onContainerMount } = useTOCScrollContainerContext();
+    useEffect(() => {
+        const anchor = anchorRef.current;
+        if (isInitialActiveRef.current && anchor) {
+            return onContainerMount((container) => {
+                if (isOutOfView(anchor, container)) {
+                    container.scrollTo({ top: anchor.offsetTop - TOC_ITEM_OFFSET });
+                }
+            });
         }
-        if (isScrolled.current) {
-            return;
-        }
-        const tocItem = linkRef.current;
-        const tocContainer = scrollContainerRef.current;
-        if (!tocItem || !tocContainer || !isOutOfView(tocItem, tocContainer)) {
-            return;
-        }
-        tocContainer?.scrollTo({
-            top: tocItem.offsetTop - TOC_ITEM_OFFSET,
-        });
-        isScrolled.current = true;
-    }, [isActive, linkRef, scrollContainerRef]);
+    }, [onContainerMount, anchorRef]);
 }
 
-function isOutOfView(tocItem: HTMLElement, tocContainer: HTMLElement) {
-    const tocItemTop = tocItem.offsetTop;
-    const containerTop = tocContainer.scrollTop;
-    const containerBottom = containerTop + tocContainer.clientHeight;
+function isOutOfView(element: HTMLElement, container: HTMLElement) {
+    const tocItemTop = element.offsetTop;
+    const containerTop = container.scrollTop;
+    const containerBottom = containerTop + container.clientHeight;
     return (
         tocItemTop < containerTop + TOC_ITEM_OFFSET ||
         tocItemTop > containerBottom - TOC_ITEM_OFFSET

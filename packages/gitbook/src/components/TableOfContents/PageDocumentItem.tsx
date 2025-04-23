@@ -20,7 +20,7 @@ export async function PageDocumentItem(props: {
     const href = context.linker.toPathForPage({ pages: rootPages, page });
 
     return (
-        <li className={tcls('flex', 'flex-col')}>
+        <li className="flex flex-col">
             <ToggleableLinkItem
                 href={href}
                 pathname={getPagePath(rootPages, page)}
@@ -52,7 +52,7 @@ export async function PageDocumentItem(props: {
                 }
             >
                 {page.emoji || page.icon ? (
-                    <span className={tcls('flex', 'gap-3', 'items-center')}>
+                    <span className="flex items-center gap-3">
                         <TOCPageIcon page={page} />
                         {page.title}
                     </span>

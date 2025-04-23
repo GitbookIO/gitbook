@@ -75,13 +75,13 @@ export function SiteSectionListItem(props: {
     const isMounted = useIsMounted();
     React.useEffect(() => {}, [isMounted]); // This updates the useScrollToActiveTOCItem hook once we're mounted, so we can actually scroll to the this item
 
-    const linkRef = React.createRef<HTMLAnchorElement>();
-    useScrollToActiveTOCItem({ linkRef, isActive });
+    const anchorRef = React.createRef<HTMLAnchorElement>();
+    useScrollToActiveTOCItem({ anchorRef, isActive });
 
     return (
         <Link
+            ref={anchorRef}
             href={section.url}
-            ref={linkRef}
             aria-current={isActive && 'page'}
             className={tcls(
                 'group/section-link flex flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint',
@@ -121,18 +121,15 @@ export function SiteSectionGroupItem(props: {
 
     const hasDescendants = group.sections.length > 0;
     const isActiveGroup = group.sections.some((section) => section.id === currentSection.id);
-    const [isVisible, setIsVisible] = React.useState(isActiveGroup);
+    const shouldOpen = hasDescendants && isActiveGroup;
+    const [isOpen, setIsOpen] = React.useState(shouldOpen);
 
-    // Update the visibility of the children, if we are navigating to a descendant.
+    // Update the visibility of the children if the group becomes active.
     React.useEffect(() => {
-        if (!hasDescendants) {
-            return;
+        if (shouldOpen) {
+            setIsOpen(shouldOpen);
         }
-
-        setIsVisible((prev) => prev || isActiveGroup);
-    }, [isActiveGroup, hasDescendants]);
-
-    const { show, hide, scope } = useToggleAnimation({ hasDescendants, isVisible });
+    }, [shouldOpen]);
 
     return (
         <>
@@ -141,7 +138,7 @@ export function SiteSectionGroupItem(props: {
                 onClick={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    setIsVisible((prev) => !prev);
+                    setIsOpen((prev) => !prev);
                 }}
                 className={`group/section-link flex w-full flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 text-left transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint ${
                     isActiveGroup
@@ -184,7 +181,7 @@ export function SiteSectionGroupItem(props: {
                         'after:h-7',
                         'hover:bg-tint-active',
                         'hover:text-current',
-                        isActiveGroup ? ['hover:bg-tint-hover'] : []
+                        isActiveGroup && 'hover:bg-tint-hover'
                     )}
                 >
                     <Icon
@@ -201,17 +198,13 @@ export function SiteSectionGroupItem(props: {
                             'group-hover:opacity-11',
                             'contrast-more:opacity-11',
 
-                            isVisible ? ['rotate-90'] : ['rotate-0']
+                            isOpen ? 'rotate-90' : 'rotate-0'
                         )}
                     />
                 </span>
             </button>
             {hasDescendants ? (
-                <motion.div
-                    ref={scope}
-                    className={tcls(isVisible ? null : '[&_ul>li]:opacity-1')}
-                    initial={isVisible ? show : hide}
-                >
+                <Descendants isVisible={isOpen}>
                     {group.sections.map((section) => (
                         <SiteSectionListItem
                             section={section}
@@ -220,8 +213,25 @@ export function SiteSectionGroupItem(props: {
                             className="pl-5"
                         />
                     ))}
-                </motion.div>
+                </Descendants>
             ) : null}
         </>
+    );
+}
+
+function Descendants(props: {
+    isVisible: boolean;
+    children: React.ReactNode;
+}) {
+    const { isVisible, children } = props;
+    const { show, hide, scope } = useToggleAnimation(isVisible);
+    return (
+        <motion.div
+            ref={scope}
+            className={isVisible ? undefined : '[&_ul>li]:opacity-1'}
+            initial={isVisible ? show : hide}
+        >
+            {children}
+        </motion.div>
     );
 }
