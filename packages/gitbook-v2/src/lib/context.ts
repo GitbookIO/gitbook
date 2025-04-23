@@ -244,87 +244,86 @@ export async function fetchSiteContextByIds(
         siteSpaces,
         siteSpace,
         sections,
-    }: { siteSpaces: SiteSpace[]; siteSpace: SiteSpace; sections: SiteSections | null } =
-        (() => {
-            if (siteStructure.type === 'siteSpaces') {
-                const siteSpaces = siteStructure.structure;
-                const siteSpace = siteSpaces.find((siteSpace) => siteSpace.id === ids.siteSpace);
+    }: { siteSpaces: SiteSpace[]; siteSpace: SiteSpace; sections: SiteSections | null } = (() => {
+        if (siteStructure.type === 'siteSpaces') {
+            const siteSpaces = siteStructure.structure;
+            const siteSpace = siteSpaces.find((siteSpace) => siteSpace.id === ids.siteSpace);
 
-                if (!siteSpace) {
-                    throw new Error(
-                        `Site space "${ids.siteSpace}" not found in structure type="siteSpaces"`
-                    );
-                }
-
-                return { siteSpaces, siteSpace, sections: null };
+            if (!siteSpace) {
+                throw new Error(
+                    `Site space "${ids.siteSpace}" not found in structure type="siteSpaces"`
+                );
             }
 
-            if (siteStructure.type === 'sections') {
-                /**
-                 * Workaround for #inc-56-sites-are-crashing-with-application-error-a-client-side-exception-ha
-                 * 
-                 * If a site structure is set up as sections, we should always be given a siteSection in the ids. However,
-                 * in the incident we noticed it is sometimes undefined - perhaps due to caching.
-                 * 
-                 * This workaround will pick the default section in the site structure if no explicit is provided. It should
-                 * be eventually removed and replaced with an assert.
-                 */
-                const currentSectionId = (() => {
-                    if (ids.siteSection) {
-                        return ids.siteSection;
+            return { siteSpaces, siteSpace, sections: null };
+        }
+
+        if (siteStructure.type === 'sections') {
+            /**
+             * Workaround for #inc-56-sites-are-crashing-with-application-error-a-client-side-exception-ha
+             *
+             * If a site structure is set up as sections, we should always be given a siteSection in the ids. However,
+             * in the incident we noticed it is sometimes undefined - perhaps due to caching.
+             *
+             * This workaround will pick the default section in the site structure if no explicit is provided. It should
+             * be eventually removed and replaced with an assert.
+             */
+            const currentSectionId = (() => {
+                if (ids.siteSection) {
+                    return ids.siteSection;
+                }
+
+                let defaultSectionId: string | undefined;
+
+                for (const sectionOrGroup of siteStructure.structure) {
+                    if (sectionOrGroup.object === 'site-section') {
+                        defaultSectionId = sectionOrGroup.id;
+                        break;
                     }
 
-                    let defaultSectionId: string | undefined;
+                    if (sectionOrGroup.object === 'site-section-group') {
+                        const defaultSection = sectionOrGroup.sections.find(
+                            (group) => group.default
+                        );
 
-                    for (const sectionOrGroup of siteStructure.structure) {
-                        if (sectionOrGroup.object === 'site-section') {
-                            defaultSectionId = sectionOrGroup.id;
+                        if (defaultSection) {
+                            defaultSectionId = defaultSection.id;
                             break;
                         }
-
-                        if (sectionOrGroup.object === 'site-section-group') {
-                            const defaultSection = sectionOrGroup.sections.find(
-                                (group) => group.default
-                            );
-
-                            if (defaultSection) {
-                                defaultSectionId = defaultSection.id;
-                                break;
-                            }
-                        }
                     }
+                }
 
-                    if (!defaultSectionId) {
-                        throw new Error(
-                            `No default section found in structure type="sections" for site "${ids.site}"`
-                        );
-                    }
-
-                    return defaultSectionId;
-                })();
-
-                const sections = parseSiteSectionsAndGroups(siteStructure, currentSectionId);
-                const currentSection = sections.current;
-                const siteSpaces = currentSection.siteSpaces;
-                const siteSpace = currentSection.siteSpaces.find(
-                    (siteSpace) => siteSpace.id === ids.siteSpace
-                );
-
-                if (!siteSpace) {
+                if (!defaultSectionId) {
                     throw new Error(
-                        `Site space "${ids.siteSpace}" not found in structure type="sections" currentSection="${currentSection.id}"`
+                        `No default section found in structure type="sections" for site "${ids.site}"`
                     );
                 }
 
-                return { siteSpaces, siteSpace, sections };
+                return defaultSectionId;
+            })();
+
+            const sections = parseSiteSectionsAndGroups(siteStructure, currentSectionId);
+            const currentSection = sections.current;
+            const siteSpaces = currentSection.siteSpaces;
+            const siteSpace = currentSection.siteSpaces.find(
+                (siteSpace) => siteSpace.id === ids.siteSpace
+            );
+
+            if (!siteSpace) {
+                throw new Error(
+                    `Site space "${ids.siteSpace}" not found in structure type="sections" currentSection="${currentSection.id}"`
+                );
             }
 
-            assertNever(
-                siteStructure,
-                // @ts-expect-error
-                `cannot handle site structure of type ${siteStructure.type}`
-            );
-        })();
+            return { siteSpaces, siteSpace, sections };
+        }
+
+        assertNever(
+            siteStructure,
+            // @ts-expect-error
+            `cannot handle site structure of type ${siteStructure.type}`
+        );
+    })();
 
     const customization = (() => {
         if (ids.siteSpace) {
@@ -447,10 +446,7 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
     }
 }
 
-function parseSiteSectionsAndGroups(
-    structure: SiteStructure,
-    siteSectionId: string
-): SiteSections {
+function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string): SiteSections {
     const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
     const section = parseCurrentSection(structure, siteSectionId);
     assert(section, 'A section must be defined when there are multiple sections');
