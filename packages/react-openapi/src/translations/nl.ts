@@ -22,6 +22,7 @@ export const nl = {
     header: 'Header',
     authorizations: 'Autorisaties',
     responses: 'Reacties',
+    response: 'Reactie',
     path_parameters: 'Padparameters',
     query_parameters: 'Queryparameters',
     header_parameters: 'Headerparameters',

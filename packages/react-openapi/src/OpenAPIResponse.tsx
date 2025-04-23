@@ -57,7 +57,12 @@ export function OpenAPIResponse(props: {
                 <div className="openapi-responsebody">
                     <OpenAPISchemaProperties
                         id={`response-${context.blockKey}`}
-                        properties={[{ schema: mediaType.schema }]}
+                        properties={[
+                            {
+                                schema: mediaType.schema,
+                                propertyName: tString(context.translation, 'response'),
+                            },
+                        ]}
                         context={context}
                     />
                 </div>

@@ -22,6 +22,7 @@ export const no = {
     header: 'Overskrift',
     authorizations: 'Autorisasjoner',
     responses: 'Responser',
+    response: 'Respons',
     path_parameters: 'Sti-parametere',
     query_parameters: 'Forespørselsparametere',
     header_parameters: 'Header-parametere',

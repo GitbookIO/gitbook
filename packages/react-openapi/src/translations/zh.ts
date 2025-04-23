@@ -22,6 +22,7 @@ export const zh = {
     header: '头部',
     authorizations: '授权',
     responses: '响应',
+    response: '响应',
     path_parameters: '路径参数',
     query_parameters: '查询参数',
     header_parameters: '头参数',

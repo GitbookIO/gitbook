@@ -22,6 +22,7 @@ export const ja = {
     header: 'ヘッダー',
     authorizations: '認可',
     responses: 'レスポンス',
+    response: 'レスポンス',
     path_parameters: 'パスパラメータ',
     query_parameters: 'クエリパラメータ',
     header_parameters: 'ヘッダーパラメータ',

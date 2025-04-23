@@ -777,8 +777,11 @@ body:has(.openapi-select-popover) {
     @apply ring-1 shadow-sm;
 }
 
+.openapi-disclosure[data-expanded="true"]:not(:first-child) {
+    @apply mt-2;
+}
 .openapi-disclosure[data-expanded="true"]:not(:last-child) {
-    @apply my-2;
+    @apply mb-2;
 }
 
 .openapi-disclosure-trigger-label {

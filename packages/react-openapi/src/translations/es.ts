@@ -22,6 +22,7 @@ export const es = {
     header: 'Encabezado',
     authorizations: 'Autorizaciones',
     responses: 'Respuestas',
+    response: 'Respuesta',
     path_parameters: 'Parámetros de ruta',
     query_parameters: 'Parámetros de consulta',
     header_parameters: 'Parámetros de encabezado',

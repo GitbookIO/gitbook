@@ -22,6 +22,7 @@ export const pt_br = {
     header: 'Cabeçalho',
     authorizations: 'Autorizações',
     responses: 'Respostas',
+    response: 'Resposta',
     path_parameters: 'Parâmetros de rota',
     query_parameters: 'Parâmetros de consulta',
     header_parameters: 'Parâmetros de cabeçalho',

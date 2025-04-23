@@ -22,6 +22,7 @@ export const en = {
     header: 'Header',
     authorizations: 'Authorizations',
     responses: 'Responses',
+    response: 'Response',
     path_parameters: 'Path parameters',
     query_parameters: 'Query parameters',
     header_parameters: 'Header parameters',

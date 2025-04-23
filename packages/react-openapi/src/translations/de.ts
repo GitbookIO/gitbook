@@ -22,6 +22,7 @@ export const de = {
     header: 'Header',
     authorizations: 'Autorisierungen',
     responses: 'Antworten',
+    response: 'Antwort',
     path_parameters: 'Pfadparameter',
     query_parameters: 'Abfrageparameter',
     header_parameters: 'Header-Parameter',
