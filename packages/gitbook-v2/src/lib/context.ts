@@ -19,6 +19,7 @@ import {
     getDataOrNull,
     throwIfDataError,
 } from '@v2/lib/data';
+import assertNever from 'assert-never';
 import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_URL } from './env';
@@ -242,19 +243,45 @@ export async function fetchSiteContextByIds(
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
         : null;
 
-    const siteSpace = (
-        siteStructure.type === 'siteSpaces' && siteStructure.structure
-            ? siteStructure.structure
-            : sections?.current.siteSpaces
-    )?.find((siteSpace) => siteSpace.id === ids.siteSpace);
-    if (!siteSpace) {
-        throw new Error('Site space not found');
-    }
+    // Parse the current siteSpace and siteSpaces based on the site structure type.
+    const { siteSpaces, siteSpace }: { siteSpaces: SiteSpace[]; siteSpace: SiteSpace } = (() => {
+        if (siteStructure.type === 'siteSpaces') {
+            const siteSpaces = siteStructure.structure;
+            const siteSpace = siteSpaces.find((siteSpace) => siteSpace.id === ids.siteSpace);
 
-    const siteSpaces =
-        siteStructure.type === 'siteSpaces'
-            ? siteStructure.structure
-            : (sections?.current.siteSpaces ?? []);
+            if (!siteSpace) {
+                throw new Error(
+                    `Site space "${ids.siteSpace}" not found in structure type="siteSpaces"`
+                );
+            }
+
+            return { siteSpaces, siteSpace };
+        }
+
+        if (siteStructure.type === 'sections') {
+            assert(
+                sections,
+                `cannot find site space "${ids.siteSpace}" because parsed sections are missing siteStructure.type="sections" siteSection="${ids.siteSection}"`
+            );
+
+            const currentSection = sections.current;
+            const siteSpaces = currentSection.siteSpaces;
+            const siteSpace = currentSection.siteSpaces.find(
+                (siteSpace) => siteSpace.id === ids.siteSpace
+            );
+
+            if (!siteSpace) {
+                throw new Error(
+                    `Site space "${ids.siteSpace}" not found in structure type="sections" currentSection="${currentSection.id}"`
+                );
+            }
+
+            return { siteSpaces, siteSpace };
+        }
+
+        // @ts-expect-error
+        assertNever(siteStructure, `cannot handle site structure of type ${siteStructure.type}`);
+    })();
 
     const customization = (() => {
         if (ids.siteSpace) {
