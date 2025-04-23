@@ -220,8 +220,6 @@ export async function fetchSiteContextByIds(
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
 
-    const DEBUG = ids.site === 'site_cu2ih';
-
     const [{ site: orgSite, structure: siteStructure, customizations, scripts }, spaceContext] =
         await Promise.all([
             throwIfDataError(
@@ -233,22 +231,6 @@ export async function fetchSiteContextByIds(
             ),
             fetchSpaceContextByIds(baseContext, ids),
         ]);
-
-    DEBUG && console.log('ids', JSON.stringify(ids));
-    DEBUG &&
-        console.log(
-            'siteStructure',
-            siteStructure
-                ? JSON.stringify({
-                      type: siteStructure.type,
-                      structure: siteStructure.structure.map((s) => {
-                          // @ts-ignore
-                          const { siteSpaces, urls, ...rest } = s;
-                          return rest;
-                      }),
-                  })
-                : 'null'
-        );
 
     // override the title with the customization title
     // TODO: remove this hack once we have a proper way to handle site customizations
