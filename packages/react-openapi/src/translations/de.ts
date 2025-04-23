@@ -18,7 +18,8 @@ export const de = {
     nullable: 'Nullfähig',
     body: 'Rumpf',
     payload: 'Nutzlast',
-    headers: 'Kopfzeilen',
+    headers: 'Header',
+    header: 'Header',
     authorizations: 'Autorisierungen',
     responses: 'Antworten',
     path_parameters: 'Pfadparameter',
@@ -34,4 +35,6 @@ export const de = {
     hide: 'Verstecken',
     available_items: 'Verfügbare Elemente',
     properties: 'Eigenschaften',
+    or: 'oder',
+    and: 'und',
 };

@@ -754,11 +754,11 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger {
-    @apply flex flex-row justify-between flex-wrap relative items-start gap-2 text-left -m-3 p-3 pr-10;
+    @apply flex flex-row justify-between flex-wrap relative items-start gap-2 text-left -mx-3 px-3 -my-2.5 py-2.5 pr-10;
 }
 
 .openapi-disclosure {
-    @apply -mx-3 p-3 transition-all flex flex-col ring-tint-subtle;
+    @apply -mx-3 px-3 py-2.5 transition-all flex flex-col ring-tint-subtle;
 }
 
 .openapi-disclosure:not(
@@ -835,6 +835,12 @@ body:has(.openapi-select-popover) {
 
 .openapi-schema-alternatives {
     @apply ml-1.5 pl-3 border-l border-tint-subtle;
+}
+.openapi-schema-alternative {
+    @apply relative;
+}
+.openapi-schema-alternative-separator {
+    @apply p-0.5 tracking-wide leading-none uppercase text-[0.625rem] text-tint-subtle whitespace-nowrap absolute -left-3 -bottom-2.5 -translate-x-1/2 z-10 bg-tint-base border-y border-tint-subtle -rotate-6;
 }
 
 .openapi-tooltip {

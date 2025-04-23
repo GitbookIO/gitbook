@@ -19,6 +19,7 @@ export const es = {
     body: 'Cuerpo',
     payload: 'Caga útil',
     headers: 'Encabezados',
+    header: 'Encabezado',
     authorizations: 'Autorizaciones',
     responses: 'Respuestas',
     path_parameters: 'Parámetros de ruta',
@@ -34,4 +35,6 @@ export const es = {
     hide: 'Ocultar',
     available_items: 'Elementos disponibles',
     properties: 'Propiedades',
+    or: 'o',
+    and: 'y',
 };

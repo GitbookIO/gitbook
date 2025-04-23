@@ -19,6 +19,7 @@ export const en = {
     body: 'Body',
     payload: 'Payload',
     headers: 'Headers',
+    header: 'Header',
     authorizations: 'Authorizations',
     responses: 'Responses',
     path_parameters: 'Path parameters',
@@ -34,4 +35,6 @@ export const en = {
     hide: 'Hide',
     available_items: 'Available items',
     properties: 'Properties',
+    or: 'or',
+    and: 'and',
 };

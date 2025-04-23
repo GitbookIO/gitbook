@@ -19,6 +19,7 @@ export const ja = {
     body: '本文',
     payload: 'ペイロード',
     headers: 'ヘッダー',
+    header: 'ヘッダー',
     authorizations: '認可',
     responses: 'レスポンス',
     path_parameters: 'パスパラメータ',
@@ -34,4 +35,6 @@ export const ja = {
     hide: '非表示',
     available_items: '利用可能なアイテム',
     properties: 'プロパティ',
+    or: 'または',
+    and: 'かつ',
 };

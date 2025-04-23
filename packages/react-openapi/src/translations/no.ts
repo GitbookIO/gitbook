@@ -19,6 +19,7 @@ export const no = {
     body: 'Brødtekst',
     payload: 'Nyttelast',
     headers: 'Overskrifter',
+    header: 'Overskrift',
     authorizations: 'Autorisasjoner',
     responses: 'Responser',
     path_parameters: 'Sti-parametere',
@@ -34,4 +35,6 @@ export const no = {
     hide: 'Skjul',
     available_items: 'Tilgjengelige elementer',
     properties: 'Egenskaper',
+    or: 'eller',
+    and: 'og',
 };

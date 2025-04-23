@@ -19,6 +19,7 @@ export const nl = {
     body: 'Body',
     payload: 'Payload',
     headers: 'Headers',
+    header: 'Header',
     authorizations: 'Autorisaties',
     responses: 'Reacties',
     path_parameters: 'Padparameters',
@@ -34,4 +35,6 @@ export const nl = {
     hide: 'Verbergen',
     available_items: 'Beschikbare items',
     properties: 'Eigenschappen',
+    or: 'of',
+    and: 'en',
 };

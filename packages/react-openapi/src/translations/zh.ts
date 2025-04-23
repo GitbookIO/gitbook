@@ -19,6 +19,7 @@ export const zh = {
     body: '请求体',
     payload: '有效载荷',
     headers: '头部信息',
+    header: '头部',
     authorizations: '授权',
     responses: '响应',
     path_parameters: '路径参数',
@@ -34,4 +35,6 @@ export const zh = {
     hide: '隐藏',
     available_items: '可用项',
     properties: '属性',
+    or: '或',
+    and: '和',
 };

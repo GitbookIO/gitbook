@@ -36,7 +36,9 @@ export function OpenAPIResponse(props: {
                             </span>
                             <span className="openapi-schema-type">
                                 {headers.length}{' '}
-                                {tString(context.translation, 'headers').toLowerCase()}
+                                {headers.length === 1
+                                    ? tString(context.translation, 'header').toLowerCase()
+                                    : tString(context.translation, 'headers').toLowerCase()}
                             </span>
                         </div>
                     }

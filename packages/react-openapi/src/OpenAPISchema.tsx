@@ -71,13 +71,21 @@ function OpenAPISchemaProperty(
         if (alternatives) {
             return (
                 <div className="openapi-schema-alternatives">
-                    {alternatives.map((schema, index) => (
-                        <OpenAPISchemaAlternative
-                            key={index}
-                            schema={schema}
-                            circularRefs={circularRefs}
-                            context={context}
-                        />
+                    {alternatives.map((alternativeSchema, index) => (
+                        <div key={index} className="openapi-schema-alternative">
+                            <OpenAPISchemaAlternative
+                                schema={alternativeSchema}
+                                circularRefs={circularRefs}
+                                context={context}
+                            />
+                            {index < alternatives.length - 1 ? (
+                                <span className="openapi-schema-alternative-separator">
+                                    {schema.anyOf && tString(context.translation, 'or')}
+                                    {schema.oneOf && tString(context.translation, 'or')}
+                                    {schema.allOf && tString(context.translation, 'and')}
+                                </span>
+                            ) : null}
+                        </div>
                     ))}
                 </div>
             );

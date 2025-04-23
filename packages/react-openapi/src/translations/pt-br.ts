@@ -19,6 +19,7 @@ export const pt_br = {
     body: 'Corpo',
     payload: 'Carga útil',
     headers: 'Cabeçalhos',
+    header: 'Cabeçalho',
     authorizations: 'Autorizações',
     responses: 'Respostas',
     path_parameters: 'Parâmetros de rota',
@@ -34,4 +35,6 @@ export const pt_br = {
     hide: 'Ocultar',
     available_items: 'Itens disponíveis',
     properties: 'Propriedades',
+    or: 'ou',
+    and: 'e',
 };
