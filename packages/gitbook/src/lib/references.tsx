@@ -236,9 +236,10 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
+            const spaceId = contentRef.space ?? space.id;
             const reusableContent = await getDataOrNull(
                 dataFetcher.getReusableContent({
-                    spaceId: contentRef.space ?? space.id,
+                    spaceId,
                     revisionId,
                     reusableContentId: contentRef.reusableContent,
                     apiToken: options.apiToken,
@@ -248,7 +249,7 @@ export async function resolveContentRef(
                 return null;
             }
             return {
-                href: getGitBookAppHref(`/s/${space.id}`),
+                href: getGitBookAppHref(`/s/${spaceId}/~/reusable/${reusableContent.id}`),
                 text: reusableContent.title,
                 active: false,
                 reusableContent,
