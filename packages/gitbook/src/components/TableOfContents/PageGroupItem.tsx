@@ -15,27 +15,13 @@ export function PageGroupItem(props: {
     const { rootPages, page, context } = props;
 
     return (
-        <li className={tcls('flex', 'flex-col', 'group/page-group-item')}>
+        <li className="group/page-group-item flex flex-col">
             <div
                 className={tcls(
-                    'flex',
-                    'items-center',
-
-                    'gap-3',
-                    'px-3',
-                    'z-[1]',
-                    'sticky',
-                    '-top-5',
-                    'pt-6',
-                    'group-first/page-group-item:-mt-5',
+                    '-top-5 group-first/page-group-item:-mt-5 sticky z-[1] flex items-center gap-3 px-3 pt-6',
+                    'font-semibold text-xs uppercase tracking-wide',
                     'pb-3', // Add extra padding to make the header fade a bit nicer
                     '-mb-1.5', // Then pull the page items a bit closer, effective bottom padding is 1.5 units / 6px.
-
-                    'text-xs',
-                    'tracking-wide',
-                    'font-semibold',
-                    'uppercase',
-
                     '[mask-image:linear-gradient(rgba(0,0,0,1)_70%,rgba(0,0,0,0))]', // Fade out effect of fixed page items. We want the fade to start past the header, this is a good approximation.
                     'bg-tint-base',
                     'sidebar-filled:bg-tint-subtle',
