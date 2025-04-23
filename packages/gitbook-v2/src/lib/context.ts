@@ -407,7 +407,7 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
 function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
     const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
     const section = parseCurrentSection(structure, siteSectionId);
-    assert(section, 'A section must be defined when there are multiple sections');
+    assert(section, `couldn't find section "${siteSectionId}" in site structure`);
     return { list: sectionsAndGroups, current: section } satisfies SiteSections;
 }
 
