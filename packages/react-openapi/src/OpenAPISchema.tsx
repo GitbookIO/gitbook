@@ -640,5 +640,7 @@ function getDisclosureLabel(props: {
         label = schema.title || tString(context.translation, 'properties').toLowerCase();
     }
 
-    return `${isExpanded ? tString(context.translation, 'hide') : tString(context.translation, 'show')} ${label}`;
+    return isExpanded
+        ? tString(context.translation, 'hide', label)
+        : tString(context.translation, 'show', label);
 }

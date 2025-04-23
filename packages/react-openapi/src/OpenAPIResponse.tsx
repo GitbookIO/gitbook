@@ -36,14 +36,33 @@ export function OpenAPIResponse(props: {
                             </span>
                             <span className="openapi-schema-type">
                                 {headers.length}{' '}
-                                {headers.length === 1
-                                    ? tString(context.translation, 'header').toLowerCase()
-                                    : tString(context.translation, 'headers').toLowerCase()}
+                                {tString(
+                                    context.translation,
+                                    headers.length === 1 ? 'header' : 'headers'
+                                ).toLowerCase()}
                             </span>
                         </div>
                     }
                     icon={context.icons.plus}
-                    label={(isExpanded) => (isExpanded ? 'Hide headers' : 'Show headers')}
+                    label={(isExpanded) =>
+                        isExpanded
+                            ? tString(
+                                  context.translation,
+                                  'hide',
+                                  tString(
+                                      context.translation,
+                                      headers.length === 1 ? 'header' : 'headers'
+                                  )
+                              )
+                            : tString(
+                                  context.translation,
+                                  'show',
+                                  tString(
+                                      context.translation,
+                                      headers.length === 1 ? 'header' : 'headers'
+                                  )
+                              )
+                    }
                 >
                     <OpenAPISchemaProperties
                         properties={headers.map(([name, header]) =>
