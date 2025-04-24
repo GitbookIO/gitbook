@@ -12,13 +12,13 @@ interface Test {
 // and to be able to see the results, and only catch major regressions.
 const tests: Array<Test> = [
     {
-        url: 'https://docs.gitbook.com',
+        url: 'https://gitbook.com/docs',
         strategy: 'desktop',
         threshold: 60,
     },
 
     {
-        url: 'https://docs.gitbook.com',
+        url: 'https://gitbook.com/docs',
         strategy: 'mobile',
         threshold: 30,
     },
