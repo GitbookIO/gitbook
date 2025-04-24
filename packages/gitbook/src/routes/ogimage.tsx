@@ -121,9 +121,6 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     const gridWhite = getAssetURL('images/ogimage-grid-white.png');
     const gridBlack = getAssetURL('images/ogimage-grid-black.png');
 
-    console.log('gridWhite', gridWhite);
-    console.log('gridBlack', gridBlack);
-
     let gridAsset = useLightTheme ? gridBlack : gridWhite;
 
     switch (customization.header.preset) {
@@ -177,20 +174,16 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
                 </span>
             );
-        
-        const faviconURL = linker.toAbsoluteURL(
-            linker.toPathInSpace(
-                `~gitbook/icon?size=medium&theme=${customization.themes.default}`
-            )
-        )
-        console.log('faviconURL', faviconURL);
         const src = await readSelfImage(
-            faviconURL
+            linker.toAbsoluteURL(
+                linker.toPathInSpace(
+                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`
+                )
+            )
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
     })();
 
-    console.log('Got favicon');
     return new ImageResponse(
         <div
             tw={`justify-between p-20 relative w-full h-full flex flex-col bg-[${colors.background}] text-[${colors.body}]`}
