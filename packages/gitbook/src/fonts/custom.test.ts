@@ -30,7 +30,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     multiWeight: {
@@ -86,7 +86,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     multiSource: {
@@ -107,7 +107,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     missingFormat: {
@@ -128,7 +128,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     empty: {
@@ -138,7 +138,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         fontFaces: [],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     specialChars: {
@@ -153,7 +153,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     complex: {
@@ -178,7 +178,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 
     variousURLs: {
@@ -197,7 +197,7 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         ],
         permissions: {
             edit: false,
-        }
+        },
     },
 };
 
