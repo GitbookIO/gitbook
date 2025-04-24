@@ -9,11 +9,12 @@ import { Button, Disclosure, DisclosurePanel } from 'react-aria-components';
  */
 export function OpenAPIDisclosure(props: {
     icon: React.ReactNode;
+    header: React.ReactNode;
     children: React.ReactNode;
     label: string | ((isExpanded: boolean) => string);
     className?: string;
 }): React.JSX.Element {
-    const { icon, children, label, className } = props;
+    const { icon, header, label, children, className } = props;
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
@@ -31,8 +32,11 @@ export function OpenAPIDisclosure(props: {
                         : 'none',
                 })}
             >
-                {icon}
-                <span>{typeof label === 'function' ? label(isExpanded) : label}</span>
+                {header}
+                <div className="openapi-disclosure-trigger-label">
+                    <span>{typeof label === 'function' ? label(isExpanded) : label}</span>
+                    {icon}
+                </div>
             </Button>
             <DisclosurePanel className="openapi-disclosure-panel">
                 {isExpanded ? children : null}

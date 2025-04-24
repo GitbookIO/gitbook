@@ -9,7 +9,7 @@ import {
     getOpenAPIClientContext,
     resolveOpenAPIContext,
 } from '../context';
-import { t } from '../translate';
+import { t, tString } from '../translate';
 import { getExampleFromSchema } from '../util/example';
 
 /**
@@ -89,7 +89,10 @@ export function OpenAPISchemas(props: {
                         className="openapi-schemas-disclosure"
                         key={name}
                         icon={context.icons.chevronRight}
-                        label={name}
+                        header={name}
+                        label={(isExpanded) =>
+                            tString(context.translation, isExpanded ? 'hide' : 'show')
+                        }
                     >
                         <Section className="openapi-section-schemas">
                             <SectionBody>
