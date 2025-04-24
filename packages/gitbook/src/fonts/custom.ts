@@ -1,9 +1,9 @@
-import type { CustomizationFontDefinition } from '@gitbook/api';
+import type { CustomizationFontDefinitionInput } from '@gitbook/api';
 
 /**
  * Define the custom font faces and set the --font-custom to the custom font name
  */
-export function generateFontFacesCSS(customFont: CustomizationFontDefinition): string {
+export function generateFontFacesCSS(customFont: CustomizationFontDefinitionInput): string {
     const { fontFaces } = customFont;
 
     // Generate font face declarations for all weights
@@ -45,7 +45,7 @@ export function generateFontFacesCSS(customFont: CustomizationFontDefinition): s
 /**
  * Get a list of font sources to preload (only 400 and 700 weights)
  */
-export function getFontSourcesToPreload(customFont: CustomizationFontDefinition) {
+export function getFontSourcesToPreload(customFont: CustomizationFontDefinitionInput) {
     return customFont.fontFaces.filter(
         (face): face is typeof face & { weight: 400 | 700 } =>
             face.weight === 400 || face.weight === 700

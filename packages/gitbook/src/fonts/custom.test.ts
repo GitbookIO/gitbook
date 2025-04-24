@@ -28,6 +28,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 ],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 
     multiWeight: {
@@ -81,6 +84,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 ],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 
     multiSource: {
@@ -99,6 +105,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 ],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 
     missingFormat: {
@@ -117,6 +126,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 ],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 
     empty: {
@@ -124,6 +136,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
         custom: true,
         fontFamily: 'Empty Font',
         fontFaces: [],
+        permissions: {
+            edit: false,
+        }
     },
 
     specialChars: {
@@ -136,6 +151,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 sources: [{ url: 'https://example.com/fonts/special.woff2', format: 'woff2' }],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 
     complex: {
@@ -158,6 +176,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 ],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 
     variousURLs: {
@@ -174,6 +195,9 @@ const TEST_FONTS: { [key in string]: CustomizationFontDefinition } = {
                 ],
             },
         ],
+        permissions: {
+            edit: false,
+        }
     },
 };
 
