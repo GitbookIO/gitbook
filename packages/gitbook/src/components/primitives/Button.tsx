@@ -90,7 +90,7 @@ export function Button({
         'contrast-more:hover:ring-2',
         'contrast-more:hover:ring-tint-12',
 
-        'hover:scale-105',
+        'hover:scale-104',
         'active:scale-100',
         'transition-all',
 
