@@ -115,7 +115,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 return <Tag className={tcls(['w-full', verticalAlignment])}>{''}</Tag>;
             }
 
-            const alignment = getColumnAlignment(definition);
+            const horizontalAlignment = `[&_*]:${getColumnAlignment(definition)} ${getColumnAlignment(definition)}`;
 
             return (
                 <Blocks
@@ -130,8 +130,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         'lg:space-y-3',
                         'leading-normal',
                         verticalAlignment,
-                        alignment === 'right' ? 'text-right' : null,
-                        alignment === 'center' ? 'text-center' : null,
+                        horizontalAlignment,
                     ]}
                     context={context}
                     blockStyle={['w-full', 'max-w-[unset]']}

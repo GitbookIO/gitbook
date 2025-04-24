@@ -42,32 +42,28 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         )}
                     >
                         <div role="row" className={tcls('flex', 'w-full')}>
-                            {view.columns.map((column) => {
-                                const alignment = getColumnAlignment(block.data.definition[column]);
-                                return (
-                                    <div
-                                        key={column}
-                                        role="columnheader"
-                                        className={tcls(
-                                            styles.columnHeader,
-                                            alignment === 'right' ? 'text-right' : null,
-                                            alignment === 'center' ? 'text-center' : null
-                                        )}
-                                        style={{
-                                            width: getColumnWidth({
-                                                column,
-                                                columnWidths,
-                                                autoSizedColumns,
-                                                fixedColumns,
-                                            }),
-                                            minWidth: columnWidths?.[column] || '100px',
-                                        }}
-                                        title={block.data.definition[column].title}
-                                    >
-                                        {block.data.definition[column].title}
-                                    </div>
-                                );
-                            })}
+                            {view.columns.map((column) => (
+                                <div
+                                    key={column}
+                                    role="columnheader"
+                                    className={tcls(
+                                        styles.columnHeader,
+                                        getColumnAlignment(block.data.definition[column])
+                                    )}
+                                    style={{
+                                        width: getColumnWidth({
+                                            column,
+                                            columnWidths,
+                                            autoSizedColumns,
+                                            fixedColumns,
+                                        }),
+                                        minWidth: columnWidths?.[column] || '100px',
+                                    }}
+                                    title={block.data.definition[column].title}
+                                >
+                                    {block.data.definition[column].title}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
