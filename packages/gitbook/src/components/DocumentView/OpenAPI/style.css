@@ -73,6 +73,10 @@
     @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
+.openapi-markdown pre code {
+    @apply bg-transparent ring-transparent;
+}
+
 /* Markdown Base */
 .openapi-markdown {
     @apply prose text-tint-strong prose-p:!my-2 dark:prose-invert max-w-none whitespace-normal;
