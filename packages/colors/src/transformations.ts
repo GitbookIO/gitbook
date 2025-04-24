@@ -220,7 +220,21 @@ export function colorScale(
             continue;
         }
 
-        const chromaRatio = index === 8 || index === 9 ? 1 : index * 0.05;
+        const chromaRatio = (() => {
+            switch (index) {
+                // Step 9 and 10 have max chroma, meaning they are fully saturated.
+                case 8:
+                case 9:
+                    return 1;
+                // Step 12 is fully desaturated
+                case 10:
+                    return 0.4;
+                case 11:
+                    return 0.1;
+                default:
+                    return index * 0.05;
+            }
+        })();
 
         const shade = {
             L: targetL, // Blend lightness
