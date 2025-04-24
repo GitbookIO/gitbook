@@ -8,6 +8,7 @@ import type { GitBookDataFetcher } from '@v2/lib/data/types';
 import { createImageResizer } from '@v2/lib/images';
 import { createLinker } from '@v2/lib/links';
 
+import { GitBookAPI } from '@gitbook/api';
 import { DataFetcherError, wrapDataFetcherError } from '@v2/lib/data';
 import { headers } from 'next/headers';
 import {
@@ -30,6 +31,7 @@ import {
     getUserById,
     renderIntegrationUi,
     searchSiteContent,
+    withAPI as withAPIV1,
 } from './api';
 import { getDynamicCustomizationSettings } from './customization';
 import { withLeadingSlash, withTrailingSlash } from './paths';
@@ -58,7 +60,7 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
         return url;
     };
 
-    const dataFetcher = await getDataFetcherV1();
+    const dataFetcher = getDataFetcherV1();
 
     const imageResizer = createImageResizer({
         imagesContextId: host,
@@ -82,77 +84,121 @@ export async function getV1BaseContext(): Promise<GitBookBaseContext> {
  * Try not to use this as much as possible, and instead take the data fetcher from the props.
  * This data fetcher should only be used at the top of the tree.
  */
-async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
+function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
+    let apiClient: GitBookAPI | undefined;
+
+    /**
+     * Run a function with the correct API client. If an API token is provided, we
+     * create a new API client with the token. Otherwise, we use the default API client.
+     */
+    async function withAPI<T>(fn: () => Promise<T>): Promise<T> {
+        // No token override - we can use the default API client.
+        if (!apiTokenOverride) {
+            return fn();
+        }
+        
+        const client = await api();
+
+        if (!apiClient) {
+            // New client uses same endpoint and user agent as the default client.
+            apiClient = new GitBookAPI({
+                endpoint: client.client.endpoint,
+                authToken: apiTokenOverride,
+                userAgent: client.client.userAgent,
+            });
+        }
+
+        return withAPIV1(
+            {
+                client: apiClient,
+                contextId: client.contextId,
+            },
+            fn
+        );
+    }
+
     const dataFetcher: GitBookDataFetcher = {
         async api() {
-            const result = await api();
-            return result.client;
+            return withAPI(async () => {
+                const result = await api();
+                return result.client;
+            });
         },
 
-        withToken() {
-            // In v1, the token is global and controlled by the middleware.
-            // We don't need to do anything special here.
-            return dataFetcher;
+        withToken({ apiToken }) {
+            return getDataFetcherV1(apiToken);
         },
 
         getUserById(userId) {
-            return wrapDataFetcherError(async () => {
-                const user = await getUserById(userId);
-                if (!user) {
-                    throw new DataFetcherError('User not found', 404);
-                }
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const user = await getUserById(userId);
+                    if (!user) {
+                        throw new DataFetcherError('User not found', 404);
+                    }
 
-                return user;
-            });
+                    return user;
+                })
+            );
         },
 
         getPublishedContentSite(params) {
-            return wrapDataFetcherError(async () => {
-                return getPublishedContentSite(params);
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    return getPublishedContentSite(params);
+                })
+            );
         },
 
         getSpace(params) {
-            return wrapDataFetcherError(async () => {
-                return getSpace(params.spaceId, params.shareKey);
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    return getSpace(params.spaceId, params.shareKey);
+                })
+            );
         },
 
         getChangeRequest(params) {
-            return wrapDataFetcherError(async () => {
-                const changeRequest = await getChangeRequest(
-                    params.spaceId,
-                    params.changeRequestId
-                );
-                if (!changeRequest) {
-                    throw new DataFetcherError('Change request not found', 404);
-                }
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const changeRequest = await getChangeRequest(
+                        params.spaceId,
+                        params.changeRequestId
+                    );
+                    if (!changeRequest) {
+                        throw new DataFetcherError('Change request not found', 404);
+                    }
 
-                return changeRequest;
-            });
+                    return changeRequest;
+                })
+            );
         },
 
         getRevision(params) {
-            return wrapDataFetcherError(async () => {
-                return getRevision(params.spaceId, params.revisionId, {
-                    metadata: params.metadata,
-                });
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    return getRevision(params.spaceId, params.revisionId, {
+                        metadata: params.metadata,
+                    });
+                })
+            );
         },
 
         getRevisionFile(params) {
-            return wrapDataFetcherError(async () => {
-                const revisionFile = await getRevisionFile(
-                    params.spaceId,
-                    params.revisionId,
-                    params.fileId
-                );
-                if (!revisionFile) {
-                    throw new DataFetcherError('Revision file not found', 404);
-                }
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const revisionFile = await getRevisionFile(
+                        params.spaceId,
+                        params.revisionId,
+                        params.fileId
+                    );
+                    if (!revisionFile) {
+                        throw new DataFetcherError('Revision file not found', 404);
+                    }
 
-                return revisionFile;
-            });
+                    return revisionFile;
+                })
+            );
         },
 
         getRevisionPageMarkdown() {
@@ -160,117 +206,140 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
         },
 
         getDocument(params) {
-            return wrapDataFetcherError(async () => {
-                const document = await getDocument(params.spaceId, params.documentId);
-                if (!document) {
-                    throw new DataFetcherError('Document not found', 404);
-                }
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const document = await getDocument(params.spaceId, params.documentId);
+                    if (!document) {
+                        throw new DataFetcherError('Document not found', 404);
+                    }
 
-                return document;
-            });
+                    return document;
+                })
+            );
         },
 
         getComputedDocument(params) {
-            return wrapDataFetcherError(() => {
-                return getComputedDocument(
-                    params.organizationId,
-                    params.spaceId,
-                    params.source,
-                    params.seed
-                );
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(() => {
+                    return getComputedDocument(
+                        params.organizationId,
+                        params.spaceId,
+                        params.source,
+                        params.seed
+                    );
+                })
+            );
         },
 
         getRevisionPages(params) {
-            return wrapDataFetcherError(async () => {
-                return getRevisionPages(params.spaceId, params.revisionId, {
-                    metadata: params.metadata,
-                });
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    return getRevisionPages(params.spaceId, params.revisionId, {
+                        metadata: params.metadata,
+                    });
+                })
+            );
         },
 
         getRevisionPageByPath(params) {
-            return wrapDataFetcherError(async () => {
-                const revisionPage = await getRevisionPageByPath(
-                    params.spaceId,
-                    params.revisionId,
-                    params.path
-                );
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const revisionPage = await getRevisionPageByPath(
+                        params.spaceId,
+                        params.revisionId,
+                        params.path
+                    );
 
-                if (!revisionPage) {
-                    throw new DataFetcherError('Revision page not found', 404);
-                }
+                    if (!revisionPage) {
+                        throw new DataFetcherError('Revision page not found', 404);
+                    }
 
-                return revisionPage;
-            });
+                    return revisionPage;
+                })
+            );
         },
 
         getReusableContent(params) {
-            return wrapDataFetcherError(async () => {
-                const reusableContent = await getReusableContent(
-                    params.spaceId,
-                    params.revisionId,
-                    params.reusableContentId
-                );
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const reusableContent = await getReusableContent(
+                        params.spaceId,
+                        params.revisionId,
+                        params.reusableContentId
+                    );
 
-                if (!reusableContent) {
-                    throw new DataFetcherError('Reusable content not found', 404);
-                }
+                    if (!reusableContent) {
+                        throw new DataFetcherError('Reusable content not found', 404);
+                    }
 
-                return reusableContent;
-            });
+                    return reusableContent;
+                })
+            );
         },
 
         getLatestOpenAPISpecVersionContent(params) {
-            return wrapDataFetcherError(async () => {
-                const openAPISpecVersionContent = await getLatestOpenAPISpecVersionContent(
-                    params.organizationId,
-                    params.slug
-                );
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const openAPISpecVersionContent = await getLatestOpenAPISpecVersionContent(
+                        params.organizationId,
+                        params.slug
+                    );
 
-                if (!openAPISpecVersionContent) {
-                    throw new DataFetcherError('OpenAPI spec version content not found', 404);
-                }
+                    if (!openAPISpecVersionContent) {
+                        throw new DataFetcherError('OpenAPI spec version content not found', 404);
+                    }
 
-                return openAPISpecVersionContent;
-            });
+                    return openAPISpecVersionContent;
+                })
+            );
         },
 
         getSiteRedirectBySource(params) {
-            return wrapDataFetcherError(async () => {
-                const siteRedirect = await getSiteRedirectBySource(params);
-                if (!siteRedirect) {
-                    throw new DataFetcherError('Site redirect not found', 404);
-                }
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const siteRedirect = await getSiteRedirectBySource(params);
+                    if (!siteRedirect) {
+                        throw new DataFetcherError('Site redirect not found', 404);
+                    }
 
-                return siteRedirect;
-            });
+                    return siteRedirect;
+                })
+            );
         },
         getEmbedByUrl(params) {
-            return wrapDataFetcherError(() => {
-                return getEmbedByUrlInSpace(params.spaceId, params.url);
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(() => {
+                    return getEmbedByUrlInSpace(params.spaceId, params.url);
+                })
+            );
         },
 
         searchSiteContent(params) {
-            return wrapDataFetcherError(async () => {
-                const { organizationId, siteId, query, cacheBust, scope } = params;
-                const result = await searchSiteContent(
-                    organizationId,
-                    siteId,
-                    query,
-                    scope,
-                    cacheBust
-                );
-                return result.items;
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const { organizationId, siteId, query, cacheBust, scope } = params;
+                    const result = await searchSiteContent(
+                        organizationId,
+                        siteId,
+                        query,
+                        scope,
+                        cacheBust
+                    );
+                    return result.items;
+                })
+            );
         },
 
         renderIntegrationUi(params) {
-            return wrapDataFetcherError(async () => {
-                const result = await renderIntegrationUi(params.integrationName, params.request);
-                return result;
-            });
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    const result = await renderIntegrationUi(
+                        params.integrationName,
+                        params.request
+                    );
+                    return result;
+                })
+            );
         },
 
         streamAIResponse() {
