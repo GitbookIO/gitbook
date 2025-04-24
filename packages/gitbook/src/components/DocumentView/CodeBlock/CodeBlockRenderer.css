@@ -24,7 +24,7 @@
 }
 
 .highlight-line-number {
-    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-tint to-transparent;
+    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-tint-subtle contrast-more:from-tint-base theme-muted:from-tint-base [html.theme-bold.sidebar-filled_&]:from-tint-base to-transparent;
     @apply before:text-tint before:content-[counter(line)];
 
     .highlight-line.highlighted > & {

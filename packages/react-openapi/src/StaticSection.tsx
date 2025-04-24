@@ -11,7 +11,7 @@ export function SectionHeader(props: ComponentPropsWithoutRef<'div'>) {
             {...props}
             className={clsx(
                 'openapi-section-header',
-                props.className && `${props.className}-header`
+                props.className ? `${props.className}-header` : undefined
             )}
         />
     );
