@@ -11,8 +11,6 @@ import type { CacheBackend, CacheEntry } from './types';
 
 export type CacheFunctionOptions = {
     signal: AbortSignal | undefined;
-
-    apiToken?: string;
 };
 
 export type CacheFunction<Args extends any[], Result> = ((

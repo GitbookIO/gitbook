@@ -125,14 +125,14 @@ export async function apiWithToken(
 /**
  * Create an API client for the current request.
  */
-export async function api(tokenOverride?: string): Promise<GitBookAPIContext> {
+export async function api(): Promise<GitBookAPIContext> {
     const existing = apiSyncStorage.getStore();
-    if (existing && (!tokenOverride || existing.client.authToken === tokenOverride)) {
+    if (existing) {
         return existing;
     }
 
     const headersList = await headers();
-    const apiToken = tokenOverride ?? headersList.get('x-gitbook-token');
+    const apiToken = headersList.get('x-gitbook-token');
     const contextId = headersList.get('x-gitbook-token-context') ?? undefined;
 
     if (!apiToken) {
@@ -308,7 +308,7 @@ export const getSpace = cache({
     name: 'api.getSpace',
     tag: (spaceId) => getCacheTag({ tag: 'space', space: spaceId }),
     get: async (spaceId: string, shareKey: string | undefined, options: CacheFunctionOptions) => {
-        const apiCtx = await api(options.apiToken);
+        const apiCtx = await api();
         const response = await apiCtx.client.spaces.getSpaceById(
             spaceId,
             {
@@ -371,8 +371,6 @@ interface GetRevisionOptions {
      * These options don't impact the cache key and it means revisions can be shared between different fetches with different metadata options.
      */
     metadata: boolean;
-
-    apiToken?: string;
 }
 
 const getAPIContextId = async () => {
@@ -395,7 +393,7 @@ export const getRevision = cache({
         fetchOptions: GetRevisionOptions,
         options: CacheFunctionOptions
     ) => {
-        const apiCtx = await api(fetchOptions.apiToken);
+        const apiCtx = await api();
         const response = await apiCtx.client.spaces.getRevisionById(
             spaceId,
             revisionId,
@@ -549,7 +547,7 @@ const getRevisionReusableContentById = cache({
         options: CacheFunctionOptions
     ) => {
         try {
-            const apiCtx = await api(options.apiToken);
+            const apiCtx = await api();
             const response = await apiCtx.client.spaces.getReusableContentInRevisionById(
                 spaceId,
                 revisionId,
@@ -674,25 +672,21 @@ export const getRevisionFile = batch<[string, string, string], RevisionFile | nu
 export const getReusableContent = async (
     spaceId: string,
     revisionId: string,
-    reusableContentId: string,
-    apiToken?: string
+    reusableContentId: string
 ): Promise<RevisionReusableContent | null> => {
     const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
         metadata: false,
     });
 
     if (hasRevisionInMemory) {
-        const revision = await getRevision(spaceId, revisionId, { metadata: false, apiToken });
+        const revision = await getRevision(spaceId, revisionId, { metadata: false });
         return (
             revision.reusableContents.find(
                 (reusableContent) => reusableContent.id === reusableContentId
             ) ?? null
         );
     }
-    return getRevisionReusableContentById(spaceId, revisionId, reusableContentId, {
-        signal: undefined,
-        apiToken,
-    });
+    return getRevisionReusableContentById(spaceId, revisionId, reusableContentId);
 };
 
 /**
@@ -705,7 +699,7 @@ export const getDocument = cache({
     tagImmutable: true,
     getKeySuffix: getAPIContextId,
     get: async (spaceId: string, documentId: string, options: CacheFunctionOptions) => {
-        const apiCtx = await api(options.apiToken);
+        const apiCtx = await api();
         const response = await apiCtx.client.spaces.getDocumentById(
             spaceId,
             documentId,

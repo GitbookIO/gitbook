@@ -114,10 +114,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getSpace(params) {
             return wrapDataFetcherError(async () => {
-                return getSpace(params.spaceId, params.shareKey, {
-                    signal: undefined,
-                    apiToken: params.apiToken,
-                });
+                return getSpace(params.spaceId, params.shareKey);
             });
         },
 
@@ -164,10 +161,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
 
         getDocument(params) {
             return wrapDataFetcherError(async () => {
-                const document = await getDocument(params.spaceId, params.documentId, {
-                    signal: undefined,
-                    apiToken: params.apiToken,
-                });
+                const document = await getDocument(params.spaceId, params.documentId);
                 if (!document) {
                     throw new DataFetcherError('Document not found', 404);
                 }
@@ -216,8 +210,7 @@ async function getDataFetcherV1(): Promise<GitBookDataFetcher> {
                 const reusableContent = await getReusableContent(
                     params.spaceId,
                     params.revisionId,
-                    params.reusableContentId,
-                    params.apiToken
+                    params.reusableContentId
                 );
 
                 if (!reusableContent) {
