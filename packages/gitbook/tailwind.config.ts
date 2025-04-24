@@ -443,6 +443,7 @@ const config: Config = {
             scale: {
                 '98': '0.98',
                 '102': '1.02',
+                '104': '1.04',
             },
         },
         opacity: opacity(),
