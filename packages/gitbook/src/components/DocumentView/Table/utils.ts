@@ -1,4 +1,5 @@
 import type { ContentRef, DocumentTableDefinition, DocumentTableRecord } from '@gitbook/api';
+import assertNever from 'assert-never';
 
 /**
  * Get the value for a column in a record.
@@ -14,11 +15,24 @@ export function getRecordValue<T extends number | string | boolean | string[] | 
 /**
  * Get the text alignment for a column.
  */
-export function getColumnAlignment(column: DocumentTableDefinition): 'left' | 'right' | 'center' {
+export function getColumnAlignment(column: DocumentTableDefinition) {
+    const defaultAlignment = 'text-left';
+
     if (column.type === 'text') {
-        return column.textAlignment ?? 'left';
+        switch (column.textAlignment) {
+            case undefined:
+            case 'left':
+                return defaultAlignment;
+            case 'center':
+                return 'text-center';
+            case 'right':
+                return 'text-right';
+            default:
+                assertNever(column.textAlignment);
+        }
     }
-    return 'left';
+
+    return defaultAlignment;
 }
 
 /**
