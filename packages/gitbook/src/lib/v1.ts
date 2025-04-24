@@ -96,7 +96,7 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
         if (!apiTokenOverride) {
             return fn();
         }
-        
+
         const client = await api();
 
         if (!apiClient) {
