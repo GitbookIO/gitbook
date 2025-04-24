@@ -22,14 +22,19 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         dataFetcher,
     });
 
-    if (!resolved?.reusableContent?.document) {
+    if (!resolved?.reusableContent) {
+        return null;
+    }
+
+    const reusableContent = resolved.reusableContent.revisionReusableContent;
+    if (!reusableContent.document) {
         return null;
     }
 
     const document = await getDataOrNull(
         dataFetcher.getDocument({
             spaceId: resolved.reusableContent.space,
-            documentId: resolved.reusableContent.document,
+            documentId: reusableContent.document,
         })
     );
 

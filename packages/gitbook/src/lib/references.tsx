@@ -42,7 +42,11 @@ export interface ResolvedContentRef {
     /** Page document resolved from the content ref */
     page?: RevisionPageDocument;
     /** Resolved reusable content, if the ref points to reusable content on a revision. Also contains the space and revision used for resolution. */
-    reusableContent?: RevisionReusableContent & { space: string; revision: string };
+    reusableContent?: {
+        revisionReusableContent: RevisionReusableContent;
+        space: string;
+        revision: string;
+    };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
 }
@@ -273,7 +277,7 @@ export async function resolveContentRef(
                 text: reusableContent.title,
                 active: false,
                 reusableContent: {
-                    ...reusableContent,
+                    revisionReusableContent: reusableContent,
                     space: container.space,
                     revision: container.revision,
                 },
