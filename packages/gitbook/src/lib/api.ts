@@ -266,7 +266,7 @@ export const getPublishedContentByUrl = cache({
             );
 
             const parsed = parseCacheResponse(response);
-        
+
             // biome-ignore lint/suspicious/noConsole: log the ttl of the token
             console.log(
                 `Parsed ttl: ${parsed.ttl} at ${Date.now()}, for ${'apiToken' in response.data ? response.data.apiToken : '<no-token>'}`
@@ -689,7 +689,10 @@ export const getReusableContent = async (
             ) ?? null
         );
     }
-    return getRevisionReusableContentById(spaceId, revisionId, reusableContentId, { signal: undefined, apiToken });
+    return getRevisionReusableContentById(spaceId, revisionId, reusableContentId, {
+        signal: undefined,
+        apiToken,
+    });
 };
 
 /**

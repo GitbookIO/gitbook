@@ -41,8 +41,8 @@ export interface ResolvedContentRef {
     file?: RevisionFile;
     /** Page document resolved from the content ref */
     page?: RevisionPageDocument;
-    /** Resolved reusable content, if the ref points to reusable content on a revision. */
-    reusableContent?: RevisionReusableContent & { space: string };
+    /** Resolved reusable content, if the ref points to reusable content on a revision. Also contains the space and revision used for resolution. */
+    reusableContent?: RevisionReusableContent & { space: string; revision: string };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
 }
@@ -236,9 +236,11 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
-            const resolvedSpace = await (async () => {
+            // Figure out which space and revision the reusable content is in.
+            const container: { space: string; revision: string } | null = await (async () => {
+                // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
                 if (!contentRef.space || contentRef.space === context.space.id) {
-                    return { spaceId: context.space.id, revisionId };
+                    return { space: context.space.id, revision: revisionId };
                 }
 
                 const space = await getDataOrNull(
@@ -248,38 +250,39 @@ export async function resolveContentRef(
                         apiToken: options.apiToken,
                     })
                 );
-                
+
                 if (!space) {
                     return null;
                 }
 
-                return { spaceId: space.id, revisionId: space.revision };
+                return { space: space.id, revision: space.revision };
             })();
 
-            if (!resolvedSpace) {
+            if (!container) {
                 return null;
             }
-            
-            
+
             const reusableContent = await getDataOrNull(
                 dataFetcher.getReusableContent({
-                    spaceId: resolvedSpace.spaceId,
-                    revisionId: resolvedSpace.revisionId,
+                    spaceId: container.space,
+                    revisionId: container.revision,
                     reusableContentId: contentRef.reusableContent,
                     apiToken: options.apiToken,
                 })
             );
-            
+
             if (!reusableContent) {
                 return null;
             }
+
             return {
-                href: getGitBookAppHref(`/s/${resolvedSpace.spaceId}/~/reusable/${reusableContent.id}`),
+                href: getGitBookAppHref(`/s/${container.space}/~/reusable/${reusableContent.id}`),
                 text: reusableContent.title,
                 active: false,
                 reusableContent: {
                     ...reusableContent,
-                    space: resolvedSpace.spaceId,
+                    space: container.space,
+                    revision: container.revision,
                 },
             };
         }

@@ -49,9 +49,11 @@ export interface GitBookDataFetcher {
     /**
      * Get a space by its ID.
      */
-    getSpace(params: { spaceId: string; shareKey: string | undefined; apiToken?: string | undefined }): Promise<
-        DataFetcherResponse<api.Space>
-    >;
+    getSpace(params: {
+        spaceId: string;
+        shareKey: string | undefined;
+        apiToken?: string | undefined;
+    }): Promise<DataFetcherResponse<api.Space>>;
 
     /**
      * Get a change request by its space ID and change request ID.
