@@ -38,4 +38,5 @@ export const es = {
     properties: 'Propiedades',
     or: 'o',
     and: 'y',
+    possible_values: 'Valores posibles',
 };

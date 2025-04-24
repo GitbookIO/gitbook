@@ -38,4 +38,5 @@ export const de = {
     properties: 'Eigenschaften',
     or: 'oder',
     and: 'und',
+    possible_values: 'Mögliche Werte',
 };

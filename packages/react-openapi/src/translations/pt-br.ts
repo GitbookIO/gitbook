@@ -38,4 +38,5 @@ export const pt_br = {
     properties: 'Propriedades',
     or: 'ou',
     and: 'e',
+    possible_values: 'Valores possíveis',
 };

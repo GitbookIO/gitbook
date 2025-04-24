@@ -38,4 +38,5 @@ export const ja = {
     properties: 'プロパティ',
     or: 'または',
     and: 'かつ',
+    possible_values: '可能な値',
 };

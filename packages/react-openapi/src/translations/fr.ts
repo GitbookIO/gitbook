@@ -38,4 +38,5 @@ export const fr = {
     properties: 'Propriétés',
     or: 'ou',
     and: 'et',
+    possible_values: 'Valeurs possibles',
 };

@@ -35,6 +35,7 @@ export const en = {
     show: 'Show ${1}',
     hide: 'Hide ${1}',
     available_items: 'Available items',
+    possible_values: 'Possible values',
     properties: 'Properties',
     or: 'or',
     and: 'and',

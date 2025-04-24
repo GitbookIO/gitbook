@@ -312,7 +312,7 @@ function OpenAPISchemaEnum(props: {
 
     return (
         <span className="openapi-schema-enum">
-            Allowed values:{' '}
+            {tString(context.translation, 'possible_values')}:{' '}
             {enumValues.map((item, index) => (
                 <span key={index} className="openapi-schema-enum-value">
                     <OpenAPICopyButton

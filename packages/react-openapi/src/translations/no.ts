@@ -38,4 +38,5 @@ export const no = {
     properties: 'Egenskaper',
     or: 'eller',
     and: 'og',
+    possible_values: 'Mulige verdier',
 };

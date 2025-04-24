@@ -38,4 +38,5 @@ export const nl = {
     properties: 'Eigenschappen',
     or: 'of',
     and: 'en',
+    possible_values: 'Mogelijke waarden',
 };

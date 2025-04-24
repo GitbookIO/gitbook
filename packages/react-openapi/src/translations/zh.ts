@@ -38,4 +38,5 @@ export const zh = {
     properties: '属性',
     or: '或',
     and: '和',
+    possible_values: '可能的值',
 };
