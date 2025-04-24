@@ -42,7 +42,7 @@ export interface ResolvedContentRef {
     /** Page document resolved from the content ref */
     page?: RevisionPageDocument;
     /** Resolved reusable content, if the ref points to reusable content on a revision. */
-    reusableContent?: RevisionReusableContent;
+    reusableContent?: RevisionReusableContent & { space: string };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
 }
@@ -236,23 +236,51 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
-            const spaceId = contentRef.space ?? space.id;
+            const resolvedSpace = await (async () => {
+                if (!contentRef.space || contentRef.space === context.space.id) {
+                    return { spaceId: context.space.id, revisionId };
+                }
+
+                const space = await getDataOrNull(
+                    dataFetcher.getSpace({
+                        spaceId: contentRef.space,
+                        shareKey: undefined,
+                        apiToken: options.apiToken,
+                    })
+                );
+                
+                if (!space) {
+                    return null;
+                }
+
+                return { spaceId: space.id, revisionId: space.revision };
+            })();
+
+            if (!resolvedSpace) {
+                return null;
+            }
+            
+            
             const reusableContent = await getDataOrNull(
                 dataFetcher.getReusableContent({
-                    spaceId,
-                    revisionId,
+                    spaceId: resolvedSpace.spaceId,
+                    revisionId: resolvedSpace.revisionId,
                     reusableContentId: contentRef.reusableContent,
                     apiToken: options.apiToken,
                 })
             );
+            
             if (!reusableContent) {
                 return null;
             }
             return {
-                href: getGitBookAppHref(`/s/${spaceId}/~/reusable/${reusableContent.id}`),
+                href: getGitBookAppHref(`/s/${resolvedSpace.spaceId}/~/reusable/${reusableContent.id}`),
                 text: reusableContent.title,
                 active: false,
-                reusableContent,
+                reusableContent: {
+                    ...reusableContent,
+                    space: resolvedSpace.spaceId,
+                },
             };
         }
 

@@ -21,9 +21,10 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         return null;
     }
 
+
     const document = await getDataOrNull(
         context.contentContext.dataFetcher.getDocument({
-            spaceId: context.contentContext.space.id,
+            spaceId: resolved.reusableContent.space,
             documentId: resolved.reusableContent.document,
             apiToken: block.meta?.token,
         })
