@@ -91,9 +91,7 @@ export function OpenAPISchemas(props: {
                         icon={context.icons.chevronRight}
                         header={name}
                         label={(isExpanded) =>
-                            isExpanded
-                                ? tString(context.translation, 'hide')
-                                : tString(context.translation, 'show')
+                            tString(context.translation, isExpanded ? 'hide' : 'show')
                         }
                     >
                         <Section className="openapi-section-schemas">

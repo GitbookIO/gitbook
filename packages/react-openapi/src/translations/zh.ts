@@ -18,7 +18,7 @@ export const zh = {
     nullable: '可为 null',
     body: '请求体',
     payload: '有效载荷',
-    headers: '头部信息',
+    headers: '头字段',
     header: '头部',
     authorizations: '授权',
     responses: '响应',

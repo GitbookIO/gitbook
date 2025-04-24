@@ -20,8 +20,8 @@ import { checkIsReference, resolveDescription, resolveFirstExample } from './uti
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
 export interface OpenAPISchemaPropertyEntry {
-    propertyName?: string | undefined;
-    required?: boolean | undefined;
+    propertyName?: string;
+    required?: boolean | null;
     schema: OpenAPIV3.SchemaObject;
 }
 
@@ -80,8 +80,8 @@ function OpenAPISchemaProperty(
                             />
                             {index < alternatives.length - 1 ? (
                                 <span className="openapi-schema-alternative-separator">
-                                    {schema.anyOf && tString(context.translation, 'or')}
-                                    {schema.oneOf && tString(context.translation, 'or')}
+                                    {(schema.anyOf || schema.oneOf) &&
+                                        tString(context.translation, 'or')}
                                     {schema.allOf && tString(context.translation, 'and')}
                                 </span>
                             ) : null}
@@ -332,7 +332,7 @@ function OpenAPISchemaEnum(props: {
 /**
  * Render the top row of a schema. e.g: name, type, and required status.
  */
-function OpenAPISchemaPresentation(props: {
+export function OpenAPISchemaPresentation(props: {
     property: OpenAPISchemaPropertyEntry;
     context: OpenAPIClientContext;
 }) {
@@ -640,7 +640,5 @@ function getDisclosureLabel(props: {
         label = schema.title || tString(context.translation, 'properties').toLowerCase();
     }
 
-    return isExpanded
-        ? tString(context.translation, 'hide', label)
-        : tString(context.translation, 'show', label);
+    return tString(context.translation, isExpanded ? 'hide' : 'show', label);
 }

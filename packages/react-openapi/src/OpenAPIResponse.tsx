@@ -1,5 +1,6 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
+import { OpenAPISchemaPresentation } from './OpenAPISchema';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import type { OpenAPIClientContext } from './context';
 import { tString } from './translate';
@@ -26,42 +27,31 @@ export function OpenAPIResponse(props: {
     }
 
     return (
-        <div className="openapi-response-body text-sm">
+        <div className="openapi-response-body">
             {headers.length > 0 ? (
                 <OpenAPIDisclosure
                     header={
-                        <div className="openapi-schema-name">
-                            <span className="openapi-schema-propertyname">
-                                {tString(context.translation, 'headers')}
-                            </span>
-                            <span className="openapi-schema-type">
-                                {headers.length}{' '}
-                                {tString(
-                                    context.translation,
-                                    headers.length === 1 ? 'header' : 'headers'
-                                ).toLowerCase()}
-                            </span>
-                        </div>
+                        <OpenAPISchemaPresentation
+                            context={context}
+                            property={{
+                                propertyName: tString(context.translation, 'headers'),
+                                schema: {
+                                    type: 'object',
+                                },
+                                required: null,
+                            }}
+                        />
                     }
                     icon={context.icons.plus}
                     label={(isExpanded) =>
-                        isExpanded
-                            ? tString(
-                                  context.translation,
-                                  'hide',
-                                  tString(
-                                      context.translation,
-                                      headers.length === 1 ? 'header' : 'headers'
-                                  )
-                              )
-                            : tString(
-                                  context.translation,
-                                  'show',
-                                  tString(
-                                      context.translation,
-                                      headers.length === 1 ? 'header' : 'headers'
-                                  )
-                              )
+                        tString(
+                            context.translation,
+                            isExpanded ? 'hide' : 'show',
+                            tString(
+                                context.translation,
+                                headers.length === 1 ? 'header' : 'headers'
+                            )
+                        )
                     }
                 >
                     <OpenAPISchemaProperties
@@ -80,6 +70,7 @@ export function OpenAPIResponse(props: {
                             {
                                 schema: mediaType.schema,
                                 propertyName: tString(context.translation, 'response'),
+                                required: null,
                             },
                         ]}
                         context={context}
