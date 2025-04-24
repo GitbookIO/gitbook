@@ -49,11 +49,9 @@ export interface GitBookDataFetcher {
     /**
      * Get a space by its ID.
      */
-    getSpace(params: {
-        spaceId: string;
-        shareKey: string | undefined;
-        apiToken?: string | undefined;
-    }): Promise<DataFetcherResponse<api.Space>>;
+    getSpace(params: { spaceId: string; shareKey: string | undefined }): Promise<
+        DataFetcherResponse<api.Space>
+    >;
 
     /**
      * Get a change request by its space ID and change request ID.
@@ -111,12 +109,9 @@ export interface GitBookDataFetcher {
     /**
      * Get a document by its space ID and document ID.
      */
-    getDocument(params: {
-        spaceId: string;
-        documentId: string;
-        /** Optionally override the API token used to fetch the content. */
-        apiToken?: string;
-    }): Promise<DataFetcherResponse<api.JSONDocument>>;
+    getDocument(params: { spaceId: string; documentId: string }): Promise<
+        DataFetcherResponse<api.JSONDocument>
+    >;
 
     /**
      * Get a computed document by its space ID and computed source.
@@ -135,8 +130,6 @@ export interface GitBookDataFetcher {
         spaceId: string;
         revisionId: string;
         reusableContentId: string;
-        /** Optionally override the API token used to fetch the content. */
-        apiToken?: string;
     }): Promise<DataFetcherResponse<api.RevisionReusableContent>>;
 
     /**

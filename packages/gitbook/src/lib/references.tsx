@@ -236,6 +236,10 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
+            const fetcher = options.apiToken
+                ? dataFetcher.withToken({ apiToken: options.apiToken })
+                : dataFetcher;
+
             // Figure out which space and revision the reusable content is in.
             const container: { space: string; revision: string } | null = await (async () => {
                 // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
@@ -244,10 +248,9 @@ export async function resolveContentRef(
                 }
 
                 const space = await getDataOrNull(
-                    dataFetcher.getSpace({
+                    fetcher.getSpace({
                         spaceId: contentRef.space,
                         shareKey: undefined,
-                        apiToken: options.apiToken,
                     })
                 );
 
@@ -263,11 +266,10 @@ export async function resolveContentRef(
             }
 
             const reusableContent = await getDataOrNull(
-                dataFetcher.getReusableContent({
+                fetcher.getReusableContent({
                     spaceId: container.space,
                     revisionId: container.revision,
                     reusableContentId: contentRef.reusableContent,
-                    apiToken: options.apiToken,
                 })
             );
 
