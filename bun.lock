@@ -260,6 +260,8 @@
   "overrides": {
     "@codemirror/state": "6.4.1",
     "@gitbook/api": "0.111.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
   },
   "packages": {
     "@ai-sdk/provider": ["@ai-sdk/provider@1.1.0", "", { "dependencies": { "json-schema": "^0.4.0" } }, "sha512-0M+qjp+clUD0R1E5eWQFhxEvWLNaOtGQRUaBn8CUABnSKredagq92hUS9VjOzGsTm37xLfpaxl97AVtbeOsHew=="],
