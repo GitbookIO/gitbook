@@ -4,7 +4,7 @@ import type { Space } from '@gitbook/api';
 
 import { joinPath } from '@/lib/paths';
 import { useCurrentPagePath } from '../hooks';
-import { DropdownMenuItem } from './Dropdown';
+import { DropdownMenuItem } from './DropdownMenu';
 
 function useVariantSpaceHref(variantSpaceUrl: string) {
     const currentPathname = useCurrentPagePath();
