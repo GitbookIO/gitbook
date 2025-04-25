@@ -111,13 +111,13 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
-                    const spaceDrowpdown = page
+                    const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
 
                     const variantSelectionDropdown = page.locator(
-                        'css=[data-testid="space-dropdown-button"] + div'
+                        'css=[data-testid="dropdown-menu"]'
                     );
                     // the customized space title
                     await expect(
@@ -145,17 +145,18 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page
+                    const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
 
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
                     // Click the second variant in the dropdown
-                    await page
-                        .getByRole('link', {
-                            name: '2.0',
-                        })
-                        .click();
+                    await variantSelectionDropdown.getByRole('link', {
+                        name: '2.0',
+                    }).click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL((url) =>
@@ -168,17 +169,19 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page
+                    const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
 
                     // Click the second variant in the dropdown
-                    await page
-                        .getByRole('link', {
-                            name: '2.0',
-                        })
-                        .click();
+                    await variantSelectionDropdown.getByRole('link', {
+                        name: '2.0',
+                    }).click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL((url) =>
@@ -205,17 +208,19 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 },
                 run: async (page) => {
-                    const spaceDrowpdown = await page
+                    const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
 
                     // Click the second variant in the dropdown
-                    await page
-                        .getByRole('link', {
-                            name: '2.0',
-                        })
-                        .click();
+                    await variantSelectionDropdown.getByRole('link', {
+                        name: '2.0',
+                    }).click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL((url) =>

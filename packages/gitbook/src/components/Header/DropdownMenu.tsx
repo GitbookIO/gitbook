@@ -50,6 +50,7 @@ export function DropdownMenu(props: {
 
             <RadixDropdownMenu.Portal>
                 <RadixDropdownMenu.Content
+                    data-testid="dropdown-menu"
                     collisionPadding={8}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
