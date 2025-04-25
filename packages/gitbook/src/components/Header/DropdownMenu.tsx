@@ -51,6 +51,7 @@ export function DropdownMenu(props: {
             <RadixDropdownMenu.Portal>
                 <RadixDropdownMenu.Content
                     data-testid="dropdown-menu"
+                    hideWhenDetached
                     collisionPadding={8}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
@@ -160,7 +161,11 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
                 <Icon icon="chevron-right" className="size-3 shrink-0 opacity-6" />
             </RadixDropdownMenu.SubTrigger>
             <RadixDropdownMenu.Portal>
-                <RadixDropdownMenu.SubContent collisionPadding={8} className="z-40 animate-present">
+                <RadixDropdownMenu.SubContent
+                    hideWhenDetached
+                    collisionPadding={8}
+                    className="z-40 animate-present"
+                >
                     <div className="flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
                         {children}
                     </div>
