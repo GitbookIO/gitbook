@@ -3,7 +3,7 @@ import type { SiteSpace } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSiteContext } from '@v2/lib/context';
-import { Dropdown, DropdownChevron, DropdownMenu } from './DropdownMenu';
+import { DropdownChevron, DropdownMenu } from './DropdownMenu';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
 
 export function SpacesDropdown(props: {
@@ -66,19 +66,19 @@ export function SpacesDropdown(props: {
                 </div>
             }
         >
-                {siteSpaces.map((otherSiteSpace, index) => (
-                    <SpacesDropdownMenuItem
-                        key={`${otherSiteSpace.id}-${index}`}
-                        variantSpace={{
-                            id: otherSiteSpace.id,
-                            title: otherSiteSpace.title,
-                            url: otherSiteSpace.urls.published
-                                ? linker.toLinkForContent(otherSiteSpace.urls.published)
-                                : otherSiteSpace.space.urls.app,
-                        }}
-                        active={otherSiteSpace.id === siteSpace.id}
-                    />
-                ))}
+            {siteSpaces.map((otherSiteSpace, index) => (
+                <SpacesDropdownMenuItem
+                    key={`${otherSiteSpace.id}-${index}`}
+                    variantSpace={{
+                        id: otherSiteSpace.id,
+                        title: otherSiteSpace.title,
+                        url: otherSiteSpace.urls.published
+                            ? linker.toLinkForContent(otherSiteSpace.urls.published)
+                            : otherSiteSpace.space.urls.app,
+                    }}
+                    active={otherSiteSpace.id === siteSpace.id}
+                />
+            ))}
         </DropdownMenu>
     );
 }

@@ -56,7 +56,12 @@ export function DropdownMenu(props: {
                     align="start"
                     className="z-40 animate-present pt-2"
                 >
-                    <div className="max-h-80 flex flex-col gap-1 min-w-40 sm:min-w-52 max-w-[40vw] sm:max-w-80 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle">
+                    <div
+                        className={tcls(
+                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
+                            className
+                        )}
+                    >
                         {children}
                     </div>
                 </RadixDropdownMenu.Content>
@@ -155,7 +160,7 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
             </RadixDropdownMenu.SubTrigger>
             <RadixDropdownMenu.Portal>
                 <RadixDropdownMenu.SubContent collisionPadding={8} className="z-40 animate-present">
-                    <div className="flex max-h-80 min-w-40 sm:min-w-52 max-w-[40vw] sm:max-w-80 flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle">
+                    <div className="flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
                         {children}
                     </div>
                 </RadixDropdownMenu.SubContent>

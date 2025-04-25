@@ -13,7 +13,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { Button, Link } from '../primitives';
 import {
-    Dropdown,
     type DropdownButtonProps,
     DropdownChevron,
     DropdownMenu,
@@ -51,9 +50,9 @@ export async function HeaderLink(props: {
                 }
                 openOnHover={true}
             >
-                    {link.links.map((subLink, index) => (
-                        <SubHeaderLink key={index} {...props} link={subLink} />
-                    ))}
+                {link.links.map((subLink, index) => (
+                    <SubHeaderLink key={index} {...props} link={subLink} />
+                ))}
             </DropdownMenu>
         );
     }

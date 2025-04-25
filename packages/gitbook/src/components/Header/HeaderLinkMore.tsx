@@ -10,13 +10,7 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import {
-    Dropdown,
-    DropdownChevron,
-    DropdownMenu,
-    DropdownMenuItem,
-    DropdownSubMenu,
-} from './DropdownMenu';
+import { DropdownChevron, DropdownMenu, DropdownMenuItem, DropdownSubMenu } from './DropdownMenu';
 import styles from './headerLinks.module.css';
 
 /**
@@ -59,9 +53,9 @@ export function HeaderLinkMore(props: {
                     context.customization.styling.search === 'prominent' && 'right-0 left-auto'
                 )}
             >
-                    {links.map((link, index) => (
-                        <MoreMenuLink key={index} link={link} context={context} />
-                    ))}
+                {links.map((link, index) => (
+                    <MoreMenuLink key={index} link={link} context={context} />
+                ))}
             </DropdownMenu>
         </div>
     );
