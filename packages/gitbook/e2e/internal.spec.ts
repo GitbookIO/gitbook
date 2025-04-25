@@ -121,14 +121,14 @@ const testCases: TestsCase[] = [
                     );
                     // the customized space title
                     await expect(
-                        variantSelectionDropdown.getByRole('link', {
+                        variantSelectionDropdown.getByRole('menuitem', {
                             name: 'Multi-Variants',
                         })
                     ).toBeVisible();
 
                     // the NON-customized space title
                     await expect(
-                        variantSelectionDropdown.getByRole('link', {
+                        variantSelectionDropdown.getByRole('menuitem', {
                             name: 'RFCs',
                         })
                     ).toBeVisible();
@@ -155,7 +155,7 @@ const testCases: TestsCase[] = [
                     );
                     // Click the second variant in the dropdown
                     await variantSelectionDropdown
-                        .getByRole('link', {
+                        .getByRole('menuitem', {
                             name: '2.0',
                         })
                         .click();
@@ -182,7 +182,7 @@ const testCases: TestsCase[] = [
 
                     // Click the second variant in the dropdown
                     await variantSelectionDropdown
-                        .getByRole('link', {
+                        .getByRole('menuitem', {
                             name: '2.0',
                         })
                         .click();
@@ -223,7 +223,7 @@ const testCases: TestsCase[] = [
 
                     // Click the second variant in the dropdown
                     await variantSelectionDropdown
-                        .getByRole('link', {
+                        .getByRole('menuitem', {
                             name: '2.0',
                         })
                         .click();
