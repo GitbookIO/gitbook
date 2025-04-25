@@ -43,6 +43,9 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         return null;
     }
 
+    // Create a new context for reusable content block, including
+    // the data fetcher with the token from the block meta and the correct
+    // space and revision pointers.
     const reusableContentContext: GitBookSpaceContext = {
         ...context.contentContext,
         dataFetcher,
