@@ -2,6 +2,7 @@ import type { DocumentBlockReusableContent } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
 
+import type { GitBookSpaceContext } from '@v2/lib/context';
 import { getDataOrNull } from '@v2/lib/data';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
@@ -33,7 +34,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
 
     const document = await getDataOrNull(
         dataFetcher.getDocument({
-            spaceId: resolved.reusableContent.space,
+            spaceId: resolved.reusableContent.space.id,
             documentId: reusableContent.document,
         })
     );
@@ -42,12 +43,27 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         return null;
     }
 
+    // Create a new context for reusable content block, including
+    // the data fetcher with the token from the block meta and the correct
+    // space and revision pointers.
+    const reusableContentContext: GitBookSpaceContext = {
+        ...context.contentContext,
+        dataFetcher,
+        space: resolved.reusableContent.space,
+        revisionId: resolved.reusableContent.revision,
+        pages: [],
+        shareKey: undefined,
+    };
+
     return (
         <UnwrappedBlocks
             nodes={document.nodes}
             document={document}
             ancestorBlocks={[...ancestorBlocks, block]}
-            context={context}
+            context={{
+                ...context,
+                contentContext: reusableContentContext,
+            }}
         />
     );
 }
