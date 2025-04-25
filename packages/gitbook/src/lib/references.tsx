@@ -44,7 +44,7 @@ export interface ResolvedContentRef {
     /** Resolved reusable content, if the ref points to reusable content on a revision. Also contains the space and revision used for resolution. */
     reusableContent?: {
         revisionReusableContent: RevisionReusableContent;
-        space: string;
+        space: Space;
         revision: string;
     };
     /** Resolve OpenAPI spec filesystem. */
@@ -236,10 +236,10 @@ export async function resolveContentRef(
 
         case 'reusable-content': {
             // Figure out which space and revision the reusable content is in.
-            const container: { space: string; revision: string } | null = await (async () => {
+            const container: { space: Space; revision: string } | null = await (async () => {
                 // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
                 if (!contentRef.space || contentRef.space === context.space.id) {
-                    return { space: context.space.id, revision: revisionId };
+                    return { space: context.space, revision: revisionId };
                 }
 
                 const space = await getDataOrNull(
@@ -253,7 +253,7 @@ export async function resolveContentRef(
                     return null;
                 }
 
-                return { space: space.id, revision: space.revision };
+                return { space, revision: space.revision };
             })();
 
             if (!container) {
@@ -262,7 +262,7 @@ export async function resolveContentRef(
 
             const reusableContent = await getDataOrNull(
                 dataFetcher.getReusableContent({
-                    spaceId: container.space,
+                    spaceId: container.space.id,
                     revisionId: container.revision,
                     reusableContentId: contentRef.reusableContent,
                 })
