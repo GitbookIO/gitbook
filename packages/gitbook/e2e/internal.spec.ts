@@ -154,9 +154,11 @@ const testCases: TestsCase[] = [
                         'css=[data-testid="dropdown-menu"]'
                     );
                     // Click the second variant in the dropdown
-                    await variantSelectionDropdown.getByRole('link', {
-                        name: '2.0',
-                    }).click();
+                    await variantSelectionDropdown
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL((url) =>
@@ -179,9 +181,11 @@ const testCases: TestsCase[] = [
                     );
 
                     // Click the second variant in the dropdown
-                    await variantSelectionDropdown.getByRole('link', {
-                        name: '2.0',
-                    }).click();
+                    await variantSelectionDropdown
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL((url) =>
@@ -218,9 +222,11 @@ const testCases: TestsCase[] = [
                     );
 
                     // Click the second variant in the dropdown
-                    await variantSelectionDropdown.getByRole('link', {
-                        name: '2.0',
-                    }).click();
+                    await variantSelectionDropdown
+                        .getByRole('link', {
+                            name: '2.0',
+                        })
+                        .click();
 
                     // It should keep the current page path, i.e "reference/api-reference/pets" when navigating to the new variant
                     await page.waitForURL((url) =>
