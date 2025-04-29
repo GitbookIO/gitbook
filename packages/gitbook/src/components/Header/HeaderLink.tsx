@@ -13,12 +13,11 @@ import { tcls } from '@/lib/tailwind';
 
 import { Button, Link } from '../primitives';
 import {
-    Dropdown,
     type DropdownButtonProps,
     DropdownChevron,
     DropdownMenu,
     DropdownMenuItem,
-} from './Dropdown';
+} from './DropdownMenu';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;
@@ -33,21 +32,13 @@ export async function HeaderLink(props: {
 
     if (link.links && link.links.length > 0) {
         return (
-            <Dropdown
+            <DropdownMenu
                 className={`shrink ${customization.styling.search === 'prominent' ? 'right-0 left-auto' : null}`}
-                button={(buttonProps) => {
-                    if (!target || !link.to) {
-                        return (
-                            <HeaderItemDropdown
-                                {...buttonProps}
-                                headerPreset={headerPreset}
-                                title={link.title}
-                            />
-                        );
-                    }
-                    return (
+                button={
+                    !target || !link.to ? (
+                        <HeaderItemDropdown headerPreset={headerPreset} title={link.title} />
+                    ) : (
                         <HeaderLinkNavItem
-                            {...buttonProps}
                             linkTarget={link.to}
                             linkStyle={linkStyle}
                             headerPreset={headerPreset}
@@ -55,15 +46,14 @@ export async function HeaderLink(props: {
                             isDropdown
                             href={target?.href}
                         />
-                    );
-                }}
+                    )
+                }
+                openOnHover={true}
             >
-                <DropdownMenu>
-                    {link.links.map((subLink, index) => (
-                        <SubHeaderLink key={index} {...props} link={subLink} />
-                    ))}
-                </DropdownMenu>
-            </Dropdown>
+                {link.links.map((subLink, index) => (
+                    <SubHeaderLink key={index} {...props} link={subLink} />
+                ))}
+            </DropdownMenu>
         );
     }
 
@@ -157,10 +147,12 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
 
         'text-tint',
         'links-default:hover:text-primary',
+        'links-default:data-[state=open]:text-primary',
         'links-default:tint:hover:text-tint-strong',
-
+        'links-default:tint:data-[state=open]:text-tint-strong',
         'underline-offset-2',
         'links-accent:hover:underline',
+        'links-accent:data-[state=open]:underline',
         'links-accent:underline-offset-4',
         'links-accent:decoration-primary-subtle',
         'links-accent:decoration-[3px]',

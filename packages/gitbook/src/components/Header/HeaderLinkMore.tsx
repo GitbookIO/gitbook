@@ -10,7 +10,7 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { Dropdown, DropdownChevron, DropdownMenu, DropdownMenuItem } from './Dropdown';
+import { DropdownChevron, DropdownMenu, DropdownMenuItem, DropdownSubMenu } from './DropdownMenu';
 import styles from './headerLinks.module.css';
 
 /**
@@ -23,7 +23,7 @@ export function HeaderLinkMore(props: {
 }) {
     const { label, links, context } = props;
 
-    const renderButton = () => (
+    const renderButton = (
         <button
             type="button"
             className={tcls(
@@ -45,19 +45,18 @@ export function HeaderLinkMore(props: {
 
     return (
         <div className={`${styles.linkEllipsis} z-20 items-center`}>
-            <Dropdown
+            <DropdownMenu
                 button={renderButton}
+                openOnHover={true}
                 className={tcls(
                     'max-md:right-0 max-md:left-auto',
                     context.customization.styling.search === 'prominent' && 'right-0 left-auto'
                 )}
             >
-                <DropdownMenu>
-                    {links.map((link, index) => (
-                        <MoreMenuLink key={index} link={link} context={context} />
-                    ))}
-                </DropdownMenu>
-            </Dropdown>
+                {links.map((link, index) => (
+                    <MoreMenuLink key={index} link={link} context={context} />
+                ))}
+            </DropdownMenu>
         </div>
     );
 }
@@ -70,32 +69,28 @@ async function MoreMenuLink(props: {
 
     const target = link.to ? await resolveContentRef(link.to, context) : null;
 
-    return (
-        <>
-            {'links' in link && link.links.length > 0 && (
-                <hr className="-mx-2 my-1 border-tint border-t first:hidden" />
-            )}
-            <DropdownMenuItem
-                href={target?.href ?? null}
-                insights={
-                    link.to
-                        ? {
-                              type: 'link_click',
-                              link: {
-                                  target: link.to,
-                                  position: SiteInsightsLinkPosition.Header,
-                              },
-                          }
-                        : undefined
-                }
-            >
-                {link.title}
-            </DropdownMenuItem>
-            {'links' in link
-                ? link.links.map((subLink, index) => (
-                      <MoreMenuLink key={index} {...props} link={subLink} />
-                  ))
-                : null}
-        </>
+    return 'links' in link && link.links.length > 0 ? (
+        <DropdownSubMenu label={link.title}>
+            {link.links.map((subLink, index) => {
+                return <MoreMenuLink key={index} {...props} link={subLink} />;
+            })}
+        </DropdownSubMenu>
+    ) : (
+        <DropdownMenuItem
+            href={target?.href ?? null}
+            insights={
+                link.to
+                    ? {
+                          type: 'link_click',
+                          link: {
+                              target: link.to,
+                              position: SiteInsightsLinkPosition.Header,
+                          },
+                      }
+                    : undefined
+            }
+        >
+            {link.title}
+        </DropdownMenuItem>
     );
 }
