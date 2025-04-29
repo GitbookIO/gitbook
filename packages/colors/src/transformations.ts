@@ -226,7 +226,7 @@ export function colorScale(
                 case 8:
                 case 9:
                     return 1;
-                // Step 12 is fully desaturated
+                // Step 11 and 12 have a reduced chroma
                 case 10:
                     return 0.4;
                 case 11:
