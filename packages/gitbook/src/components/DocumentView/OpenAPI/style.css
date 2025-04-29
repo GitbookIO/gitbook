@@ -210,7 +210,7 @@
 }
 
 .openapi-schema-optional {
-    @apply text-info-subtle text-[0.813rem] lowercase;
+    @apply text-tint-subtle text-[0.813rem] lowercase;
 }
 
 .openapi-schema-readonly {
