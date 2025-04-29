@@ -755,9 +755,14 @@ body:has(.openapi-select-popover) {
 
 .openapi-disclosure:not(
         .openapi-disclosure-group .openapi-disclosure,
-        .openapi-schema-alternatives .openapi-disclosure
+        .openapi-schema-alternatives .openapi-disclosure,
+        .openapi-schemas-disclosure .openapi-schema.openapi-disclosure
     ) {
     @apply rounded-xl;
+}
+
+.openapi-disclosure .openapi-schemas-disclosure .openapi-schema.openapi-disclosure {
+    @apply !rounded-none;
 }
 
 .openapi-disclosure:has(> .openapi-disclosure-trigger:hover) {
