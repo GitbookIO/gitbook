@@ -806,7 +806,7 @@ body:has(.openapi-select-popover) {
 @media (hover: none) {
     /* Make button label always visible on non-hover devices like phones */
     .openapi-disclosure-trigger-label {
-        @apply relative ring-1 bg-tint-base;
+        @apply relative ring-1 bg-tint-base right-0;
     }
     .openapi-disclosure-trigger-label span {
         @apply block;
