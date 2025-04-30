@@ -692,18 +692,18 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex w-full items-baseline gap-3 transition-all relative flex-1 p-3 -outline-offset-1;
+    @apply flex w-full cursor-pointer items-baseline gap-3 transition-all relative flex-1 p-3 -outline-offset-1;
 }
 
 .openapi-disclosure-group-label {
     @apply flex flex-wrap items-baseline gap-x-3 gap-y-1 flex-1 truncate;
 }
 
-.openapi-disclosure-group-trigger:disabled {
+.openapi-disclosure-group-trigger[aria-disabled="true"] {
     @apply cursor-default hover:bg-inherit;
 }
 
-.openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
+.openapi-disclosure-group-trigger[aria-disabled="true"] .openapi-disclosure-group-icon {
     @apply invisible;
 }
 

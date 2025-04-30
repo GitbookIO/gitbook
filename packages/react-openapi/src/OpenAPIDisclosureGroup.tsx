@@ -76,7 +76,7 @@ function DisclosureItem(props: {
     });
 
     const panelRef = useRef<HTMLDivElement | null>(null);
-    const triggerRef = useRef<HTMLButtonElement | null>(null);
+    const triggerRef = useRef<HTMLDivElement | null>(null);
     const isDisabled = groupState?.isDisabled || !group.tabs?.length || false;
     const { buttonProps: triggerProps, panelProps } = useDisclosure(
         {
@@ -96,11 +96,11 @@ function DisclosureItem(props: {
 
     return (
         <div className="openapi-disclosure-group" aria-expanded={state.isExpanded}>
-            <button
+            <div
                 slot="trigger"
                 ref={triggerRef}
                 {...mergeProps(buttonProps, focusProps)}
-                disabled={isDisabled}
+                aria-disabled={isDisabled}
                 style={{
                     outline: isFocusVisible
                         ? '2px solid rgb(var(--primary-color-500)/0.4)'
@@ -146,7 +146,7 @@ function DisclosureItem(props: {
                         </div>
                     ) : null}
                 </div>
-            </button>
+            </div>
 
             {state.isExpanded && selectedTab && (
                 <div className="openapi-disclosure-group-panel" ref={panelRef} {...panelProps}>
