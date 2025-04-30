@@ -687,6 +687,10 @@ body:has(.openapi-select-popover) {
     @apply bg-tint-subtle;
 }
 
+.openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover):has(.openapi-select:hover) {
+    @apply !bg-transparent;
+}
+
 .openapi-disclosure-group-trigger {
     @apply flex w-full items-baseline gap-3 transition-all relative flex-1 p-3 -outline-offset-1;
 }
@@ -719,7 +723,7 @@ body:has(.openapi-select-popover) {
     @apply rotate-90;
 }
 
-.openapi-disclosure-group-mediatype {
+.openapi-disclosure-group-mediatype:not(:has(.openapi-select)) {
     @apply text-[0.625rem] font-mono shrink-0 grow-0 text-tint-subtle contrast-more:text-tint;
 }
 
