@@ -66,13 +66,14 @@ export function TableOfContents(props: {
             <div // The actual sidebar, either shown with a filled bg or transparent.
                 className={tcls(
                     'lg:-ms-5',
-                    'relative flex flex-grow flex-col overflow-hidden',
+                    'relative flex flex-grow flex-col overflow-hidden border-tint-subtle',
 
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                    '[html.sidebar-filled.theme-gradient_&]:border',
                     'page-no-toc:!bg-transparent',
 
                     'sidebar-filled:rounded-xl',

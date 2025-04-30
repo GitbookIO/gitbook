@@ -13,6 +13,7 @@ import { OpenAPIDisclosure } from './OpenAPIDisclosure';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { retrocycle } from './decycle';
+import { getDisclosureLabel } from './getDisclosureLabel';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
 import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
@@ -606,6 +607,11 @@ function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
         if (schema.format) {
             type += ` · ${schema.format}`;
         }
+
+        // Only add the title if it's an object (no need for the title of a string, number, etc.)
+        if (type === 'object' && schema.title) {
+            type += ` · ${schema.title.replaceAll(' ', '')}`;
+        }
     }
 
     if ('anyOf' in schema) {
@@ -619,26 +625,4 @@ function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     }
 
     return type;
-}
-
-function getDisclosureLabel(props: {
-    schema: OpenAPIV3.SchemaObject;
-    isExpanded: boolean;
-    context: OpenAPIClientContext;
-}) {
-    const { schema, isExpanded, context } = props;
-    let label: string;
-    if (schema.type === 'array' && !!schema.items) {
-        if (schema.items.oneOf) {
-            label = tString(context.translation, 'available_items').toLowerCase();
-        } else if (schema.items.enum || schema.items.type === 'object') {
-            label = tString(context.translation, 'properties').toLowerCase();
-        } else {
-            label = schema.items.title ?? schema.title ?? getSchemaTitle(schema.items);
-        }
-    } else {
-        label = schema.title || tString(context.translation, 'properties').toLowerCase();
-    }
-
-    return tString(context.translation, isExpanded ? 'hide' : 'show', label);
 }

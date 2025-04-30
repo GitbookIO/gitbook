@@ -210,7 +210,7 @@
 }
 
 .openapi-schema-optional {
-    @apply text-info-subtle text-[0.813rem] lowercase;
+    @apply text-tint-subtle text-[0.813rem] lowercase;
 }
 
 .openapi-schema-readonly {
@@ -687,19 +687,23 @@ body:has(.openapi-select-popover) {
     @apply bg-tint-subtle;
 }
 
+.openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover):has(.openapi-select:hover) {
+    @apply !bg-transparent;
+}
+
 .openapi-disclosure-group-trigger {
-    @apply flex w-full items-baseline gap-3 transition-all relative flex-1 p-3 -outline-offset-1;
+    @apply flex w-full cursor-pointer items-baseline gap-3 transition-all relative flex-1 p-3 -outline-offset-1;
 }
 
 .openapi-disclosure-group-label {
     @apply flex flex-wrap items-baseline gap-x-3 gap-y-1 flex-1 truncate;
 }
 
-.openapi-disclosure-group-trigger:disabled {
+.openapi-disclosure-group-trigger[aria-disabled="true"] {
     @apply cursor-default hover:bg-inherit;
 }
 
-.openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
+.openapi-disclosure-group-trigger[aria-disabled="true"] .openapi-disclosure-group-icon {
     @apply invisible;
 }
 
@@ -719,7 +723,7 @@ body:has(.openapi-select-popover) {
     @apply rotate-90;
 }
 
-.openapi-disclosure-group-mediatype {
+.openapi-disclosure-group-mediatype:not(:has(.openapi-select)) {
     @apply text-[0.625rem] font-mono shrink-0 grow-0 text-tint-subtle contrast-more:text-tint;
 }
 
@@ -755,9 +759,14 @@ body:has(.openapi-select-popover) {
 
 .openapi-disclosure:not(
         .openapi-disclosure-group .openapi-disclosure,
-        .openapi-schema-alternatives .openapi-disclosure
+        .openapi-schema-alternatives .openapi-disclosure,
+        .openapi-schemas-disclosure .openapi-schema.openapi-disclosure
     ) {
     @apply rounded-xl;
+}
+
+.openapi-disclosure .openapi-schemas-disclosure .openapi-schema.openapi-disclosure {
+    @apply !rounded-none;
 }
 
 .openapi-disclosure:has(> .openapi-disclosure-trigger:hover) {
@@ -801,7 +810,7 @@ body:has(.openapi-select-popover) {
 @media (hover: none) {
     /* Make button label always visible on non-hover devices like phones */
     .openapi-disclosure-trigger-label {
-        @apply relative ring-1 bg-tint-base;
+        @apply relative ring-1 bg-tint-base right-0;
     }
     .openapi-disclosure-trigger-label span {
         @apply block;
