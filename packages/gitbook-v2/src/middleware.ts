@@ -10,9 +10,9 @@ import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
-    getVisitorToken,
+    getVisitorPayload,
     normalizeVisitorAuthURL,
-} from '@/lib/visitor-token';
+} from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
@@ -85,8 +85,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     // Detect and extract the visitor authentication token from the request
     //
-    // @ts-ignore - request typing
-    const visitorToken = getVisitorToken({
+    const { visitorToken } = getVisitorPayload({
         cookies: request.cookies.getAll(),
         url: siteRequestURL,
     });
