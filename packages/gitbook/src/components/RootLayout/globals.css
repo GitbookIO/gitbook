@@ -1,6 +1,128 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
+
+@utility hide-scroll {
+    /*  hide scroll bar but still scroll */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+@utility linear-mask-gradient {
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
+}
+
+@utility linear-mask-util {
+    mask-image: linear-gradient(to bottom, white, white);
+}
+
+@utility grid-area-1-1 {
+    grid-area: 1 / 1;
+}
+
+@utility gutter-stable {
+    scrollbar-gutter: stable;
+}
+
+@utility triangle {
+    position: relative;
+    background-color: orange;
+    text-align: left;
+    transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+    &:before {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    &:after {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    width: inherit;
+    height: inherit;
+    border-top-right-radius: 30%;
+    &:before {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+    &:after {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+
+    &:before {
+        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+    }
+    &:after {
+        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+    }
+}
+
+@utility break-anywhere {
+    word-break: break-word;
+    @supports (overflow-wrap: anywhere) {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+}
+
+@utility bg-gradient-primary {
+    @apply bg-gradient-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+}
+
+@utility bg-gradient-tint {
+    @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+}
+
+@utility scroll-nojump {
+    /**
+     * Utility to prevent horizontal jumps when the vertical scrollbar appears
+     * It should be used on main containers of the layout, while preserving horizontal delimiters.
+     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
+     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
+     */
+    width: 100%;
+    @media screen and (min-width: 1536px) {
+        margin-left: var(--scrollbar-width);
+        margin-right: 0;
+        width: calc(100% - var(--scrollbar-width));
+        body:has(.page-full-width) & {
+            margin-left: 0;
+            width: 100%;
+        }
+    }
+}
+
+@utility page-full-width {
+    @media screen and (min-width: 1536px) {
+        body:has(&) .scroll-nojump {
+            margin-left: 0;
+            width: 100%;
+        }
+    }
+}
 
 @layer base {
     :root {
@@ -58,95 +180,6 @@
         @apply [&:is(h1,h2,h3,h4)]:[grid-auto-columns:auto_1fr];
         @apply [&:is(h1,h2,h3,h4)>div:first-child]:[grid-area:1/2];
         @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-1;
-    }
-}
-
-@layer utilities {
-    /*  hide scroll bar but still scroll */
-    .hide-scroll::-webkit-scrollbar {
-        display: none;
-    }
-    .hide-scroll {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    .linear-mask-gradient {
-        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
-    }
-    .linear-mask-util {
-        mask-image: linear-gradient(to bottom, white, white);
-    }
-    .grid-area-1-1 {
-        grid-area: 1 / 1;
-    }
-    .gutter-stable {
-        scrollbar-gutter: stable;
-    }
-
-    .triangle {
-        position: relative;
-        background-color: orange;
-        text-align: left;
-        transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
-    }
-    .triangle:before,
-    .triangle:after {
-        content: "";
-        position: absolute;
-        background-color: inherit;
-    }
-    .triangle,
-    .triangle:before,
-    .triangle:after {
-        width: inherit;
-        height: inherit;
-        border-top-right-radius: 30%;
-    }
-
-    .triangle:before {
-        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
-    }
-    .triangle:after {
-        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
-    }
-
-    .break-anywhere {
-        word-break: break-word;
-    }
-    @supports (overflow-wrap: anywhere) {
-        .break-anywhere {
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-    }
-
-    .bg-gradient-primary {
-        @apply bg-gradient-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
-    }
-    .bg-gradient-tint {
-        @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
-    }
-
-    /**
-     * Utility to prevent horizontal jumps when the vertical scrollbar appears
-     * It should be used on main containers of the layout, while preserving horizontal delimiters.
-     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
-     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
-     */
-    .scroll-nojump {
-        width: 100%;
-    }
-    @media screen and (min-width: 1536px) {
-        .scroll-nojump {
-            margin-left: var(--scrollbar-width);
-            margin-right: 0;
-            width: calc(100% - var(--scrollbar-width));
-        }
-        body:has(.page-full-width) .scroll-nojump {
-            margin-left: 0;
-            width: 100%;
-        }
     }
 }
 
