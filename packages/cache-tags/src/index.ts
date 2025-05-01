@@ -36,6 +36,14 @@ export function getCacheTag(
               changeRequest: string;
           }
         /**
+         * All data related to resuable content.
+         */
+        | {
+              tag: 'reusable-content';
+              space: string;
+              reusableContent: string;
+          }
+        /**
          * Immutable data related to a revision
          * @deprecated - in v2, no tag as this is an immutable data
          */
@@ -108,6 +116,8 @@ export function getCacheTag(
             return `space:${spec.space}:document:${spec.document}`;
         case 'computed-document':
             return `space:${spec.space}:computed-document:${spec.sourceType}`;
+        case 'reusable-content':
+            return `space:${spec.space}:reusable-content:${spec.reusableContent}`;
         case 'site':
             return `site:${spec.site}`;
         case 'integration':
@@ -116,6 +126,7 @@ export function getCacheTag(
             return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
         case 'translation':
             return `organization:${spec.organization}:translation:${spec.translationSettings}`;
+
         default:
             assertNever(spec);
     }
