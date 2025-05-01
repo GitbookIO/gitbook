@@ -71,11 +71,7 @@ function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
 }
 
 function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
-    return (
-        <kbd className="rounded-sm border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
-            {props.children}
-        </kbd>
-    );
+    return <kbd className="rounded-sm border border-b-2 px-1 font-mono">{props.children}</kbd>;
 }
 
 function Superscript(props: MarkedLeafProps<DocumentMarkSuperscript>) {
