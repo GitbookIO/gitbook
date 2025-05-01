@@ -19,8 +19,8 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
 
                 !page.emoji
                     ? [
-                          'theme-gradient:bg-gradient-to-b',
-                          'theme-bold:bg-gradient-to-b',
+                          'theme-gradient:bg-linear-to-b',
+                          'theme-bold:bg-linear-to-b',
                           'theme-gradient:bg-fixed',
                           'theme-bold:bg-fixed',
 

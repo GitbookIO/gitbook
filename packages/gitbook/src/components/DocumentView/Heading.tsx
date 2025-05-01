@@ -40,10 +40,10 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'w-7',
                     'border-0',
                     'opacity-0',
-                    'group-hover:opacity-[0]',
-                    'group-focus:opacity-[0]',
-                    'md:group-hover:md:opacity-[1]',
-                    'md:group-focus:md:opacity-[1]',
+                    'group-hover:opacity-0',
+                    'group-focus:opacity-0',
+                    'md:md:group-hover:opacity-1',
+                    'md:md:group-focus:opacity-1',
                     textStyle.marginTop
                 )}
             >
@@ -70,7 +70,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <div
                 className={tcls(
                     'grid-area-1-1',
-                    'z-[1]',
+                    'z-1',
                     'justify-self-start',
                     'text-left',
                     textStyle.lineHeight,

@@ -37,10 +37,10 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         className={tcls(
                             'mx-auto grid max-w-3xl justify-between gap-12 lg:max-w-none',
                             'grid-cols-[auto_auto]',
-                            'lg:grid-cols-[18rem_minmax(auto,_48rem)_auto]',
-                            'xl:grid-cols-[18rem_minmax(auto,_48rem)_14rem]',
-                            'page-no-toc:lg:grid-cols-[minmax(auto,_48rem)_auto]',
-                            'page-no-toc:xl:grid-cols-[14rem_minmax(auto,_48rem)_14rem]'
+                            'lg:grid-cols-[18rem_minmax(auto,48rem)_auto]',
+                            'xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
+                            'lg:page-no-toc:grid-cols-[minmax(auto,48rem)_auto]',
+                            'xl:page-no-toc:grid-cols-[14rem_minmax(auto,48rem)_14rem]'
                         )}
                     >
                         {
@@ -69,8 +69,8 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                             'lg:max-h-12',
                                             'object-contain',
                                             'object-left',
-                                            'rounded',
-                                            'straight-corners:rounded-sm',
+                                            'rounded-sm',
+                                            'straight-corners:rounded-xs',
                                         ]}
                                         sizes={[
                                             {
@@ -98,7 +98,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             customization.footer.groups?.length > 0 ? (
                                 <div
                                     className={tcls(
-                                        'col-span-2 page-has-toc:lg:col-span-1 page-has-toc:lg:col-start-2 page-no-toc:xl:col-span-1 page-no-toc:xl:col-start-2'
+                                        'col-span-2 lg:page-has-toc:col-span-1 lg:page-has-toc:col-start-2 xl:page-no-toc:col-span-1 xl:page-no-toc:col-start-2'
                                     )}
                                 >
                                     <div className="mx-auto flex max-w-3xl flex-col gap-10 sm:flex-row sm:gap-6">

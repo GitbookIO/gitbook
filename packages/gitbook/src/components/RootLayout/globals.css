@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@config '../../../tailwind.config.ts';
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -89,11 +91,11 @@
 }
 
 @utility bg-gradient-primary {
-    @apply bg-gradient-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+    @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
 }
 
 @utility bg-gradient-tint {
-    @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+    @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
 }
 
 @utility scroll-nojump {
@@ -176,8 +178,8 @@
     }
 
     .flip-heading-hash {
-        @apply [&:is(h1,h2,h3,h4)]:content-start;
-        @apply [&:is(h1,h2,h3,h4)]:[grid-auto-columns:auto_1fr];
+        @apply [h1,h2,h3,h4]:content-start;
+        @apply [h1,h2,h3,h4]:[grid-auto-columns:auto_1fr];
         @apply [&:is(h1,h2,h3,h4)>div:first-child]:[grid-area:1/2];
         @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-1;
     }

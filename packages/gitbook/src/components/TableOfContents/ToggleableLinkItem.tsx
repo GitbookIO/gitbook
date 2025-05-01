@@ -71,9 +71,9 @@ function LinkItem(
                 'flex flex-row justify-between',
                 'rounded-md straight-corners:rounded-none p-1.5 pl-3',
                 'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
-                'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
+                'contrast-more:hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint-12',
                 'before:contents[] before:-left-px before:absolute before:inset-y-0',
-                'sidebar-list-line:rounded-l-none sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none [&+div_a]:pl-5 sidebar-list-default:[&+div_a]:before:w-px',
+                'sidebar-list-line:rounded-l-none sidebar-list-line:before:w-px [&+div_a]:sidebar-list-default:rounded-l-none [&+div_a]:pl-5 [&+div_a]:sidebar-list-default:before:w-px',
 
                 isActive && [
                     'font-semibold',
@@ -92,7 +92,7 @@ function LinkItem(
                     'hover:bg-primary-hover',
                     'hover:text-primary',
                     'hover:before:bg-primary-solid-hover',
-                    'sidebar-list-pill:hover:bg-primary-hover',
+                    'hover:sidebar-list-pill:bg-primary-hover',
 
                     'contrast-more:text-primary',
                     'contrast-more:hover:text-primary-strong',
@@ -152,7 +152,7 @@ function Toggler(props: {
                 'group',
                 'relative',
                 'rounded-full',
-                'straight-corners:rounded-sm',
+                'straight-corners:rounded-xs',
                 'w-5',
                 'h-5',
                 'after:grid-area-1-1',
@@ -175,7 +175,7 @@ function Toggler(props: {
             <Icon
                 icon="chevron-right"
                 className={tcls(
-                    'm-1 grid size-3 flex-shrink-0 text-current opacity-6 transition',
+                    'm-1 grid size-3 shrink-0 text-current opacity-6 transition',
                     'group-hover:opacity-11 contrast-more:opacity-11',
                     isOpen ? 'rotate-90' : 'rotate-0'
                 )}

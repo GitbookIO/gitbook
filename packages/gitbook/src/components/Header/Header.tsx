@@ -83,7 +83,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     'text-tint-strong',
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
-                                    'theme-bold:hover:bg-header-link/3',
+                                    'hover:theme-bold:bg-header-link/3',
                                     'page-no-toc:hidden'
                                 )}
                             />
@@ -106,9 +106,9 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                           'lg:max-w-lg',
                                           'lg:ml-[max(calc((100%-18rem-48rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - margin (3rem)
                                           'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'page-no-toc:lg:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),0rem)]',
-                                          'page-full-width:lg:ml-[max(calc((100%-18rem-103rem-3rem)/2),1.5rem)]',
-                                          'page-full-width:2xl:ml-[max(calc((100%-18rem-96rem-14rem+3rem)/2),1.5rem)]',
+                                          'lg:page-no-toc:ml-[max(calc((100%-18rem-48rem-18rem-3rem)/2),0rem)]',
+                                          'lg:page-full-width:ml-[max(calc((100%-18rem-103rem-3rem)/2),1.5rem)]',
+                                          '2xl:page-full-width:ml-[max(calc((100%-18rem-96rem-14rem+3rem)/2),1.5rem)]',
                                           'md:mr-auto',
                                           'order-last',
                                           'md:order-[unset]',
@@ -120,28 +120,28 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 <SearchButton
                                     style={[
                                         'theme-bold:bg-header-link/2',
-                                        'theme-bold:hover:bg-header-link/3',
+                                        'hover:theme-bold:bg-header-link/3',
 
                                         'theme-bold:text-header-link/8',
-                                        'theme-bold:hover:text-header-link',
+                                        'hover:theme-bold:text-header-link',
 
                                         'theme-bold:ring-header-link/4',
-                                        'theme-bold:hover:ring-header-link/5',
+                                        'hover:theme-bold:ring-header-link/5',
 
-                                        'theme-bold:[&_svg]:text-header-link/10',
-                                        'theme-bold:[&_.shortcut]:text-header-link/8',
+                                        '[&_svg]:theme-bold:text-header-link/10',
+                                        '[&_.shortcut]:theme-bold:text-header-link/8',
 
-                                        'theme-bold:contrast-more:bg-header-background',
-                                        'theme-bold:contrast-more:text-header-link',
-                                        'theme-bold:contrast-more:ring-header-link',
-                                        'theme-bold:contrast-more:hover:bg-header-background',
-                                        'theme-bold:contrast-more:hover:ring-header-link',
-                                        'theme-bold:contrast-more:focus:text-header-link',
-                                        'theme-bold:contrast-more:focus:bg-header-background',
-                                        'theme-bold:contrast-more:focus:ring-header-link',
+                                        'contrast-more:theme-bold:bg-header-background',
+                                        'contrast-more:theme-bold:text-header-link',
+                                        'contrast-more:theme-bold:ring-header-link',
+                                        'contrast-more:hover:theme-bold:bg-header-background',
+                                        'contrast-more:hover:theme-bold:ring-header-link',
+                                        'contrast-more:focus:theme-bold:text-header-link',
+                                        'contrast-more:focus:theme-bold:bg-header-background',
+                                        'contrast-more:focus:theme-bold:ring-header-link',
 
                                         'theme-bold:shadow-none',
-                                        'theme-bold:hover:shadow-none',
+                                        'hover:theme-bold:shadow-none',
                                         'whitespace-nowrap',
                                     ]}
                                 >
@@ -199,7 +199,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'grow',
                                 'flex',
                                 'items-end',
-                                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
+                                '2xl:page-default-width:px-[calc((100%-1536px+4rem)/2)]'
                             )}
                         >
                             {siteSpaces.length > 1 && (

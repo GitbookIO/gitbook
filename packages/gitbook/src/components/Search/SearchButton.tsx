@@ -52,14 +52,14 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'ring-1',
                 'ring-tint-12/2',
 
-                'shadow-sm',
+                'shadow-xs',
                 'shadow-tint-12/3',
                 'dark:shadow-none',
 
                 'text-tint',
 
                 'rounded-lg',
-                'straight-corners:rounded-sm',
+                'straight-corners:rounded-xs',
 
                 'contrast-more:ring-tint-12',
                 'contrast-more:text-tint-strong',
@@ -80,7 +80,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'contrast-more:focus:ring-2',
                 'contrast-more:focus:ring-tint-12',
 
-                'active:shadow-sm',
+                'active:shadow-xs',
                 'active:scale-100',
 
                 'md:justify-start',
@@ -119,18 +119,18 @@ function Shortcut() {
         <div
             aria-busy={operatingSystem === null ? 'true' : undefined}
             className={tcls(
-                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
+                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong md:flex`,
                 operatingSystem
                     ? 'motion-safe:animate-fadeIn motion-reduce:opacity-100'
                     : 'opacity-0'
             )}
         >
             <kbd
-                className={`flex h-5 min-w-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
+                className={`flex h-5 min-w-5 items-center justify-center rounded-sm border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
             >
                 {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
             </kbd>
-            <kbd className="flex size-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background">
+            <kbd className="flex size-5 items-center justify-center rounded-sm border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background">
                 K
             </kbd>
         </div>

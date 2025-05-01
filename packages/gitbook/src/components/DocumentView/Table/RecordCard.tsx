@@ -64,11 +64,11 @@ export async function RecordCard(
                 // - If the file is square or portrait, we display it left with 40% of the card width
                 coverIsSquareOrPortrait
                     ? [
-                          'grid-cols-[40%,_1fr]',
+                          'grid-cols-[40%__1fr]',
                           'min-[432px]:grid-cols-none',
-                          'min-[432px]:grid-rows-[auto,1fr]',
+                          'min-[432px]:grid-rows-[auto_1fr]',
                       ]
-                    : 'grid-rows-[auto,1fr]'
+                    : 'grid-rows-[auto_1fr]'
             )}
         >
             {cover ? (

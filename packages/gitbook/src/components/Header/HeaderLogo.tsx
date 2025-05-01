@@ -48,14 +48,14 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                     ]}
                     priority="high"
                     style={tcls(
-                        'rounded',
-                        'straight-corners:rounded-sm',
+                        'rounded-sm',
+                        'straight-corners:rounded-xs',
                         'overflow-hidden',
                         'shrink',
                         'min-w-0',
                         'max-w-40',
                         'lg:max-w-64',
-                        'site-header-none:page-no-toc:lg:max-w-56',
+                        'lg:page-no-toc:site-header-none:max-w-56',
                         'max-h-10',
                         'lg:max-h-12',
                         'h-full',

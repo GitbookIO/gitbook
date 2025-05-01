@@ -52,8 +52,8 @@ export function Details(props: {
                 //all
                 '[&]:mt-[0px]',
                 //select first child
-                '[&:first-child]:mt-5',
-                '[&:first-child]:rounded-t-lg',
+                'first:mt-5',
+                'first:rounded-t-lg',
                 //select first in group
                 '[:not(&)_+&]:mt-5',
                 '[:not(&)_+&]:rounded-t-lg',

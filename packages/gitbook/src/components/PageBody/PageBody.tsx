@@ -40,9 +40,9 @@ export function PageBody(props: {
                     // Allow words to break if they are too long.
                     'break-anywhere',
                     // When in api page mode without the aside, we align with the border of the main content
-                    'page-api-block:xl:max-2xl:pr-0',
+                    'xl:max-2xl:page-api-block:pr-0',
                     // Max size to ensure one column in api is aligned with rest of content (2 x 3xl) + (gap-3 + 2) * px-12
-                    'page-api-block:mx-auto page-api-block:max-w-screen-2xl',
+                    'page-api-block:mx-auto page-api-block:max-w-(--breakpoint-2xl)',
                     // page.layout.tableOfContents ? null : 'xl:ml-56',
                     asFullWidth ? 'page-full-width' : 'page-default-width',
                     page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'

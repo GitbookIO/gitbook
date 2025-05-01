@@ -80,7 +80,7 @@ export function Button({
         'ring-tint',
         'hover:ring-tint-hover',
 
-        'shadow-sm',
+        'shadow-xs',
         'shadow-tint',
         'dark:shadow-tint-1',
         'hover:shadow-md',

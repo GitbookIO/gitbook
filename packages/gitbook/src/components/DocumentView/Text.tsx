@@ -72,7 +72,7 @@ function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
 
 function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
     return (
-        <kbd className="rounded border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
+        <kbd className="rounded-sm border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
             {props.children}
         </kbd>
     );
@@ -100,7 +100,7 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'ring-inset',
                 'ring-tint',
                 'bg-tint',
-                'rounded',
+                'rounded-sm',
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings

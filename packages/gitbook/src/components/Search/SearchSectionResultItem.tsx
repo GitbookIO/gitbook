@@ -75,7 +75,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
             <div
                 className={tcls(
                     'p-2',
-                    'rounded',
+                    'rounded-sm',
                     'straight-corners:rounded-none',
                     'bg-primary-solid',
                     'text-contrast-primary-solid',
