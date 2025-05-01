@@ -155,8 +155,9 @@
         @apply focus-visible:outline-2 focus-visible:outline-primary;
     }
 
-    button {
-        @apply hover:cursor-pointer;
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
     }
 
     code,
