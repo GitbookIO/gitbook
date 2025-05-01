@@ -39,7 +39,7 @@ export default function MathJaXFormula(props: MathJaXFormulaProps) {
                 return;
             }
 
-            const domNode = MathJax.tex2chtml(formula, { display: inline! });
+            const domNode = MathJax.tex2chtml(formula, { display: !inline });
             setHTML(domNode.outerHTML);
         });
 
