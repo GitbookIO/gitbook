@@ -1,3 +1,5 @@
+@reference "../../RootLayout/globals.css";
+
 /* Layout Components */
 .openapi-operation,
 .openapi-schemas,
@@ -742,7 +744,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-schema .openapi-schema-properties .openapi-schema {
-    @apply animate-fadeIn [animation-fill-mode:both];
+    animation: fadeIn 0.2s ease-in-out both;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger[aria-expanded="true"] > svg {
@@ -804,7 +806,8 @@ body:has(.openapi-select-popover) {
 
 .openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label span,
 .openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label span {
-    @apply block animate-fadeIn;
+    @apply block;
+    animation: fadeIn 0.2s ease-in-out both;
 }
 
 @media (hover: none) {

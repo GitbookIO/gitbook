@@ -42,8 +42,8 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'opacity-0',
                     'group-hover:opacity-0',
                     'group-focus:opacity-0',
-                    'md:md:group-hover:opacity-1',
-                    'md:md:group-focus:opacity-1',
+                    'md:md:group-hover:opacity-11',
+                    'md:md:group-focus:opacity-11',
                     textStyle.marginTop
                 )}
             >

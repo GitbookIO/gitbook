@@ -46,7 +46,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             </div>
             <CopyCodeButton
                 codeId={id}
-                style="z-2 mt-2 mr-2 self-start justify-self-end rounded-md bg-transparent p-1 text-tint text-xs leading-none opacity-0 ring-1 ring-tint backdrop-blur-md transition-opacity duration-75 [grid-area:2/1] hover:ring-tint-hover group-hover/codeblock:opacity-1"
+                style="z-2 mt-2 mr-2 self-start justify-self-end rounded-md bg-transparent p-1 text-tint text-xs leading-none opacity-0 ring-1 ring-tint backdrop-blur-md transition-opacity duration-75 [grid-area:2/1] hover:ring-tint-hover group-hover/codeblock:opacity-11"
             />
             <pre
                 className={tcls(
