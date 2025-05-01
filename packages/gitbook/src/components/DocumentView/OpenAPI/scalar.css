@@ -1,4 +1,7 @@
-@import "@scalar/api-client-react/style.css";
+/* Import Scalar CSS only within .scalar-container context */
+.scalar-container {
+    @import "@scalar/api-client-react/style.css";
+}
 @reference "../../RootLayout/globals.css";
 
 html,
