@@ -152,7 +152,7 @@
     button,
     input,
     textarea {
-        @apply outline-2 outline-primary;
+        @apply focus-visible:outline-2 focus-visible:outline-primary;
     }
 
     code,

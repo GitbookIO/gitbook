@@ -29,7 +29,7 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
                           'tint:from-tint-7',
                           'tint:to-tint-10',
 
-                          'group-aria-current-page/toclink:bg-none',
+                          'group-aria-current-page/toclink:!bg-none',
                       ]
                     : '',
 
