@@ -7,18 +7,15 @@ import {
     type RenderIntegrationUI,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
-import {
-    GITBOOK_API_TOKEN,
-    GITBOOK_API_URL,
-    GITBOOK_RUNTIME,
-    GITBOOK_USER_AGENT,
-} from '@v2/lib/env';
+import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { unstable_cache } from 'next/cache';
 import { getCloudflareContext, getCloudflareRequestGlobal } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import { withCacheKey, withoutConcurrentExecution } from './memoize';
 import type { GitBookDataFetcher } from './types';
+
+const withUseCache = true;
 
 interface DataFetcherInput {
     /**
@@ -221,7 +218,7 @@ const getUserById = withCacheKey(
     withoutConcurrentExecution(
         getCloudflareRequestGlobal,
         async (cacheKey, input: DataFetcherInput, params: { userId: string }) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getUserByIdUseCache(input, params);
             }
 
@@ -273,7 +270,7 @@ const getSpace = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; shareKey: string | undefined }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getSpaceUseCache(input, params);
             }
 
@@ -345,7 +342,7 @@ const getChangeRequest = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; changeRequestId: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getChangeRequestUseCache(input, params);
             }
 
@@ -422,7 +419,7 @@ const getRevision = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; metadata: boolean }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getRevisionUseCache(input, params);
             }
 
@@ -479,7 +476,7 @@ const getRevisionPages = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; metadata: boolean }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getRevisionPagesUseCache(input, params);
             }
 
@@ -540,7 +537,7 @@ const getRevisionFile = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; fileId: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getRevisionFileUseCache(input, params);
             }
 
@@ -603,7 +600,7 @@ const getRevisionPageMarkdown = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; pageId: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getRevisionPageMarkdownUseCache(input, params);
             }
 
@@ -673,7 +670,7 @@ const getRevisionPageByPath = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; path: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getRevisionPageByPathUseCache(input, params);
             }
 
@@ -737,7 +734,7 @@ const getDocument = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; documentId: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getDocumentUseCache(input, params);
             }
 
@@ -797,7 +794,7 @@ const getComputedDocument = withCacheKey(
                 seed: string;
             }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getComputedDocumentUseCache(input, params);
             }
 
@@ -886,7 +883,7 @@ const getReusableContent = withCacheKey(
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; reusableContentId: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getReusableContentUseCache(input, params);
             }
 
@@ -948,7 +945,7 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
             input: DataFetcherInput,
             params: { organizationId: string; slug: string }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getLatestOpenAPISpecVersionContentUseCache(input, params);
             }
 
@@ -1025,7 +1022,7 @@ const getPublishedContentSite = withCacheKey(
             input: DataFetcherInput,
             params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getPublishedContentSiteUseCache(input, params);
             }
 
@@ -1108,7 +1105,7 @@ const getSiteRedirectBySource = withCacheKey(
                 source: string;
             }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getSiteRedirectBySourceUseCache(input, params);
             }
 
@@ -1193,7 +1190,7 @@ const getEmbedByUrl = withCacheKey(
     withoutConcurrentExecution(
         getCloudflareRequestGlobal,
         async (cacheKey, input: DataFetcherInput, params: { spaceId: string; url: string }) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return getEmbedByUrlUseCache(input, params);
             }
 
@@ -1259,7 +1256,7 @@ const searchSiteContent = withCacheKey(
             input: DataFetcherInput,
             params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return searchSiteContentUseCache(input, params);
             }
 
@@ -1330,7 +1327,7 @@ const renderIntegrationUi = withCacheKey(
             input: DataFetcherInput,
             params: { integrationName: string; request: RenderIntegrationUI }
         ) => {
-            if (GITBOOK_RUNTIME !== 'cloudflare') {
+            if (withUseCache) {
                 return renderIntegrationUiUseCache(input, params);
             }
 
