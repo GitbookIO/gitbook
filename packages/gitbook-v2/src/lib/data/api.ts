@@ -22,6 +22,15 @@ interface DataFetcherInput {
 }
 
 /**
+ * Options to pass to the `fetch` call to disable the Next data-cache when wrapped in `use cache`.
+ */
+export const noCacheFetchOptions: Partial<RequestInit> = {
+    next: {
+        revalidate: 0,
+    },
+};
+
+/**
  * Create a data fetcher using an API token.
  * The data are being cached by Next.js built-in cache.
  */
@@ -196,7 +205,9 @@ const getUserById = withCacheKey(
             return trace(`getUserById(${params.userId})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.users.getUserById(params.userId);
+                    const res = await api.users.getUserById(params.userId, {
+                        ...noCacheFetchOptions,
+                    });
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('days');
                     return res.data;
@@ -225,9 +236,15 @@ const getSpace = withCacheKey(
             return trace(`getSpace(${params.spaceId}, ${params.shareKey})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.getSpaceById(params.spaceId, {
-                        shareKey: params.shareKey,
-                    });
+                    const res = await api.spaces.getSpaceById(
+                        params.spaceId,
+                        {
+                            shareKey: params.shareKey,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('days');
                     return res.data;
@@ -261,7 +278,10 @@ const getChangeRequest = withCacheKey(
                         const api = apiClient(input);
                         const res = await api.spaces.getChangeRequestById(
                             params.spaceId,
-                            params.changeRequestId
+                            params.changeRequestId,
+                            {
+                                ...noCacheFetchOptions,
+                            }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('minutes');
@@ -290,6 +310,9 @@ const getRevision = withCacheKey(
                         params.revisionId,
                         {
                             metadata: params.metadata,
+                        },
+                        {
+                            ...noCacheFetchOptions,
                         }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
@@ -318,6 +341,9 @@ const getRevisionPages = withCacheKey(
                         params.revisionId,
                         {
                             metadata: params.metadata,
+                        },
+                        {
+                            ...noCacheFetchOptions,
                         }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
@@ -347,7 +373,10 @@ const getRevisionFile = withCacheKey(
                             params.spaceId,
                             params.revisionId,
                             params.fileId,
-                            {}
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -379,6 +408,9 @@ const getRevisionPageMarkdown = withCacheKey(
                             params.pageId,
                             {
                                 format: 'markdown',
+                            },
+                            {
+                                ...noCacheFetchOptions,
                             }
                         );
 
@@ -415,7 +447,10 @@ const getRevisionPageByPath = withCacheKey(
                             params.spaceId,
                             params.revisionId,
                             encodedPath,
-                            {}
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -438,7 +473,10 @@ const getDocument = withCacheKey(
                     const res = await api.spaces.getDocumentById(
                         params.spaceId,
                         params.documentId,
-                        {}
+                        {},
+                        {
+                            ...noCacheFetchOptions,
+                        }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('max');
@@ -478,10 +516,17 @@ const getComputedDocument = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getComputedDocument(params.spaceId, {
-                            source: params.source,
-                            seed: params.seed,
-                        });
+                        const res = await api.spaces.getComputedDocument(
+                            params.spaceId,
+                            {
+                                source: params.source,
+                                seed: params.seed,
+                            },
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
                         return res.data;
@@ -509,7 +554,11 @@ const getReusableContent = withCacheKey(
                         const res = await api.spaces.getReusableContentInRevisionById(
                             params.spaceId,
                             params.revisionId,
-                            params.reusableContentId
+                            params.reusableContentId,
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -541,7 +590,10 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
                         const api = apiClient(input);
                         const res = await api.orgs.getLatestOpenApiSpecVersionContent(
                             params.organizationId,
-                            params.slug
+                            params.slug,
+                            {
+                                ...noCacheFetchOptions,
+                            }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -579,6 +631,9 @@ const getPublishedContentSite = withCacheKey(
                             params.siteId,
                             {
                                 shareKey: params.siteShareKey,
+                            },
+                            {
+                                ...noCacheFetchOptions,
                             }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
@@ -623,6 +678,9 @@ const getSiteRedirectBySource = withCacheKey(
                             {
                                 shareKey: params.siteShareKey,
                                 source: params.source,
+                            },
+                            {
+                                ...noCacheFetchOptions,
                             }
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
@@ -650,9 +708,15 @@ const getEmbedByUrl = withCacheKey(
             return trace(`getEmbedByUrl(${params.spaceId}, ${params.url})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.getEmbedByUrlInSpace(params.spaceId, {
-                        url: params.url,
-                    });
+                    const res = await api.spaces.getEmbedByUrlInSpace(
+                        params.spaceId,
+                        {
+                            url: params.url,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('weeks');
                     return res.data;
@@ -684,10 +748,18 @@ const searchSiteContent = withCacheKey(
                     return wrapDataFetcherError(async () => {
                         const { organizationId, siteId, query, scope } = params;
                         const api = apiClient(input);
-                        const res = await api.orgs.searchSiteContent(organizationId, siteId, {
-                            query,
-                            ...scope,
-                        });
+                        const res = await api.orgs.searchSiteContent(
+                            organizationId,
+                            siteId,
+                            {
+                                query,
+                                ...scope,
+                            },
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('hours');
                         return res.data.items;
@@ -719,7 +791,10 @@ const renderIntegrationUi = withCacheKey(
                     const api = apiClient(input);
                     const res = await api.integrations.renderIntegrationUiWithPost(
                         params.integrationName,
-                        params.request
+                        params.request,
+                        {
+                            ...noCacheFetchOptions,
+                        }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('days');
@@ -735,11 +810,18 @@ async function* streamAIResponse(
     params: Parameters<GitBookDataFetcher['streamAIResponse']>[0]
 ) {
     const api = apiClient(input);
-    const res = await api.orgs.streamAiResponseInSite(params.organizationId, params.siteId, {
-        input: params.input,
-        output: params.output,
-        model: params.model,
-    });
+    const res = await api.orgs.streamAiResponseInSite(
+        params.organizationId,
+        params.siteId,
+        {
+            input: params.input,
+            output: params.output,
+            model: params.model,
+        },
+        {
+            ...noCacheFetchOptions,
+        }
+    );
 
     for await (const event of res) {
         yield event;
