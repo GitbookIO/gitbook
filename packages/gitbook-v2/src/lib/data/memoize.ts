@@ -10,6 +10,7 @@ export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
 
     return (key: string, ...args: ArgsType) => {
         const globalContext = getGlobalContext() ?? globalThis;
+        console.log('globalContext', globalContext);
 
         /**
          * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
@@ -21,6 +22,7 @@ export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
 
         const concurrent = promiseCache.get(key);
         if (concurrent) {
+            console.log('returning concurrent value for', key);
             return concurrent;
         }
 
