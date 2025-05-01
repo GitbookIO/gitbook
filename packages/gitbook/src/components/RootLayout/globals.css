@@ -155,6 +155,10 @@
         @apply focus-visible:outline-2 focus-visible:outline-primary;
     }
 
+    button {
+        @apply hover:cursor-pointer;
+    }
+
     code,
     pre {
         /* Don't apply antialiased to `code` and `pre` elements */

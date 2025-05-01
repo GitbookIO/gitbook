@@ -70,7 +70,6 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'hover:scale-102',
                 'hover:ring-tint-hover',
                 'hover:text-tint-strong',
-                'hover:cursor-pointer',
                 'focus:shadow-md',
                 'focus:scale-102',
                 'focus:ring-tint-hover',
