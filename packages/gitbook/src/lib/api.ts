@@ -242,7 +242,6 @@ export const getLatestOpenAPISpecVersionContent = cache({
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
-    timeout: 30 * 1000,
     name: 'api.getPublishedContentByUrl.v7',
     tag: (url) => getCacheTagForURL(url),
     get: async (
