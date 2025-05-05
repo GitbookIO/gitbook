@@ -146,6 +146,7 @@ export function DynamicTabs(
                 id={getTabButtonId(active.id)}
                 block={block}
                 className={tcls('absolute', '-left-6')}
+                label="Direct link to selected tab"
             />
 
             <div

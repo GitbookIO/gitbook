@@ -33,6 +33,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 id={id}
                 block={block}
                 className={tcls('relative', '-ml-6', textStyle.marginTop)}
+                label="Direct link to heading"
             />
 
             <div
