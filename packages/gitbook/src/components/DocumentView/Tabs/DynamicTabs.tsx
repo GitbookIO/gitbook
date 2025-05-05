@@ -141,7 +141,7 @@ export function DynamicTabs(
     }, [hash, tabs, onSelectTab]);
 
     return (
-        <div className={tcls(hashLinkButtonWrapperStyles, 'flex', style)}>
+        <div className={tcls(hashLinkButtonWrapperStyles, 'w-full', style)}>
             <HashLinkButton
                 id={getTabButtonId(active.id)}
                 block={block}
