@@ -6,7 +6,7 @@ import { useHash, useIsMounted } from '@/components/hooks';
 import * as storage from '@/lib/local-storage';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import type { DocumentBlockTabs } from '@gitbook/api';
-import { HashLinkButton } from '../HashLinkButton';
+import { HashLinkButton, hashLinkButtonWrapperStyles } from '../HashLinkButton';
 
 interface TabsState {
     activeIds: {
@@ -141,7 +141,7 @@ export function DynamicTabs(
     }, [hash, tabs, onSelectTab]);
 
     return (
-        <div className={tcls('relative', 'group')}>
+        <div className={hashLinkButtonWrapperStyles}>
             <HashLinkButton
                 id={getTabButtonId(active.id)}
                 block={block}

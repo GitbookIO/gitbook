@@ -3,7 +3,7 @@ import type { DocumentBlockHeading } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
-import { HashLinkButton } from './HashLinkButton';
+import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 
@@ -23,10 +23,9 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             className={tcls(
                 textStyle.textSize,
                 'heading',
-                'group',
-                'relative',
                 'grid',
                 'scroll-m-12',
+                hashLinkButtonWrapperStyles,
                 style
             )}
         >

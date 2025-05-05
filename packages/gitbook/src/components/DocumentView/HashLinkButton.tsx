@@ -5,7 +5,10 @@ import { getBlockTextStyle } from './spacing';
 
 /**
  * A hash icon which adds the block or active block item's ID in the URL hash.
+ * The button needs to be wrapped in a container with `hashLinkButtonWrapperStyles`.
  */
+export const hashLinkButtonWrapperStyles = tcls('relative', 'group');
+
 export function HashLinkButton(props: {
     id: string;
     block: DocumentBlockTabs | DocumentBlockHeading;
@@ -20,9 +23,6 @@ export function HashLinkButton(props: {
                 'hash',
                 'grid',
                 'grid-area-1-1',
-                // 'absolute',
-                // 'left-0',
-                // 'top-1',
                 'w-7',
                 'border-0',
                 'opacity-0',
