@@ -24,6 +24,7 @@ export function HashLinkButton(props: {
                 'grid',
                 'grid-area-1-1',
                 'w-7',
+                'h-[1em]',
                 'border-0',
                 'opacity-0',
                 'group-hover:opacity-[0]',
@@ -42,6 +43,8 @@ export function HashLinkButton(props: {
                     icon="hashtag"
                     className={tcls(
                         'size-4',
+                        'mt-1',
+                        'self-center',
                         'transition-colors',
                         'text-transparent',
                         'group-hover:text-tint-subtle',

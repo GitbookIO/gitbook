@@ -32,7 +32,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <HashLinkButton
                 id={id}
                 block={block}
-                className={tcls('relative', '-ml-6', 'top-1', textStyle.marginTop)}
+                className={tcls('relative', '-ml-6', textStyle.marginTop)}
             />
 
             <div
