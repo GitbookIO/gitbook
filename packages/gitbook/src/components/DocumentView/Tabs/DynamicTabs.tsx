@@ -145,7 +145,7 @@ export function DynamicTabs(
             <HashLinkButton
                 id={getTabButtonId(active.id)}
                 block={block}
-                className={tcls('absolute', 'left-6')}
+                className={tcls('absolute', block.data?.fullWidth ? '-left-6' : 'left-6')}
             />
 
             <div
