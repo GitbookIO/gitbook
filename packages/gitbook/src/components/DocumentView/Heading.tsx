@@ -1,9 +1,9 @@
 import type { DocumentBlockHeading } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 
 import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
+import { HashLinkButton } from './HashLinkButton';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 
@@ -30,43 +30,12 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 style
             )}
         >
-            <div
-                className={tcls(
-                    'hash',
-                    'grid',
-                    'grid-area-1-1',
-                    'relative',
-                    '-ml-6',
-                    'w-7',
-                    'border-0',
-                    'opacity-0',
-                    'group-hover:opacity-[0]',
-                    'group-focus:opacity-[0]',
-                    'md:group-hover:md:opacity-[1]',
-                    'md:group-focus:md:opacity-[1]',
-                    textStyle.marginTop
-                )}
-            >
-                <a
-                    href={`#${id}`}
-                    aria-label="Direct link to heading"
-                    className={tcls('inline-flex', 'h-full', 'items-start', textStyle.lineHeight)}
-                >
-                    <Icon
-                        icon="hashtag"
-                        className={tcls(
-                            'w-3.5',
-                            'h-[1em]',
-                            'mt-0.5',
-                            'transition-colors',
-                            'text-transparent',
-                            'group-hover:text-tint-subtle',
-                            'contrast-more:group-hover:text-tint-strong',
-                            'lg:w-4'
-                        )}
-                    />
-                </a>
-            </div>
+            <HashLinkButton
+                id={id}
+                block={block}
+                className={tcls('relative', '-ml-6', 'top-1', textStyle.marginTop)}
+            />
+
             <div
                 className={tcls(
                     'grid-area-1-1',
