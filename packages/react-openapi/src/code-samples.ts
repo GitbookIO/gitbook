@@ -362,12 +362,15 @@ const BodyGenerators = {
                         return '$$__TRUE__$$';
                     case false:
                         return '$$__FALSE__$$';
+                    case null:
+                        return '$$__NULL__$$';
                     default:
                         return value;
                 }
             })
                 .replaceAll('"$$__TRUE__$$"', 'True')
-                .replaceAll('"$$__FALSE__$$"', 'False');
+                .replaceAll('"$$__FALSE__$$"', 'False')
+                .replaceAll('"$$__NULL__$$"', 'None');
         }
 
         return { body, code, headers };
