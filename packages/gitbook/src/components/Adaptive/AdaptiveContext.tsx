@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
-import { streamPageJourneySuggestions } from './server-actions';
 
 export type SuggestedPage = {
     id: string;
@@ -50,27 +49,27 @@ export function JourneyContextProvider({
     useEffect(() => {
         let canceled = false;
 
-        setJourneys([]);
+        // setJourneys([]);
 
         (async () => {
-            const stream = await streamPageJourneySuggestions({
-                count: JOURNEY_COUNT,
-                currentPage: {
-                    id: currentPage.pageId,
-                    title: currentPage.title,
-                },
-                currentSpace: {
-                    id: currentPage.spaceId,
-                },
-                allSpaces: spaces,
-                visitedPages,
-            });
+            // const stream = await streamPageJourneySuggestions({
+            //     count: JOURNEY_COUNT,
+            //     currentPage: {
+            //         id: currentPage.pageId,
+            //         title: currentPage.title,
+            //     },
+            //     currentSpace: {
+            //         id: currentPage.spaceId,
+            //     },
+            //     allSpaces: spaces,
+            //     visitedPages,
+            // });
 
-            for await (const journey of stream) {
-                if (canceled) return;
+            // for await (const journey of stream) {
+            //     if (canceled) return;
 
-                setJourneys((prev) => [...prev, journey]);
-            }
+            //     setJourneys((prev) => [...prev, journey]);
+            // }
 
             setLoading(false);
         })();

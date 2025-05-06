@@ -1,8 +1,7 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
-import { AINextPageSuggestions } from './AINextPageSuggestions';
-import { AIPageJourneySuggestions } from './AIPageJourneySuggestions';
+import { AIPageSummary } from './AIPageSummary';
 import { useAdaptiveContext } from './AdaptiveContext';
 import { AdaptivePaneHeader } from './AdaptivePaneHeader';
 export function AdaptivePane() {
@@ -16,8 +15,9 @@ export function AdaptivePane() {
             )}
         >
             <AdaptivePaneHeader />
-            <AIPageJourneySuggestions />
-            <AINextPageSuggestions />
+            <AIPageSummary />
+            {/* <AIPageJourneySuggestions />
+            <AINextPageSuggestions /> */}
         </div>
     );
 }

@@ -29,7 +29,7 @@ export function PageAside(props: {
     const { page, document, withPageFeedback, context } = props;
     const { customization, site, space } = context;
 
-    const useAdaptivePane = true;
+    const useAdaptivePane = customization.ai?.pageLinkSummaries.enabled;
 
     return (
         <aside
