@@ -83,9 +83,12 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                                     )
                                                 }
                                                 asChild
-                                                onPointerOver={(e) => e.preventDefault()}
-                                                onPointerMove={(e) => e.preventDefault()}
-                                                onPointerLeave={(e) => e.preventDefault()}
+                                                onClick={(e) => {
+                                                    if (value) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }
+                                                }}
                                             >
                                                 <SectionGroupTab
                                                     isActive={isActive}
@@ -93,11 +96,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                                     icon={icon as IconName}
                                                 />
                                             </NavigationMenu.Trigger>
-                                            <NavigationMenu.Content
-                                                className="absolute top-0 left-0 z-20 w-full data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft md:w-max"
-                                                onPointerEnter={(e) => e.preventDefault()}
-                                                onPointerLeave={(e) => e.preventDefault()}
-                                            >
+                                            <NavigationMenu.Content className="absolute top-0 left-0 z-20 w-full data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft md:w-max">
                                                 <SectionGroupTileList
                                                     sections={sectionOrGroup.sections}
                                                     currentSection={currentSection}
