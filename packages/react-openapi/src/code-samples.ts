@@ -30,7 +30,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
     {
         id: 'http',
         label: 'HTTP',
-        syntax: 'bash',
+        syntax: 'http',
         generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
             const { host, path } = parseHostAndPath(url);
 
