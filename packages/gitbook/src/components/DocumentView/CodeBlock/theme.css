@@ -5,7 +5,7 @@
     --shiki-token-link: theme("colors.primary.10");
 
     --shiki-token-constant: theme("colors.warning.10");
-    --shiki-token-string: theme("colors.success.10");
+    --shiki-token-string: theme("colors.warning.10");
     --shiki-token-string-expression: theme("colors.success.10");
     --shiki-token-keyword: theme("colors.danger.10");
     --shiki-token-parameter: theme("colors.warning.10");
@@ -24,7 +24,7 @@
         --shiki-token-link: theme("colors.primary.11");
 
         --shiki-token-constant: theme("colors.warning.11");
-        --shiki-token-string: theme("colors.success.11");
+        --shiki-token-string: theme("colors.warning.11");
         --shiki-token-string-expression: theme("colors.success.11");
         --shiki-token-keyword: theme("colors.danger.11");
         --shiki-token-parameter: theme("colors.warning.11");
@@ -41,7 +41,7 @@ html.dark {
     --shiki-token-comment: theme("colors.neutral.9");
 
     --shiki-token-constant: theme("colors.warning.11");
-    --shiki-token-string: theme("colors.success.11");
+    --shiki-token-string: theme("colors.warning.11");
     --shiki-token-string-expression: theme("colors.success.11");
     --shiki-token-keyword: theme("colors.danger.11");
     --shiki-token-parameter: theme("colors.warning.11");
