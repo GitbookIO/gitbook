@@ -83,6 +83,12 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                                     )
                                                 }
                                                 asChild
+                                                onClick={(e) => {
+                                                    if (value) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }
+                                                }}
                                             >
                                                 <SectionGroupTab
                                                     isActive={isActive}
