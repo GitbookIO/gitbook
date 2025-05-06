@@ -55,7 +55,7 @@ export async function* streamPageSummary({
                             : z.undefined(),
                 }),
                 tools: {
-                    getPages: true,
+                    // getPages: true,
                     // getPageContent: true,
                 },
                 messages: [
