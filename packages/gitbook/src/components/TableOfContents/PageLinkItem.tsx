@@ -57,7 +57,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Git
                         'transition-colors',
                         '[&>path]:transition-opacity',
                         '[&>path]:opacity-[0.4]',
-                        'group-hover:[&>path]:opacity-11'
+                        '[&>path]:group-hover:opacity-11'
                     )}
                 />
             </Link>

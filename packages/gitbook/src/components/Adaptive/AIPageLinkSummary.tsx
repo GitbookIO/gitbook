@@ -175,7 +175,7 @@ export function AIPageLinkSummary(props: {
                     {shimmerBlocks.map((block, index) => (
                         <div
                             key={`${index}-${block}`}
-                            className={`${block} h-4 animate-pulse rounded straight-corners:rounded-none bg-tint-active`}
+                            className={`${block} h-4 animate-pulse rounded-sm straight-corners:rounded-none bg-tint-active`}
                         />
                     ))}
                 </div>

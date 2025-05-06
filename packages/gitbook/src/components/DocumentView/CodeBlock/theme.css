@@ -1,3 +1,5 @@
+@reference "../../RootLayout/globals.css";
+
 :root {
     --shiki-color-text: theme("colors.tint.11");
     --shiki-token-punctuation: theme("colors.tint.11");

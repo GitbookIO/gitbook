@@ -119,9 +119,9 @@ function HeaderItemButton(
             className={tcls(
                 {
                     'button-primary':
-                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none theme-bold:hover:bg-header-link theme-bold:hover:text-header-background theme-bold:hover:shadow-none',
+                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none hover:theme-bold:bg-header-link hover:theme-bold:text-header-background hover:theme-bold:shadow-none',
                     'button-secondary': tcls(
-                        'theme-bold:bg-header-link/2 theme-gradient:bg-tint-base theme-muted:bg-tint-base theme-bold:text-header-link theme-bold:shadow-none theme-bold:ring-header-link/4 theme-bold:hover:bg-header-link/3 theme-bold:hover:text-header-link theme-bold:hover:shadow-none theme-bold:hover:ring-header-link/5 theme-bold:contrast-more:bg-header-background theme-bold:contrast-more:text-header-link theme-bold:contrast-more:ring-header-link theme-bold:contrast-more:hover:ring-header-link'
+                        'theme-bold:bg-header-link/2 theme-gradient:bg-tint-base theme-muted:bg-tint-base theme-bold:text-header-link theme-bold:shadow-none theme-bold:ring-header-link/4 hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link hover:theme-bold:shadow-none hover:theme-bold:ring-header-link/5 contrast-more:theme-bold:bg-header-background contrast-more:theme-bold:text-header-link contrast-more:theme-bold:ring-header-link contrast-more:hover:theme-bold:ring-header-link'
                     ),
                 }[linkStyle]
             )}
@@ -146,20 +146,20 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
         'truncate',
 
         'text-tint',
-        'links-default:hover:text-primary',
-        'links-default:data-[state=open]:text-primary',
-        'links-default:tint:hover:text-tint-strong',
-        'links-default:tint:data-[state=open]:text-tint-strong',
+        'hover:links-default:text-primary',
+        'data-[state=open]:links-default:text-primary',
+        'hover:tint:links-default:text-tint-strong',
+        'data-[state=open]:tint:links-default:text-tint-strong',
         'underline-offset-2',
-        'links-accent:hover:underline',
-        'links-accent:data-[state=open]:underline',
+        'hover:links-accent:underline',
+        'data-[state=open]:links-accent:underline',
         'links-accent:underline-offset-4',
         'links-accent:decoration-primary-subtle',
         'links-accent:decoration-[3px]',
         'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
-        'theme-bold:hover:text-header-link'
+        'hover:theme-bold:text-header-link'
     );
 }
 

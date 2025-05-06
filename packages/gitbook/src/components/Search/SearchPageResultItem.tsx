@@ -106,7 +106,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             <div
                 className={tcls(
                     'p-2',
-                    'rounded',
+                    'rounded-sm',
                     'straight-corners:rounded-none',
                     active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6']
                 )}

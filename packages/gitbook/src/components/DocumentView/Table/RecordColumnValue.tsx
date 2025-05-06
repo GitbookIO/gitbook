@@ -306,7 +306,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     className={tcls(
                                         'text-sm',
                                         'whitespace-pre',
-                                        'rounded',
+                                        'rounded-sm',
                                         'py-1',
                                         'px-2',
                                         'bg-primary',

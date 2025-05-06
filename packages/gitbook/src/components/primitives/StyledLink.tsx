@@ -10,13 +10,13 @@ export const linkStyles = [
 
     'links-default:decoration-primary/6',
     'links-default:text-primary-subtle',
-    'links-default:hover:text-primary-strong',
-    'links-default:contrast-more:text-primary',
-    'links-default:contrast-more:hover:text-primary-strong',
+    'hover:links-default:text-primary-strong',
+    'contrast-more:links-default:text-primary',
+    'contrast-more:hover:links-default:text-primary-strong',
 
     'links-accent:decoration-primary-subtle',
-    'links-accent:hover:decoration-[3px]',
-    'links-accent:hover:[text-decoration-skip-ink:none]',
+    'hover:links-accent:decoration-[3px]',
+    'hover:links-accent:[text-decoration-skip-ink:none]',
 
     'transition-all',
     'duration-100',

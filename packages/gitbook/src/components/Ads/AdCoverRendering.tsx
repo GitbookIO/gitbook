@@ -49,7 +49,7 @@ export async function AdCoverRendering({
                 'rounded-lg',
                 'p-4',
                 'overflow-hidden',
-                'shadow-sm'
+                'shadow-xs'
             )}
             style={{ backgroundColor: ad.backgroundColor, color: ad.textColor ?? '#ffffff' }}
             href={ad.statlink}
@@ -68,7 +68,7 @@ export async function AdCoverRendering({
                 }}
             />
 
-            <div className={tcls('z-[2]')}>
+            <div className={tcls('z-2')}>
                 <img
                     alt="Large cover"
                     src={largeImage}
@@ -81,10 +81,10 @@ export async function AdCoverRendering({
                     )}
                 />
             </div>
-            <div className={tcls('z-[2]')}>
+            <div className={tcls('z-2')}>
                 <img alt={ad.company} src={ad.logo} className={tcls('max-w-36', 'max-h-12')} />
             </div>
-            <div className={tcls('flex', 'flex-col', 'z-[2]')}>
+            <div className={tcls('flex', 'flex-col', 'z-2')}>
                 <div className={tcls('text-sm', 'font-semibold', 'mb-2')}>{ad.companyTagline}</div>
                 <div
                     className={tcls(
@@ -99,7 +99,7 @@ export async function AdCoverRendering({
                     {ad.description}
                 </div>
             </div>
-            <div className={tcls('z-[2]')}>
+            <div className={tcls('z-2')}>
                 <span
                     className={tcls(
                         'text-sm',
@@ -119,7 +119,7 @@ export async function AdCoverRendering({
                 </span>
             </div>
             <div
-                className={tcls('absolute', 'inset-0', 'backdrop-blur', 'z-[1]')}
+                className={tcls('absolute', 'inset-0', 'backdrop-blur-sm', 'z-1')}
                 style={{
                     backgroundColor: hexToRgba(ad.backgroundColor, 0.8),
                 }}

@@ -28,7 +28,7 @@ export async function Card(
                 'gap-4',
                 'ring-1',
                 'ring-tint-subtle',
-                'rounded',
+                'rounded-sm',
                 'straight-corners:rounded-none',
                 'px-5',
                 'py-3',

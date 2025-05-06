@@ -90,7 +90,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                                     icon={icon as IconName}
                                                 />
                                             </NavigationMenu.Trigger>
-                                            <NavigationMenu.Content className="absolute top-0 left-0 z-20 w-full data-[motion=from-end]:motion-safe:animate-enterFromRight data-[motion=from-start]:motion-safe:animate-enterFromLeft data-[motion=to-end]:motion-safe:animate-exitToRight data-[motion=to-start]:motion-safe:animate-exitToLeft md:w-max">
+                                            <NavigationMenu.Content className="absolute top-0 left-0 z-20 w-full motion-safe:data-[motion=from-end]:animate-enterFromRight motion-safe:data-[motion=from-start]:animate-enterFromLeft motion-safe:data-[motion=to-end]:animate-exitToRight motion-safe:data-[motion=to-start]:animate-exitToLeft md:w-max">
                                                 <SectionGroupTileList
                                                     sections={sectionOrGroup.sections}
                                                     currentSection={currentSection}
@@ -112,7 +112,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                         );
                     })}
                     <NavigationMenu.Indicator
-                        className="fixed top-full z-50 flex h-3 items-end justify-center duration-150 motion-safe:transition-[width,_transform] data-[state=hidden]:motion-safe:animate-fadeOut data-[state=visible]:motion-safe:animate-fadeIn"
+                        className="fixed top-full z-50 flex h-3 items-end justify-center duration-150 motion-safe:transition-[width,transform] motion-safe:data-[state=hidden]:animate-fadeOut motion-safe:data-[state=visible]:animate-fadeIn"
                         aria-hidden
                     >
                         <div className="relative top-1/2 size-3 rotate-45 rounded-tl-sm border-tint-subtle border-t border-l bg-tint-base" />
@@ -127,7 +127,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                 }}
             >
                 <NavigationMenu.Viewport
-                    className="relative mt-3 h-[var(--radix-navigation-menu-viewport-height)] w-[calc(100vw_-_2rem)] origin-[top_center] overflow-hidden rounded-lg straight-corners:rounded-sm bg-tint-base shadow-lg shadow-tint-10/6 ring-1 ring-tint-subtle duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,_height,_transform] data-[state=closed]:motion-safe:animate-scaleOut data-[state=open]:motion-safe:animate-scaleIn md:mx-0 md:w-[var(--radix-navigation-menu-viewport-width)] dark:shadow-tint-1/6"
+                    className="relative mt-3 h-(--radix-navigation-menu-viewport-height) w-[calc(100vw-2rem)] origin-[top_center] overflow-hidden rounded-lg straight-corners:rounded-xs bg-tint-base shadow-lg shadow-tint-10/6 ring-1 ring-tint-subtle duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,height,transform] motion-safe:data-[state=closed]:animate-scaleOut motion-safe:data-[state=open]:animate-scaleIn md:mx-0 md:w-(--radix-navigation-menu-viewport-width) dark:shadow-tint-1/6"
                     style={{
                         translate:
                             undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,
@@ -151,7 +151,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             ref={ref}
             {...rest}
             className={tcls(
-                'group relative my-2 flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1',
+                'group relative my-2 flex select-none items-center justify-between rounded-sm straight-corners:rounded-none px-3 py-1',
                 isActive
                     ? 'text-primary-subtle'
                     : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
@@ -180,7 +180,7 @@ const SectionGroupTab = React.forwardRef(function SectionGroupTab(
             ref={ref}
             {...rest}
             className={tcls(
-                'group relative my-2 flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 transition-colors',
+                'group relative my-2 flex select-none items-center justify-between rounded-sm straight-corners:rounded-none px-3 py-1 transition-colors',
                 isActive
                     ? 'text-primary-subtle'
                     : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
@@ -246,7 +246,7 @@ function SectionGroupTile(props: { section: ClientSiteSection; isActive: boolean
             <Link
                 href={url}
                 className={tcls(
-                    'flex w-full select-none flex-col gap-1 rounded straight-corners:rounded-none px-3 py-2 transition-colors hover:bg-tint-hover',
+                    'flex w-full select-none flex-col gap-1 rounded-sm straight-corners:rounded-none px-3 py-2 transition-colors hover:bg-tint-hover',
                     isActive ? 'text-primary' : 'text-tint-strong'
                 )}
             >

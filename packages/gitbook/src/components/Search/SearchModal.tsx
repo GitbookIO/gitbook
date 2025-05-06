@@ -224,7 +224,7 @@ function SearchModalBody(
                 'max-h-[70dvh]',
                 'w-full',
                 'rounded-lg',
-                'straight-corners:rounded-sm',
+                'straight-corners:rounded-xs',
                 'ring-1',
                 'ring-tint-hover',
                 'shadow-2xl',
@@ -272,7 +272,7 @@ function SearchModalBody(
                             'flex-1',
                             'h-12',
                             'p-2',
-                            'focus:outline-none',
+                            'focus:outline-hidden',
                             'bg-transparent',
                             'whitespace-pre-line'
                         )}

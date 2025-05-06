@@ -70,7 +70,7 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 style={[
                     'mx-auto w-full decoration-primary/6',
                     node.data && 'fullWidth' in node.data && node.data.fullWidth
-                        ? 'max-w-screen-xl'
+                        ? 'max-w-(--breakpoint-xl)'
                         : 'max-w-3xl',
                     blockStyle,
                 ]}

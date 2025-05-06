@@ -12,7 +12,7 @@ export const CONTAINER_STYLE: ClassValue = [
     'px-4',
     'sm:px-6',
     'md:px-8',
-    'max-w-screen-2xl',
+    'max-w-(--breakpoint-2xl)',
     'mx-auto',
     'page-full-width:max-w-full',
 ];

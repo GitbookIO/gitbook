@@ -106,7 +106,7 @@ function NavigationCard(
                 reversed ? 'pl-4' : null,
                 'border',
                 'border-tint-subtle',
-                'rounded',
+                'rounded-sm',
                 'straight-corners:rounded-none',
                 'hover:border-primary',
                 'text-pretty',

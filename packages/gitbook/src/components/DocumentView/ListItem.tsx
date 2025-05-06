@@ -165,7 +165,7 @@ function PseudoBefore(props: {
 }) {
     return (
         <div
-            className="before:font-var before:content-[--pseudoBefore--content]"
+            className="before:font-var before:content-(--pseudoBefore--content)"
             style={
                 {
                     '--pseudoBefore--content': `'${props.content}'`,
