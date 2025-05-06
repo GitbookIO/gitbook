@@ -55,14 +55,14 @@ export async function* streamPageSummary({
                             : z.undefined(),
                 }),
                 tools: {
-                    // getPages: true,
+                    getPages: true,
                     // getPageContent: true,
                 },
                 messages: [
                     {
                         role: AIMessageRole.Developer,
                         content: `# 1. Role
-                        You are a fact extractor. Your job is to identify and extract the most important facts from the current page.
+    You are a fact extractor. Your job is to identify and extract the most important facts from the current page.
     
     # 2. Task
     Extract multiple key facts that:
@@ -123,41 +123,18 @@ export async function* streamPageSummary({
                         role: AIMessageRole.Developer,
                         content: `# 6. Guidelines for Fact Extraction
     ALWAYS:
-    - Extract multiple distinct facts rather than a single summary
-    - Focus on specific, concrete details rather than general descriptions
-    - Include numbers, limitations, requirements, or specifications when available
-    - Prioritize facts that would be most useful to someone using the documentation
-    - Consider how facts on this page relate to previously visited pages
+    - ALWAYS extract multiple distinct facts rather than a single summary
+    - ALWAYS focus on specific, concrete details rather than general descriptions
+    - ALWAYS include numbers, limitations, requirements, or specifications when available
+    - ALWAYS prioritize facts that would be most useful to someone using the documentation
+    - ALWAYS consider how facts on this page relate to previously visited pages
     
     NEVER:
-    - Use instructional language like "learn", "how to", "discover", etc.
-    - Include vague or generic statements that lack specific details
-    - Repeat the page title without adding informative value
-    - Combine multiple distinct facts into a single general statement`,
-                    },
-                    {
-                        role: AIMessageRole.Developer,
-                        content: `## Big Picture Guidelines
-    For the big picture summary:
-    
-    ALWAYS:
-    - Synthesize specific concepts from across multiple pages into concrete insights
-    - Highlight practical patterns and workflows that emerge when combining these concepts
-    - Focus on real capabilities that come from understanding multiple features together
-    - Use specific examples that show the value of combining these ideas
-    - Keep the language simple and direct
-    - Use a conversational tone and short sentences, without commas.
-    
-    POOR EXAMPLES TO AVOID:
-    ✗ "GitBook combines content creation, collaboration, and integrations, building on your understanding of identifiers and paginated results for seamless documentation management."
-    ✗ "The platform's robust features for content organization, versioning, and access control work together to create a powerful documentation ecosystem."
-    ✗ "By leveraging GitBook's content blocks, permissions system, and API capabilities, you can build comprehensive documentation solutions."
-    
-    GOOD EXAMPLES TO FOLLOW:
-    ✓ "Combining Markdown tables with webhook notifications means your API docs stay up-to-date automatically - when you update a parameter, the PDF version refreshes too."
-    ✓ "Content blocks and version history together solve the biggest docs headache - you can experiment with different layouts while keeping a clean record of what changed and why."
-    ✓ "The real power comes from linking custom domains with content permissions - your sales team gets branded docs while your developers see the technical details on the same site."
-    ✓ "With spaces, webhooks, and custom metadata working together, you're not just making docs - you're building a knowledge system that responds to how your team actually works."`,
+    - NEVER use instructional language like "learn", "how to", "discover", etc.
+    - NEVER include vague or generic statements that lack specific details.
+    - NEVER repeat the page title without adding informative value.
+    - NEVER combine multiple distinct facts into a single general statement.
+    - NEVER use numbered lists.`,
                     },
                     {
                         role: AIMessageRole.Developer,
@@ -174,6 +151,39 @@ export async function* streamPageSummary({
     Page content: "API authentication requires an API key generated in account settings. Keys expire after 90 days by default. Rate limits are set to 1000 requests per hour. Keys can have read-only or read-write permissions."
     ✓ "API keys expire after 90 days by default. Rate limits are capped at 1000 requests per hour. Keys can be configured with read-only or read-write permissions."
     ✗ "API keys are required for authentication and have various settings."`,
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `# 7. Guidelines for Big Picture
+    For the big picture summary:
+    
+    ALWAYS:
+    - ALWAYS highlight practical patterns and workflows that emerge when combining these concepts.
+    - ALWAYS focus on real capabilities that come from understanding multiple features together.
+    - ALWAYS use specific examples that show the value of combining these ideas.
+    - ALWAYS keep the language simple, direct and conversational without corporate jargon.
+    - ALWAYS use short sentences with a single clause and no commas.
+
+    NEVER:
+    - NEVER use corporate jargon like "seamless", "ensures", "integrates", etc.
+    - NEVER use complex sentences with multiple clauses.
+    - NEVER use passive voice.
+    - NEVER state the same fact twice.
+    - NEVER repeat the page title without adding informative value.`,
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content: `## Big Picture Examples
+    POOR "BIG PICTURE" EXAMPLES TO AVOID:
+    ✗ "GitBook combines content creation, collaboration, and integrations, building on your understanding of identifiers and paginated results for seamless documentation management."
+    ✗ "The platform's robust features for content organization, versioning, and access control work together to create a powerful documentation ecosystem."
+    ✗ "By leveraging GitBook's content blocks, permissions system, and API capabilities, you can build comprehensive documentation solutions."
+    
+    GOOD "BIG PICTURE" EXAMPLES TO FOLLOW:
+    ✓ "Combining Markdown tables with webhook notifications means your API docs stay up-to-date automatically. When you update a parameter, the PDF version refreshes too."
+    ✓ "Content blocks and version history together solve the biggest docs headache. You can experiment with different layouts while keeping a clean record of what changed and why."
+    ✓ "The real power comes from linking custom domains with content permissions. Your sales team gets branded docs while your developers see the technical details on the same site."
+    ✓ "With spaces, webhooks, and custom metadata working together, you're not just making docs. You're building a knowledge system that responds to how your team actually works."`,
                     },
                     {
                         role: AIMessageRole.Developer,

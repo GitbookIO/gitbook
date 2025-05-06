@@ -58,7 +58,7 @@ export function AIPageSummary() {
         return () => {
             canceled = true;
         };
-    }, [currentPage, visitedPages]);
+    }, [currentPage, visitedPages, toggle, setLoading, setToggle]);
 
     const shimmerBlocks = [20, 35, 25, 10, 45, 30, 30, 35, 25, 10, 40, 30]; // Widths in percentages
 
@@ -76,6 +76,7 @@ export function AIPageSummary() {
                     <div className="flex w-full flex-wrap gap-2">
                         {shimmerBlocks.map((width, index) => (
                             <div
+                                // biome-ignore lint/suspicious/noArrayIndexKey: No other distinguishing feature available
                                 key={index}
                                 className="h-4 animate-pulse rounded bg-tint-active"
                                 style={{

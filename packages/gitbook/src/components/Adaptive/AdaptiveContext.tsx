@@ -20,7 +20,7 @@ export const AdaptiveContext = React.createContext<AdaptiveContextType | null>(n
 export function AdaptiveContextProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = React.useState(true);
     const [toggle, setToggle] = React.useState({
-        open: false,
+        open: true,
         manual: false,
     });
 
