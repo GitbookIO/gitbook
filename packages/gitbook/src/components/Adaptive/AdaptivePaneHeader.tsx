@@ -6,7 +6,7 @@ import { Button, Loading } from '../primitives';
 import { useAdaptiveContext } from './AdaptiveContext';
 
 export function AdaptivePaneHeader() {
-    const { loading, open, setOpen } = useAdaptiveContext();
+    const { loading, toggle, setToggle } = useAdaptiveContext();
 
     return (
         <div className="flex flex-row items-center gap-3 rounded-md straight-corners:rounded-none transition-all duration-500">
@@ -29,11 +29,16 @@ export function AdaptivePaneHeader() {
             </div>
             <Button
                 variant="blank"
-                className={tcls('px-2 *:transition-transform', !open && '*:-rotate-45')}
+                className={tcls('px-2 *:transition-transform', !toggle.open && '*:-rotate-45')}
                 iconOnly
                 label="Close"
                 icon="close"
-                onClick={() => setOpen(!open)}
+                onClick={() =>
+                    setToggle({
+                        open: !toggle.open,
+                        manual: true,
+                    })
+                }
             />
         </div>
     );

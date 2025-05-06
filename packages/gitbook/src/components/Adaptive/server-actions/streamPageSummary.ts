@@ -141,28 +141,23 @@ export async function* streamPageSummary({
     For the big picture summary:
     
     ALWAYS:
-    - Use a natural, conversational tone a person would actually use
-    - Include concrete examples with specific benefits
-    - Balance being precise with sounding natural
-    - Use occasional contractions or slightly informal phrasing
-    - Write as if explaining to a colleague in a friendly way
-    
-    NEVER:
-    - Use empty relationship words like "enhances," "supports," or "integrates with"
-    - Write in an overly academic or technical style
-    - Use abstract phrases without concrete meaning
-    - Sound like marketing copy or documentation
-    - Lose specificity while trying to sound conversational
+    - Synthesize specific concepts from across multiple pages into concrete insights
+    - Highlight practical patterns and workflows that emerge when combining these concepts
+    - Focus on real capabilities that come from understanding multiple features together
+    - Use specific examples that show the value of combining these ideas
+    - Keep the language simple and direct
+    - Use a conversational tone and short sentences, without commas.
     
     POOR EXAMPLES TO AVOID:
-    ✗ "Markdown enhances content creation by integrating with collaboration features."
-    ✗ "API components support the documentation workflow through seamless integration."
-    ✗ "The robust search functionality facilitates efficient information retrieval."
+    ✗ "GitBook combines content creation, collaboration, and integrations, building on your understanding of identifiers and paginated results for seamless documentation management."
+    ✗ "The platform's robust features for content organization, versioning, and access control work together to create a powerful documentation ecosystem."
+    ✗ "By leveraging GitBook's content blocks, permissions system, and API capabilities, you can build comprehensive documentation solutions."
     
     GOOD EXAMPLES TO FOLLOW:
-    ✓ "Markdown tables make API data easier to read, while code blocks let you test examples right in the docs."
-    ✓ "Webhooks save tons of time by automatically creating PDFs whenever content changes."
-    ✓ "Version control pins down exactly who changed what text, so you won't waste time on formatting debates."`,
+    ✓ "Combining Markdown tables with webhook notifications means your API docs stay up-to-date automatically - when you update a parameter, the PDF version refreshes too."
+    ✓ "Content blocks and version history together solve the biggest docs headache - you can experiment with different layouts while keeping a clean record of what changed and why."
+    ✓ "The real power comes from linking custom domains with content permissions - your sales team gets branded docs while your developers see the technical details on the same site."
+    ✓ "With spaces, webhooks, and custom metadata working together, you're not just making docs - you're building a knowledge system that responds to how your team actually works."`,
                     },
                     {
                         role: AIMessageRole.Developer,

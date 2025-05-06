@@ -15,7 +15,6 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@v2/lib/images';
-import { JourneyContextProvider } from '../Adaptive/AdaptiveContext';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
@@ -71,32 +70,30 @@ export async function SitePage(props: SitePageProps) {
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-            <JourneyContextProvider spaces={getSpaces(context.structure)}>
-                {withFullPageCover && page.cover ? (
-                    <PageCover as="full" page={page} cover={page.cover} context={context} />
-                ) : null}
-                {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-                <div className="flex grow flex-row-reverse justify-end">
-                    <PageAside
-                        page={page}
-                        document={document}
-                        withHeaderOffset={headerOffset}
-                        withFullPageCover={withFullPageCover}
-                        withPageFeedback={withPageFeedback}
-                        context={context}
-                    />
-                    <PageBody
-                        context={context}
-                        page={page}
-                        ancestors={ancestors}
-                        document={document}
-                        withPageFeedback={withPageFeedback}
-                    />
-                </div>
-                <React.Suspense fallback={null}>
-                    <PageClientLayout withSections={withSections} />
-                </React.Suspense>
-            </JourneyContextProvider>
+            {withFullPageCover && page.cover ? (
+                <PageCover as="full" page={page} cover={page.cover} context={context} />
+            ) : null}
+            {/* We use a flex row reverse to render the aside first because the page is streamed. */}
+            <div className="flex grow flex-row-reverse justify-end">
+                <PageAside
+                    page={page}
+                    document={document}
+                    withHeaderOffset={headerOffset}
+                    withFullPageCover={withFullPageCover}
+                    withPageFeedback={withPageFeedback}
+                    context={context}
+                />
+                <PageBody
+                    context={context}
+                    page={page}
+                    ancestors={ancestors}
+                    document={document}
+                    withPageFeedback={withPageFeedback}
+                />
+            </div>
+            <React.Suspense fallback={null}>
+                <PageClientLayout withSections={withSections} />
+            </React.Suspense>
         </PageContextProvider>
     );
 }
