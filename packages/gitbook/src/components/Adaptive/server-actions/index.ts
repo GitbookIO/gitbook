@@ -1,2 +1,2 @@
 export * from './streamLinkPageSummary';
-export * from './streamPageJourneySuggestions';
+export * from './streamPageSummary';

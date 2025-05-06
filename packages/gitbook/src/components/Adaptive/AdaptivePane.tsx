@@ -16,8 +16,6 @@ export function AdaptivePane() {
         >
             <AdaptivePaneHeader />
             <AIPageSummary />
-            {/* <AIPageJourneySuggestions />
-            <AINextPageSuggestions /> */}
         </div>
     );
 }
