@@ -8,7 +8,6 @@ const nextConfig = {
         // This is needed to throw "forbidden" when the api token expired during revalidation
         authInterrupts: true,
         useCache: true,
-        dynamicIO: true,
 
         // Content is fully static, we can cache it in the session memory cache for a long time
         staleTimes: {
