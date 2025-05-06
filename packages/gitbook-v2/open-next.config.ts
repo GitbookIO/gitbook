@@ -23,4 +23,7 @@ export default defineCloudflareConfig({
         filterFn: softTagFilter,
     }),
     queue: doQueue,
+
+    // Performance improvements as we don't use PPR
+    enableCacheInterception: true,
 });
