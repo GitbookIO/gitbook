@@ -189,5 +189,6 @@ export interface GitBookDataFetcher {
         input: api.AIMessageInput[];
         output: api.AIOutputFormat;
         model: api.AIModel;
+        tools?: api.AIToolCapabilities;
     }): AsyncGenerator<api.AIStreamResponse, void, unknown>;
 }
