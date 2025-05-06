@@ -564,7 +564,7 @@
 - 4cbcc5b: Rollback of scalar modal while fixing perf issue
 - 3996110: Optimize images rendered in community ads
 - 133c3e7: Update design of Checkbox to be more consistent and readable
-- 5096f7f: Disable KV cache for docs.gitbook.com as a test, also disable it for change-request to improve consistency
+- 5096f7f: Disable KV cache for gitbook.com/docs as a test, also disable it for change-request to improve consistency
 - 0f1565c: Add optional env `GITBOOK_INTEGRATIONS_HOST` to configure the host serving the integrations
 - 2ff7ed1: Fix table of contents being visible on mobile when disabled at the page level
 - b075f0f: Fix accessibility of the table of contents by using `aria-current` instead of `aria-selected`
