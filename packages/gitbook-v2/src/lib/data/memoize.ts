@@ -3,43 +3,40 @@
  * With a logic to work per-request in Cloudflare Workers.
  */
 export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
-    _getGlobalContext: () => object | null | undefined,
+    getGlobalContext: () => object | null | undefined,
     wrapped: (key: string, ...args: ArgsType) => Promise<ReturnType>
 ): (cacheKey: string, ...args: ArgsType) => Promise<ReturnType> {
-    return wrapped;
-    // const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
+    const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
 
-    // return (key: string, ...args: ArgsType) => {
-    //     const globalContext = getGlobalContext() ?? globalThis;
-    //     console.log('globalContext', globalContext);
+    return (key: string, ...args: ArgsType) => {
+        const globalContext = getGlobalContext() ?? globalThis;
 
-    //     /**
-    //      * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
-    //      * to avoid "Cannot perform I/O on behalf of a different request" errors.
-    //      */
-    //     const promiseCache =
-    //         globalPromiseCache.get(globalContext) ?? new Map<string, Promise<ReturnType>>();
-    //     globalPromiseCache.set(globalContext, promiseCache);
+        /**
+         * Cache storage that is scoped to the current request when executed in Cloudflare Workers,
+         * to avoid "Cannot perform I/O on behalf of a different request" errors.
+         */
+        const promiseCache =
+            globalPromiseCache.get(globalContext) ?? new Map<string, Promise<ReturnType>>();
+        globalPromiseCache.set(globalContext, promiseCache);
 
-    //     const concurrent = promiseCache.get(key);
-    //     if (concurrent) {
-    //         console.log('returning concurrent value for', key);
-    //         return concurrent;
-    //     }
+        const concurrent = promiseCache.get(key);
+        if (concurrent) {
+            return concurrent;
+        }
 
-    //     const promise = (async () => {
-    //         try {
-    //             const result = await wrapped(key, ...args);
-    //             return result;
-    //         } finally {
-    //             promiseCache.delete(key);
-    //         }
-    //     })();
+        const promise = (async () => {
+            try {
+                const result = await wrapped(key, ...args);
+                return result;
+            } finally {
+                promiseCache.delete(key);
+            }
+        })();
 
-    //     promiseCache.set(key, promise);
+        promiseCache.set(key, promise);
 
-    //     return promise;
-    // };
+        return promise;
+    };
 }
 
 /**
