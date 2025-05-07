@@ -51,6 +51,7 @@ export async function streamGenerateObject<T>(
     {
         schema,
         messages,
+        previousResponseId,
         model = AIModel.Fast,
         tools = {},
     }: {
@@ -64,6 +65,7 @@ export async function streamGenerateObject<T>(
     const rawStream = context.dataFetcher.streamAIResponse({
         organizationId,
         siteId,
+        previousResponseId,
         input: messages,
         output: {
             type: 'object',

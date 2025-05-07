@@ -21,7 +21,6 @@ export async function* streamPageSummary({
     };
     currentSpace: {
         id: string;
-        // title: string;
     };
     visitedPages: {
         pageId: string;
@@ -31,7 +30,7 @@ export async function* streamPageSummary({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const [{ stream }] = await Promise.all([
+    const [{ stream, response }] = await Promise.all([
         streamGenerateObject(
             baseContext,
             {
@@ -54,10 +53,6 @@ export async function* streamPageSummary({
                                   )
                             : z.undefined(),
                 }),
-                tools: {
-                    // getPages: true,
-                    // getPageContent: true,
-                },
                 messages: [
                     {
                         role: AIMessageRole.Developer,
@@ -200,6 +195,17 @@ export async function* streamPageSummary({
         fetchServerActionSiteContext(baseContext),
     ]);
 
+    // Get the responseId asynchronously in the background
+    let responseId: string | null = null;
+    const responseIdPromise = response
+        .then((r) => {
+            responseId = r.responseId;
+        })
+        .catch((error) => {
+            console.error('Error getting responseId:', error);
+        });
+
+    // Start processing the stream immediately
     for await (const value of stream) {
         const keyFacts = value.keyFacts;
         const bigPicture = value.bigPicture;
@@ -211,4 +217,8 @@ export async function* streamPageSummary({
             bigPicture,
         };
     }
+
+    // Wait for the responseId to be available and yield one final time
+    await responseIdPromise;
+    yield { responseId };
 }
