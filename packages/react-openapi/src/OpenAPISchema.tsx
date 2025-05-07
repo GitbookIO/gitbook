@@ -572,6 +572,9 @@ function flattenAlternatives(
     schemasOrRefs: (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
     ancestors: Set<OpenAPIV3.SchemaObject>
 ): OpenAPIV3.SchemaObject[] {
+    // Get the parent schema's required fields from the most recent ancestor
+    const latestAncestor = Array.from(ancestors).pop();
+
     return schemasOrRefs.reduce<OpenAPIV3.SchemaObject[]>((acc, schemaOrRef) => {
         if (checkIsReference(schemaOrRef)) {
             return acc;
@@ -580,14 +583,45 @@ function flattenAlternatives(
         if (schemaOrRef[alternativeType] && !ancestors.has(schemaOrRef)) {
             const schemas = getSchemaAlternatives(schemaOrRef, ancestors);
             if (schemas) {
-                acc.push(...schemas);
+                acc.push(
+                    ...schemas.map((schema) => ({
+                        ...schema,
+                        required: mergeRequiredFields(schema, latestAncestor),
+                    }))
+                );
             }
             return acc;
         }
 
-        acc.push(schemaOrRef);
+        // For direct schemas, handle required fields
+        const schema = {
+            ...schemaOrRef,
+            required: mergeRequiredFields(schemaOrRef, latestAncestor),
+        };
+
+        acc.push(schema);
         return acc;
     }, []);
+}
+
+/**
+ * Merge the required fields of a schema with the required fields of its latest ancestor.
+ */
+function mergeRequiredFields(
+    schemaOrRef: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
+    latestAncestor: OpenAPIV3.SchemaObject | undefined
+) {
+    if (!schemaOrRef.required && !latestAncestor?.required) {
+        return undefined;
+    }
+
+    if (checkIsReference(schemaOrRef)) {
+        return latestAncestor?.required;
+    }
+
+    return Array.from(
+        new Set([...(latestAncestor?.required || []), ...(schemaOrRef.required || [])])
+    );
 }
 
 function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {

@@ -141,7 +141,7 @@ function getUrlsFromSiteSpaces(context: GitBookSiteContext, siteSpaces: SiteSpac
         }
         const url = new URL(siteSpace.urls.published);
         url.pathname = joinPath(url.pathname, 'sitemap-pages.xml');
-        return context.linker.toLinkForContent(url.toString());
+        return context.linker.toAbsoluteURL(context.linker.toLinkForContent(url.toString()));
     }, []);
     return urls.filter(filterOutNullable);
 }

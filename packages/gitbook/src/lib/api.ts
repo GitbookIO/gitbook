@@ -242,7 +242,6 @@ export const getLatestOpenAPISpecVersionContent = cache({
  * Resolve a URL to the content to render.
  */
 export const getPublishedContentByUrl = cache({
-    timeout: 30 * 1000,
     name: 'api.getPublishedContentByUrl.v7',
     tag: (url) => getCacheTagForURL(url),
     get: async (
@@ -766,7 +765,12 @@ export const getComputedDocument = cache({
  * Mimic the validation done on source server-side to reduce API usage.
  */
 function validateSiteRedirectSource(source: string) {
-    return source.length <= 512 && /^\/[a-zA-Z0-9-_.\\/]+[a-zA-Z0-9-_.]$/.test(source);
+    return (
+        source.length <= 512 &&
+        /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/.test(
+            source
+        )
+    );
 }
 
 /**
