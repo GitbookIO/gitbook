@@ -40,6 +40,11 @@ export async function* streamPageQuestion(question: string, responseId: string) 
                     {
                         role: AIMessageRole.Developer,
                         content:
+                            'Important: NEVER respond with anything except the answer to the question. Do not respond with anything else. If the input is not a question about the documentation or you cannot answer the question using the context provided, respond with an empty string.',
+                    },
+                    {
+                        role: AIMessageRole.Developer,
+                        content:
                             'Use the tools available to you to find the answers (read page content, etc).',
                     },
                     {
@@ -64,11 +69,12 @@ export async function* streamPageQuestion(question: string, responseId: string) 
 
     // Start processing the stream immediately
     for await (const value of stream) {
-        if (!value.answer) continue;
-
-        yield {
-            answer: value.answer,
-        };
+        // Always yield the answer, even if it's an empty string
+        if ('answer' in value) {
+            yield {
+                answer: value.answer,
+            };
+        }
     }
 
     // Wait for the responseId to be available and yield one final time

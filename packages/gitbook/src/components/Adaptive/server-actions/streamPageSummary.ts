@@ -21,6 +21,7 @@ export async function* streamPageSummary({
     };
     currentSpace: {
         id: string;
+        title: string;
     };
     visitedPages: {
         pageId: string;
@@ -77,7 +78,10 @@ export async function* streamPageSummary({
                     },
                     {
                         role: AIMessageRole.Developer,
-                        content: `# 4. Current page
+                        content: `# 4. Current space and page
+    The user is currently reading the page titled "${currentPage.title}" (ID ${currentPage.id}) in the space titled "${currentSpace.title}" (ID ${currentSpace.id}).
+    Use these identifiers for tool calls.
+    
     The content of the current page is:`,
                         attachments: [
                             {

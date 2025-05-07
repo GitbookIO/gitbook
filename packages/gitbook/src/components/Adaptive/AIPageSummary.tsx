@@ -15,7 +15,7 @@ interface ChatMessage {
 type StreamData = { answer: string } | { newResponseId: string } | { toolUsage: boolean };
 
 export function AIPageSummary() {
-    const { toggle, setLoading, setToggle } = useAdaptiveContext();
+    const { toggle, setLoading } = useAdaptiveContext();
 
     const currentPage = usePageContext();
     const visitedPages = useVisitedPages((state) => state.pages);
@@ -48,9 +48,16 @@ export function AIPageSummary() {
             let currentAnswer = '';
 
             for await (const data of stream as AsyncIterableIterator<StreamData>) {
-                if ('answer' in data && data.answer) {
+                if ('answer' in data && data.answer !== undefined) {
                     currentAnswer = data.answer;
                     setShowTypingIndicator(false);
+
+                    // If the answer is empty, replace it with a generic error message
+                    if (data.answer.trim() === '') {
+                        currentAnswer =
+                            'An answer could not be found for your question. You could try rephrasing it, or be more specific.';
+                    }
+
                     // Update the last message in chat history with the streaming answer
                     setChatHistory((prev) => {
                         const newHistory = [...prev];
@@ -104,6 +111,7 @@ export function AIPageSummary() {
                 },
                 currentSpace: {
                     id: currentPage.spaceId,
+                    title: currentPage.spaceTitle,
                 },
                 visitedPages: visitedPages,
             });
@@ -168,13 +176,13 @@ export function AIPageSummary() {
 
                 {chatHistory.length > 0 && (
                     <div className="flex flex-col gap-3">
-                        {chatHistory.map((message) => (
+                        {chatHistory.map((message, index) => (
                             <div
-                                key={message.content.slice(0, 10)}
-                                className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}
+                                key={index}
+                                className={`flex ${message.type === 'question' ? 'animate-[present_300ms_ease-in-out_both] justify-end' : 'justify-start'}`}
                             >
                                 <div
-                                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                                    className={`max-w-[90%] rounded-lg px-4 py-2 ${
                                         message.type === 'question'
                                             ? 'bg-primary-solid text-contrast-primary-solid'
                                             : 'bg-tint-active'
@@ -186,22 +194,18 @@ export function AIPageSummary() {
                         ))}
 
                         {showTypingIndicator && (
-                            <div className="flex justify-start">
-                                <div className="flex max-w-[80%] items-center gap-2 rounded-lg bg-tint-active px-4 py-2">
-                                    <span className="animate-pulse">•</span>
-                                    <span
-                                        className="animate-pulse"
-                                        style={{ animationDelay: '0.3s' }}
-                                    >
-                                        •
-                                    </span>
-                                    <span
-                                        className="animate-pulse"
-                                        style={{ animationDelay: '0.6s' }}
-                                    >
-                                        •
-                                    </span>
-                                </div>
+                            <div className="flex w-full max-w-[90%] animate-[present_300ms_200ms_ease-in-out_both] flex-wrap items-center gap-2 rounded-lg bg-tint-active px-4 py-3">
+                                {shimmerBlocks.slice(0, 5).map((width, index) => (
+                                    <div
+                                        // biome-ignore lint/suspicious/noArrayIndexKey: No other distinguishing feature available
+                                        key={index}
+                                        className="h-3 animate-pulse rounded bg-tint-11/4"
+                                        style={{
+                                            width: `${width}%`,
+                                            animationDelay: `${index * 0.1}s`,
+                                        }}
+                                    />
+                                ))}
                             </div>
                         )}
                     </div>

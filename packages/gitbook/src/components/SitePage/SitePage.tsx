@@ -65,7 +65,12 @@ export async function SitePage(props: SitePageProps) {
     const document = await getPageDocument(context.dataFetcher, context.space, page);
 
     return (
-        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+        <PageContextProvider
+            pageId={page.id}
+            spaceId={context.space.id}
+            spaceTitle={context.space.title}
+            title={page.title}
+        >
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
