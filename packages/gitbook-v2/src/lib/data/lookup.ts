@@ -1,55 +1,128 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 import { trace } from '@/lib/tracing';
-import type { PublishedSiteContentLookup } from '@gitbook/api';
+import type { HttpResponse, PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
 
-/**
- * Lookup a content by its URL using the GitBook API.
- * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
- */
-export async function getPublishedContentByURL(input: {
+interface LookupPublishedContentByUrlSharedInput {
     url: string;
-    visitorAuthToken: string | null;
     redirectOnError: boolean;
     apiToken: string | null;
+}
+
+interface FetchLookupAPIResultFnArgs {
+    url: string;
+    signal: AbortSignal;
+}
+type FetchLookupAPIResponse =
+    | {
+          data?: undefined;
+          error: Error;
+      }
+    | {
+          data: HttpResponse<
+              PublishedSiteContentLookup,
+              {
+                  error: {
+                      code: 404;
+                      message: string;
+                  };
+              }
+          >;
+          error?: undefined;
+      };
+
+/**
+ * Lookup a content by its URL using the GitBook resolvePublishedContentByUrl API endpoint.
+ * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
+ */
+export async function resolvePublishedContentByUrl(
+    input: LookupPublishedContentByUrlSharedInput & { visitorPayload: SiteVisitorPayload }
+) {
+    return lookupPublishedContentByUrl({
+        url: input.url,
+        fetchLookupAPIResult: async ({ url, signal }: FetchLookupAPIResultFnArgs) => {
+            const api = await apiClient({ apiToken: input.apiToken });
+
+            return trace(
+                {
+                    operation: 'resolvePublishedContentByUrl',
+                    name: url,
+                },
+                () =>
+                    tryCatch(
+                        api.urls.resolvePublishedContentByUrl(
+                            {
+                                url,
+                                ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
+                                redirectOnError: input.redirectOnError,
+                                // @ts-expect-error - cacheVersion is not a real query param
+                                cacheVersion: 'v2',
+                            },
+                            { signal }
+                        )
+                    )
+            );
+        },
+    });
+}
+
+/**
+ * Lookup a content by its URL using the GitBook getPublishedContentByUrl API endpoint.
+ * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
+ *
+ * @deprecated use resolvePublishedContentByUrl.
+ *
+ */
+export async function getPublishedContentByURL(
+    input: LookupPublishedContentByUrlSharedInput & {
+        visitorAuthToken: string | null;
+    }
+) {
+    return lookupPublishedContentByUrl({
+        url: input.url,
+        fetchLookupAPIResult: async ({ url, signal }: FetchLookupAPIResultFnArgs) => {
+            const api = await apiClient({ apiToken: input.apiToken });
+
+            return trace(
+                {
+                    operation: 'getPublishedContentByURL',
+                    name: url,
+                },
+                () =>
+                    tryCatch(
+                        api.urls.getPublishedContentByUrl(
+                            {
+                                url,
+                                visitorAuthToken: input.visitorAuthToken ?? undefined,
+                                redirectOnError: input.redirectOnError,
+                                // @ts-expect-error - cacheVersion is not a real query param
+                                cacheVersion: 'v2',
+                            },
+                            { signal }
+                        )
+                    )
+            );
+        },
+    });
+}
+
+async function lookupPublishedContentByUrl(input: {
+    url: LookupPublishedContentByUrlSharedInput['url'];
+    fetchLookupAPIResult: (args: FetchLookupAPIResultFnArgs) => Promise<FetchLookupAPIResponse>;
 }): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const api = await apiClient({ apiToken: input.apiToken });
-
-        const callResult = await trace(
-            {
-                operation: 'getPublishedContentByURL',
-                name: alternative.url,
-            },
-            () =>
-                tryCatch(
-                    api.urls.getPublishedContentByUrl(
-                        {
-                            url: alternative.url,
-                            visitorAuthToken: input.visitorAuthToken ?? undefined,
-                            redirectOnError: input.redirectOnError,
-
-                            // As this endpoint is cached by our API, we version the request
-                            // to void getting stale data with missing properties.
-                            // this could be improved by ensuring our API cache layer is versioned
-                            // or invalidated when needed
-                            // @ts-expect-error - cacheVersion is not a real query param
-                            cacheVersion: 'v2',
-                        },
-                        {
-                            signal,
-                        }
-                    )
-                )
-        );
+        const callResult = await input.fetchLookupAPIResult({
+            url: alternative.url,
+            signal,
+        });
 
         if (callResult.error) {
             if (alternative.primary) {

@@ -49,7 +49,7 @@ type ClaimPrimitive =
  *   - a visitor token (JWT)
  *   - a record of visitor public/unsigned claims (JSON object)
  */
-export type VisitorPayload = {
+export type VisitorPayloadLookup = {
     visitorToken: VisitorTokenLookup;
     unsignedClaims: Record<string, ClaimPrimitive>;
 };
@@ -86,7 +86,7 @@ export function getVisitorPayload({
 }: {
     cookies: RequestCookies;
     url: URL | NextRequest['nextUrl'];
-}): VisitorPayload {
+}): VisitorPayloadLookup {
     const visitorToken = getVisitorToken({ cookies, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
 

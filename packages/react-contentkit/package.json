@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "classnames": "^2.5.1",
-        "@gitbook/api": "*",
+        "@gitbook/api": "https://pkg.pr.new/GitbookIO/integrations/@gitbook/api@811",
         "@gitbook/icons": "workspace:*"
     },
     "peerDependencies": {
