@@ -19,10 +19,38 @@ export const AdaptiveContext = React.createContext<AdaptiveContextType | null>(n
  */
 export function AdaptiveContextProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = React.useState(true);
+
+    // Start with a default state that works for SSR
     const [toggle, setToggle] = React.useState({
-        open: true,
+        open: false, // Default to open for SSR
         manual: false,
     });
+
+    // Update the toggle state on the client side only
+    React.useEffect(() => {
+        // Check for mobile only on the client
+        const handleResize = () => {
+            if (!toggle.manual) {
+                const isMobile = window.innerWidth < 1280;
+                setToggle((prev) => ({
+                    ...prev,
+                    open: !isMobile,
+                }));
+            }
+        };
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [toggle.manual]);
+
+    React.useEffect(() => {
+        if (toggle.open) {
+            document.body.classList.add('adaptive-pane');
+        } else {
+            document.body.classList.remove('adaptive-pane');
+        }
+    }, [toggle.open]);
 
     return (
         <AdaptiveContext.Provider value={{ loading, setLoading, toggle, setToggle }}>

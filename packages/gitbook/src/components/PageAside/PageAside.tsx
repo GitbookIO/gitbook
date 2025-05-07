@@ -35,10 +35,11 @@ export function PageAside(props: {
         <aside
             className={tcls(
                 'group/aside',
-                'hidden',
+                'flex',
+                // 'hidden',
                 'xl:flex',
                 'flex-col',
-                'basis-56',
+                'xl:basis-56',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
@@ -46,7 +47,14 @@ export function PageAside(props: {
                 'text-tint',
                 'contrast-more:text-tint-strong',
                 'text-sm',
-                'sticky',
+                'xl:sticky',
+
+                'lg:px-12',
+                'xl:px-0',
+                'mx-auto',
+                'xl:mx-0',
+                'w-full',
+                'max-w-3xl',
 
                 // Without header
                 'lg:top-0',
@@ -79,22 +87,22 @@ export function PageAside(props: {
                 'page-api-block:p-2'
             )}
         >
-            <div className="lg:top:0 sticky flex grow flex-col gap-6 overflow-y-auto overflow-x-visible border-none py-8 *:border-tint-subtle site-header-sections:lg:top-[6.75rem] site-header:lg:top-16 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:pt-6">
+            <div className="lg:top:0 sticky flex grow flex-col gap-6 overflow-y-auto overflow-x-visible border-none pt-8 *:border-tint-subtle site-header-sections:lg:top-[6.75rem] site-header:lg:top-16 xl:pb-8 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:pt-6">
                 {useAdaptivePane ? <AdaptivePane /> : null}
                 {page.layout.outline ? (
-                    <>
+                    <div className="hidden flex-col gap-6 xl:flex">
                         <PageOutline document={document} context={context} />
                         <PageActions
                             page={page}
                             context={context}
                             withPageFeedback={withPageFeedback}
                         />
-                    </>
+                    </div>
                 ) : null}
             </div>
             <div
                 className={tcls(
-                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:group-hover/aside:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                    'sticky bottom-0 z-10 mt-auto hidden flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 xl:flex page-api-block:xl:max-2xl:hidden page-api-block:xl:max-2xl:pb-0 page-api-block:xl:max-2xl:group-hover/aside:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'page-api-block:xl:max-2xl:bg-transparent'
                 )}
             >

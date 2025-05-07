@@ -13,11 +13,12 @@ export function AIPageSummary() {
     const visitedPagesRef = useRef(visitedPages);
 
     const [summary, setSummary] = useState<{
-        pageSummary?: string;
+        keyFacts?: string;
         bigPicture?: string;
     }>({});
 
     useEffect(() => {
+        if (!summary.keyFacts) setLoading(true);
         if (!visitedPages?.length) return;
 
         // Skip if the visited pages haven't changed
@@ -47,12 +48,6 @@ export function AIPageSummary() {
             }
         })().finally(() => {
             setLoading(false);
-            if (!toggle.manual) {
-                setToggle({
-                    open: true,
-                    manual: false,
-                });
-            }
         });
 
         return () => {
@@ -64,13 +59,13 @@ export function AIPageSummary() {
 
     return (
         toggle.open && (
-            <div className="flex animate-fadeIn flex-col gap-4">
-                {summary.pageSummary ? (
+            <div className="flex min-w-64 animate-fadeIn flex-col gap-4">
+                {summary.keyFacts ? (
                     <div>
                         <h5 className="mb-0.5 font-semibold text-tint-subtle text-xs uppercase">
                             Key facts
                         </h5>
-                        {summary.pageSummary}
+                        {summary.keyFacts}
                     </div>
                 ) : (
                     <div className="flex w-full flex-wrap gap-2">

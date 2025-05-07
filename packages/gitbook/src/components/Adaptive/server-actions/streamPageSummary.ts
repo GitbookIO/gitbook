@@ -40,7 +40,7 @@ export async function* streamPageSummary({
             },
             {
                 schema: z.object({
-                    pageSummary: z
+                    keyFacts: z
                         .string()
                         .describe(
                             'A collection of key facts from the page that together form a comprehensive summary. Keep it under 30 words.'
@@ -201,13 +201,13 @@ export async function* streamPageSummary({
     ]);
 
     for await (const value of stream) {
-        const pageSummary = value.pageSummary;
+        const keyFacts = value.keyFacts;
         const bigPicture = value.bigPicture;
 
-        if (!pageSummary) continue;
+        if (!keyFacts) continue;
 
         yield {
-            pageSummary,
+            keyFacts,
             bigPicture,
         };
     }

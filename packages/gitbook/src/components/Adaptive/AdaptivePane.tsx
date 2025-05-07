@@ -10,8 +10,8 @@ export function AdaptivePane() {
     return (
         <div
             className={tcls(
-                'flex flex-col gap-4 rounded-md straight-corners:rounded-none bg-tint-subtle ring-1 ring-tint-subtle ring-inset transition-all duration-300',
-                toggle.open ? 'w-72 px-4 py-4' : 'w-56 px-4 py-3'
+                'flex shrink-0 flex-col gap-4 overflow-x-hidden rounded-md straight-corners:rounded-none bg-tint-subtle ring-1 ring-tint-subtle ring-inset transition-all duration-300',
+                toggle.open ? 'max-h px-4 py-4 xl:w-72' : 'px-4 py-3 xl:w-56'
             )}
         >
             <AdaptivePaneHeader />

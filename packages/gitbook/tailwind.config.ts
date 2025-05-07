@@ -465,6 +465,11 @@ const config: Config = {
                 'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
             ]);
 
+            /**
+             * Variant when the adaptive pane is open.
+             */
+            addVariant('adaptive-pane', 'body.adaptive-pane &');
+
             const customisationVariants = {
                 // Sidebar styles
                 sidebar: ['sidebar-default', 'sidebar-filled'],

@@ -21,6 +21,7 @@ export function AdaptivePaneHeader() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
                         className="text-tint-subtle text-xs"
                     >
                         {loading ? 'Basing on your context...' : 'Based on your context'}
