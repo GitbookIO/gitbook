@@ -1,37 +1,25 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 import { trace } from '@/lib/tracing';
-import type { HttpResponse, PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
+import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
 import { getURLLookupAlternatives, stripURLSearch } from './urls';
 
-interface LookupPublishedContentByUrlSharedInput {
+interface LookupPublishedContentByUrlInput {
     url: string;
     redirectOnError: boolean;
     apiToken: string | null;
 }
 
-interface FetchLookupAPIResultFnArgs {
-    url: string;
-    signal: AbortSignal;
-}
 type FetchLookupAPIResponse =
     | {
           data?: undefined;
           error: Error;
       }
     | {
-          data: HttpResponse<
-              PublishedSiteContentLookup,
-              {
-                  error: {
-                      code: 404;
-                      message: string;
-                  };
-              }
-          >;
+          data: Awaited<ReturnType<GitBookAPI['urls']['resolvePublishedContentByUrl']>>;
           error?: undefined;
       };
 
@@ -40,13 +28,12 @@ type FetchLookupAPIResponse =
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
 export async function resolvePublishedContentByUrl(
-    input: LookupPublishedContentByUrlSharedInput & { visitorPayload: SiteVisitorPayload }
+    input: LookupPublishedContentByUrlInput & { visitorPayload: SiteVisitorPayload }
 ) {
     return lookupPublishedContentByUrl({
         url: input.url,
-        fetchLookupAPIResult: async ({ url, signal }: FetchLookupAPIResultFnArgs) => {
-            const api = await apiClient({ apiToken: input.apiToken });
-
+        fetchLookupAPIResult: ({ url, signal }) => {
+            const api = apiClient({ apiToken: input.apiToken });
             return trace(
                 {
                     operation: 'resolvePublishedContentByUrl',
@@ -59,8 +46,6 @@ export async function resolvePublishedContentByUrl(
                                 url,
                                 ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
                                 redirectOnError: input.redirectOnError,
-                                // @ts-expect-error - cacheVersion is not a real query param
-                                cacheVersion: 'v2',
                             },
                             { signal }
                         )
@@ -78,15 +63,14 @@ export async function resolvePublishedContentByUrl(
  *
  */
 export async function getPublishedContentByURL(
-    input: LookupPublishedContentByUrlSharedInput & {
+    input: LookupPublishedContentByUrlInput & {
         visitorAuthToken: string | null;
     }
 ) {
     return lookupPublishedContentByUrl({
         url: input.url,
-        fetchLookupAPIResult: async ({ url, signal }: FetchLookupAPIResultFnArgs) => {
-            const api = await apiClient({ apiToken: input.apiToken });
-
+        fetchLookupAPIResult: ({ url, signal }) => {
+            const api = apiClient({ apiToken: input.apiToken });
             return trace(
                 {
                     operation: 'getPublishedContentByURL',
@@ -111,8 +95,11 @@ export async function getPublishedContentByURL(
 }
 
 async function lookupPublishedContentByUrl(input: {
-    url: LookupPublishedContentByUrlSharedInput['url'];
-    fetchLookupAPIResult: (args: FetchLookupAPIResultFnArgs) => Promise<FetchLookupAPIResponse>;
+    url: string;
+    fetchLookupAPIResult: (args: {
+        url: string;
+        signal: AbortSignal;
+    }) => Promise<FetchLookupAPIResponse>;
 }): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
