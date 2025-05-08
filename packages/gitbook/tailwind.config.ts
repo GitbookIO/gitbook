@@ -296,14 +296,14 @@ const config: Config = {
             },
             animation: {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
-                scaleIn: 'scaleIn 200ms ease',
-                scaleOut: 'scaleOut 200ms ease',
-                fadeIn: 'fadeIn 200ms ease forwards',
-                fadeOut: 'fadeOut 200ms ease forwards',
-                enterFromLeft: 'enterFromLeft 250ms ease',
-                enterFromRight: 'enterFromRight 250ms ease',
-                exitToLeft: 'exitToLeft 250ms ease',
-                exitToRight: 'exitToRight 250ms ease',
+                scaleIn: 'scaleIn 200ms ease both',
+                scaleOut: 'scaleOut 200ms ease both',
+                fadeIn: 'fadeIn 200ms ease both',
+                fadeOut: 'fadeOut 200ms ease both',
+                enterFromLeft: 'enterFromLeft 250ms ease both',
+                enterFromRight: 'enterFromRight 250ms ease both',
+                exitToLeft: 'exitToLeft 250ms ease both',
+                exitToRight: 'exitToRight 250ms ease both',
             },
             keyframes: {
                 pulseAlt: {
@@ -464,6 +464,11 @@ const config: Config = {
                 'body:has(#site-header:not(.mobile-only) #sections) &',
                 'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
             ]);
+
+            /**
+             * Variant when the adaptive pane is open.
+             */
+            addVariant('adaptive-pane', 'body.adaptive-pane &');
 
             const customisationVariants = {
                 // Sidebar styles

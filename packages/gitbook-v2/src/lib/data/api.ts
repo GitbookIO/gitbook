@@ -1394,6 +1394,8 @@ async function* streamAIResponse(
         input: params.input,
         output: params.output,
         model: params.model,
+        tools: params.tools,
+        previousResponseId: params.previousResponseId,
     });
 
     for await (const event of res) {

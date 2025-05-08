@@ -65,12 +65,17 @@ export async function SitePage(props: SitePageProps) {
     const document = await getPageDocument(context.dataFetcher, context.space, page);
 
     return (
-        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+        <PageContextProvider
+            pageId={page.id}
+            spaceId={context.space.id}
+            spaceTitle={context.space.title}
+            title={page.title}
+        >
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-            <div className="flex grow flex-row-reverse justify-end">
+            <div className="flex grow flex-col xl:flex-row-reverse xl:justify-end">
                 <PageAside
                     page={page}
                     document={document}

@@ -1,5 +1,10 @@
 'use server';
-import { type AIMessageInput, AIModel, type AIStreamResponse } from '@gitbook/api';
+import {
+    type AIMessageInput,
+    AIModel,
+    type AIStreamResponse,
+    type AIToolCapabilities,
+} from '@gitbook/api';
 import type { GitBookBaseContext } from '@v2/lib/context';
 import { EventIterator } from 'event-iterator';
 import type { MaybePromise } from 'p-map';
@@ -46,28 +51,33 @@ export async function streamGenerateObject<T>(
     {
         schema,
         messages,
+        previousResponseId,
         model = AIModel.Fast,
+        tools = {},
     }: {
         schema: z.ZodSchema<T>;
         messages: AIMessageInput[];
         model?: AIModel;
         previousResponseId?: string;
+        tools?: AIToolCapabilities;
     }
 ) {
     const rawStream = context.dataFetcher.streamAIResponse({
         organizationId,
         siteId,
+        previousResponseId,
         input: messages,
         output: {
             type: 'object',
             schema: zodToJsonSchema(schema),
         },
+        tools,
         model,
     });
 
     let json = '';
     return parseResponse<DeepPartial<T>>(rawStream, (event) => {
-        if (event.type === 'response_object') {
+        if (event.type === 'response_object' && event.jsonChunk) {
             json += event.jsonChunk;
 
             const parsed = partialJson.parse(json, partialJson.ALL);

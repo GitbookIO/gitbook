@@ -14,6 +14,7 @@ type ButtonProps = {
     iconOnly?: boolean;
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
+    disabled?: boolean;
     label?: string;
 } & LinkInsightsProps &
     HTMLAttributes<HTMLElement>;
@@ -33,10 +34,12 @@ const variantClasses = {
         'ring-0',
         'shadow-none',
         'hover:bg-primary-hover',
+        'disabled:hover:bg-transparent',
         'hover:text-primary',
         'hover:scale-1',
         'hover:shadow-none',
         'contrast-more:bg-tint-subtle',
+        'disabled:hover:shadow-none',
     ],
     secondary: [
         'bg-tint',
@@ -57,6 +60,7 @@ export function Button({
     label,
     icon,
     iconOnly = false,
+    disabled = false,
     ...rest
 }: ButtonProps & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
@@ -94,6 +98,10 @@ export function Button({
         'active:scale-100',
         'transition-all',
 
+        'disabled:opacity-5',
+        'disabled:cursor-not-allowed',
+        'disabled:hover:shadow-none',
+
         'grow-0',
         'shrink-0',
         'truncate',
@@ -119,7 +127,13 @@ export function Button({
     }
 
     return (
-        <button type="button" className={domClassName} aria-label={label} {...rest}>
+        <button
+            type="button"
+            className={domClassName}
+            aria-label={label}
+            disabled={disabled}
+            {...rest}
+        >
             {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
             {iconOnly ? null : label}
         </button>

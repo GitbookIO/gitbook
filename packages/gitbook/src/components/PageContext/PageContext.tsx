@@ -4,8 +4,9 @@ import React from 'react';
 
 export type PageContextType = {
     pageId: string;
-    spaceId: string;
     title: string;
+    spaceId: string;
+    spaceTitle: string;
 };
 
 export const PageContext = React.createContext<PageContextType | null>(null);
@@ -14,9 +15,12 @@ export const PageContext = React.createContext<PageContextType | null>(null);
  * Client side context provider to pass information about the current page.
  */
 export function PageContextProvider(props: PageContextType & { children: React.ReactNode }) {
-    const { pageId, spaceId, title, children } = props;
+    const { pageId, spaceId, title, spaceTitle, children } = props;
 
-    const value = React.useMemo(() => ({ pageId, spaceId, title }), [pageId, spaceId, title]);
+    const value = React.useMemo(
+        () => ({ pageId, spaceId, spaceTitle, title }),
+        [pageId, spaceId, spaceTitle, title]
+    );
 
     return <PageContext.Provider value={value}>{children}</PageContext.Provider>;
 }
