@@ -160,7 +160,7 @@ function assertVisitorAuthCookieValue(
     throw new Error('Expected a VisitorAuthCookieValue');
 }
 
-describe('getVisitorPublicClaims', () => {
+describe('getVisitorUnsignedClaims', () => {
     it('should merge claims from multiple public cookies', () => {
         const cookies = [
             {
