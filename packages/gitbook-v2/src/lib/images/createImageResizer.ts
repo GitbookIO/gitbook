@@ -1,7 +1,7 @@
 import 'server-only';
 import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY, GITBOOK_IMAGE_RESIZE_URL } from '../env';
 import type { GitBookLinker } from '../links';
-import { checkIsSizableImageURL } from './checkIsSizableImageURL';
+import { SizableImageAction, checkIsSizableImageURL } from './checkIsSizableImageURL';
 import { getImageSize } from './resizer';
 import { type SignatureVersion, generateImageSignature } from './signatures';
 import type { ImageResizer } from './types';
@@ -24,7 +24,7 @@ export function createImageResizer({
 
     return {
         getResizedImageURL: (urlInput) => {
-            if (!checkIsSizableImageURL(urlInput)) {
+            if (checkIsSizableImageURL(urlInput) === SizableImageAction.Skip) {
                 return null;
             }
 
@@ -64,7 +64,7 @@ export function createImageResizer({
         },
 
         getImageSize: async (input, options) => {
-            if (!checkIsSizableImageURL(input)) {
+            if (checkIsSizableImageURL(input) !== SizableImageAction.Resize) {
                 return null;
             }
 

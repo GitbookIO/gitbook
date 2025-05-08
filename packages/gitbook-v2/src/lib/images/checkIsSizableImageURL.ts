@@ -1,4 +1,8 @@
-import { checkIsHttpURL } from '@/lib/urls';
+export enum SizableImageAction {
+    Resize = 'resize',
+    Skip = 'skip',
+    Passthrough = 'passthrough',
+}
 
 /**
  * Check if an image URL is resizable.
@@ -6,22 +10,24 @@ import { checkIsHttpURL } from '@/lib/urls';
  * Skip it for SVGs.
  * Skip it for GitBook images (to avoid recursion).
  */
-export function checkIsSizableImageURL(input: string): boolean {
+export function checkIsSizableImageURL(input: string): SizableImageAction {
     if (!URL.canParse(input)) {
-        return false;
-    }
-
-    if (input.includes('/~gitbook/image')) {
-        return false;
+        return SizableImageAction.Skip;
     }
 
     const parsed = new URL(input);
-    if (parsed.pathname.endsWith('.svg') || parsed.pathname.endsWith('.avif')) {
-        return false;
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return SizableImageAction.Skip;
     }
-    if (!checkIsHttpURL(parsed)) {
-        return false;
+    if (parsed.hostname === 'localhost') {
+        return SizableImageAction.Skip;
+    }
+    if (parsed.pathname.includes('/~gitbook/image')) {
+        return SizableImageAction.Skip;
+    }
+    if (parsed.pathname.endsWith('.svg') || parsed.pathname.endsWith('.avif')) {
+        return SizableImageAction.Passthrough;
     }
 
-    return true;
+    return SizableImageAction.Resize;
 }
