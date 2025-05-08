@@ -4,11 +4,7 @@ import hash from 'object-hash';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
-const VISITOR_UNSIGNED_CLAIM_COOKIES = [
-    'gitbook-visitor-public',
-    'gitbook-visitor-public-bucket',
-    'gitbook-visitor-public-launchdarkly',
-];
+const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
 
 /**
  * Typing for a cookie, matching the internal type of Next.js.
@@ -137,7 +133,7 @@ export function getVisitorUnsignedClaims(args: {
     const claims: Record<string, ClaimPrimitive> = {};
 
     for (const cookie of cookies) {
-        if (VISITOR_UNSIGNED_CLAIM_COOKIES.includes(cookie.name)) {
+        if (cookie.name.startsWith(VISITOR_UNSIGNED_CLAIMS_PREFIX)) {
             try {
                 const parsed = JSON.parse(cookie.value);
                 if (typeof parsed === 'object' && parsed !== null) {
