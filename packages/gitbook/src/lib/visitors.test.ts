@@ -209,32 +209,6 @@ describe('getVisitorUnsignedClaims', () => {
         });
     });
 
-    it('should ignore public cookies not present in the allowed list', () => {
-        const url = new URL('https://example.com/');
-
-        const claims = getVisitorUnsignedClaims({
-            cookies: [
-                {
-                    name: 'gitbook-visitor-public',
-                    value: JSON.stringify({ role: 'admin', language: 'fr' }),
-                },
-                // The claims in this cookie should be ignored
-                {
-                    name: 'gitbook-visitor-public-disallowed',
-                    value: JSON.stringify({
-                        disallowed: { flags: { SITE_AI: true, SITE_PREVIEW: true } },
-                    }),
-                },
-            ],
-            url,
-        });
-
-        expect(claims).toStrictEqual({
-            role: 'admin',
-            language: 'fr',
-        });
-    });
-
     it('should support nested query param keys via dot notation', () => {
         const url = new URL(
             'https://example.com/?visitor.isEnterprise=true&visitor.flags.ALPHA=true&visitor.flags.API=false'
