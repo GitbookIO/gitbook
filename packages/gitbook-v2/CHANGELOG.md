@@ -1,5 +1,22 @@
 # gitbook-v2
 
+## 0.3.0
+
+### Minor Changes
+
+- 3119066: Add support for reusable content across spaces.
+- 7d7806d: Pass SVG images through image resizing without resizing them to serve them from optimal host.
+
+### Patch Changes
+
+- e6ddc0f: Fix URL in sitemap
+- 5e975ab: Fix code highlighting for HTTP
+- e15757d: Fix crash on Cloudflare by using latest stable version of Next.js instead of canary
+- 634e0b4: Improve error messages around undefined site sections.
+- 97b7c79: Increase logging around caching behaviour causing page crashes.
+- 3f29206: Update the regex for validating site redirect
+- dd043df: Revert investigation work around URL caches.
+
 ## 0.2.5
 
 ### Patch Changes
