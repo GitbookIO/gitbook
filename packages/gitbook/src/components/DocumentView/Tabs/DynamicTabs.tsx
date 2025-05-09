@@ -204,7 +204,6 @@ export function DynamicTabs(
                             'bg-tint-12/1',
                             'hover:text-tint-strong',
                             'max-w-72',
-                            'truncate',
 
                             active.id === tab.id
                                 ? [
@@ -233,9 +232,7 @@ export function DynamicTabs(
                                 'transition-[color]',
                                 'font-[500]',
                                 'relative',
-
-                                'truncate',
-                                'max-w-full'
+                                'truncate'
                             )}
                         >
                             {tab.title}
