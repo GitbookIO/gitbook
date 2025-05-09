@@ -7,7 +7,7 @@ import { getBlockTextStyle } from './spacing';
  * A hash icon which adds the block or active block item's ID in the URL hash.
  * The button needs to be wrapped in a container with `hashLinkButtonWrapperStyles`.
  */
-export const hashLinkButtonWrapperStyles = tcls('relative', 'group');
+export const hashLinkButtonWrapperStyles = tcls('relative', 'group/hash');
 
 export function HashLinkButton(props: {
     id: string;
@@ -28,10 +28,10 @@ export function HashLinkButton(props: {
                 'h-[1em]',
                 'border-0',
                 'opacity-0',
-                'group-hover:opacity-[0]',
-                'group-focus:opacity-[0]',
-                'md:group-hover:md:opacity-[1]',
-                'md:group-focus:md:opacity-[1]',
+                'group-hover/hash:opacity-[0]',
+                'group-focus/hash:opacity-[0]',
+                'md:group-hover/hash:md:opacity-[1]',
+                'md:group-focus/hash:md:opacity-[1]',
                 className
             )}
         >
@@ -47,8 +47,8 @@ export function HashLinkButton(props: {
                         'self-center',
                         'transition-colors',
                         'text-transparent',
-                        'group-hover:text-tint-subtle',
-                        'contrast-more:group-hover:text-tint-strong',
+                        'group-hover/hash:text-tint-subtle',
+                        'contrast-more:group-hover/hash:text-tint-strong',
                         iconClassName
                     )}
                 />

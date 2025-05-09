@@ -172,7 +172,9 @@ export function DynamicTabs(
                         key={tab.id}
                         className={tcls(
                             hashLinkButtonWrapperStyles,
-                            'flex items-center gap-3.5',
+                            'flex',
+                            'items-center',
+                            'gap-3.5',
 
                             //prev from active-tab
                             '[&:has(+_.active-tab)]:rounded-br-md',
