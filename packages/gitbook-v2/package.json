@@ -1,6 +1,6 @@
 {
     "name": "gitbook-v2",
-    "version": "0.2.5",
+    "version": "0.3.0",
     "private": true,
     "dependencies": {
         "@gitbook/api": "^0.115.0",
