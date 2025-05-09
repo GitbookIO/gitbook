@@ -11,25 +11,14 @@ interface LookupPublishedContentByUrlInput {
     url: string;
     redirectOnError: boolean;
     apiToken: string | null;
+    visitorPayload: SiteVisitorPayload;
 }
-
-type FetchLookupAPIResponse =
-    | {
-          data?: undefined;
-          error: Error;
-      }
-    | {
-          data: Awaited<ReturnType<GitBookAPI['urls']['resolvePublishedContentByUrl']>>;
-          error?: undefined;
-      };
 
 /**
  * Lookup a content by its URL using the GitBook resolvePublishedContentByUrl API endpoint.
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
-export async function resolvePublishedContentByUrl(
-    input: LookupPublishedContentByUrlInput & { visitorPayload: SiteVisitorPayload }
-) {
+export async function resolvePublishedContentByUrl(input: LookupPublishedContentByUrlInput) {
     return lookupPublishedContentByUrl({
         url: input.url,
         fetchLookupAPIResult: ({ url, signal }) => {
@@ -62,11 +51,7 @@ export async function resolvePublishedContentByUrl(
  * @deprecated use resolvePublishedContentByUrl.
  *
  */
-export async function getPublishedContentByURL(
-    input: LookupPublishedContentByUrlInput & {
-        visitorAuthToken: string | null;
-    }
-) {
+export async function getPublishedContentByURL(input: LookupPublishedContentByUrlInput) {
     return lookupPublishedContentByUrl({
         url: input.url,
         fetchLookupAPIResult: ({ url, signal }) => {
@@ -81,7 +66,7 @@ export async function getPublishedContentByURL(
                         api.urls.getPublishedContentByUrl(
                             {
                                 url,
-                                visitorAuthToken: input.visitorAuthToken ?? undefined,
+                                visitorAuthToken: input.visitorPayload.jwtToken ?? undefined,
                                 redirectOnError: input.redirectOnError,
                                 // @ts-expect-error - cacheVersion is not a real query param
                                 cacheVersion: 'v2',
@@ -94,12 +79,14 @@ export async function getPublishedContentByURL(
     });
 }
 
+type TryCatch<T> = ReturnType<typeof tryCatch<T>>;
+
 async function lookupPublishedContentByUrl(input: {
     url: string;
     fetchLookupAPIResult: (args: {
         url: string;
         signal: AbortSignal;
-    }) => Promise<FetchLookupAPIResponse>;
+    }) => TryCatch<Awaited<ReturnType<GitBookAPI['urls']['resolvePublishedContentByUrl']>>>;
 }): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
