@@ -219,6 +219,7 @@ export function DynamicTabs(
                         )}
                     >
                         <button
+                            type="button"
                             role="tab"
                             aria-selected={active.id === tab.id}
                             aria-controls={getTabPanelId(tab.id)}
