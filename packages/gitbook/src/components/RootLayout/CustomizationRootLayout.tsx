@@ -34,6 +34,7 @@ import { ClientContexts } from './ClientContexts';
 import '@gitbook/icons/style.css';
 import './globals.css';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@v2/lib/env';
+import { AdaptiveContextProvider } from '../Adaptive/AdaptiveContext';
 import { AnnouncementDismissedScript } from '../Announcement';
 
 /**
@@ -175,7 +176,9 @@ export async function CustomizationRootLayout(props: {
                             : null) || IconStyle.Regular
                     }
                 >
-                    <ClientContexts language={language}>{children}</ClientContexts>
+                    <ClientContexts language={language}>
+                        <AdaptiveContextProvider>{children}</AdaptiveContextProvider>
+                    </ClientContexts>
                 </IconsProvider>
             </body>
         </html>
