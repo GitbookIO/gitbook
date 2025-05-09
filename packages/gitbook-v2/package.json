@@ -3,21 +3,21 @@
     "version": "0.2.5",
     "private": true,
     "dependencies": {
+        "@gitbook/api": "^0.115.0",
+        "@gitbook/cache-tags": "workspace:*",
+        "@sindresorhus/fnv1a": "^3.1.0",
+        "assert-never": "^1.2.1",
+        "jwt-decode": "^4.0.0",
         "next": "^15.3.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "@gitbook/api": "*",
-        "@gitbook/cache-tags": "workspace:*",
-        "@sindresorhus/fnv1a": "^3.1.0",
-        "server-only": "^0.0.1",
-        "warn-once": "^0.1.1",
         "rison": "^0.1.1",
-        "jwt-decode": "^4.0.0",
-        "assert-never": "^1.2.1"
+        "server-only": "^0.0.1",
+        "warn-once": "^0.1.1"
     },
     "devDependencies": {
         "gitbook": "*",
-        "@opennextjs/cloudflare": "^1.0.0",
+        "@opennextjs/cloudflare": "^1.0.1",
         "@types/rison": "^0.0.9",
         "tailwindcss": "^3.4.0",
         "postcss": "^8"

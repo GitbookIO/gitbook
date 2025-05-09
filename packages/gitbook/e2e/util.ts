@@ -345,19 +345,30 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
  */
 async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urlStates: Record<string, 'pending' | 'loaded'> =
-            (window as any).__ICONS_STATES__ || {};
+        const urlStates: Record<
+            string,
+            { state: 'pending'; uri: null } | { state: 'loaded'; uri: string }
+        > = (window as any).__ICONS_STATES__ || {};
         (window as any).__ICONS_STATES__ = urlStates;
+
+        const fetchSvgAsDataUri = async (url: string): Promise<string> => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch SVG: ${response.status}`);
+            }
+
+            const svgText = await response.text();
+            const encoded = encodeURIComponent(svgText).replace(/'/g, '%27').replace(/"/g, '%22');
+
+            return `data:image/svg+xml;charset=utf-8,${encoded}`;
+        };
 
         const loadUrl = (url: string) => {
             // Mark the URL as pending.
-            urlStates[url] = 'pending';
-
-            const img = new Image();
-            img.onload = () => {
-                urlStates[url] = 'loaded';
-            };
-            img.src = url;
+            urlStates[url] = { state: 'pending', uri: null };
+            fetchSvgAsDataUri(url).then((uri) => {
+                urlStates[url] = { state: 'loaded', uri };
+            });
         };
 
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
@@ -393,18 +404,11 @@ async function waitForIcons(page: Page) {
 
             // If the URL is already queued for loading, we return the state.
             if (urlStates[url]) {
-                if (urlStates[url] === 'loaded') {
+                if (urlStates[url].state === 'loaded') {
                     icon.setAttribute('data-argos-state', 'pending');
-                    const bckMaskImage = icon.style.maskImage;
-                    const bckDisplay = icon.style.display;
-                    icon.style.maskImage = '';
-                    icon.style.display = 'none';
+                    icon.style.maskImage = `url("${urlStates[url].uri}")`;
                     requestAnimationFrame(() => {
-                        icon.style.maskImage = bckMaskImage;
-                        icon.style.display = bckDisplay;
-                        requestAnimationFrame(() => {
-                            icon.setAttribute('data-argos-state', 'loaded');
-                        });
+                        icon.setAttribute('data-argos-state', 'loaded');
                     });
                     return false;
                 }
