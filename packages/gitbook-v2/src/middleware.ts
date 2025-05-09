@@ -10,15 +10,16 @@ import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
-    getVisitorToken,
+    getVisitorPayload,
     normalizeVisitorAuthURL,
-} from '@/lib/visitor-token';
+} from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
     getPublishedContentByURL,
     getVisitorAuthBasePath,
     normalizeURL,
+    resolvePublishedContentByUrl,
     throwIfDataError,
 } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
@@ -32,6 +33,15 @@ export const config = {
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
+
+/**
+ * Temporary list of hosts to test adaptive content using the new resolution API.
+ */
+const ADAPTIVE_CONTENT_HOSTS = [
+    'docs.gitbook.com',
+    'adaptive-docs.gitbook-staging.com',
+    'enriched-content-playground.gitbook-staging.io',
+];
 
 export async function middleware(request: NextRequest) {
     try {
@@ -85,17 +95,22 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     // Detect and extract the visitor authentication token from the request
     //
-    // @ts-ignore - request typing
-    const visitorToken = getVisitorToken({
+    const { visitorToken, unsignedClaims } = getVisitorPayload({
         cookies: request.cookies.getAll(),
         url: siteRequestURL,
     });
 
     const withAPIToken = async (apiToken: string | null) => {
+        const resolve = ADAPTIVE_CONTENT_HOSTS.includes(siteRequestURL.hostname)
+            ? resolvePublishedContentByUrl
+            : getPublishedContentByURL;
         const siteURLData = await throwIfDataError(
-            getPublishedContentByURL({
+            resolve({
                 url: siteRequestURL.toString(),
-                visitorAuthToken: visitorToken?.token ?? null,
+                visitorPayload: {
+                    jwtToken: visitorToken?.token ?? undefined,
+                    unsignedClaims,
+                },
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
                 // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.

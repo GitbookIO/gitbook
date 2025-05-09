@@ -93,6 +93,11 @@ export function createLinker(
         },
 
         toAbsoluteURL(absolutePath: string): string {
+            // If the path is already a full URL, we return it as is.
+            if (URL.canParse(absolutePath)) {
+                return absolutePath;
+            }
+
             if (!servedOn.host) {
                 return absolutePath;
             }

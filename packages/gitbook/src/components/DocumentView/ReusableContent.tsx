@@ -46,14 +46,21 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     // Create a new context for reusable content block, including
     // the data fetcher with the token from the block meta and the correct
     // space and revision pointers.
-    const reusableContentContext: GitBookSpaceContext = {
-        ...context.contentContext,
-        dataFetcher,
-        space: resolved.reusableContent.space,
-        revisionId: resolved.reusableContent.revision,
-        pages: [],
-        shareKey: undefined,
-    };
+    const reusableContentContext: GitBookSpaceContext =
+        context.contentContext.space.id === resolved.reusableContent.space.id
+            ? context.contentContext
+            : {
+                  ...context.contentContext,
+                  dataFetcher,
+                  space: resolved.reusableContent.space,
+                  revisionId: resolved.reusableContent.revision,
+                  // When the reusable content is in a different space, we don't resolve relative links to pages
+                  // as this space might not be part of the current site.
+                  // In the future, we might expand the logic to look up the space from the list of all spaces in the site
+                  // and adapt the relative links to point to the correct variant.
+                  pages: [],
+                  shareKey: undefined,
+              };
 
     return (
         <UnwrappedBlocks

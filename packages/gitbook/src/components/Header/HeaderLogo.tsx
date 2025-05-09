@@ -20,7 +20,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 
     return (
         <Link
-            href={linker.toAbsoluteURL(linker.toPathInSpace(''))}
+            href={linker.toAbsoluteURL(linker.toPathInSite(''))}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
@@ -48,8 +48,6 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                     ]}
                     priority="high"
                     style={tcls(
-                        'rounded',
-                        'straight-corners:rounded-sm',
                         'overflow-hidden',
                         'shrink',
                         'min-w-0',

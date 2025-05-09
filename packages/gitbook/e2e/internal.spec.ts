@@ -12,7 +12,7 @@ import {
     VISITOR_TOKEN_COOKIE,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-} from '@/lib/visitor-token';
+} from '@/lib/visitors';
 
 import { getSiteAPIToken } from '../tests/utils';
 import {
