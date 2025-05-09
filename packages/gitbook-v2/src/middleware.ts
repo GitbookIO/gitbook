@@ -37,7 +37,11 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 /**
  * Temporary list of hosts to test adaptive content using the new resolution API.
  */
-const ADAPTIVE_CONTENT_HOSTS = ['docs.gitbook.com', 'adaptive-docs.gitbook-staging.com'];
+const ADAPTIVE_CONTENT_HOSTS = [
+    'docs.gitbook.com',
+    'adaptive-docs.gitbook-staging.com',
+    'enriched-content-playground.gitbook-staging.io',
+];
 
 export async function middleware(request: NextRequest) {
     try {
