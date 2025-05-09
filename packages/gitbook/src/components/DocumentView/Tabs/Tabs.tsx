@@ -39,6 +39,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
                     <DynamicTabs
                         key={tab.id}
                         id={block.key!}
+                        block={block}
                         tabs={[tab]}
                         tabsBody={[tabsBody[index]]}
                         style={style}
@@ -48,5 +49,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
         );
     }
 
-    return <DynamicTabs id={block.key!} tabs={tabs} tabsBody={tabsBody} style={style} />;
+    return (
+        <DynamicTabs id={block.key!} block={block} tabs={tabs} tabsBody={tabsBody} style={style} />
+    );
 }
