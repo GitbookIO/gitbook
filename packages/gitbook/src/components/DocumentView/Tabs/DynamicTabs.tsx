@@ -241,7 +241,7 @@ export function DynamicTabs(
                         <HashLinkButton
                             id={getTabButtonId(tab.id)}
                             block={block}
-                            label="Direct link to heading"
+                            label="Direct link to tab"
                         />
                     </div>
                 ))}
