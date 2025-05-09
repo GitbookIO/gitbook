@@ -1,6 +1,4 @@
 'use client';
-
-import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -219,8 +217,9 @@ function SearchModalBody(
                 'flex',
                 'flex-col',
                 'bg-tint-base',
-                'max-w-prose',
+                'max-w-screen-lg',
                 'mx-auto',
+                'min-h-[30dvh]',
                 'max-h-[70dvh]',
                 'w-full',
                 'rounded-lg',
@@ -236,69 +235,72 @@ function SearchModalBody(
                 event.stopPropagation();
             }}
         >
-            <div
-                className={tcls(
-                    'flex',
-                    'flex-row',
-                    'items-start',
-                    state.query !== null ? 'border-b' : null,
-                    'border-tint-subtle'
-                )}
-            >
-                <div className={tcls('p-2', 'pl-4', 'pt-4')}>
-                    <Icon icon="magnifying-glass" className={tcls('size-4', 'text-tint-subtle')} />
-                </div>
+            <div className="grid grow grid-rows-[auto_1fr_1fr] overflow-hidden md:grid-cols-[1fr_1fr] md:grid-rows-[auto_1fr]">
                 <div
                     className={tcls(
-                        'w-full',
                         'flex',
                         'flex-row',
-                        'flex-wrap',
-                        'gap-y-0',
-                        'gap-x-4',
-                        'items-end'
+                        'items-start',
+                        state.query !== null ? 'border-b' : null,
+                        'border-tint-subtle',
+                        'col-span-full'
                     )}
                 >
-                    <input
-                        ref={inputRef}
-                        value={state.query}
-                        onKeyDown={onKeyDown}
-                        onChange={onChange}
+                    <div
                         className={tcls(
-                            'text-tint-strong',
-                            'placeholder:text-tint',
+                            'w-full',
                             'flex',
-                            'resize-none',
-                            'flex-1',
-                            'h-12',
-                            'p-2',
-                            'focus:outline-none',
-                            'bg-transparent',
-                            'whitespace-pre-line'
+                            'flex-row',
+                            'flex-wrap',
+                            'gap-y-0',
+                            'gap-x-4',
+                            'items-end'
                         )}
-                        placeholder={tString(
-                            language,
-                            withAsk ? 'search_ask_input_placeholder' : 'search_input_placeholder'
-                        )}
-                        spellCheck="false"
-                        autoComplete="off"
-                        autoCorrect="off"
+                    >
+                        <input
+                            ref={inputRef}
+                            value={state.query}
+                            onKeyDown={onKeyDown}
+                            onChange={onChange}
+                            className={tcls(
+                                'text-tint-strong',
+                                'placeholder:text-tint',
+                                'flex',
+                                'resize-none',
+                                'flex-1',
+                                'py-4',
+                                'px-8',
+                                'focus:outline-none',
+                                'bg-transparent',
+                                'whitespace-pre-line'
+                            )}
+                            placeholder={tString(
+                                language,
+                                withAsk
+                                    ? 'search_ask_input_placeholder'
+                                    : 'search_input_placeholder'
+                            )}
+                            spellCheck="false"
+                            autoComplete="off"
+                            autoCorrect="off"
+                        />
+                        {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                    </div>
+                </div>
+
+                <div className="overflow-y-auto md:col-start-1 md:row-start-2">
+                    <SearchResults
+                        ref={resultsRef}
+                        global={isMultiVariants && state.global}
+                        query={normalizedQuery}
+                        withAsk={withAsk}
+                        onSwitchToAsk={onSwitchToAsk}
                     />
-                    {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                </div>
+                <div className="overflow-y-auto border-tint-subtle bg-tint-subtle max-md:border-t md:col-start-2 md:row-start-2 md:border-l">
+                    <SearchAskAnswer query={normalizedQuery} />
                 </div>
             </div>
-            {!state.ask || !withAsk ? (
-                <SearchResults
-                    ref={resultsRef}
-                    global={isMultiVariants && state.global}
-                    query={normalizedQuery}
-                    withAsk={withAsk}
-                    onSwitchToAsk={onSwitchToAsk}
-                />
-            ) : null}
-            {normalizedQuery && state.ask && withAsk ? (
-                <SearchAskAnswer query={normalizedQuery} />
-            ) : null}
         </motion.div>
     );
 }

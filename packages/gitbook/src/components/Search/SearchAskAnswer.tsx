@@ -94,7 +94,7 @@ export function SearchAskAnswer(props: { query: string }) {
     );
 
     return (
-        <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
+        <>
             {askState?.type === 'answer' ? (
                 <React.Suspense fallback={loading}>
                     <TransitionAnswerBody answer={askState.answer} placeholder={loading} />
@@ -104,7 +104,7 @@ export function SearchAskAnswer(props: { query: string }) {
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
             ) : null}
             {askState?.type === 'loading' ? loading : null}
-        </div>
+        </>
     );
 }
 
