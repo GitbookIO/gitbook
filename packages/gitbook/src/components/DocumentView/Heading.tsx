@@ -32,7 +32,8 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <HashLinkButton
                 id={id}
                 block={block}
-                className={tcls('relative', '-ml-6', textStyle.marginTop)}
+                className={tcls('-ml-6')}
+                iconClassName={tcls('size-4', textStyle.anchorButtonMarginTop)}
                 label="Direct link to heading"
             />
 

@@ -141,42 +141,83 @@ export function DynamicTabs(
     }, [hash, tabs, onSelectTab]);
 
     return (
-        <div className={tcls(hashLinkButtonWrapperStyles, 'flex-1', style)}>
-            <HashLinkButton
-                id={getTabButtonId(active.id)}
-                block={block}
-                className={tcls('absolute', '-left-6')}
-                label="Direct link to selected tab"
-            />
-
+        <div
+            className={tcls(
+                'rounded-lg',
+                'straight-corners:rounded-sm',
+                'ring-1',
+                'ring-inset',
+                'ring-tint-subtle',
+                'flex',
+                'overflow-hidden',
+                'flex-col',
+                style
+            )}
+        >
             <div
+                role="tablist"
                 className={tcls(
-                    'rounded-lg',
-                    'straight-corners:rounded-sm',
-                    'ring-1',
-                    'ring-inset',
-                    'ring-tint-subtle',
-                    'flex',
-                    'overflow-hidden',
-                    'flex-col'
+                    'group/tabs',
+                    'inline-flex',
+                    'flex-row',
+                    'self-stretch',
+                    'after:flex-[1]',
+                    'after:bg-tint-12/1',
+                    // if last tab is selected, apply rounded to :after element
+                    '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
                 )}
             >
-                <div
-                    role="tablist"
-                    className={tcls(
-                        'group/tabs',
-                        'inline-flex',
-                        'flex-row',
-                        'self-stretch',
-                        'after:flex-[1]',
-                        'after:bg-tint-12/1',
-                        // if last tab is selected, apply rounded to :after element
-                        '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
-                    )}
-                >
-                    {tabs.map((tab) => (
+                {tabs.map((tab) => (
+                    <div
+                        key={tab.id}
+                        className={tcls(
+                            hashLinkButtonWrapperStyles,
+                            'flex items-center gap-3.5',
+
+                            //prev from active-tab
+                            '[&:has(+_.active-tab)]:rounded-br-md',
+
+                            //next from active-tab
+                            '[.active-tab_+_&]:rounded-bl-md',
+
+                            //next from active-tab
+                            '[.active-tab_+_:after]:rounded-br-md',
+
+                            'after:transition-colors',
+                            'after:border-r',
+                            'after:absolute',
+                            'after:left-[unset]',
+                            'after:right-0',
+                            'after:border-tint',
+                            'after:top-[15%]',
+                            'after:h-[70%]',
+                            'after:w-[1px]',
+
+                            'px-3.5',
+                            'py-2',
+
+                            'last:after:border-transparent',
+
+                            'text-tint',
+                            'bg-tint-12/1',
+                            'hover:text-tint-strong',
+                            'max-w-72',
+                            'truncate',
+
+                            active.id === tab.id
+                                ? [
+                                      'shrink-0',
+                                      'active-tab',
+                                      'text-tint-strong',
+                                      'bg-transparent',
+                                      'after:[&.active-tab]:border-transparent',
+                                      'after:[:has(+_&.active-tab)]:border-transparent',
+                                      'after:[:has(&_+)]:border-transparent',
+                                  ]
+                                : null
+                        )}
+                    >
                         <button
-                            key={tab.id}
                             role="tab"
                             aria-selected={active.id === tab.id}
                             aria-controls={getTabPanelId(tab.id)}
@@ -185,71 +226,38 @@ export function DynamicTabs(
                                 onSelectTab(tab);
                             }}
                             className={tcls(
-                                //prev from active-tab
-                                '[&:has(+_.active-tab)]:rounded-br-md',
-
-                                //next from active-tab
-                                '[.active-tab_+_&]:rounded-bl-md',
-
-                                //next from active-tab
-                                '[.active-tab_+_:after]:rounded-br-md',
-
                                 'inline-block',
                                 'text-sm',
-                                'px-3.5',
-                                'py-2',
                                 'transition-[color]',
                                 'font-[500]',
                                 'relative',
 
-                                'after:transition-colors',
-                                'after:border-r',
-                                'after:absolute',
-                                'after:left-[unset]',
-                                'after:right-0',
-                                'after:border-tint',
-                                'after:top-[15%]',
-                                'after:h-[70%]',
-                                'after:w-[1px]',
-
-                                'last:after:border-transparent',
-
-                                'text-tint',
-                                'bg-tint-12/1',
-                                'hover:text-tint-strong',
-
                                 'truncate',
-                                'max-w-full',
-
-                                active.id === tab.id
-                                    ? [
-                                          'shrink-0',
-                                          'active-tab',
-                                          'text-tint-strong',
-                                          'bg-transparent',
-                                          'after:[&.active-tab]:border-transparent',
-                                          'after:[:has(+_&.active-tab)]:border-transparent',
-                                          'after:[:has(&_+)]:border-transparent',
-                                      ]
-                                    : null
+                                'max-w-full'
                             )}
                         >
                             {tab.title}
                         </button>
-                    ))}
-                </div>
-                {tabs.map((tab, index) => (
-                    <div
-                        key={tab.id}
-                        role="tabpanel"
-                        id={getTabPanelId(tab.id)}
-                        aria-labelledby={getTabButtonId(tab.id)}
-                        className={tcls('p-4', tab.id !== active.id ? 'hidden' : null)}
-                    >
-                        {tabsBody[index]}
+
+                        <HashLinkButton
+                            id={getTabButtonId(tab.id)}
+                            block={block}
+                            label="Direct link to heading"
+                        />
                     </div>
                 ))}
             </div>
+            {tabs.map((tab, index) => (
+                <div
+                    key={tab.id}
+                    role="tabpanel"
+                    id={getTabPanelId(tab.id)}
+                    aria-labelledby={getTabButtonId(tab.id)}
+                    className={tcls('p-4', tab.id !== active.id ? 'hidden' : null)}
+                >
+                    {tabsBody[index]}
+                </div>
+            ))}
         </div>
     );
 }

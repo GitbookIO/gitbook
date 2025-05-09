@@ -14,16 +14,17 @@ export function HashLinkButton(props: {
     block: DocumentBlockTabs | DocumentBlockHeading;
     label?: string;
     className?: ClassValue;
+    iconClassName?: ClassValue;
 }) {
-    const { id, block, className, label = 'Direct link to block' } = props;
+    const { id, block, className, iconClassName, label = 'Direct link to block' } = props;
     const textStyle = getBlockTextStyle(block);
     return (
         <div
             className={tcls(
+                'relative',
                 'hash',
                 'grid',
                 'grid-area-1-1',
-                'w-7',
                 'h-[1em]',
                 'border-0',
                 'opacity-0',
@@ -42,13 +43,13 @@ export function HashLinkButton(props: {
                 <Icon
                     icon="hashtag"
                     className={tcls(
-                        'size-4',
-                        'mt-1',
+                        'size-3',
                         'self-center',
                         'transition-colors',
                         'text-transparent',
                         'group-hover:text-tint-subtle',
-                        'contrast-more:group-hover:text-tint-strong'
+                        'contrast-more:group-hover:text-tint-strong',
+                        iconClassName
                     )}
                 />
             </a>
