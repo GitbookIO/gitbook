@@ -6,7 +6,8 @@ import {
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
     getVisitorToken,
-} from './visitor-token';
+    getVisitorUnsignedClaims,
+} from './visitors';
 
 describe('getVisitorAuthToken', () => {
     it('should return the token from the query parameters', () => {
@@ -158,3 +159,113 @@ function assertVisitorAuthCookieValue(
 
     throw new Error('Expected a VisitorAuthCookieValue');
 }
+
+describe('getVisitorUnsignedClaims', () => {
+    it('should merge claims from multiple public cookies', () => {
+        const cookies = [
+            {
+                name: 'gitbook-visitor-public-bucket',
+                value: JSON.stringify({ bucket: { flags: { SITE_AI: true, SITE_PREVIEW: true } } }),
+            },
+            {
+                name: 'gitbook-visitor-public-launchdarkly',
+                value: JSON.stringify({
+                    launchdarkly: { flags: { ALPHA: true, API: true } },
+                }),
+            },
+        ];
+
+        const url = new URL('https://example.com/');
+        const claims = getVisitorUnsignedClaims({ cookies, url });
+
+        expect(claims).toStrictEqual({
+            bucket: { flags: { SITE_AI: true, SITE_PREVIEW: true } },
+            launchdarkly: { flags: { ALPHA: true, API: true } },
+        });
+    });
+
+    it('should parse visitor.* query params with simple types', () => {
+        const url = new URL(
+            'https://example.com/?visitor.isEnterprise=true&visitor.language=fr&visitor.country=fr'
+        );
+
+        const claims = getVisitorUnsignedClaims({ cookies: [], url });
+
+        expect(claims).toStrictEqual({
+            isEnterprise: true,
+            language: 'fr',
+            country: 'fr',
+        });
+    });
+
+    it('should ignore params that do not match visitor.* convention', () => {
+        const url = new URL('https://example.com/?visitor.isEnterprise=true&otherParam=true');
+
+        const claims = getVisitorUnsignedClaims({ cookies: [], url });
+
+        expect(claims).toStrictEqual({
+            isEnterprise: true,
+            // otherParam is not present
+        });
+    });
+
+    it('should support nested query param keys via dot notation', () => {
+        const url = new URL(
+            'https://example.com/?visitor.isEnterprise=true&visitor.flags.ALPHA=true&visitor.flags.API=false'
+        );
+
+        const claims = getVisitorUnsignedClaims({ cookies: [], url });
+
+        expect(claims).toStrictEqual({
+            isEnterprise: true,
+            flags: {
+                ALPHA: true,
+                API: false,
+            },
+        });
+    });
+
+    it('should ignore invalid JSON in cookie values', () => {
+        const cookies = [
+            {
+                name: 'gitbook-visitor-public',
+                value: '{not: "json"}',
+            },
+        ];
+        const url = new URL('https://example.com/');
+        const claims = getVisitorUnsignedClaims({ cookies, url });
+
+        expect(claims).toStrictEqual({});
+    });
+
+    it('should merge claims from cookies and visitor.* query params', () => {
+        const cookies = [
+            {
+                name: 'gitbook-visitor-public',
+                value: JSON.stringify({ role: 'admin', language: 'fr' }),
+            },
+            {
+                name: 'gitbook-visitor-public-bucket',
+                value: JSON.stringify({ bucket: { flags: { SITE_AI: true, SITE_PREVIEW: true } } }),
+            },
+        ];
+        const url = new URL(
+            'https://example.com/?visitor.isEnterprise=true&visitor.flags.ALPHA=true&visitor.flags.API=false'
+        );
+
+        const claims = getVisitorUnsignedClaims({ cookies, url });
+
+        expect(claims).toStrictEqual({
+            role: 'admin',
+            language: 'fr',
+            bucket: {
+                flags: { SITE_AI: true, SITE_PREVIEW: true },
+            },
+            isEnterprise: true,
+            flags: {
+                ALPHA: true,
+                API: false,
+            },
+        });
+    });
+});

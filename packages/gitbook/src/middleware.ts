@@ -24,9 +24,9 @@ import {
     type ResponseCookies,
     type VisitorTokenLookup,
     getResponseCookiesForVisitorAuth,
-    getVisitorToken,
+    getVisitorPayload,
     normalizeVisitorAuthURL,
-} from '@/lib/visitor-token';
+} from '@/lib/visitors';
 
 import { joinPath, withLeadingSlash } from '@/lib/paths';
 import { getProxyModeBasePath } from '@/lib/proxy';
@@ -392,17 +392,17 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
  * When serving multi spaces based on the current URL.
  */
 async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const visitorAuthToken = getVisitorToken({
+    const { visitorToken } = getVisitorPayload({
         cookies: request.cookies.getAll(),
         url,
     });
-    const lookup = await lookupSiteByAPI(url, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(url, visitorToken);
     return {
         ...lookup,
-        ...('basePath' in lookup && visitorAuthToken
-            ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
+        ...('basePath' in lookup && visitorToken
+            ? getLookupResultForVisitorAuth(lookup.basePath, visitorToken)
             : {}),
-        visitorToken: visitorAuthToken?.token,
+        visitorToken: visitorToken?.token,
     };
 }
 
@@ -609,12 +609,12 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
     const target = new URL(targetStr);
     target.search = url.search;
 
-    const visitorAuthToken = getVisitorToken({
+    const { visitorToken } = getVisitorPayload({
         cookies: request.cookies.getAll(),
         url: target,
     });
 
-    const lookup = await lookupSiteByAPI(target, visitorAuthToken);
+    const lookup = await lookupSiteByAPI(target, visitorToken);
     if ('error' in lookup) {
         return lookup;
     }
@@ -641,10 +641,10 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
         ...lookup,
         siteBasePath: joinPath(target.host, lookup.siteBasePath),
         basePath: joinPath(target.host, lookup.basePath),
-        ...('basePath' in lookup && visitorAuthToken
-            ? getLookupResultForVisitorAuth(lookup.basePath, visitorAuthToken)
+        ...('basePath' in lookup && visitorToken
+            ? getLookupResultForVisitorAuth(lookup.basePath, visitorToken)
             : {}),
-        visitorToken: visitorAuthToken?.token,
+        visitorToken: visitorToken?.token,
     };
 }
 

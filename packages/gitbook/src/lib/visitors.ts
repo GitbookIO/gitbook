@@ -4,6 +4,7 @@ import hash from 'object-hash';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
+const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
 
 /**
  * Typing for a cookie, matching the internal type of Next.js.
@@ -30,6 +31,25 @@ type VisitorAuthCookieValue = {
     token: string;
 };
 
+type ClaimPrimitive =
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | { [key: string]: ClaimPrimitive }
+    | ClaimPrimitive[];
+
+/**
+ * The result of a visitor info lookup that can include:
+ *   - a visitor token (JWT)
+ *   - a record of visitor public/unsigned claims (JSON object)
+ */
+export type VisitorPayloadLookup = {
+    visitorToken: VisitorTokenLookup;
+    unsignedClaims: Record<string, ClaimPrimitive>;
+};
+
 /**
  * The result of a visitor token lookup.
  */
@@ -52,6 +72,25 @@ export type VisitorTokenLookup =
       }
     /** Not visitor token was found */
     | undefined;
+
+/**
+ * Get the visitor info for the request including its token and/or unsigned claims when present.
+ */
+export function getVisitorPayload({
+    cookies,
+    url,
+}: {
+    cookies: RequestCookies;
+    url: URL | NextRequest['nextUrl'];
+}): VisitorPayloadLookup {
+    const visitorToken = getVisitorToken({ cookies, url });
+    const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
+
+    return {
+        visitorToken,
+        unsignedClaims,
+    };
+}
 
 /**
  * Get the visitor token for the request. This token can either be in the
@@ -80,6 +119,106 @@ export function getVisitorToken({
     if (visitorCustomToken) {
         return { source: 'gitbook-visitor-cookie', token: visitorCustomToken };
     }
+}
+
+/**
+ * Get the visitor unsigned/public claims for the request. They can either be in `visitor.` query
+ * parameters or stored in special `gitbook-visitor-public-*` cookies.
+ */
+export function getVisitorUnsignedClaims(args: {
+    cookies: RequestCookies;
+    url: URL | NextRequest['nextUrl'];
+}): Record<string, ClaimPrimitive> {
+    const { cookies, url } = args;
+    const claims: Record<string, ClaimPrimitive> = {};
+
+    for (const cookie of cookies) {
+        if (cookie.name.startsWith(VISITOR_UNSIGNED_CLAIMS_PREFIX)) {
+            try {
+                const parsed = JSON.parse(cookie.value);
+                if (typeof parsed === 'object' && parsed !== null) {
+                    Object.assign(claims, parsed);
+                }
+            } catch (_err) {
+                console.warn(`Invalid JSON in unsigned claim cookie "${cookie.name}"`);
+            }
+        }
+    }
+
+    for (const [key, value] of url.searchParams.entries()) {
+        if (key.startsWith('visitor.')) {
+            const claimPath = key.substring('visitor.'.length);
+            const claimValue = parseVisitorQueryParamValue(value);
+            setVisitorClaimByPath(claims, claimPath, claimValue);
+        }
+    }
+
+    return claims;
+}
+
+/**
+ * Set the value of claims in a claims object at a specific path.
+ */
+function setVisitorClaimByPath(
+    claims: Record<string, ClaimPrimitive>,
+    keyPath: string,
+    value: ClaimPrimitive
+): void {
+    const keys = keyPath.split('.');
+    let current = claims;
+
+    for (let index = 0; index < keys.length; index++) {
+        const key = keys[index];
+
+        if (index === keys.length - 1) {
+            current[key] = value;
+        } else {
+            if (!(key in current) || !isClaimPrimitiveObject(current[key])) {
+                current[key] = {};
+            }
+
+            current = current[key];
+        }
+    }
+}
+
+function isClaimPrimitiveObject(value: unknown): value is Record<string, ClaimPrimitive> {
+    return typeof value === 'object' && value !== null;
+}
+
+/**
+ * Parse the value expected in a `visitor.` URL query parameter.
+ */
+function parseVisitorQueryParamValue(value: string): ClaimPrimitive {
+    if (value === 'true') {
+        return true;
+    }
+
+    if (value === 'false') {
+        return false;
+    }
+
+    if (value === 'null') {
+        return null;
+    }
+
+    if (value === 'undefined') {
+        return undefined;
+    }
+
+    const num = Number(value);
+    if (!Number.isNaN(num) && value.trim() !== '') {
+        return num;
+    }
+
+    try {
+        const parsed = JSON.parse(value);
+        if (typeof parsed === 'object' && parsed !== null) {
+            return parsed;
+        }
+    } catch {}
+
+    return value;
 }
 
 /**
