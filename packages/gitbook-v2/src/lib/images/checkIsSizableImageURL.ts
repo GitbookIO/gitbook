@@ -1,4 +1,4 @@
-import * as Path from 'node:path';
+import { getExtension } from '@/lib/paths';
 
 export enum SizableImageAction {
     Resize = 'resize',
@@ -33,7 +33,7 @@ export function checkIsSizableImageURL(input: string): SizableImageAction {
         return SizableImageAction.Skip;
     }
 
-    const extension = Path.extname(parsed.pathname).toLowerCase();
+    const extension = getExtension(parsed.pathname).toLowerCase();
     if (!extension || SUPPORTED_IMAGE_EXTENSIONS.includes(extension)) {
         // If no extension, we consider it resizable.
         return SizableImageAction.Resize;

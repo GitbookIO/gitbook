@@ -57,3 +57,11 @@ export function withTrailingSlash(pathname: string): string {
 
     return pathname;
 }
+
+/**
+ * Get the extension of a path.
+ */
+export function getExtension(path: string): string {
+    const parts = path.split('.');
+    return parts.pop() ?? '';
+}
