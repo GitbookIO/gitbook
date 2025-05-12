@@ -4,15 +4,16 @@ import { resolvePageId } from '@/lib/pages';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
-import type {
-    RevisionPage,
-    SearchAIAnswer,
-    SearchAIRecommendedQuestionStream,
-    SearchPageResult,
-    SearchSpaceResult,
-    SiteSection,
-    SiteSectionGroup,
-    Space,
+import {
+    AIMessageRole,
+    type RevisionPage,
+    type SearchAIAnswer,
+    type SearchAIRecommendedQuestionStream,
+    type SearchPageResult,
+    type SearchSpaceResult,
+    type SiteSection,
+    type SiteSectionGroup,
+    type Space,
 } from '@gitbook/api';
 import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
@@ -24,6 +25,8 @@ import { isV2 } from '@/lib/v2';
 import type { IconName } from '@gitbook/icons';
 import { throwIfDataError } from '@v2/lib/data';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
+import { z } from 'zod';
+import { streamGenerateObject } from '../Adaptive/server-actions/api';
 import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
@@ -409,4 +412,112 @@ async function transformSitePageResult(
     );
 
     return [page, ...pageSections];
+}
+
+/**
+ * Get an AI-generated answer to a search query.
+ */
+export async function* streamAISearchSummary({
+    visitedPages,
+}: {
+    visitedPages: { spaceId: string; pageId: string }[];
+}) {
+    const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const siteURLData = await getSiteURLDataFromMiddleware();
+
+    const { stream, response } = await streamGenerateObject(
+        baseContext,
+        {
+            organizationId: siteURLData.organization,
+            siteId: siteURLData.site,
+        },
+        {
+            schema: z.object({
+                summary: z
+                    .string()
+                    .describe(
+                        'A summary of the most important information the user has learned from the provided context.'
+                    ),
+            }),
+            messages: [
+                {
+                    role: AIMessageRole.Developer,
+                    content:
+                        'Summarise the most important information the user has learned from the provided context. Be concise and focus on facts. Do not add commentary, adjectives or other empty descriptors.',
+                    attachments: visitedPages.map(({ spaceId, pageId }) => ({
+                        type: 'page' as const,
+                        spaceId,
+                        pageId,
+                    })),
+                },
+            ].filter(filterOutNullable),
+        }
+    );
+
+    // Get the responseId asynchronously in the background
+    let responseId: string | null = null;
+    const responseIdPromise = response
+        .then((r) => {
+            responseId = r.responseId;
+        })
+        .catch((error) => {
+            console.error('Error getting responseId:', error);
+        });
+
+    for await (const value of stream) {
+        const summary = value.summary;
+        if (!summary) {
+            continue;
+        }
+
+        yield { summary };
+    }
+
+    // Wait for the responseId to be available and yield one final time
+    await responseIdPromise;
+    yield { responseId };
+}
+
+/**
+ * Get an AI-generated answer to a search query.
+ */
+export async function* streamAISearchAnswer({
+    question,
+}: {
+    question: string;
+}) {
+    const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const siteURLData = await getSiteURLDataFromMiddleware();
+
+    const { stream } = await streamGenerateObject(
+        baseContext,
+        {
+            organizationId: siteURLData.organization,
+            siteId: siteURLData.site,
+        },
+        {
+            schema: z.object({
+                answer: z.string().describe('The answer to the question.'),
+            }),
+            messages: [
+                {
+                    role: AIMessageRole.Developer,
+                    content: `Answer the following question using only the provided context below. Format the answer in Markdown. If you cannot answer the question using the context provided, provide an empty string. Always list related follow-up questions using the provided context. Check first that you can answer the question given the provided context before listing it as a follow-up question. If you can't answer a question, don't include it in the follow up questions. If there is no provided context, do not list follow-up questions. List the sources used to answer the question in the "sources" field. Only list the sources that were directly used for the content of the answer.`,
+                },
+                {
+                    role: AIMessageRole.User,
+                    content: `Question: ${question}`,
+                },
+            ].filter(filterOutNullable),
+        }
+    );
+
+    for await (const value of stream) {
+        const highlight = value.answer;
+        if (!highlight) {
+            continue;
+        }
+
+        yield highlight;
+    }
 }

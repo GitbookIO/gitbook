@@ -9,8 +9,8 @@ import { tcls } from '@/lib/tailwind';
 
 import { Button } from '../primitives/Button';
 import { LoadingPane } from '../primitives/LoadingPane';
-import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
+import { SearchChat } from './SearchChat';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
 import { type SearchState, type UpdateSearchState, useSearch } from './useSearch';
@@ -317,7 +317,7 @@ function SearchModalBody(
                             key="chat"
                             layout
                             className={tcls(
-                                '-col-end-1 flex items-start gap-4 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle p-8 max-md:border-t md:row-start-2 md:border-l',
+                                'md:-col-end-1 flex items-start gap-4 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle p-8 max-md:border-t md:row-start-2 md:border-l',
                                 state.mode === 'chat' && 'md:col-start-1'
                             )}
                             initial={{ width: 0 }}
@@ -338,7 +338,7 @@ function SearchModalBody(
                                     }}
                                 />
                             ) : null}
-                            <SearchAskAnswer query={normalizedQuery} />
+                            <SearchChat />
                         </motion.div>
                     ) : null}
                 </AnimatePresence>
