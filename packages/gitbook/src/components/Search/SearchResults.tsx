@@ -7,6 +7,7 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { motion } from 'framer-motion';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -18,6 +19,7 @@ import {
     searchSiteSpaceContent,
     streamRecommendedQuestions,
 } from './server-actions';
+import { useSearch } from './useSearch';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -61,6 +63,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }>({ results: [], fetching: true });
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
+    const [searchState, setSearchState] = useSearch();
 
     React.useEffect(() => {
         if (!query) {
@@ -157,9 +160,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
             setCursor(null);
         } else if (results.length > 0) {
             // Auto-focus the first result
+            setSearchState((prev) => (prev ? { ...prev, mode: 'both' } : null));
             setCursor(0);
+        } else if (results.length === 0 && !resultsState.fetching && !searchState?.manual) {
+            setSearchState((prev) => (prev ? { ...prev, mode: 'chat' } : null));
         }
-    }, [results, query]);
+    }, [results, query, setSearchState, resultsState.fetching, searchState?.manual]);
 
     // Scroll to the active result.
     React.useEffect(() => {
@@ -210,9 +216,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     if (resultsState.fetching) {
         return (
-            <div className={tcls('flex', 'items-center', 'justify-center', 'p-8')}>
+            <motion.div
+                className={tcls('flex', 'items-center', 'justify-center', 'p-8')}
+                layout="position"
+            >
                 <Loading className={tcls('w-6', 'text-primary-subtle')} />
-            </div>
+            </motion.div>
         );
     }
 
@@ -293,16 +302,3 @@ export const SearchResults = React.forwardRef(function SearchResults(
         </>
     );
 });
-
-/**
- * Add a "Ask <question>" item at the top of the results list.
- */
-function withQuestionResult(results: ResultType[], query: string): ResultType[] {
-    const without = results.filter((result) => result.type !== 'question');
-
-    if (query.length === 0) {
-        return without;
-    }
-
-    return [{ type: 'question', id: 'question', query }, ...(without ?? [])];
-}
