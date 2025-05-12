@@ -1,21 +1,19 @@
 'use client';
 
-import { Icon } from '@gitbook/icons';
-import { readStreamableValue } from 'ai/rsc';
-import React from 'react';
-
-import { Loading } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import type { TranslationLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
+import { readStreamableValue } from 'ai/rsc';
+import React from 'react';
 
+import { motion } from 'framer-motion';
 import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
 import { type AskAnswerResult, type AskAnswerSource, streamAskQuestion } from './server-actions';
 import { useSearch, useSearchLink } from './useSearch';
-
 export type SearchAskState =
     | {
           type: 'answer';
@@ -88,13 +86,22 @@ export function SearchAskAnswer(props: { query: string }) {
     }, [setAskState]);
 
     const loading = (
-        <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-            <Loading className={tcls('w-6', 'py-8', 'text-primary-subtle')} />
+        <div key="loading" className={tcls('flex', 'flex-wrap', 'gap-2')}>
+            {[...Array(9)].map((_, index) => (
+                <div
+                    key={index}
+                    className="h-4 animate-[fadeIn_0.5s_ease-in-out_both,pulse_2s_ease-in-out_infinite] rounded straight-corners:rounded-none bg-tint-active"
+                    style={{
+                        animationDelay: `${index * 0.1}s,${0.5 + index * 0.1}s`,
+                        width: `${((index % 5) + 1) * 15}%`,
+                    }}
+                />
+            ))}
         </div>
     );
 
     return (
-        <>
+        <motion.div className={tcls('mx-auto w-full max-w-prose')} layout="position">
             {askState?.type === 'answer' ? (
                 <React.Suspense fallback={loading}>
                     <TransitionAnswerBody answer={askState.answer} placeholder={loading} />
@@ -104,7 +111,7 @@ export function SearchAskAnswer(props: { query: string }) {
                 <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
             ) : null}
             {askState?.type === 'loading' ? loading : null}
-        </>
+        </motion.div>
     );
 }
 
@@ -138,10 +145,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
 
     return (
         <>
-            <div
-                data-testid="search-ask-answer"
-                className={tcls('my-4', 'sm:mt-6', 'px-4', 'sm:px-12', 'text-tint-strong')}
-            >
+            <div data-testid="search-ask-answer" className={tcls('text-tint-strong')}>
                 {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />

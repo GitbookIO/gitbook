@@ -7,6 +7,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { Button } from '../primitives/Button';
 import { LoadingPane } from '../primitives/LoadingPane';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
@@ -33,7 +34,7 @@ export function SearchModal(props: SearchModalProps) {
         'mod+k',
         (e) => {
             e.preventDefault();
-            setSearchState({ ask: false, query: '', global: false });
+            setSearchState({ mode: 'both', query: '', global: false });
         },
         []
     );
@@ -177,7 +178,7 @@ function SearchModalBody(
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchState({
-            ask: false, // When typing, we go back to the default search mode
+            mode: 'both', // When typing, we go back to the default search mode
             query: event.target.value,
             global: state.global,
         });
@@ -288,18 +289,59 @@ function SearchModalBody(
                     </div>
                 </div>
 
-                <div className="overflow-y-auto md:col-start-1 md:row-start-2">
-                    <SearchResults
-                        ref={resultsRef}
-                        global={isMultiVariants && state.global}
-                        query={normalizedQuery}
-                        withAsk={withAsk}
-                        onSwitchToAsk={onSwitchToAsk}
-                    />
-                </div>
-                <div className="overflow-y-auto border-tint-subtle bg-tint-subtle max-md:border-t md:col-start-2 md:row-start-2 md:border-l">
-                    <SearchAskAnswer query={normalizedQuery} />
-                </div>
+                <AnimatePresence>
+                    {state.mode !== 'chat' ? (
+                        <motion.div
+                            key="results"
+                            layout
+                            className={tcls(
+                                'overflow-y-auto md:col-start-1 md:row-start-2',
+                                state.mode === 'results' && 'md:-col-end-1'
+                            )}
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            exit={{ width: 0 }}
+                        >
+                            <SearchResults
+                                ref={resultsRef}
+                                global={isMultiVariants && state.global}
+                                query={normalizedQuery}
+                                withAsk={withAsk}
+                                onSwitchToAsk={onSwitchToAsk}
+                            />
+                        </motion.div>
+                    ) : null}
+
+                    {state.mode !== 'results' ? (
+                        <motion.div
+                            key="chat"
+                            layout
+                            className={tcls(
+                                '-col-end-1 flex items-start gap-4 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle p-8 max-md:border-t md:row-start-2 md:border-l',
+                                state.mode === 'chat' && 'md:col-start-1'
+                            )}
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            exit={{ width: 0 }}
+                        >
+                            {state.mode === 'chat' ? (
+                                <Button
+                                    icon="right-from-line"
+                                    iconOnly
+                                    label="Show results"
+                                    variant="blank"
+                                    className="px-2"
+                                    onClick={() => {
+                                        setSearchState((prev) =>
+                                            prev ? { ...prev, mode: 'both', manual: true } : null
+                                        );
+                                    }}
+                                />
+                            ) : null}
+                            <SearchAskAnswer query={normalizedQuery} />
+                        </motion.div>
+                    ) : null}
+                </AnimatePresence>
             </div>
         </motion.div>
     );
