@@ -5,6 +5,11 @@ export enum SizableImageAction {
 }
 
 /**
+ * https://developers.cloudflare.com/images/transform-images/#supported-input-formats
+ */
+const SUPPORTED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+
+/**
  * Check if an image URL is resizable.
  * Skip it for non-http(s) URLs (data, etc).
  * Skip it for SVGs.
@@ -25,9 +30,11 @@ export function checkIsSizableImageURL(input: string): SizableImageAction {
     if (parsed.pathname.includes('/~gitbook/image')) {
         return SizableImageAction.Skip;
     }
-    if (parsed.pathname.endsWith('.svg') || parsed.pathname.endsWith('.avif')) {
-        return SizableImageAction.Passthrough;
+
+    const extension = parsed.pathname.split('.').pop()?.toLowerCase();
+    if (extension && SUPPORTED_IMAGE_EXTENSIONS.includes(`.${extension}`)) {
+        return SizableImageAction.Resize;
     }
 
-    return SizableImageAction.Resize;
+    return SizableImageAction.Passthrough;
 }
