@@ -63,5 +63,8 @@ export function withTrailingSlash(pathname: string): string {
  */
 export function getExtension(path: string): string {
     const parts = path.split('.');
+    if (parts.length === 1) {
+        return '';
+    }
     return parts.pop() ?? '';
 }
