@@ -7,7 +7,7 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -80,7 +80,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             let cancelled = false;
 
             // Silently fetch the recommended questions, instead of showing a spinner
-            setResultsState({ results: [], fetching: false });
+            // setResultsState({ results: [], fetching: false });
 
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.
@@ -214,91 +214,106 @@ export const SearchResults = React.forwardRef(function SearchResults(
         [moveBy, select]
     );
 
-    if (resultsState.fetching) {
-        return (
-            <motion.div
-                className={tcls('flex', 'items-center', 'justify-center', 'p-8')}
-                layout="position"
-            >
-                <Loading className={tcls('w-6', 'text-primary-subtle')} />
-            </motion.div>
-        );
-    }
-
-    const noResults = (
-        <div className={tcls('text', 'text-tint', 'text-center', 'p-8')}>
-            {t(language, 'search_no_results', query)}
-        </div>
+    const loading = (
+        <motion.div
+            className={tcls('flex', 'items-center', 'justify-center', 'p-8')}
+            layout="position"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
+            <Loading className={tcls('w-6', 'text-primary-subtle')} />
+        </motion.div>
     );
 
-    return results.length === 0 ? (
-        query ? (
-            noResults
-        ) : null
-    ) : (
-        <>
-            <div className="flex flex-col gap-2 p-4" data-testid="search-results">
-                {results.map((item, index) => {
-                    switch (item.type) {
-                        case 'page': {
-                            return (
-                                <SearchPageResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    query={query}
-                                    item={item}
-                                    active={index === cursor}
-                                />
-                            );
+    const noResults = (
+        <motion.div
+            layout="position"
+            className={tcls('text', 'text-tint', 'text-center', 'p-8')}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
+            {t(language, 'search_no_results', query)}
+        </motion.div>
+    );
+
+    return (
+        <AnimatePresence initial={false} mode="wait">
+            {resultsState.fetching ? (
+                loading
+            ) : query && results.length === 0 ? (
+                noResults
+            ) : (
+                <motion.div
+                    layout="position"
+                    className="flex flex-col gap-2 p-4"
+                    data-testid="search-results"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    {results.map((item, index) => {
+                        switch (item.type) {
+                            case 'page': {
+                                return (
+                                    <SearchPageResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        query={query}
+                                        item={item}
+                                        active={index === cursor}
+                                    />
+                                );
+                            }
+                            case 'question': {
+                                return (
+                                    <SearchQuestionResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        question={query}
+                                        active={index === cursor}
+                                        onClick={onSwitchToAsk}
+                                    />
+                                );
+                            }
+                            case 'recommended-question': {
+                                return (
+                                    <SearchQuestionResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        question={item.question}
+                                        active={index === cursor}
+                                        onClick={onSwitchToAsk}
+                                        recommended
+                                    />
+                                );
+                            }
+                            case 'section': {
+                                return (
+                                    <SearchSectionResultItem
+                                        ref={(ref) => {
+                                            refs.current[index] = ref;
+                                        }}
+                                        key={item.id}
+                                        query={query}
+                                        item={item}
+                                        active={index === cursor}
+                                    />
+                                );
+                            }
+                            default:
+                                assertNever(item);
                         }
-                        case 'question': {
-                            return (
-                                <SearchQuestionResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    question={query}
-                                    active={index === cursor}
-                                    onClick={onSwitchToAsk}
-                                />
-                            );
-                        }
-                        case 'recommended-question': {
-                            return (
-                                <SearchQuestionResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    question={item.question}
-                                    active={index === cursor}
-                                    onClick={onSwitchToAsk}
-                                    recommended
-                                />
-                            );
-                        }
-                        case 'section': {
-                            return (
-                                <SearchSectionResultItem
-                                    ref={(ref) => {
-                                        refs.current[index] = ref;
-                                    }}
-                                    key={item.id}
-                                    query={query}
-                                    item={item}
-                                    active={index === cursor}
-                                />
-                            );
-                        }
-                        default:
-                            assertNever(item);
-                    }
-                })}
-            </div>
-            {!results.some((result) => result.type !== 'question') && noResults}
-        </>
+                    })}
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 });

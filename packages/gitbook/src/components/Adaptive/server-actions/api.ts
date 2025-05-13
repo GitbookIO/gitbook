@@ -1,5 +1,10 @@
 'use server';
-import { type AIMessageInput, AIModel, type AIStreamResponse } from '@gitbook/api';
+import {
+    type AIMessageInput,
+    AIModel,
+    type AIStreamResponse,
+    type AIToolCapabilities,
+} from '@gitbook/api';
 import type { GitBookBaseContext } from '@v2/lib/context';
 import { EventIterator } from 'event-iterator';
 import type { MaybePromise } from 'p-map';
@@ -51,6 +56,7 @@ export async function streamGenerateObject<T>(
         schema: z.ZodSchema<T>;
         messages: AIMessageInput[];
         model?: AIModel;
+        tools?: AIToolCapabilities;
         previousResponseId?: string;
     }
 ) {

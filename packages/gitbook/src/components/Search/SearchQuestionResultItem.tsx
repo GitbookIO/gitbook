@@ -42,7 +42,6 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 ]
             )}
             {...getLinkProp({
-                ask: true,
                 query: question,
             })}
         >
