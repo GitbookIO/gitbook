@@ -19,6 +19,7 @@ export function TableOfContents(props: {
     return (
         <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
             data-testid="table-of-contents"
+            id="table-of-contents"
             className={tcls(
                 'group',
                 'text-sm',
