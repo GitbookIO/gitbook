@@ -35,14 +35,17 @@ export function TableOfContents(props: {
                 // Without header
                 'lg:top-0',
                 'lg:h-screen',
+                'announcement:lg:h-[calc(100vh-4.25rem)]',
 
                 // With header
                 'site-header:lg:top-16',
-                'site-header:lg:h-[calc(100vh_-_4rem)]',
+                'site-header:lg:h-[calc(100vh-4rem)]',
+                'announcement:site-header:lg:h-[calc(100vh-4rem-4.25rem)]',
 
                 // With header and sections
                 'site-header-sections:lg:top-[6.75rem]',
-                'site-header-sections:lg:h-[calc(100vh_-_6.75rem)]',
+                'site-header-sections:lg:h-[calc(100vh-6.75rem)]',
+                'announcement:site-header-sections:lg:h-[calc(100vh-6.75rem-4.25rem)]',
 
                 'pt-6',
                 'pb-4',

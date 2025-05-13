@@ -76,7 +76,7 @@ export async function CustomizationRootLayout(props: {
             className={tcls(
                 customization.header.preset === CustomizationHeaderPreset.None
                     ? 'site-header-none'
-                    : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
+                    : ['site-header', 'scroll-pt-[76px]'], // Take the sticky header in consideration for the scrolling
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',
