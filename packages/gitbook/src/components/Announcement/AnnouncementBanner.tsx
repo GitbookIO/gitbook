@@ -5,7 +5,6 @@ import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import { useEffect, useRef } from 'react';
 import { CONTAINER_STYLE } from '../layout';
 import { Link, linkStyles } from '../primitives';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
@@ -25,33 +24,10 @@ export function AnnouncementBanner(props: {
     const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
-    const announcementRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        document.addEventListener('scroll', () => {
-            const toc = document.documentElement.querySelector('#table-of-contents');
-            const header = document.documentElement.querySelector('#site-header');
-            const announcement = announcementRef.current;
-
-            if (toc && announcement && header) {
-                const announcementHeight = Math.max(68 - window.scrollY, 0);
-                const headerHeight = header.clientHeight;
-                toc.setAttribute(
-                    'style',
-                    `height: calc(100vh - ${headerHeight}px - ${announcementHeight}px)`
-                );
-            }
-        });
-        return () => {
-            document.removeEventListener('scroll', () => {});
-        };
-    }, []);
-
     return (
         <div
             id="announcement-banner"
-            ref={announcementRef}
-            className="theme-bold:bg-header-background pt-4 pb-2"
+            className="announcement-banner theme-bold:bg-header-background pt-4 pb-2"
         >
             <div className="scroll-nojump">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
