@@ -6,8 +6,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
-import { Button } from '../primitives/Button';
 import { LoadingPane } from '../primitives/LoadingPane';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
 import { SearchChat } from './SearchChat';
@@ -220,8 +218,8 @@ function SearchModalBody(
                 'bg-tint-base',
                 'max-w-screen-lg',
                 'mx-auto',
-                'min-h-[30dvh]',
-                'max-h-[70dvh]',
+                // 'min-h-[50dvh]',
+                'h-[70dvh]',
                 'w-full',
                 'rounded-lg',
                 'straight-corners:rounded-sm',
@@ -317,28 +315,14 @@ function SearchModalBody(
                             key="chat"
                             layout
                             className={tcls(
-                                'md:-col-end-1 flex items-start gap-4 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle p-8 max-md:border-t md:row-start-2 md:border-l',
+                                'md:-col-end-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle max-md:border-t md:row-start-2 md:border-l',
                                 state.mode === 'chat' && 'md:col-start-1'
                             )}
                             initial={{ width: 0 }}
                             animate={{ width: '100%' }}
                             exit={{ width: 0 }}
                         >
-                            {state.mode === 'chat' ? (
-                                <Button
-                                    icon="right-from-line"
-                                    iconOnly
-                                    label="Show results"
-                                    variant="blank"
-                                    className="px-2"
-                                    onClick={() => {
-                                        setSearchState((prev) =>
-                                            prev ? { ...prev, mode: 'both', manual: true } : null
-                                        );
-                                    }}
-                                />
-                            ) : null}
-                            <SearchChat />
+                            <SearchChat query={normalizedQuery} />
                         </motion.div>
                     ) : null}
                 </AnimatePresence>
