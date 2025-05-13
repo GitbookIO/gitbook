@@ -149,8 +149,8 @@ export function DynamicTabs(
                 'ring-inset',
                 'ring-tint-subtle',
                 'flex',
-                'overflow-hidden',
                 'flex-col',
+                'overflow-hidden',
                 style
             )}
         >
@@ -203,7 +203,8 @@ export function DynamicTabs(
                             'text-tint',
                             'bg-tint-12/1',
                             'hover:text-tint-strong',
-                            'max-w-72',
+                            'max-w-full',
+                            'truncate',
 
                             active.id === tab.id
                                 ? [
@@ -233,6 +234,7 @@ export function DynamicTabs(
                                 'transition-[color]',
                                 'font-[500]',
                                 'relative',
+                                'max-w-full',
                                 'truncate'
                             )}
                         >
