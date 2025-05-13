@@ -5,7 +5,6 @@ import hash from 'object-hash';
 const VISITOR_AUTH_PARAM = 'jwt_token';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
-const VISITOR_PARAMS_COOKIE_MAX_AGE = 60 * 60; // 1 hour
 
 /**
  * Typing for a cookie, matching the internal type of Next.js.
@@ -245,7 +244,6 @@ export function getResponseCookieForVisitorParams(
             httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
             secure: process.env.NODE_ENV === 'production',
-            maxAge: VISITOR_PARAMS_COOKIE_MAX_AGE,
         },
     };
 }
