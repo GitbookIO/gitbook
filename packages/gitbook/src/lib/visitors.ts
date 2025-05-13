@@ -44,13 +44,12 @@ type ClaimPrimitive =
  * The result of a visitor info lookup that can include:
  *   - a visitor token (JWT)
  *   - a record of visitor public/unsigned claims (JSON object)
+ *   - a session cookie response to persist any visitor query params across navigations.
  */
 export type VisitorPayloadLookup = {
     visitorToken: VisitorTokenLookup;
-    unsignedClaims: {
-        all: Record<string, ClaimPrimitive>;
-        fromVisitorParams: Record<string, ClaimPrimitive>;
-    };
+    unsignedClaims: Record<string, ClaimPrimitive>;
+    visitorParamsCookie: ResponseCookie | undefined;
 };
 
 /**
@@ -77,9 +76,12 @@ export type VisitorTokenLookup =
     | undefined;
 
 /**
- * Get the visitor info for the request including its token and/or unsigned claims when present.
+ * Get the visitor data for the request potentially including:
+ *   - a JWT token that may contain signed claims or can be used for VA authentication.
+ *   - a record of the unsigned claims passed via a cookie or visitor.* params.
+ *   - a session cookie response that is used to persist any visitor.* params that were passed via the site URL.
  */
-export function getVisitorPayload({
+export function getVisitorData({
     cookies,
     url,
 }: {
@@ -88,10 +90,12 @@ export function getVisitorPayload({
 }): VisitorPayloadLookup {
     const visitorToken = getVisitorToken({ cookies, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
+    const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims.fromVisitorParams);
 
     return {
         visitorToken,
-        unsignedClaims,
+        unsignedClaims: unsignedClaims.all,
+        visitorParamsCookie,
     };
 }
 
@@ -131,7 +135,7 @@ export function getVisitorToken({
 export function getVisitorUnsignedClaims(args: {
     cookies: RequestCookies;
     url: URL | NextRequest['nextUrl'];
-}): VisitorPayloadLookup['unsignedClaims'] {
+}): { all: Record<string, ClaimPrimitive>; fromVisitorParams: Record<string, ClaimPrimitive> } {
     const { cookies, url } = args;
     const claims: Record<string, ClaimPrimitive> = {};
     const searchParamsClaims: Record<string, ClaimPrimitive> = {};
@@ -230,16 +234,16 @@ function parseVisitorQueryParamValue(value: string): ClaimPrimitive {
 /**
  * Returns to cookie response to use in order to persist visitor params that were passed to the URL.
  */
-export function getResponseCookieForVisitorParams(
-    visitorUnsignedClaims: VisitorPayloadLookup['unsignedClaims']
+function getResponseCookieForVisitorParams(
+    visitorParamsClaims: Record<string, ClaimPrimitive>
 ): ResponseCookie | undefined {
-    if (Object.keys(visitorUnsignedClaims.fromVisitorParams).length === 0) {
+    if (Object.keys(visitorParamsClaims).length === 0) {
         return undefined;
     }
 
     return {
         name: VISITOR_UNSIGNED_CLAIMS_PREFIX,
-        value: JSON.stringify(visitorUnsignedClaims.fromVisitorParams),
+        value: JSON.stringify(visitorParamsClaims),
         options: {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
