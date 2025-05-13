@@ -204,6 +204,14 @@ const getExampleFromSchema = (
         return cache(schema, schema.example);
     }
 
+    // Use a default value, if there’s one and it’s a string or number
+    if (
+        schema.default !== undefined &&
+        ['string', 'number', 'boolean'].includes(typeof schema.default)
+    ) {
+        return cache(schema, schema.default);
+    }
+
     // enum: [ 'available', 'pending', 'sold' ]
     if (Array.isArray(schema.enum) && schema.enum.length > 0) {
         return cache(schema, schema.enum[0]);
