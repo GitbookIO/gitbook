@@ -9,6 +9,7 @@ import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
+    getResponseCookieForVisitorParams,
     getResponseCookiesForVisitorAuth,
     getVisitorPayload,
     normalizeVisitorAuthURL,
@@ -109,7 +110,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 url: siteRequestURL.toString(),
                 visitorPayload: {
                     jwtToken: visitorToken?.token ?? undefined,
-                    unsignedClaims,
+                    unsignedClaims: unsignedClaims.all,
                 },
                 // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
@@ -121,8 +122,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 apiToken,
             })
         );
-        const cookies: ResponseCookies = [];
 
+        //
+        // Retrieve the response cookie for visitor params that were passed to the URL to persist them in a session cookie.
+        //
+        const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims);
+
+        const cookies: ResponseCookies = visitorParamsCookie ? [visitorParamsCookie] : [];
         //
         // Handle redirects
         //

@@ -5,6 +5,7 @@ import hash from 'object-hash';
 const VISITOR_AUTH_PARAM = 'jwt_token';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
+const VISITOR_PARAMS_COOKIE_MAX_AGE = 60 * 60; // 1 hour
 
 /**
  * Typing for a cookie, matching the internal type of Next.js.
@@ -47,7 +48,10 @@ type ClaimPrimitive =
  */
 export type VisitorPayloadLookup = {
     visitorToken: VisitorTokenLookup;
-    unsignedClaims: Record<string, ClaimPrimitive>;
+    unsignedClaims: {
+        all: Record<string, ClaimPrimitive>;
+        fromVisitorParams: Record<string, ClaimPrimitive>;
+    };
 };
 
 /**
@@ -128,9 +132,10 @@ export function getVisitorToken({
 export function getVisitorUnsignedClaims(args: {
     cookies: RequestCookies;
     url: URL | NextRequest['nextUrl'];
-}): Record<string, ClaimPrimitive> {
+}): VisitorPayloadLookup['unsignedClaims'] {
     const { cookies, url } = args;
     const claims: Record<string, ClaimPrimitive> = {};
+    const searchParamsClaims: Record<string, ClaimPrimitive> = {};
 
     for (const cookie of cookies) {
         if (cookie.name.startsWith(VISITOR_UNSIGNED_CLAIMS_PREFIX)) {
@@ -149,11 +154,13 @@ export function getVisitorUnsignedClaims(args: {
         if (key.startsWith('visitor.')) {
             const claimPath = key.substring('visitor.'.length);
             const claimValue = parseVisitorQueryParamValue(value);
+
             setVisitorClaimByPath(claims, claimPath, claimValue);
+            setVisitorClaimByPath(searchParamsClaims, claimPath, claimValue);
         }
     }
 
-    return claims;
+    return { all: claims, fromVisitorParams: searchParamsClaims };
 }
 
 /**
@@ -219,6 +226,28 @@ function parseVisitorQueryParamValue(value: string): ClaimPrimitive {
     } catch {}
 
     return value;
+}
+
+/**
+ * Returns to cookie response to use in order to persist visitor params that were passed to the URL.
+ */
+export function getResponseCookieForVisitorParams(
+    visitorUnsignedClaims: VisitorPayloadLookup['unsignedClaims']
+): ResponseCookie | undefined {
+    if (Object.keys(visitorUnsignedClaims.fromVisitorParams).length === 0) {
+        return undefined;
+    }
+
+    return {
+        name: VISITOR_UNSIGNED_CLAIMS_PREFIX,
+        value: JSON.stringify(visitorUnsignedClaims.fromVisitorParams),
+        options: {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: VISITOR_PARAMS_COOKIE_MAX_AGE,
+        },
+    };
 }
 
 /**
