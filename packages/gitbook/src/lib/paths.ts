@@ -57,3 +57,15 @@ export function withTrailingSlash(pathname: string): string {
 
     return pathname;
 }
+
+/**
+ * Get the extension of a path.
+ */
+export function getExtension(path: string): string {
+    const re = /\.[0-9a-z]+$/i;
+    const match = path.match(re);
+    if (match) {
+        return match[0];
+    }
+    return '';
+}
