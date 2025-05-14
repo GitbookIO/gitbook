@@ -10,7 +10,7 @@ import {
     type ResponseCookies,
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
-    getVisitorPayload,
+    getVisitorData,
     normalizeVisitorAuthURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
@@ -95,7 +95,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     // Detect and extract the visitor authentication token from the request
     //
-    const { visitorToken, unsignedClaims } = getVisitorPayload({
+    const { visitorToken, unsignedClaims, visitorParamsCookie } = getVisitorData({
         cookies: request.cookies.getAll(),
         url: siteRequestURL,
     });
@@ -121,7 +121,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 apiToken,
             })
         );
-        const cookies: ResponseCookies = [];
+
+        const cookies: ResponseCookies = visitorParamsCookie
+            ? [
+                  // If visitor.* params were passed to the site URL, include a session cookie to persist these params across navigation.
+                  visitorParamsCookie,
+              ]
+            : [];
 
         //
         // Handle redirects
