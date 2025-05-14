@@ -41,12 +41,12 @@ type ClaimPrimitive =
     | ClaimPrimitive[];
 
 /**
- * The result of a visitor info lookup that can include:
+ * The result of a visitor data lookup that can include:
  *   - a visitor token (JWT)
  *   - a record of visitor public/unsigned claims (JSON object)
  *   - a session cookie response to persist any visitor query params across navigations.
  */
-export type VisitorPayloadLookup = {
+export type VisitorDataLookup = {
     visitorToken: VisitorTokenLookup;
     unsignedClaims: Record<string, ClaimPrimitive>;
     visitorParamsCookie: ResponseCookie | undefined;
@@ -87,7 +87,7 @@ export function getVisitorData({
 }: {
     cookies: RequestCookies;
     url: URL | NextRequest['nextUrl'];
-}): VisitorPayloadLookup {
+}): VisitorDataLookup {
     const visitorToken = getVisitorToken({ cookies, url });
     const unsignedClaims = getVisitorUnsignedClaims({ cookies, url });
     const visitorParamsCookie = getResponseCookieForVisitorParams(unsignedClaims.fromVisitorParams);
@@ -135,7 +135,16 @@ export function getVisitorToken({
 export function getVisitorUnsignedClaims(args: {
     cookies: RequestCookies;
     url: URL | NextRequest['nextUrl'];
-}): { all: Record<string, ClaimPrimitive>; fromVisitorParams: Record<string, ClaimPrimitive> } {
+}): {
+    /**
+     * The unsigned claims coming from both `gitbook-visitor-public` cookies and `visitor.*` query params.
+     */
+    all: Record<string, ClaimPrimitive>;
+    /**
+     * The unsigned claims from the `visitor.*` query params.
+     */
+    fromVisitorParams: Record<string, ClaimPrimitive>;
+} {
     const { cookies, url } = args;
     const claims: Record<string, ClaimPrimitive> = {};
     const searchParamsClaims: Record<string, ClaimPrimitive> = {};
@@ -245,7 +254,6 @@ function getResponseCookieForVisitorParams(
         name: VISITOR_UNSIGNED_CLAIMS_PREFIX,
         value: JSON.stringify(visitorParamsClaims),
         options: {
-            httpOnly: true,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
             secure: process.env.NODE_ENV === 'production',
         },
