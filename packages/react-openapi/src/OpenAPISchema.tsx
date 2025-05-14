@@ -80,11 +80,10 @@ function OpenAPISchemaProperty(
                                 context={context}
                             />
                             {index < alternatives.length - 1 ? (
-                                <span className="openapi-schema-alternative-separator">
-                                    {(schema.anyOf || schema.oneOf) &&
-                                        tString(context.translation, 'or')}
-                                    {schema.allOf && tString(context.translation, 'and')}
-                                </span>
+                                <OpenAPISchemaAlternativeSeparator
+                                    schema={schema}
+                                    context={context}
+                                />
                             ) : null}
                         </div>
                     ))}
@@ -253,6 +252,28 @@ function OpenAPISchemaAlternative(props: {
             circularRefs={circularRefs}
             context={context}
         />
+    );
+}
+
+function OpenAPISchemaAlternativeSeparator(props: {
+    schema: OpenAPIV3.SchemaObject;
+    context: OpenAPIClientContext;
+}) {
+    const { schema, context } = props;
+
+    const anyOf = schema.anyOf || schema.items?.anyOf;
+    const oneOf = schema.oneOf || schema.items?.oneOf;
+    const allOf = schema.allOf || schema.items?.allOf;
+
+    if (!anyOf && !oneOf && !allOf) {
+        return null;
+    }
+
+    return (
+        <span className="openapi-schema-alternative-separator">
+            {(anyOf || oneOf) && tString(context.translation, 'or')}
+            {allOf && tString(context.translation, 'and')}
+        </span>
     );
 }
 
@@ -457,6 +478,14 @@ export function getSchemaAlternatives(
     schema: OpenAPIV3.SchemaObject,
     ancestors: Set<OpenAPIV3.SchemaObject> = new Set()
 ): OpenAPIV3.SchemaObject[] | null {
+    // Search for alternatives in the items property if it exists
+    if (
+        schema.items &&
+        ('oneOf' in schema.items || 'allOf' in schema.items || 'anyOf' in schema.items)
+    ) {
+        return getSchemaAlternatives(schema.items, ancestors);
+    }
+
     const alternatives:
         | [AlternativeType, (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[]]
         | null = (() => {
