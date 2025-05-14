@@ -1,0 +1,17 @@
+diff --git a/dist/server/app-render/async-local-storage.js b/dist/server/app-render/async-local-storage.js
+index 5b3b462376c2d0fb7982f06e6d7256ff8ab796f3..5b74509eac151571f0b73dcb86a7d87d08b1a9f5 100644
+--- a/dist/server/app-render/async-local-storage.js
++++ b/dist/server/app-render/async-local-storage.js
+@@ -64,9 +64,9 @@ function bindSnapshot(fn) {
+     return FakeAsyncLocalStorage.bind(fn);
+ }
+ function createSnapshot() {
+-    if (maybeGlobalAsyncLocalStorage) {
+-        return maybeGlobalAsyncLocalStorage.snapshot();
+-    }
++    // if (maybeGlobalAsyncLocalStorage) {
++    //     return maybeGlobalAsyncLocalStorage.snapshot();
++    // }
+     return function(fn, ...args) {
+         return fn(...args);
+     };
