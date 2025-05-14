@@ -1,7 +1,9 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';
+import { OpenAPISchemaPresentation } from './OpenAPISchema';
 import { OpenAPISchemaProperties } from './OpenAPISchemaServer';
 import type { OpenAPIClientContext } from './context';
+import { tString } from './translate';
 import { parameterToProperty, resolveDescription } from './utils';
 
 /**
@@ -27,7 +29,31 @@ export function OpenAPIResponse(props: {
     return (
         <div className="openapi-response-body">
             {headers.length > 0 ? (
-                <OpenAPIDisclosure icon={context.icons.plus} label="Headers">
+                <OpenAPIDisclosure
+                    header={
+                        <OpenAPISchemaPresentation
+                            context={context}
+                            property={{
+                                propertyName: tString(context.translation, 'headers'),
+                                schema: {
+                                    type: 'object',
+                                },
+                                required: null,
+                            }}
+                        />
+                    }
+                    icon={context.icons.plus}
+                    label={(isExpanded) =>
+                        tString(
+                            context.translation,
+                            isExpanded ? 'hide' : 'show',
+                            tString(
+                                context.translation,
+                                headers.length === 1 ? 'header' : 'headers'
+                            )
+                        )
+                    }
+                >
                     <OpenAPISchemaProperties
                         properties={headers.map(([name, header]) =>
                             parameterToProperty({ name, ...header })
@@ -40,7 +66,13 @@ export function OpenAPIResponse(props: {
                 <div className="openapi-responsebody">
                     <OpenAPISchemaProperties
                         id={`response-${context.blockKey}`}
-                        properties={[{ schema: mediaType.schema }]}
+                        properties={[
+                            {
+                                schema: mediaType.schema,
+                                propertyName: tString(context.translation, 'response'),
+                                required: null,
+                            },
+                        ]}
                         context={context}
                     />
                 </div>

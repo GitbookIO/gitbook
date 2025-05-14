@@ -1,9 +1,8 @@
 import type { OpenAPISchema } from '@gitbook/openapi-parser';
 import clsx from 'clsx';
-import { OpenAPIDisclosure } from '../OpenAPIDisclosure';
 import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
-import { Section, SectionBody, StaticSection } from '../StaticSection';
+import { StaticSection } from '../StaticSection';
 import {
     type OpenAPIContextInput,
     getOpenAPIClientContext,
@@ -11,6 +10,7 @@ import {
 } from '../context';
 import { t } from '../translate';
 import { getExampleFromSchema } from '../util/example';
+import { OpenAPISchemaItem } from './OpenAPISchemaItem';
 
 /**
  * OpenAPI Schemas component.
@@ -85,18 +85,12 @@ export function OpenAPISchemas(props: {
         <div className={clsx('openapi-schemas', className)}>
             {schemas.map(({ name, schema }) => {
                 return (
-                    <OpenAPIDisclosure
-                        className="openapi-schemas-disclosure"
+                    <OpenAPISchemaItem
                         key={name}
-                        icon={context.icons.chevronRight}
-                        label={name}
-                    >
-                        <Section className="openapi-section-schemas">
-                            <SectionBody>
-                                <OpenAPIRootSchema schema={schema} context={clientContext} />
-                            </SectionBody>
-                        </Section>
-                    </OpenAPIDisclosure>
+                        name={name}
+                        context={clientContext}
+                        schema={schema}
+                    />
                 );
             })}
         </div>

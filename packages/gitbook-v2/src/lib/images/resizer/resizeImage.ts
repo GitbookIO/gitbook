@@ -1,7 +1,7 @@
 import 'server-only';
 import assertNever from 'assert-never';
 import { GITBOOK_IMAGE_RESIZE_MODE } from '../../env';
-import { checkIsSizableImageURL } from '../checkIsSizableImageURL';
+import { SizableImageAction, checkIsSizableImageURL } from '../checkIsSizableImageURL';
 import { resizeImageWithCDNCgi } from './cdn-cgi';
 import { resizeImageWithCFFetch } from './cf-fetch';
 import type { CloudflareImageJsonFormat, CloudflareImageOptions } from './types';
@@ -13,7 +13,7 @@ export async function getImageSize(
     input: string,
     defaultSize: Partial<CloudflareImageOptions> = {}
 ): Promise<{ width: number; height: number } | null> {
-    if (!checkIsSizableImageURL(input)) {
+    if (checkIsSizableImageURL(input) !== SizableImageAction.Resize) {
         return null;
     }
 
@@ -48,13 +48,17 @@ export async function resizeImage(
         signal?: AbortSignal;
     }
 ): Promise<Response> {
-    const parsed = new URL(input);
-    if (parsed.protocol === 'data:') {
-        throw new Error('Cannot resize data: URLs');
+    const action = checkIsSizableImageURL(input);
+    if (action === SizableImageAction.Skip) {
+        throw new Error(
+            'Cannot resize this image, this function should have never been called on this url'
+        );
     }
 
-    if (parsed.hostname === 'localhost') {
-        throw new Error('Cannot resize localhost URLs');
+    if (action === SizableImageAction.Passthrough) {
+        return fetch(input, {
+            signal: options.signal,
+        });
     }
 
     switch (GITBOOK_IMAGE_RESIZE_MODE) {

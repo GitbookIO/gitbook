@@ -20,8 +20,9 @@ export function OpenAPIResponses(props: {
 }) {
     const { responses, context } = props;
 
-    const groups = Object.entries(responses).map(
-        ([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
+    const groups = Object.entries(responses)
+        .filter(([_, response]) => response && typeof response === 'object')
+        .map(([statusCode, response]: [string, OpenAPIV3.ResponseObject]) => {
             const tabs = (() => {
                 // If there is no content, but there are headers, we need to show the headers
                 if (
@@ -83,8 +84,7 @@ export function OpenAPIResponses(props: {
                 ),
                 tabs,
             };
-        }
-    );
+        });
 
     const state = useResponseExamplesState(context.blockKey, groups[0]?.key);
 

@@ -169,41 +169,18 @@
     @apply flex flex-col;
 }
 
-.openapi-schema {
+.openapi-schema,
+.openapi-disclosure {
     @apply py-2.5 flex flex-col gap-2;
-}
-
-.openapi-section-body .openapi-schema-properties {
-    @apply divide-y divide-tint-subtle;
-}
-
-.openapi-disclosure-group-panel > .openapi-schema-properties > *:first-child > .openapi-schema {
-    @apply pt-0;
-}
-
-.openapi-responsebody > .openapi-schema-properties > .openapi-schema:last-child {
-    @apply pb-0;
-}
-
-.openapi-responsebody > .openapi-schema-properties > .openapi-schema:only-child {
-    @apply py-0;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
     @apply border-b-0;
 }
 
-.openapi-schema-properties .openapi-schema-opened {
-    @apply pb-3;
-}
-
-.openapi-schema > .openapi-schema-properties {
-    @apply mt-3;
-}
-
 /* Schema Presentation */
 .openapi-schema-presentation {
-    @apply flex flex-col gap-1.5 font-normal;
+    @apply flex flex-col gap-1 font-normal;
 }
 
 .openapi-schema-properties:last-child {
@@ -221,7 +198,7 @@
 }
 
 .openapi-schema-propertyname {
-    @apply select-all font-mono font-normal text-tint-strong;
+    @apply select-all font-mono font-semibold text-tint-strong;
 }
 
 .openapi-schema-propertyname[data-deprecated="true"] {
@@ -233,7 +210,7 @@
 }
 
 .openapi-schema-optional {
-    @apply text-info-subtle text-[0.813rem] lowercase;
+    @apply text-tint-subtle text-[0.813rem] lowercase;
 }
 
 .openapi-schema-readonly {
@@ -242,6 +219,10 @@
 
 .openapi-schema-writeonly {
     @apply text-success dark:text-success-subtle/9 text-[0.813rem] lowercase;
+}
+
+.openapi-schema-types {
+    @apply flex items-baseline flex-wrap gap-1;
 }
 
 .openapi-schema-type {
@@ -321,7 +302,7 @@
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code,
 .openapi-schema-default code {
-    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
 }
 
 /* Authentication */
@@ -373,28 +354,25 @@
 }
 
 .openapi-response-tab-content {
-    @apply overflow-hidden max-w-full flex items-baseline;
-    @apply text-left text-pretty relative leading-[1.125rem] text-tint !font-normal truncate select-text;
+    @apply flex items-baseline truncate grow shrink max-w-max basis-[60%] mr-auto;
+    @apply text-left text-pretty relative leading-tight text-tint select-text;
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply text-left prose-sm text-[0.813rem] text-pretty h-auto relative leading-[1.125rem] text-tint !font-normal truncate select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply text-left truncate prose-sm text-sm leading-tight text-tint select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-.openapi-response-description.openapi-markdown::-webkit-scrollbar {
-    display: none;
+.openapi-disclosure-group-trigger[aria-expanded="true"] .openapi-response-tab-content {
+    @apply basis-full;
 }
 
-.openapi-response-description p {
-    @apply truncate max-w-full inline pr-1;
-}
-
-.openapi-response-content-type {
-    @apply text-xs text-tint-8 ml-auto shrink-0;
+.openapi-disclosure-group-trigger[aria-expanded="true"]
+    .openapi-response-description.openapi-markdown {
+    @apply whitespace-normal;
 }
 
 .openapi-response-body {
-    @apply flex flex-col gap-3;
+    @apply flex flex-col;
 }
 
 /* Response Body and Headers */
@@ -411,22 +389,19 @@
     @apply px-3 py-1;
 }
 
-.openapi-responsebody-header-content,
-.openapi-responseheaders-header-content {
-    /* unstyled */
-}
-
 /* Code Sample */
-.openapi-codesample {
-    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
-}
-
 .openapi-codesample-header {
     @apply flex flex-row items-center;
 }
 
 .openapi-response-media-types-examples-footer-content {
     @apply flex flex-row items-center gap-2.5;
+}
+
+.openapi-panel-heading,
+.openapi-codesample-header,
+.openapi-response-examples-header {
+    @apply border-b border-tint-subtle;
 }
 
 .openapi-response-examples-header .openapi-select > button {
@@ -503,8 +478,16 @@
 }
 
 /* Panel */
-.openapi-panel {
-    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
+.openapi-panel,
+.openapi-codesample,
+.openapi-response-examples {
+    @apply border rounded-md straight-corners:rounded-none bg-tint-subtle border-tint-subtle shadow-sm;
+}
+
+.openapi-panel pre,
+.openapi-codesample pre,
+.openapi-response-examples pre {
+    @apply bg-transparent border-none rounded-none shadow-none;
 }
 
 .openapi-panel-heading {
@@ -513,12 +496,11 @@
 
 .openapi-panel-body {
     @apply relative;
-    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
 }
 
 .openapi-panel-footer,
 .openapi-codesample-footer {
-    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint;
+    @apply px-3 py-2 pt-2.5 border-t border-tint-subtle text-[0.813rem] text-tint empty:hidden;
 }
 
 .openapi-panel-footer .openapi-markdown {
@@ -526,10 +508,6 @@
 }
 
 /* Example */
-.openapi-response-examples {
-    @apply border rounded-md straight-corners:rounded-none bg-tint border-tint-subtle;
-}
-
 .openapi-response-examples-header {
     @apply flex flex-row items-center p-2.5;
 }
@@ -551,7 +529,6 @@
 .openapi-response-examples-panel,
 .openapi-codesample-panel {
     @apply flex-1 text-sm relative focus-visible:outline-none;
-    @apply before:w-full before:h-px before:absolute before:bg-tint-6 before:-top-px before:z-10;
 }
 
 .openapi-example-empty {
@@ -703,27 +680,31 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-tint-subtle border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
+    @apply border-tint-subtle transition-all border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
 }
 
-.openapi-disclosure-group-header {
-    @apply flex flex-row items-baseline justify-between gap-3 relative;
+.openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover) {
+    @apply bg-tint-subtle;
+}
+
+.openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover):has(.openapi-select:hover) {
+    @apply !bg-transparent;
 }
 
 .openapi-disclosure-group-trigger {
-    @apply flex items-baseline transition-all hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex w-full cursor-pointer items-baseline gap-3 transition-all relative flex-1 p-3 -outline-offset-1;
 }
 
-.openapi-disclosure-group-trigger:disabled {
+.openapi-disclosure-group-label {
+    @apply flex flex-wrap items-baseline gap-x-3 gap-y-1 flex-1 truncate;
+}
+
+.openapi-disclosure-group-trigger[aria-disabled="true"] {
     @apply cursor-default hover:bg-inherit;
 }
 
-.openapi-disclosure-group-trigger:disabled .openapi-disclosure-group-icon {
+.openapi-disclosure-group-trigger[aria-disabled="true"] .openapi-disclosure-group-icon {
     @apply invisible;
-}
-
-.openapi-disclosure-group-trigger[aria-expanded="true"] .openapi-response-description {
-    @apply whitespace-normal;
 }
 
 .openapi-disclosure-group-icon > svg {
@@ -735,29 +716,20 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-group-panel {
-    @apply p-3 pt-1 transition-all;
+    @apply px-3 transition-all;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
     @apply rotate-90;
 }
 
-.openapi-disclosure-group:hover .openapi-disclosure-group-mediatype,
-.openapi-disclosure-group-mediatype:has(> .openapi-select[data-open="true"]) {
-    @apply opacity-11 visible flex;
-}
-
-.openapi-disclosure-group-mediatype {
-    @apply opacity-0 invisible text-xs transition-opacity duration-300 shrink-0 absolute right-2.5 top-2.5;
-}
-
-.openapi-disclosure-group-mediatype > span {
-    @apply px-1 bg-tint-6 text-tint-12 rounded-full straight-corners:rounded-md;
+.openapi-disclosure-group-mediatype:not(:has(.openapi-select)) {
+    @apply text-[0.625rem] font-mono shrink-0 grow-0 text-tint-subtle contrast-more:text-tint;
 }
 
 /* Disclosure */
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
-    @apply flex items-center font-mono !w-full transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex items-center font-mono transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger,
@@ -765,49 +737,95 @@ body:has(.openapi-select-popover) {
     @apply straight-corners:!rounded-none;
 }
 
+.openapi-disclosure-panel {
+    @apply ml-1.5 pl-3 border-l border-tint-subtle;
+}
+
+.openapi-schema .openapi-schema-properties .openapi-schema {
+    @apply animate-fadeIn [animation-fill-mode:both];
+}
+
 .openapi-schemas-disclosure > .openapi-disclosure-trigger[aria-expanded="true"] > svg {
     @apply rotate-90;
 }
 
 .openapi-disclosure-trigger {
-    @apply transition-all truncate duration-300 max-w-full hover:text-tint-strong rounded-2xl straight-corners:rounded border border-tint-subtle px-2.5 py-1 text-[0.813rem] text-tint flex flex-row items-center gap-1.5 -outline-offset-1;
+    @apply flex flex-row justify-between flex-wrap relative items-start gap-2 text-left -mx-3 px-3 -my-2.5 py-2.5 pr-10;
 }
 
-.openapi-disclosure-trigger span {
-    @apply truncate;
+.openapi-disclosure {
+    @apply -mx-3 px-3 py-2.5 transition-all flex flex-col ring-tint-subtle;
 }
 
-.openapi-disclosure svg {
-    @apply size-3 shrink-0 transition-transform duration-300;
+.openapi-disclosure:not(
+        .openapi-disclosure-group .openapi-disclosure,
+        .openapi-schema-alternatives .openapi-disclosure,
+        .openapi-schemas-disclosure .openapi-schema.openapi-disclosure
+    ) {
+    @apply rounded-xl;
+}
+
+.openapi-disclosure .openapi-schemas-disclosure .openapi-schema.openapi-disclosure {
+    @apply !rounded-none;
+}
+
+.openapi-disclosure:has(> .openapi-disclosure-trigger:hover) {
+    @apply bg-tint-subtle;
+}
+
+.openapi-disclosure:has(> .openapi-disclosure-trigger:hover),
+.openapi-disclosure[data-expanded="true"] {
+    @apply ring-1 shadow-sm;
+}
+
+.openapi-disclosure[data-expanded="true"]:not(:first-child) {
+    @apply mt-2;
+}
+.openapi-disclosure[data-expanded="true"]:not(:last-child) {
+    @apply mb-2;
+}
+
+.openapi-disclosure-trigger-label {
+    @apply absolute right-3 px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none flex flex-row gap-1 items-center text-xs;
+}
+
+.openapi-disclosure-trigger-label span {
+    @apply hidden;
+}
+
+.openapi-disclosure-trigger-label svg {
+    @apply size-3 shrink-0 transition-transform duration-300 text-tint-subtle;
+}
+
+.openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label,
+.openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label {
+    @apply shadow ring-1 bg-tint-base;
+}
+
+.openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label span,
+.openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label span {
+    @apply block animate-fadeIn;
+}
+
+@media (hover: none) {
+    /* Make button label always visible on non-hover devices like phones */
+    .openapi-disclosure-trigger-label {
+        @apply relative ring-1 bg-tint-base right-0;
+    }
+    .openapi-disclosure-trigger-label span {
+        @apply block;
+    }
+    .openapi-disclosure-trigger {
+        @apply pr-3;
+    }
 }
 
 .openapi-disclosure-trigger[aria-expanded="true"] svg {
     @apply rotate-45;
 }
 
-.openapi-disclosure-trigger[aria-expanded="true"] {
-    @apply w-full rounded-lg border-b rounded-b-none straight-corners:rounded-b-none;
-}
-
 .openapi-disclosure-trigger[aria-expanded="false"] {
     @apply w-auto;
-}
-
-.openapi-disclosure-panel[aria-hidden="false"] {
-    @apply border-b border-x border-tint-subtle rounded-b-lg straight-corners:rounded-b;
-}
-
-.openapi-disclosure-panel .openapi-schema {
-    @apply p-2.5;
-}
-
-.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child,
-.openapi-disclosure .openapi-schema-properties .openapi-schema:only-child .openapi-schema-name {
-    @apply !m-0;
-}
-
-.openapi-disclosure .openapi-schema-properties .openapi-schema-enum {
-    @apply pt-0 mt-0;
 }
 
 .openapi-section-body.openapi-schema.openapi-schema-root {
@@ -817,6 +835,16 @@ body:has(.openapi-select-popover) {
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-schema,
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-root {
     @apply p-2.5;
+}
+
+.openapi-schema-alternatives {
+    @apply ml-1.5 pl-3 border-l border-tint-subtle;
+}
+.openapi-schema-alternative {
+    @apply relative;
+}
+.openapi-schema-alternative-separator {
+    @apply p-0.5 tracking-wide leading-none uppercase text-[0.625rem] text-tint-subtle whitespace-nowrap absolute -left-3 -bottom-2.5 -translate-x-1/2 z-10 bg-tint-base border-y border-tint-subtle -rotate-6;
 }
 
 .openapi-tooltip {
@@ -865,11 +893,11 @@ body:has(.openapi-select-popover) {
 }
 
 @keyframes popover-leave {
-    0% {
+    from {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
-    100% {
+    to {
         opacity: 0;
         transform: translateY(4px) scale(0.95);
     }

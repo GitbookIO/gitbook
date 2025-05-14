@@ -214,13 +214,31 @@ export function colorScale(
         const targetL =
             foregroundColor.L * mapping[index] + backgroundColor.L * (1 - mapping[index]);
 
-        if (index === 8 && !mix && Math.abs(baseColor.L - targetL) < 0.2) {
+        if (
+            index === 8 &&
+            !mix &&
+            (darkMode ? targetL - baseColor.L < 0.2 : baseColor.L - targetL < 0.2)
+        ) {
             // Original colour is close enough to target, so let's use the original colour as step 9.
             result.push(hex);
             continue;
         }
 
-        const chromaRatio = index === 8 || index === 9 ? 1 : index * 0.05;
+        const chromaRatio = (() => {
+            switch (index) {
+                // Step 9 and 10 have max chroma, meaning they are fully saturated.
+                case 8:
+                case 9:
+                    return 1;
+                // Step 11 and 12 have a reduced chroma
+                case 10:
+                    return 0.4;
+                case 11:
+                    return 0.1;
+                default:
+                    return index * 0.05;
+            }
+        })();
 
         const shade = {
             L: targetL, // Blend lightness

@@ -83,6 +83,12 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                                     )
                                                 }
                                                 asChild
+                                                onClick={(e) => {
+                                                    if (value) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }
+                                                }}
                                             >
                                                 <SectionGroupTab
                                                     isActive={isActive}
@@ -180,7 +186,7 @@ const SectionGroupTab = React.forwardRef(function SectionGroupTab(
             ref={ref}
             {...rest}
             className={tcls(
-                'group relative my-2 flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 transition-colors',
+                'group relative my-2 flex select-none items-center justify-between rounded straight-corners:rounded-none px-3 py-1 transition-colors hover:cursor-default',
                 isActive
                     ? 'text-primary-subtle'
                     : 'text-tint hover:bg-tint-hover hover:text-tint-strong'

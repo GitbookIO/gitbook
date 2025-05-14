@@ -76,7 +76,7 @@ function DisclosureItem(props: {
     });
 
     const panelRef = useRef<HTMLDivElement | null>(null);
-    const triggerRef = useRef<HTMLButtonElement | null>(null);
+    const triggerRef = useRef<HTMLDivElement | null>(null);
     const isDisabled = groupState?.isDisabled || !group.tabs?.length || false;
     const { buttonProps: triggerProps, panelProps } = useDisclosure(
         {
@@ -96,55 +96,56 @@ function DisclosureItem(props: {
 
     return (
         <div className="openapi-disclosure-group" aria-expanded={state.isExpanded}>
-            <div className="openapi-disclosure-group-header">
-                <button
-                    slot="trigger"
-                    ref={triggerRef}
-                    {...mergeProps(buttonProps, focusProps)}
-                    disabled={isDisabled}
-                    style={{
-                        outline: isFocusVisible
-                            ? '2px solid rgb(var(--primary-color-500)/0.4)'
-                            : 'none',
-                    }}
-                    className="openapi-disclosure-group-trigger"
-                >
-                    <div className="openapi-disclosure-group-icon">
-                        {icon || (
-                            <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
-                                <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                            </svg>
-                        )}
-                    </div>
+            <div
+                slot="trigger"
+                ref={triggerRef}
+                {...mergeProps(buttonProps, focusProps)}
+                aria-disabled={isDisabled}
+                style={{
+                    outline: isFocusVisible
+                        ? '2px solid rgb(var(--primary-color-500)/0.4)'
+                        : 'none',
+                }}
+                className="openapi-disclosure-group-trigger"
+            >
+                <div className="openapi-disclosure-group-icon">
+                    {icon || (
+                        <svg viewBox="0 0 24 24" className="openapi-disclosure-group-icon">
+                            <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                    )}
+                </div>
 
+                <div className="openapi-disclosure-group-label">
                     {group.label}
-                </button>
-                {group.tabs ? (
-                    <div
-                        className="openapi-disclosure-group-mediatype"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {group.tabs?.length > 1 ? (
-                            <OpenAPISelect
-                                icon={selectIcon}
-                                stateKey={selectStateKey}
-                                onSelectionChange={() => {
-                                    state.expand();
-                                }}
-                                items={group.tabs}
-                                placement="bottom end"
-                            >
-                                {group.tabs.map((tab) => (
-                                    <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
-                                        {tab.label}
-                                    </OpenAPISelectItem>
-                                ))}
-                            </OpenAPISelect>
-                        ) : group.tabs[0]?.label ? (
-                            <span>{group.tabs[0].label}</span>
-                        ) : null}
-                    </div>
-                ) : null}
+
+                    {group.tabs ? (
+                        <div
+                            className="openapi-disclosure-group-mediatype"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {group.tabs?.length > 1 ? (
+                                <OpenAPISelect
+                                    icon={selectIcon}
+                                    stateKey={selectStateKey}
+                                    onSelectionChange={() => {
+                                        state.expand();
+                                    }}
+                                    items={group.tabs}
+                                    placement="bottom end"
+                                >
+                                    {group.tabs.map((tab) => (
+                                        <OpenAPISelectItem key={tab.key} id={tab.key} value={tab}>
+                                            {tab.label}
+                                        </OpenAPISelectItem>
+                                    ))}
+                                </OpenAPISelect>
+                            ) : group.tabs[0]?.label ? (
+                                <span>{group.tabs[0].label}</span>
+                            ) : null}
+                        </div>
+                    ) : null}
+                </div>
             </div>
 
             {state.isExpanded && selectedTab && (

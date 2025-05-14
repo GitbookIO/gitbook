@@ -267,6 +267,7 @@ export const getPublishedContentByUrl = cache({
 
             const parsed = parseCacheResponse(response);
 
+            // biome-ignore lint/suspicious/noConsole: log the ttl of the token
             console.log(
                 `Parsed ttl: ${parsed.ttl} at ${Date.now()}, for ${'apiToken' in response.data ? response.data.apiToken : '<no-token>'}`
             );
@@ -764,7 +765,12 @@ export const getComputedDocument = cache({
  * Mimic the validation done on source server-side to reduce API usage.
  */
 function validateSiteRedirectSource(source: string) {
-    return source.length <= 512 && /^\/[a-zA-Z0-9-_.\\/]+[a-zA-Z0-9-_.]$/.test(source);
+    return (
+        source.length <= 512 &&
+        /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/.test(
+            source
+        )
+    );
 }
 
 /**

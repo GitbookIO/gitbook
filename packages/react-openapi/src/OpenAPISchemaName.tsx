@@ -6,7 +6,7 @@ import { t, tString } from './translate';
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
     propertyName?: string | React.JSX.Element;
-    required?: boolean;
+    required?: boolean | null;
     type?: string;
     context: OpenAPIClientContext;
 }
@@ -43,7 +43,7 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
                     {t(context.translation, 'write_only')}
                 </span>
             ) : null}
-            {required ? (
+            {required === null ? null : required ? (
                 <span className="openapi-schema-required">
                     {t(context.translation, 'required')}
                 </span>

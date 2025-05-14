@@ -41,8 +41,12 @@ export interface ResolvedContentRef {
     file?: RevisionFile;
     /** Page document resolved from the content ref */
     page?: RevisionPageDocument;
-    /** Resolved reusable content, if the ref points to reusable content on a revision. */
-    reusableContent?: RevisionReusableContent;
+    /** Resolved reusable content, if the ref points to reusable content on a revision. Also contains the space and revision used for resolution. */
+    reusableContent?: {
+        revisionReusableContent: RevisionReusableContent;
+        space: Space;
+        revision: string;
+    };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
 }
@@ -231,21 +235,52 @@ export async function resolveContentRef(
         }
 
         case 'reusable-content': {
+            // Figure out which space and revision the reusable content is in.
+            const container: { space: Space; revision: string } | null = await (async () => {
+                // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
+                if (!contentRef.space || contentRef.space === context.space.id) {
+                    return { space: context.space, revision: revisionId };
+                }
+
+                const space = await getDataOrNull(
+                    dataFetcher.getSpace({
+                        spaceId: contentRef.space,
+                        shareKey: undefined,
+                    })
+                );
+
+                if (!space) {
+                    return null;
+                }
+
+                return { space, revision: space.revision };
+            })();
+
+            if (!container) {
+                return null;
+            }
+
             const reusableContent = await getDataOrNull(
                 dataFetcher.getReusableContent({
-                    spaceId: space.id,
-                    revisionId,
+                    spaceId: container.space.id,
+                    revisionId: container.revision,
                     reusableContentId: contentRef.reusableContent,
                 })
             );
+
             if (!reusableContent) {
                 return null;
             }
+
             return {
-                href: getGitBookAppHref(`/s/${space.id}`),
+                href: getGitBookAppHref(`/s/${container.space}/~/reusable/${reusableContent.id}`),
                 text: reusableContent.title,
                 active: false,
-                reusableContent,
+                reusableContent: {
+                    revisionReusableContent: reusableContent,
+                    space: container.space,
+                    revision: container.revision,
+                },
             };
         }
 

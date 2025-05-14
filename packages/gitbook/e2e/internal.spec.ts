@@ -12,7 +12,7 @@ import {
     VISITOR_TOKEN_COOKIE,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-} from '@/lib/visitor-token';
+} from '@/lib/visitors';
 
 import { getSiteAPIToken } from '../tests/utils';
 import {
@@ -111,24 +111,24 @@ const testCases: TestsCase[] = [
                 name: 'Customized variant titles are displayed',
                 url: '',
                 run: async (page) => {
-                    const spaceDrowpdown = page
+                    const spaceDropdown = page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
 
                     const variantSelectionDropdown = page.locator(
-                        'css=[data-testid="space-dropdown-button"] + div'
+                        'css=[data-testid="dropdown-menu"]'
                     );
                     // the customized space title
                     await expect(
-                        variantSelectionDropdown.getByRole('link', {
+                        variantSelectionDropdown.getByRole('menuitem', {
                             name: 'Multi-Variants',
                         })
                     ).toBeVisible();
 
                     // the NON-customized space title
                     await expect(
-                        variantSelectionDropdown.getByRole('link', {
+                        variantSelectionDropdown.getByRole('menuitem', {
                             name: 'RFCs',
                         })
                     ).toBeVisible();
@@ -145,14 +145,17 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page
+                    const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
 
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
                     // Click the second variant in the dropdown
-                    await page
-                        .getByRole('link', {
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
                             name: '2.0',
                         })
                         .click();
@@ -168,14 +171,18 @@ const testCases: TestsCase[] = [
                 url: 'api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/reference/api-reference/pets',
                 screenshot: false,
                 run: async (page) => {
-                    const spaceDrowpdown = await page
+                    const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
 
                     // Click the second variant in the dropdown
-                    await page
-                        .getByRole('link', {
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
                             name: '2.0',
                         })
                         .click();
@@ -205,14 +212,18 @@ const testCases: TestsCase[] = [
                     return `api-multi-versions-va/reference/api-reference/pets?jwt_token=${token}`;
                 },
                 run: async (page) => {
-                    const spaceDrowpdown = await page
+                    const spaceDropdown = await page
                         .locator('[data-testid="space-dropdown-button"]')
                         .locator('visible=true');
-                    await spaceDrowpdown.click();
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
 
                     // Click the second variant in the dropdown
-                    await page
-                        .getByRole('link', {
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
                             name: '2.0',
                         })
                         .click();

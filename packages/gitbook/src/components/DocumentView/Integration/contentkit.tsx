@@ -20,6 +20,8 @@ export const contentKitServerContext: ContentKitServerContext = {
         'link-external': (props) => <Icon icon="arrow-up-right-from-square" {...props} />,
         eye: (props) => <Icon icon="eye" {...props} />,
         lock: (props) => <Icon icon="lock" {...props} />,
+        check: (props) => <Icon icon="check" {...props} />,
+        'check-circle': (props) => <Icon icon="check-circle" {...props} />,
     },
     codeBlock: (props) => {
         return <PlainCodeBlock code={props.code} syntax={props.syntax} />;

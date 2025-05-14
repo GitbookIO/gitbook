@@ -1,4 +1,15 @@
-import { checkIsHttpURL } from '@/lib/urls';
+import { getExtension } from '@/lib/paths';
+
+export enum SizableImageAction {
+    Resize = 'resize',
+    Skip = 'skip',
+    Passthrough = 'passthrough',
+}
+
+/**
+ * https://developers.cloudflare.com/images/transform-images/#supported-input-formats
+ */
+const SUPPORTED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
 /**
  * Check if an image URL is resizable.
@@ -6,22 +17,27 @@ import { checkIsHttpURL } from '@/lib/urls';
  * Skip it for SVGs.
  * Skip it for GitBook images (to avoid recursion).
  */
-export function checkIsSizableImageURL(input: string): boolean {
+export function checkIsSizableImageURL(input: string): SizableImageAction {
     if (!URL.canParse(input)) {
-        return false;
-    }
-
-    if (input.includes('/~gitbook/image')) {
-        return false;
+        return SizableImageAction.Skip;
     }
 
     const parsed = new URL(input);
-    if (parsed.pathname.endsWith('.svg') || parsed.pathname.endsWith('.avif')) {
-        return false;
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return SizableImageAction.Skip;
     }
-    if (!checkIsHttpURL(parsed)) {
-        return false;
+    if (parsed.hostname === 'localhost') {
+        return SizableImageAction.Skip;
+    }
+    if (parsed.pathname.includes('/~gitbook/image')) {
+        return SizableImageAction.Skip;
     }
 
-    return true;
+    const extension = getExtension(parsed.pathname).toLowerCase();
+    if (!extension || SUPPORTED_IMAGE_EXTENSIONS.includes(extension)) {
+        // If no extension, we consider it resizable.
+        return SizableImageAction.Resize;
+    }
+
+    return SizableImageAction.Passthrough;
 }
