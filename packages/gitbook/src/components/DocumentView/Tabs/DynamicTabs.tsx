@@ -5,6 +5,8 @@ import React, { useCallback, useMemo } from 'react';
 import { useHash, useIsMounted } from '@/components/hooks';
 import * as storage from '@/lib/local-storage';
 import { type ClassValue, tcls } from '@/lib/tailwind';
+import type { DocumentBlockTabs } from '@gitbook/api';
+import { HashLinkButton, hashLinkButtonWrapperStyles } from '../HashLinkButton';
 
 interface TabsState {
     activeIds: {
@@ -68,9 +70,10 @@ export function DynamicTabs(
     props: TabsInput & {
         tabsBody: React.ReactNode[];
         style: ClassValue;
+        block: DocumentBlockTabs;
     }
 ) {
-    const { id, tabs, tabsBody, style } = props;
+    const { id, block, tabs, tabsBody, style } = props;
 
     const hash = useHash();
     const [tabsState, setTabsState] = useTabsState();
@@ -146,8 +149,8 @@ export function DynamicTabs(
                 'ring-inset',
                 'ring-tint-subtle',
                 'flex',
-                'overflow-hidden',
                 'flex-col',
+                'overflow-hidden',
                 style
             )}
         >
@@ -165,16 +168,14 @@ export function DynamicTabs(
                 )}
             >
                 {tabs.map((tab) => (
-                    <button
+                    <div
                         key={tab.id}
-                        role="tab"
-                        aria-selected={active.id === tab.id}
-                        aria-controls={getTabPanelId(tab.id)}
-                        id={getTabButtonId(tab.id)}
-                        onClick={() => {
-                            onSelectTab(tab);
-                        }}
                         className={tcls(
+                            hashLinkButtonWrapperStyles,
+                            'flex',
+                            'items-center',
+                            'gap-3.5',
+
                             //prev from active-tab
                             '[&:has(+_.active-tab)]:rounded-br-md',
 
@@ -183,14 +184,6 @@ export function DynamicTabs(
 
                             //next from active-tab
                             '[.active-tab_+_:after]:rounded-br-md',
-
-                            'inline-block',
-                            'text-sm',
-                            'px-3.5',
-                            'py-2',
-                            'transition-[color]',
-                            'font-[500]',
-                            'relative',
 
                             'after:transition-colors',
                             'after:border-r',
@@ -202,14 +195,16 @@ export function DynamicTabs(
                             'after:h-[70%]',
                             'after:w-[1px]',
 
+                            'px-3.5',
+                            'py-2',
+
                             'last:after:border-transparent',
 
                             'text-tint',
                             'bg-tint-12/1',
                             'hover:text-tint-strong',
-
-                            'truncate',
                             'max-w-full',
+                            'truncate',
 
                             active.id === tab.id
                                 ? [
@@ -224,8 +219,34 @@ export function DynamicTabs(
                                 : null
                         )}
                     >
-                        {tab.title}
-                    </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={active.id === tab.id}
+                            aria-controls={getTabPanelId(tab.id)}
+                            id={getTabButtonId(tab.id)}
+                            onClick={() => {
+                                onSelectTab(tab);
+                            }}
+                            className={tcls(
+                                'inline-block',
+                                'text-sm',
+                                'transition-[color]',
+                                'font-[500]',
+                                'relative',
+                                'max-w-full',
+                                'truncate'
+                            )}
+                        >
+                            {tab.title}
+                        </button>
+
+                        <HashLinkButton
+                            id={getTabButtonId(tab.id)}
+                            block={block}
+                            label="Direct link to tab"
+                        />
+                    </div>
                 ))}
             </div>
             {tabs.map((tab, index) => (
