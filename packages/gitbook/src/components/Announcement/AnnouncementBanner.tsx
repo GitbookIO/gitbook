@@ -25,10 +25,7 @@ export function AnnouncementBanner(props: {
     const style = BANNER_STYLES[announcement.style];
 
     return (
-        <div
-            id="announcement-banner"
-            className="announcement-banner theme-bold:bg-header-background pt-4 pb-2"
-        >
+        <div id="announcement-banner" className="theme-bold:bg-header-background pt-4 pb-2">
             <div className="scroll-nojump">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
                     <Tag

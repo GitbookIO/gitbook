@@ -3,91 +3,69 @@
 import { useEffect } from 'react';
 
 /**
- * Client component to adjust the TOC positioning based on dynamic elements
- * This gets included alongside the server-rendered TableOfContents
+ * Adjusts TableOfContents height based on visible elements
  */
 export function TableOfContentsScript() {
     useEffect(() => {
-        // Get DOM elements once
         const root = document.documentElement;
 
-        /**
-         * Updates TOC position and height based on current layout
-         */
+        // Calculate and set TOC dimensions
         const updateTocLayout = () => {
-            // 1. Calculate header height for top offset
+            // Get key elements
             const header = document.getElementById('site-header');
-            const headerHeight = header?.offsetHeight || 0;
-
-            // 2. Calculate available height = viewport - header - visibleBanner - visibleFooter
-            let availableHeight = window.innerHeight - headerHeight;
-
-            // 3. Subtract visible banner height (if any)
             const banner = document.getElementById('announcement-banner');
-            if (
-                banner instanceof HTMLElement &&
-                window.getComputedStyle(banner).display !== 'none'
-            ) {
-                const rect = banner.getBoundingClientRect();
-                if (rect.height > 0 && rect.bottom > 0) {
-                    availableHeight -= Math.min(rect.height, rect.bottom);
-                }
-            }
+            const footer = document.getElementById('site-footer');
 
-            // 4. Subtract visible footer height (if any)
-            const footer = document.querySelector('footer');
-            if (footer) {
-                const rect = footer.getBoundingClientRect();
-                if (rect.top < window.innerHeight) {
-                    availableHeight -= Math.min(rect.height, window.innerHeight - rect.top);
-                }
-            }
-
-            // 5. Update CSS variables
+            // Set sticky top position based on header
+            const headerHeight = header?.offsetHeight ?? 0;
             root.style.setProperty('--toc-top-offset', `${headerHeight}px`);
-            root.style.setProperty('--toc-height', `${availableHeight}px`);
-        };
 
-        // Throttled scroll handler using requestAnimationFrame
-        let isUpdating = false;
-        const handleScroll = () => {
-            if (!isUpdating) {
-                requestAnimationFrame(() => {
-                    updateTocLayout();
-                    isUpdating = false;
-                });
-                isUpdating = true;
+            // Start with full viewport height minus header
+            let height = window.innerHeight - headerHeight;
+
+            // Subtract visible banner (if any)
+            if (banner && banner.computedStyleMap().get('display') !== 'none') {
+                const bannerRect = banner.getBoundingClientRect();
+                if (bannerRect.height > 0 && bannerRect.bottom > 0) {
+                    height -= Math.min(bannerRect.height, bannerRect.bottom);
+                }
             }
+
+            // Subtract visible footer (if any)
+            if (footer) {
+                const footerRect = footer.getBoundingClientRect();
+                if (footerRect.top < window.innerHeight) {
+                    height -= Math.min(footerRect.height, window.innerHeight - footerRect.top);
+                }
+            }
+
+            // Update height
+            root.style.setProperty('--toc-height', `${height}px`);
         };
 
-        // Set up observers and event listeners
-        const observer = new MutationObserver(updateTocLayout);
-
-        // Initial calculation
+        // Initial update
         updateTocLayout();
 
-        // Observe both document.body and root element
-        observer.observe(document.body, {
+        // Let the browser handle scroll throttling naturally
+        window.addEventListener('scroll', updateTocLayout, { passive: true });
+        window.addEventListener('resize', updateTocLayout, { passive: true });
+
+        // Use MutationObserver for DOM changes
+        const observer = new MutationObserver(() => {
+            requestAnimationFrame(updateTocLayout);
+        });
+
+        // Only observe what matters
+        observer.observe(document.documentElement, {
             subtree: true,
-            childList: true,
             attributes: true,
-            attributeFilter: ['style', 'class', 'id'],
+            attributeFilter: ['style', 'class'],
         });
 
-        observer.observe(root, {
-            attributes: true,
-            attributeFilter: ['class'],
-        });
-
-        // Add event listeners
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', updateTocLayout);
-
-        // Cleanup function
         return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', updateTocLayout);
             observer.disconnect();
+            window.removeEventListener('scroll', updateTocLayout);
+            window.removeEventListener('resize', updateTocLayout);
         };
     }, []);
 

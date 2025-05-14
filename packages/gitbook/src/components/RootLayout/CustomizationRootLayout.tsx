@@ -1,6 +1,5 @@
 import {
     CustomizationCorners,
-    CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -74,9 +73,6 @@ export async function CustomizationRootLayout(props: {
             suppressHydrationWarning
             lang={customization.internationalization.locale}
             className={tcls(
-                customization.header.preset === CustomizationHeaderPreset.None
-                    ? 'site-header-none'
-                    : ['site-header', 'scroll-pt-[76px]'], // Take the sticky header in consideration for the scrolling
                 customization.styling.corners === CustomizationCorners.Straight
                     ? ' straight-corners'
                     : '',

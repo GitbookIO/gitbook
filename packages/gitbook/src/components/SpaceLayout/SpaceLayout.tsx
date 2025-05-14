@@ -5,7 +5,7 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { SearchButton, SearchModal } from '@/components/Search';
-import { AdaptiveTableOfContents } from '@/components/TableOfContents';
+import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
@@ -79,7 +79,7 @@ export function SpaceLayout(props: {
                             withTopHeader ? null : 'lg:min-h-screen'
                         )}
                     >
-                        <AdaptiveTableOfContents
+                        <TableOfContents
                             context={context}
                             header={
                                 withTopHeader ? null : (
