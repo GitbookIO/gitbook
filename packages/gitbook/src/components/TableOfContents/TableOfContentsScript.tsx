@@ -24,7 +24,7 @@ export function TableOfContentsScript() {
             let height = window.innerHeight - headerHeight;
 
             // Subtract visible banner (if any)
-            if (banner && banner.computedStyleMap().get('display') !== 'none') {
+            if (banner && banner?.computedStyleMap().get('display') !== 'none') {
                 const bannerRect = banner.getBoundingClientRect();
                 if (bannerRect.height > 0 && bannerRect.bottom > 0) {
                     height -= Math.min(bannerRect.height, bannerRect.bottom);
