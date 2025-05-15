@@ -15,14 +15,14 @@ export function RecordRow(
         fixedColumns: string[];
     }
 ) {
-    const { view, autoSizedColumns, fixedColumns, block } = props;
+    const { view, autoSizedColumns, fixedColumns, block, context } = props;
 
     return (
         <div className={styles.row} role="row">
             {view.columns.map((column) => {
                 const columnWidth = getColumnWidth({
                     column,
-                    columnWidths: view.columnWidths,
+                    columnWidths: context.mode === 'print' ? undefined : view.columnWidths,
                     autoSizedColumns,
                     fixedColumns,
                 });
