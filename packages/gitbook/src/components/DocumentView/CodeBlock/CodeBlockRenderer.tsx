@@ -58,7 +58,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 <code
                     id={id}
                     className={tcls(
-                        'inline-grid min-w-full grid-cols-[auto_1fr] p-2 [count-reset:line]',
+                        'inline-grid min-w-full grid-cols-[auto_1fr] p-2 [count-reset:line] print:whitespace-pre-wrap',
                         withWrap && 'whitespace-pre-wrap'
                     )}
                 >

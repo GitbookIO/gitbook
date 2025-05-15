@@ -24,7 +24,7 @@ import {
     type ResponseCookies,
     type VisitorTokenLookup,
     getResponseCookiesForVisitorAuth,
-    getVisitorPayload,
+    getVisitorData,
     normalizeVisitorAuthURL,
 } from '@/lib/visitors';
 
@@ -392,7 +392,7 @@ async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<Lookup
  * When serving multi spaces based on the current URL.
  */
 async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const { visitorToken } = getVisitorPayload({
+    const { visitorToken } = getVisitorData({
         cookies: request.cookies.getAll(),
         url,
     });
@@ -609,7 +609,7 @@ async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promis
     const target = new URL(targetStr);
     target.search = url.search;
 
-    const { visitorToken } = getVisitorPayload({
+    const { visitorToken } = getVisitorData({
         cookies: request.cookies.getAll(),
         url: target,
     });

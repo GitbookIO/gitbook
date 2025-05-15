@@ -178,7 +178,7 @@ describe('getVisitorUnsignedClaims', () => {
         const url = new URL('https://example.com/');
         const claims = getVisitorUnsignedClaims({ cookies, url });
 
-        expect(claims).toStrictEqual({
+        expect(claims.all).toStrictEqual({
             bucket: { flags: { SITE_AI: true, SITE_PREVIEW: true } },
             launchdarkly: { flags: { ALPHA: true, API: true } },
         });
@@ -191,7 +191,12 @@ describe('getVisitorUnsignedClaims', () => {
 
         const claims = getVisitorUnsignedClaims({ cookies: [], url });
 
-        expect(claims).toStrictEqual({
+        expect(claims.all).toStrictEqual({
+            isEnterprise: true,
+            language: 'fr',
+            country: 'fr',
+        });
+        expect(claims.fromVisitorParams).toStrictEqual({
             isEnterprise: true,
             language: 'fr',
             country: 'fr',
@@ -203,9 +208,12 @@ describe('getVisitorUnsignedClaims', () => {
 
         const claims = getVisitorUnsignedClaims({ cookies: [], url });
 
-        expect(claims).toStrictEqual({
+        expect(claims.all).toStrictEqual({
             isEnterprise: true,
             // otherParam is not present
+        });
+        expect(claims.fromVisitorParams).toStrictEqual({
+            isEnterprise: true,
         });
     });
 
@@ -216,7 +224,14 @@ describe('getVisitorUnsignedClaims', () => {
 
         const claims = getVisitorUnsignedClaims({ cookies: [], url });
 
-        expect(claims).toStrictEqual({
+        expect(claims.all).toStrictEqual({
+            isEnterprise: true,
+            flags: {
+                ALPHA: true,
+                API: false,
+            },
+        });
+        expect(claims.fromVisitorParams).toStrictEqual({
             isEnterprise: true,
             flags: {
                 ALPHA: true,
@@ -235,7 +250,7 @@ describe('getVisitorUnsignedClaims', () => {
         const url = new URL('https://example.com/');
         const claims = getVisitorUnsignedClaims({ cookies, url });
 
-        expect(claims).toStrictEqual({});
+        expect(claims.all).toStrictEqual({});
     });
 
     it('should merge claims from cookies and visitor.* query params', () => {
@@ -250,16 +265,27 @@ describe('getVisitorUnsignedClaims', () => {
             },
         ];
         const url = new URL(
-            'https://example.com/?visitor.isEnterprise=true&visitor.flags.ALPHA=true&visitor.flags.API=false'
+            'https://example.com/?visitor.isEnterprise=true&visitor.flags.ALPHA=true&visitor.flags.API=false&visitor.bucket.flags.HELLO=false'
         );
 
         const claims = getVisitorUnsignedClaims({ cookies, url });
 
-        expect(claims).toStrictEqual({
+        expect(claims.all).toStrictEqual({
             role: 'admin',
             language: 'fr',
             bucket: {
-                flags: { SITE_AI: true, SITE_PREVIEW: true },
+                flags: { HELLO: false, SITE_AI: true, SITE_PREVIEW: true },
+            },
+            isEnterprise: true,
+            flags: {
+                ALPHA: true,
+                API: false,
+            },
+        });
+
+        expect(claims.fromVisitorParams).toStrictEqual({
+            bucket: {
+                flags: { HELLO: false },
             },
             isEnterprise: true,
             flags: {
