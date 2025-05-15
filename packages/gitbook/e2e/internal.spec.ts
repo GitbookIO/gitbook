@@ -269,7 +269,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'GitBook',
-        contentBaseURL: 'https://gitbook.com/docs',
+        contentBaseURL: 'https://gitbook.com/docs/',
         tests: [
             {
                 name: 'Home',
