@@ -257,7 +257,6 @@
   "patchedDependencies": {
     "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
     "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch",
-    "next@15.3.2": "patches/next@15.3.2.patch",
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
@@ -635,6 +634,8 @@
     "@gitbook/colors": ["@gitbook/colors@workspace:packages/colors"],
 
     "@gitbook/emoji-codepoints": ["@gitbook/emoji-codepoints@workspace:packages/emoji-codepoints"],
+
+    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.8", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.6.0" } }, "sha512-i4PgiuGyUb52Muhc52kK3aMJIMfMkA2RbPW30tre8a6M8T6mWTfYo6gafSgjNvF1vH29zcuB8oBYnF0gO4XcHA=="],
 
     "@gitbook/icons": ["@gitbook/icons@workspace:packages/icons"],
 
