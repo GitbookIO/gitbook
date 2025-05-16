@@ -1,5 +1,13 @@
 # @gitbook/colors
 
+## 0.3.3
+
+### Patch Changes
+
+- c3f6b8c: Update chroma ratio per step
+- 5e975ab: Fix code highlighting for HTTP
+- f7a3470: Change lightness check for color step 9 to allow input colors with a higher-than-needed contrast
+
 ## 0.3.2
 
 ### Patch Changes
