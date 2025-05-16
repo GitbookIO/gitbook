@@ -458,12 +458,16 @@ const config: Config = {
             /**
              * Variant when a header is displayed.
              */
-            addVariant('site-header-none', 'html.site-header-none &');
+            addVariant('site-header-none', 'body:not(:has(#site-header:not(.mobile-only))) &');
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
             addVariant('site-header-sections', [
                 'body:has(#site-header:not(.mobile-only) #sections) &',
                 'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
             ]);
+            addVariant(
+                'announcement',
+                'html:not(.announcement-hidden):has(#announcement-banner) &'
+            );
 
             const customisationVariants = {
                 // Sidebar styles
