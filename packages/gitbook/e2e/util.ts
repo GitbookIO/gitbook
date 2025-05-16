@@ -168,7 +168,7 @@ export function runTestCases(testCases: TestsCase[]) {
                               new URL(testEntryPathname, testCase.contentBaseURL).toString()
                           )
                         : getTestURL(testEntryPathname);
-                    console.log(`Testing ${url}`);
+
                     if (testEntry.cookies) {
                         await context.addCookies(
                             testEntry.cookies.map((cookie) => ({
