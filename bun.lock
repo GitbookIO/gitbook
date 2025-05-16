@@ -157,7 +157,6 @@
         "warn-once": "^0.1.1",
       },
       "devDependencies": {
-        "@opennextjs/cloudflare": "^1.0.1",
         "@types/rison": "^0.0.9",
         "gitbook": "*",
         "postcss": "^8",
