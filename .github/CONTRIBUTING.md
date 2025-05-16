@@ -63,9 +63,9 @@ To start your local version of GitBook, run the command `bun dev`.
 
 When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/`.
 
-For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/docs.gitbook.com` after running the development server.
+For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/gitbook.com/docs` after running the development server.
 
-You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://docs.gitbook.com/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
+You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://gitbook.com/docs/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
 
 ### Commit your update
 
