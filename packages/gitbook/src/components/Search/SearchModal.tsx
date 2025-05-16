@@ -1,6 +1,4 @@
 'use client';
-
-import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -8,10 +6,9 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
 import { LoadingPane } from '../primitives/LoadingPane';
-import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
+import { SearchChat } from './SearchChat';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
 import { type SearchState, type UpdateSearchState, useSearch } from './useSearch';
@@ -35,7 +32,7 @@ export function SearchModal(props: SearchModalProps) {
         'mod+k',
         (e) => {
             e.preventDefault();
-            setSearchState({ ask: false, query: '', global: false });
+            setSearchState({ mode: 'both', query: '', global: false });
         },
         []
     );
@@ -179,7 +176,7 @@ function SearchModalBody(
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchState({
-            ask: false, // When typing, we go back to the default search mode
+            mode: 'both', // When typing, we go back to the default search mode
             query: event.target.value,
             global: state.global,
         });
@@ -219,9 +216,10 @@ function SearchModalBody(
                 'flex',
                 'flex-col',
                 'bg-tint-base',
-                'max-w-prose',
+                'max-w-screen-lg',
                 'mx-auto',
-                'max-h-[70dvh]',
+                // 'min-h-[50dvh]',
+                'h-[70dvh]',
                 'w-full',
                 'rounded-lg',
                 'straight-corners:rounded-sm',
@@ -236,69 +234,99 @@ function SearchModalBody(
                 event.stopPropagation();
             }}
         >
-            <div
-                className={tcls(
-                    'flex',
-                    'flex-row',
-                    'items-start',
-                    state.query !== null ? 'border-b' : null,
-                    'border-tint-subtle'
-                )}
-            >
-                <div className={tcls('p-2', 'pl-4', 'pt-4')}>
-                    <Icon icon="magnifying-glass" className={tcls('size-4', 'text-tint-subtle')} />
-                </div>
+            <div className="grid grow grid-rows-[auto_1fr_1fr] overflow-hidden md:grid-cols-[1fr_1fr] md:grid-rows-[auto_1fr]">
                 <div
                     className={tcls(
-                        'w-full',
                         'flex',
                         'flex-row',
-                        'flex-wrap',
-                        'gap-y-0',
-                        'gap-x-4',
-                        'items-end'
+                        'items-start',
+                        state.query !== null ? 'border-b' : null,
+                        'border-tint-subtle',
+                        'col-span-full'
                     )}
                 >
-                    <input
-                        ref={inputRef}
-                        value={state.query}
-                        onKeyDown={onKeyDown}
-                        onChange={onChange}
+                    <div
                         className={tcls(
-                            'text-tint-strong',
-                            'placeholder:text-tint',
+                            'w-full',
                             'flex',
-                            'resize-none',
-                            'flex-1',
-                            'h-12',
-                            'p-2',
-                            'focus:outline-none',
-                            'bg-transparent',
-                            'whitespace-pre-line'
+                            'flex-row',
+                            'flex-wrap',
+                            'gap-y-0',
+                            'gap-x-4',
+                            'items-end'
                         )}
-                        placeholder={tString(
-                            language,
-                            withAsk ? 'search_ask_input_placeholder' : 'search_input_placeholder'
-                        )}
-                        spellCheck="false"
-                        autoComplete="off"
-                        autoCorrect="off"
-                    />
-                    {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                    >
+                        <input
+                            ref={inputRef}
+                            value={state.query}
+                            onKeyDown={onKeyDown}
+                            onChange={onChange}
+                            className={tcls(
+                                'text-tint-strong',
+                                'placeholder:text-tint',
+                                'flex',
+                                'resize-none',
+                                'flex-1',
+                                'py-4',
+                                'px-8',
+                                'focus:outline-none',
+                                'bg-transparent',
+                                'whitespace-pre-line'
+                            )}
+                            placeholder={tString(
+                                language,
+                                withAsk
+                                    ? 'search_ask_input_placeholder'
+                                    : 'search_input_placeholder'
+                            )}
+                            spellCheck="false"
+                            autoComplete="off"
+                            autoCorrect="off"
+                        />
+                        {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                    </div>
                 </div>
+
+                <AnimatePresence>
+                    {state.mode !== 'chat' ? (
+                        <motion.div
+                            key="results"
+                            layout
+                            className={tcls(
+                                'overflow-y-auto md:col-start-1 md:row-start-2',
+                                state.mode === 'results' && 'md:-col-end-1'
+                            )}
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            exit={{ width: 0 }}
+                        >
+                            <SearchResults
+                                ref={resultsRef}
+                                global={isMultiVariants && state.global}
+                                query={normalizedQuery}
+                                withAsk={withAsk}
+                                onSwitchToAsk={onSwitchToAsk}
+                            />
+                        </motion.div>
+                    ) : null}
+
+                    {state.mode !== 'results' ? (
+                        <motion.div
+                            key="chat"
+                            layout
+                            className={tcls(
+                                'md:-col-end-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle max-md:border-t md:row-start-2 md:border-l',
+                                state.mode === 'chat' && 'md:col-start-1'
+                            )}
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            exit={{ width: 0 }}
+                        >
+                            <SearchChat query={normalizedQuery} />
+                        </motion.div>
+                    ) : null}
+                </AnimatePresence>
             </div>
-            {!state.ask || !withAsk ? (
-                <SearchResults
-                    ref={resultsRef}
-                    global={isMultiVariants && state.global}
-                    query={normalizedQuery}
-                    withAsk={withAsk}
-                    onSwitchToAsk={onSwitchToAsk}
-                />
-            ) : null}
-            {normalizedQuery && state.ask && withAsk ? (
-                <SearchAskAnswer query={normalizedQuery} />
-            ) : null}
         </motion.div>
     );
 }

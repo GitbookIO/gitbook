@@ -1,19 +1,21 @@
-import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
+import { parseAsBoolean, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
 import React from 'react';
 
 import type { LinkProps } from '../primitives';
 
 export interface SearchState {
     query: string;
-    ask: boolean;
     global: boolean;
+    mode: 'results' | 'chat' | 'both';
+    manual?: boolean;
 }
 
 // KeyMap needs to be statically defined to avoid `setRawState` being redefined on every render.
 const keyMap = {
     q: parseAsString,
-    ask: parseAsBoolean,
+    mode: parseAsStringEnum(['both', 'results', 'chat']).withDefault('both'),
     global: parseAsBoolean,
+    manual: parseAsBoolean,
 };
 
 export type UpdateSearchState = (
@@ -33,7 +35,12 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
             return null;
         }
 
-        return { query: rawState.q, ask: !!rawState.ask, global: !!rawState.global };
+        return {
+            query: rawState.q,
+            mode: rawState.mode,
+            global: !!rawState.global,
+            manual: !!rawState.manual,
+        };
     }, [rawState]);
 
     const stateRef = React.useRef(state);
@@ -52,14 +59,16 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
             if (update === null) {
                 return setRawState({
                     q: null,
-                    ask: null,
+                    mode: null,
                     global: null,
+                    manual: null,
                 });
             }
             return setRawState({
                 q: update.query,
-                ask: update.ask ? true : null,
+                mode: update.mode,
                 global: update.global ? true : null,
+                manual: update.manual ? true : null,
             });
         },
         [setRawState]
@@ -78,8 +87,9 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
         (query) => {
             const searchParams = new URLSearchParams();
             searchParams.set('q', query.query ?? '');
-            query.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
+            query.mode ? searchParams.set('mode', query.mode) : searchParams.delete('mode');
             query.global ? searchParams.set('global', 'on') : searchParams.delete('global');
+            searchParams.delete('manual');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -87,7 +97,7 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                     event.preventDefault();
                     setSearch((prev) => ({
                         query: '',
-                        ask: false,
+                        mode: 'both',
                         global: false,
                         ...(prev ?? {}),
                         ...query,
