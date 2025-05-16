@@ -6,6 +6,7 @@
 
 # cloudflare
 .open-next
+.wrangler
 
 # Symbolic links
 public
