@@ -1,7 +1,7 @@
 <h1 align="center">GitBook</h1>
 
 <p align="center">
-  <a href="https://docs.gitbook.com/">Docs</a> - <a href="https://github.com/GitbookIO/community">Community</a> - <a href="https://developer.gitbook.com/">Developer Docs</a> - <a href="https://changelog.gitbook.com/">Changelog</a> - <a href="https://github.com/GitbookIO/gitbook/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a> 
+  <a href="https://gitbook.com/docs">Docs</a> - <a href="https://github.com/GitbookIO/community">Community</a> - <a href="https://gitbook.com/docs/developers">Developer Docs</a> - <a href="https://changelog.gitbook.com/">Changelog</a> - <a href="https://github.com/GitbookIO/gitbook/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a>
 </p>
 
 <p align="center">
@@ -66,7 +66,7 @@ bun dev:v2
 
 examples:
 
--   http://localhost:3000/url/docs.gitbook.com
+-   http://localhost:3000/url/gitbook.com/docs
 -   http://localhost:3000/url/open-source.gitbook.io/midjourney
 
 Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
@@ -118,7 +118,7 @@ Encounter a bug or find an issue you'd like to fix? Helping us fix issues relate
 
 ## Deployment
 
-> [!WARNING]  
+> [!WARNING]
 > While it is possible to self-host this project, we do not recommend this unless you are certain this option fits your need.
 >
 > _Looking to add a specific feature in GitBook? Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to get started._
