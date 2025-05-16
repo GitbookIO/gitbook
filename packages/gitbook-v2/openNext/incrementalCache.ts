@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 
+import { trace } from '@/lib/tracing';
 import type {
     CacheEntryType,
     CacheValue,
@@ -24,28 +25,39 @@ class GitbookIncrementalCache implements IncrementalCache {
         key: string,
         cacheType?: CacheType
     ): Promise<WithLastModified<CacheValue<CacheType>> | null> {
-        const r2 = getCloudflareContext().env[BINDING_NAME];
-        const localCache = await this.getCacheInstance();
-        if (!r2) throw new Error('No R2 bucket');
-        try {
-            const cacheKey = this.getR2Key(key, cacheType);
-            // Check local cache first if available
-            const localCacheEntry = await localCache.match(this.getCacheUrlKey(cacheKey));
-            if (localCacheEntry) {
-                return localCacheEntry.json();
+        return trace(
+            {
+                operation: 'openNextIncrementalCacheGet',
+                name: key,
+            },
+            async (span) => {
+                span.setAttribute('cacheType', cacheType ?? 'cache');
+                const r2 = getCloudflareContext().env[BINDING_NAME];
+                const localCache = await this.getCacheInstance();
+                if (!r2) throw new Error('No R2 bucket');
+                try {
+                    const cacheKey = this.getR2Key(key, cacheType);
+                    // Check local cache first if available
+                    const localCacheEntry = await localCache.match(this.getCacheUrlKey(cacheKey));
+                    if (localCacheEntry) {
+                        span.setAttribute('cacheHit', 'local');
+                        return localCacheEntry.json();
+                    }
+
+                    const r2Object = await r2.get(this.getR2Key(key, cacheType));
+                    if (!r2Object) return null;
+
+                    span.setAttribute('cacheHit', 'r2');
+                    return {
+                        value: await r2Object.json(),
+                        lastModified: r2Object.uploaded.getTime(),
+                    };
+                } catch (e) {
+                    console.error('Failed to get from cache', e);
+                    return null;
+                }
             }
-
-            const r2Object = await r2.get(this.getR2Key(key, cacheType));
-            if (!r2Object) return null;
-
-            return {
-                value: await r2Object.json(),
-                lastModified: r2Object.uploaded.getTime(),
-            };
-        } catch (e) {
-            console.error('Failed to get from cache', e);
-            return null;
-        }
+        );
     }
 
     async set<CacheType extends CacheEntryType = 'cache'>(
@@ -53,62 +65,79 @@ class GitbookIncrementalCache implements IncrementalCache {
         value: CacheValue<CacheType>,
         cacheType?: CacheType
     ): Promise<void> {
-        const r2 = getCloudflareContext().env[BINDING_NAME];
-        const localCache = await this.getCacheInstance();
-        if (!r2) throw new Error('No R2 bucket');
+        return trace(
+            {
+                operation: 'openNextIncrementalCacheSet',
+                name: key,
+            },
+            async (span) => {
+                span.setAttribute('cacheType', cacheType ?? 'cache');
+                const r2 = getCloudflareContext().env[BINDING_NAME];
+                const localCache = await this.getCacheInstance();
+                if (!r2) throw new Error('No R2 bucket');
 
-        try {
-            const cacheKey = this.getR2Key(key, cacheType);
-            await r2.put(cacheKey, JSON.stringify(value));
+                try {
+                    const cacheKey = this.getR2Key(key, cacheType);
+                    await r2.put(cacheKey, JSON.stringify(value));
 
-            //TODO: Check if there is any places where we don't have tags
-            // Ideally we should always have tags, but in case we don't, we need to decide how to handle it
-            // For now we default to a build ID tag, which allow us to invalidate the cache in case something is wrong in this deployment
-            const tags = this.getTagsFromCacheEntry(value) ?? [
-                `build_id/${process.env.NEXT_BUILD_ID}`,
-            ];
+                    //TODO: Check if there is any places where we don't have tags
+                    // Ideally we should always have tags, but in case we don't, we need to decide how to handle it
+                    // For now we default to a build ID tag, which allow us to invalidate the cache in case something is wrong in this deployment
+                    const tags = this.getTagsFromCacheEntry(value) ?? [
+                        `build_id/${process.env.NEXT_BUILD_ID}`,
+                    ];
 
-            // We consider R2 as the source of truth, so we update the local cache
-            // only after a successful R2 write
-            await localCache.put(
-                this.getCacheUrlKey(cacheKey),
-                new Response(
-                    JSON.stringify({
-                        value,
-                        // Note: `Date.now()` returns the time of the last IO rather than the actual time.
-                        //       See https://developers.cloudflare.com/workers/reference/security-model/
-                        lastModified: Date.now(),
-                    }),
-                    {
-                        headers: {
-                            // Cache-Control default to 30 minutes, will be overridden by `revalidate`
-                            // In theory we should always get the `revalidate` value
-                            'cache-control': `max-age=${value.revalidate ?? 60 * 30}`,
-                            'cache-tag': tags.join(','),
-                        },
-                    }
-                )
-            );
-        } catch (e) {
-            console.error('Failed to set to cache', e);
-        }
+                    // We consider R2 as the source of truth, so we update the local cache
+                    // only after a successful R2 write
+                    await localCache.put(
+                        this.getCacheUrlKey(cacheKey),
+                        new Response(
+                            JSON.stringify({
+                                value,
+                                // Note: `Date.now()` returns the time of the last IO rather than the actual time.
+                                //       See https://developers.cloudflare.com/workers/reference/security-model/
+                                lastModified: Date.now(),
+                            }),
+                            {
+                                headers: {
+                                    // Cache-Control default to 30 minutes, will be overridden by `revalidate`
+                                    // In theory we should always get the `revalidate` value
+                                    'cache-control': `max-age=${value.revalidate ?? 60 * 30}`,
+                                    'cache-tag': tags.join(','),
+                                },
+                            }
+                        )
+                    );
+                } catch (e) {
+                    console.error('Failed to set to cache', e);
+                }
+            }
+        );
     }
 
     async delete(key: string): Promise<void> {
-        const r2 = getCloudflareContext().env[BINDING_NAME];
-        const localCache = await this.getCacheInstance();
-        if (!r2) throw new Error('No R2 bucket');
+        return trace(
+            {
+                operation: 'openNextIncrementalCacheDelete',
+                name: key,
+            },
+            async () => {
+                const r2 = getCloudflareContext().env[BINDING_NAME];
+                const localCache = await this.getCacheInstance();
+                if (!r2) throw new Error('No R2 bucket');
 
-        try {
-            const cacheKey = this.getR2Key(key);
+                try {
+                    const cacheKey = this.getR2Key(key);
 
-            await r2.delete(cacheKey);
+                    await r2.delete(cacheKey);
 
-            // Here again R2 is the source of truth, so we delete from local cache first
-            await localCache.delete(this.getCacheUrlKey(cacheKey));
-        } catch (e) {
-            console.error('Failed to delete from cache', e);
-        }
+                    // Here again R2 is the source of truth, so we delete from local cache first
+                    await localCache.delete(this.getCacheUrlKey(cacheKey));
+                } catch (e) {
+                    console.error('Failed to delete from cache', e);
+                }
+            }
+        );
     }
 
     async getCacheInstance(): Promise<Cache> {
