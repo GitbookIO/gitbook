@@ -7,7 +7,7 @@
         "turbo": "^2.5.0",
         "vercel": "^39.3.0"
     },
-    "packageManager": "bun@1.2.8",
+    "packageManager": "bun@1.2.11",
     "overrides": {
         "@codemirror/state": "6.4.1",
         "@gitbook/api": "^0.115.0",
