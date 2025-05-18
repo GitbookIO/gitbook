@@ -770,7 +770,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure:has(> .openapi-disclosure-trigger:hover) {
-    @apply bg-tint-subtle;
+    @apply bg-tint-subtle overflow-hidden;
 }
 
 .openapi-disclosure:has(> .openapi-disclosure-trigger:hover),
@@ -778,10 +778,10 @@ body:has(.openapi-select-popover) {
     @apply ring-1 shadow-sm;
 }
 
-.openapi-disclosure[data-expanded="true"]:not(:first-child) {
+.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure):not(:first-child) {
     @apply mt-2;
 }
-.openapi-disclosure[data-expanded="true"]:not(:last-child) {
+.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure):not(:last-child) {
     @apply mb-2;
 }
 
