@@ -87,7 +87,7 @@ export function PageAside(props: {
                 'page-api-block:xl:max-2xl:dark:hover:shadow-tint-1/1',
                 'page-api-block:xl:max-2xl:rounded-md',
                 'page-api-block:xl:max-2xl:h-auto',
-                'page-api-block:xl:max-2xl:my-8',
+                'page-api-block:xl:max-2xl:my-4',
                 'page-api-block:p-2'
             )}
         >
