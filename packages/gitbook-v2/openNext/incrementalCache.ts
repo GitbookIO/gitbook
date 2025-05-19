@@ -25,10 +25,11 @@ class GitbookIncrementalCache implements IncrementalCache {
         key: string,
         cacheType?: CacheType
     ): Promise<WithLastModified<CacheValue<CacheType>> | null> {
+        const cacheKey = this.getR2Key(key, cacheType);
         return trace(
             {
                 operation: 'openNextIncrementalCacheGet',
-                name: key,
+                name: cacheKey,
             },
             async (span) => {
                 span.setAttribute('cacheType', cacheType ?? 'cache');
@@ -36,7 +37,6 @@ class GitbookIncrementalCache implements IncrementalCache {
                 const localCache = await this.getCacheInstance();
                 if (!r2) throw new Error('No R2 bucket');
                 try {
-                    const cacheKey = this.getR2Key(key, cacheType);
                     // Check local cache first if available
                     const localCacheEntry = await localCache.match(this.getCacheUrlKey(cacheKey));
                     if (localCacheEntry) {
@@ -44,7 +44,7 @@ class GitbookIncrementalCache implements IncrementalCache {
                         return localCacheEntry.json();
                     }
 
-                    const r2Object = await r2.get(this.getR2Key(key, cacheType));
+                    const r2Object = await r2.get(cacheKey);
                     if (!r2Object) return null;
 
                     span.setAttribute('cacheHit', 'r2');
@@ -65,10 +65,11 @@ class GitbookIncrementalCache implements IncrementalCache {
         value: CacheValue<CacheType>,
         cacheType?: CacheType
     ): Promise<void> {
+        const cacheKey = this.getR2Key(key, cacheType);
         return trace(
             {
                 operation: 'openNextIncrementalCacheSet',
-                name: key,
+                name: cacheKey,
             },
             async (span) => {
                 span.setAttribute('cacheType', cacheType ?? 'cache');
@@ -77,7 +78,6 @@ class GitbookIncrementalCache implements IncrementalCache {
                 if (!r2) throw new Error('No R2 bucket');
 
                 try {
-                    const cacheKey = this.getR2Key(key, cacheType);
                     await r2.put(cacheKey, JSON.stringify(value));
 
                     //TODO: Check if there is any places where we don't have tags
@@ -116,10 +116,11 @@ class GitbookIncrementalCache implements IncrementalCache {
     }
 
     async delete(key: string): Promise<void> {
+        const cacheKey = this.getR2Key(key);
         return trace(
             {
                 operation: 'openNextIncrementalCacheDelete',
-                name: key,
+                name: cacheKey,
             },
             async () => {
                 const r2 = getCloudflareContext().env[BINDING_NAME];
@@ -127,8 +128,6 @@ class GitbookIncrementalCache implements IncrementalCache {
                 if (!r2) throw new Error('No R2 bucket');
 
                 try {
-                    const cacheKey = this.getR2Key(key);
-
                     await r2.delete(cacheKey);
 
                     // Here again R2 is the source of truth, so we delete from local cache first
@@ -147,7 +146,7 @@ class GitbookIncrementalCache implements IncrementalCache {
     }
 
     // Utility function to generate keys for R2/Cache API
-    getR2Key(key: string, cacheType?: CacheEntryType): string {
+    getR2Key(key: string, cacheType: CacheEntryType = 'cache'): string {
         const hash = createHash('sha256').update(key).digest('hex');
         return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? process.env?.NEXT_BUILD_ID : 'dataCache'}/${hash}.${cacheType}`.replace(
             /\/+/g,
