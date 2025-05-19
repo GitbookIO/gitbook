@@ -16,6 +16,12 @@ export type KeyOptions = {
     cacheType?: CacheEntryType;
 };
 
+/**
+ *
+ * It is very similar to the `R2IncrementalCache` in the `@opennextjs/cloudflare` package, but it allow us to trace
+ * the cache operations. It also integrates both R2 and Cache API in a single class.
+ * Having our own, will allow us to customize it in the future if needed.
+ */
 class GitbookIncrementalCache implements IncrementalCache {
     name = 'GitbookIncrementalCache';
 
