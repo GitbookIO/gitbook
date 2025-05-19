@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.1.4
+
+### Patch Changes
+
+- d00dc8c: Pass scalar's errors through OpenAPIParseError
+
 ## 2.1.3
 
 ### Patch Changes
