@@ -14,6 +14,9 @@
     "observability": {
         "enabled": true
     },
+    "vars": {
+        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+    },
     "env": {
         "preview": {
             "r2_buckets": [
@@ -87,6 +90,11 @@
             ]
         },
         "production": {
+            "vars": {
+                // This is a bit misleading, but it means that we can have 100 concurrent revalidations
+                // This means that we'll have up to 20 durable objects instance running at the same time
+                "MAX_REVALIDATE_CONCURRENCY": "20"
+            },
             "routes": [
                 {
                     "pattern": "open-2c.gitbook.com/*",
