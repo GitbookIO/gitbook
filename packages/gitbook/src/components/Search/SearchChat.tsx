@@ -2,12 +2,12 @@
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 import { Icon } from '@gitbook/icons';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useVisitedPages } from '../Insights/useVisitedPages';
 import { Button } from '../primitives';
 import { isQuestion } from './isQuestion';
 import { streamAISearchAnswer, streamAISearchSummary } from './server-actions';
+import { useSearch } from './useSearch';
 
 export function SearchChat(props: { query: string }) {
     // const currentPage = usePageContext();
@@ -18,11 +18,15 @@ export function SearchChat(props: { query: string }) {
     const visitedPages = useVisitedPages((state) => state.pages);
     const [summary, setSummary] = useState('');
     const [messages, setMessages] = useState<
-        { role: string; content?: string; fetching?: boolean }[]
+        { role: string; content?: string; context?: string; fetching?: boolean }[]
     >([]);
     const [followupQuestions, setFollowupQuestions] = useState<string[]>();
 
     const [responseId, setResponseId] = useState<string | null>(null);
+    const [searchState, setSearchState] = useSearch();
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const latestMessageRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -56,11 +60,8 @@ export function SearchChat(props: { query: string }) {
         if (query) {
             setMessages([
                 {
-                    role: 'user',
-                    content: query,
-                },
-                {
                     role: 'assistant',
+                    context: `You asked ${isQuestion(query) ? '' : 'about'} "${query}"`,
                     fetching: true,
                 },
             ]);
@@ -97,8 +98,50 @@ export function SearchChat(props: { query: string }) {
         }
     }, [query, responseId]);
 
+    useEffect(() => {
+        if (latestMessageRef.current) {
+            latestMessageRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+    }, [messages]);
+
     return (
-        <motion.div layout="position" className="relative mx-auto h-full p-8">
+        <div
+            className={tcls(
+                'mx-auto h-full justify-between overflow-y-auto p-8',
+                searchState?.mode === 'chat' && 'md:px-20'
+            )}
+        >
+            {searchState?.mode === 'chat' ? (
+                <div className="left-4 mb-8 md:absolute">
+                    <Button
+                        label="Show search results"
+                        variant="blank"
+                        size="small"
+                        icon="arrow-up-to-line"
+                        className="md:hidden"
+                        onClick={() => {
+                            setSearchState((state) =>
+                                state ? { ...state, mode: 'both', manual: true } : null
+                            );
+                        }}
+                    />
+                    <Button
+                        label="Show search results"
+                        iconOnly
+                        variant="blank"
+                        icon="arrow-left-to-line"
+                        className="hidden md:block"
+                        onClick={() => {
+                            setSearchState((state) =>
+                                state ? { ...state, mode: 'both', manual: true } : null
+                            );
+                        }}
+                    />
+                </div>
+            ) : null}
             <div className="mx-auto flex w-full max-w-prose flex-col gap-4">
                 <div>
                     <h5 className="mb-1 flex items-center gap-1 font-semibold text-tint-subtle text-xs">
@@ -124,21 +167,24 @@ export function SearchChat(props: { query: string }) {
                     )}
                 </div>
 
-                {messages.map((message) => (
+                {messages.map((message, index) => (
                     <div
                         key={message.content}
+                        ref={index === messages.length - 1 ? latestMessageRef : null}
                         className={tcls(
-                            'flex flex-col gap-1',
-                            message.role === 'user' && 'items-end gap-1 self-end'
+                            'flex scroll-mt-20 scroll-mb-[100%] flex-col gap-1',
+                            message.role === 'user' && 'items-end gap-1 self-end',
+                            index === messages.length - 1 && 'mb-[45vh]'
                         )}
                     >
                         {message.role === 'user' ? (
                             <h5 className="flex items-center gap-1 font-semibold text-tint-subtle text-xs">
-                                You asked {isQuestion(query) ? '' : 'about'}
+                                {message.context ?? `You asked ${isQuestion(query) ? '' : 'about'}`}
                             </h5>
                         ) : (
                             <h5 className="flex items-center gap-1 font-semibold text-tint-subtle text-xs">
-                                <Icon icon="sparkle" className="mt-0.5 size-3" /> AI Answer
+                                <Icon icon="sparkle" className="mt-0.5 size-3" />{' '}
+                                {message.context ?? 'AI Answer'}
                             </h5>
                         )}
                         {message.fetching ? (
@@ -194,11 +240,17 @@ export function SearchChat(props: { query: string }) {
                                 icon="arrow-up"
                                 size="medium"
                                 className="shrink-0"
+                                onClick={() => {
+                                    setMessages((prev) => [
+                                        ...prev,
+                                        { role: 'user', content: 'Hello', fetching: false },
+                                    ]);
+                                }}
                             />
                         </div>
                     </div>
                 </div>
             ) : null}
-        </motion.div>
+        </div>
     );
 }

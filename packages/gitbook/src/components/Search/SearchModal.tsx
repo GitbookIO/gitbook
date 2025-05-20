@@ -234,98 +234,84 @@ function SearchModalBody(
                 event.stopPropagation();
             }}
         >
-            <div className="grid grow grid-rows-[auto_1fr_1fr] overflow-hidden md:grid-cols-[1fr_1fr] md:grid-rows-[auto_1fr]">
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-row',
+                    'items-start',
+                    state.query !== null ? 'border-b' : null,
+                    'border-tint-subtle',
+                    'col-span-full'
+                )}
+            >
                 <div
                     className={tcls(
+                        'w-full',
                         'flex',
                         'flex-row',
-                        'items-start',
-                        state.query !== null ? 'border-b' : null,
-                        'border-tint-subtle',
-                        'col-span-full'
+                        'flex-wrap',
+                        'gap-y-0',
+                        'gap-x-4',
+                        'items-end'
                     )}
                 >
-                    <div
+                    <input
+                        ref={inputRef}
+                        value={state.query}
+                        onKeyDown={onKeyDown}
+                        onChange={onChange}
                         className={tcls(
-                            'w-full',
+                            'text-tint-strong',
+                            'placeholder:text-tint',
                             'flex',
-                            'flex-row',
-                            'flex-wrap',
-                            'gap-y-0',
-                            'gap-x-4',
-                            'items-end'
+                            'resize-none',
+                            'flex-1',
+                            'py-4',
+                            'px-8',
+                            'focus:outline-none',
+                            'bg-transparent',
+                            'whitespace-pre-line'
                         )}
-                    >
-                        <input
-                            ref={inputRef}
-                            value={state.query}
-                            onKeyDown={onKeyDown}
-                            onChange={onChange}
-                            className={tcls(
-                                'text-tint-strong',
-                                'placeholder:text-tint',
-                                'flex',
-                                'resize-none',
-                                'flex-1',
-                                'py-4',
-                                'px-8',
-                                'focus:outline-none',
-                                'bg-transparent',
-                                'whitespace-pre-line'
-                            )}
-                            placeholder={tString(
-                                language,
-                                withAsk
-                                    ? 'search_ask_input_placeholder'
-                                    : 'search_input_placeholder'
-                            )}
-                            spellCheck="false"
-                            autoComplete="off"
-                            autoCorrect="off"
-                        />
-                        {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
-                    </div>
+                        placeholder={tString(
+                            language,
+                            withAsk ? 'search_ask_input_placeholder' : 'search_input_placeholder'
+                        )}
+                        spellCheck="false"
+                        autoComplete="off"
+                        autoCorrect="off"
+                    />
+                    {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
+                </div>
+            </div>
+            <div className={tcls('flex grow flex-col overflow-hidden md:flex-row')}>
+                <div
+                    key="results"
+                    className={tcls(
+                        'h-full w-full flex-1 overflow-y-auto transition-all duration-500 *:transition-opacity *:delay-200 *:duration-300',
+                        state.mode === 'chat' && 'flex-[0] *:opacity-0 *:delay-0'
+                    )}
+                    aria-hidden={state.mode === 'chat' ? 'true' : undefined}
+                >
+                    <SearchResults
+                        ref={resultsRef}
+                        global={isMultiVariants && state.global}
+                        query={normalizedQuery}
+                        withAsk={withAsk}
+                        onSwitchToAsk={onSwitchToAsk}
+                    />
                 </div>
 
-                <AnimatePresence>
-                    {state.mode !== 'chat' ? (
-                        <motion.div
-                            key="results"
-                            layout
-                            className={tcls(
-                                'overflow-y-auto md:col-start-1 md:row-start-2',
-                                state.mode === 'results' && 'md:-col-end-1'
-                            )}
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            exit={{ width: 0 }}
-                        >
-                            <SearchResults
-                                ref={resultsRef}
-                                global={isMultiVariants && state.global}
-                                query={normalizedQuery}
-                                withAsk={withAsk}
-                                onSwitchToAsk={onSwitchToAsk}
-                            />
-                        </motion.div>
-                    ) : null}
-
-                    {state.mode !== 'results' ? (
-                        <motion.div
-                            key="chat"
-                            layout
-                            className={tcls(
-                                'md:-col-end-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle max-md:border-t md:row-start-2 md:border-l',
-                                state.mode === 'chat' && 'md:col-start-1'
-                            )}
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            exit={{ width: 0 }}
-                        >
-                            <SearchChat query={normalizedQuery} />
-                        </motion.div>
-                    ) : null}
-                </AnimatePresence>
+                <div
+                    key="chat"
+                    className={tcls(
+                        'relative h-full w-full flex-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle *:transition-opacity *:delay-200 *:duration-300',
+                        state.mode === 'results' && 'flex-[0] *:opacity-0 *:delay-0',
+                        state.mode === 'both' && 'max-md:border-t md:border-l'
+                    )}
+                    aria-hidden={state.mode === 'results' ? 'true' : undefined}
+                >
+                    <SearchChat query={normalizedQuery} />
+                </div>
             </div>
         </motion.div>
     );

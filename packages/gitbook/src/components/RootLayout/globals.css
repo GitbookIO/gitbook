@@ -39,7 +39,7 @@
 
     /*  Light mode */
     ::-webkit-scrollbar {
-        @apply bg-tint-subtle;
+        @apply bg-tint-subtle z-50;
         width: 8px;
         height: 8px;
     }

@@ -7,7 +7,7 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -19,7 +19,7 @@ import {
     searchSiteSpaceContent,
     streamRecommendedQuestions,
 } from './server-actions';
-import { useSearch } from './useSearch';
+import { type SearchState, useSearch } from './useSearch';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -64,6 +64,57 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
     const [searchState, setSearchState] = useSearch();
+    const manualStateRef = React.useRef(false);
+
+    React.useEffect(() => {
+        if (searchState?.manual !== undefined) {
+            manualStateRef.current = searchState.manual;
+        }
+    }, [searchState?.manual]);
+
+    const results: ResultType[] = React.useMemo(() => resultsState.results, [resultsState.results]);
+
+    React.useEffect(() => {
+        console.log('Effect running with:', {
+            query,
+            resultsLength: results.length,
+            fetching: resultsState.fetching,
+            manual: searchState?.manual,
+            currentState: searchState,
+        });
+
+        // If manual is true, don't do any automatic mode changes
+        if (searchState?.manual) {
+            console.log('Skipping automatic mode changes because manual is true');
+            return;
+        }
+
+        if (!query) {
+            // Reset the cursor when there's no query
+            setCursor(null);
+        } else if (results.length > 0) {
+            // Auto-focus the first result
+            console.log('Setting mode to both');
+            setSearchState((prev) => {
+                const newState: SearchState | null = prev
+                    ? { ...prev, mode: 'both' as const }
+                    : null;
+                console.log('New state will be:', newState);
+                return newState;
+            });
+            setCursor(0);
+        } else if (results.length === 0 && !resultsState.fetching) {
+            // Only switch to chat mode if manual is false
+            console.log('Setting mode to chat');
+            setSearchState((prev) => {
+                const newState: SearchState | null = prev
+                    ? { ...prev, mode: 'chat' as const }
+                    : null;
+                console.log('New state will be:', newState);
+                return newState;
+            });
+        }
+    }, [results, query, setSearchState, resultsState.fetching, searchState?.manual]);
 
     React.useEffect(() => {
         if (!query) {
@@ -152,21 +203,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
         };
     }, [query, global, withAsk, trackEvent]);
 
-    const results: ResultType[] = React.useMemo(() => resultsState.results, [resultsState.results]);
-
-    React.useEffect(() => {
-        if (!query) {
-            // Reset the cursor when there's no query
-            setCursor(null);
-        } else if (results.length > 0) {
-            // Auto-focus the first result
-            setSearchState((prev) => (prev ? { ...prev, mode: 'both' } : null));
-            setCursor(0);
-        } else if (results.length === 0 && !resultsState.fetching && !searchState?.manual) {
-            setSearchState((prev) => (prev ? { ...prev, mode: 'chat' } : null));
-        }
-    }, [results, query, setSearchState, resultsState.fetching, searchState?.manual]);
-
     // Scroll to the active result.
     React.useEffect(() => {
         if (cursor === null || !refs.current[cursor]) {
@@ -215,27 +251,15 @@ export const SearchResults = React.forwardRef(function SearchResults(
     );
 
     const loading = (
-        <motion.div
-            className={tcls('flex', 'items-center', 'justify-center', 'p-8')}
-            layout="position"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-        >
+        <div className={tcls('flex', 'items-center', 'justify-center', 'p-8')}>
             <Loading className={tcls('w-6', 'text-primary-subtle')} />
-        </motion.div>
+        </div>
     );
 
     const noResults = (
-        <motion.div
-            layout="position"
-            className={tcls('text', 'text-tint', 'text-center', 'p-8')}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-        >
+        <div className={tcls('text', 'text-tint', 'text-center', 'p-8')}>
             {t(language, 'search_no_results', query)}
-        </motion.div>
+        </div>
     );
 
     return (
@@ -245,13 +269,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
             ) : query && results.length === 0 ? (
                 noResults
             ) : (
-                <motion.div
+                <div
                     layout="position"
                     className="flex flex-col gap-2 p-4"
                     data-testid="search-results"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
                 >
                     {results.map((item, index) => {
                         switch (item.type) {
@@ -312,7 +333,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 assertNever(item);
                         }
                     })}
-                </motion.div>
+                </div>
             )}
         </AnimatePresence>
     );
