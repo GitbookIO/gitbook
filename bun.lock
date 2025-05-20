@@ -35,7 +35,7 @@
     },
     "packages/colors": {
       "name": "@gitbook/colors",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "devDependencies": {
         "typescript": "^5.5.3",
       },
@@ -49,7 +49,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.11.1",
+      "version": "0.12.0",
       "dependencies": {
         "@gitbook/api": "^0.115.0",
         "@gitbook/cache-do": "workspace:*",
@@ -141,11 +141,11 @@
     },
     "packages/gitbook-v2": {
       "name": "gitbook-v2",
-      "version": "0.2.5",
+      "version": "0.3.0",
       "dependencies": {
         "@gitbook/api": "^0.115.0",
         "@gitbook/cache-tags": "workspace:*",
-        "@opennextjs/cloudflare": "https://pkg.pr.new/@opennextjs/cloudflare@673",
+        "@opennextjs/cloudflare": "1.0.4",
         "@sindresorhus/fnv1a": "^3.1.0",
         "assert-never": "^1.2.1",
         "jwt-decode": "^4.0.0",
@@ -185,7 +185,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "2.1.3",
+      "version": "2.1.4",
       "dependencies": {
         "@scalar/openapi-parser": "^0.10.10",
         "@scalar/openapi-types": "^0.1.9",
@@ -232,7 +232,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.2.1",
+      "version": "1.3.0",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.2.19",
@@ -793,7 +793,7 @@
 
     "@opennextjs/aws": ["@opennextjs/aws@3.6.2", "", { "dependencies": { "@ast-grep/napi": "^0.35.0", "@aws-sdk/client-cloudfront": "3.398.0", "@aws-sdk/client-dynamodb": "^3.398.0", "@aws-sdk/client-lambda": "^3.398.0", "@aws-sdk/client-s3": "^3.398.0", "@aws-sdk/client-sqs": "^3.398.0", "@node-minify/core": "^8.0.6", "@node-minify/terser": "^8.0.6", "@tsconfig/node18": "^1.0.1", "aws4fetch": "^1.0.18", "chalk": "^5.3.0", "esbuild": "0.25.4", "express": "5.0.1", "path-to-regexp": "^6.3.0", "urlpattern-polyfill": "^10.0.0", "yaml": "^2.7.0" }, "bin": { "open-next": "dist/index.js" } }, "sha512-26/3GSoj7mKN7XpQFikYM2Lrwal5jlMc4fJO//QAdd5bCSnBaWBAkzr7+VvXAFVIC6eBeDLdtlWiQuUQVEAPZQ=="],
 
-    "@opennextjs/cloudflare": ["@opennextjs/cloudflare@https://pkg.pr.new/@opennextjs/cloudflare@673", { "dependencies": { "@dotenvx/dotenvx": "1.31.0", "@opennextjs/aws": "^3.6.2", "enquirer": "^2.4.1", "glob": "^11.0.0", "ts-tqdm": "^0.8.6" }, "peerDependencies": { "wrangler": "^4.14.0" }, "bin": { "opennextjs-cloudflare": "dist/cli/index.js" } }],
+    "@opennextjs/cloudflare": ["@opennextjs/cloudflare@1.0.4", "", { "dependencies": { "@dotenvx/dotenvx": "1.31.0", "@opennextjs/aws": "^3.6.2", "enquirer": "^2.4.1", "glob": "^11.0.0", "ts-tqdm": "^0.8.6" }, "peerDependencies": { "wrangler": "^4.14.0" }, "bin": { "opennextjs-cloudflare": "dist/cli/index.js" } }, "sha512-DVudGpOSJ91ruPiBJ0kuFmPhEQbXIXLTbvUjAx1OlbwFskG2gvdNIAmF3ZXV6z1VGDO7Q/u2W2ybMZLf7avlrA=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
 
