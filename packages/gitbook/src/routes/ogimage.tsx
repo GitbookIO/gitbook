@@ -312,12 +312,24 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
 }
 
 /**
+ * Temporary function to log some data on Cloudflare.
+ * TODO: remove this when we found the issue
+ */
+function logOnCloudflareOnly(message: string) {
+    if (process.env.DEBUG_CLOUDFLARE === 'true') {
+        // biome-ignore lint/suspicious/noConsole: <explanation>
+        console.log(message);
+    }
+}
+
+/**
  * Fetch a resource from the function itself.
  * To avoid error with worker to worker requests in the same zone, we use the `WORKER_SELF_REFERENCE` binding.
  */
 async function fetchSelf(url: string) {
     const cloudflare = getCloudflareContext();
     if (cloudflare?.env.WORKER_SELF_REFERENCE) {
+        logOnCloudflareOnly(`Fetching self: ${url}`);
         return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(
             // `getAssetURL` can return a relative URL, so we need to make it absolute
             // the URL doesn't matter, as we're using the worker-self-reference binding
@@ -334,6 +346,9 @@ async function fetchSelf(url: string) {
 async function readImage(response: Response) {
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.startsWith('image/')) {
+        logOnCloudflareOnly(`Invalid content type: ${contentType}, 
+            status: ${response.status}
+            rayId: ${response.headers.get('cf-ray')}`);
         throw new Error(`Invalid content type: ${contentType}`);
     }
 
