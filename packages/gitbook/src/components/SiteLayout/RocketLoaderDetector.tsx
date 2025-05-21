@@ -18,7 +18,7 @@ export function RocketLoaderDetector(props: { nonce?: string }) {
             alert.className = 'p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 mt-8 mx-8';
             alert.innerHTML = \`
               <strong>Error in site configuration:</strong>
-                It looks like \${window.location.hostname} has been incorrectly configured in Cloudflare. This may lead to unexpected behavior or issues with the page loading. If you are the owner of this site, please refer to <a href="https://docs.gitbook.com/published-documentation/custom-domain/configure-dns#are-you-using-cloudflare" class="underline">GitBook's documentation</a> for steps to fix the problem.
+                It looks like \${window.location.hostname} has been incorrectly configured in Cloudflare. This may lead to unexpected behavior or issues with the page loading. If you are the owner of this site, please refer to <a href="https://gitbook.com/docs/published-documentation/custom-domain/configure-dns#are-you-using-cloudflare" class="underline">GitBook's documentation</a> for steps to fix the problem.
               \`;
 
             document.body.prepend(alert);

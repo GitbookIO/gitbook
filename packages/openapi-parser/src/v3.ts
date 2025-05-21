@@ -40,6 +40,7 @@ async function untrustedValidate(input: ValidateOpenAPIV3Input) {
         throw new OpenAPIParseError('Invalid OpenAPI document', {
             code: 'invalid',
             rootURL,
+            errors: result.errors,
         });
     }
 

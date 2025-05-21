@@ -1,5 +1,24 @@
 # @gitbook/react-openapi
 
+## 1.3.0
+
+### Minor Changes
+
+- 326e28e: Design tweaks to code blocks and OpenAPI pages
+
+### Patch Changes
+
+- 42ca7e1: Fix openapi CR preview
+- 5e975ab: Fix code highlighting for HTTP
+- 580101d: Fix schemas disclosure label causing client error
+- 20ebecb: Missing top-level required OpenAPI alternatives
+- 80cb52a: Handle OpenAPI alternatives from schema.items
+- cb5598d: Handle invalid OpenAPI Responses
+- c6637b0: Use default value if string number or boolean in generateSchemaExample
+- a3ec264: Fix Python code sample "null vs None"
+- Updated dependencies [d00dc8c]
+  - @gitbook/openapi-parser@2.1.4
+
 ## 1.2.1
 
 ### Patch Changes

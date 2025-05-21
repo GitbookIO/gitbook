@@ -165,7 +165,7 @@ export function getBaseContext(input: {
         // Create link in the same format for links to other sites/sections.
         linker.toLinkForContent = (rawURL: string) => {
             const urlObject = new URL(rawURL);
-            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`;
+            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
         };
     }
 

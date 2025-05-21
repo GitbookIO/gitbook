@@ -2,7 +2,11 @@
     "main": ".open-next/worker.js",
     "name": "gitbook-open-v2",
     "compatibility_date": "2025-04-14",
-    "compatibility_flags": ["nodejs_compat", "allow_importable_env"],
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public"
+    ],
     "assets": {
         "directory": ".open-next/assets",
         "binding": "ASSETS"
@@ -10,8 +14,15 @@
     "observability": {
         "enabled": true
     },
+    "vars": {
+        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+        "IS_PREVIEW": "false"
+    },
     "env": {
         "preview": {
+            "vars": {
+                "IS_PREVIEW": "true"
+            },
             "r2_buckets": [
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
@@ -83,6 +94,14 @@
             ]
         },
         "production": {
+            "vars": {
+                // This is a bit misleading, but it means that we can have 500 concurrent revalidations
+                // This means that we'll have up to 100 durable objects instance running at the same time
+                "MAX_REVALIDATE_CONCURRENCY": "100",
+                // Temporary variable to find the issue once deployed
+                // TODO: remove this once the issue is fixed
+                "DEBUG_CLOUDFLARE": "true"
+            },
             "routes": [
                 {
                     "pattern": "open-2c.gitbook.com/*",

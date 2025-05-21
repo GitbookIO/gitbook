@@ -1,5 +1,51 @@
 # gitbook
 
+## 0.12.0
+
+### Minor Changes
+
+- 8339e91: Fix images in reusable content across spaces.
+- 326e28e: Design tweaks to code blocks and OpenAPI pages
+- 3119066: Add support for reusable content across spaces.
+- 7d7806d: Pass SVG images through image resizing without resizing them to serve them from optimal host.
+
+### Patch Changes
+
+- c4ebb3f: Fix openapi-select hover in responses
+- aed79fd: Decrease rounding of header logo
+- 42ca7e1: Fix openapi CR preview
+- e6ddc0f: Fix URL in sitemap
+- 5e975ab: Fix code highlighting for HTTP
+- 5d504ff: Fix resolution of links in reusable contents
+- 95a1f65: Better print layouts: wrap code blocks & force table column auto-sizing
+- 0499966: Fix invalid sitemap.xml generated with relative URLs instead of absolute ones
+- 2a805cc: Change OpenAPI schema-optional from `info` to `tint` color
+- 580101d: Fix schemas disclosure label causing client error
+- 12a455d: Fix OpenAPI layout issues
+- 97b7c79: Increase logging around caching behaviour causing page crashes.
+- 373f18f: Prevent section group popovers from opening on click
+- 3f29206: Update the regex for validating site redirect
+- 0c973a3: Always link main logo to the root of the site
+- ae5f1ab: Change `Dropdown`s to use Radix's `DropdownMenu`
+- 0e201d5: Add border to filled sidebar on gradient theme
+- dd043df: Revert investigation work around URL caches.
+- 89a5816: Fix OpenAPI disclosure label ("Show properties") misalignment on mobile
+- Updated dependencies [c3f6b8c]
+- Updated dependencies [d00dc8c]
+- Updated dependencies [42ca7e1]
+- Updated dependencies [326e28e]
+- Updated dependencies [5e975ab]
+- Updated dependencies [f7a3470]
+- Updated dependencies [580101d]
+- Updated dependencies [20ebecb]
+- Updated dependencies [80cb52a]
+- Updated dependencies [cb5598d]
+- Updated dependencies [c6637b0]
+- Updated dependencies [a3ec264]
+  - @gitbook/colors@0.3.3
+  - @gitbook/openapi-parser@2.1.4
+  - @gitbook/react-openapi@1.3.0
+
 ## 0.11.1
 
 ### Patch Changes
@@ -564,7 +610,7 @@
 - 4cbcc5b: Rollback of scalar modal while fixing perf issue
 - 3996110: Optimize images rendered in community ads
 - 133c3e7: Update design of Checkbox to be more consistent and readable
-- 5096f7f: Disable KV cache for docs.gitbook.com as a test, also disable it for change-request to improve consistency
+- 5096f7f: Disable KV cache for gitbook.com/docs as a test, also disable it for change-request to improve consistency
 - 0f1565c: Add optional env `GITBOOK_INTEGRATIONS_HOST` to configure the host serving the integrations
 - 2ff7ed1: Fix table of contents being visible on mobile when disabled at the page level
 - b075f0f: Fix accessibility of the table of contents by using `aria-current` instead of `aria-selected`
