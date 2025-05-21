@@ -27,14 +27,21 @@ export function SearchModal(props: SearchModalProps) {
     const searchAsk = useSearchAskState();
     const [askState] = searchAsk;
     const router = useRouter();
+    const chatInputRef = React.useRef<HTMLInputElement>(null);
 
     useHotkeys(
         'mod+k',
         (e) => {
             e.preventDefault();
-            setSearchState({ mode: 'both', query: '', global: false });
+            if (state !== null) {
+                // If search is already open, focus the chat input
+                chatInputRef.current?.focus();
+            } else {
+                // Otherwise open the search modal
+                setSearchState({ mode: 'both', query: '', global: false });
+            }
         },
-        []
+        [state]
     );
 
     // Add a global class on the body when the search modal is open
@@ -122,6 +129,7 @@ export function SearchModal(props: SearchModalProps) {
                                 state={state}
                                 setSearchState={setSearchState}
                                 onClose={onClose}
+                                chatInputRef={chatInputRef}
                             />
                         </div>
                     </motion.div>
@@ -136,9 +144,11 @@ function SearchModalBody(
         state: SearchState;
         setSearchState: UpdateSearchState;
         onClose: (to?: string) => void;
+        chatInputRef: React.RefObject<HTMLInputElement>;
     }
 ) {
-    const { spaceTitle, withAsk, isMultiVariants, state, setSearchState, onClose } = props;
+    const { spaceTitle, withAsk, isMultiVariants, state, setSearchState, onClose, chatInputRef } =
+        props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -162,6 +172,12 @@ function SearchModalBody(
     }, [onClose]);
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        // Handle second Cmd+K
+        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+            event.preventDefault();
+            chatInputRef.current?.focus();
+            return;
+        }
         if (event.key === 'ArrowUp') {
             event.preventDefault();
             resultsRef.current?.moveUp();
@@ -287,8 +303,8 @@ function SearchModalBody(
                 <div
                     key="results"
                     className={tcls(
-                        'h-full w-full flex-1 overflow-y-auto transition-all duration-500 *:transition-opacity *:delay-200 *:duration-300',
-                        state.mode === 'chat' && 'flex-[0] *:opacity-0 *:delay-0'
+                        'h-full w-full flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.85,0,0.15,1)] *:transition-opacity *:delay-200 *:duration-300',
+                        state.mode === 'chat' && 'flex-[0] delay-200 *:opacity-0 *:delay-0'
                     )}
                     aria-hidden={state.mode === 'chat' ? 'true' : undefined}
                 >
@@ -304,13 +320,15 @@ function SearchModalBody(
                 <div
                     key="chat"
                     className={tcls(
-                        'relative relative h-full w-full flex-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle *:transition-opacity *:delay-200 *:duration-300',
+                        'relative h-full w-full flex-1 overflow-y-auto overflow-x-hidden bg-tint-subtle transition-colors duration-500 *:transition-opacity *:delay-200 *:duration-300 max-md:border-t md:border-l',
                         state.mode === 'results' && 'flex-[0] *:opacity-0 *:delay-0',
-                        state.mode === 'both' && 'max-md:border-t md:border-l'
+                        state.mode === 'both'
+                            ? 'border-tint-subtle'
+                            : 'border-transparent delay-500'
                     )}
                     aria-hidden={state.mode === 'results' ? 'true' : undefined}
                 >
-                    <SearchChat query={normalizedQuery} />
+                    <SearchChat query={normalizedQuery} chatInputRef={chatInputRef} />
                 </div>
             </div>
         </motion.div>

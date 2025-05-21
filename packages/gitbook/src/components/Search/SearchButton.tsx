@@ -99,7 +99,7 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     );
 }
 
-function Shortcut() {
+export function Shortcut() {
     const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
 
     useEffect(() => {

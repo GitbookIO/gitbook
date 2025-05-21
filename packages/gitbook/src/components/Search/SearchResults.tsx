@@ -75,44 +75,25 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const results: ResultType[] = React.useMemo(() => resultsState.results, [resultsState.results]);
 
     React.useEffect(() => {
-        console.log('Effect running with:', {
-            query,
-            resultsLength: results.length,
-            fetching: resultsState.fetching,
-            manual: searchState?.manual,
-            currentState: searchState,
-        });
-
-        // If manual is true, don't do any automatic mode changes
-        if (searchState?.manual) {
-            console.log('Skipping automatic mode changes because manual is true');
-            return;
-        }
-
         if (!query) {
             // Reset the cursor when there's no query
             setCursor(null);
-        } else if (results.length > 0) {
-            // Auto-focus the first result
-            console.log('Setting mode to both');
-            setSearchState((prev) => {
-                const newState: SearchState | null = prev
-                    ? { ...prev, mode: 'both' as const }
-                    : null;
-                console.log('New state will be:', newState);
-                return newState;
-            });
-            setCursor(0);
-        } else if (results.length === 0 && !resultsState.fetching) {
-            // Only switch to chat mode if manual is false
-            console.log('Setting mode to chat');
+        } else if (!searchState?.manual && !resultsState.fetching && results.length === 0) {
             setSearchState((prev) => {
                 const newState: SearchState | null = prev
                     ? { ...prev, mode: 'chat' as const }
                     : null;
-                console.log('New state will be:', newState);
                 return newState;
             });
+        } else if (results.length > 0) {
+            // Auto-focus the first result
+            setSearchState((prev) => {
+                const newState: SearchState | null = prev
+                    ? { ...prev, mode: 'both' as const }
+                    : null;
+                return newState;
+            });
+            setCursor(0);
         }
     }, [results, query, setSearchState, resultsState.fetching, searchState?.manual]);
 
@@ -258,7 +239,9 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const noResults = (
         <div className={tcls('text', 'text-tint', 'text-center', 'p-8')}>
-            {t(language, 'search_no_results', query)}
+            <div className="animate-fadeIn" style={{ animationDelay: '0.5s' }}>
+                {t(language, 'search_no_results', query)}
+            </div>
         </div>
     );
 

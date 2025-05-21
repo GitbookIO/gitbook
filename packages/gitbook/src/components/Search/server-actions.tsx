@@ -539,7 +539,7 @@ export async function* streamAISearchAnswer({
         const answer = value.answer;
         const followupQuestions = value.followupQuestions;
 
-        if (!answer) {
+        if (answer === undefined) {
             continue;
         }
 
