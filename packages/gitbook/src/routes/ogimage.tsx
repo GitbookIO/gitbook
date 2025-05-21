@@ -344,6 +344,7 @@ const staticImagesCache = new Map<string, string>();
  * Read a static image and cache it in memory.
  */
 async function readStaticImage(url: string) {
+    logOnCloudflareOnly(`Reading static image: ${url}, cache size: ${staticImagesCache.size}`);
     const cached = staticImagesCache.get(url);
     if (cached) {
         return cached;
