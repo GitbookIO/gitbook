@@ -28,6 +28,8 @@ export function SearchChat(props: { query: string }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const latestMessageRef = useRef<HTMLDivElement>(null);
 
+    const isExpanded = searchState?.mode === 'chat';
+
     useEffect(() => {
         let cancelled = false;
 
@@ -65,6 +67,7 @@ export function SearchChat(props: { query: string }) {
                     fetching: true,
                 },
             ]);
+            setFollowupQuestions([]);
 
             (async () => {
                 const stream = await streamAISearchAnswer({
@@ -108,19 +111,15 @@ export function SearchChat(props: { query: string }) {
     }, [messages]);
 
     return (
-        <div
-            className={tcls(
-                'mx-auto h-full justify-between overflow-y-auto p-8',
-                searchState?.mode === 'chat' && 'md:px-20'
-            )}
-        >
+        <div className={tcls('flex h-full flex-col')}>
             {searchState?.mode === 'chat' ? (
-                <div className="left-4 mb-8 md:absolute">
+                <div className="absolute top-2 max-md:right-4 md:top-4 md:left-4">
                     <Button
                         label="Show search results"
-                        variant="blank"
+                        variant="secondary"
                         size="small"
-                        icon="arrow-up-to-line"
+                        iconOnly
+                        icon="arrow-down-from-line"
                         className="md:hidden"
                         onClick={() => {
                             setSearchState((state) =>
@@ -132,8 +131,9 @@ export function SearchChat(props: { query: string }) {
                         label="Show search results"
                         iconOnly
                         variant="blank"
-                        icon="arrow-left-to-line"
-                        className="hidden md:block"
+                        size="default"
+                        icon="sidebar"
+                        className="hidden px-2 md:block"
                         onClick={() => {
                             setSearchState((state) =>
                                 state ? { ...state, mode: 'both', manual: true } : null
@@ -142,8 +142,13 @@ export function SearchChat(props: { query: string }) {
                     />
                 </div>
             ) : null}
-            <div className="mx-auto flex w-full max-w-prose flex-col gap-4">
-                <div>
+            <div
+                className={tcls(
+                    'mx-auto flex w-full grow scroll-pt-16 flex-col gap-4 overflow-y-auto p-8',
+                    isExpanded && 'md:px-16'
+                )}
+            >
+                <div className="mx-auto w-full max-w-prose">
                     <h5 className="mb-1 flex items-center gap-1 font-semibold text-tint-subtle text-xs">
                         <Icon icon="glasses-round" className="mt-0.5 size-3" /> Summary of what
                         you've read
@@ -172,9 +177,9 @@ export function SearchChat(props: { query: string }) {
                         key={message.content}
                         ref={index === messages.length - 1 ? latestMessageRef : null}
                         className={tcls(
-                            'flex scroll-mt-20 scroll-mb-[100%] flex-col gap-1',
+                            'mx-auto flex w-full max-w-prose flex-col gap-1',
                             message.role === 'user' && 'items-end gap-1 self-end',
-                            index === messages.length - 1 && 'mb-[45vh]'
+                            index === messages.length - 1 && 'min-h-full'
                         )}
                     >
                         {message.role === 'user' ? (
@@ -209,25 +214,33 @@ export function SearchChat(props: { query: string }) {
                                 {message.content}
                             </div>
                         )}
+
+                        {index === messages.length - 1 &&
+                            followupQuestions &&
+                            followupQuestions.length > 0 && (
+                                <div className="mx-auto my-4 flex w-full max-w-prose flex-col">
+                                    {followupQuestions?.map((question) => (
+                                        <div
+                                            key={question}
+                                            className="-mx-4 flex items-center gap-4 rounded straight-corners:rounded-none px-4 py-2 text-tint hover:bg-tint-hover"
+                                        >
+                                            <Icon icon="search" className="size-4" /> {question}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                     </div>
                 ))}
             </div>
 
             {query ? (
-                <div className="absolute inset-x-0 bottom-0 border-tint-subtle border-t bg-tint-subtle px-8 py-4">
+                <div
+                    className={tcls(
+                        'border-tint-subtle border-t bg-tint-subtle px-8 py-4',
+                        isExpanded && 'md:px-16'
+                    )}
+                >
                     <div className="mx-auto flex w-full max-w-prose flex-col gap-2">
-                        {followupQuestions && followupQuestions.length > 0 && (
-                            <div className="flex gap-2 overflow-x-auto">
-                                {followupQuestions?.map((question) => (
-                                    <div
-                                        className="whitespace-nowrap rounded straight-corners:rounded-sm border border-tint-subtle bg-tint-base px-2 py-1 text-sm"
-                                        key={question}
-                                    >
-                                        {question}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                         <div className="flex gap-2">
                             <input
                                 type="text"

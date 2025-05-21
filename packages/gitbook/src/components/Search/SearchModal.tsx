@@ -304,7 +304,7 @@ function SearchModalBody(
                 <div
                     key="chat"
                     className={tcls(
-                        'relative h-full w-full flex-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle *:transition-opacity *:delay-200 *:duration-300',
+                        'relative relative h-full w-full flex-1 overflow-y-auto overflow-x-hidden border-tint-subtle bg-tint-subtle *:transition-opacity *:delay-200 *:duration-300',
                         state.mode === 'results' && 'flex-[0] *:opacity-0 *:delay-0',
                         state.mode === 'both' && 'max-md:border-t md:border-l'
                     )}
