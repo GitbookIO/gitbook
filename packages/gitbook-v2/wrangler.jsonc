@@ -15,10 +15,14 @@
         "enabled": true
     },
     "vars": {
-        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+        "IS_PREVIEW": "false"
     },
     "env": {
         "preview": {
+            "vars": {
+                "IS_PREVIEW": "true"
+            },
             "r2_buckets": [
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",

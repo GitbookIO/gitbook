@@ -1,5 +1,4 @@
 import { defineCloudflareConfig } from '@opennextjs/cloudflare';
-import doQueue from '@opennextjs/cloudflare/overrides/queue/do-queue';
 import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache';
 import {
     softTagFilter,
@@ -20,7 +19,7 @@ export default defineCloudflareConfig({
         // We don't use `revalidatePath`, so we filter out soft tags
         filterFn: softTagFilter,
     }),
-    queue: doQueue,
+    queue: () => import('./openNext/queue').then((m) => m.default),
 
     // Performance improvements as we don't use PPR
     enableCacheInterception: true,
