@@ -72,8 +72,12 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
 
             const fonts = (
                 await Promise.all([
-                    loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
-                    loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
+                    getWithCache(`google-font:${fontFamily}:400`, () =>
+                        loadGoogleFont({ fontFamily, text: regularText, weight: 400 })
+                    ),
+                    getWithCache(`google-font:${fontFamily}:700`, () =>
+                        loadGoogleFont({ fontFamily, text: boldText, weight: 700 })
+                    ),
                 ])
             ).filter(filterOutNullable);
 
@@ -338,21 +342,27 @@ async function readImage(response: Response) {
     return `data:${contentType};base64,${base64}`;
 }
 
-const staticImagesCache = new Map<string, string>();
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const staticCache = new Map<string, any>();
+
+// Do we need to limit the in-memory cache size? I think given the usage, we should be fine.
+async function getWithCache<T>(key: string, fn: () => Promise<T>) {
+    const cached = staticCache.get(key) as T;
+    if (cached) {
+        return Promise.resolve(cached);
+    }
+
+    const result = await fn();
+    staticCache.set(key, result);
+    return result;
+}
 
 /**
  * Read a static image and cache it in memory.
  */
 async function readStaticImage(url: string) {
-    logOnCloudflareOnly(`Reading static image: ${url}, cache size: ${staticImagesCache.size}`);
-    const cached = staticImagesCache.get(url);
-    if (cached) {
-        return cached;
-    }
-
-    const image = await readSelfImage(url);
-    staticImagesCache.set(url, image);
-    return image;
+    logOnCloudflareOnly(`Reading static image: ${url}, cache size: ${staticCache.size}`);
+    return getWithCache(`static-image:${url}`, () => readSelfImage(url));
 }
 
 /**
