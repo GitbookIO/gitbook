@@ -63,6 +63,17 @@ runs:
           env:
             GITBOOK_RUNTIME: cloudflare
           shell: bash
+        - id: upload_server
+          name: Upload server to Cloudflare
+          uses: cloudflare/wrangler-action@v3.14.0
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              workingDirectory: ./
+              wranglerVersion: '4.10.0'
+              environment: ${{ inputs.environment }}
+              command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
+        
         - id: upload_middleware
           name: Upload middleware to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0
@@ -73,17 +84,6 @@ runs:
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
               command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
-        - id: upload_server
-          name: Upload server to Cloudflare
-          uses: cloudflare/wrangler-action@v3.14.0
-          with:
-              apiToken: ${{ inputs.apiToken }}
-              accountId: ${{ inputs.accountId }}
-              workingDirectory: ./
-              wranglerVersion: '4.10.0'
-              environment: ${{ inputs.environment }}
-              command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
-        
         - name: Outputs
           shell: bash
           env:
