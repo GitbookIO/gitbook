@@ -172,6 +172,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'integration':
         case 'stepper':
         case 'reusable-content':
+        case 'columns':
             return <SkeletonCard id={id} style={style} />;
         case 'embed':
         case 'images':
@@ -180,6 +181,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'image':
         case 'code-line':
         case 'tabs-item':
+        case 'column':
             throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
         default:
             return nullIfNever(block);
