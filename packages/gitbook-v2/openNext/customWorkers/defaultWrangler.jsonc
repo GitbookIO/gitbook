@@ -1,0 +1,100 @@
+{
+    "main": "default.js",
+    "name": "gitbook-open-v2-server",
+    "compatibility_date": "2025-04-14",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public"
+    ],
+    "observability": {
+        "enabled": true
+    },
+    "vars": {
+        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+        "IS_PREVIEW": "false"
+    },
+    "env": {
+        "preview": {
+            "vars": {
+                "IS_PREVIEW": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-preview"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-prod-api-cache"
+                },
+                {
+                    "binding": "MIDDLEWARE_REFERENCE",
+                    "service": "gitbook-open-v2-preview"
+                }
+            ]
+            // No durable objects on preview, as they block the generation of preview URLs
+            // and we don't need tags invalidation on preview
+        },
+        "staging": {
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-staging"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-staging-api-cache"
+                },
+                {
+                    "binding": "MIDDLEWARE_REFERENCE",
+                    "service": "gitbook-open-v2-staging"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail"
+                }
+            ]
+        },
+        "production": {
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-production"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-prod-api-cache"
+                },
+                {
+                    "binding": "MIDDLEWARE_REFERENCE",
+                    "service": "gitbook-open-v2-production"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail"
+                }
+            ]
+        }
+    }
+}
