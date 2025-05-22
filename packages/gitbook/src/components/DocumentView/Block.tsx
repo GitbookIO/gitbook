@@ -12,6 +12,7 @@ import type { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
+import { Columns } from './Columns';
 import { Divider } from './Divider';
 import type { DocumentContextProps } from './DocumentView';
 import { Drawing } from './Drawing';
@@ -33,7 +34,6 @@ import { Stepper } from './Stepper';
 import { StepperStep } from './StepperStep';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
-import { Columns } from './Columns';
 
 export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
