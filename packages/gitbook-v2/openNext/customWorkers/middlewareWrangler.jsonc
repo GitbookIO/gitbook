@@ -15,13 +15,37 @@
         "enabled": true
     },
     "vars": {
-        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
-        "IS_PREVIEW": "false"
+        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
     },
     "env": {
+        "dev": {
+            "vars": {
+                "STAGE": "dev"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-dev"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-prod-api-cache"
+                },
+                {
+                    "binding": "DEFAULT_WORKER",
+                    "service": "gitbook-open-v2-server-dev"
+                }
+            ]
+        },
         "preview": {
             "vars": {
-                "IS_PREVIEW": "true"
+                "STAGE": "preview"
             },
             "r2_buckets": [
                 {
