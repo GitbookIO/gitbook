@@ -63,6 +63,7 @@ runs:
           env:
             GITBOOK_RUNTIME: cloudflare
           shell: bash
+
         - id: upload_server
           name: Upload server to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0
@@ -72,8 +73,20 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
-              command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
-        
+              command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
+
+        - name: Extract version worker ID
+          shell: bash
+          id: extract_version_id
+          run: |
+              version_id=$(echo '${{ steps.upload_server.outputs.command-output }}' | grep "Worker Version ID" | awk '{print $4}')
+              echo "version_id=$version_id" >> $GITHUB_OUTPUT
+
+        - name: Run updateWrangler scripts
+          shell: bash
+          run: |
+              bun run ./packages/gitbook-v2/openNext/script/updateWrangler.ts ${{ steps.extract_version_id.outputs.version_id }}
+
         - id: upload_middleware
           name: Upload middleware to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0
@@ -83,10 +96,12 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
-              command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
+              command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
+        
         - name: Outputs
           shell: bash
           env:
             DEPLOYMENT_URL: ${{ steps.upload_middleware.outputs.deployment-url }}
           run: |
               echo "URL: ${{ steps.upload_middleware.outputs.deployment-url }}"
+              echo "Output server: ${{ steps.upload_server.outputs.command-output }}"
