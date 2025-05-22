@@ -74,7 +74,7 @@ export function SpacesDropdown(props: {
                         title: otherSiteSpace.title,
                         url: otherSiteSpace.urls.published
                             ? linker.toLinkForContent(otherSiteSpace.urls.published)
-                            : otherSiteSpace.space.urls.app,
+                            : linker.toPathInSite(otherSiteSpace.path),
                     }}
                     active={otherSiteSpace.id === siteSpace.id}
                 />
