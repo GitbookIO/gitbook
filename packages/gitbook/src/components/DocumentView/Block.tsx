@@ -33,6 +33,7 @@ import { Stepper } from './Stepper';
 import { StepperStep } from './StepperStep';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
+import { Columns } from './Columns';
 
 export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
@@ -68,6 +69,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <List {...props} block={block} />;
             case 'list-item':
                 return <ListItem {...props} block={block} />;
+            case 'columns':
+                return <Columns {...props} block={block} />;
             case 'code':
                 return <CodeBlock {...props} block={block} />;
             case 'hint':
@@ -112,6 +115,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'image':
             case 'code-line':
             case 'tabs-item':
+            case 'column':
                 throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
             default:
                 return nullIfNever(block);
