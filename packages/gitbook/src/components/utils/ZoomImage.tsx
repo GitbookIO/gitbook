@@ -32,9 +32,6 @@ export function ZoomImage(
             return;
         }
 
-        const imageWidth = typeof width === 'number' ? width : 0;
-        let viewWidth = 0;
-
         const mediaQueryList = window.matchMedia('(min-width: 768px)');
         const resizeObserver =
             typeof ResizeObserver !== 'undefined'
@@ -44,7 +41,6 @@ export function ZoomImage(
                       // Since the image is removed from the DOM when the modal is opened,
                       // We only care when the size is defined.
                       if (imgEntry && imgEntry.contentRect.width !== 0) {
-                          viewWidth = entries[0]?.contentRect.width;
                           setPlaceholderRect(entries[0].contentRect);
                           onChange();
                       }
