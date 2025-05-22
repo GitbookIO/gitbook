@@ -55,9 +55,6 @@ export function ZoomImage(
             if (!mediaQueryList.matches) {
                 // Don't allow zooming on mobile
                 setZoomable(false);
-            } else if (resizeObserver && imageWidth && viewWidth && imageWidth <= viewWidth) {
-                // Image can't be zoomed if it's already rendered as it's largest size
-                setZoomable(false);
             } else {
                 setZoomable(true);
             }
