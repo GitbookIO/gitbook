@@ -46,7 +46,7 @@
         "preview": {
             "vars": {
                 "STAGE": "preview",
-                "PREVIEW_URL": "TO_REPLACE"
+                "VERSION_ID": "TO_REPLACE"
             },
             "r2_buckets": [
                 {
