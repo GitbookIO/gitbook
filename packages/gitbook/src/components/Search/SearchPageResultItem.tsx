@@ -2,7 +2,9 @@ import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import React from 'react';
 
-import { Link } from '../primitives';
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
+import { Button, Link } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedPageResult } from './server-actions';
 
@@ -14,6 +16,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
+    const language = useLanguage();
     const { query, item, active } = props;
 
     const breadcrumbs =
@@ -34,16 +37,19 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 'flex-row',
                 'items-center',
                 'p-4',
-                'border-t',
-                'border-tint-subtle',
-                'first:border-none',
+                'rounded-lg',
+                'straight-corners:rounded-none',
                 'text-base',
                 'font-medium',
+                'text-tint-strong',
                 'hover:bg-tint-hover',
                 'group',
-                active
-                    ? ['is-active', 'bg-primary', 'text-contrast-primary', 'hover:bg-primary-hover']
-                    : null
+                active && [
+                    'is-active',
+                    'bg-primary',
+                    'text-primary-strong',
+                    'hover:bg-primary-hover',
+                ]
             )}
             insights={{
                 type: 'search_open_result',
@@ -56,8 +62,8 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
         >
             <div className="size-4">
                 <Icon
-                    icon="file-lines"
-                    className={tcls('size-4', active ? 'text-primary' : 'text-tint-subtle')}
+                    icon="file"
+                    className={tcls('size-4', active ? 'text-primary-subtle' : 'text-tint-subtle')}
                 />
             </div>
             <div className={tcls('flex', 'flex-col', 'w-full')}>
@@ -65,7 +71,8 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     <div
                         className={tcls(
                             'text-xs',
-                            'opacity-6',
+                            active ? 'text-primary-subtle' : 'text-neutral-subtle',
+                            // 'opacity-6',
                             'contrast-more:opacity-11',
                             'font-normal',
                             'uppercase',
@@ -103,19 +110,15 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                 ) : null}
                 <HighlightQuery query={query} text={item.title} />
             </div>
-            <div
-                className={tcls(
-                    'p-2',
-                    'rounded',
-                    'straight-corners:rounded-none',
-                    active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6']
-                )}
-            >
-                <Icon
-                    icon={active ? 'arrow-turn-down-left' : 'chevron-right'}
-                    className={tcls('size-4')}
+            {active ? (
+                <Button
+                    icon="arrow-turn-down-left"
+                    size="small"
+                    label={tString(language, 'view')}
                 />
-            </div>
+            ) : (
+                <Icon icon="chevron-right" className="size-4 text-tint-subtle/6" />
+            )}
         </Link>
     );
 });

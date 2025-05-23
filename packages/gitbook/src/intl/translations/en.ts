@@ -6,6 +6,7 @@ export const en = {
     switch_to_light_theme: 'Switch to light theme',
     switch_to_system_theme: 'Switch to system theme',
     search: 'Search',
+    view: 'View',
     search_or_ask: 'Ask or search',
     search_input_placeholder: 'Search content',
     search_ask_input_placeholder: 'Search content or ask a question',
