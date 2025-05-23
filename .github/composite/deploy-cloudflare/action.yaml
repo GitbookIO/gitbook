@@ -85,7 +85,7 @@ runs:
         - name: Run updateWrangler scripts
           shell: bash
           run: |
-              bun run ./packages/gitbook-v2/openNext/customWorkers/script/updateWrangler.js ${{ steps.extract_server_version_id.outputs.version_id }}
+              bun run ./packages/gitbook-v2/openNext/customWorkers/script/updateWrangler.ts ${{ steps.extract_server_version_id.outputs.version_id }}
 
         - id: upload_middleware
           name: Upload middleware to Cloudflare

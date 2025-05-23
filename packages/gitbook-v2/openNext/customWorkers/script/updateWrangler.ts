@@ -1,6 +1,6 @@
 // In this script, we use the args from the cli to update the PREVIEW_URL vars in the wrangler config file for the middleware
-const fs = require('node:fs');
-const path = require('node:path');
+import fs from 'node:fs';
+import path from 'node:path';
 
 const wranglerConfigPath = path.join(__dirname, '../middlewareWrangler.jsonc');
 
@@ -11,8 +11,11 @@ const args = process.argv.slice(2);
 const versionId = args[0];
 
 // The preview URL is in the format https://<versionId>-gitbook-open-v2-server-preview.gitbook.workers.dev
-const previewUrl = `https://${versionId.split('-')[0]}-gitbook-open-v2-server-preview.gitbook.workers.dev`;
+const previewHostname = `${versionId.split('-')[0]}-gitbook-open-v2-server-preview.gitbook.workers.dev`;
 
-const updatedFile = file.replace(/"PREVIEW_URL": "TO_REPLACE"/, `"PREVIEW_URL": "${previewUrl}"`);
+const updatedFile = file.replace(
+    /"PREVIEW_HOSTNAME": "TO_REPLACE"/,
+    `"PREVIEW_HOSTNAME": "${previewHostname}"`
+);
 
 fs.writeFileSync(wranglerConfigPath, updatedFile);

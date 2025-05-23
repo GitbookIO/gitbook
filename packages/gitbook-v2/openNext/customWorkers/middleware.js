@@ -16,21 +16,17 @@ export default class extends WorkerEntrypoint {
                 return reqOrResp;
             }
 
-            // If it is a `Request`, we need to send it to the Next server
-            // But we need to send it using the preview URL if we are in preview mode
-            const nextRequest =
-                this.env.STAGE === 'preview'
-                    ? new Request(new URL(reqOrResp.url, this.env.PREVIEW_URL), reqOrResp)
-                    : reqOrResp;
-
             if (this.env.STAGE !== 'preview') {
-                return this.env.DEFAULT_WORKER?.fetch(nextRequest, {
+                return this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
                     cf: {
                         cacheEverything: false,
                     },
                 });
             }
             // If we are in preview mode, we need to send the request to the preview URL
+            const modifiedUrl = new URL(reqOrResp.url);
+            modifiedUrl.hostname = this.env.PREVIEW_HOSTNAME;
+            const nextRequest = new Request(modifiedUrl, reqOrResp);
             return fetch(nextRequest, {
                 cf: {
                     cacheEverything: false,
