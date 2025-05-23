@@ -1,6 +1,8 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
 
+import onConfig from '../../.open-next/middleware/open-next.config.mjs';
+
 import { handler as middlewareHandler } from '../../.open-next/middleware/handler.mjs';
 
 export { DOQueueHandler } from '../../.open-next/.build/durable-objects/queue.js';
@@ -35,5 +37,67 @@ export default class extends WorkerEntrypoint {
         });
     }
 
-    //TODO: Add methods for the DO queue and sharded tag cache so that they can be used in the main function through service bindings
+    /**
+     * Forwards the message from the server to the DO queue.
+     */
+    async send(message) {
+        return runWithCloudflareRequestContext(
+            new Request('http://local'),
+            this.env,
+            this.ctx,
+            async () => {
+                const queue = await onConfig.middleware.override.queue();
+                if (queue) {
+                    return queue.send(message);
+                }
+            }
+        );
+    }
+
+    /**
+     * All the functions below are used to interact with the tag cache.
+     * They are needed for the server who wouldn't be able to access the tag cache directly.
+     */
+
+    async getLastRevalidated() {
+        return runWithCloudflareRequestContext(
+            new Request('http://local'),
+            this.env,
+            this.ctx,
+            async () => {
+                const tagCache = await onConfig.middleware.override.tagCache();
+                if (tagCache) {
+                    return tagCache.getLastRevalidated();
+                }
+            }
+        );
+    }
+
+    async hasBeenRevalidated() {
+        return runWithCloudflareRequestContext(
+            new Request('http://local'),
+            this.env,
+            this.ctx,
+            async () => {
+                const tagCache = await onConfig.middleware.override.tagCache();
+                if (tagCache) {
+                    return tagCache.hasBeenRevalidated();
+                }
+            }
+        );
+    }
+
+    async writeTags(tags) {
+        return runWithCloudflareRequestContext(
+            new Request('http://local'),
+            this.env,
+            this.ctx,
+            async () => {
+                const tagCache = await onConfig.middleware.override.tagCache();
+                if (tagCache) {
+                    return tagCache.writeTags(tags);
+                }
+            }
+        );
+    }
 }
