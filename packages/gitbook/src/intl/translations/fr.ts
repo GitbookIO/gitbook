@@ -8,6 +8,7 @@ export const fr: TranslationLanguage = {
     switch_to_light_theme: 'Passer au thème clair',
     switch_to_system_theme: 'Passer au thème système',
     search: 'Rechercher',
+    view: 'Voir',
     search_or_ask: 'Demander ou rechercher',
     search_input_placeholder: 'Rechercher le contenu',
     search_ask_input_placeholder: 'Rechercher du contenu ou poser une question',

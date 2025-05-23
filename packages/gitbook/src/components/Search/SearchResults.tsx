@@ -7,7 +7,7 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -252,7 +252,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             ) : query && results.length === 0 ? (
                 noResults
             ) : (
-                <div
+                <motion.div
                     layout="position"
                     className="flex flex-col gap-2 p-4"
                     data-testid="search-results"
@@ -316,7 +316,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                 assertNever(item);
                         }
                     })}
-                </div>
+                </motion.div>
             )}
         </AnimatePresence>
     );
