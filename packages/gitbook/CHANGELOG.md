@@ -1,5 +1,15 @@
 # gitbook
 
+## 0.12.1
+
+### Patch Changes
+
+- dc4268d: Fix navigation between sections/variants when previewing a site in v2
+- 57bb146: Make TOC height dynamic based on visible header and footer elements
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- Updated dependencies [a0c06a7]
+  - @gitbook/react-openapi@1.3.1
+
 ## 0.12.0
 
 ### Minor Changes

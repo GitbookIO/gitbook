@@ -1,5 +1,13 @@
 # gitbook-v2
 
+## 0.3.1
+
+### Patch Changes
+
+- ba0094a: fix ISR on preview env
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- 4b67fe5: Add `urlObject.hash` to `linker.toLinkForContent` to pass through URL fragment identifiers, used in search
+
 ## 0.3.0
 
 ### Minor Changes
