@@ -46,7 +46,8 @@
         "preview": {
             "vars": {
                 "STAGE": "preview",
-                "PREVIEW_HOSTNAME": "TO_REPLACE"
+                "PREVIEW_HOSTNAME": "TO_REPLACE",
+                "WORKER_VERSION_ID": "TO_REPLACE"
             },
             "r2_buckets": [
                 {
@@ -72,6 +73,10 @@
             // and we don't need tags invalidation on preview
         },
         "staging": {
+            "vars": {
+                "STAGE": "staging",
+                "WORKER_VERSION_ID": "TO_REPLACE"
+            },
             "routes": [
                 {
                     "pattern": "open-2c.gitbook-staging.com/*",
@@ -133,7 +138,9 @@
                 "MAX_REVALIDATE_CONCURRENCY": "100",
                 // Temporary variable to find the issue once deployed
                 // TODO: remove this once the issue is fixed
-                "DEBUG_CLOUDFLARE": "true"
+                "DEBUG_CLOUDFLARE": "true",
+                "WORKER_VERSION_ID": "TO_REPLACE",
+                "STAGE": "production"
             },
             "routes": [
                 {

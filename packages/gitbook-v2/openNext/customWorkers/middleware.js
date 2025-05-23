@@ -20,6 +20,9 @@ export default class extends WorkerEntrypoint {
 
             if (this.env.STAGE !== 'preview') {
                 return this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
+                    headers: {
+                        'Cloudflare-Workers-Version-Overrides': `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`,
+                    },
                     cf: {
                         cacheEverything: false,
                     },

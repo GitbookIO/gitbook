@@ -105,6 +105,20 @@ runs:
               version_id=$(echo '${{ steps.upload_middleware.outputs.command-output }}' | grep "Worker Version ID" | awk '{print $4}')
               echo "version_id=$version_id" >> $GITHUB_OUTPUT
 
+        - name: Deploy server and middleware to Cloudflare
+          if: ${{ inputs.deploy == 'true' }}
+          uses: ./.github/actions/gradual-deploy-cloudflare
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              opServiceAccount: ${{ inputs.opServiceAccount }}
+              opItem: ${{ inputs.opItem }}
+              environment: ${{ inputs.environment }}
+              serverVersionId: ${{ steps.extract_server_version_id.outputs.version_id }}
+              middlewareVersionId: ${{ steps.extract_middleware_version_id.outputs.version_id }}
+              deploy: ${{ inputs.deploy }}
+
+
         - name: Outputs
           shell: bash
           env:
