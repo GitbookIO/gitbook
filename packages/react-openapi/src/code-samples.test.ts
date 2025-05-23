@@ -400,7 +400,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/x-www-form-urlencoded"},\n    data={"key":"value"}\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/x-www-form-urlencoded"},\n    data={\n      "key": "value"\n    }\n)\n\ndata = response.json()'
         );
     });
 
@@ -422,7 +422,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data=json.dumps({"key":"value","truethy":True,"falsey":False,"nullish":None})\n)\n\ndata = response.json()'
+            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data=json.dumps({\n      "key": "value",\n      "truethy": True,\n      "falsey": False,\n      "nullish": None\n    })\n)\n\ndata = response.json()'
         );
     });
 
