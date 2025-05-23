@@ -356,18 +356,22 @@ const BodyGenerators = {
             // Convert JSON to XML if needed
             body = JSON.stringify(convertBodyToXML(body));
         } else {
-            body = stringifyOpenAPI(body, (_key, value) => {
-                switch (value) {
-                    case true:
-                        return '$$__TRUE__$$';
-                    case false:
-                        return '$$__FALSE__$$';
-                    case null:
-                        return '$$__NULL__$$';
-                    default:
-                        return value;
-                }
-            })
+            body = stringifyOpenAPI(
+                body,
+                (_key, value) => {
+                    switch (value) {
+                        case true:
+                            return '$$__TRUE__$$';
+                        case false:
+                            return '$$__FALSE__$$';
+                        case null:
+                            return '$$__NULL__$$';
+                        default:
+                            return value;
+                    }
+                },
+                2
+            )
                 .replaceAll('"$$__TRUE__$$"', 'True')
                 .replaceAll('"$$__FALSE__$$"', 'False')
                 .replaceAll('"$$__NULL__$$"', 'None');
