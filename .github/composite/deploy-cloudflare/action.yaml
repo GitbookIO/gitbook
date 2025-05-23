@@ -98,16 +98,6 @@ runs:
               environment: ${{ inputs.environment }}
               command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
         
-        - name: Deploy server at 0% traffic
-          uses: cloudflare/wrangler-action@v3.14.0
-          with:
-              apiToken: ${{ inputs.apiToken }}
-              accountId: ${{ inputs.accountId }}
-              workingDirectory: ./
-              wranglerVersion: '4.10.0'
-              environment: ${{ inputs.environment }}
-              command: versions deploy ${{ steps.extract_server_version_id.outputs.version_id }}@0% --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
-
         - name: Extract middleware version worker ID
           shell: bash
           id: extract_middleware_version_id
