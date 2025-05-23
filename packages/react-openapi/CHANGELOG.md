@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.3.1
+
+### Patch Changes
+
+- a0c06a7: Indent JSON python code sample
+
 ## 1.3.0
 
 ### Minor Changes
