@@ -53,6 +53,8 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
         description: section.description,
         icon: section.icon,
         object: section.object,
-        url: section.urls.published ? linker.toLinkForContent(section.urls.published) : '',
+        url: section.urls.published
+            ? linker.toLinkForContent(section.urls.published)
+            : linker.toPathInSite(section.path),
     };
 }
