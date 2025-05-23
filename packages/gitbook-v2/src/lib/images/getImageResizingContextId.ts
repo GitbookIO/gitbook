@@ -1,4 +1,5 @@
-import { getProxyRequestIdentifier, isProxyRequest } from '../data';
+import { getPreviewRequestIdentifier, isPreviewRequest } from '@v2/lib/preview';
+import { getProxyRequestIdentifier, isProxyRequest } from '@v2/lib/proxy';
 
 /**
  * Get the site identifier to use for image resizing for an incoming request.
@@ -7,6 +8,9 @@ import { getProxyRequestIdentifier, isProxyRequest } from '../data';
 export function getImageResizingContextId(url: URL): string {
     if (isProxyRequest(url)) {
         return getProxyRequestIdentifier(url);
+    }
+    if (isPreviewRequest(url)) {
+        return getPreviewRequestIdentifier(url);
     }
 
     return url.host;
