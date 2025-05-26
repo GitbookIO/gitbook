@@ -167,7 +167,7 @@ const getExampleFromSchema = (
     const makeUpRandomData = !!options?.emptyString;
 
     // If the property is deprecated we don't show it in examples.
-    if (schema.deprecated) {
+    if (schema.deprecated || (schema.type === 'array' && schema.items?.deprecated)) {
         return undefined;
     }
 
