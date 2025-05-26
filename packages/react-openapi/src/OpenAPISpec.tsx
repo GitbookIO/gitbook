@@ -18,7 +18,7 @@ export function OpenAPISpec(props: {
 
     const { operation } = data;
 
-    const parameters = operation.parameters ?? [];
+    const parameters = deduplicateParameters(operation.parameters ?? []);
     const parameterGroups = groupParameters(parameters, context);
 
     const securities = 'securities' in data ? data.securities : [];
@@ -112,4 +112,24 @@ function getParameterGroupName(paramIn: string, context: OpenAPIClientContext): 
         default:
             return paramIn;
     }
+}
+
+/** Deduplicate parameters by name and in.
+ * Some specs have both parameters define at path and operation level.
+ * We only want to display one of them.
+ */
+function deduplicateParameters(parameters: OpenAPI.Parameters): OpenAPI.Parameters {
+    const seen = new Set();
+
+    return parameters.filter((param) => {
+        const key = `${param.name}:${param.in}`;
+
+        if (seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+
+        return true;
+    });
 }
