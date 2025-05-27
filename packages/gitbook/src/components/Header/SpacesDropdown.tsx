@@ -2,6 +2,7 @@ import type { SiteSpace } from '@gitbook/api';
 
 import { tcls } from '@/lib/tailwind';
 
+import { joinPath } from '@/lib/paths';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { DropdownChevron, DropdownMenu } from './DropdownMenu';
 import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
@@ -74,11 +75,22 @@ export function SpacesDropdown(props: {
                         title: otherSiteSpace.title,
                         url: otherSiteSpace.urls.published
                             ? linker.toLinkForContent(otherSiteSpace.urls.published)
-                            : otherSiteSpace.space.urls.app,
+                            : getFallbackSiteSpaceURL(otherSiteSpace, context),
                     }}
                     active={otherSiteSpace.id === siteSpace.id}
                 />
             ))}
         </DropdownMenu>
+    );
+}
+
+/**
+ * When the site is not published yet, `urls.published` is not available.
+ * To ensure navigation works in preview, we compute a relative URL from the siteSpace path.
+ */
+function getFallbackSiteSpaceURL(siteSpace: SiteSpace, context: GitBookSiteContext) {
+    const { linker, sections } = context;
+    return linker.toPathInSite(
+        sections?.current ? joinPath(sections.current.path, siteSpace.path) : siteSpace.path
     );
 }

@@ -1017,4 +1017,24 @@ describe('generateSchemaExample', () => {
             },
         });
     });
+
+    it('handles deprecated properties', () => {
+        expect(
+            generateSchemaExample({
+                type: 'object',
+                deprecated: true,
+            })
+        ).toBeUndefined();
+    });
+
+    it('handle nested deprecated properties', () => {
+        expect(
+            generateSchemaExample({
+                type: 'array',
+                items: {
+                    deprecated: true,
+                },
+            })
+        ).toBeUndefined();
+    });
 });

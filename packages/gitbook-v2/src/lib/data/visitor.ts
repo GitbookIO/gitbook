@@ -1,6 +1,6 @@
 import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 import type { PublishedSiteContent } from '@gitbook/api';
-import { getProxyRequestIdentifier, isProxyRequest } from './proxy';
+import { getProxyRequestIdentifier, isProxyRequest } from '@v2/lib/proxy';
 
 /**
  * Get the appropriate base path for the visitor authentication cookie.
