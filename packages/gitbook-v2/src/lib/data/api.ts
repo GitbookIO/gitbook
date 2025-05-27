@@ -2,7 +2,6 @@ import { trace } from '@/lib/tracing';
 import {
     type ComputedContentSource,
     GitBookAPI,
-    type GitBookAPIServiceBinding,
     type HttpResponse,
     type RenderIntegrationUI,
 } from '@gitbook/api';
@@ -828,37 +827,18 @@ async function* streamAIResponse(
     }
 }
 
-// const loggedServiceBinding = false;
-
 /**
  * Create a new API client.
+ * We don't use the binding because it can cause Error: Response closed due to connection limit
+ * Connection limit are shared between all the bindings.
  */
 export function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
-    let serviceBinding: GitBookAPIServiceBinding | undefined;
-
-    // TODO: Don't forget to uncomment if it wasn't the issue.
-    // const cloudflareContext = getCloudflareContext();
-    // if (cloudflareContext) {
-    //     // @ts-expect-error
-    //     serviceBinding = cloudflareContext.env.GITBOOK_API as GitBookAPIServiceBinding | undefined;
-    //     if (!loggedServiceBinding) {
-    //         loggedServiceBinding = true;
-    //         if (serviceBinding) {
-    //             // biome-ignore lint/suspicious/noConsole: we want to log here
-    //             console.log(`using service binding for the API (${GITBOOK_API_URL})`);
-    //         } else {
-    //             // biome-ignore lint/suspicious/noConsole: we want to log here
-    //             console.warn(`no service binding for the API (${GITBOOK_API_URL})`);
-    //         }
-    //     }
-    // }
 
     const api = new GitBookAPI({
         authToken: apiToken || GITBOOK_API_TOKEN || undefined,
         endpoint: GITBOOK_API_URL,
         userAgent: GITBOOK_USER_AGENT,
-        serviceBinding,
     });
 
     return api;

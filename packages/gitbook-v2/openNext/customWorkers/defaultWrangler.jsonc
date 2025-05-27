@@ -30,10 +30,6 @@
                     "service": "gitbook-open-v2-server-dev"
                 },
                 {
-                    "binding": "GITBOOK_API",
-                    "service": "gitbook-x-prod-api-cache"
-                },
-                {
                     "binding": "MIDDLEWARE_REFERENCE",
                     "service": "gitbook-open-v2-dev"
                 }
@@ -55,10 +51,6 @@
                     "service": "gitbook-open-v2-server-preview"
                 },
                 {
-                    "binding": "GITBOOK_API",
-                    "service": "gitbook-x-prod-api-cache"
-                },
-                {
                     "binding": "MIDDLEWARE_REFERENCE",
                     "service": "gitbook-open-v2-preview"
                 }
@@ -77,10 +69,6 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-staging"
-                },
-                {
-                    "binding": "GITBOOK_API",
-                    "service": "gitbook-x-staging-api-cache"
                 },
                 {
                     "binding": "MIDDLEWARE_REFERENCE",
@@ -104,10 +92,6 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-production"
-                },
-                {
-                    "binding": "GITBOOK_API",
-                    "service": "gitbook-x-prod-api-cache"
                 },
                 {
                     "binding": "MIDDLEWARE_REFERENCE",
