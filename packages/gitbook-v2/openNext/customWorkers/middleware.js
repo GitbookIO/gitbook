@@ -41,23 +41,6 @@ export default class extends WorkerEntrypoint {
     }
 
     /**
-     * Forwards the message from the server to the DO queue.
-     */
-    async send(message) {
-        return runWithCloudflareRequestContext(
-            new Request('http://local'),
-            this.env,
-            this.ctx,
-            async () => {
-                const queue = await onConfig.middleware.override.queue();
-                if (queue) {
-                    return queue.send(message);
-                }
-            }
-        );
-    }
-
-    /**
      * All the functions below are used to interact with the tag cache.
      * They are needed for the server who wouldn't be able to access the tag cache directly.
      */
@@ -71,20 +54,6 @@ export default class extends WorkerEntrypoint {
                 const tagCache = await onConfig.middleware.override.tagCache();
                 if (tagCache) {
                     return tagCache.getLastRevalidated();
-                }
-            }
-        );
-    }
-
-    async hasBeenRevalidated() {
-        return runWithCloudflareRequestContext(
-            new Request('http://local'),
-            this.env,
-            this.ctx,
-            async () => {
-                const tagCache = await onConfig.middleware.override.tagCache();
-                if (tagCache) {
-                    return tagCache.hasBeenRevalidated();
                 }
             }
         );
