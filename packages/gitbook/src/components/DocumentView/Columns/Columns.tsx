@@ -7,7 +7,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
     const { block, style, ancestorBlocks, document, context } = props;
 
     return (
-        <div className={tcls('flex gap-4', style)}>
+        <div className={tcls('flex flex-col md:flex-row gap-x-8', style)}>
             {block.nodes.map((columnBlock) => (
                 <Column>
                     <Blocks
@@ -26,5 +26,5 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
 }
 
 export function Column(props: { children?: React.ReactNode }) {
-    return <div className="flex-1 flex-column">{props.children}</div>;
+    return <div className="flex-1 flex-col">{props.children}</div>;
 }
