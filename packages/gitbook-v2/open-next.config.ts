@@ -8,7 +8,7 @@ export default {
             proxyExternalRequest: 'fetch',
             queue: () => import('./openNext/queue/server').then((m) => m.default),
             incrementalCache: () => import('./openNext/incrementalCache').then((m) => m.default),
-            tagCache: () => import('./openNext/tagCache/server').then((m) => m.default),
+            tagCache: () => import('./openNext/tagCache/middleware').then((m) => m.default),
         },
     },
     middleware: {

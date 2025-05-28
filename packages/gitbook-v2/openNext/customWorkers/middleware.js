@@ -1,8 +1,6 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
 
-import onConfig from '../../.open-next/middleware/open-next.config.mjs';
-
 import { handler as middlewareHandler } from '../../.open-next/middleware/handler.mjs';
 
 export { DOQueueHandler } from '../../.open-next/.build/durable-objects/queue.js';
@@ -19,10 +17,11 @@ export default class extends WorkerEntrypoint {
             }
 
             if (this.env.STAGE !== 'preview') {
+                reqOrResp.headers.set(
+                    'Cloudflare-Workers-Version-Overrides',
+                    `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
+                );
                 return this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
-                    headers: {
-                        'Cloudflare-Workers-Version-Overrides': `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`,
-                    },
                     cf: {
                         cacheEverything: false,
                     },
@@ -38,38 +37,5 @@ export default class extends WorkerEntrypoint {
                 },
             });
         });
-    }
-
-    /**
-     * All the functions below are used to interact with the tag cache.
-     * They are needed for the server who wouldn't be able to access the tag cache directly.
-     */
-
-    async getLastRevalidated() {
-        return runWithCloudflareRequestContext(
-            new Request('http://local'),
-            this.env,
-            this.ctx,
-            async () => {
-                const tagCache = await onConfig.middleware.override.tagCache();
-                if (tagCache) {
-                    return tagCache.getLastRevalidated();
-                }
-            }
-        );
-    }
-
-    async writeTags(tags) {
-        return runWithCloudflareRequestContext(
-            new Request('http://local'),
-            this.env,
-            this.ctx,
-            async () => {
-                const tagCache = await onConfig.middleware.override.tagCache();
-                if (tagCache) {
-                    return tagCache.writeTags(tags);
-                }
-            }
-        );
     }
 }

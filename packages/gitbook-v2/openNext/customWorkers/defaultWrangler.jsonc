@@ -28,16 +28,14 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-dev"
-                },
-                {
-                    "binding": "MIDDLEWARE_REFERENCE",
-                    "service": "gitbook-open-v2-dev"
                 }
             ]
         },
         "preview": {
             "vars": {
-                "STAGE": "preview"
+                "STAGE": "preview",
+                // Just as a test for the preview environment to check that everything works
+                "NEXT_PRIVATE_DEBUG_CACHE": "true"
             },
             "r2_buckets": [
                 {
@@ -49,10 +47,6 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-preview"
-                },
-                {
-                    "binding": "MIDDLEWARE_REFERENCE",
-                    "service": "gitbook-open-v2-preview"
                 }
             ]
             // No durable objects on preview, as they block the generation of preview URLs
@@ -69,10 +63,21 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-staging"
-                },
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-staging"
+                    }
+                ]
+            },
+            "migrations": [
                 {
-                    "binding": "MIDDLEWARE_REFERENCE",
-                    "service": "gitbook-open-v2-staging"
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOShardedTagCache"]
                 }
             ],
             "tail_consumers": [
@@ -92,10 +97,21 @@
                 {
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-production"
-                },
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-production"
+                    }
+                ]
+            },
+            "migrations": [
                 {
-                    "binding": "MIDDLEWARE_REFERENCE",
-                    "service": "gitbook-open-v2-production"
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOShardedTagCache"]
                 }
             ],
             "tail_consumers": [

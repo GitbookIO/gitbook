@@ -1,47 +1,76 @@
+import { trace } from '@/lib/tracing';
 import type { NextModeTagCache } from '@opennextjs/aws/types/overrides.js';
 import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache';
-import {
-    softTagFilter,
-    withFilter,
-} from '@opennextjs/cloudflare/overrides/tag-cache/tag-cache-filter';
+import { softTagFilter } from '@opennextjs/cloudflare/overrides/tag-cache/tag-cache-filter';
 
-const filteredTagCache = withFilter({
-    tagCache: doShardedTagCache({
-        baseShardSize: 12,
-        regionalCache: true,
-        shardReplication: {
-            numberOfSoftReplicas: 2,
-            numberOfHardReplicas: 1,
-        },
-    }),
-    // We don't use `revalidatePath`, so we filter out soft tags
-    filterFn: softTagFilter,
+const originalTagCache = doShardedTagCache({
+    baseShardSize: 12,
+    regionalCache: true,
+    shardReplication: {
+        numberOfSoftReplicas: 2,
+        numberOfHardReplicas: 1,
+    },
 });
 
 export default {
     name: 'GitbookTagCache',
     mode: 'nextMode',
     getLastRevalidated: async (tags: string[]) => {
-        try {
-            return await filteredTagCache.getLastRevalidated(tags);
-        } catch (error) {
-            console.error('Error getting last revalidated tags:', error);
-            return 0; // Fallback to 0 if there's an error
+        const tagsToCheck = tags.filter(softTagFilter);
+        if (tagsToCheck.length === 0) {
+            // If we reach here, it probably means that there is an issue that we'll need to address.
+            console.warn(
+                'getLastRevalidated - No valid tags to check for last revalidation, original tags:',
+                tags
+            );
+            return 0; // If no tags to check, return 0
         }
+        return trace(
+            {
+                operation: 'gitbookTagCacheGetLastRevalidated',
+                name: tagsToCheck.join(', '),
+            },
+            async () => {
+                return await originalTagCache.getLastRevalidated(tagsToCheck);
+            }
+        );
     },
     hasBeenRevalidated: async (tags: string[]) => {
-        try {
-            return await filteredTagCache.hasBeenRevalidated(tags);
-        } catch (error) {
-            console.error('Error checking if tags have been revalidated:', error);
-            return false; // Fallback to false if there's an error
+        const tagsToCheck = tags.filter(softTagFilter);
+        if (tagsToCheck.length === 0) {
+            // If we reach here, it probably means that there is an issue that we'll need to address.
+            console.warn(
+                'hasBeenRevalidated - No valid tags to check for revalidation, original tags:',
+                tags
+            );
+            return false; // If no tags to check, return false
         }
+        return trace(
+            {
+                operation: 'gitbookTagCacheHasBeenRevalidated',
+                name: tagsToCheck.join(', '),
+            },
+            async () => {
+                const result = await originalTagCache.hasBeenRevalidated(tagsToCheck);
+                return result;
+            }
+        );
     },
     writeTags: async (tags: string[]) => {
-        try {
-            await filteredTagCache.writeTags(tags);
-        } catch (error) {
-            console.error('Error writing tags:', error);
-        }
+        return trace(
+            {
+                operation: 'gitbookTagCacheWriteTags',
+                name: tags.join(', '),
+            },
+            async () => {
+                const tagsToWrite = tags.filter(softTagFilter);
+                if (tagsToWrite.length === 0) {
+                    console.warn('writeTags - No valid tags to write');
+                    return; // If no tags to write, exit early
+                }
+                // Write only the filtered tags
+                await originalTagCache.writeTags(tagsToWrite);
+            }
+        );
     },
 } satisfies NextModeTagCache;

@@ -20,7 +20,8 @@
     "env": {
         "dev": {
             "vars": {
-                "STAGE": "dev"
+                "STAGE": "dev",
+                "NEXT_PRIVATE_DEBUG_CACHE": "true"
             },
             "r2_buckets": [
                 {
