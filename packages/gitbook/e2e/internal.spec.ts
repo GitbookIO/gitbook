@@ -632,6 +632,7 @@ const testCases: TestsCase[] = [
                 name: 'Stepper',
                 url: 'blocks/stepper',
             },
+            { name: 'Columns', url: 'blocks/columns' },
         ],
     },
     {
