@@ -1,5 +1,25 @@
 import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/init.js';
 
+import { DurableObject } from 'cloudflare:workers';
+
+export class R2WriteBuffer extends DurableObject {
+    writePromise;
+
+    async write(cacheKey, value) {
+        // We are already writing to this key
+        if (this.writePromise) {
+            return;
+        }
+
+        this.writePromise = this.env.NEXT_INC_CACHE_R2_BUCKET.put(cacheKey, value);
+        this.ctx.waitUntil(
+            this.writePromise.finally(() => {
+                this.writePromise = undefined;
+            })
+        );
+    }
+}
+
 export default {
     async fetch(request, env, ctx) {
         return runWithCloudflareRequestContext(request, env, ctx, async () => {

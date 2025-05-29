@@ -29,6 +29,20 @@
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-dev"
                 }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["R2WriteBuffer"]
+                }
             ]
         },
         "preview": {
@@ -73,9 +87,19 @@
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
                         "class_name": "DOShardedTagCache",
                         "script_name": "gitbook-open-v2-staging"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
                     }
                 ]
             },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["R2WriteBuffer"]
+                }
+            ],
             "tail_consumers": [
                 {
                     "service": "gitbook-x-staging-tail"
@@ -103,9 +127,19 @@
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
                         "class_name": "DOShardedTagCache",
                         "script_name": "gitbook-open-v2-production"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
                     }
                 ]
             },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["R2WriteBuffer"]
+                }
+            ],
             "tail_consumers": [
                 {
                     "service": "gitbook-x-prod-tail"

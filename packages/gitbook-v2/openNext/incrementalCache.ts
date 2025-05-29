@@ -9,6 +9,8 @@ import type {
 } from '@opennextjs/aws/types/overrides.js';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
+import type { DurableObjectNamespace, Rpc } from '@cloudflare/workers-types';
+
 export const BINDING_NAME = 'NEXT_INC_CACHE_R2_BUCKET';
 export const DEFAULT_PREFIX = 'incremental-cache';
 
@@ -79,12 +81,10 @@ class GitbookIncrementalCache implements IncrementalCache {
             },
             async (span) => {
                 span.setAttribute('cacheType', cacheType ?? 'cache');
-                const r2 = getCloudflareContext().env[BINDING_NAME];
                 const localCache = await this.getCacheInstance();
-                if (!r2) throw new Error('No R2 bucket');
 
                 try {
-                    await r2.put(cacheKey, JSON.stringify(value));
+                    await this.writeToR2(cacheKey, JSON.stringify(value));
 
                     //TODO: Check if there is any places where we don't have tags
                     // Ideally we should always have tags, but in case we don't, we need to decide how to handle it
@@ -143,6 +143,22 @@ class GitbookIncrementalCache implements IncrementalCache {
                 }
             }
         );
+    }
+
+    async writeToR2(key: string, value: string): Promise<void> {
+        const env = getCloudflareContext().env as {
+            WRITE_BUFFER: DurableObjectNamespace<
+                Rpc.DurableObjectBranded & {
+                    write: (key: string, value: string) => Promise<void>;
+                }
+            >;
+        };
+        const id = env.WRITE_BUFFER.idFromName(key);
+
+        // A stub is a client used to invoke methods on the Durable Object
+        const stub = env.WRITE_BUFFER.get(id);
+
+        await stub.write(key, value);
     }
 
     async getCacheInstance(): Promise<Cache> {
