@@ -67,6 +67,8 @@
             ],
             "durable_objects": {
                 "bindings": [
+                    // We do not need to define migrations for external DOs,
+                    // In fact, defining migrations for external DOs will crash
                     {
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
                         "class_name": "DOShardedTagCache",
@@ -74,12 +76,6 @@
                     }
                 ]
             },
-            "migrations": [
-                {
-                    "tag": "v1",
-                    "new_sqlite_classes": ["DOShardedTagCache"]
-                }
-            ],
             "tail_consumers": [
                 {
                     "service": "gitbook-x-staging-tail"
@@ -102,18 +98,14 @@
             "durable_objects": {
                 "bindings": [
                     {
+                        // We do not need to define migrations for external DOs,
+                        // In fact, defining migrations for external DOs will crash
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
                         "class_name": "DOShardedTagCache",
                         "script_name": "gitbook-open-v2-production"
                     }
                 ]
             },
-            "migrations": [
-                {
-                    "tag": "v1",
-                    "new_sqlite_classes": ["DOShardedTagCache"]
-                }
-            ],
             "tail_consumers": [
                 {
                     "service": "gitbook-x-prod-tail"
