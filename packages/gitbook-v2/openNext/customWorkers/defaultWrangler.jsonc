@@ -62,9 +62,26 @@
                     "binding": "WORKER_SELF_REFERENCE",
                     "service": "gitbook-open-v2-server-preview"
                 }
-            ]
-            // No durable objects on preview, as they block the generation of preview URLs
-            // and we don't need tags invalidation on preview
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-preview"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-preview"
+                    },
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-preview"
+                    }
+                ]
+            }
         },
         "staging": {
             "r2_buckets": [
@@ -81,25 +98,23 @@
             ],
             "durable_objects": {
                 "bindings": [
-                    // We do not need to define migrations for external DOs,
-                    // In fact, defining migrations for external DOs will crash
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-staging"
+                    },
                     {
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
                         "class_name": "DOShardedTagCache",
-                        "script_name": "gitbook-open-v2-staging"
+                        "script_name": "gitbook-open-v2-do-staging"
                     },
                     {
-                        "name": "WRITE_BUFFER",
-                        "class_name": "R2WriteBuffer"
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-staging"
                     }
                 ]
             },
-            "migrations": [
-                {
-                    "tag": "v1",
-                    "new_sqlite_classes": ["R2WriteBuffer"]
-                }
-            ],
             "tail_consumers": [
                 {
                     "service": "gitbook-x-staging-tail"
@@ -122,24 +137,22 @@
             "durable_objects": {
                 "bindings": [
                     {
-                        // We do not need to define migrations for external DOs,
-                        // In fact, defining migrations for external DOs will crash
-                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
-                        "class_name": "DOShardedTagCache",
-                        "script_name": "gitbook-open-v2-production"
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-production"
                     },
                     {
-                        "name": "WRITE_BUFFER",
-                        "class_name": "R2WriteBuffer"
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-production"
+                    },
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-production"
                     }
                 ]
             },
-            "migrations": [
-                {
-                    "tag": "v1",
-                    "new_sqlite_classes": ["R2WriteBuffer"]
-                }
-            ],
             "tail_consumers": [
                 {
                     "service": "gitbook-x-prod-tail"

@@ -2,6 +2,7 @@ import { runWithCloudflareRequestContext } from '../../.open-next/cloudflare/ini
 
 import { DurableObject } from 'cloudflare:workers';
 
+// Only needed to run locally, in prod we'll use the one from do.js
 export class R2WriteBuffer extends DurableObject {
     writePromise;
 

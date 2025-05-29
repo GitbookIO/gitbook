@@ -61,9 +61,26 @@
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-preview"
                 }
-            ]
-            // No durable objects on preview, as they block the generation of preview URLs
-            // and we don't need tags invalidation on preview
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-preview"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-preview"
+                    },
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-preview"
+                    }
+                ]
+            }
         },
         "staging": {
             "vars": {
@@ -104,12 +121,19 @@
             "durable_objects": {
                 "bindings": [
                     {
-                        "name": "NEXT_CACHE_DO_QUEUE",
-                        "class_name": "DOQueueHandler"
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-staging"
                     },
                     {
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
-                        "class_name": "DOShardedTagCache"
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-staging"
+                    },
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-staging"
                     }
                 ]
             },
@@ -165,12 +189,19 @@
             "durable_objects": {
                 "bindings": [
                     {
-                        "name": "NEXT_CACHE_DO_QUEUE",
-                        "class_name": "DOQueueHandler"
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer",
+                        "script_name": "gitbook-open-v2-do-production"
                     },
                     {
                         "name": "NEXT_TAG_CACHE_DO_SHARDED",
-                        "class_name": "DOShardedTagCache"
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-do-production"
+                    },
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                        "script_name": "gitbook-open-v2-do-production"
                     }
                 ]
             },
