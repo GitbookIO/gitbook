@@ -17,22 +17,100 @@
         "dev": {
             "vars": {
                 "STAGE": "dev"
-            }
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-dev"
+                }
+            ]
         },
         "preview": {
             "vars": {
-                "STAGE": "preview"
-            }
+                "STAGE": "preview",
+                // Just as a test for the preview environment to check that everything works
+                "NEXT_PRIVATE_DEBUG_CACHE": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-preview"
+                }
+            ]
+            // No durable objects on preview, as they block the generation of preview URLs
+            // and we don't need tags invalidation on preview
         },
         "staging": {
-            "vars": {
-                "STAGE": "staging"
-            }
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-staging"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    // We do not need to define migrations for external DOs,
+                    // In fact, defining migrations for external DOs will crash
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-staging"
+                    }
+                ]
+            },
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail"
+                }
+            ]
         },
         "production": {
-            "vars": {
-                "STAGE": "production"
-            }
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-server-production"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        // We do not need to define migrations for external DOs,
+                        // In fact, defining migrations for external DOs will crash
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache",
+                        "script_name": "gitbook-open-v2-production"
+                    }
+                ]
+            },
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail"
+                }
+            ]
         }
     }
 }
