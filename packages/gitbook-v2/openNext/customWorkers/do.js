@@ -1,6 +1,8 @@
 // This worker only purposes it to host the different DO that we will need in the other workers.
 import { DurableObject } from 'cloudflare:workers';
 
+// `use cache` could cause multiple writes to the same key to happen concurrently, there is a limit of 1 write per key/second
+// so we need to buffer writes to the R2 bucket to avoid hitting this limit.
 export class R2WriteBuffer extends DurableObject {
     writePromise;
 
