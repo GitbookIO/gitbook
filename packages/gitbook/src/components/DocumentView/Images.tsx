@@ -19,7 +19,6 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
     const isMultipleImages = block.nodes.length > 1;
     const { align = 'center' } = block.data;
 
-
     return (
         <div
             className={tcls(
