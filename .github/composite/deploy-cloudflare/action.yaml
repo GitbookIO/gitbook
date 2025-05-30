@@ -73,6 +73,17 @@ runs:
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
               command: ${{ inputs.deploy == 'true' && 'deploy' || format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/wrangler.jsonc
+        
+        - name: Temporary deploy server CF worker
+          uses: cloudflare/wrangler-action@v3.14.0
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              workingDirectory: ./
+              wranglerVersion: '4.10.0'
+              environment: ${{ inputs.environment }}
+              command: 'deploy --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc'
+        
         - name: Outputs
           shell: bash
           env:
