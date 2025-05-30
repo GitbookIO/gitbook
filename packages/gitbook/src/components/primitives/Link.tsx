@@ -3,6 +3,7 @@
 import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
+import { tcls } from '@/lib/tailwind';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
@@ -72,6 +73,37 @@ export const Link = React.forwardRef(function Link(
         <NextLink ref={ref} href={href} prefetch={prefetch} {...domProps} onClick={onClick}>
             {children}
         </NextLink>
+    );
+});
+
+export const LinkBox = React.forwardRef(function LinkBox(
+    props: React.BaseHTMLAttributes<HTMLDivElement>,
+    ref: React.Ref<HTMLDivElement>
+) {
+    const { children, className, ...domProps } = props;
+    return (
+        <div ref={ref} {...domProps} className={tcls('elevate-link relative', className)}>
+            {children}
+        </div>
+    );
+});
+
+export const LinkOverlay = React.forwardRef(function LinkOverlay(
+    props: LinkProps,
+    ref: React.Ref<HTMLAnchorElement>
+) {
+    const { children, className, ...domProps } = props;
+    return (
+        <Link
+            ref={ref}
+            {...domProps}
+            className={tcls(
+                'link-overlay static before:absolute before:top-0 before:left-0 before:z-10 before:h-full before:w-full',
+                className
+            )}
+        >
+            {children}
+        </Link>
     );
 });
 

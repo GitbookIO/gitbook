@@ -148,6 +148,13 @@
             width: 100%;
         }
     }
+
+    .elevate-link {
+        & a[href]:not(.link-overlay) {
+            position: relative;
+            z-index: 20;
+        }
+    }
 }
 
 html {
