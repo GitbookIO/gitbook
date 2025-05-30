@@ -17,6 +17,7 @@ export default class extends WorkerEntrypoint {
             }
 
             if (this.env.STAGE !== 'preview') {
+                // https://developers.cloudflare.com/workers/configuration/versions-and-deployments/gradual-deployments/#version-affinity
                 reqOrResp.headers.set(
                     'Cloudflare-Workers-Version-Overrides',
                     `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`

@@ -829,8 +829,6 @@ async function* streamAIResponse(
 
 /**
  * Create a new API client.
- * We don't use the binding because it can cause Error: Response closed due to connection limit
- * Connection limit are shared between all the bindings.
  */
 export function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
