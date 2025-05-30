@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.12.1
+
+### Patch Changes
+
+- b3a7ad6: fix href being empty in TOC
+- dc4268d: Fix navigation between sections/variants when previewing a site in v2
+- 57bb146: Make TOC height dynamic based on visible header and footer elements
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- Updated dependencies [957afd9]
+- Updated dependencies [a0c06a7]
+- Updated dependencies [4c9a9d0]
+- Updated dependencies [40df91a]
+  - @gitbook/react-openapi@1.3.1
+
 ## 0.12.0
 
 ### Minor Changes
