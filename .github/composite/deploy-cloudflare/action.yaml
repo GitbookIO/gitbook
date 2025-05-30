@@ -64,6 +64,16 @@ runs:
             GITBOOK_RUNTIME: cloudflare
           shell: bash
 
+        - name: Upload the DO worker
+          uses: cloudflare/wrangler-action@v3.14.0
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              workingDirectory: ./
+              wranglerVersion: '4.10.0'
+              environment: ${{ inputs.environment }}
+              command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/doWrangler.jsonc
+
         - id: upload_server
           name: Upload server to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0

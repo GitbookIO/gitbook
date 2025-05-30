@@ -6,6 +6,8 @@ import { softTagFilter } from '@opennextjs/cloudflare/overrides/tag-cache/tag-ca
 const originalTagCache = doShardedTagCache({
     baseShardSize: 12,
     regionalCache: true,
+    // We can probably increase this value even further
+    regionalCacheTtlSec: 60,
     shardReplication: {
         numberOfSoftReplicas: 2,
         numberOfHardReplicas: 1,
@@ -35,7 +37,7 @@ export default {
             }
         );
     },
-    hasBeenRevalidated: async (tags: string[]) => {
+    hasBeenRevalidated: async (tags: string[], lastModified?: number) => {
         const tagsToCheck = tags.filter(softTagFilter);
         if (tagsToCheck.length === 0) {
             // If we reach here, it probably means that there is an issue that we'll need to address.
@@ -51,7 +53,7 @@ export default {
                 name: tagsToCheck.join(', '),
             },
             async () => {
-                const result = await originalTagCache.hasBeenRevalidated(tagsToCheck);
+                const result = await originalTagCache.hasBeenRevalidated(tagsToCheck, lastModified);
                 return result;
             }
         );
