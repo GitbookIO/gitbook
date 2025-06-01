@@ -165,6 +165,9 @@ export async function RecordCard(
 
     if (target && targetRef) {
         return (
+            // We don't use `Link` directly here because we could end up in a situation where
+            // a link is rendered inside a link, which is not allowed in HTML.
+            // It causes an hydration error in React.
             <LinkBox href={target.href} className={tcls(style, 'hover:before:ring-tint-12/5')}>
                 <LinkOverlay
                     href={target.href}
