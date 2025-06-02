@@ -2,14 +2,13 @@ import { trace } from '@/lib/tracing';
 import {
     type ComputedContentSource,
     GitBookAPI,
-    type GitBookAPIServiceBinding,
     type HttpResponse,
     type RenderIntegrationUI,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
-import { getCloudflareContext, getCloudflareRequestGlobal } from './cloudflare';
+import { getCloudflareRequestGlobal } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import { withCacheKey, withoutConcurrentExecution } from './memoize';
 import type { GitBookDataFetcher } from './types';
@@ -828,36 +827,16 @@ async function* streamAIResponse(
     }
 }
 
-let loggedServiceBinding = false;
-
 /**
  * Create a new API client.
  */
 export function apiClient(input: DataFetcherInput = { apiToken: null }) {
     const { apiToken } = input;
-    let serviceBinding: GitBookAPIServiceBinding | undefined;
-
-    const cloudflareContext = getCloudflareContext();
-    if (cloudflareContext) {
-        // @ts-expect-error
-        serviceBinding = cloudflareContext.env.GITBOOK_API as GitBookAPIServiceBinding | undefined;
-        if (!loggedServiceBinding) {
-            loggedServiceBinding = true;
-            if (serviceBinding) {
-                // biome-ignore lint/suspicious/noConsole: we want to log here
-                console.log(`using service binding for the API (${GITBOOK_API_URL})`);
-            } else {
-                // biome-ignore lint/suspicious/noConsole: we want to log here
-                console.warn(`no service binding for the API (${GITBOOK_API_URL})`);
-            }
-        }
-    }
 
     const api = new GitBookAPI({
         authToken: apiToken || GITBOOK_API_TOKEN || undefined,
         endpoint: GITBOOK_API_URL,
         userAgent: GITBOOK_USER_AGENT,
-        serviceBinding,
     });
 
     return api;
