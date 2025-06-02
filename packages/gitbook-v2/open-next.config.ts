@@ -6,7 +6,7 @@ export default {
             wrapper: 'cloudflare-node',
             converter: 'edge',
             proxyExternalRequest: 'fetch',
-            queue: () => import('./openNext/queue/server').then((m) => m.default),
+            queue: () => import('./openNext/queue/middleware').then((m) => m.default),
             incrementalCache: () => import('./openNext/incrementalCache').then((m) => m.default),
             tagCache: () => import('./openNext/tagCache/middleware').then((m) => m.default),
         },
