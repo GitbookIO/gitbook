@@ -4,7 +4,7 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
-import { Link } from '@/components/primitives';
+import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
@@ -44,7 +44,6 @@ export async function RecordCard(
         <div
             className={tcls(
                 'grid-area-1-1',
-                'z-0',
                 'relative',
                 'grid',
                 'bg-tint-base',
@@ -151,7 +150,6 @@ export async function RecordCard(
         'rounded-md',
         'straight-corners:rounded-none',
         'dark:shadow-transparent',
-        'z-0',
 
         'before:pointer-events-none',
         'before:grid-area-1-1',
@@ -167,19 +165,22 @@ export async function RecordCard(
 
     if (target && targetRef) {
         return (
-            <Link
-                href={target.href}
-                className={tcls(style, 'hover:before:ring-tint-12/5')}
-                insights={{
-                    type: 'link_click',
-                    link: {
-                        target: targetRef,
-                        position: SiteInsightsLinkPosition.Content,
-                    },
-                }}
-            >
+            // We don't use `Link` directly here because we could end up in a situation where
+            // a link is rendered inside a link, which is not allowed in HTML.
+            // It causes an hydration error in React.
+            <LinkBox href={target.href} className={tcls(style, 'hover:before:ring-tint-12/5')}>
+                <LinkOverlay
+                    href={target.href}
+                    insights={{
+                        type: 'link_click',
+                        link: {
+                            target: targetRef,
+                            position: SiteInsightsLinkPosition.Content,
+                        },
+                    }}
+                />
                 {body}
-            </Link>
+            </LinkBox>
         );
     }
 

@@ -11,6 +11,9 @@ const originalTagCache = doShardedTagCache({
     shardReplication: {
         numberOfSoftReplicas: 2,
         numberOfHardReplicas: 1,
+        regionalReplication: {
+            defaultRegion: 'enam',
+        },
     },
 });
 
