@@ -29,7 +29,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 align === 'center' && 'justify-center',
                 align === 'right' && 'justify-end',
                 align === 'left' && 'justify-start',
-                isMultipleImages && ['grid', 'grid-flow-col', 'max-w-none']
+                isMultipleImages && ['grid', 'grid-flow-col']
             )}
         >
             {block.nodes.map((node: any, _i: number) => (
