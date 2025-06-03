@@ -159,7 +159,7 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
         'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
-        'theme-bold:hover:text-header-link'
+        'theme-bold:hover:!text-header-link/7'
     );
 }
 
