@@ -1,4 +1,4 @@
-import { ClassValue, tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 import type { DocumentBlockColumns, Length } from '@gitbook/api';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
@@ -6,29 +6,38 @@ import { Blocks } from '../Blocks';
 export function Columns(props: BlockProps<DocumentBlockColumns>) {
     const { block, style, ancestorBlocks, document, context } = props;
     return (
-        <div className={tcls('flex flex-col md:flex-row gap-x-8', style)}>
+        <div className={tcls('flex flex-col gap-x-8 md:flex-row', style)}>
             {block.nodes.map((columnBlock) => {
                 const width = columnBlock.data.width;
                 const { className, style } = width ? transformLengthToCSS(width) : {};
                 return (
-                <Column key={columnBlock.key} className={className} style={style}>
-                    <Blocks
-                        key={columnBlock.key}
-                        nodes={columnBlock.nodes}
-                        document={document}
-                        ancestorBlocks={[...ancestorBlocks, block, columnBlock]}
-                        context={context}
-                        blockStyle="flip-heading-hash"
-                        style="w-full space-y-4"
-                    />
-                </Column>);
+                    <Column key={columnBlock.key} className={className} style={style}>
+                        <Blocks
+                            key={columnBlock.key}
+                            nodes={columnBlock.nodes}
+                            document={document}
+                            ancestorBlocks={[...ancestorBlocks, block, columnBlock]}
+                            context={context}
+                            blockStyle="flip-heading-hash"
+                            style="w-full space-y-4"
+                        />
+                    </Column>
+                );
             })}
         </div>
     );
 }
 
-export function Column(props: { children?: React.ReactNode, className?: ClassValue; style?: React.CSSProperties }) {
-    return <div className={tcls("flex-col", props.className)} style={props.style}>{props.children}</div>;
+export function Column(props: {
+    children?: React.ReactNode;
+    className?: ClassValue;
+    style?: React.CSSProperties;
+}) {
+    return (
+        <div className={tcls('flex-col', props.className)} style={props.style}>
+            {props.children}
+        </div>
+    );
 }
 
 function transformLengthToCSS(length: Length) {
