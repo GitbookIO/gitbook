@@ -40,7 +40,7 @@ export const pt_br = {
     cookies_prompt_privacy: 'política de privacidade',
     cookies_accept: 'Aceitar',
     cookies_reject: 'Rejeitar',
-    cookies_close: 'Fechar',
+    close: 'Fechar',
     edit_on_git: 'Editar no ${1}',
     notfound_title: 'Página não encontrada',
     notfound: 'A página que você está procurando não existe.',
