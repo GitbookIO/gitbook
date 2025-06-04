@@ -42,7 +42,7 @@ export const no: TranslationLanguage = {
     cookies_prompt_privacy: 'personvernerklæringen',
     cookies_accept: 'Godta',
     cookies_reject: 'Avslå',
-    cookies_close: 'Lukk',
+    close: 'Lukk',
     edit_on_git: 'Rediger på ${1}',
     notfound_title: 'Siden ble ikke funnet',
     notfound: 'Siden du leter etter eksisterer ikke.',
