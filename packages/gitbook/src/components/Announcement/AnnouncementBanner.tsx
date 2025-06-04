@@ -1,5 +1,6 @@
 'use client';
 
+import { tString, useLanguage } from '@/intl/client';
 import * as storage from '@/lib/local-storage';
 import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
@@ -17,6 +18,8 @@ export function AnnouncementBanner(props: {
     contentRef: ResolvedContentRef | null;
 }) {
     const { announcement, contentRef } = props;
+
+    const language = useLanguage();
 
     const hasLink = announcement.link && contentRef?.href;
     const closeable = announcement.style !== 'danger';
@@ -81,6 +84,7 @@ export function AnnouncementBanner(props: {
                             className={`absolute top-0 right-4 mt-2 mr-2 rounded straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
                             type="button"
                             onClick={dismissAnnouncement}
+                            title={tString(language, 'close')}
                         >
                             <Icon icon="close" className="size-4" />
                         </button>

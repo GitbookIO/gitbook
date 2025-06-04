@@ -42,7 +42,7 @@ export const ja: TranslationLanguage = {
     cookies_prompt_privacy: 'プライバシーポリシー',
     cookies_accept: '同意する',
     cookies_reject: '拒否する',
-    cookies_close: '閉じる',
+    close: '閉じる',
     edit_on_git: '${1}で編集',
     notfound_title: 'ページが見つかりません',
     notfound: 'お探しのページは存在しません。',
