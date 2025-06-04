@@ -47,9 +47,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'bg-tint-base',
                 'rounded',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
                 'ring-1',
                 'ring-tint-subtle',
                 'shadow-1xs',
+                'depth-flat:shadow-none',
                 'p-4',
                 'pr-8',
                 'bottom-4',
@@ -83,6 +85,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'justify-center',
                     'items-center',
                     'rounded-sm',
+                    'circular-corners:rounded-full',
                     'hover:bg-tint-hover'
                 )}
                 title={tString(language, 'cookies_close')}

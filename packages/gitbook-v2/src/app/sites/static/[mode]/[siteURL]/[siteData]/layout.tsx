@@ -17,6 +17,13 @@ export default async function SiteStaticLayout({
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
     const { context, visitorAuthClaims } = await getStaticSiteContext(await params);
 
+    if (context.site.id === 'site_JOVzv') {
+        // @ts-expect-error: TODO: remove this once we have a proper customization setting for this
+        context.customization.styling.corners = 'circular';
+        // @ts-expect-error: TODO: remove this once we have a proper customization setting for this
+        context.customization.styling.depth = 'flat';
+    }
+
     return (
         <CustomizationRootLayout customization={context.customization}>
             <SiteLayout

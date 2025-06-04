@@ -483,7 +483,10 @@ const config: Config = {
                 theme: ['theme-clean', 'theme-muted', 'theme-bold', 'theme-gradient'],
 
                 // Corner styles
-                corner: ['straight-corners'],
+                corner: ['straight-corners', 'rounded-corners', 'circular-corners'],
+
+                // Depth styles
+                depth: ['depth-flat', 'depth-elevated'],
 
                 // Link styles
                 links: ['links-default', 'links-accent'],
