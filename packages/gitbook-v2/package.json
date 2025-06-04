@@ -3,7 +3,7 @@
     "version": "0.3.0",
     "private": true,
     "dependencies": {
-        "@gitbook/api": "^0.115.0",
+        "@gitbook/api": "^0.117.1",
         "@gitbook/cache-tags": "workspace:*",
         "@opennextjs/cloudflare": "1.0.4",
         "@sindresorhus/fnv1a": "^3.1.0",
