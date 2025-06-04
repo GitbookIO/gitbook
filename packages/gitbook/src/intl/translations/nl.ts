@@ -43,7 +43,7 @@ export const nl: TranslationLanguage = {
     cookies_prompt_privacy: 'privacyverklaring',
     cookies_accept: 'Accepteren',
     cookies_reject: 'Weigeren',
-    cookies_close: 'Sluiten',
+    close: 'Sluiten',
     edit_on_git: 'Bewerk op ${1}',
     notfound_title: 'Pagina niet gevonden',
     notfound: 'De pagina die je zoekt, bestaat niet.',

@@ -43,7 +43,7 @@ export const es: TranslationLanguage = {
     cookies_prompt_privacy: 'política de privacidad',
     cookies_accept: 'Aceptar',
     cookies_reject: 'Rechazar',
-    cookies_close: 'Cerrar',
+    close: 'Cerrar',
     edit_on_git: 'Editar en ${1}',
     notfound_title: 'Página no encontrada',
     notfound: 'La página que buscas no existe.',

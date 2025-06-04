@@ -41,7 +41,7 @@ export const zh: TranslationLanguage = {
     cookies_prompt_privacy: '隐私政策',
     cookies_accept: '接受',
     cookies_reject: '拒绝',
-    cookies_close: '关闭',
+    close: '关闭',
     edit_on_git: '在${1}上编辑',
     notfound_title: '页面未找到',
     notfound: '您要找的页面不存在。',
