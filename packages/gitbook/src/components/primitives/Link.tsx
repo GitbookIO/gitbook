@@ -3,6 +3,7 @@
 import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
+import { tcls } from '@/lib/tailwind';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
@@ -72,6 +73,46 @@ export const Link = React.forwardRef(function Link(
         <NextLink ref={ref} href={href} prefetch={prefetch} {...domProps} onClick={onClick}>
             {children}
         </NextLink>
+    );
+});
+
+/**
+ * A box used to contain a link overlay.
+ * It is used to create a clickable area that can contain other elements.
+ */
+export const LinkBox = React.forwardRef(function LinkBox(
+    props: React.BaseHTMLAttributes<HTMLDivElement>,
+    ref: React.Ref<HTMLDivElement>
+) {
+    const { children, className, ...domProps } = props;
+    return (
+        <div ref={ref} {...domProps} className={tcls('elevate-link relative', className)}>
+            {children}
+        </div>
+    );
+});
+
+/**
+ * A link overlay that can be used to create a clickable area on top of other elements.
+ * It is used to create a link that covers the entire area of the element without encapsulating it in a link tag.
+ * This is useful to avoid nesting links inside links.
+ */
+export const LinkOverlay = React.forwardRef(function LinkOverlay(
+    props: LinkProps,
+    ref: React.Ref<HTMLAnchorElement>
+) {
+    const { children, className, ...domProps } = props;
+    return (
+        <Link
+            ref={ref}
+            {...domProps}
+            className={tcls(
+                'link-overlay static before:absolute before:top-0 before:left-0 before:z-10 before:h-full before:w-full',
+                className
+            )}
+        >
+            {children}
+        </Link>
     );
 });
 

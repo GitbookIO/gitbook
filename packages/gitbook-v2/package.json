@@ -5,7 +5,7 @@
     "dependencies": {
         "@gitbook/api": "^0.115.0",
         "@gitbook/cache-tags": "workspace:*",
-        "@opennextjs/cloudflare": "1.0.4",
+        "@opennextjs/cloudflare": "1.1.0",
         "@sindresorhus/fnv1a": "^3.1.0",
         "assert-never": "^1.2.1",
         "jwt-decode": "^4.0.0",
@@ -30,6 +30,8 @@
         "start": "next start",
         "build:v2:cloudflare": "opennextjs-cloudflare build",
         "dev:v2:cloudflare": "wrangler dev --port 8771 --env preview",
+        "dev:v2:cf:middleware": "wrangler dev --port 8771 --inspector-port 9230 --env dev --config ./openNext/customWorkers/middlewareWrangler.jsonc",
+        "dev:v2:cf:server": "wrangler dev --port 8772 --env dev --config ./openNext/customWorkers/defaultWrangler.jsonc",
         "unit": "bun test",
         "typecheck": "tsc --noEmit"
     }

@@ -1,0 +1,127 @@
+{
+    "main": "do.js",
+    "name": "gitbook-open-v2-do",
+    "compatibility_date": "2025-04-14",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public"
+    ],
+    "observability": {
+        "enabled": true
+    },
+    "env": {
+        "preview": {
+            "vars": {
+                "STAGE": "preview",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        },
+        "staging": {
+            "vars": {
+                "STAGE": "staging",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        },
+        "production": {
+            "vars": {
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                "STAGE": "production"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        }
+    }
+}

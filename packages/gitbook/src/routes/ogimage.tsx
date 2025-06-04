@@ -9,7 +9,6 @@ import { getAssetURL } from '@/lib/assets';
 import { filterOutNullable } from '@/lib/typescript';
 import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
-import { getCloudflareContext } from '@v2/lib/data/cloudflare';
 import { getResizedImageURL } from '@v2/lib/images';
 
 const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
@@ -73,8 +72,12 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
 
             const fonts = (
                 await Promise.all([
-                    loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
-                    loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
+                    getWithCache(`google-font:${fontFamily}:400`, () =>
+                        loadGoogleFont({ fontFamily, text: regularText, weight: 400 })
+                    ),
+                    getWithCache(`google-font:${fontFamily}:700`, () =>
+                        loadGoogleFont({ fontFamily, text: boldText, weight: 700 })
+                    ),
                 ])
             ).filter(filterOutNullable);
 
@@ -323,24 +326,6 @@ function logOnCloudflareOnly(message: string) {
 }
 
 /**
- * Fetch a resource from the function itself.
- * To avoid error with worker to worker requests in the same zone, we use the `WORKER_SELF_REFERENCE` binding.
- */
-async function fetchSelf(url: string) {
-    const cloudflare = getCloudflareContext();
-    if (cloudflare?.env.WORKER_SELF_REFERENCE) {
-        logOnCloudflareOnly(`Fetching self: ${url}`);
-        return await cloudflare.env.WORKER_SELF_REFERENCE.fetch(
-            // `getAssetURL` can return a relative URL, so we need to make it absolute
-            // the URL doesn't matter, as we're using the worker-self-reference binding
-            new URL(url, 'https://worker-self-reference/')
-        );
-    }
-
-    return await fetch(url);
-}
-
-/**
  * Read an image from a response as a base64 encoded string.
  */
 async function readImage(response: Response) {
@@ -357,27 +342,34 @@ async function readImage(response: Response) {
     return `data:${contentType};base64,${base64}`;
 }
 
-const staticImagesCache = new Map<string, string>();
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const staticCache = new Map<string, any>();
+
+// Do we need to limit the in-memory cache size? I think given the usage, we should be fine.
+async function getWithCache<T>(key: string, fn: () => Promise<T>) {
+    const cached = staticCache.get(key) as T;
+    if (cached) {
+        return Promise.resolve(cached);
+    }
+
+    const result = await fn();
+    staticCache.set(key, result);
+    return result;
+}
 
 /**
  * Read a static image and cache it in memory.
  */
 async function readStaticImage(url: string) {
-    const cached = staticImagesCache.get(url);
-    if (cached) {
-        return cached;
-    }
-
-    const image = await readSelfImage(url);
-    staticImagesCache.set(url, image);
-    return image;
+    logOnCloudflareOnly(`Reading static image: ${url}, cache size: ${staticCache.size}`);
+    return getWithCache(`static-image:${url}`, () => readSelfImage(url));
 }
 
 /**
  * Read an image from GitBook itself.
  */
 async function readSelfImage(url: string) {
-    const response = await fetchSelf(url);
+    const response = await fetch(url);
     const image = await readImage(response);
     return image;
 }

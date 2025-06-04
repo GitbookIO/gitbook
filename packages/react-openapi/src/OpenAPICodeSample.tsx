@@ -312,6 +312,11 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
                 [name]: 'YOUR_API_KEY',
             };
         }
+        case 'oauth2': {
+            return {
+                Authorization: 'Bearer YOUR_OAUTH2_TOKEN',
+            };
+        }
         default: {
             return {};
         }

@@ -19,7 +19,7 @@ const siteGitBookIO = createLinker({
     siteBasePath: '/sitename/',
 });
 
-describe('toPathInContent', () => {
+describe('toPathInSpace', () => {
     it('should return the correct path', () => {
         expect(root.toPathInSpace('some/path')).toBe('/some/path');
         expect(variantInSection.toPathInSpace('some/path')).toBe('/section/variant/some/path');
@@ -29,12 +29,32 @@ describe('toPathInContent', () => {
         expect(root.toPathInSpace('/some/path')).toBe('/some/path');
         expect(variantInSection.toPathInSpace('/some/path')).toBe('/section/variant/some/path');
     });
+
+    it('should remove the trailing slash', () => {
+        expect(root.toPathInSpace('some/path/')).toBe('/some/path');
+        expect(variantInSection.toPathInSpace('some/path/')).toBe('/section/variant/some/path');
+    });
+
+    it('should not add a trailing slash', () => {
+        expect(root.toPathInSpace('')).toBe('');
+        expect(variantInSection.toPathInSpace('')).toBe('/section/variant');
+    });
 });
 
 describe('toPathInSite', () => {
     it('should return the correct path', () => {
         expect(root.toPathInSite('some/path')).toBe('/some/path');
         expect(siteGitBookIO.toPathInSite('some/path')).toBe('/sitename/some/path');
+    });
+
+    it('should remove the trailing slash', () => {
+        expect(root.toPathInSite('some/path/')).toBe('/some/path');
+        expect(siteGitBookIO.toPathInSite('some/path/')).toBe('/sitename/some/path');
+    });
+
+    it('should not add a trailing slash', () => {
+        expect(root.toPathInSite('')).toBe('');
+        expect(siteGitBookIO.toPathInSite('')).toBe('/sitename');
     });
 });
 

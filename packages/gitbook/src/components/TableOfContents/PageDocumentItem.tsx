@@ -17,7 +17,11 @@ export async function PageDocumentItem(props: {
     context: GitBookSiteContext;
 }) {
     const { rootPages, page, context } = props;
-    const href = context.linker.toPathForPage({ pages: rootPages, page });
+    let href = context.linker.toPathForPage({ pages: rootPages, page });
+    // toPathForPage can returns an empty path, this will cause all links to point to the current page.
+    if (href === '') {
+        href = '/';
+    }
 
     return (
         <li className="flex flex-col">
