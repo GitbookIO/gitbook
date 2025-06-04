@@ -18,35 +18,18 @@ export function AnnouncementBanner(props: {
 }) {
     const { announcement, contentRef } = props;
 
-    const hasLink = announcement.link && contentRef?.href;
+    const hasLink = contentRef?.href;
     const closeable = announcement.style !== 'danger';
-
-    const Tag = hasLink ? Link : 'div';
     const style = BANNER_STYLES[announcement.style];
 
     return (
         <div id="announcement-banner" className="theme-bold:bg-header-background pt-4 pb-2">
             <div className="scroll-nojump">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
-                    <Tag
-                        href={contentRef?.href ?? ''}
-                        className={tcls(
-                            'flex w-full items-start justify-center overflow-hidden rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
-                            style.container,
-                            closeable && 'pr-12',
-                            hasLink && style.hover
-                        )}
-                        insights={
-                            announcement.link
-                                ? {
-                                      type: 'link_click',
-                                      link: {
-                                          target: announcement.link.to,
-                                          position: SiteInsightsLinkPosition.Announcement,
-                                      },
-                                  }
-                                : undefined
-                        }
+                    <AnnouncementBannerParent
+                        announcement={announcement}
+                        closeable={closeable}
+                        contentRef={contentRef}
                     >
                         <Icon
                             icon={style.icon as IconName}
@@ -75,7 +58,7 @@ export function AnnouncementBanner(props: {
                                 </div>
                             ) : null}
                         </div>
-                    </Tag>
+                    </AnnouncementBannerParent>
                     {closeable ? (
                         <button
                             className={`absolute top-0 right-4 mt-2 mr-2 rounded straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
@@ -89,6 +72,48 @@ export function AnnouncementBanner(props: {
             </div>
         </div>
     );
+}
+
+/**
+ * Render the appropriate parent for the announcement banner depending on the presence of a link.
+ */
+function AnnouncementBannerParent(props: {
+    announcement: CustomizationAnnouncement;
+    children: React.ReactNode;
+    closeable: boolean;
+    contentRef: ResolvedContentRef | null;
+}) {
+    const { announcement, contentRef, closeable, children } = props;
+    const style = BANNER_STYLES[announcement.style];
+
+    const classNames = [
+        'flex w-full items-start justify-center overflow-hidden rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
+        style.container,
+    ];
+
+    if (contentRef?.href) {
+        return (
+            <Link
+                href={contentRef.href}
+                className={tcls(classNames, closeable && 'pr-12', style.hover)}
+                insights={
+                    announcement.link
+                        ? {
+                              type: 'link_click',
+                              link: {
+                                  target: announcement.link.to,
+                                  position: SiteInsightsLinkPosition.Announcement,
+                              },
+                          }
+                        : undefined
+                }
+            >
+                {children}
+            </Link>
+        );
+    }
+
+    return <div className={tcls(classNames)}>{children}</div>;
 }
 
 /**

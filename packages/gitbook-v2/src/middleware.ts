@@ -104,6 +104,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const resolve = ADAPTIVE_CONTENT_HOSTS.includes(siteRequestURL.hostname)
             ? resolvePublishedContentByUrl
             : getPublishedContentByURL;
+
         const siteURLData = await throwIfDataError(
             resolve({
                 url: siteRequestURL.toString(),
@@ -290,7 +291,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return writeResponseCookies(response, cookies);
     };
 
-    // For https://preview/<siteURL> requests,
+    // For https://preview/<siteId> requests,
     if (siteRequestURL.hostname === 'preview') {
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
