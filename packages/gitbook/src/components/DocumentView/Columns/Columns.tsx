@@ -11,7 +11,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
                 const width = columnBlock.data.width;
                 const { className, style } = width ? transformLengthToCSS(width) : {};
                 return (
-                <Column className={className} style={style}>
+                <Column key={columnBlock.key} className={className} style={style}>
                     <Blocks
                         key={columnBlock.key}
                         nodes={columnBlock.nodes}
@@ -28,7 +28,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
 }
 
 export function Column(props: { children?: React.ReactNode, className?: ClassValue; style?: React.CSSProperties }) {
-    return <div className={tcls("flex-1 flex-col", props.className)} style={props.style}>{props.children}</div>;
+    return <div className={tcls("flex-col", props.className)} style={props.style}>{props.children}</div>;
 }
 
 function transformLengthToCSS(length: Length) {
