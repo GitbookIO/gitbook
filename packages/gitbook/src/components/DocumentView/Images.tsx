@@ -1,9 +1,4 @@
-import type {
-    DocumentBlockImage,
-    Length,
-    DocumentBlockImages,
-    JSONDocument,
-} from '@gitbook/api';
+import type { DocumentBlockImage, DocumentBlockImages, JSONDocument, Length } from '@gitbook/api';
 
 import { Image, type ImageResponsiveSize } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
