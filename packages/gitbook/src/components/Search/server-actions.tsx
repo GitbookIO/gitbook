@@ -6,6 +6,7 @@ import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 import {
     AIMessageRole,
+    AIModel,
     type RevisionPage,
     type SearchAIAnswer,
     type SearchAIRecommendedQuestionStream,
@@ -26,7 +27,7 @@ import type { IconName } from '@gitbook/icons';
 import { throwIfDataError } from '@v2/lib/data';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { z } from 'zod';
-import { streamGenerateObject } from '../Adaptive/server-actions/api';
+import { streamGenerateDocument, streamGenerateObject } from '../Adaptive/server-actions';
 import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
@@ -425,56 +426,30 @@ export async function* streamAISearchSummary({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const { stream, response } = await streamGenerateObject(
-        baseContext,
-        {
-            organizationId: siteURLData.organization,
-            siteId: siteURLData.site,
-        },
-        {
-            schema: z.object({
-                summary: z
-                    .string()
-                    .describe(
-                        'A summary of the most important information the user has learned from the provided context.'
-                    ),
-            }),
-            messages: [
-                {
-                    role: AIMessageRole.Developer,
-                    content:
-                        'Summarise the most important information the user has learned from the provided context. Be concise and focus on facts. Do not add commentary, adjectives or other empty descriptors.',
-                    attachments: visitedPages.map(({ spaceId, pageId }) => ({
-                        type: 'page' as const,
-                        spaceId,
-                        pageId,
-                    })),
-                },
-            ].filter(filterOutNullable),
-        }
-    );
+    const { response, stream } = await streamGenerateDocument(baseContext, {
+        organizationId: siteURLData.organization,
+        siteId: siteURLData.site,
+        model: AIModel.Fast,
+        input: [
+            {
+                role: AIMessageRole.Developer,
+                content:
+                    'Summarise the most important information the user has learned from the provided context. Be concise and focus on facts. Do not add commentary, adjectives or other empty descriptors.',
+                attachments: visitedPages.map(({ spaceId, pageId }) => ({
+                    type: 'page' as const,
+                    spaceId,
+                    pageId,
+                })),
+            },
+        ].filter(filterOutNullable),
+    });
 
-    // Get the responseId asynchronously in the background
-    let responseId: string | null = null;
-    const responseIdPromise = response
-        .then((r) => {
-            responseId = r.responseId;
-        })
-        .catch((error) => {
-            console.error('Error getting responseId:', error);
-        });
-
-    for await (const value of stream) {
-        const summary = value.summary;
-        if (!summary) {
-            continue;
-        }
-
-        yield { summary };
+    for await (const output of stream) {
+        yield { output };
     }
 
     // Wait for the responseId to be available and yield one final time
-    await responseIdPromise;
+    const responseId = await response;
     yield { responseId };
 }
 

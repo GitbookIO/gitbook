@@ -226,7 +226,7 @@ function useAIStream({
 
 // Summary hook
 function useSummary(visitedPages: any[]) {
-    const [summary, setSummary] = useState('');
+    const [summary, setSummary] = useState<React.ReactNode | undefined>(undefined);
     const [summaryResponseId, setSummaryResponseId] = useState<string | undefined>(undefined);
 
     useEffect(() => {
@@ -236,19 +236,16 @@ function useSummary(visitedPages: any[]) {
             try {
                 const stream = await streamAISearchSummary({ visitedPages });
 
-                for await (const rawData of stream) {
+                for await (const data of stream) {
                     if (cancelled) break;
-                    if (!rawData) continue;
-
-                    // Use type assertion
-                    const data = rawData as any;
+                    if (!data) continue;
 
                     if (data.responseId) {
                         setSummaryResponseId(String(data.responseId));
                     }
 
-                    if (data.summary) {
-                        setSummary(String(data.summary));
+                    if (data.output) {
+                        setSummary(data.output);
                     }
                 }
             } catch (error) {
