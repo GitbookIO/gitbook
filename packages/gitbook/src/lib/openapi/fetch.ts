@@ -7,8 +7,6 @@ import type {
     OpenAPIWebhookBlock,
     ResolveOpenAPIBlockArgs,
 } from '@/lib/openapi/types';
-import { getCloudflareRequestGlobal } from '@v2/lib/data/cloudflare';
-import { withCacheKey, withoutConcurrentExecution } from '@v2/lib/data/memoize';
 import { assert } from 'ts-essentials';
 import { resolveContentRef } from '../references';
 import { isV2 } from '../v2';
@@ -48,7 +46,7 @@ export async function fetchOpenAPIFilesystem(
 
 function fetchFilesystem(url: string) {
     if (isV2()) {
-        return fetchFilesystemV2(url);
+        return fetchFilesystemUseCache(url);
     }
 
     return fetchFilesystemV1(url);
@@ -67,12 +65,6 @@ const fetchFilesystemV1 = cache({
         };
     },
 });
-
-const fetchFilesystemV2 = withCacheKey(
-    withoutConcurrentExecution(getCloudflareRequestGlobal, async (_cacheKey, url: string) => {
-        return fetchFilesystemUseCache(url);
-    })
-);
 
 const fetchFilesystemUseCache = async (url: string) => {
     'use cache';
