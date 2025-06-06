@@ -8,6 +8,7 @@ export const zh: TranslationLanguage = {
     switch_to_light_theme: '切换到浅色主题',
     switch_to_system_theme: '切换到系统主题',
     search: '搜索',
+    view: '查看',
     search_or_ask: '询问或搜索',
     search_input_placeholder: '搜索内容',
     search_ask_input_placeholder: '搜索内容或提问',

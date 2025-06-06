@@ -1,6 +1,4 @@
 'use client';
-
-import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -8,10 +6,9 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
 import { LoadingPane } from '../primitives/LoadingPane';
-import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
+import { SearchChat } from './SearchChat';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
 import { type SearchState, type UpdateSearchState, useSearch } from './useSearch';
@@ -30,14 +27,21 @@ export function SearchModal(props: SearchModalProps) {
     const searchAsk = useSearchAskState();
     const [askState] = searchAsk;
     const router = useRouter();
+    const chatInputRef = React.useRef<HTMLInputElement>(null);
 
     useHotkeys(
         'mod+k',
         (e) => {
             e.preventDefault();
-            setSearchState({ ask: false, query: '', global: false });
+            if (state !== null) {
+                // If search is already open, focus the chat input
+                chatInputRef.current?.focus();
+            } else {
+                // Otherwise open the search modal
+                setSearchState({ mode: 'both', query: '', global: false });
+            }
         },
-        []
+        [state]
     );
 
     // Add a global class on the body when the search modal is open
@@ -125,6 +129,7 @@ export function SearchModal(props: SearchModalProps) {
                                 state={state}
                                 setSearchState={setSearchState}
                                 onClose={onClose}
+                                chatInputRef={chatInputRef}
                             />
                         </div>
                     </motion.div>
@@ -139,9 +144,11 @@ function SearchModalBody(
         state: SearchState;
         setSearchState: UpdateSearchState;
         onClose: (to?: string) => void;
+        chatInputRef: React.RefObject<HTMLInputElement>;
     }
 ) {
-    const { spaceTitle, withAsk, isMultiVariants, state, setSearchState, onClose } = props;
+    const { spaceTitle, withAsk, isMultiVariants, state, setSearchState, onClose, chatInputRef } =
+        props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -165,6 +172,12 @@ function SearchModalBody(
     }, [onClose]);
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        // Handle second Cmd+K
+        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+            event.preventDefault();
+            chatInputRef.current?.focus();
+            return;
+        }
         if (event.key === 'ArrowUp') {
             event.preventDefault();
             resultsRef.current?.moveUp();
@@ -179,7 +192,7 @@ function SearchModalBody(
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchState({
-            ask: false, // When typing, we go back to the default search mode
+            mode: 'both', // When typing, we go back to the default search mode
             query: event.target.value,
             global: state.global,
         });
@@ -219,9 +232,10 @@ function SearchModalBody(
                 'flex',
                 'flex-col',
                 'bg-tint-base',
-                'max-w-prose',
+                'max-w-screen-lg',
                 'mx-auto',
-                'max-h-[70dvh]',
+                // 'min-h-[50dvh]',
+                'h-[70dvh]',
                 'w-full',
                 'rounded-lg',
                 'straight-corners:rounded-sm',
@@ -242,12 +256,10 @@ function SearchModalBody(
                     'flex-row',
                     'items-start',
                     state.query !== null ? 'border-b' : null,
-                    'border-tint-subtle'
+                    'border-tint-subtle',
+                    'col-span-full'
                 )}
             >
-                <div className={tcls('p-2', 'pl-4', 'pt-4')}>
-                    <Icon icon="magnifying-glass" className={tcls('size-4', 'text-tint-subtle')} />
-                </div>
                 <div
                     className={tcls(
                         'w-full',
@@ -270,8 +282,8 @@ function SearchModalBody(
                             'flex',
                             'resize-none',
                             'flex-1',
-                            'h-12',
-                            'p-2',
+                            'py-4',
+                            'px-8',
                             'focus:outline-none',
                             'bg-transparent',
                             'whitespace-pre-line'
@@ -287,18 +299,38 @@ function SearchModalBody(
                     {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
                 </div>
             </div>
-            {!state.ask || !withAsk ? (
-                <SearchResults
-                    ref={resultsRef}
-                    global={isMultiVariants && state.global}
-                    query={normalizedQuery}
-                    withAsk={withAsk}
-                    onSwitchToAsk={onSwitchToAsk}
-                />
-            ) : null}
-            {normalizedQuery && state.ask && withAsk ? (
-                <SearchAskAnswer query={normalizedQuery} />
-            ) : null}
+            <div className={tcls('flex grow flex-col overflow-hidden md:flex-row')}>
+                <div
+                    key="results"
+                    className={tcls(
+                        'h-full w-full flex-1 overflow-y-auto transition-all duration-500 ease-[cubic-bezier(0.85,0,0.15,1)] *:transition-opacity *:delay-200 *:duration-300',
+                        state.mode === 'chat' && 'flex-[0] delay-200 *:opacity-0 *:delay-0'
+                    )}
+                    aria-hidden={state.mode === 'chat' ? 'true' : undefined}
+                >
+                    <SearchResults
+                        ref={resultsRef}
+                        global={isMultiVariants && state.global}
+                        query={normalizedQuery}
+                        withAsk={withAsk}
+                        onSwitchToAsk={onSwitchToAsk}
+                    />
+                </div>
+
+                <div
+                    key="chat"
+                    className={tcls(
+                        'relative h-full w-full flex-1 overflow-y-auto overflow-x-hidden bg-tint-subtle transition-colors duration-500 *:transition-opacity *:delay-200 *:duration-300 max-md:border-t md:border-l',
+                        state.mode === 'results' && 'flex-[0] *:opacity-0 *:delay-0',
+                        state.mode === 'both'
+                            ? 'border-tint-subtle'
+                            : 'border-transparent delay-500'
+                    )}
+                    aria-hidden={state.mode === 'results' ? 'true' : undefined}
+                >
+                    <SearchChat query={normalizedQuery} chatInputRef={chatInputRef} />
+                </div>
+            </div>
         </motion.div>
     );
 }

@@ -3,7 +3,8 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
+import { tString, useLanguage } from '@/intl/client';
+import { Button, Link } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedSectionResult } from './server-actions';
 
@@ -16,13 +17,15 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
     ref: React.Ref<HTMLAnchorElement>
 ) {
     const { query, item, active } = props;
+    const language = useLanguage();
 
     return (
         <Link
             ref={ref}
             href={item.href}
             className={tcls(
-                '[&:has(+:not(&))]:mb-6',
+                // '[&:has(+:not(&))]:mb-6',
+                '-mt-2',
                 'flex',
                 'items-center',
                 'pl-6',
@@ -33,6 +36,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 'font-normal',
                 'py-2',
                 'group',
+                'rounded-lg',
+                'straight-corners:rounded-none',
                 active && [
                     'is-active',
                     'bg-primary',
@@ -72,20 +77,15 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     </p>
                 ) : null}
             </div>
-            <div
-                className={tcls(
-                    'p-2',
-                    'rounded',
-                    'straight-corners:rounded-none',
-                    'bg-primary-solid',
-                    'text-contrast-primary-solid',
-                    'hidden',
-                    'sm:block',
-                    active ? ['opacity-11', 'block'] : ['opacity-0']
-                )}
-            >
-                <Icon icon="arrow-turn-down-left" className={tcls('size-4')} />
-            </div>
+            {active ? (
+                <Button
+                    icon="arrow-turn-down-left"
+                    size="small"
+                    label={tString(language, 'view')}
+                />
+            ) : (
+                <Icon icon="chevron-right" className="size-4 text-tint-subtle/6" />
+            )}
         </Link>
     );
 });
