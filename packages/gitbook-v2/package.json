@@ -5,7 +5,7 @@
     "dependencies": {
         "@gitbook/api": "^0.115.0",
         "@gitbook/cache-tags": "workspace:*",
-        "@opennextjs/cloudflare": "1.1.0",
+        "@opennextjs/cloudflare": "1.2.1",
         "@sindresorhus/fnv1a": "^3.1.0",
         "assert-never": "^1.2.1",
         "jwt-decode": "^4.0.0",
