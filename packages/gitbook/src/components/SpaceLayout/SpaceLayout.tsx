@@ -11,6 +11,8 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
+import { MobileMenuSheet } from '@/components/Header/mobile-menu/MobileMenuSheet';
+import { TOCScrollContent } from '@/components/TableOfContents/TOCScrollContent';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
 import { Announcement } from '../Announcement';
@@ -66,6 +68,9 @@ export function SpaceLayout(props: {
             >
                 <Announcement context={context} />
                 <Header withTopHeader={withTopHeader} context={context} />
+                <MobileMenuSheet>
+                    <TOCScrollContent context={context} />
+                </MobileMenuSheet>
                 <div className="scroll-nojump">
                     <div
                         className={tcls(

@@ -1,13 +1,9 @@
-import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import type React from 'react';
 
+import { TOCScrollContent } from '@/components/TableOfContents/TOCScrollContent';
 import { tcls } from '@/lib/tailwind';
-
-import { PagesList } from './PagesList';
-import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
-import { Trademark } from './Trademark';
 
 export function TableOfContents(props: {
     context: GitBookSiteContext;
@@ -15,7 +11,6 @@ export function TableOfContents(props: {
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
     const { innerHeader, context, header } = props;
-    const { space, customization, pages } = context;
 
     return (
         <>
@@ -60,66 +55,17 @@ export function TableOfContents(props: {
                     'page-no-toc:lg:pr-0',
 
                     'hidden',
-                    'navigation-open:!flex',
                     'lg:flex',
                     'page-no-toc:lg:hidden',
                     'page-no-toc:xl:flex',
                     'site-header-none:page-no-toc:lg:flex',
                     'flex-col',
                     'gap-4',
-
-                    'navigation-open:border-b',
                     'border-tint-subtle'
                 )}
             >
                 {header && header}
-                <div // The actual sidebar, either shown with a filled bg or transparent.
-                    className={tcls(
-                        'lg:-ms-5',
-                        'relative flex flex-grow flex-col overflow-hidden border-tint-subtle',
-
-                        'sidebar-filled:bg-tint-subtle',
-                        'theme-muted:bg-tint-subtle',
-                        '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                        '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                        '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                        '[html.sidebar-filled.theme-gradient_&]:border',
-                        'page-no-toc:!bg-transparent',
-                        'page-no-toc:!border-none',
-
-                        'sidebar-filled:rounded-xl',
-                        'straight-corners:rounded-none',
-                        '[html.sidebar-filled.circular-corners_&]:page-has-toc:rounded-3xl'
-                    )}
-                >
-                    {innerHeader && <div className="px-5 *:my-4">{innerHeader}</div>}
-                    <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls(
-                            'flex flex-grow flex-col p-2',
-                            customization.trademark.enabled && 'lg:pb-20',
-                            'lg:gutter-stable overflow-y-auto',
-                            '[&::-webkit-scrollbar]:bg-transparent',
-                            '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                            'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
-                            'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
-                            'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8'
-                        )}
-                    >
-                        <PagesList
-                            rootPages={pages}
-                            pages={pages}
-                            context={context}
-                            style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
-                        />
-                        {customization.trademark.enabled ? (
-                            <Trademark
-                                space={space}
-                                customization={customization}
-                                placement={SiteInsightsTrademarkPlacement.Sidebar}
-                            />
-                        ) : null}
-                    </TOCScrollContainer>
-                </div>
+                <TOCScrollContent context={context} innerHeader={innerHeader} />
             </aside>
             <TableOfContentsScript />
         </>

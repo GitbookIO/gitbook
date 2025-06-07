@@ -21,13 +21,16 @@ export function Trademark(props: {
     return (
         <div
             className={tcls(
-                'relative',
                 'z-[2]',
-                'lg:absolute',
+                'absolute',
 
-                'left-0',
+                'lg:left-0',
+                'left-2',
                 'right-2',
                 'bottom-0',
+
+                'py-2',
+                'lg:py-0',
 
                 'pointer-events-none',
                 'sidebar-filled:pl-2',
@@ -107,8 +110,7 @@ export function TrademarkLink(props: {
                 'hover:bg-tint',
                 'hover:text-tint-strong',
 
-                'ring-2',
-                'lg:ring-1',
+                'ring-1',
                 'ring-inset',
                 'ring-tint-subtle',
 
