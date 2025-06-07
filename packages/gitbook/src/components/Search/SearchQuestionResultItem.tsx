@@ -72,6 +72,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'rounded',
                     'self-center',
                     'straight-corners:rounded-none',
+                    'circular-corners:rounded-full',
                     active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6']
                 )}
             >

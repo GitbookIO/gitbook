@@ -225,9 +225,11 @@ function SearchModalBody(
                 'w-full',
                 'rounded-lg',
                 'straight-corners:rounded-sm',
+                'circular-corners:rounded-2xl',
                 'ring-1',
-                'ring-tint-hover',
+                'ring-tint',
                 'shadow-2xl',
+                'depth-flat:shadow-none',
                 'overflow-hidden',
                 'dark:ring-inset',
                 'dark:ring-tint'
