@@ -819,7 +819,7 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
-                name: 'With flat depth - Circular corners',
+                name: `With flat and circular corners - Theme mode ${themeMode}`,
                 url: getCustomizationURL({
                     styling: {
                         depth: CustomizationDepth.Flat,
