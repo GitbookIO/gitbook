@@ -1,5 +1,28 @@
 # gitbook
 
+## 0.13.0
+
+### Minor Changes
+
+- 7d3fe23: Add circular corners and depth styling
+
+### Patch Changes
+
+- 015615d: Respect fullWidth and defaultWidth for images
+- 7d5a6d2: fix nested a tag causing hydration error
+- b3a7ad6: fix href being empty in TOC
+- dc4268d: Fix navigation between sections/variants when previewing a site in v2
+- 521052d: Fix concurrent execution in Vercel causing pages to not be attached to the proper tags.
+- c730845: Fix missing title on button to close the announcement banner.
+- 57bb146: Make TOC height dynamic based on visible header and footer elements
+- c9373ef: Fix bold header links hover color
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- Updated dependencies [957afd9]
+- Updated dependencies [a0c06a7]
+- Updated dependencies [4c9a9d0]
+- Updated dependencies [40df91a]
+  - @gitbook/react-openapi@1.3.1
+
 ## 0.12.0
 
 ### Minor Changes
