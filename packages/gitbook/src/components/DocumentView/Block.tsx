@@ -47,7 +47,7 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
 /**
  * Alternative to `assertNever` that returns `null` instead of throwing an error.
  */
-function nullIfNever<T>(_value: T): null {
+function nullIfNever(_value: never): null {
     return null;
 }
 
@@ -113,8 +113,11 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'code-line':
             case 'tabs-item':
                 throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
+            case 'columns':
+            case 'column':
+                return null;
             default:
-                return nullIfNever(block as never);
+                return nullIfNever(block);
         }
     })();
 
@@ -177,7 +180,10 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'code-line':
         case 'tabs-item':
             throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
+        case 'columns':
+        case 'column':
+            return null;
         default:
-            return nullIfNever(block as never);
+            return nullIfNever(block);
     }
 }

@@ -1,6 +1,7 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
+    CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
@@ -813,6 +814,16 @@ const testCases: TestsCase[] = [
                     themes: {
                         default: themeMode,
                         toggeable: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With flat depth - Circular corners',
+                url: getCustomizationURL({
+                    styling: {
+                        depth: CustomizationDepth.Flat,
+                        corners: CustomizationCorners.Circular,
                     },
                 }),
                 run: waitForCookiesDialog,
