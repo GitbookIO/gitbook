@@ -1,9 +1,4 @@
-import type {
-    DocumentBlockImage,
-    DocumentBlockImageDimension,
-    DocumentBlockImages,
-    JSONDocument,
-} from '@gitbook/api';
+import type { DocumentBlockImage, DocumentBlockImages, JSONDocument, Length } from '@gitbook/api';
 
 import { Image, type ImageResponsiveSize } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
@@ -119,7 +114,7 @@ async function ImageBlock(props: {
  * When using relative values, the converted dimension will be relative to the parent element's size.
  */
 function getImageDimension<DefaultValue>(
-    dimension: DocumentBlockImageDimension | undefined,
+    dimension: Length | undefined,
     defaultValue: DefaultValue
 ): string | DefaultValue {
     if (typeof dimension === 'number') {
