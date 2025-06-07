@@ -48,26 +48,24 @@ export function DropdownMenu(props: {
                 {button}
             </RadixDropdownMenu.Trigger>
 
-            <RadixDropdownMenu.Portal>
-                <RadixDropdownMenu.Content
-                    data-testid="dropdown-menu"
-                    hideWhenDetached
-                    collisionPadding={8}
-                    onMouseEnter={() => setHovered(true)}
-                    onMouseLeave={() => setHovered(false)}
-                    align="start"
-                    className="z-40 animate-present pt-2"
+            <RadixDropdownMenu.Content
+                data-testid="dropdown-menu"
+                hideWhenDetached
+                collisionPadding={8}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                align="start"
+                className="z-[9999] animate-present pt-2"
+            >
+                <div
+                    className={tcls(
+                        'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
+                        className
+                    )}
                 >
-                    <div
-                        className={tcls(
-                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
-                            className
-                        )}
-                    >
-                        {children}
-                    </div>
-                </RadixDropdownMenu.Content>
-            </RadixDropdownMenu.Portal>
+                    {children}
+                </div>
+            </RadixDropdownMenu.Content>
         </RadixDropdownMenu.Root>
     );
 }

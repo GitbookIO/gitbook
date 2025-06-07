@@ -31,11 +31,12 @@ export function TOCScrollContent(props: {
                 'straight-corners:rounded-none'
             )}
         >
-            {innerHeader && <div className="px-5 *:my-4">{innerHeader}</div>}
+            {innerHeader && <div className="*:mt-0.5 max-lg:mt-2 max-lg:pr-12">{innerHeader}</div>}
 
             <TOCScrollContainer // The scrollview inside the sidebar
                 className={tcls(
                     'flex flex-grow flex-col p-2',
+                    innerHeader ? 'mt-0' : 'mt-8',
                     customization.trademark.enabled && 'pb-20',
                     'gutter-stable overflow-y-auto',
                     'max-lg:[&::-webkit-scrollbar]:hidden',

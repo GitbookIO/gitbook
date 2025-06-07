@@ -3,8 +3,8 @@
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import type * as React from 'react';
 
+import { Button } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
 
 export function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
     return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -18,6 +18,10 @@ export function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimit
     return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
+export function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+    return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
+}
+
 function SheetOverlay({
     className,
     ...props
@@ -26,7 +30,7 @@ function SheetOverlay({
         <SheetPrimitive.Overlay
             data-slot="sheet-overlay"
             className={tcls(
-                'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:animate-out data-[state=open]:animate-in dark:bg-tint-1/6',
+                'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-30 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:animate-out data-[state=open]:animate-in dark:bg-tint-1/6',
                 className
             )}
             {...props}
@@ -50,23 +54,39 @@ export function SheetContent({
             <SheetPrimitive.Content
                 data-slot="sheet-content"
                 className={tcls(
-                    'fixed z-50 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
-                    'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                    'fixed z-30 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
                     'border-tint-subtle',
-                    'inset-x-0 inset-y-1 w-10/12 rounded-xl border sm:max-w-sm',
+                    'bg-tint-base',
+                    'sidebar-filled:bg-tint-subtle',
+                    'theme-muted:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                    '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                    '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
+                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
+                    'inset-x-1.5 inset-y-1.5 w-10/12 rounded-xl border sm:max-w-sm',
                     side === 'right' &&
-                        'right-1 data-[state=closed]:animate-exitToRight data-[state=open]:animate-enterFromRight',
+                        'right-1.5 data-[state=closed]:animate-exitToRight data-[state=open]:animate-enterFromRight',
                     side === 'left' &&
-                        'left-1 data-[state=closed]:animate-exitToLeft data-[state=open]:animate-enterFromLeft',
+                        'left-1.5 data-[state=closed]:animate-exitToLeft data-[state=open]:animate-enterFromLeft',
                     className
                 )}
                 {...props}
             >
                 {children}
-                <SheetPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden disabled:pointer-events-none">
-                    <Icon icon="close" className="size-4 text-tint-subtle" />
-                    <span className="sr-only">Close</span>
-                </SheetPrimitive.Close>
+
+                <SheetClose asChild>
+                    <Button
+                        data-slot="sheet-close"
+                        variant="blank"
+                        icon="close"
+                        iconOnly
+                        size="default"
+                        className="absolute top-3 right-2"
+                    >
+                        <span className="sr-only">Close</span>
+                    </Button>
+                </SheetClose>
             </SheetPrimitive.Content>
         </>
     );

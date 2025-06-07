@@ -1,6 +1,12 @@
 'use client';
 
-import { Sheet, SheetContent } from '@/components/utils/Sheet';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/utils/Sheet';
 import { useMobileMenuSheet } from './useMobileMenuSheet';
 
 export function MobileMenuSheet({ children }: { children: React.ReactNode }) {
@@ -11,8 +17,14 @@ export function MobileMenuSheet({ children }: { children: React.ReactNode }) {
             <SheetContent
                 aria-label="Mobile menu"
                 overlayClassName="lg:hidden"
-                className="pt-10 lg:hidden"
+                className="lg:hidden"
             >
+                {/** Needed for screen readers */}
+                <SheetHeader className="sr-only">
+                    <SheetTitle>Table of contents</SheetTitle>
+                    <SheetDescription>A list of all the pages in the site.</SheetDescription>
+                </SheetHeader>
+
                 {children}
             </SheetContent>
         </Sheet>

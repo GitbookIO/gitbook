@@ -69,7 +69,25 @@ export function SpaceLayout(props: {
                 <Announcement context={context} />
                 <Header withTopHeader={withTopHeader} context={context} />
                 <MobileMenuSheet>
-                    <TOCScrollContent context={context} />
+                    <TOCScrollContent
+                        innerHeader={
+                            <div className="pl-5">
+                                {isMultiVariants ? (
+                                    <SpacesDropdown
+                                        context={context}
+                                        siteSpace={siteSpace}
+                                        siteSpaces={siteSpaces}
+                                        className={tcls(
+                                            'w-full',
+                                            'page-no-toc:hidden',
+                                            'site-header-none:page-no-toc:flex'
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        }
+                        context={context}
+                    />
                 </MobileMenuSheet>
                 <div className="scroll-nojump">
                     <div
@@ -106,7 +124,7 @@ export function SpaceLayout(props: {
                             }
                             innerHeader={
                                 // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                                <>
+                                <div className="inline-flex w-full flex-col gap-2 px-4">
                                     {!withTopHeader && (
                                         <div className={tcls('hidden', 'lg:block')}>
                                             <React.Suspense fallback={null}>
@@ -142,7 +160,7 @@ export function SpaceLayout(props: {
                                             )}
                                         />
                                     )}
-                                </>
+                                </div>
                             }
                         />
                         <div className="flex min-w-0 flex-1 flex-col">{children}</div>
