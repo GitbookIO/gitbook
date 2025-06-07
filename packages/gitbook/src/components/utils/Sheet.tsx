@@ -42,7 +42,7 @@ export function SheetContent({
     ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
     overlayClassName?: string;
-    side?: 'top' | 'right' | 'bottom' | 'left';
+    side?: 'right' | 'left';
 }) {
     return (
         <>
@@ -50,18 +50,14 @@ export function SheetContent({
             <SheetPrimitive.Content
                 data-slot="sheet-content"
                 className={tcls(
-                    'fixed z-50 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500',
+                    'fixed z-50 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
                     'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'border-tint-subtle',
-                    'inset-x-1 inset-y-1 rounded-xl border',
+                    'inset-x-0 inset-y-1 w-10/12 rounded-xl border sm:max-w-sm',
                     side === 'right' &&
-                        'right-1 w-10/12 data-[state=closed]:animate-exitToRight data-[state=open]:animate-enterFromRight sm:max-w-sm',
+                        'right-1 data-[state=closed]:animate-exitToRight data-[state=open]:animate-enterFromRight',
                     side === 'left' &&
-                        'left-1 w-10/12 data-[state=closed]:animate-exitToLeft data-[state=open]:animate-enterFromLeft sm:max-w-sm',
-                    side === 'top' &&
-                        'inset-x-0 top-0 h-auto data-[state=closed]:animate-exitToTop data-[state=open]:animate-enterFromTop',
-                    side === 'bottom' &&
-                        'inset-x-0 bottom-0 h-auto data-[state=closed]:animate-exitToBottom data-[state=open]:animate-enterFromBottom',
+                        'left-1 data-[state=closed]:animate-exitToLeft data-[state=open]:animate-enterFromLeft',
                     className
                 )}
                 {...props}

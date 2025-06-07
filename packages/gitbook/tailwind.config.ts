@@ -304,10 +304,6 @@ const config: Config = {
                 enterFromRight: 'enterFromRight 250ms ease',
                 exitToLeft: 'exitToLeft 250ms ease',
                 exitToRight: 'exitToRight 250ms ease',
-                enterFromTop: 'enterFromTop 250ms ease',
-                enterFromBottom: 'enterFromBottom 250ms ease',
-                exitToTop: 'exitToTop 250ms ease',
-                exitToBottom: 'exitToBottom 250ms ease',
             },
             keyframes: {
                 pulseAlt: {
@@ -425,22 +421,6 @@ const config: Config = {
                 exitToLeft: {
                     from: { opacity: '1', transform: 'translateX(0)' },
                     to: { opacity: '0', transform: 'translateX(-200px)' },
-                },
-                enterFromTop: {
-                    from: { opacity: '0', transform: 'translateY(-200px)' },
-                    to: { opacity: '1', transform: 'translateY(0)' },
-                },
-                enterFromBottom: {
-                    from: { opacity: '0', transform: 'translateY(200px)' },
-                    to: { opacity: '1', transform: 'translateY(0)' },
-                },
-                exitToTop: {
-                    from: { opacity: '1', transform: 'translateY(0)' },
-                    to: { opacity: '0', transform: 'translateY(-200px)' },
-                },
-                exitToBottom: {
-                    from: { opacity: '1', transform: 'translateY(0)' },
-                    to: { opacity: '0', transform: 'translateY(200px)' },
                 },
                 scaleIn: {
                     from: { opacity: '0', transform: 'rotateX(-10deg) scale(0.9)' },
