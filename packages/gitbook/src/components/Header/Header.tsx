@@ -11,7 +11,7 @@ import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
-import { HeaderMobileMenu } from './HeaderMobileMenu';
+import { HeaderMobileMenuButton } from './HeaderMobileMenuButton';
 import { SpacesDropdown } from './SpacesDropdown';
 
 /**
@@ -76,7 +76,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                             )}
                         >
-                            <HeaderMobileMenu
+                            <HeaderMobileMenuButton
+                                pages={context.pages}
                                 className={tcls(
                                     'lg:hidden',
                                     '-ml-2',
