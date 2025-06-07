@@ -7,7 +7,7 @@ import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api'
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
 import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
-import type { Root, RootContent } from 'mdast';
+import type { Link, Root, RootContent } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
@@ -165,8 +165,8 @@ export function transformLinks(
     const { currentPagePath, basePath } = options;
     const currentDir = path.posix.dirname(currentPagePath);
 
-    visit(tree, 'link', (node) => {
-        const original = (node as any).url as string;
+    visit(tree, 'link', (node: Link) => {
+        const original = node.url;
 
         // Skip anchors, mailto:, http(s):, protocol-like, or already-rooted paths
         if (checkIsExternalURL(original) || checkIsAnchor(original) || original.startsWith('/')) {
@@ -178,7 +178,7 @@ export function transformLinks(
             .normalize(path.posix.join(basePath, currentDir, original))
             .replace(/^\/+/, '');
 
-        (node as any).url = linker.toPathInSite(pathInSite);
+        node.url = linker.toPathInSite(pathInSite);
     });
 
     return tree;
