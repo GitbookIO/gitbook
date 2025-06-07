@@ -23,6 +23,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'rounded-md',
                 hasHeading ? 'rounded-l' : null,
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-xl',
                 'overflow-hidden',
                 hasHeading ? ['border-l-2', hintStyle.containerWithHeader] : hintStyle.container,
 

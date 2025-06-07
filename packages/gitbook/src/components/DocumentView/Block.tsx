@@ -113,6 +113,9 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'code-line':
             case 'tabs-item':
                 throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
+            case 'columns':
+            case 'column':
+                return null;
             default:
                 return nullIfNever(block);
         }
@@ -177,6 +180,9 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'code-line':
         case 'tabs-item':
             throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
+        case 'columns':
+        case 'column':
+            return null;
         default:
             return nullIfNever(block);
     }

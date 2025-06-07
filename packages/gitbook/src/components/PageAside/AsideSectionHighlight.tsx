@@ -30,6 +30,7 @@ export function AsideSectionHighlight({
 
                 'rounded-md',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
                 'sidebar-list-line:rounded-l-none',
 
                 'sidebar-list-pill:bg-primary',
