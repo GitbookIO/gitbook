@@ -97,7 +97,10 @@ async function getNodesFromSiteSpaces(
                     metadata: false,
                 })
             );
-            const pages = getIndexablePages(rootPages);
+            const pages = getIndexablePages(rootPages)
+                // We currently limit the number of pages to 500 to avoid generating a too large markdown output
+                // and because of limits with the server on how many requests / files can be opened.
+                .slice(0, 500);
             const nodes = (
                 await Promise.all(
                     pages.map(async ({ page }): Promise<RootContent[]> => {
