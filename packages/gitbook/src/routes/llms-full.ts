@@ -32,7 +32,7 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext) {
 
     return new Response(toMarkdown(tree, { extensions: [gfmToMarkdown()] }), {
         headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
+            'Content-Type': 'text/markdown; charset=utf-8',
         },
     });
 }
