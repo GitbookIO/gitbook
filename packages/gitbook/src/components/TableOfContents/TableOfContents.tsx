@@ -84,6 +84,7 @@ export function TableOfContents(props: {
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
                         'page-no-toc:!bg-transparent',
+                        'page-no-toc:!border-none',
 
                         'sidebar-filled:rounded-xl',
                         'straight-corners:rounded-none'
