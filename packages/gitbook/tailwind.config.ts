@@ -486,7 +486,7 @@ const config: Config = {
                 corner: ['straight-corners', 'rounded-corners', 'circular-corners'],
 
                 // Depth styles
-                depth: ['depth-flat', 'depth-elevated'],
+                depth: ['depth-flat', 'depth-subtle'],
 
                 // Link styles
                 links: ['links-default', 'links-accent'],
