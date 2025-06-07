@@ -104,7 +104,7 @@ async function getNodesFromSiteSpaces(
             const nodes = (
                 await Promise.all(
                     pages.map(async ({ page }): Promise<RootContent[]> => {
-                        if (page.type !== 'document' || !page.documentId) {
+                        if (page.type !== 'document') {
                             return [];
                         }
 
