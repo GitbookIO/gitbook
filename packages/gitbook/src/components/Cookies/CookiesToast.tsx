@@ -74,7 +74,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             <button
                 type="button"
                 onClick={() => setShow(false)}
-                aria-label={tString(language, 'cookies_close')}
+                aria-label={tString(language, 'close')}
                 className={tcls(
                     'absolute',
                     'top-3',
@@ -88,7 +88,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'circular-corners:rounded-full',
                     'hover:bg-tint-hover'
                 )}
-                title={tString(language, 'cookies_close')}
+                title={tString(language, 'close')}
             >
                 <Icon icon="xmark" className={tcls('size-4')} />
             </button>

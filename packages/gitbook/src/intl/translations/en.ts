@@ -40,7 +40,7 @@ export const en = {
     cookies_prompt_privacy: 'privacy policy',
     cookies_accept: 'Accept',
     cookies_reject: 'Reject',
-    cookies_close: 'Close',
+    close: 'Close',
     edit_on_git: 'Edit on ${1}',
     notfound_title: 'Page not found',
     notfound: "The page you are looking for doesn't exist.",

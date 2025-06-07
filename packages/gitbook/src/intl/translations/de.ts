@@ -40,7 +40,7 @@ export const de = {
     cookies_prompt_privacy: 'Datenschutzrichtlinie',
     cookies_accept: 'Akzeptieren',
     cookies_reject: 'Ablehnen',
-    cookies_close: 'Schließen',
+    close: 'Schließen',
     edit_on_git: 'Bearbeiten auf ${1}',
     notfound_title: 'Seite nicht gefunden',
     notfound: 'Die gesuchte Seite existiert nicht.',
