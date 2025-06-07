@@ -7,7 +7,7 @@ import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api'
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
 import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
-import type { Link, Root, RootContent } from 'mdast';
+import type { Link, Paragraph, Root, RootContent } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
@@ -146,6 +146,16 @@ async function getNodesFromPage(
 
     // Remove frontmatter
     remove(tree, 'yaml');
+
+    if (page.description) {
+        // The first node is the page title as a H1, we insert the description as a paragraph
+        // after it.
+        const descriptionNode: Paragraph = {
+            type: 'paragraph',
+            children: [{ type: 'text', value: page.description }],
+        };
+        tree.children.splice(1, 0, descriptionNode);
+    }
 
     // Rewrite relative links to absolute links
     transformLinks(context, tree, { currentPagePath: page.path, basePath });
