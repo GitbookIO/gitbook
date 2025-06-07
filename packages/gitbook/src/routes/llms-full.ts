@@ -32,7 +32,7 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext) {
     }
 
     return new Response(
-        new ReadableStream({
+        new ReadableStream<Uint8Array>({
             async pull(controller) {
                 await streamMarkdownFromSiteStructure(context, controller);
                 controller.close();
@@ -51,7 +51,7 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext) {
  */
 async function streamMarkdownFromSiteStructure(
     context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<string>
+    stream: ReadableStreamDefaultController<Uint8Array>
 ): Promise<void> {
     switch (context.structure.type) {
         case 'sections':
@@ -72,7 +72,7 @@ async function streamMarkdownFromSiteStructure(
  */
 async function streamMarkdownFromSections(
     context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<string>,
+    stream: ReadableStreamDefaultController<Uint8Array>,
     siteSections: SiteSection[]
 ): Promise<void> {
     for (const siteSection of siteSections) {
@@ -90,7 +90,7 @@ async function streamMarkdownFromSections(
  */
 async function streamMarkdownFromSiteSpaces(
     context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<string>,
+    stream: ReadableStreamDefaultController<Uint8Array>,
     siteSpaces: SiteSpace[],
     basePath: string
 ): Promise<void> {
@@ -128,7 +128,7 @@ async function streamMarkdownFromSiteSpaces(
                 concurrency: MAX_CONCURRENCY,
             }
         )) {
-            stream.enqueue(markdown);
+            stream.enqueue(new TextEncoder().encode(markdown));
         }
     }
 }
