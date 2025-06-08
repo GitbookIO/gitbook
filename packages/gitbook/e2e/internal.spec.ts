@@ -433,7 +433,6 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'llms.txt',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
@@ -449,7 +448,6 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'llms-full.txt',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
             {
