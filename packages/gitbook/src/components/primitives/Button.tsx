@@ -7,17 +7,6 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import { Link, type LinkInsightsProps } from './Link';
 
-type ButtonProps = {
-    href?: string;
-    variant?: 'primary' | 'secondary' | 'blank';
-    icon?: IconName;
-    iconOnly?: boolean;
-    size?: 'default' | 'medium' | 'small';
-    className?: ClassValue;
-    label?: string;
-} & LinkInsightsProps &
-    HTMLAttributes<HTMLElement>;
-
 const variantClasses = {
     primary: [
         'bg-primary-solid',
@@ -49,6 +38,17 @@ const variantClasses = {
     ],
 };
 
+type ButtonProps = {
+    href?: string;
+    variant?: keyof typeof variantClasses;
+    icon?: IconName;
+    iconOnly?: boolean;
+    size?: 'default' | 'medium' | 'small';
+    className?: ClassValue;
+    label?: string;
+} & LinkInsightsProps &
+    HTMLAttributes<HTMLElement>;
+
 export function Button({
     href,
     variant = 'primary',
@@ -62,8 +62,14 @@ export function Button({
     ...rest
 }: ButtonProps & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
-        default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
-        medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
+        default: [
+            'text-base',
+            'font-semibold',
+            iconOnly ? 'px-2' : 'px-5',
+            'py-2',
+            'circular-corners:px-6',
+        ],
+        medium: ['text-sm', iconOnly ? 'px-1.5' : 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
         small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
     };
 

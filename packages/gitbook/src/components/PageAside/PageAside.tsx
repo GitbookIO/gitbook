@@ -48,6 +48,7 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
+                'ask-open:hidden',
                 // 'page-no-toc:lg:flex',
                 'flex-col',
                 'basis-56',

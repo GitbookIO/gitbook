@@ -1,10 +1,13 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
-import { useAskState } from './state';
+import { Button } from '../primitives';
+import { AskInput } from './AskInput';
+import { useAskController, useAskState } from './state';
 
 export function AskDialog() {
     const state = useAskState();
+    const controller = useAskController();
 
     if (!state.opened) {
         return null;
@@ -35,6 +38,23 @@ export function AskDialog() {
                 'dark:ring-tint'
             )})`}
         >
+            <div className="flex flex-row">
+                <div className="flex-1"></div>
+                <div className="p-2">
+                    <Button
+                        variant="blank"
+                        icon="close"
+                        iconOnly
+                        onClick={() => {
+                            controller.close();
+                        }}
+                    />
+                </div>
+            </div>
+            <div className="flex-1"></div>
+            <div className="flex flex-row">
+                <AskInput />
+            </div>
             {/* <div>
             <h1>{state.session.title}</h1>
         </div> */}
