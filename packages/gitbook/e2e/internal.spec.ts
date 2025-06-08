@@ -5,6 +5,7 @@ import {
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
+    CustomizationThemeMode,
 } from '@gitbook/api';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
@@ -679,6 +680,16 @@ const testCases: TestsCase[] = [
             {
                 name: 'With cover',
                 url: 'page-options/page-with-cover',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With cover for dark mode',
+                url: `page-options/page-with-dark-cover${getCustomizationURL({
+                    themes: {
+                        default: CustomizationThemeMode.Dark,
+                        toggeable: false,
+                    },
+                })}`,
                 run: waitForCookiesDialog,
             },
             {
