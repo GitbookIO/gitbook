@@ -32,7 +32,7 @@ export function TOCScrollContent(props: {
             )}
         >
             {!!innerHeader && (
-                <div className="inline-flex w-full flex-col gap-2 px-2 max-lg:mt-2 max-lg:pr-12 lg:pr-4 lg:*:mt-0.5">
+                <div className="inline-flex w-full flex-col gap-4 px-2 max-lg:py-2 max-lg:pr-12 lg:pr-4 lg:first:mt-4">
                     {innerHeader}
                 </div>
             )}
@@ -40,7 +40,7 @@ export function TOCScrollContent(props: {
             <TOCScrollContainer // The scrollview inside the sidebar
                 className={tcls(
                     'flex flex-grow flex-col p-2',
-                    innerHeader ? 'mt-0' : 'mt-8',
+                    innerHeader ? 'mt-0 lg:mt-2' : 'mt-8',
                     customization.trademark.enabled && 'pb-20',
                     'gutter-stable overflow-y-auto',
                     '[&::-webkit-scrollbar]:bg-transparent',
