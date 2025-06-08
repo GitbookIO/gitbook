@@ -49,23 +49,38 @@ export function SheetContent({
     side?: 'right' | 'left';
 }) {
     return (
-        <>
+        <SheetPortal>
             <SheetOverlay className={overlayClassName} />
             <SheetPrimitive.Content
                 data-slot="sheet-content"
                 className={tcls(
-                    'fixed z-30 flex flex-col rounded-xl shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+                    'fixed',
+                    'z-30',
+                    'flex',
+                    'flex-col',
+                    'shadow-lg',
+                    'depth-flat:shadow-none',
+
+                    'transition ease-in-out',
+                    'data-[state=closed]:duration-300 data-[state=open]:duration-500',
+
+                    'border',
                     'border-tint-subtle',
-                    'inset-x-1.5 inset-y-1.5 w-10/12 border sm:max-w-sm',
+
+                    'inset-x-1.5',
+                    'inset-y-1.5',
+
+                    'w-10/12',
+                    'sm:max-w-sm',
+
                     'bg-tint-base',
-                    'theme-gradient:bg-gradient-primary',
-                    'sidebar-filled:bg-tint-subtle',
-                    'theme-muted:bg-tint-subtle',
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+
+                    'rounded-xl',
                     'circular-corners:rounded-2xl',
                     'straight-corners:rounded-none',
                     side === 'right' &&
@@ -80,18 +95,17 @@ export function SheetContent({
 
                 <SheetClose asChild>
                     <Button
-                        data-slot="sheet-close"
-                        variant="blank"
+                        variant="secondary"
                         icon="close"
                         iconOnly
-                        size="default"
-                        className="absolute top-3 right-2 z-50"
+                        autoFocus={false}
+                        className="absolute top-2 right-2 z-50 bg-transparent text-tint opacity-8 shadow-none ring-transparent"
                     >
                         <span className="sr-only">Close</span>
                     </Button>
                 </SheetClose>
             </SheetPrimitive.Content>
-        </>
+        </SheetPortal>
     );
 }
 

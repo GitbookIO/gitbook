@@ -9,7 +9,8 @@ import {
 } from '@/components/utils/Sheet';
 import { useMobileMenuSheet } from './useMobileMenuSheet';
 
-export function MobileMenuSheet({ children }: { children: React.ReactNode }) {
+export function MobileMenuSheet(props: { children: React.ReactNode }) {
+    const { children } = props;
     const { open, setOpen } = useMobileMenuSheet();
 
     return (
@@ -17,7 +18,7 @@ export function MobileMenuSheet({ children }: { children: React.ReactNode }) {
             <SheetContent
                 aria-label="Mobile menu"
                 overlayClassName="lg:hidden"
-                className="lg:hidden"
+                className="pb-2 lg:hidden"
             >
                 {/** Needed for screen readers */}
                 <SheetHeader className="sr-only">

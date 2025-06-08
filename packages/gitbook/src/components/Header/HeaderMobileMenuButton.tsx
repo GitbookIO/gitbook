@@ -6,18 +6,14 @@ import { useEffect } from 'react';
 import { useMobileMenuSheet } from '@/components/Header/mobile-menu/useMobileMenuSheet';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { usePathname } from 'next/navigation';
 
 /**
  * Button to show/hide the table of content on mobile.
  */
-export function HeaderMobileMenuButton({
-    pages,
-    ...props
-}: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>> & {
-    pages: GitBookSiteContext['pages'];
-}) {
+export function HeaderMobileMenuButton(
+    props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>
+) {
     const language = useLanguage();
     const pathname = usePathname();
     const { open, setOpen } = useMobileMenuSheet();
@@ -26,7 +22,7 @@ export function HeaderMobileMenuButton({
         setOpen(!open);
     };
 
-    // Close the navigation when navigating to a page
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Close the navigation when navigating to a page
     useEffect(() => {
         if (!open) return;
         setOpen(false);

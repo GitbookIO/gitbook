@@ -64,7 +64,7 @@ export function Button({
     const sizes = {
         default: ['text-base', 'py-2', 'circular-corners:px-6', iconOnly ? '!px-2' : 'px-5'],
         medium: ['text-sm', 'py-1.5', 'circular-corners:px-4', iconOnly ? '!px-1.5' : 'px-3.5'],
-        small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
+        small: ['text-xs', 'py-2', iconOnly ? '!px-2' : 'px-3'],
     };
 
     const sizeClasses = sizes[size] || sizes.default;

@@ -77,7 +77,6 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                             )}
                         >
                             <HeaderMobileMenuButton
-                                pages={context.pages}
                                 className={tcls(
                                     'lg:hidden',
                                     '-ml-2',

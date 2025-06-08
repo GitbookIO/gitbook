@@ -24,14 +24,13 @@ export function Trademark(props: {
                 'z-[2]',
                 'absolute',
 
-                'lg:left-0',
-                'lg:bottom-0',
                 'left-2',
                 'right-2',
-                'bottom-2',
+                'bottom-0',
+                'lg:left-0',
 
                 'pt-2',
-                'lg:py-0',
+                'lg:pt-0',
 
                 'pointer-events-none',
                 'sidebar-filled:pl-2',

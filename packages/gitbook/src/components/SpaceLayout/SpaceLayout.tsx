@@ -73,13 +73,15 @@ export function SpaceLayout(props: {
                         innerHeader={
                             isMultiVariants ? (
                                 <SpacesDropdown
+                                    withPortal={false}
                                     context={context}
                                     siteSpace={siteSpace}
                                     siteSpaces={siteSpaces}
                                     className={tcls(
                                         'w-full',
                                         'page-no-toc:hidden',
-                                        'site-header-none:page-no-toc:flex'
+                                        'site-header-none:page-no-toc:flex',
+                                        'h-8'
                                     )}
                                 />
                             ) : null

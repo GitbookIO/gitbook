@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Slot } from '@radix-ui/react-slot';
 
 import { Link, type LinkInsightsProps } from '../primitives';
 
@@ -25,12 +26,20 @@ export function DropdownMenu(props: {
     children: React.ReactNode;
     /** Custom styles */
     className?: ClassValue;
-    /** Open the dropdown on hover */
+    /** Open the dropdown on hover
+     * @default false
+     */
     openOnHover?: boolean;
+    /** Whether to render the dropdown menu in a portal
+     * @default true
+     */
+    withPortal?: boolean;
 }) {
-    const { button, children, className, openOnHover = false } = props;
+    const { button, children, className, openOnHover = false, withPortal = true } = props;
     const [hovered, setHovered] = useState(false);
     const [clicked, setClicked] = useState(false);
+
+    const Portal = withPortal ? RadixDropdownMenu.Portal : Slot;
 
     return (
         <RadixDropdownMenu.Root
@@ -48,24 +57,27 @@ export function DropdownMenu(props: {
                 {button}
             </RadixDropdownMenu.Trigger>
 
-            <RadixDropdownMenu.Content
-                data-testid="dropdown-menu"
-                hideWhenDetached
-                collisionPadding={8}
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-                align="start"
-                className="z-[9999] animate-present pt-2"
-            >
-                <div
-                    className={tcls(
-                        'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
-                        className
-                    )}
+            <Portal>
+                <RadixDropdownMenu.Content
+                    data-testid="dropdown-menu"
+                    hideWhenDetached
+                    collisionPadding={8}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    align="start"
+                    sideOffset={8}
+                    className="z-40 animate-present"
                 >
-                    {children}
-                </div>
-            </RadixDropdownMenu.Content>
+                    <div
+                        className={tcls(
+                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
+                            className
+                        )}
+                    >
+                        {children}
+                    </div>
+                </RadixDropdownMenu.Content>
+            </Portal>
         </RadixDropdownMenu.Root>
     );
 }
