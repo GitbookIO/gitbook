@@ -43,7 +43,6 @@ export function TOCScrollContent(props: {
                     innerHeader ? 'mt-0' : 'mt-8',
                     customization.trademark.enabled && 'pb-20',
                     'gutter-stable overflow-y-auto',
-                    'max-lg:[&::-webkit-scrollbar]:hidden',
                     '[&::-webkit-scrollbar]:bg-transparent',
                     '[&::-webkit-scrollbar-thumb]:bg-transparent',
                     'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
