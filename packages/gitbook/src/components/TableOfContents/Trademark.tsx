@@ -25,8 +25,9 @@ export function Trademark(props: {
                 'absolute',
 
                 'lg:left-0',
-                'left-2',
-                'right-2',
+                'left-3',
+                'lg:right-2',
+                'right-3',
                 'bottom-0',
 
                 'py-2',

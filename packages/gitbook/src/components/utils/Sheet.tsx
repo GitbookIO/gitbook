@@ -54,17 +54,19 @@ export function SheetContent({
             <SheetPrimitive.Content
                 data-slot="sheet-content"
                 className={tcls(
-                    'fixed z-30 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+                    'fixed z-30 flex flex-col rounded-xl shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
                     'border-tint-subtle',
+                    'inset-x-1.5 inset-y-1.5 w-10/12 border sm:max-w-sm',
                     'bg-tint-base',
+                    'theme-gradient:bg-gradient-primary',
+                    'sidebar-filled:bg-tint-subtle',
+                    'theme-muted:bg-tint-subtle',
                     'sidebar-filled:bg-tint-subtle',
                     'theme-muted:bg-tint-subtle',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
-                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    'inset-x-1.5 inset-y-1.5 w-10/12 rounded-xl border sm:max-w-sm',
+                    'straight-corners:rounded-none',
                     side === 'right' &&
                         'right-1.5 data-[state=closed]:animate-exitToRight data-[state=open]:animate-enterFromRight',
                     side === 'left' &&
@@ -82,7 +84,7 @@ export function SheetContent({
                         icon="close"
                         iconOnly
                         size="default"
-                        className="absolute top-3 right-2"
+                        className="absolute top-3 right-2 z-50"
                     >
                         <span className="sr-only">Close</span>
                     </Button>
@@ -97,16 +99,6 @@ export function SheetHeader({ className, ...props }: React.ComponentProps<'div'>
         <div
             data-slot="sheet-header"
             className={tcls('flex flex-col gap-1.5 p-4', className)}
-            {...props}
-        />
-    );
-}
-
-export function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
-    return (
-        <div
-            data-slot="sheet-footer"
-            className={tcls('mt-auto flex flex-col gap-2 p-4', className)}
             {...props}
         />
     );
