@@ -533,6 +533,11 @@ const config: Config = {
              * Variant when the page is displayed in print mode.
              */
             addVariant('print-mode', 'body:has(.print-mode) &');
+
+            /**
+             * Variant when the Ask dialog is open.
+             */
+            addVariant('ask-open', 'html:has(.ask-dialog) &');
         }),
         plugin(({ matchUtilities }) => {
             matchUtilities({

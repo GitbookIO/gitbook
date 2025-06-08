@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { useAskController } from '../Ask';
 import { useTrackEvent } from '../Insights';
 import { useSearch } from './useSearch';
 
@@ -17,14 +18,19 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
 
     const language = useLanguage();
     const [, setSearchState] = useSearch();
+    const askController = useAskController();
     const trackEvent = useTrackEvent();
 
     const onClick = () => {
-        setSearchState({
-            ask: false,
-            global: false,
-            query: '',
-        });
+        if (1) {
+            askController.open();
+        } else {
+            setSearchState({
+                ask: false,
+                global: false,
+                query: '',
+            });
+        }
 
         trackEvent({
             type: 'search_open',

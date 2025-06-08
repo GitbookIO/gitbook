@@ -177,7 +177,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             block: 'nearest',
             inline: 'nearest',
         });
-    }, [cursor, refs]);
+    }, [cursor]);
 
     const moveBy = React.useCallback(
         (delta: number) => {
@@ -198,7 +198,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
 
         refs.current[cursor]?.click();
-    }, [cursor, refs]);
+    }, [cursor]);
 
     React.useImperativeHandle(
         ref,

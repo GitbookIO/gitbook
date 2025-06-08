@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { useAskController } from '../Ask';
 import { LoadingPane } from '../primitives/LoadingPane';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { SearchAskProvider, useSearchAskState } from './SearchAskContext';
@@ -146,6 +147,7 @@ function SearchModalBody(
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const askController = useAskController();
 
     React.useEffect(() => {
         inputRef.current?.focus();
@@ -186,7 +188,9 @@ function SearchModalBody(
     };
 
     const onSwitchToAsk = () => {
-        setSearchState((state) => (state ? { ...state, ask: true } : null));
+        alert('switch to ask');
+        askController.open();
+        // setSearchState((state) => (state ? { ...state, ask: true } : null));
     };
 
     // We trim the query to avoid invalidating the search when the user is typing between words.

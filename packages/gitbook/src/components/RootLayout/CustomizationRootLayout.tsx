@@ -156,7 +156,9 @@ export async function CustomizationRootLayout(props: {
                     'theme-muted:bg-tint-subtle',
 
                     'theme-gradient:bg-gradient-primary',
-                    'theme-gradient-tint:bg-gradient-tint'
+                    'theme-gradient-tint:bg-gradient-tint',
+
+                    'ask-open:mr-[500px]'
                 )}
             >
                 <IconsProvider
