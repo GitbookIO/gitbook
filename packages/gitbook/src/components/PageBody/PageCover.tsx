@@ -22,6 +22,7 @@ export async function PageCover(props: {
 }) {
     const { as, page, cover, context } = props;
     const resolved = cover.ref ? await resolveContentRef(cover.ref, context) : null;
+    const resolvedDark = cover.refDark ? await resolveContentRef(cover.refDark, context) : null;
 
     return (
         <div
@@ -58,6 +59,12 @@ export async function PageCover(props: {
                                   height: defaultPageCover.height,
                               },
                           },
+                    dark: resolvedDark
+                        ? {
+                              src: resolvedDark.href,
+                              size: resolvedDark.file?.dimensions,
+                          }
+                        : null,
                 }}
                 resize={
                     // When using the default cover, we don't want to resize as it's a SVG
