@@ -66,6 +66,7 @@ export function SheetContent({
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                    'circular-corners:rounded-2xl',
                     'straight-corners:rounded-none',
                     side === 'right' &&
                         'right-1.5 data-[state=closed]:animate-exitToRight data-[state=open]:animate-enterFromRight',

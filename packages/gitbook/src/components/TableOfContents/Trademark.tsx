@@ -25,12 +25,12 @@ export function Trademark(props: {
                 'absolute',
 
                 'lg:left-0',
-                'left-3',
-                'lg:right-2',
-                'right-3',
-                'bottom-0',
+                'lg:bottom-0',
+                'left-2',
+                'right-2',
+                'bottom-2',
 
-                'py-2',
+                'pt-2',
                 'lg:py-0',
 
                 'pointer-events-none',
