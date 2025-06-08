@@ -163,7 +163,7 @@ function useAIStream({
     previousResponseId?: string;
 }) {
     const [response, setResponse] = useState<{
-        content?: string;
+        content?: React.ReactNode;
         responseId?: string;
         followupQuestions?: string[];
         fetching: boolean;
@@ -184,12 +184,9 @@ function useAIStream({
                     previousResponseId,
                 });
 
-                for await (const rawData of stream) {
+                for await (const data of stream) {
                     if (cancelled) break;
-                    if (!rawData) continue;
-
-                    // Use type assertion to handle the data
-                    const data = rawData as any;
+                    if (!data) continue;
 
                     setResponse((prev) => {
                         const updated = { ...prev, fetching: false };
@@ -199,12 +196,11 @@ function useAIStream({
                         }
 
                         if (data.answer) {
-                            updated.content = String(data.answer);
+                            updated.content = data.answer;
                         }
 
                         if (data.followupQuestions) {
-                            updated.followupQuestions =
-                                data.followupQuestions.filter(filterOutNullable);
+                            updated.followupQuestions = data.followupQuestions;
                         }
 
                         return updated;

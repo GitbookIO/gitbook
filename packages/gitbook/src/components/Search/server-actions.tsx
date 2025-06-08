@@ -466,62 +466,67 @@ export async function* streamAISearchAnswer({
     const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const { stream, response } = await streamGenerateObject(
-        baseContext,
-        {
-            organizationId: siteURLData.organization,
-            siteId: siteURLData.site,
+    const mainResponse = await streamGenerateDocument(baseContext, {
+        organizationId: siteURLData.organization,
+        siteId: siteURLData.site,
+        model: AIModel.Fast,
+        tools: {
+            search: true,
+            getPageContent: true,
         },
-        {
-            schema: z.object({
-                answer: z.string().describe('The answer to the question.'),
-                followupQuestions: z
-                    .array(z.string())
-                    .describe(
-                        'Follow-up questions to the question, based on the provided content only. Keep questions very short and use pronouns to refer to known concepts.'
-                    )
-                    .max(3),
-            }),
-            tools: {
-                search: true,
-                getPageContent: true,
+        previousResponseId: previousResponseId,
+        input: [
+            {
+                role: AIMessageRole.Developer,
+                content:
+                    'Answer the following question by using the provided documentation or by searching. Format the answer in Markdown.',
             },
-            previousResponseId: previousResponseId,
-            messages: [
-                {
-                    role: AIMessageRole.Developer,
-                    content: `Answer the following question by using the provided documentation or by searching. Format the answer in Markdown. If you cannot answer the question using the context provided, provide an empty string. Always list related follow-up questions using the provided context. Check first that you can answer the question given the provided context before listing it as a follow-up question. If you can't answer a question, don't include it in the follow up questions. If there is no provided context, do not list follow-up questions. List the sources used to answer the question in the "sources" field. Only list the sources that were directly used for the content of the answer.`,
-                },
-                {
-                    role: AIMessageRole.User,
-                    content: question,
-                },
-            ].filter(filterOutNullable),
-        }
-    );
+            {
+                role: AIMessageRole.User,
+                content: question,
+            },
+        ],
+    });
 
-    // Get the responseId asynchronously in the background
-    let responseId: string | null = null;
-    const responseIdPromise = response
-        .then((r) => {
-            responseId = r.responseId;
-        })
-        .catch((error) => {
-            console.error('Error getting responseId:', error);
-        });
-
-    for await (const value of stream) {
-        const answer = value.answer;
-        const followupQuestions = value.followupQuestions;
-
-        if (answer === undefined) {
-            continue;
-        }
-
-        yield { answer, followupQuestions };
+    for await (const answer of mainResponse.stream) {
+        yield { answer };
     }
 
     // Wait for the responseId to be available and yield one final time
-    await responseIdPromise;
+    const { responseId } = await mainResponse.response;
     yield { responseId };
+
+    // Generate a list of follow-up questions
+    const followupQuestionsResponse = await streamGenerateObject(baseContext, {
+        organizationId: siteURLData.organization,
+        siteId: siteURLData.site,
+        model: AIModel.Fast,
+        tools: {
+            search: true,
+            getPageContent: true,
+        },
+        previousResponseId: responseId,
+        schema: z.object({
+            followupQuestions: z
+                .array(z.string())
+                .describe(
+                    'Follow-up questions to the question, based on the provided content only. Keep questions very short and use pronouns to refer to known concepts.'
+                )
+                .max(3),
+        }),
+        input: [
+            {
+                role: AIMessageRole.Developer,
+                content: `Based on the previously asked question and the answer, generate a list of follow-up questions. Keep questions very short and use pronouns to refer to known concepts. Check first that you can answer the question given the provided context before listing it as a follow-up question. If you can't answer a question, don't include it in the follow up questions.`,
+            },
+        ],
+    });
+
+    for await (const partial of followupQuestionsResponse.stream) {
+        yield {
+            followupQuestions: (partial.followupQuestions ?? []).filter(
+                filterOutNullable
+            ) as string[],
+        };
+    }
 }
