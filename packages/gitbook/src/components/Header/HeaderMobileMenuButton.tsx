@@ -3,7 +3,7 @@
 import { Icon } from '@gitbook/icons';
 import { useEffect } from 'react';
 
-import { useMobileMenuSheet } from '@/components/Header/mobile-menu/useMobileMenuSheet';
+import { useMobileMenuSheet } from '@/components/MobileMenu/useMobileMenuSheet';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { usePathname } from 'next/navigation';

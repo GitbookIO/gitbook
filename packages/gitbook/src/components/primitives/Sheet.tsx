@@ -6,22 +6,53 @@ import type * as React from 'react';
 import { Button } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
+/**
+ * Root component for the Sheet dialog.
+ * Wraps the Radix UI Dialog.Root component and provides the context for the sheet dialog.
+ *
+ * @example
+ * <Sheet>
+ *   <SheetTrigger>Open</SheetTrigger>
+ *   <SheetContent>
+ *     <SheetHeader>
+ *       <SheetTitle>Title</SheetTitle>
+ *       <SheetDescription>Description</SheetDescription>
+ *     </SheetHeader>
+ *   </SheetContent>
+ * </Sheet>
+ */
 export function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
     return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
+/**
+ * Trigger component that opens the sheet dialog.
+ * Typically used as a button or other interactive element to open the sheet.
+ */
 export function SheetTrigger({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
     return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
+/**
+ * Close component that closes the sheet dialog.
+ * Can be used to create custom close buttons or triggers.
+ */
 export function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) {
     return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
+/**
+ * Portal component that renders the sheet content outside the DOM hierarchy.
+ * Ensures proper stacking context and accessibility.
+ */
 export function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
     return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
+/**
+ * Overlay component that creates a semi-transparent backdrop behind the sheet.
+ * Includes blur effect and animation states for opening/closing.
+ */
 function SheetOverlay({
     className,
     ...props
@@ -30,7 +61,7 @@ function SheetOverlay({
         <SheetPrimitive.Overlay
             data-slot="sheet-overlay"
             className={tcls(
-                'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-30 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:animate-out data-[state=open]:animate-in dark:bg-tint-1/6',
+                'fixed inset-0 z-30 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:animate-fadeIn data-[state=closed]:animate-out data-[state=open]:animate-fadeOut data-[state=open]:animate-in dark:bg-tint-1/6',
                 className
             )}
             {...props}
@@ -38,6 +69,12 @@ function SheetOverlay({
     );
 }
 
+/**
+ * Main content component for the sheet dialog.
+ * Handles positioning, animations, and styling of the sheet content.
+ * @param side - Determines which side the sheet slides in from ('left' or 'right')
+ * @param overlayClassName - Optional className for the overlay component
+ */
 export function SheetContent({
     className,
     overlayClassName,
@@ -109,6 +146,10 @@ export function SheetContent({
     );
 }
 
+/**
+ * Header component for the sheet dialog.
+ * Provides consistent padding and layout for the sheet header area.
+ */
 export function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
     return (
         <div
@@ -119,6 +160,10 @@ export function SheetHeader({ className, ...props }: React.ComponentProps<'div'>
     );
 }
 
+/**
+ * Title component for the sheet dialog.
+ * Renders the main heading of the sheet with consistent styling.
+ */
 export function SheetTitle({
     className,
     ...props
@@ -132,6 +177,10 @@ export function SheetTitle({
     );
 }
 
+/**
+ * Description component for the sheet dialog.
+ * Renders supplementary text or description with consistent styling.
+ */
 export function SheetDescription({
     className,
     ...props

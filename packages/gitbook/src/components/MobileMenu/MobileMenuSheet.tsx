@@ -6,7 +6,7 @@ import {
     SheetDescription,
     SheetHeader,
     SheetTitle,
-} from '@/components/utils/Sheet';
+} from '@/components/primitives/Sheet';
 import { useMobileMenuSheet } from './useMobileMenuSheet';
 
 export function MobileMenuSheet(props: { children: React.ReactNode }) {

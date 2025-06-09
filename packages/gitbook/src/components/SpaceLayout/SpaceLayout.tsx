@@ -11,7 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
-import { MobileMenuSheet } from '@/components/Header/mobile-menu/MobileMenuSheet';
+import { MobileMenuSheet } from '@/components/MobileMenu';
 import { TOCScrollContent } from '@/components/TableOfContents/TOCScrollContent';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
