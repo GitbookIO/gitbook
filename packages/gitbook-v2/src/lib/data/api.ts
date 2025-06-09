@@ -8,7 +8,9 @@ import {
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
+import { getCloudflareRequestGlobal } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
+import { withCacheKey, withoutConcurrentExecution } from './memoize';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -194,518 +196,613 @@ export function createDataFetcher(
     };
 }
 
-const getUserById = async (input: DataFetcherInput, params: { userId: string }) => {
-    'use cache';
-    return trace(`getUserById(${params.userId})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.users.getUserById(params.userId, {
-                ...noCacheFetchOptions,
-            });
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('days');
-            return res.data;
-        });
-    });
-};
-
-const getSpace = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; shareKey: string | undefined }
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: params.spaceId,
-        })
-    );
-
-    return trace(`getSpace(${params.spaceId}, ${params.shareKey})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.spaces.getSpaceById(
-                params.spaceId,
-                {
-                    shareKey: params.shareKey,
-                },
-                {
-                    ...noCacheFetchOptions,
-                }
-            );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('days');
-            return res.data;
-        });
-    });
-};
-
-const getChangeRequest = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; changeRequestId: string }
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'change-request',
-            space: params.spaceId,
-            changeRequest: params.changeRequestId,
-        })
-    );
-
-    return trace(`getChangeRequest(${params.spaceId}, ${params.changeRequestId})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.spaces.getChangeRequestById(
-                params.spaceId,
-                params.changeRequestId,
-                {
-                    ...noCacheFetchOptions,
-                }
-            );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('minutes');
-            return res.data;
-        });
-    });
-};
-
-const getRevision = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; revisionId: string; metadata: boolean }
-) => {
-    'use cache';
-    return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.spaces.getRevisionById(
-                params.spaceId,
-                params.revisionId,
-                {
-                    metadata: params.metadata,
-                },
-                {
-                    ...noCacheFetchOptions,
-                }
-            );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('max');
-            return res.data;
-        });
-    });
-};
-
-const getRevisionPages = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; revisionId: string; metadata: boolean }
-) => {
-    'use cache';
-    return trace(`getRevisionPages(${params.spaceId}, ${params.revisionId})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.spaces.listPagesInRevisionById(
-                params.spaceId,
-                params.revisionId,
-                {
-                    metadata: params.metadata,
-                },
-                {
-                    ...noCacheFetchOptions,
-                }
-            );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('max');
-            return res.data.pages;
-        });
-    });
-};
-
-const getRevisionFile = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; revisionId: string; fileId: string }
-) => {
-    'use cache';
-    return trace(
-        `getRevisionFile(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.getFileInRevisionById(
-                    params.spaceId,
-                    params.revisionId,
-                    params.fileId,
-                    {},
-                    {
+const getUserById = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (_, input: DataFetcherInput, params: { userId: string }) => {
+            'use cache';
+            return trace(`getUserById(${params.userId})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.users.getUserById(params.userId, {
                         ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data;
+                    });
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
+                });
             });
         }
-    );
-};
+    )
+);
 
-const getRevisionPageMarkdown = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; revisionId: string; pageId: string }
-) => {
-    'use cache';
-    return trace(
-        `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.getPageInRevisionById(
-                    params.spaceId,
-                    params.revisionId,
-                    params.pageId,
+const getSpace = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; shareKey: string | undefined }
+        ) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'space',
+                    space: params.spaceId,
+                })
+            );
+
+            return trace(`getSpace(${params.spaceId}, ${params.shareKey})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getSpaceById(
+                        params.spaceId,
+                        {
+                            shareKey: params.shareKey,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
+                });
+            });
+        }
+    )
+);
+
+const getChangeRequest = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; changeRequestId: string }
+        ) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'change-request',
+                    space: params.spaceId,
+                    changeRequest: params.changeRequestId,
+                })
+            );
+
+            return trace(
+                `getChangeRequest(${params.spaceId}, ${params.changeRequestId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getChangeRequestById(
+                            params.spaceId,
+                            params.changeRequestId,
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('minutes');
+                        return res.data;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getRevision = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; metadata: boolean }
+        ) => {
+            'use cache';
+            return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            metadata: params.metadata,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+                    return res.data;
+                });
+            });
+        }
+    )
+);
+
+const getRevisionPages = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; metadata: boolean }
+        ) => {
+            'use cache';
+            return trace(`getRevisionPages(${params.spaceId}, ${params.revisionId})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.listPagesInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        {
+                            metadata: params.metadata,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+                    return res.data.pages;
+                });
+            });
+        }
+    )
+);
+
+const getRevisionFile = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; fileId: string }
+        ) => {
+            'use cache';
+            return trace(
+                `getRevisionFile(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getFileInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.fileId,
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+                        return res.data;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getRevisionPageMarkdown = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; pageId: string }
+        ) => {
+            'use cache';
+            return trace(
+                `getRevisionPageMarkdown(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getPageInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.pageId,
+                            {
+                                format: 'markdown',
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+
+                        if (!('markdown' in res.data)) {
+                            throw new DataFetcherError('Page is not a document', 404);
+                        }
+                        return res.data.markdown;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getRevisionPageByPath = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; path: string }
+        ) => {
+            'use cache';
+            return trace(
+                `getRevisionPageByPath(${params.spaceId}, ${params.revisionId}, ${params.path})`,
+                async () => {
+                    const encodedPath = encodeURIComponent(params.path);
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getPageInRevisionByPath(
+                            params.spaceId,
+                            params.revisionId,
+                            encodedPath,
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+                        return res.data;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getDocument = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (_, input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
+            'use cache';
+            return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getDocumentById(
+                        params.spaceId,
+                        params.documentId,
+                        {},
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('max');
+                    return res.data;
+                });
+            });
+        }
+    )
+);
+
+const getComputedDocument = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: {
+                spaceId: string;
+                organizationId: string;
+                source: ComputedContentSource;
+                seed: string;
+            }
+        ) => {
+            'use cache';
+            cacheTag(
+                ...getComputedContentSourceCacheTags(
                     {
-                        format: 'markdown',
+                        spaceId: params.spaceId,
+                        organizationId: params.organizationId,
                     },
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
+                    params.source
+                )
+            );
 
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-
-                if (!('markdown' in res.data)) {
-                    throw new DataFetcherError('Page is not a document', 404);
-                }
-                return res.data.markdown;
-            });
-        }
-    );
-};
-
-const getRevisionPageByPath = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; revisionId: string; path: string }
-) => {
-    'use cache';
-    return trace(
-        `getRevisionPageByPath(${params.spaceId}, ${params.revisionId}, ${params.path})`,
-        async () => {
-            const encodedPath = encodeURIComponent(params.path);
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.getPageInRevisionByPath(
-                    params.spaceId,
-                    params.revisionId,
-                    encodedPath,
-                    {},
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data;
-            });
-        }
-    );
-};
-
-const getDocument = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; documentId: string }
-) => {
-    'use cache';
-    return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.spaces.getDocumentById(
-                params.spaceId,
-                params.documentId,
-                {},
-                {
-                    ...noCacheFetchOptions,
+            return trace(
+                `getComputedDocument(${params.spaceId}, ${params.organizationId}, ${params.source.type}, ${params.seed})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getComputedDocument(
+                            params.spaceId,
+                            {
+                                source: params.source,
+                                seed: params.seed,
+                            },
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+                        return res.data;
+                    });
                 }
             );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('max');
-            return res.data;
-        });
-    });
-};
-
-const getComputedDocument = async (
-    input: DataFetcherInput,
-    params: {
-        spaceId: string;
-        organizationId: string;
-        source: ComputedContentSource;
-        seed: string;
-    }
-) => {
-    'use cache';
-    cacheTag(
-        ...getComputedContentSourceCacheTags(
-            {
-                spaceId: params.spaceId,
-                organizationId: params.organizationId,
-            },
-            params.source
-        )
-    );
-
-    return trace(
-        `getComputedDocument(${params.spaceId}, ${params.organizationId}, ${params.source.type}, ${params.seed})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.getComputedDocument(
-                    params.spaceId,
-                    {
-                        source: params.source,
-                        seed: params.seed,
-                    },
-                    {},
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data;
-            });
         }
-    );
-};
+    )
+);
 
-const getReusableContent = async (
-    input: DataFetcherInput,
-    params: { spaceId: string; revisionId: string; reusableContentId: string }
-) => {
-    'use cache';
-    return trace(
-        `getReusableContent(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.getReusableContentInRevisionById(
-                    params.spaceId,
-                    params.revisionId,
-                    params.reusableContentId,
-                    {},
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data;
-            });
-        }
-    );
-};
-
-const getLatestOpenAPISpecVersionContent = async (
-    input: DataFetcherInput,
-    params: { organizationId: string; slug: string }
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'openapi',
-            organization: params.organizationId,
-            openAPISpec: params.slug,
-        })
-    );
-
-    return trace(
-        `getLatestOpenAPISpecVersionContent(${params.organizationId}, ${params.slug})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.orgs.getLatestOpenApiSpecVersionContent(
-                    params.organizationId,
-                    params.slug,
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data;
-            });
-        }
-    );
-};
-
-const getPublishedContentSite = async (
-    input: DataFetcherInput,
-    params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: params.siteId,
-        })
-    );
-
-    return trace(
-        `getPublishedContentSite(${params.organizationId}, ${params.siteId}, ${params.siteShareKey})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.orgs.getPublishedContentSite(
-                    params.organizationId,
-                    params.siteId,
-                    {
-                        shareKey: params.siteShareKey,
-                    },
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('days');
-                return res.data;
-            });
-        }
-    );
-};
-
-const getSiteRedirectBySource = async (
-    input: DataFetcherInput,
-    params: {
-        organizationId: string;
-        siteId: string;
-        siteShareKey: string | undefined;
-        source: string;
-    }
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: params.siteId,
-        })
-    );
-
-    return trace(
-        `getSiteRedirectBySource(${params.organizationId}, ${params.siteId}, ${params.siteShareKey}, ${params.source})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.orgs.getSiteRedirectBySource(
-                    params.organizationId,
-                    params.siteId,
-                    {
-                        shareKey: params.siteShareKey,
-                        source: params.source,
-                    },
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('days');
-                return res.data;
-            });
-        }
-    );
-};
-
-const getEmbedByUrl = async (input: DataFetcherInput, params: { spaceId: string; url: string }) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'space',
-            space: params.spaceId,
-        })
-    );
-
-    return trace(`getEmbedByUrl(${params.spaceId}, ${params.url})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.spaces.getEmbedByUrlInSpace(
-                params.spaceId,
-                {
-                    url: params.url,
-                },
-                {
-                    ...noCacheFetchOptions,
+const getReusableContent = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; reusableContentId: string }
+        ) => {
+            'use cache';
+            return trace(
+                `getReusableContent(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getReusableContentInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.reusableContentId,
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+                        return res.data;
+                    });
                 }
             );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('weeks');
-            return res.data;
-        });
-    });
-};
-
-const searchSiteContent = async (
-    input: DataFetcherInput,
-    params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'site',
-            site: params.siteId,
-        })
-    );
-
-    return trace(
-        `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
-        async () => {
-            return wrapDataFetcherError(async () => {
-                const { organizationId, siteId, query, scope } = params;
-                const api = apiClient(input);
-                const res = await api.orgs.searchSiteContent(
-                    organizationId,
-                    siteId,
-                    {
-                        query,
-                        ...scope,
-                    },
-                    {},
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('hours');
-                return res.data.items;
-            });
         }
-    );
-};
+    )
+);
 
-const renderIntegrationUi = async (
-    input: DataFetcherInput,
-    params: { integrationName: string; request: RenderIntegrationUI }
-) => {
-    'use cache';
-    cacheTag(
-        getCacheTag({
-            tag: 'integration',
-            integration: params.integrationName,
-        })
-    );
+const getLatestOpenAPISpecVersionContent = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (_, input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'openapi',
+                    organization: params.organizationId,
+                    openAPISpec: params.slug,
+                })
+            );
 
-    return trace(`renderIntegrationUi(${params.integrationName})`, async () => {
-        return wrapDataFetcherError(async () => {
-            const api = apiClient(input);
-            const res = await api.integrations.renderIntegrationUiWithPost(
-                params.integrationName,
-                params.request,
-                {
-                    ...noCacheFetchOptions,
+            return trace(
+                `getLatestOpenAPISpecVersionContent(${params.organizationId}, ${params.slug})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.orgs.getLatestOpenApiSpecVersionContent(
+                            params.organizationId,
+                            params.slug,
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+                        return res.data;
+                    });
                 }
             );
-            cacheTag(...getCacheTagsFromResponse(res));
-            cacheLife('days');
-            return res.data;
-        });
-    });
-};
+        }
+    )
+);
+
+const getPublishedContentSite = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
+        ) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'site',
+                    site: params.siteId,
+                })
+            );
+
+            return trace(
+                `getPublishedContentSite(${params.organizationId}, ${params.siteId}, ${params.siteShareKey})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.orgs.getPublishedContentSite(
+                            params.organizationId,
+                            params.siteId,
+                            {
+                                shareKey: params.siteShareKey,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('days');
+                        return res.data;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getSiteRedirectBySource = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: {
+                organizationId: string;
+                siteId: string;
+                siteShareKey: string | undefined;
+                source: string;
+            }
+        ) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'site',
+                    site: params.siteId,
+                })
+            );
+
+            return trace(
+                `getSiteRedirectBySource(${params.organizationId}, ${params.siteId}, ${params.siteShareKey}, ${params.source})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.orgs.getSiteRedirectBySource(
+                            params.organizationId,
+                            params.siteId,
+                            {
+                                shareKey: params.siteShareKey,
+                                source: params.source,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('days');
+                        return res.data;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getEmbedByUrl = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (_, input: DataFetcherInput, params: { spaceId: string; url: string }) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'space',
+                    space: params.spaceId,
+                })
+            );
+
+            return trace(`getEmbedByUrl(${params.spaceId}, ${params.url})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getEmbedByUrlInSpace(
+                        params.spaceId,
+                        {
+                            url: params.url,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('weeks');
+                    return res.data;
+                });
+            });
+        }
+    )
+);
+
+const searchSiteContent = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
+        ) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'site',
+                    site: params.siteId,
+                })
+            );
+
+            return trace(
+                `searchSiteContent(${params.organizationId}, ${params.siteId}, ${params.query})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const { organizationId, siteId, query, scope } = params;
+                        const api = apiClient(input);
+                        const res = await api.orgs.searchSiteContent(
+                            organizationId,
+                            siteId,
+                            {
+                                query,
+                                ...scope,
+                            },
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('hours');
+                        return res.data.items;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const renderIntegrationUi = withCacheKey(
+    withoutConcurrentExecution(
+        getCloudflareRequestGlobal,
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { integrationName: string; request: RenderIntegrationUI }
+        ) => {
+            'use cache';
+            cacheTag(
+                getCacheTag({
+                    tag: 'integration',
+                    integration: params.integrationName,
+                })
+            );
+
+            return trace(`renderIntegrationUi(${params.integrationName})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await api.integrations.renderIntegrationUiWithPost(
+                        params.integrationName,
+                        params.request,
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
+                });
+            });
+        }
+    )
+);
 
 async function* streamAIResponse(
     input: DataFetcherInput,

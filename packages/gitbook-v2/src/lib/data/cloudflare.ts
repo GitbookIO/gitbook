@@ -1,4 +1,5 @@
 import { getCloudflareContext as getCloudflareContextOpenNext } from '@opennextjs/cloudflare';
+import { cache } from 'react';
 import { GITBOOK_RUNTIME } from '../env';
 
 /**
@@ -10,4 +11,13 @@ export function getCloudflareContext() {
     }
 
     return getCloudflareContextOpenNext();
+}
+
+export function getCloudflareRequestGlobal() {
+    const context = getCloudflareContext();
+    if (!context) {
+        return cache(() => ({}));
+    }
+
+    return context.cf;
 }
