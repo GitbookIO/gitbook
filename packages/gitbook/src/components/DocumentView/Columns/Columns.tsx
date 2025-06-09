@@ -9,7 +9,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
         <div className={tcls('flex flex-col gap-x-8 md:flex-row', style)}>
             {block.nodes.map((columnBlock) => {
                 const width = columnBlock.data.width;
-                const { className, style } = width ? transformLengthToCSS(width) : {};
+                const { className, style } = transformLengthToCSS(width);
                 return (
                     <Column key={columnBlock.key} className={className} style={style}>
                         <Blocks
@@ -40,10 +40,15 @@ export function Column(props: {
     );
 }
 
-function transformLengthToCSS(length: Length) {
+function transformLengthToCSS(length: Length | undefined) {
+    if (!length) {
+        return { className: ['md:w-full'] }; // default to full width if no length is specified
+    }
+
     if (typeof length === 'number') {
         return { style: undefined }; // not implemented yet with non-percentage lengths
     }
+
     if (length.unit === '%') {
         return {
             className: [
@@ -52,6 +57,7 @@ function transformLengthToCSS(length: Length) {
             ],
         };
     }
+
     return { style: undefined }; // not implemented yet with non-percentage lengths
 }
 
