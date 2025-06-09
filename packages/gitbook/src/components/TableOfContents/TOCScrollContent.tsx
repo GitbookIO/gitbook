@@ -40,8 +40,8 @@ export function TOCScrollContent(props: {
             <TOCScrollContainer // The scrollview inside the sidebar
                 className={tcls(
                     'flex flex-grow flex-col p-2',
-                    innerHeader ? 'mt-0 lg:mt-2' : 'mt-8',
-                    customization.trademark.enabled && 'pb-20',
+                    innerHeader && 'mt-0 lg:mt-2',
+                    customization.trademark.enabled && 'pb-[4.5rem]',
                     'gutter-stable overflow-y-auto',
                     '[&::-webkit-scrollbar]:bg-transparent',
                     '[&::-webkit-scrollbar-thumb]:bg-transparent',

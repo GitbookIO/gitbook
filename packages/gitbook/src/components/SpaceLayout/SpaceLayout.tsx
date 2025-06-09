@@ -5,15 +5,13 @@ import React from 'react';
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { SearchButton, SearchModal } from '@/components/Search';
-import { TableOfContents } from '@/components/TableOfContents';
+import { TOCScrollContent, TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
+import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { tcls } from '@/lib/tailwind';
 
-import { MobileMenuSheet } from '@/components/MobileMenu';
-import { TOCScrollContent } from '@/components/TableOfContents/TOCScrollContent';
-import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
@@ -68,27 +66,6 @@ export function SpaceLayout(props: {
             >
                 <Announcement context={context} />
                 <Header withTopHeader={withTopHeader} context={context} />
-                <MobileMenuSheet>
-                    <TOCScrollContent
-                        innerHeader={
-                            isMultiVariants ? (
-                                <SpacesDropdown
-                                    withPortal={false}
-                                    context={context}
-                                    siteSpace={siteSpace}
-                                    siteSpaces={siteSpaces}
-                                    className={tcls(
-                                        'w-full',
-                                        'page-no-toc:hidden',
-                                        'site-header-none:page-no-toc:flex',
-                                        'h-8'
-                                    )}
-                                />
-                            ) : null
-                        }
-                        context={context}
-                    />
-                </MobileMenuSheet>
                 <div className="scroll-nojump">
                     <div
                         className={tcls(
@@ -104,7 +81,6 @@ export function SpaceLayout(props: {
                         )}
                     >
                         <TableOfContents
-                            context={context}
                             header={
                                 withTopHeader ? null : (
                                     <div
@@ -122,48 +98,59 @@ export function SpaceLayout(props: {
                                     </div>
                                 )
                             }
-                            innerHeader={
-                                // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                                <>
-                                    {!withTopHeader && (
-                                        <div className={tcls('hidden', 'lg:block')}>
-                                            <React.Suspense fallback={null}>
-                                                <SearchButton>
-                                                    <span className={tcls('flex-1')}>
-                                                        {t(
-                                                            getSpaceLanguage(customization),
-                                                            customization.aiSearch.enabled
-                                                                ? 'search_or_ask'
-                                                                : 'search'
-                                                        )}
-                                                        ...
-                                                    </span>
-                                                </SearchButton>
-                                            </React.Suspense>
-                                        </div>
-                                    )}
-                                    {!withTopHeader && withSections && sections && (
-                                        <SiteSectionList
-                                            className={tcls('hidden', 'lg:block')}
-                                            sections={encodeClientSiteSections(context, sections)}
-                                        />
-                                    )}
-                                    {isMultiVariants && (
-                                        <SpacesDropdown
-                                            context={context}
-                                            siteSpace={siteSpace}
-                                            siteSpaces={siteSpaces}
-                                            className={tcls(
-                                                'w-full',
-                                                'page-no-toc:hidden',
-                                                'site-header-none:page-no-toc:flex',
-                                                'mb-2'
+                        >
+                            <TOCScrollContent
+                                context={context}
+                                innerHeader={
+                                    !withTopHeader || isMultiVariants ? (
+                                        // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                                        <>
+                                            {!withTopHeader && (
+                                                <div className={tcls('hidden', 'lg:block')}>
+                                                    <React.Suspense fallback={null}>
+                                                        <SearchButton>
+                                                            <span className={tcls('flex-1')}>
+                                                                {t(
+                                                                    getSpaceLanguage(customization),
+                                                                    customization.aiSearch.enabled
+                                                                        ? 'search_or_ask'
+                                                                        : 'search'
+                                                                )}
+                                                                ...
+                                                            </span>
+                                                        </SearchButton>
+                                                    </React.Suspense>
+                                                </div>
                                             )}
-                                        />
-                                    )}
-                                </>
-                            }
-                        />
+                                            {!withTopHeader && withSections && sections && (
+                                                <SiteSectionList
+                                                    className={tcls('hidden', 'lg:block')}
+                                                    sections={encodeClientSiteSections(
+                                                        context,
+                                                        sections
+                                                    )}
+                                                />
+                                            )}
+                                            {isMultiVariants && (
+                                                <SpacesDropdown
+                                                    context={context}
+                                                    siteSpace={siteSpace}
+                                                    siteSpaces={siteSpaces}
+                                                    className={tcls(
+                                                        'w-full',
+                                                        'page-no-toc:hidden',
+                                                        'site-header-none:page-no-toc:flex',
+                                                        'mb-2',
+                                                        // Set the height to match the close button of the mobile menu sheet
+                                                        'max-lg:h-8'
+                                                    )}
+                                                />
+                                            )}
+                                        </>
+                                    ) : null
+                                }
+                            />
+                        </TableOfContents>
                         <div className="flex min-w-0 flex-1 flex-col">{children}</div>
                     </div>
                 </div>

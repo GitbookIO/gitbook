@@ -1,16 +1,23 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+'use client';
+
 import type React from 'react';
 
-import { TOCScrollContent } from '@/components/TableOfContents/TOCScrollContent';
+import { MobileMenuSheet } from '@/components/MobileMenu';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { tcls } from '@/lib/tailwind';
 import { TableOfContentsScript } from './TableOfContentsScript';
 
 export function TableOfContents(props: {
-    context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
-    innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
+    children: React.ReactNode;
 }) {
-    const { innerHeader, context, header } = props;
+    const { header, children } = props;
+    const isMobile = useIsMobile();
+
+    // If the screen is mobile, we use the mobile menu sheet to display the table of contents.
+    if (isMobile) {
+        return <MobileMenuSheet>{children}</MobileMenuSheet>;
+    }
 
     return (
         <>
@@ -65,7 +72,7 @@ export function TableOfContents(props: {
                 )}
             >
                 {header && header}
-                <TOCScrollContent context={context} innerHeader={innerHeader} />
+                {children}
             </aside>
             <TableOfContentsScript />
         </>
