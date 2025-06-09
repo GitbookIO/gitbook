@@ -22,6 +22,12 @@
                     "bucket_name": "gitbook-open-v2-cache-preview"
                 }
             ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-preview"
+                }
+            ],
             "durable_objects": {
                 "bindings": [
                     {
@@ -61,6 +67,12 @@
                     "service": "gitbook-x-staging-tail"
                 }
             ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-staging"
+                }
+            ],
             "durable_objects": {
                 "bindings": [
                     {
@@ -98,6 +110,12 @@
             "tail_consumers": [
                 {
                     "service": "gitbook-x-prod-tail"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-production"
                 }
             ],
             "durable_objects": {
