@@ -1,5 +1,4 @@
 import {
-    CustomizationCorners,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
@@ -77,14 +76,13 @@ export async function CustomizationRootLayout(props: {
                 customization.header.preset === CustomizationHeaderPreset.None
                     ? null
                     : 'scroll-pt-[76px]', // Take the sticky header in consideration for the scrolling
-                customization.styling.corners === CustomizationCorners.Straight
-                    ? ' straight-corners'
-                    : '',
+                customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
                 sidebarStyles.background && `sidebar-${sidebarStyles.background}`,
                 sidebarStyles.list && `sidebar-list-${sidebarStyles.list}`,
                 'links' in customization.styling && `links-${customization.styling.links}`,
+                'depth' in customization.styling && `depth-${customization.styling.depth}`,
                 fontNotoColorEmoji.variable,
                 ibmPlexMono.variable,
                 fontData.type === 'default' ? fontData.variable : 'font-custom',

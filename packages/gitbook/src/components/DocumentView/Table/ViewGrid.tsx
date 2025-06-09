@@ -38,7 +38,8 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         className={tcls(
                             tableWidth,
                             styles.rowGroup,
-                            'straight-corners:rounded-none'
+                            'straight-corners:rounded-none',
+                            'circular-corners:rounded-xl'
                         )}
                     >
                         <div role="row" className={tcls('flex', 'w-full')}>

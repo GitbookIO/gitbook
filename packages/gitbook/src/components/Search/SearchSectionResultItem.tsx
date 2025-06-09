@@ -77,6 +77,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
+                    'circular-corners:rounded-full',
                     'bg-primary-solid',
                     'text-contrast-primary-solid',
                     'hidden',

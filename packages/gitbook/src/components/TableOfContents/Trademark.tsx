@@ -102,6 +102,7 @@ export function TrademarkLink(props: {
 
                 'rounded-lg',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
 
                 'hover:bg-tint',
                 'hover:text-tint-strong',

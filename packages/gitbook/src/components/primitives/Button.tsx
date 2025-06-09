@@ -40,8 +40,10 @@ const variantClasses = {
     ],
     secondary: [
         'bg-tint',
+        'depth-flat:bg-transparent',
         'text-tint',
         'hover:bg-tint-hover',
+        'depth-flat:hover:bg-tint-hover',
         'hover:text-primary',
         'contrast-more:bg-tint-subtle',
     ],
@@ -60,8 +62,8 @@ export function Button({
     ...rest
 }: ButtonProps & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
-        default: ['text-base', 'px-4', 'py-2'],
-        medium: ['text-sm', 'px-3', 'py-1.5'],
+        default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
+        medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
         small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
     };
 
@@ -74,6 +76,7 @@ export function Button({
         'gap-2',
         'rounded-md',
         'straight-corners:rounded-none',
+        'circular-corners:rounded-full',
         // 'place-self-start',
 
         'ring-1',
@@ -85,12 +88,14 @@ export function Button({
         'dark:shadow-tint-1',
         'hover:shadow-md',
         'active:shadow-none',
+        'depth-flat:shadow-none',
 
         'contrast-more:ring-tint-12',
         'contrast-more:hover:ring-2',
         'contrast-more:hover:ring-tint-12',
 
         'hover:scale-104',
+        'depth-flat:hover:scale-100',
         'active:scale-100',
         'transition-all',
 

@@ -1,9 +1,11 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
+    CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
+    CustomizationThemeMode,
 } from '@gitbook/api';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
@@ -431,6 +433,38 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'llms.txt',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'llms.txt',
+                url: 'llms.txt',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
+        name: 'llms-full.txt',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'llms-full.txt',
+                url: 'llms-full.txt',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
         name: 'Site subdirectory (proxy)',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         contentBaseURL: 'https://nextjs-gbo-proxy.vercel.app/documentation/',
@@ -649,6 +683,16 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
+                name: 'With cover for dark mode',
+                url: `page-options/page-with-dark-cover${getCustomizationURL({
+                    themes: {
+                        default: CustomizationThemeMode.Dark,
+                        toggeable: false,
+                    },
+                })}`,
+                run: waitForCookiesDialog,
+            },
+            {
                 name: 'With hero cover',
                 url: 'page-options/page-with-hero-cover',
                 run: waitForCookiesDialog,
@@ -813,6 +857,16 @@ const testCases: TestsCase[] = [
                     themes: {
                         default: themeMode,
                         toggeable: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: `With flat and circular corners - Theme mode ${themeMode}`,
+                url: getCustomizationURL({
+                    styling: {
+                        depth: CustomizationDepth.Flat,
+                        corners: CustomizationCorners.Circular,
                     },
                 }),
                 run: waitForCookiesDialog,

@@ -42,7 +42,7 @@ export function Caption(
             'after:pointer-events-none',
             fit ? 'w-fit' : null,
             withBorder
-                ? 'rounded straight-corners:rounded-none after:border-tint-subtle after:border after:rounded straight-corners:after:rounded-none dark:after:mix-blend-plus-lighter after:pointer-events-none'
+                ? 'rounded circular-corners:rounded-2xl straight-corners:rounded-none after:border-tint-subtle after:border after:rounded circular-corners:after:rounded-2xl straight-corners:after:rounded-none dark:after:mix-blend-plus-lighter after:pointer-events-none'
                 : null,
         ],
         style,

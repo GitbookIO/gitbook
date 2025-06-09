@@ -481,7 +481,7 @@
 .openapi-panel,
 .openapi-codesample,
 .openapi-response-examples {
-    @apply border rounded-md straight-corners:rounded-none bg-tint-subtle border-tint-subtle shadow-sm;
+    @apply border rounded-md straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
 }
 
 .openapi-panel pre,
@@ -571,7 +571,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none;
+    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
@@ -680,7 +680,7 @@ body:has(.openapi-select-popover) {
 
 /* Disclosure group */
 .openapi-disclosure-group {
-    @apply border-tint-subtle transition-all border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none first:rounded-t-md straight-corners:first:rounded-none first:border-t relative;
+    @apply border-tint-subtle transition-all border-b border-x overflow-auto last:rounded-b-md straight-corners:last:rounded-none circular-corners:last:rounded-b-xl first:rounded-t-md straight-corners:first:rounded-none circular-corners:first:rounded-t-xl first:border-t relative;
 }
 
 .openapi-disclosure-group:has(.openapi-disclosure-group-trigger:hover) {
@@ -786,7 +786,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger-label {
-    @apply absolute right-3 px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none flex flex-row gap-1 items-center text-xs;
+    @apply absolute right-3 px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
 }
 
 .openapi-disclosure-trigger-label span {
@@ -848,7 +848,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tooltip {
-    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none font-medium px-1.5 py-0.5 shadow-sm text-[13px];
+    @apply flex items-center gap-1 bg-tint-base border border-tint-subtle text-tint-strong rounded-md straight-corners:rounded-none circular-corners:rounded-lg font-medium px-1.5 py-0.5 shadow-sm text-[13px];
 }
 
 .openapi-tooltip svg {

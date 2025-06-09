@@ -84,7 +84,21 @@ export function SiteSectionListItem(props: {
             href={section.url}
             aria-current={isActive && 'page'}
             className={tcls(
-                'group/section-link flex flex-row items-center gap-3 rounded-md straight-corners:rounded-none px-3 py-2 transition-all hover:bg-tint-hover hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint',
+                'group/section-link',
+                'flex',
+                'flex-row',
+                'items-center',
+                'gap-3',
+                'rounded-md',
+                'straight-corners:rounded-none',
+                'circular-corners:rounded-xl',
+                'px-3',
+                'py-2',
+                'transition-all',
+                'hover:bg-tint-hover',
+                'hover:text-tint-strong',
+                'contrast-more:hover:ring-1',
+                'contrast-more:hover:ring-tint',
                 isActive
                     ? 'font-semibold text-primary-subtle hover:bg-primary-hover hover:text-primary contrast-more:text-primary contrast-more:hover:text-primary-strong contrast-more:hover:ring-1 contrast-more:hover:ring-primary-hover'
                     : null,

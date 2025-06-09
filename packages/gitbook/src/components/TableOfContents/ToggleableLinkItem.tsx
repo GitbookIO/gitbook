@@ -69,7 +69,7 @@ function LinkItem(
             className={tcls(
                 'group/toclink relative transition-colors',
                 'flex flex-row justify-between',
-                'rounded-md straight-corners:rounded-none p-1.5 pl-3',
+                'circular-corners:rounded-2xl rounded-md straight-corners:rounded-none p-1.5 pl-3',
                 'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
                 'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
                 'before:contents[] before:-left-px before:absolute before:inset-y-0',
