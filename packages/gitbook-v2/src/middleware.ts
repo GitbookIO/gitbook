@@ -226,7 +226,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         const customization = siteRequestURL.searchParams.get('customization');
         if (customization && validateSerializedCustomization(customization)) {
             routeType = 'dynamic';
-            requestHeaders.set(MiddlewareHeaders.Customization, customization);
+            // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
+            requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
         }
         const theme = siteRequestURL.searchParams.get('theme');
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
