@@ -30,6 +30,7 @@ export async function Card(
                 'ring-tint-subtle',
                 'rounded',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
                 'px-5',
                 'py-3',
                 'transition-shadow',

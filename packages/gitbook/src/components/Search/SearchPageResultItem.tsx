@@ -108,6 +108,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     'p-2',
                     'rounded',
                     'straight-corners:rounded-none',
+                    'circular-corners:rounded-full',
                     active ? ['bg-primary-solid', 'text-contrast-primary-solid'] : ['opacity-6']
                 )}
             >

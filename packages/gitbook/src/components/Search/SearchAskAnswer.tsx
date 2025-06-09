@@ -176,6 +176,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'py-2',
                         'rounded',
                         'straight-corners:rounded-none',
+                        'circular-corners:rounded-full',
                         'text-tint',
                         'hover:bg-tint-hover',
                         'focus-within:bg-tint-hover'

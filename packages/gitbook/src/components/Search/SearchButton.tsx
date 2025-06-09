@@ -45,21 +45,25 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'w-full',
                 'py-2',
                 'px-3',
+                'circular-corners:px-4',
                 'gap-2',
 
                 'bg-tint-base',
 
                 'ring-1',
                 'ring-tint-12/2',
+                'depth-flat:ring-tint-subtle',
 
                 'shadow-sm',
                 'shadow-tint-12/3',
                 'dark:shadow-none',
+                'depth-flat:shadow-none',
 
                 'text-tint',
 
                 'rounded-lg',
                 'straight-corners:rounded-sm',
+                'circular-corners:rounded-full',
 
                 'contrast-more:ring-tint-12',
                 'contrast-more:text-tint-strong',
@@ -68,10 +72,12 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'hover:bg-tint-subtle',
                 'hover:shadow-md',
                 'hover:scale-102',
+                'depth-flat:hover:scale-100',
                 'hover:ring-tint-hover',
                 'hover:text-tint-strong',
                 'focus:shadow-md',
                 'focus:scale-102',
+                'depth-flat:focus:scale-100',
                 'focus:ring-tint-hover',
                 'focus:text-tint-strong',
 
