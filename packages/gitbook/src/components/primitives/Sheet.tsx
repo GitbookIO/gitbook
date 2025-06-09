@@ -69,22 +69,25 @@ function SheetOverlay({
     );
 }
 
+interface SheetContentProps extends React.ComponentProps<typeof SheetPrimitive.Content> {
+    /**
+     * The class name for the overlay component.
+     */
+    overlayClassName?: string;
+    /**
+     * The side the sheet slides in from.
+     * @default 'left'
+     */
+    side?: 'right' | 'left';
+}
+
 /**
  * Main content component for the sheet dialog.
  * Handles positioning, animations, and styling of the sheet content.
- * @param side - Determines which side the sheet slides in from ('left' or 'right')
- * @param overlayClassName - Optional className for the overlay component
  */
-export function SheetContent({
-    className,
-    overlayClassName,
-    children,
-    side = 'left',
-    ...props
-}: React.ComponentProps<typeof SheetPrimitive.Content> & {
-    overlayClassName?: string;
-    side?: 'right' | 'left';
-}) {
+export function SheetContent(props: SheetContentProps) {
+    const { overlayClassName, side = 'left', className, children, ...rest } = props;
+
     return (
         <SheetPortal>
             <SheetOverlay className={overlayClassName} />
@@ -126,7 +129,7 @@ export function SheetContent({
                         'left-1.5 data-[state=closed]:animate-exitToLeft data-[state=open]:animate-enterFromLeft',
                     className
                 )}
-                {...props}
+                {...rest}
             >
                 {children}
 
