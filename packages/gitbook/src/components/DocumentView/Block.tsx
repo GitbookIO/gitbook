@@ -12,6 +12,7 @@ import type { ClassValue } from '@/lib/tailwind';
 
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
+import { Columns } from './Columns';
 import { Divider } from './Divider';
 import type { DocumentContextProps } from './DocumentView';
 import { Drawing } from './Drawing';
@@ -68,6 +69,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <List {...props} block={block} />;
             case 'list-item':
                 return <ListItem {...props} block={block} />;
+            case 'columns':
+                return <Columns {...props} block={block} />;
             case 'code':
                 return <CodeBlock {...props} block={block} />;
             case 'hint':
@@ -112,10 +115,8 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'image':
             case 'code-line':
             case 'tabs-item':
-                throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
-            case 'columns':
             case 'column':
-                return null;
+                throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
             default:
                 return nullIfNever(block);
         }
@@ -171,6 +172,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'integration':
         case 'stepper':
         case 'reusable-content':
+        case 'columns':
             return <SkeletonCard id={id} style={style} />;
         case 'embed':
         case 'images':
@@ -179,10 +181,8 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'image':
         case 'code-line':
         case 'tabs-item':
-            throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
-        case 'columns':
         case 'column':
-            return null;
+            throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
         default:
             return nullIfNever(block);
     }
