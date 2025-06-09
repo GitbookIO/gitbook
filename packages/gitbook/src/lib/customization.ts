@@ -12,9 +12,12 @@ export async function getDynamicCustomizationSettings(
 ): Promise<SiteCustomizationSettings> {
     const headersList = await headers();
     const extend = headersList.get(MiddlewareHeaders.Customization);
+
     if (extend) {
         try {
-            const parsedSettings = rison.decode_object<SiteCustomizationSettings>(extend);
+            // We need to decode it first as it is URL encoded, then decode the Rison object
+            const unencoded = decodeURIComponent(extend);
+            const parsedSettings = rison.decode_object<SiteCustomizationSettings>(unencoded);
 
             return parsedSettings;
         } catch (_error) {}
