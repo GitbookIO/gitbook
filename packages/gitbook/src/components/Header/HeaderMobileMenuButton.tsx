@@ -24,7 +24,6 @@ export function HeaderMobileMenuButton(
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: Close the navigation when navigating to a page
     useEffect(() => {
-        if (!open) return;
         setOpen(false);
     }, [pathname]);
 
