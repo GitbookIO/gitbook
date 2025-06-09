@@ -56,6 +56,7 @@ function transformLengthToCSS(length: Length) {
 }
 
 // Tailwind CSS classes for column widths.
+// The index of the array corresponds to the percentage width of the column.
 const COLUMN_WIDTHS = [
     'md:w-0',
     'md:w-1/12',
