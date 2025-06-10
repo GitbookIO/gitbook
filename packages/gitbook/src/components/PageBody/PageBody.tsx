@@ -27,7 +27,9 @@ export function PageBody(props: {
     const { page, context, ancestors, document, withPageFeedback } = props;
     const { customization } = context;
 
-    const asFullWidth = document ? hasFullWidthBlock(document) : false;
+    const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+    const pageFullWidth = page.id === 'wtthNFMqmEQmnt5LKR0q';
+    const asFullWidth = pageFullWidth || contentFullWidth;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
@@ -36,7 +38,7 @@ export function PageBody(props: {
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
-                    'py-8 lg:px-12',
+                    'mx-auto py-8 xl:px-12',
                     // Allow words to break if they are too long.
                     'break-anywhere',
                     // When in api page mode without the aside, we align with the border of the main content
@@ -44,7 +46,8 @@ export function PageBody(props: {
                     // Max size to ensure one column in api is aligned with rest of content (2 x 3xl) + (gap-3 + 2) * px-12
                     'page-api-block:mx-auto page-api-block:max-w-screen-2xl',
                     // page.layout.tableOfContents ? null : 'xl:ml-56',
-                    asFullWidth ? 'page-full-width' : 'page-default-width',
+                    pageFullWidth ? 'page-full-width max-w-screen-2xl' : 'page-default-width',
+                    asFullWidth ? 'site-full-width' : 'site-default-width',
                     page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'
                 )}
             >
@@ -81,7 +84,7 @@ export function PageBody(props: {
                     <PageFooterNavigation context={context} page={page} />
                 ) : null}
 
-                <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
+                <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
                     {updatedAt ? (
                         <p className="mr-auto text-sm">
                             {t(language, 'page_last_modified', <DateRelative value={updatedAt} />)}

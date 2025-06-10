@@ -41,7 +41,13 @@ export async function PageCover(props: {
                               ? 'xl:-ml-64'
                               : null,
                       ]
-                    : ['sm:mx-auto', 'max-w-3xl', 'sm:rounded-md', 'mb-8']
+                    : [
+                          'sm:mx-auto',
+                          'max-w-3xl ',
+                          'page-full-width:max-w-screen-2xl',
+                          'sm:rounded-md',
+                          'mb-8',
+                      ]
             )}
         >
             <Image

@@ -514,8 +514,9 @@ const config: Config = {
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.
              */
+            addVariant('site-full-width', 'body:has(.site-full-width) &');
+            addVariant('site-default-width', 'body:has(.site-default-width) &');
             addVariant('page-full-width', 'body:has(.page-full-width) &');
-            addVariant('page-default-width', 'body:has(.page-default-width) &');
 
             /**
              * Variant when the page is configured to hide the table of content.
