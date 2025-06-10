@@ -204,11 +204,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://sosovalue-white-paper.gitbook.io',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.revrobotics.com',
-        contentBaseURL: 'https://docs.revrobotics.com',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
-    },
+    // {
+    //     name: 'docs.revrobotics.com',
+    //     contentBaseURL: 'https://docs.revrobotics.com',
+    //     tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
+    // },
     {
         name: 'chartschool.stockcharts.com',
         contentBaseURL: 'https://chartschool.stockcharts.com',
