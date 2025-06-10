@@ -1,6 +1,6 @@
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
-import { getPageDocument } from '@v2/lib/data';
+import { getDataOrNull } from '@v2/lib/data';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
@@ -62,7 +62,13 @@ export async function SitePage(props: SitePageProps) {
     const withSections = Boolean(sections && sections.list.length > 0);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
-    const document = await getPageDocument(context.dataFetcher, context.space, page);
+    const document = await getDataOrNull(
+        context.dataFetcher.getRevisionPageDocument({
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
+            pageId: page.id,
+        })
+    );
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>

@@ -113,6 +113,15 @@ export function createDataFetcher(
                 })
             );
         },
+        getRevisionPageDocument(params) {
+            return trace('getRevisionPageDocument', () =>
+                getRevisionPageDocument(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                })
+            );
+        },
         getReusableContent(params) {
             return trace('getReusableContent', () =>
                 getReusableContent(input, {
@@ -410,6 +419,42 @@ const getRevisionPageMarkdown = withCacheKey(
                             throw new DataFetcherError('Page is not a document', 404);
                         }
                         return res.data.markdown;
+                    });
+                }
+            );
+        }
+    )
+);
+
+const getRevisionPageDocument = withCacheKey(
+    withoutConcurrentExecution(
+        async (
+            _,
+            input: DataFetcherInput,
+            params: { spaceId: string; revisionId: string; pageId: string }
+        ) => {
+            'use cache';
+            return trace(
+                `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    return wrapDataFetcherError(async () => {
+                        const api = apiClient(input);
+                        const res = await api.spaces.getPageDocumentInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            params.pageId,
+                            {
+                                evaluated: true,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        );
+
+                        cacheTag(...getCacheTagsFromResponse(res));
+                        cacheLife('max');
+
+                        return res.data;
                     });
                 }
             );
