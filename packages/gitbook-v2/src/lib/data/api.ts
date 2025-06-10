@@ -8,7 +8,6 @@ import {
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
-import { getCloudflareRequestGlobal } from './cloudflare';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
 import { withCacheKey, withoutConcurrentExecution } from './memoize';
 import type { GitBookDataFetcher } from './types';
@@ -197,28 +196,24 @@ export function createDataFetcher(
 }
 
 const getUserById = withCacheKey(
-    withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
-        async (_, input: DataFetcherInput, params: { userId: string }) => {
-            'use cache';
-            return trace(`getUserById(${params.userId})`, async () => {
-                return wrapDataFetcherError(async () => {
-                    const api = apiClient(input);
-                    const res = await api.users.getUserById(params.userId, {
-                        ...noCacheFetchOptions,
-                    });
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('days');
-                    return res.data;
+    withoutConcurrentExecution(async (_, input: DataFetcherInput, params: { userId: string }) => {
+        'use cache';
+        return trace(`getUserById(${params.userId})`, async () => {
+            return wrapDataFetcherError(async () => {
+                const api = apiClient(input);
+                const res = await api.users.getUserById(params.userId, {
+                    ...noCacheFetchOptions,
                 });
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('days');
+                return res.data;
             });
-        }
-    )
+        });
+    })
 );
 
 const getSpace = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -255,7 +250,6 @@ const getSpace = withCacheKey(
 
 const getChangeRequest = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -294,7 +288,6 @@ const getChangeRequest = withCacheKey(
 
 const getRevision = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -325,7 +318,6 @@ const getRevision = withCacheKey(
 
 const getRevisionPages = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -356,7 +348,6 @@ const getRevisionPages = withCacheKey(
 
 const getRevisionFile = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -389,7 +380,6 @@ const getRevisionFile = withCacheKey(
 
 const getRevisionPageMarkdown = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -429,7 +419,6 @@ const getRevisionPageMarkdown = withCacheKey(
 
 const getRevisionPageByPath = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -463,7 +452,6 @@ const getRevisionPageByPath = withCacheKey(
 
 const getDocument = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (_, input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
             'use cache';
             return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
@@ -488,7 +476,6 @@ const getDocument = withCacheKey(
 
 const getComputedDocument = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -538,7 +525,6 @@ const getComputedDocument = withCacheKey(
 
 const getReusableContent = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -571,7 +557,6 @@ const getReusableContent = withCacheKey(
 
 const getLatestOpenAPISpecVersionContent = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (_, input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
             'use cache';
             cacheTag(
@@ -606,7 +591,6 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
 
 const getPublishedContentSite = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -647,7 +631,6 @@ const getPublishedContentSite = withCacheKey(
 
 const getSiteRedirectBySource = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -694,7 +677,6 @@ const getSiteRedirectBySource = withCacheKey(
 
 const getEmbedByUrl = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (_, input: DataFetcherInput, params: { spaceId: string; url: string }) => {
             'use cache';
             cacheTag(
@@ -727,7 +709,6 @@ const getEmbedByUrl = withCacheKey(
 
 const searchSiteContent = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
@@ -771,7 +752,6 @@ const searchSiteContent = withCacheKey(
 
 const renderIntegrationUi = withCacheKey(
     withoutConcurrentExecution(
-        getCloudflareRequestGlobal,
         async (
             _,
             input: DataFetcherInput,
