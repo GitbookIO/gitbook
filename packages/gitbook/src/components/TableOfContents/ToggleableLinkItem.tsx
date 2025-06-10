@@ -67,7 +67,7 @@ function LinkItem(
             insights={insights}
             aria-current={isActive ? 'page' : undefined}
             className={tcls(
-                'group/toclink relative transition-colors',
+                'group/toclink toclink relative transition-colors',
                 'flex flex-row justify-between',
                 'circular-corners:rounded-2xl rounded-md straight-corners:rounded-none p-1.5 pl-3',
                 'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
