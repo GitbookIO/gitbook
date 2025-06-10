@@ -13,7 +13,7 @@ export function TOCPageIcon({ page }: { page: RevisionPage }) {
             page={page}
             style={tcls(
                 'text-base',
-                'text-tint-strong/6',
+                '[.toclink_&]:text-tint-strong/6',
                 'group-aria-current-page/toclink:text-primary-subtle',
                 'contrast-more:group-aria-current-page/toclink:text-primary',
 
