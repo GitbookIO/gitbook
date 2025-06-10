@@ -38,7 +38,7 @@ export async function PageCover(props: {
                           'lg:-ml-12',
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
-                              ? 'xl:-ml-64'
+                              ? 'xl:-ml-[19rem]'
                               : null,
                       ]
                     : [
