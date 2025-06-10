@@ -3,6 +3,7 @@
 import { tcls } from '@/lib/tailwind';
 import { Button } from '../primitives';
 import { AskInput } from './AskInput';
+import { AskMessages } from './AskMessages';
 import { useAskController, useAskState } from './state';
 
 export function AskDialog() {
@@ -51,7 +52,9 @@ export function AskDialog() {
                     />
                 </div>
             </div>
-            <div className="flex-1"></div>
+            <div className="flex-1">
+                <AskMessages session={state.session} />
+            </div>
             <div className="flex flex-row">
                 <AskInput />
             </div>

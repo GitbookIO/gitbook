@@ -20,6 +20,7 @@ export function AskInput() {
                     controller.postMessage({
                         message: value,
                     });
+                    setValue('');
                 }
             }}
         />

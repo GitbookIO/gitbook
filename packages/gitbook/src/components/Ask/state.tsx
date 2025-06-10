@@ -1,7 +1,8 @@
 'use client';
 
-import type { AIMessageRole } from '@gitbook/api';
+import { AIMessageRole } from '@gitbook/api';
 import * as React from 'react';
+import { streamAsk } from './server-actions';
 
 export type AskMessage = {
     role: AIMessageRole;
@@ -68,6 +69,9 @@ export function AskStateProvider(props: React.PropsWithChildren) {
         },
     });
 
+    const stateRef = React.useRef<AskState>(state);
+    stateRef.current = state;
+
     const controller = React.useMemo(() => {
         return {
             open: () => {
@@ -86,8 +90,69 @@ export function AskStateProvider(props: React.PropsWithChildren) {
                     };
                 });
             },
-            postMessage: (input: { title?: string; message: string }) => {
-                // TODO
+            postMessage: async (input: { title?: string; message: string }) => {
+                try {
+                    const stream = await streamAsk({
+                        query: input.message,
+                        previousResponseId: stateRef.current.session.responseId ?? undefined,
+                    });
+
+                    setState((previous) => {
+                        return {
+                            ...previous,
+                            session: {
+                                ...previous.session,
+                                messages: [
+                                    ...previous.session.messages,
+                                    {
+                                        role: AIMessageRole.User,
+                                        content: input.message,
+                                    },
+                                    {
+                                        role: AIMessageRole.Assistant,
+                                        content: null,
+                                    },
+                                ],
+                            },
+                        };
+                    });
+
+                    for await (const data of stream) {
+                        if (!data) continue;
+
+                        if (data.responseId) {
+                            setState((previous) => {
+                                return {
+                                    ...previous,
+                                    session: {
+                                        ...previous.session,
+                                        responseId: data.responseId,
+                                    },
+                                };
+                            });
+                        }
+
+                        if (data.output) {
+                            setState((previous) => {
+                                return {
+                                    ...previous,
+                                    session: {
+                                        ...previous.session,
+                                        messages: [
+                                            ...previous.session.messages.slice(0, -1),
+                                            {
+                                                role: AIMessageRole.Assistant,
+                                                content: data.output,
+                                            },
+                                        ],
+                                    },
+                                };
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error in summary stream:', error);
+                }
             },
         };
     }, []);
