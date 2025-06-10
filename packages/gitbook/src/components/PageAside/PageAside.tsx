@@ -50,7 +50,7 @@ export function PageAside(props: {
                 'xl:flex',
                 'flex-col',
                 'basis-56',
-                'xl:ml-12',
+                'xl:ml-8',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout

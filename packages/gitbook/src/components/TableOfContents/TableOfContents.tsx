@@ -35,7 +35,7 @@ export function TableOfContents(props: {
                     'relative',
                     'z-[1]',
                     'lg:sticky',
-                    'lg:mr-12',
+                    'lg:mr-8',
 
                     // Server-side static positioning
                     'lg:top-0',

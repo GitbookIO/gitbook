@@ -41,8 +41,6 @@ export function PageBody(props: {
                     'mx-auto max-w-screen-2xl py-8',
                     // Allow words to break if they are too long.
                     'break-anywhere',
-                    // When in api page mode without the aside, we align with the border of the main content
-                    // 'page-api-block:xl:max-2xl:pr-0',
                     pageFullWidth ? 'page-full-width 2xl:px-8' : 'page-default-width',
                     asFullWidth ? 'site-full-width' : 'site-default-width',
                     page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'
