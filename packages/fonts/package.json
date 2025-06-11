@@ -10,7 +10,7 @@
     },
     "version": "0.0.0",
     "dependencies": {
-        "@gitbook/api": "^0.120.0"
+        "@gitbook/api": "catalog:"
     },
     "devDependencies": {
         "google-font-metadata": "^6.0.3",
