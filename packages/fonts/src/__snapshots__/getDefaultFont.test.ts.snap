@@ -1,0 +1,57 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getDefaultFont should return correct object for Latin text 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjp-Ek-_0ew.woff",
+}
+`;
+
+exports[`getDefaultFont should return correct object for Cyrillic text 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZthjp-Ek-_0ewmM.woff",
+}
+`;
+
+exports[`getDefaultFont should return correct object for Greek text 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZxhjp-Ek-_0ewmM.woff",
+}
+`;
+
+exports[`getDefaultFont should handle mixed script text 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZthjp-Ek-_0ewmM.woff",
+}
+`;
+
+exports[`getDefaultFont should handle different font weights: regular 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjp-Ek-_0ew.woff",
+}
+`;
+
+exports[`getDefaultFont should handle different font weights: bold 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjp-Ek-_0ew.woff",
+}
+`;
+
+exports[`getDefaultFont should handle different fonts: inter 1`] = `
+{
+  "font": "Inter",
+  "url": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjp-Ek-_0ew.woff",
+}
+`;
+
+exports[`getDefaultFont should handle different fonts: roboto 1`] = `
+{
+  "font": "Roboto",
+  "url": "https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxMKTU1Kg.woff",
+}
+`;
