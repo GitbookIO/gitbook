@@ -34,14 +34,20 @@ export async function PageCover(props: {
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
-                          '-lg:mr-8',
-                          'lg:ml-0',
+                          'lg:-mr-8',
+                          'lg:-ml-12',
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
-                              ? 'xl:-ml-64'
+                              ? 'xl:-ml-[19rem]'
                               : null,
                       ]
-                    : ['sm:mx-auto', 'max-w-3xl', 'sm:rounded-md', 'mb-8']
+                    : [
+                          'sm:mx-auto',
+                          'max-w-3xl ',
+                          'page-full-width:max-w-screen-2xl',
+                          'sm:rounded-md',
+                          'mb-8',
+                      ]
             )}
         >
             <Image

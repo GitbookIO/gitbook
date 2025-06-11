@@ -36,12 +36,16 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 <div className={tcls(CONTAINER_STYLE, 'px-4', 'py-8', 'lg:py-12', 'mx-auto')}>
                     <div
                         className={tcls(
-                            'mx-auto grid max-w-3xl justify-between gap-12 lg:max-w-none',
+                            'lg:!max-w-none mx-auto grid max-w-3xl site-full-width:max-w-screen-2xl justify-between gap-12',
                             'grid-cols-[auto_auto]',
                             'lg:grid-cols-[18rem_minmax(auto,_48rem)_auto]',
                             'xl:grid-cols-[18rem_minmax(auto,_48rem)_14rem]',
+                            'site-full-width:lg:grid-cols-[18rem_minmax(auto,_80rem)_auto]',
+                            'site-full-width:xl:grid-cols-[18rem_minmax(auto,_80rem)_14rem]',
                             'page-no-toc:lg:grid-cols-[minmax(auto,_48rem)_auto]',
-                            'page-no-toc:xl:grid-cols-[14rem_minmax(auto,_48rem)_14rem]'
+                            'page-no-toc:xl:grid-cols-[14rem_minmax(auto,_48rem)_14rem]',
+                            '[body:has(.site-full-width,.page-no-toc)_&]:lg:grid-cols-[minmax(auto,_90rem)_auto]',
+                            '[body:has(.site-full-width,.page-no-toc)_&]:xl:grid-cols-[14rem_minmax(auto,_90rem)_14rem]'
                         )}
                     >
                         {
@@ -102,7 +106,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                         'col-span-2 page-has-toc:lg:col-span-1 page-has-toc:lg:col-start-2 page-no-toc:xl:col-span-1 page-no-toc:xl:col-start-2'
                                     )}
                                 >
-                                    <div className="mx-auto flex max-w-3xl flex-col gap-10 sm:flex-row sm:gap-6">
+                                    <div className="mx-auto flex max-w-3xl site-full-width:max-w-screen-2xl flex-col gap-10 sm:flex-row sm:gap-6">
                                         {partition(customization.footer.groups, FOOTER_COLUMNS).map(
                                             (column, columnIndex) => (
                                                 <div

@@ -23,7 +23,14 @@ export async function PageHeader(props: {
 
     return (
         <header
-            className={tcls('max-w-3xl', 'mx-auto', 'mb-6', 'space-y-3', 'page-api-block:ml-0')}
+            className={tcls(
+                'max-w-3xl',
+                'page-full-width:max-w-screen-2xl',
+                'mx-auto',
+                'mb-6',
+                'space-y-3',
+                'page-api-block:ml-0'
+            )}
         >
             {ancestors.length > 0 && (
                 <nav>

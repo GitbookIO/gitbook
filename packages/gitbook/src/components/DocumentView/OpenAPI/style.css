@@ -310,6 +310,26 @@
     @apply py-2 border-b border-tint-subtle max-w-full flex-1;
 }
 
+.openapi-securities-oauth-flows {
+    @apply flex flex-col gap-2 divide-y divide-tint-subtle;
+}
+
+.openapi-securities-oauth-content {
+    @apply prose *:!prose-sm *:text-tint;
+}
+
+.openapi-securities-oauth-content.openapi-markdown code {
+    @apply text-xs;
+}
+
+.openapi-securities-oauth-content ul {
+    @apply !my-0;
+}
+
+.openapi-securities-url {
+    @apply ml-0.5 px-0.5 rounded hover:bg-tint transition-colors;
+}
+
 .openapi-securities-body {
     @apply flex flex-col gap-2;
 }
