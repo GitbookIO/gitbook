@@ -18,7 +18,7 @@
     },
     "scripts": {
         "generate": "bun ./bin/gen-list.js",
-        "build": "tsc",
+        "build": "tsc --project tsconfig.build.json",
         "typecheck": "tsc --noEmit",
         "dev": "tsc -w",
         "clean": "rm -rf ./dist && rm -rf ./src/data",

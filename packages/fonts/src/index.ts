@@ -1,1 +1,2 @@
-export * from './getFontURL';
+export * from './getDefaultFont';
+export * from './types';

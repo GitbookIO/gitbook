@@ -1,13 +1,14 @@
 import type { CustomizationDefaultFont } from '@gitbook/api';
 
-export type FontWeight = '400' | '700';
+export type FontWeight = 400 | 700;
 
 export type FontDefinition = {
+    font: string;
     unicodeRange: {
         [script: string]: string;
     };
     variants: {
-        [weight in FontWeight]: {
+        [weight in string]: {
             [script: string]: string;
         };
     };

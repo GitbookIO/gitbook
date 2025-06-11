@@ -40,10 +40,11 @@ async function main() {
         }
 
         output[font] = {
+            font: googleFontName,
             unicodeRange: fontMetadata.unicodeRange,
             variants: {
-                400: {},
-                700: {},
+                '400': {},
+                '700': {},
             },
         };
 
