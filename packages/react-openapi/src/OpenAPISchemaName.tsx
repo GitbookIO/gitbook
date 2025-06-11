@@ -27,12 +27,14 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
                     {propertyName}
                 </span>
             ) : null}
-            <span>
-                {type ? <span className="openapi-schema-type">{type}</span> : null}
-                {additionalItems ? (
-                    <span className="openapi-schema-type">{additionalItems}</span>
-                ) : null}
-            </span>
+            {type || additionalItems ? (
+                <span>
+                    {type ? <span className="openapi-schema-type">{type}</span> : null}
+                    {additionalItems ? (
+                        <span className="openapi-schema-type">{additionalItems}</span>
+                    ) : null}
+                </span>
+            ) : null}
             {schema?.readOnly ? (
                 <span className="openapi-schema-readonly">
                     {t(context.translation, 'read_only')}
