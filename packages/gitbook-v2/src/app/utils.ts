@@ -1,4 +1,5 @@
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
+import { getDynamicCustomizationSettings } from '@/lib/customization';
 import type { SiteAPIToken } from '@gitbook/api';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
 import { jwtDecode } from 'jwt-decode';
@@ -66,6 +67,8 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
         }),
         siteURLData
     );
+
+    context.customization = await getDynamicCustomizationSettings(context.customization);
 
     return {
         context,
