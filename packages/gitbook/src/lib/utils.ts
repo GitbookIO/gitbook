@@ -17,6 +17,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             background: api.CustomizationBackground.Plain,
             icons: api.CustomizationIconsStyle.Regular,
             links: api.CustomizationLinksStyle.Default,
+            depth: api.CustomizationDepth.Subtle,
             sidebar: {
                 background: api.CustomizationSidebarBackgroundStyle.Default,
                 list: api.CustomizationSidebarListStyle.Default,

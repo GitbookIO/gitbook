@@ -1,15 +1,20 @@
+import { cache } from 'react';
+
+// This is used to create a context specific to the current request.
+// This version works both in cloudflare and in vercel.
+const getRequestContext = cache(() => ({}));
+
 /**
  * Wrap a function by preventing concurrent executions of the same function.
  * With a logic to work per-request in Cloudflare Workers.
  */
 export function withoutConcurrentExecution<ArgsType extends any[], ReturnType>(
-    getGlobalContext: () => object | null | undefined,
     wrapped: (key: string, ...args: ArgsType) => Promise<ReturnType>
 ): (cacheKey: string, ...args: ArgsType) => Promise<ReturnType> {
     const globalPromiseCache = new WeakMap<object, Map<string, Promise<ReturnType>>>();
 
     return (key: string, ...args: ArgsType) => {
-        const globalContext = getGlobalContext() ?? globalThis;
+        const globalContext = getRequestContext();
 
         /**
          * Cache storage that is scoped to the current request when executed in Cloudflare Workers,

@@ -107,6 +107,7 @@ function NavigationCard(
                 'border',
                 'border-tint-subtle',
                 'rounded',
+                'circular-corners:rounded-2xl',
                 'straight-corners:rounded-none',
                 'hover:border-primary',
                 'text-pretty',

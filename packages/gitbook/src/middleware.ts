@@ -201,7 +201,9 @@ export async function middleware(request: NextRequest) {
 
     const customization = url.searchParams.get('customization');
     if (customization && validateSerializedCustomization(customization)) {
-        headers.set(MiddlewareHeaders.Customization, customization);
+        // We need to encode the customization to ensure it is properly encoded in vercel.
+        // We do it here as well so that we have a single method to decode it later.
+        headers.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
     }
 
     const theme = url.searchParams.get('theme');

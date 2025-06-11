@@ -12,7 +12,8 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
 
     const resolved = context.contentContext
         ? await resolveContentRef(inline.data.ref, context.contentContext, {
-              resolveAnchorText: true,
+              // We don't want to resolve the anchor text here, as it can be very expensive and will block rendering if there is a lot of anchors link.
+              resolveAnchorText: false,
           })
         : null;
 

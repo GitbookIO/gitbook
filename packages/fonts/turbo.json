@@ -1,0 +1,9 @@
+{
+    "extends": ["//"],
+    "tasks": {
+        "generate": {
+            "inputs": ["bin/**/*", "package.json"],
+            "outputs": ["src/data/*.json", "dist/data/*.json"]
+        }
+    }
+}

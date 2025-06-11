@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "classnames": "^2.5.1",
-        "@gitbook/api": "^0.115.0",
+        "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*"
     },
     "peerDependencies": {
