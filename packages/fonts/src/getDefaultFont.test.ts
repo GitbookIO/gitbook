@@ -7,7 +7,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: 'invalid-font' as CustomizationDefaultFont,
             text: 'Hello',
-            weight: '400',
+            weight: 400,
         });
         expect(result).toBeNull();
     });
@@ -16,7 +16,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Hello',
-            weight: '999' as any,
+            weight: 999 as any,
         });
         expect(result).toBeNull();
     });
@@ -25,7 +25,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: '😀', // Emoji not supported by Inter
-            weight: '400',
+            weight: 400,
         });
         expect(result).toBeNull();
     });
@@ -34,7 +34,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Hello World',
-            weight: '400',
+            weight: 400,
         });
         expect(result).not.toBeNull();
         expect(result?.font).toBe(CustomizationDefaultFont.Inter);
@@ -45,7 +45,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Привет мир',
-            weight: '400',
+            weight: 400,
         });
         expect(result).not.toBeNull();
         expect(result?.font).toBe(CustomizationDefaultFont.Inter);
@@ -56,7 +56,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Γεια σας',
-            weight: '400',
+            weight: 400,
         });
         expect(result).not.toBeNull();
         expect(result?.font).toBe(CustomizationDefaultFont.Inter);
@@ -67,7 +67,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Hello Привет',
-            weight: '400',
+            weight: 400,
         });
         expect(result).not.toBeNull();
         expect(result?.font).toBe(CustomizationDefaultFont.Inter);
@@ -78,12 +78,12 @@ describe('getDefaultFont', () => {
         const regular = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Hello',
-            weight: '400',
+            weight: 400,
         });
         const bold = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Hello',
-            weight: '700',
+            weight: 700,
         });
         expect(regular).not.toBeNull();
         expect(bold).not.toBeNull();
@@ -95,7 +95,7 @@ describe('getDefaultFont', () => {
         const result = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: '',
-            weight: '400',
+            weight: 400,
         });
         expect(result).toBeNull();
     });
@@ -104,12 +104,12 @@ describe('getDefaultFont', () => {
         const inter = getDefaultFont({
             font: CustomizationDefaultFont.Inter,
             text: 'Hello',
-            weight: '400',
+            weight: 400,
         });
         const roboto = getDefaultFont({
             font: CustomizationDefaultFont.Roboto,
             text: 'Hello',
-            weight: '400',
+            weight: 400,
         });
         expect(inter).not.toBeNull();
         expect(roboto).not.toBeNull();
