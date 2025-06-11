@@ -3,6 +3,7 @@ import type { CustomizationLocale } from '@gitbook/api';
 import { de } from './de';
 import { en } from './en';
 import { es } from './es';
+import { fi } from './fi';
 import { fr } from './fr';
 import { ja } from './ja';
 import { nl } from './nl';
@@ -20,6 +21,7 @@ export const languages: {
 } = {
     de,
     en,
+    fi,
     fr,
     es,
     zh,
