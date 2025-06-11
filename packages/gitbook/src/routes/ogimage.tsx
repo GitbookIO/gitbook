@@ -1,6 +1,6 @@
 import { CustomizationDefaultFont, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
-import { type FontWeight, getFontURL } from '@gitbook/fonts';
+import { type FontWeight, getDefaultFont } from '@gitbook/fonts';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
@@ -244,20 +244,20 @@ async function loadGoogleFont(input: {
     text: string;
     weight: FontWeight;
 }) {
-    const fontURL = getFontURL({
+    const lookup = getDefaultFont({
         font: input.font,
         text: input.text,
         weight: input.weight,
     });
 
     // If we found a font file, load it
-    if (fontURL) {
-        return getWithCache(`google-font-files:${fontURL}`, async () => {
-            const response = await fetch(fontURL);
+    if (lookup) {
+        return getWithCache(`google-font-files:${lookup.url}`, async () => {
+            const response = await fetch(lookup.url);
             if (response.ok) {
                 const data = await response.arrayBuffer();
                 return {
-                    name: input.font,
+                    name: lookup.font,
                     data,
                     style: 'normal' as const,
                     weight: input.weight,
