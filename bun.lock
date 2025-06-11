@@ -26,7 +26,7 @@
       "name": "@gitbook/cache-tags",
       "version": "0.3.1",
       "dependencies": {
-        "@gitbook/api": "^0.119.0",
+        "@gitbook/api": "^0.120.0",
         "assert-never": "^1.2.1",
       },
       "devDependencies": {
@@ -51,7 +51,7 @@
       "name": "gitbook",
       "version": "0.12.0",
       "dependencies": {
-        "@gitbook/api": "^0.119.0",
+        "@gitbook/api": "^0.120.0",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
@@ -150,7 +150,7 @@
       "name": "gitbook-v2",
       "version": "0.3.0",
       "dependencies": {
-        "@gitbook/api": "^0.119.0",
+        "@gitbook/api": "^0.120.0",
         "@gitbook/cache-tags": "workspace:*",
         "@opennextjs/cloudflare": "1.2.1",
         "@sindresorhus/fnv1a": "^3.1.0",
@@ -209,7 +209,7 @@
       "name": "@gitbook/react-contentkit",
       "version": "0.7.0",
       "dependencies": {
-        "@gitbook/api": "^0.119.0",
+        "@gitbook/api": "^0.120.0",
         "@gitbook/icons": "workspace:*",
         "classnames": "^2.5.1",
       },
@@ -267,7 +267,7 @@
   },
   "overrides": {
     "@codemirror/state": "6.4.1",
-    "@gitbook/api": "^0.119.0",
+    "@gitbook/api": "^0.120.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
   },

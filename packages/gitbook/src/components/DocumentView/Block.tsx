@@ -10,6 +10,7 @@ import {
 } from '@/components/primitives';
 import type { ClassValue } from '@/lib/tailwind';
 
+import { nullIfNever } from '@/lib/typescript';
 import { BlockContentRef } from './BlockContentRef';
 import { CodeBlock } from './CodeBlock';
 import { Columns } from './Columns';
@@ -43,13 +44,6 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
     isEstimatedOffscreen: boolean;
     /** Class names to be passed to the underlying DOM element */
     style?: ClassValue;
-}
-
-/**
- * Alternative to `assertNever` that returns `null` instead of throwing an error.
- */
-function nullIfNever(_value: never): null {
-    return null;
 }
 
 export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
