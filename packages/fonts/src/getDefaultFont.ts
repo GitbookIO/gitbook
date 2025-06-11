@@ -59,7 +59,7 @@ export function getDefaultFont(input: {
  * @returns      The key of the best-matching range, or `null`
  *               when nothing matches at all.
  */
-export function getBestUnicodeRange(text: string, ranges: Record<string, string>): string | null {
+function getBestUnicodeRange(text: string, ranges: Record<string, string>): string | null {
     // ---------- helper: parse "U+XXXX" or "U+XXXX-YYYY" ----------
     const parseOne = (token: string): [number, number] | null => {
         token = token.trim().toUpperCase();
