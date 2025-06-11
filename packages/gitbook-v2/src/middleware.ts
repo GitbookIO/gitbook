@@ -42,6 +42,7 @@ const ADAPTIVE_CONTENT_HOSTS = [
     'adaptive-docs.gitbook-staging.com',
     'enriched-content-playground.gitbook-staging.io',
     'docs.testgitbook.com',
+    'launchdarkly-site.gitbook.education',
 ];
 
 export async function middleware(request: NextRequest) {
