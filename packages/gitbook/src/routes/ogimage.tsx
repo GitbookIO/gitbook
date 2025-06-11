@@ -72,12 +72,8 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
 
             const fonts = (
                 await Promise.all([
-                    getWithCache(`google-font:${fontFamily}:400`, () =>
-                        loadGoogleFont({ fontFamily, text: regularText, weight: 400 })
-                    ),
-                    getWithCache(`google-font:${fontFamily}:700`, () =>
-                        loadGoogleFont({ fontFamily, text: boldText, weight: 700 })
-                    ),
+                    loadGoogleFont({ fontFamily, text: regularText, weight: 400 }),
+                    loadGoogleFont({ fontFamily, text: boldText, weight: 700 }),
                 ])
             ).filter(filterOutNullable);
 
@@ -267,30 +263,36 @@ async function loadGoogleFont(input: { fontFamily: string; text: string; weight:
         return null;
     }
 
+    // Fetch from Google Fonts, the best font file for the given text
     const url = new URL('https://fonts.googleapis.com/css2');
     url.searchParams.set('family', `${fontFamily}:wght@${weight}`);
     url.searchParams.set('text', text);
 
-    const result = await fetch(url.href);
-    if (!result.ok) {
-        return null;
-    }
-
-    const css = await result.text();
-    const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
-    const resourceUrl = resource ? resource[1] : null;
-
-    if (resourceUrl) {
-        const response = await fetch(resourceUrl);
-        if (response.ok) {
-            const data = await response.arrayBuffer();
-            return {
-                name: fontFamily,
-                data,
-                style: 'normal' as const,
-                weight,
-            };
+    const resourceUrl = await getWithCache(`google-font-url:${url.href}`, async () => {
+        const result = await fetch(url.href);
+        if (!result.ok) {
+            return null;
         }
+
+        const css = await result.text();
+        const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
+        return resource ? resource[1] : null;
+    });
+
+    // If we found a font file, load it
+    if (resourceUrl) {
+        return getWithCache(`google-font-files:${resourceUrl}`, async () => {
+            const response = await fetch(resourceUrl);
+            if (response.ok) {
+                const data = await response.arrayBuffer();
+                return {
+                    name: fontFamily,
+                    data,
+                    style: 'normal' as const,
+                    weight,
+                };
+            }
+        });
     }
 
     // If for some reason we can't load the font, we'll just use the default one
