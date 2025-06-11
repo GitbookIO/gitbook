@@ -106,10 +106,7 @@ export const LinkOverlay = React.forwardRef(function LinkOverlay(
         <Link
             ref={ref}
             {...domProps}
-            className={tcls(
-                'link-overlay static before:absolute before:top-0 before:left-0 before:z-10 before:h-full before:w-full',
-                className
-            )}
+            className={tcls('link-overlay absolute inset-0 z-10', className)}
         >
             {children}
         </Link>
