@@ -632,7 +632,7 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@0.119.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-l2gfJ5+1HT3Sj1OQCh72lUOGU9LV9WbDjgKPjxIFz+NgOhSest1bJ3JhmHP66Xd4ETpmm0YQqnq4y18wKRMjBQ=="],
+    "@gitbook/api": ["@gitbook/api@0.120.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-FiRmPiSBwobMxmNjd14QkkOdM95BAPLDDRShgpS9Vsd8lHjNMyZfrJKVJTsJUuFcgYoi4cqNw9yu/TiUBUgv3g=="],
 
     "@gitbook/cache-do": ["@gitbook/cache-do@workspace:packages/cache-do"],
 
