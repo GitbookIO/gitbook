@@ -84,6 +84,8 @@ export function DynamicTabs(
         );
     }, [id, tabs, tabsState]);
 
+    const position: string = 'top';
+
     // To avoid issue with hydration, we only use the state from localStorage
     // once the component has been mounted.
     // Otherwise because of  the streaming/suspense approach, tabs can be first-rendered at different time
@@ -143,13 +145,14 @@ export function DynamicTabs(
     return (
         <div
             className={tcls(
-                'rounded-lg',
-                'straight-corners:rounded-sm',
-                'ring-1',
-                'ring-inset',
-                'ring-tint-subtle',
+                // 'ring-1',
+                // 'ring-inset',
+                // 'ring-tint-subtle',
+                // 'gap-2',
                 'flex',
-                'flex-col',
+                position === 'top' && 'flex-col',
+                position === 'left' && 'flex-row',
+                position === 'right' && 'flex-row-reverse',
                 'overflow-hidden',
                 style
             )}
@@ -158,13 +161,16 @@ export function DynamicTabs(
                 role="tablist"
                 className={tcls(
                     'group/tabs',
-                    'inline-flex',
-                    'flex-row',
-                    'self-stretch',
-                    'after:flex-[1]',
-                    'after:bg-tint-12/1',
+                    'flex',
+                    'overflow-hidden',
+                    position === 'top'
+                        ? 'max-w-full flex-row px-1'
+                        : '-mr-px max-w-[40%] flex-col gap-2 py-4'
+                    // 'self-stretch',
+
+                    // 'after:bg-tint-12/1',
                     // if last tab is selected, apply rounded to :after element
-                    '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
+                    // '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
                 )}
             >
                 {tabs.map((tab) => (
@@ -174,49 +180,41 @@ export function DynamicTabs(
                             hashLinkButtonWrapperStyles,
                             'flex',
                             'items-center',
-                            'gap-3.5',
+                            'relative',
+                            position === 'left' && 'pr-1.5',
+                            position === 'right' && 'pl-1.5',
+                            position === 'top' && 'max-w-full overflow-hidden pb-1.5',
+                            'min-w-16',
 
                             //prev from active-tab
-                            '[&:has(+_.active-tab)]:rounded-br-md',
+                            // '[&:has(+_.active-tab)]:rounded-br-md',
 
                             //next from active-tab
-                            '[.active-tab_+_&]:rounded-bl-md',
+                            // '[.active-tab_+_&]:rounded-bl-md',
 
                             //next from active-tab
-                            '[.active-tab_+_:after]:rounded-br-md',
+                            // '[.active-tab_+_:after]:rounded-br-md',
 
-                            'after:transition-colors',
-                            'after:border-r',
-                            'after:absolute',
-                            'after:left-[unset]',
-                            'after:right-0',
-                            'after:border-tint',
-                            'after:top-[15%]',
-                            'after:h-[70%]',
-                            'after:w-[1px]',
+                            // 'after:transition-colors',
+                            // 'after:border-r',
+                            // 'after:absolute',
+                            // 'after:left-[unset]',
+                            // 'after:right-0',
+                            // 'after:border-tint',
+                            // 'after:top-[15%]',
+                            // 'after:h-[70%]',
+                            // 'after:w-[1px]',
 
-                            'px-3.5',
-                            'py-2',
-
-                            'last:after:border-transparent',
+                            // 'last:after:border-transparent',
 
                             'text-tint',
-                            'bg-tint-12/1',
-                            'hover:text-tint-strong',
-                            'max-w-full',
-                            'truncate',
+                            // 'bg-tint-subtle',
+                            // 'bg-tint-12/1',
+                            // 'hover:text-tint-strong',
+                            'text-sm',
+                            'font-medium',
 
-                            active.id === tab.id
-                                ? [
-                                      'shrink-0',
-                                      'active-tab',
-                                      'text-tint-strong',
-                                      'bg-transparent',
-                                      'after:[&.active-tab]:border-transparent',
-                                      'after:[:has(+_&.active-tab)]:border-transparent',
-                                      'after:[:has(&_+)]:border-transparent',
-                                  ]
-                                : null
+                            active.id === tab.id ? 'active-tab text-primary-subtle' : ''
                         )}
                     >
                         <button
@@ -229,23 +227,41 @@ export function DynamicTabs(
                                 onSelectTab(tab);
                             }}
                             className={tcls(
-                                'inline-block',
-                                'text-sm',
-                                'transition-[color]',
-                                'font-[500]',
-                                'relative',
+                                'py-1 pr-2 pl-3',
+                                'transition-colors',
+                                'rounded',
+                                'gap-1',
+                                'grow',
+                                'text-left',
+                                'straight-corners:rounded-none',
+                                'circular-corners:rounded-2xl',
                                 'max-w-full',
-                                'truncate'
+                                'flex',
+                                'items-center',
+                                active.id === tab.id
+                                    ? ''
+                                    : 'hover:bg-primary-hover hover:text-primary-strong'
                             )}
                         >
-                            {tab.title}
+                            <span className="line-clamp-2">{tab.title}</span>
+                            <HashLinkButton
+                                id={getTabButtonId(tab.id)}
+                                block={block}
+                                label="Direct link to tab"
+                                className="-mt-px ml-auto"
+                            />
                         </button>
 
-                        <HashLinkButton
-                            id={getTabButtonId(tab.id)}
-                            block={block}
-                            label="Direct link to tab"
-                        />
+                        {active.id === tab.id ? (
+                            <div
+                                className={tcls(
+                                    'absolute border-primary-solid',
+                                    position === 'left' && 'inset-y-0 right-0 border-r-2',
+                                    position === 'right' && 'inset-y-0 left-0 border-l-2',
+                                    position === 'top' && 'right-6 bottom-0 left-3 border-b-2'
+                                )}
+                            />
+                        ) : null}
                     </div>
                 ))}
             </div>
@@ -255,7 +271,17 @@ export function DynamicTabs(
                     role="tabpanel"
                     id={getTabPanelId(tab.id)}
                     aria-labelledby={getTabButtonId(tab.id)}
-                    className={tcls('p-4', tab.id !== active.id ? 'hidden' : null)}
+                    className={tcls(
+                        'p-4',
+                        'rounded-lg',
+                        'straight-corners:rounded-none',
+                        'circular-corners:rounded-2xl',
+                        'grow',
+                        'ring-1',
+                        'ring-inset',
+                        'ring-tint-subtle',
+                        tab.id !== active.id ? 'hidden' : null
+                    )}
                 >
                     {tabsBody[index]}
                 </div>
