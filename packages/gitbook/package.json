@@ -16,12 +16,13 @@
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math"
     },
     "dependencies": {
-        "@gitbook/api": "^0.120.0",
+        "@gitbook/api": "catalog:",
         "@gitbook/cache-do": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
+        "@gitbook/fonts": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@gitbook/react-contentkit": "workspace:*",
         "@gitbook/react-math": "workspace:*",

@@ -7,10 +7,9 @@
         "turbo": "^2.5.0",
         "vercel": "^39.3.0"
     },
-    "packageManager": "bun@1.2.11",
+    "packageManager": "bun@1.2.15",
     "overrides": {
         "@codemirror/state": "6.4.1",
-        "@gitbook/api": "^0.120.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     },
@@ -34,7 +33,12 @@
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },
-    "workspaces": ["packages/*"],
+    "workspaces": {
+        "packages": ["packages/*"],
+        "catalog": {
+            "@gitbook/api": "^0.120.0"
+        }
+    },
     "patchedDependencies": {
         "decode-named-character-reference@1.0.2": "patches/decode-named-character-reference@1.0.2.patch",
         "@vercel/next@4.4.2": "patches/@vercel%2Fnext@4.4.2.patch"
