@@ -70,8 +70,8 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 style={[
                     'mx-auto w-full decoration-primary/6',
                     node.data && 'fullWidth' in node.data && node.data.fullWidth
-                        ? 'max-w-screen-xl'
-                        : 'max-w-3xl',
+                        ? 'max-w-screen-2xl'
+                        : 'page-full-width:ml-0 max-w-3xl',
                     blockStyle,
                 ]}
                 isEstimatedOffscreen={isOffscreen}

@@ -19,7 +19,7 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
                             ancestorBlocks={[...ancestorBlocks, block, columnBlock]}
                             context={context}
                             blockStyle="flip-heading-hash"
-                            style="w-full space-y-4"
+                            style="w-full space-y-4 *:max-w-full"
                         />
                     </Column>
                 );

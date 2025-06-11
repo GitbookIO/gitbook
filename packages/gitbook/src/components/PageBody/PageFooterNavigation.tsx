@@ -32,8 +32,8 @@ export async function PageFooterNavigation(props: {
                 'mt-6',
                 'gap-2',
                 'max-w-3xl',
+                'page-full-width:max-w-screen-2xl',
                 'mx-auto',
-                'page-api-block:ml-0',
                 'text-tint'
             )}
         >

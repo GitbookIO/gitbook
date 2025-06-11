@@ -143,10 +143,6 @@
             margin-right: 0;
             width: calc(100% - var(--scrollbar-width));
         }
-        body:has(.page-full-width) .scroll-nojump {
-            margin-left: 0;
-            width: 100%;
-        }
     }
 
     .elevate-link {
