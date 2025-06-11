@@ -35,6 +35,7 @@ export const de = {
     show: 'Zeige ${1}',
     hide: 'Verstecke ${1}',
     available_items: 'Verfügbare Elemente',
+    available_scopes: 'Verfügbare scopes',
     properties: 'Eigenschaften',
     or: 'oder',
     and: 'und',

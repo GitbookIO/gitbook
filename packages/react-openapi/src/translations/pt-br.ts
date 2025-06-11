@@ -35,6 +35,7 @@ export const pt_br = {
     show: 'Mostrar ${1}',
     hide: 'Ocultar ${1}',
     available_items: 'Itens disponíveis',
+    available_scopes: 'Scopes disponíveis',
     properties: 'Propriedades',
     or: 'ou',
     and: 'e',
