@@ -12,24 +12,6 @@ import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { getResizedImageURL } from '@v2/lib/images';
 
-const googleFontsMap: { [fontName in CustomizationDefaultFont]: string } = {
-    [CustomizationDefaultFont.Inter]: 'Inter',
-    [CustomizationDefaultFont.FiraSans]: 'Fira Sans Extra Condensed',
-    [CustomizationDefaultFont.IBMPlexSerif]: 'IBM Plex Serif',
-    [CustomizationDefaultFont.Lato]: 'Lato',
-    [CustomizationDefaultFont.Merriweather]: 'Merriweather',
-    [CustomizationDefaultFont.NotoSans]: 'Noto Sans',
-    [CustomizationDefaultFont.OpenSans]: 'Open Sans',
-    [CustomizationDefaultFont.Overpass]: 'Overpass',
-    [CustomizationDefaultFont.Poppins]: 'Poppins',
-    [CustomizationDefaultFont.Raleway]: 'Raleway',
-    [CustomizationDefaultFont.Roboto]: 'Roboto',
-    [CustomizationDefaultFont.RobotoSlab]: 'Roboto Slab',
-    [CustomizationDefaultFont.SourceSansPro]: 'Source Sans 3',
-    [CustomizationDefaultFont.Ubuntu]: 'Ubuntu',
-    [CustomizationDefaultFont.ABCFavorit]: 'Inter',
-};
-
 /**
  * Render the OpenGraph image for a site content.
  */
