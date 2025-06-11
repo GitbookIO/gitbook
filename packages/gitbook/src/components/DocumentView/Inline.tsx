@@ -1,16 +1,6 @@
-import type {
-    DocumentInline,
-    DocumentInlineAnnotation,
-    DocumentInlineButton,
-    DocumentInlineEmoji,
-    DocumentInlineImage,
-    DocumentInlineLink,
-    DocumentInlineMath,
-    DocumentInlineMention,
-    JSONDocument,
-} from '@gitbook/api';
-import assertNever from 'assert-never';
+import type { DocumentInline, JSONDocument } from '@gitbook/api';
 
+import { nullIfNever } from '@/lib/typescript';
 import { Annotation } from './Annotation/Annotation';
 import type { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
@@ -39,16 +29,7 @@ export interface InlineProps<T extends DocumentInline> extends DocumentContextPr
     children?: React.ReactNode;
 }
 
-export function Inline<
-    T extends
-        | DocumentInlineImage
-        | DocumentInlineAnnotation
-        | DocumentInlineEmoji
-        | DocumentInlineLink
-        | DocumentInlineMath
-        | DocumentInlineMention
-        | DocumentInlineButton,
->(props: InlineProps<T>) {
+export function Inline<T extends DocumentInline>(props: InlineProps<T>) {
     const { inline, ...contextProps } = props;
 
     switch (inline.type) {
@@ -66,7 +47,11 @@ export function Inline<
             return <InlineImage {...contextProps} inline={inline} />;
         case 'button':
             return <InlineButton {...contextProps} inline={inline} />;
+        case 'expression':
+            // The GitBook API should take care of evaluating expressions.
+            // We should never need to render them.
+            return null;
         default:
-            assertNever(inline);
+            return nullIfNever(inline);
     }
 }
