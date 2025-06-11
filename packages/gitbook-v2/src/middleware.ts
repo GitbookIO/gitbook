@@ -41,6 +41,7 @@ const ADAPTIVE_CONTENT_HOSTS = [
     'docs.gitbook.com',
     'adaptive-docs.gitbook-staging.com',
     'enriched-content-playground.gitbook-staging.io',
+    'docs.testgitbook.com',
 ];
 
 export async function middleware(request: NextRequest) {
