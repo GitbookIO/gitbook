@@ -1,5 +1,6 @@
 import type { ExecutionContext, IncomingRequestCfProperties } from '@cloudflare/workers-types';
 import { getCloudflareContext as getCloudflareContextV2 } from '@v2/lib/data/cloudflare';
+import { GITBOOK_RUNTIME } from '@v2/lib/env';
 import { isV2 } from './v2';
 
 let pendings: Array<Promise<unknown>> = [];
@@ -49,20 +50,32 @@ export async function waitUntil(promise: Promise<unknown>) {
         return;
     }
 
-    if (isV2()) {
-        const context = getCloudflareContextV2();
-        if (context) {
-            context.ctx.waitUntil(promise);
+    if (GITBOOK_RUNTIME === 'cloudflare') {
+        if (isV2()) {
+            const context = getCloudflareContextV2();
+            if (context) {
+                context.ctx.waitUntil(promise);
+                return;
+            }
+        } else {
+            const cloudflareContext = await getGlobalContext();
+            if ('waitUntil' in cloudflareContext) {
+                cloudflareContext.waitUntil(promise);
+                return;
+            }
+        }
+    }
+
+    if (GITBOOK_RUNTIME === 'vercel' && isV2()) {
+        // @ts-expect-error - `after` is not exported by `next/server` in next 14
+        const { after } = await import('next/server');
+        if (typeof after === 'function') {
+            after(() => promise);
             return;
         }
     }
 
-    const cloudflareContext = await getGlobalContext();
-    if ('waitUntil' in cloudflareContext) {
-        cloudflareContext.waitUntil(promise);
-    } else {
-        await promise;
-    }
+    await promise;
 }
 
 /**
