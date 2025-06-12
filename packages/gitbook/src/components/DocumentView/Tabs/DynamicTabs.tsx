@@ -84,7 +84,8 @@ export function DynamicTabs(
         );
     }, [id, tabs, tabsState]);
 
-    const position: string = 'top';
+    const position: string = 'top'; // TODO: Get position from tab block options
+    const description = null; // TODO: Get description from tabs
 
     // To avoid issue with hydration, we only use the state from localStorage
     // once the component has been mounted.
@@ -145,16 +146,23 @@ export function DynamicTabs(
     return (
         <div
             className={tcls(
-                // 'ring-1',
-                // 'ring-inset',
-                // 'ring-tint-subtle',
-                // 'gap-2',
                 'flex',
-                position === 'top' && 'flex-col',
-                position === 'left' && 'flex-row',
-                position === 'right' && 'flex-row-reverse',
+                'flex-col',
+                position === 'left' && 'gap-4 md:flex-row',
+                position === 'right' && 'gap-4 md:flex-row-reverse',
                 'overflow-hidden',
-                style
+
+                style,
+                // We need to inset the tabs container to make edge-to-edge scrolling work, since this container has overflow:hidden
+                // Also important to put this after the `style` to override those.
+                '-mx-4',
+                'px-4',
+                'sm:-mx-6',
+                'sm:px-6',
+                'md:mx-auto',
+                'md:px-0',
+                'w-auto',
+                'md:w-full'
             )}
         >
             <div
@@ -162,107 +170,97 @@ export function DynamicTabs(
                 className={tcls(
                     'group/tabs',
                     'flex',
-                    'overflow-hidden',
-                    position === 'top'
-                        ? 'max-w-full flex-row px-1'
-                        : '-mr-px max-w-[40%] flex-col gap-2 py-4'
-                    // 'self-stretch',
+                    tabs.length > 3 ? 'md:flex-wrap' : '',
 
-                    // 'after:bg-tint-12/1',
-                    // if last tab is selected, apply rounded to :after element
-                    // '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
+                    'overflow-x-auto',
+                    'md:overflow-hidden',
+
+                    'gap-1',
+                    'pb-2',
+                    'flex-row',
+
+                    position === 'left' || position === 'right'
+                        ? 'gap-2 md:max-w-[40%] md:flex-col'
+                        : '',
+                    'snap-x',
+                    'snap-mandatory',
+
+                    // We need to inset the tablist to make edge-to-edge scrolling work.
+                    '-mx-4',
+                    'px-4',
+                    'scroll-px-4',
+                    'sm:-mx-6',
+                    'sm:px-6',
+                    'sm:scroll-px-6',
+                    'md:mx-0',
+                    'md:px-0',
+                    'md:scroll-px-0'
                 )}
             >
                 {tabs.map((tab) => (
-                    <div
+                    <button
                         key={tab.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={active.id === tab.id}
+                        aria-controls={getTabPanelId(tab.id)}
+                        id={getTabButtonId(tab.id)}
+                        onClick={() => {
+                            onSelectTab(tab);
+                        }}
                         className={tcls(
                             hashLinkButtonWrapperStyles,
+                            description
+                                ? 'px-4 py-4 max-md:min-w-64 max-md:max-w-[calc(50%-0.25rem)] '
+                                : 'px-4 py-1',
+                            description && position === 'top'
+                                ? 'max-w-[calc(50%-0.25rem)] max-md:min-w-64'
+                                : 'max-w-full ',
+
+                            'max-md:shrink-0',
+                            'transition-colors',
+                            'text-left',
                             'flex',
-                            'items-center',
-                            'relative',
-                            position === 'left' && 'pr-1.5',
-                            position === 'right' && 'pl-1.5',
-                            position === 'top' && 'max-w-full overflow-hidden pb-1.5',
-                            'min-w-16',
+                            'flex-col',
+                            'gap-1',
 
-                            //prev from active-tab
-                            // '[&:has(+_.active-tab)]:rounded-br-md',
-
-                            //next from active-tab
-                            // '[.active-tab_+_&]:rounded-bl-md',
-
-                            //next from active-tab
-                            // '[.active-tab_+_:after]:rounded-br-md',
-
-                            // 'after:transition-colors',
-                            // 'after:border-r',
-                            // 'after:absolute',
-                            // 'after:left-[unset]',
-                            // 'after:right-0',
-                            // 'after:border-tint',
-                            // 'after:top-[15%]',
-                            // 'after:h-[70%]',
-                            // 'after:w-[1px]',
-
-                            // 'last:after:border-transparent',
+                            'rounded-md',
+                            'straight-corners:rounded-none',
+                            'circular-corners:rounded-2xl',
+                            'focus:outline-none',
+                            'focus-visible:ring-2',
+                            'ring-inset',
 
                             'text-tint',
-                            // 'bg-tint-subtle',
-                            // 'bg-tint-12/1',
-                            // 'hover:text-tint-strong',
-                            'text-sm',
-                            'font-medium',
-
-                            active.id === tab.id ? 'active-tab text-primary-subtle' : ''
+                            'snap-start',
+                            active.id === tab.id
+                                ? 'active-tab bg-primary-active text-primary-strong focus-visible:ring-primary-hover'
+                                : 'hover:bg-tint-hover hover:text-tint-strong focus-visible:bg-tint-hover focus-visible:text-tint-strong focus-visible:ring-tint-hover'
                         )}
                     >
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={active.id === tab.id}
-                            aria-controls={getTabPanelId(tab.id)}
-                            id={getTabButtonId(tab.id)}
-                            onClick={() => {
-                                onSelectTab(tab);
-                            }}
+                        <div
                             className={tcls(
-                                'py-1 pr-2 pl-3',
-                                'transition-colors',
-                                'rounded',
-                                'gap-1',
-                                'grow',
-                                'text-left',
-                                'straight-corners:rounded-none',
-                                'circular-corners:rounded-2xl',
-                                'max-w-full',
-                                'flex',
-                                'items-center',
-                                active.id === tab.id
-                                    ? ''
-                                    : 'hover:bg-primary-hover hover:text-primary-strong'
+                                'flex flex-row items-center gap-1',
+                                description ? 'font-semibold text-base' : 'font-medium text-sm'
                             )}
                         >
-                            <span className="line-clamp-2">{tab.title}</span>
+                            <div className="line-clamp-2">{tab.title}</div>
                             <HashLinkButton
                                 id={getTabButtonId(tab.id)}
                                 block={block}
                                 label="Direct link to tab"
-                                className="-mt-px ml-auto"
-                            />
-                        </button>
-
-                        {active.id === tab.id ? (
-                            <div
                                 className={tcls(
-                                    'absolute border-primary-solid',
-                                    position === 'left' && 'inset-y-0 right-0 border-r-2',
-                                    position === 'right' && 'inset-y-0 left-0 border-l-2',
-                                    position === 'top' && 'right-6 bottom-0 left-3 border-b-2'
+                                    '-mt-px ml-auto',
+                                    position === 'left' || position === 'right' || description
+                                        ? 'max-md:-mr-3'
+                                        : '-mr-3'
                                 )}
                             />
+                        </div>
+                        {description ? (
+                            <span className="line-clamp-5 text-sm">{description}</span>
                         ) : null}
-                    </div>
+                    </button>
                 ))}
             </div>
             {tabs.map((tab, index) => (
@@ -274,6 +272,7 @@ export function DynamicTabs(
                     className={tcls(
                         'p-4',
                         'rounded-lg',
+                        'flex-1',
                         'straight-corners:rounded-none',
                         'circular-corners:rounded-2xl',
                         'grow',
