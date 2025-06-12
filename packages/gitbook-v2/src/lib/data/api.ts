@@ -447,9 +447,9 @@ const getRevisionPageMarkdown = withCacheKey(
 );
 
 const getRevisionPageDocument = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; pageId: string }
         ) => {
@@ -459,16 +459,18 @@ const getRevisionPageDocument = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getPageDocumentInRevisionById(
-                            params.spaceId,
-                            params.revisionId,
-                            params.pageId,
-                            {
-                                evaluated: true,
-                            },
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getPageDocumentInRevisionById(
+                                params.spaceId,
+                                params.revisionId,
+                                params.pageId,
+                                {
+                                    evaluated: true,
+                                },
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
 
                         cacheTag(...getCacheTagsFromResponse(res));
