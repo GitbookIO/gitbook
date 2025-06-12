@@ -1,3 +1,4 @@
+import { getSectionURL, getSiteSpaceURL } from '@/lib/sites';
 import type { SiteSection, SiteSectionGroup } from '@gitbook/api';
 import type { GitBookSiteContext, SiteSections } from '@v2/lib/context';
 
@@ -46,15 +47,35 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
 }
 
 function encodeSection(context: GitBookSiteContext, section: SiteSection) {
-    const { linker } = context;
     return {
         id: section.id,
         title: section.title,
         description: section.description,
         icon: section.icon,
         object: section.object,
-        url: section.urls.published
-            ? linker.toLinkForContent(section.urls.published)
-            : linker.toPathInSite(section.path),
+        url: findBestTargetURL(context, section),
     };
+}
+
+/**
+ * Find the best default site space to navigate to for a givent section:
+ * 1. If we are on the default, continue on the default.
+ * 2. If a site space has the same path as the current one, return it.
+ * 3. Otherwise, return the default one.
+ */
+function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
+    const { siteSpace: currentSiteSpace } = context;
+
+    if (section.siteSpaces.length === 1 || currentSiteSpace.default) {
+        return getSectionURL(context, section);
+    }
+
+    const bestMatch = section.siteSpaces.find(
+        (siteSpace) => siteSpace.path === currentSiteSpace.path
+    );
+    if (bestMatch) {
+        return getSiteSpaceURL(context, bestMatch);
+    }
+
+    return getSectionURL(context, section);
 }
