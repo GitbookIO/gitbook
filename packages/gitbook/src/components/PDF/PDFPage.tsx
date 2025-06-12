@@ -28,7 +28,7 @@ import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
-import { getDataOrNull } from '@v2/lib/data';
+import { getPageDocument } from '@v2/lib/data';
 
 const DEFAULT_LIMIT = 100;
 
@@ -224,14 +224,7 @@ async function PDFPageDocument(props: {
     context: GitBookSpaceContext;
 }) {
     const { page, context } = props;
-    const { space } = context;
-    const document = await getDataOrNull(
-        context.dataFetcher.getRevisionPageDocument({
-            spaceId: space.id,
-            revisionId: context.revisionId,
-            pageId: page.id,
-        })
-    );
+    const document = await getPageDocument(context, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>

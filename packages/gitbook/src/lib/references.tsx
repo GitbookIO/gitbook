@@ -8,7 +8,7 @@ import type {
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { type GitBookAnyContext, fetchSpaceContextByIds } from '@v2/lib/context';
-import { getDataOrNull, ignoreDataThrownError } from '@v2/lib/data';
+import { getDataOrNull, getPageDocument, ignoreDataThrownError } from '@v2/lib/data';
 import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import type React from 'react';
@@ -155,13 +155,7 @@ export async function resolveContentRef(
                 });
 
                 if (resolveAnchorText) {
-                    const document = await getDataOrNull(
-                        context.dataFetcher.getRevisionPageDocument({
-                            spaceId: space.id,
-                            revisionId: space.revision,
-                            pageId: page.id,
-                        })
-                    );
+                    const document = await getPageDocument(context, page);
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {
