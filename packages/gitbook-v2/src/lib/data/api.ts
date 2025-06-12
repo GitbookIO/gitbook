@@ -9,7 +9,11 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { DataFetcherError, wrapDataFetcherError } from './errors';
-import { withCacheKey, withoutConcurrentExecution } from './memoize';
+import {
+    withCacheKey,
+    withoutConcurrentProcessExecution,
+    withoutConcurrentRequestExecution,
+} from './memoize';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -205,26 +209,30 @@ export function createDataFetcher(
 }
 
 const getUserById = withCacheKey(
-    withoutConcurrentExecution(async (_, input: DataFetcherInput, params: { userId: string }) => {
-        'use cache';
-        return trace(`getUserById(${params.userId})`, async () => {
-            return wrapDataFetcherError(async () => {
-                const api = apiClient(input);
-                const res = await api.users.getUserById(params.userId, {
-                    ...noCacheFetchOptions,
+    withoutConcurrentRequestExecution(
+        async (cacheKey, input: DataFetcherInput, params: { userId: string }) => {
+            'use cache';
+            return trace(`getUserById(${params.userId})`, async () => {
+                return wrapDataFetcherError(async () => {
+                    const api = apiClient(input);
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.users.getUserById(params.userId, {
+                            ...noCacheFetchOptions,
+                        })
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
                 });
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('days');
-                return res.data;
             });
-        });
-    })
+        }
+    )
 );
 
 const getSpace = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; shareKey: string | undefined }
         ) => {
@@ -239,14 +247,16 @@ const getSpace = withCacheKey(
             return trace(`getSpace(${params.spaceId}, ${params.shareKey})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.getSpaceById(
-                        params.spaceId,
-                        {
-                            shareKey: params.shareKey,
-                        },
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.spaces.getSpaceById(
+                            params.spaceId,
+                            {
+                                shareKey: params.shareKey,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        )
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('days');
@@ -258,9 +268,9 @@ const getSpace = withCacheKey(
 );
 
 const getChangeRequest = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; changeRequestId: string }
         ) => {
@@ -278,12 +288,14 @@ const getChangeRequest = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getChangeRequestById(
-                            params.spaceId,
-                            params.changeRequestId,
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getChangeRequestById(
+                                params.spaceId,
+                                params.changeRequestId,
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('minutes');
@@ -296,9 +308,9 @@ const getChangeRequest = withCacheKey(
 );
 
 const getRevision = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; metadata: boolean }
         ) => {
@@ -306,15 +318,17 @@ const getRevision = withCacheKey(
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.getRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        {
-                            metadata: params.metadata,
-                        },
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.spaces.getRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            {
+                                metadata: params.metadata,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        )
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('max');
@@ -326,9 +340,9 @@ const getRevision = withCacheKey(
 );
 
 const getRevisionPages = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; metadata: boolean }
         ) => {
@@ -336,15 +350,17 @@ const getRevisionPages = withCacheKey(
             return trace(`getRevisionPages(${params.spaceId}, ${params.revisionId})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.listPagesInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        {
-                            metadata: params.metadata,
-                        },
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.spaces.listPagesInRevisionById(
+                            params.spaceId,
+                            params.revisionId,
+                            {
+                                metadata: params.metadata,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        )
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('max');
@@ -356,9 +372,9 @@ const getRevisionPages = withCacheKey(
 );
 
 const getRevisionFile = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; fileId: string }
         ) => {
@@ -368,14 +384,16 @@ const getRevisionFile = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getFileInRevisionById(
-                            params.spaceId,
-                            params.revisionId,
-                            params.fileId,
-                            {},
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getFileInRevisionById(
+                                params.spaceId,
+                                params.revisionId,
+                                params.fileId,
+                                {},
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -388,9 +406,9 @@ const getRevisionFile = withCacheKey(
 );
 
 const getRevisionPageMarkdown = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; pageId: string }
         ) => {
@@ -400,16 +418,18 @@ const getRevisionPageMarkdown = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getPageInRevisionById(
-                            params.spaceId,
-                            params.revisionId,
-                            params.pageId,
-                            {
-                                format: 'markdown',
-                            },
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getPageInRevisionById(
+                                params.spaceId,
+                                params.revisionId,
+                                params.pageId,
+                                {
+                                    format: 'markdown',
+                                },
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
 
                         cacheTag(...getCacheTagsFromResponse(res));
@@ -463,9 +483,9 @@ const getRevisionPageDocument = withCacheKey(
 );
 
 const getRevisionPageByPath = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; path: string }
         ) => {
@@ -476,14 +496,16 @@ const getRevisionPageByPath = withCacheKey(
                     const encodedPath = encodeURIComponent(params.path);
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getPageInRevisionByPath(
-                            params.spaceId,
-                            params.revisionId,
-                            encodedPath,
-                            {},
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getPageInRevisionByPath(
+                                params.spaceId,
+                                params.revisionId,
+                                encodedPath,
+                                {},
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -496,19 +518,25 @@ const getRevisionPageByPath = withCacheKey(
 );
 
 const getDocument = withCacheKey(
-    withoutConcurrentExecution(
-        async (_, input: DataFetcherInput, params: { spaceId: string; documentId: string }) => {
+    withoutConcurrentRequestExecution(
+        async (
+            cacheKey,
+            input: DataFetcherInput,
+            params: { spaceId: string; documentId: string }
+        ) => {
             'use cache';
             return trace(`getDocument(${params.spaceId}, ${params.documentId})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.getDocumentById(
-                        params.spaceId,
-                        params.documentId,
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.spaces.getDocumentById(
+                            params.spaceId,
+                            params.documentId,
+                            {},
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        )
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('max');
@@ -520,9 +548,9 @@ const getDocument = withCacheKey(
 );
 
 const getComputedDocument = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: {
                 spaceId: string;
@@ -547,16 +575,18 @@ const getComputedDocument = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getComputedDocument(
-                            params.spaceId,
-                            {
-                                source: params.source,
-                                seed: params.seed,
-                            },
-                            {},
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getComputedDocument(
+                                params.spaceId,
+                                {
+                                    source: params.source,
+                                    seed: params.seed,
+                                },
+                                {},
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -569,9 +599,9 @@ const getComputedDocument = withCacheKey(
 );
 
 const getReusableContent = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { spaceId: string; revisionId: string; reusableContentId: string }
         ) => {
@@ -581,14 +611,16 @@ const getReusableContent = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.spaces.getReusableContentInRevisionById(
-                            params.spaceId,
-                            params.revisionId,
-                            params.reusableContentId,
-                            {},
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.spaces.getReusableContentInRevisionById(
+                                params.spaceId,
+                                params.revisionId,
+                                params.reusableContentId,
+                                {},
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -601,8 +633,12 @@ const getReusableContent = withCacheKey(
 );
 
 const getLatestOpenAPISpecVersionContent = withCacheKey(
-    withoutConcurrentExecution(
-        async (_, input: DataFetcherInput, params: { organizationId: string; slug: string }) => {
+    withoutConcurrentRequestExecution(
+        async (
+            cacheKey,
+            input: DataFetcherInput,
+            params: { organizationId: string; slug: string }
+        ) => {
             'use cache';
             cacheTag(
                 getCacheTag({
@@ -617,12 +653,14 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.orgs.getLatestOpenApiSpecVersionContent(
-                            params.organizationId,
-                            params.slug,
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.orgs.getLatestOpenApiSpecVersionContent(
+                                params.organizationId,
+                                params.slug,
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('max');
@@ -635,9 +673,9 @@ const getLatestOpenAPISpecVersionContent = withCacheKey(
 );
 
 const getPublishedContentSite = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
         ) => {
@@ -654,15 +692,17 @@ const getPublishedContentSite = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.orgs.getPublishedContentSite(
-                            params.organizationId,
-                            params.siteId,
-                            {
-                                shareKey: params.siteShareKey,
-                            },
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.orgs.getPublishedContentSite(
+                                params.organizationId,
+                                params.siteId,
+                                {
+                                    shareKey: params.siteShareKey,
+                                },
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('days');
@@ -675,9 +715,9 @@ const getPublishedContentSite = withCacheKey(
 );
 
 const getSiteRedirectBySource = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: {
                 organizationId: string;
@@ -699,16 +739,18 @@ const getSiteRedirectBySource = withCacheKey(
                 async () => {
                     return wrapDataFetcherError(async () => {
                         const api = apiClient(input);
-                        const res = await api.orgs.getSiteRedirectBySource(
-                            params.organizationId,
-                            params.siteId,
-                            {
-                                shareKey: params.siteShareKey,
-                                source: params.source,
-                            },
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.orgs.getSiteRedirectBySource(
+                                params.organizationId,
+                                params.siteId,
+                                {
+                                    shareKey: params.siteShareKey,
+                                    source: params.source,
+                                },
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('days');
@@ -721,8 +763,8 @@ const getSiteRedirectBySource = withCacheKey(
 );
 
 const getEmbedByUrl = withCacheKey(
-    withoutConcurrentExecution(
-        async (_, input: DataFetcherInput, params: { spaceId: string; url: string }) => {
+    withoutConcurrentRequestExecution(
+        async (cacheKey, input: DataFetcherInput, params: { spaceId: string; url: string }) => {
             'use cache';
             cacheTag(
                 getCacheTag({
@@ -734,14 +776,16 @@ const getEmbedByUrl = withCacheKey(
             return trace(`getEmbedByUrl(${params.spaceId}, ${params.url})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.spaces.getEmbedByUrlInSpace(
-                        params.spaceId,
-                        {
-                            url: params.url,
-                        },
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.spaces.getEmbedByUrlInSpace(
+                            params.spaceId,
+                            {
+                                url: params.url,
+                            },
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        )
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('weeks');
@@ -753,9 +797,9 @@ const getEmbedByUrl = withCacheKey(
 );
 
 const searchSiteContent = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: Parameters<GitBookDataFetcher['searchSiteContent']>[0]
         ) => {
@@ -773,17 +817,19 @@ const searchSiteContent = withCacheKey(
                     return wrapDataFetcherError(async () => {
                         const { organizationId, siteId, query, scope } = params;
                         const api = apiClient(input);
-                        const res = await api.orgs.searchSiteContent(
-                            organizationId,
-                            siteId,
-                            {
-                                query,
-                                ...scope,
-                            },
-                            {},
-                            {
-                                ...noCacheFetchOptions,
-                            }
+                        const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                            api.orgs.searchSiteContent(
+                                organizationId,
+                                siteId,
+                                {
+                                    query,
+                                    ...scope,
+                                },
+                                {},
+                                {
+                                    ...noCacheFetchOptions,
+                                }
+                            )
                         );
                         cacheTag(...getCacheTagsFromResponse(res));
                         cacheLife('hours');
@@ -796,9 +842,9 @@ const searchSiteContent = withCacheKey(
 );
 
 const renderIntegrationUi = withCacheKey(
-    withoutConcurrentExecution(
+    withoutConcurrentRequestExecution(
         async (
-            _,
+            cacheKey,
             input: DataFetcherInput,
             params: { integrationName: string; request: RenderIntegrationUI }
         ) => {
@@ -813,12 +859,14 @@ const renderIntegrationUi = withCacheKey(
             return trace(`renderIntegrationUi(${params.integrationName})`, async () => {
                 return wrapDataFetcherError(async () => {
                     const api = apiClient(input);
-                    const res = await api.integrations.renderIntegrationUiWithPost(
-                        params.integrationName,
-                        params.request,
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const res = await withoutConcurrentProcessExecution(cacheKey, async () =>
+                        api.integrations.renderIntegrationUiWithPost(
+                            params.integrationName,
+                            params.request,
+                            {
+                                ...noCacheFetchOptions,
+                            }
+                        )
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
                     cacheLife('days');
