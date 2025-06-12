@@ -12,7 +12,10 @@ export async function getPageDocument(
 ): Promise<JSONDocument | null> {
     const { dataFetcher, space } = context;
 
-    if ('site' in context && context.site.id === 'site_JOVzv') {
+    if (
+        'site' in context &&
+        (context.site.id === 'site_JOVzv' || context.site.id === 'site_IxAYj')
+    ) {
         return getDataOrNull(
             dataFetcher.getRevisionPageDocument({
                 spaceId: space.id,
