@@ -155,7 +155,7 @@ export async function resolveContentRef(
                 });
 
                 if (resolveAnchorText) {
-                    const document = await getPageDocument(dataFetcher, space, page);
+                    const document = await getPageDocument(context, page);
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {

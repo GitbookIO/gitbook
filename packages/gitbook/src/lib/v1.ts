@@ -25,6 +25,7 @@ import {
     getRevision,
     getRevisionFile,
     getRevisionPageByPath,
+    getRevisionPageDocument,
     getRevisionPages,
     getSiteRedirectBySource,
     getSpace,
@@ -237,6 +238,18 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
                     return getRevisionPages(params.spaceId, params.revisionId, {
                         metadata: params.metadata,
                     });
+                })
+            );
+        },
+
+        getRevisionPageDocument(params) {
+            return withAPI(() =>
+                wrapDataFetcherError(async () => {
+                    return getRevisionPageDocument(
+                        params.spaceId,
+                        params.revisionId,
+                        params.pageId
+                    );
                 })
             );
         },

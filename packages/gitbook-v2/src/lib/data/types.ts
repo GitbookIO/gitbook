@@ -107,6 +107,15 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<string>>;
 
     /**
+     * Get the document of a page by its path.
+     */
+    getRevisionPageDocument(params: {
+        spaceId: string;
+        revisionId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.JSONDocument>>;
+
+    /**
      * Get a document by its space ID and document ID.
      */
     getDocument(params: { spaceId: string; documentId: string }): Promise<

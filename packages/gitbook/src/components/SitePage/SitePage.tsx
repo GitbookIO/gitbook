@@ -62,7 +62,7 @@ export async function SitePage(props: SitePageProps) {
     const withSections = Boolean(sections && sections.list.length > 0);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
-    const document = await getPageDocument(context.dataFetcher, context.space, page);
+    const document = await getPageDocument(context, page);
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>

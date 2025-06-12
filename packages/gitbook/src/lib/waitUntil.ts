@@ -1,4 +1,6 @@
 import type { ExecutionContext, IncomingRequestCfProperties } from '@cloudflare/workers-types';
+import { getCloudflareContext as getCloudflareContextV2 } from '@v2/lib/data/cloudflare';
+import { isV2 } from './v2';
 
 let pendings: Array<Promise<unknown>> = [];
 
@@ -45,6 +47,14 @@ export async function waitUntil(promise: Promise<unknown>) {
         });
 
         return;
+    }
+
+    if (isV2()) {
+        const context = getCloudflareContextV2();
+        if (context) {
+            context.ctx.waitUntil(promise);
+            return;
+        }
     }
 
     const cloudflareContext = await getGlobalContext();

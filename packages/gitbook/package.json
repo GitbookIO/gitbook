@@ -10,7 +10,7 @@
         "typecheck": "tsc --noEmit",
         "e2e": "playwright test e2e/internal.spec.ts",
         "e2e-customers": "playwright test e2e/customers.spec.ts",
-        "unit": "bun test {src,packages}",
+        "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
         "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math",
         "copy:icons": "gitbook-icons ./public/~gitbook/static/icons",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math"

@@ -9,7 +9,6 @@ import {
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
-import { getPageDocument } from '@v2/lib/data';
 import type { GitBookLinker } from '@v2/lib/links';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -29,6 +28,7 @@ import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
+import { getPageDocument } from '@v2/lib/data';
 
 const DEFAULT_LIMIT = 100;
 
@@ -224,8 +224,7 @@ async function PDFPageDocument(props: {
     context: GitBookSpaceContext;
 }) {
     const { page, context } = props;
-    const { space } = context;
-    const document = await getPageDocument(context.dataFetcher, space, page);
+    const document = await getPageDocument(context, page);
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>

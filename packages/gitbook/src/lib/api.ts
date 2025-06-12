@@ -494,6 +494,39 @@ export const getRevisionPageByPath = cache({
 });
 
 /**
+ * Get a document from a page by its ID
+ */
+export const getRevisionPageDocument = cache({
+    name: 'api.getRevisionPageDocument.v1',
+    tag: (spaceId, revisionId) =>
+        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
+    tagImmutable: true,
+    getKeySuffix: getAPIContextId,
+    get: async (
+        spaceId: string,
+        revisionId: string,
+        pageId: string,
+        options: CacheFunctionOptions
+    ) => {
+        const apiCtx = await api();
+        const response = await apiCtx.client.spaces.getPageDocumentInRevisionById(
+            spaceId,
+            revisionId,
+            pageId,
+            {
+                evaluated: true,
+            },
+            {
+                ...noCacheFetchOptions,
+                signal: options.signal,
+            }
+        );
+
+        return cacheResponse(response, cacheTtl_7days);
+    },
+});
+
+/**
  * Resolve a file by its ID.
  * It should not be used directly, use `getRevisionFile` instead.
  */
