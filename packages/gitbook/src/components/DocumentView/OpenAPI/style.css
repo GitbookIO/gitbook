@@ -6,7 +6,7 @@
 }
 
 .openapi-schemas {
-    @apply flex flex-col mb-14 flex-1;
+    @apply flex flex-col mb-14 gap-0 flex-1;
 }
 
 .openapi-schemas-title {
@@ -748,8 +748,12 @@ body:has(.openapi-select-popover) {
 }
 
 /* Disclosure */
+.openapi-schemas-disclosure {
+    @apply border-t border-x last:border-b border-tint-subtle !ring-0 first:!rounded-t-xl last:!rounded-b-xl !rounded-none;
+}
+
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
-    @apply flex items-center font-mono transition-all text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-3 truncate -outline-offset-1;
+    @apply flex items-center font-mono transition-all font-normal text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-5 truncate -outline-offset-1;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger,
@@ -793,7 +797,6 @@ body:has(.openapi-select-popover) {
     @apply bg-tint-subtle overflow-hidden;
 }
 
-.openapi-disclosure:has(> .openapi-disclosure-trigger:hover),
 .openapi-disclosure[data-expanded="true"] {
     @apply ring-1 shadow-sm;
 }
