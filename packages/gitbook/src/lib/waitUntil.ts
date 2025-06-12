@@ -57,12 +57,12 @@ export async function waitUntil(promise: Promise<unknown>) {
                 context.ctx.waitUntil(promise);
                 return;
             }
-        }
-
-        const cloudflareContext = await getGlobalContext();
-        if ('waitUntil' in cloudflareContext) {
-            cloudflareContext.waitUntil(promise);
-            return;
+        } else {
+            const cloudflareContext = await getGlobalContext();
+            if ('waitUntil' in cloudflareContext) {
+                cloudflareContext.waitUntil(promise);
+                return;
+            }
         }
     }
 
