@@ -130,6 +130,7 @@ export interface PrefetchedPageData {
         };
     }>;
     document: Promise<JSONDocument | null>;
+    prefetchedRef: Promise<Map<ContentRef, Promise<ResolvedContentRef | null>>>;
 }
 
 /**
@@ -223,13 +224,16 @@ export const getPrefetchedDataFromPageParams = cache((params: RouteParams): Pref
         }
         return getPageDocument(context.dataFetcher, context.space, pageTarget?.page);
     });
-    Promise.all([staticSiteContext, document]).then(([{ context }, document]) => {
-        // Prefetch the references in the document
-        prefetchedDocumentRef(document, context);
-    });
+    const prefetchedRef = Promise.all([staticSiteContext, document]).then(
+        ([{ context }, document]) => {
+            // Prefetch the references in the document
+            return prefetchedDocumentRef(document, context);
+        }
+    );
     return {
         pageData,
         document,
+        prefetchedRef,
     };
 });
 

@@ -88,6 +88,7 @@ export async function SitePage(props: SitePageProps) {
                     ancestors={ancestors}
                     document={document}
                     withPageFeedback={withPageFeedback}
+                    prefetchedRef={prefetchedData.prefetchedRef}
                 />
             </div>
             <React.Suspense fallback={null}>

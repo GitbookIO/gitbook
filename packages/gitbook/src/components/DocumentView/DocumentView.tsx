@@ -1,7 +1,8 @@
 import type { ClassValue } from '@/lib/tailwind';
-import type { JSONDocument } from '@gitbook/api';
+import type { ContentRef, JSONDocument } from '@gitbook/api';
 import type { GitBookAnyContext } from '@v2/lib/context';
 
+import type { ResolvedContentRef } from '@/lib/references';
 import { BlockSkeleton } from './Block';
 import { Blocks } from './Blocks';
 
@@ -28,6 +29,8 @@ export interface DocumentContext {
      * @default true
      */
     wrapBlocksInSuspense?: boolean;
+
+    contentRef?: Promise<Map<ContentRef, Promise<ResolvedContentRef | null>>>;
 }
 
 export interface DocumentContextProps {
