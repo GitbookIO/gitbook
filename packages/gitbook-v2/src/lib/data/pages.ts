@@ -43,7 +43,7 @@ export async function getPageDocument(
 
     // Pre-fetch the document to start filling the cache before we migrate to this API.
     if (isInPercentRollout(space.id, 10)) {
-        waitUntil(
+        await waitUntil(
             getDataOrNull(
                 dataFetcher.getRevisionPageDocument({
                     spaceId: space.id,
