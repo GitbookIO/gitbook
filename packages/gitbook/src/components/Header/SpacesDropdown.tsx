@@ -13,7 +13,6 @@ export function SpacesDropdown(props: {
     className?: string;
 }) {
     const { context, siteSpace, siteSpaces, className } = props;
-    const { linker } = context;
 
     return (
         <DropdownMenu
