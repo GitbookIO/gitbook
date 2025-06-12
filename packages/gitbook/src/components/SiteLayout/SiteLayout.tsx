@@ -13,8 +13,8 @@ import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
+import type { PrefetchedLayoutData } from '@v2/lib/data/memoize';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
-import { getResizedImageURL } from '@v2/lib/images';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
@@ -97,50 +97,24 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
     };
 }
 
-export async function generateSiteLayoutMetadata(context: GitBookSiteContext): Promise<Metadata> {
-    const { site, customization, linker, imageResizer } = context;
-    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
+export async function generateSiteLayoutMetadata({
+    staticSiteContext,
+    icons,
+}: PrefetchedLayoutData): Promise<Metadata> {
+    const siteContext = await staticSiteContext;
+    const { site } = siteContext.context;
 
-    const faviconSize = 48;
-    const icons = await Promise.all(
-        [
-            {
-                url: customIcon?.light
-                    ? getResizedImageURL(imageResizer, customIcon.light, {
-                          width: faviconSize,
-                          height: faviconSize,
-                      })
-                    : linker.toAbsoluteURL(
-                          linker.toPathInSpace('~gitbook/icon?size=small&theme=light')
-                      ),
-                type: 'image/png',
-                media: '(prefers-color-scheme: light)',
-            },
-            {
-                url: customIcon?.dark
-                    ? getResizedImageURL(imageResizer, customIcon.dark, {
-                          width: faviconSize,
-                          height: faviconSize,
-                      })
-                    : linker.toAbsoluteURL(
-                          linker.toPathInSpace('~gitbook/icon?size=small&theme=dark')
-                      ),
-                type: 'image/png',
-                media: '(prefers-color-scheme: dark)',
-            },
-        ].map(async (icon) => ({
-            ...icon,
-            url: await icon.url,
-        }))
-    );
+    const iconsUrls = await icons;
 
     return {
         title: site.title,
         generator: `GitBook (${buildVersion()})`,
         icons: {
-            icon: icons,
-            apple: icons,
+            icon: iconsUrls,
+            apple: iconsUrls,
         },
-        robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
+        robots: (await isSiteIndexable(siteContext.context))
+            ? 'index, follow'
+            : 'noindex, nofollow',
     };
 }

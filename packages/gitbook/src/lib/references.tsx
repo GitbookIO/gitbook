@@ -14,7 +14,6 @@ import assertNever from 'assert-never';
 import type React from 'react';
 
 import { PageIcon } from '@/components/PageIcon';
-
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';

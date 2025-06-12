@@ -3,7 +3,7 @@ import {
     generateSitePageMetadata,
     generateSitePageViewport,
 } from '@/components/SitePage';
-import { type RouteParams, getDynamicSiteContext, getPagePathFromParams } from '@v2/app/utils';
+import { type RouteParams, getDynamicSiteContext } from '@v2/app/utils';
 import type { Metadata, Viewport } from 'next';
 
 type PageProps = {
@@ -14,9 +14,8 @@ type PageProps = {
 export default async function Page(props: PageProps) {
     const params = await props.params;
     const { context } = await getDynamicSiteContext(params);
-    const pathname = getPagePathFromParams(params);
 
-    return <SitePage context={context} pageParams={{ pathname }} />;
+    return <SitePage context={context} pageParams={params} />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
@@ -27,10 +26,9 @@ export async function generateViewport(props: PageProps): Promise<Viewport> {
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
     const { context } = await getDynamicSiteContext(params);
-    const pathname = getPagePathFromParams(params);
 
     return generateSitePageMetadata({
         context,
-        pageParams: { pathname },
+        pageParams: params,
     });
 }
