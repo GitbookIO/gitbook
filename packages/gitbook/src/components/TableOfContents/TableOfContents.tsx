@@ -32,6 +32,7 @@ export function TableOfContents(props: {
 
                     'max-lg:fixed',
                     'max-lg:z-50',
+                    'max-lg:py-2',
 
                     'max-lg:transition',
                     'max-lg:ease-in-out',
