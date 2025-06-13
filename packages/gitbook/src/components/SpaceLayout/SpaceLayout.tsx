@@ -133,6 +133,8 @@ export function SpaceLayout(props: {
                                             )}
                                             {isMultiVariants && (
                                                 <SpacesDropdown
+                                                    /** Needed to avoid the dropdown being rendered in the wrong place when the mobile menu is open. */
+                                                    withPortal={false}
                                                     context={context}
                                                     siteSpace={siteSpace}
                                                     siteSpaces={siteSpaces}
