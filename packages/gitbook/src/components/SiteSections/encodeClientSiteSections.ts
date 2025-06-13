@@ -72,12 +72,17 @@ function shouldIncludeSection(context: GitBookSiteContext, section: SiteSection)
     // Testing for a new mode of navigation where the multi-variants section are hidden
     // if they do not include an equivalent of the current site space.
 
-    const { siteSpace: currentSiteSpace } = context;
+    // TODO: replace with a proper flag on the section
+    const withNavigateOnlyIfEquivalent = section.id === 'sitesc_4jvEm';
 
-    if (section.siteSpaces.length === 1) {
+    if (!withNavigateOnlyIfEquivalent) {
         return true;
     }
 
+    const { siteSpace: currentSiteSpace } = context;
+    if (section.siteSpaces.length === 1) {
+        return true;
+    }
     return section.siteSpaces.some((siteSpace) =>
         areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
     );
