@@ -66,16 +66,9 @@ export async function waitUntil(promise: Promise<unknown>) {
         }
     }
 
-    if (GITBOOK_RUNTIME === 'vercel' && isV2()) {
-        // @ts-expect-error - `after` is not exported by `next/server` in next 14
-        const { after } = await import('next/server');
-        if (typeof after === 'function') {
-            after(() => promise);
-            return;
-        }
-    }
-
-    await promise;
+    await promise.catch((error) => {
+        console.error('Ignored error in waitUntil', error);
+    });
 }
 
 /**
