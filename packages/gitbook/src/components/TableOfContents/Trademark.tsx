@@ -29,9 +29,6 @@ export function Trademark(props: {
                 'bottom-0',
                 'lg:left-0',
 
-                'pt-2',
-                'lg:pt-0',
-
                 'pointer-events-none',
                 'sidebar-filled:pl-2',
                 'sidebar-filled:pb-2',
@@ -43,8 +40,7 @@ export function Trademark(props: {
                 '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
-                'before:hidden',
-                'lg:before:block',
+                'before:block',
                 'before:content-[""]',
                 'before:absolute',
                 'before:inset-x-0',
