@@ -1,7 +1,7 @@
 import { race, tryCatch } from '@/lib/async';
 import { joinPath, joinPathWithBaseURL } from '@/lib/paths';
 import { trace } from '@/lib/tracing';
-import type { GitBookAPI, PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
+import type { PublishedSiteContentLookup, SiteVisitorPayload } from '@gitbook/api';
 import { apiClient } from './api';
 import { getExposableError } from './errors';
 import type { DataFetcherResponse } from './types';
@@ -18,85 +18,32 @@ interface LookupPublishedContentByUrlInput {
  * Lookup a content by its URL using the GitBook resolvePublishedContentByUrl API endpoint.
  * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
  */
-export async function resolvePublishedContentByUrl(input: LookupPublishedContentByUrlInput) {
-    return lookupPublishedContentByUrl({
-        url: input.url,
-        fetchLookupAPIResult: ({ url, signal }) => {
-            const api = apiClient({ apiToken: input.apiToken });
-            return trace(
-                {
-                    operation: 'resolvePublishedContentByUrl',
-                    name: url,
-                },
-                () =>
-                    tryCatch(
-                        api.urls.resolvePublishedContentByUrl(
-                            {
-                                url,
-                                ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
-                                redirectOnError: input.redirectOnError,
-                            },
-                            { signal }
-                        )
-                    )
-            );
-        },
-    });
-}
-
-/**
- * Lookup a content by its URL using the GitBook getPublishedContentByUrl API endpoint.
- * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
- *
- * @deprecated use resolvePublishedContentByUrl.
- *
- */
-export async function getPublishedContentByURL(input: LookupPublishedContentByUrlInput) {
-    return lookupPublishedContentByUrl({
-        url: input.url,
-        fetchLookupAPIResult: ({ url, signal }) => {
-            const api = apiClient({ apiToken: input.apiToken });
-            return trace(
-                {
-                    operation: 'getPublishedContentByURL',
-                    name: url,
-                },
-                () =>
-                    tryCatch(
-                        api.urls.getPublishedContentByUrl(
-                            {
-                                url,
-                                visitorAuthToken: input.visitorPayload.jwtToken ?? undefined,
-                                redirectOnError: input.redirectOnError,
-                                // @ts-expect-error - cacheVersion is not a real query param
-                                cacheVersion: 'v2',
-                            },
-                            { signal }
-                        )
-                    )
-            );
-        },
-    });
-}
-
-type TryCatch<T> = ReturnType<typeof tryCatch<T>>;
-
-async function lookupPublishedContentByUrl(input: {
-    url: string;
-    fetchLookupAPIResult: (args: {
-        url: string;
-        signal: AbortSignal;
-    }) => TryCatch<Awaited<ReturnType<GitBookAPI['urls']['resolvePublishedContentByUrl']>>>;
-}): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
+export async function lookupPublishedContentByUrl(
+    input: LookupPublishedContentByUrlInput
+): Promise<DataFetcherResponse<PublishedSiteContentLookup>> {
     const lookupURL = new URL(input.url);
     const url = stripURLSearch(lookupURL);
     const lookup = getURLLookupAlternatives(url);
 
     const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const callResult = await input.fetchLookupAPIResult({
-            url: alternative.url,
-            signal,
-        });
+        const api = apiClient({ apiToken: input.apiToken });
+        const callResult = await trace(
+            {
+                operation: 'resolvePublishedContentByUrl',
+                name: alternative.url,
+            },
+            () =>
+                tryCatch(
+                    api.urls.resolvePublishedContentByUrl(
+                        {
+                            url: alternative.url,
+                            ...(input.visitorPayload ? { visitor: input.visitorPayload } : {}),
+                            redirectOnError: input.redirectOnError,
+                        },
+                        { signal }
+                    )
+                )
+        );
 
         if (callResult.error) {
             if (alternative.primary) {
