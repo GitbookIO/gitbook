@@ -42,16 +42,19 @@ export async function getPageDocument(
     }
 
     // Pre-fetch the document to start filling the cache before we migrate to this API.
-    if (isInPercentRollout(space.id, 10)) {
-        await waitUntil(
-            getDataOrNull(
-                dataFetcher.getRevisionPageDocument({
-                    spaceId: space.id,
-                    revisionId: space.revision,
-                    pageId: page.id,
-                })
-            )
-        );
+    if (process.env.NODE_ENV === 'development') {
+        // Disable for now to investigate side-effects
+        if (isInPercentRollout(space.id, 10) || process.env.VERCEL_ENV === 'preview') {
+            await waitUntil(
+                getDataOrNull(
+                    dataFetcher.getRevisionPageDocument({
+                        spaceId: space.id,
+                        revisionId: space.revision,
+                        pageId: page.id,
+                    })
+                )
+            );
+        }
     }
 
     return null;
