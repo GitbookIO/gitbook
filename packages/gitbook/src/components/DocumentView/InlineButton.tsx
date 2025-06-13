@@ -17,19 +17,22 @@ export async function InlineButton(props: InlineProps<api.DocumentInlineButton>)
     }
 
     return (
-        <Button
-            href={resolved.href}
-            label={inline.data.label}
-            // TODO: use a variant specifically for user-defined buttons.
-            variant={inline.data.kind}
-            className="[&:has(+&)]:mr-2 [&:has(+&)]:mb-2" // Add margin to offset adjacent buttons
-            insights={{
-                type: 'link_click',
-                link: {
-                    target: inline.data.ref,
-                    position: api.SiteInsightsLinkPosition.Content,
-                },
-            }}
-        />
+        // Set the leading to have some vertical space between adjacent buttons
+        <span className="inline-button leading-[3rem] [&:has(+.inline-button)]:mr-2">
+            <Button
+                href={resolved.href}
+                label={inline.data.label}
+                // TODO: use a variant specifically for user-defined buttons.
+                variant={inline.data.kind}
+                className="leading-normal"
+                insights={{
+                    type: 'link_click',
+                    link: {
+                        target: inline.data.ref,
+                        position: api.SiteInsightsLinkPosition.Content,
+                    },
+                }}
+            />
+        </span>
     );
 }
