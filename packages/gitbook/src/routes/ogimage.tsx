@@ -45,7 +45,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             : '';
 
     // Load the fonts
-    const { fontFamily, fonts } = await (async () => {
+    const fontLoader = async () => {
         // google fonts
         if (typeof customization.styling.font === 'string') {
             const fontFamily = customization.styling.font ?? CustomizationDefaultFont.Inter;
@@ -85,7 +85,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
         ).filter(filterOutNullable);
 
         return { fontFamily: 'CustomFont', fonts };
-    })();
+    };
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -139,7 +139,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             break;
     }
 
-    const favicon = await (async () => {
+    const faviconLoader = async () => {
         if ('icon' in customization.favicon)
             return (
                 <img
@@ -164,7 +164,9 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             )
         );
         return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
-    })();
+    };
+
+    const [favicon, { fontFamily, fonts }] = await Promise.all([faviconLoader(), fontLoader()]);
 
     return new ImageResponse(
         <div

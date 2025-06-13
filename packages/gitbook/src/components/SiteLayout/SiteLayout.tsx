@@ -102,7 +102,7 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     const faviconSize = 48;
-    const icons = [
+    const icons = await Promise.all([
         {
             url: customIcon?.light
                 ? await getResizedImageURL(imageResizer, customIcon.light, {
@@ -125,7 +125,7 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
             type: 'image/png',
             media: '(prefers-color-scheme: dark)',
         },
-    ];
+    ]);
 
     return {
         title: site.title,

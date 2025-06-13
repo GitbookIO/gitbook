@@ -21,8 +21,10 @@ export async function PageCover(props: {
     context: GitBookSiteContext;
 }) {
     const { as, page, cover, context } = props;
-    const resolved = cover.ref ? await resolveContentRef(cover.ref, context) : null;
-    const resolvedDark = cover.refDark ? await resolveContentRef(cover.refDark, context) : null;
+    const [resolved, resolvedDark] = await Promise.all([
+        cover.ref ? resolveContentRef(cover.ref, context) : null,
+        cover.refDark ? resolveContentRef(cover.refDark, context) : null,
+    ]);
 
     return (
         <div
