@@ -1,12 +1,10 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { useEffect } from 'react';
 
 import { useMobileMenuSheet } from '@/components/MobileMenu/useMobileMenuSheet';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { usePathname } from 'next/navigation';
 
 /**
  * Button to show/hide the table of content on mobile.
@@ -15,17 +13,11 @@ export function HeaderMobileMenuButton(
     props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>
 ) {
     const language = useLanguage();
-    const pathname = usePathname();
     const { open, setOpen } = useMobileMenuSheet();
 
     const toggleNavigation = () => {
         setOpen(!open);
     };
-
-    // biome-ignore lint/correctness/useExhaustiveDependencies: Close the navigation when navigating to a page
-    useEffect(() => {
-        setOpen(false);
-    }, [pathname]);
 
     return (
         <button
