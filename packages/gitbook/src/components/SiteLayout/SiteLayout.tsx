@@ -102,30 +102,37 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     const faviconSize = 48;
-    const icons = await Promise.all([
-        {
-            url: customIcon?.light
-                ? await getResizedImageURL(imageResizer, customIcon.light, {
-                      width: faviconSize,
-                      height: faviconSize,
-                  })
-                : linker.toAbsoluteURL(
-                      linker.toPathInSpace('~gitbook/icon?size=small&theme=light')
-                  ),
-            type: 'image/png',
-            media: '(prefers-color-scheme: light)',
-        },
-        {
-            url: customIcon?.dark
-                ? await getResizedImageURL(imageResizer, customIcon.dark, {
-                      width: faviconSize,
-                      height: faviconSize,
-                  })
-                : linker.toAbsoluteURL(linker.toPathInSpace('~gitbook/icon?size=small&theme=dark')),
-            type: 'image/png',
-            media: '(prefers-color-scheme: dark)',
-        },
-    ]);
+    const icons = await Promise.all(
+        [
+            {
+                url: customIcon?.light
+                    ? getResizedImageURL(imageResizer, customIcon.light, {
+                          width: faviconSize,
+                          height: faviconSize,
+                      })
+                    : linker.toAbsoluteURL(
+                          linker.toPathInSpace('~gitbook/icon?size=small&theme=light')
+                      ),
+                type: 'image/png',
+                media: '(prefers-color-scheme: light)',
+            },
+            {
+                url: customIcon?.dark
+                    ? getResizedImageURL(imageResizer, customIcon.dark, {
+                          width: faviconSize,
+                          height: faviconSize,
+                      })
+                    : linker.toAbsoluteURL(
+                          linker.toPathInSpace('~gitbook/icon?size=small&theme=dark')
+                      ),
+                type: 'image/png',
+                media: '(prefers-color-scheme: dark)',
+            },
+        ].map(async (icon) => ({
+            ...icon,
+            url: await icon.url,
+        }))
+    );
 
     return {
         title: site.title,
