@@ -29,10 +29,12 @@ export function TableOfContents(props: {
 
                     'flex',
                     'flex-col',
+                    'gap-4',
 
-                    'max-lg:fixed',
-                    'max-lg:z-50',
-                    'max-lg:py-2',
+                    'border-tint-subtle',
+
+                    'fixed',
+                    'z-50',
 
                     'max-lg:transition',
                     'max-lg:ease-in-out',
@@ -48,6 +50,7 @@ export function TableOfContents(props: {
                     'max-lg:[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     'max-lg:[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
+                    'max-lg:py-2',
                     'max-lg:w-10/12',
                     'max-lg:shadow-lg',
                     'max-lg:depth-flat:shadow-none',
@@ -92,9 +95,7 @@ export function TableOfContents(props: {
 
                     'page-no-toc:lg:hidden',
                     'page-no-toc:xl:flex',
-                    'site-header-none:page-no-toc:lg:flex',
-                    'gap-4',
-                    'border-tint-subtle'
+                    'site-header-none:page-no-toc:lg:flex'
                 )}
             >
                 {header && header}
