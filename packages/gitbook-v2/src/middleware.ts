@@ -39,6 +39,7 @@ type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
  */
 const ADAPTIVE_CONTENT_HOSTS = [
     'docs.gitbook.com',
+    'paypal.gitbook.com',
     'adaptive-docs.gitbook-staging.com',
     'enriched-content-playground.gitbook-staging.io',
     'docs.testgitbook.com',
