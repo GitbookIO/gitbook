@@ -1,5 +1,5 @@
 import { getSectionURL, getSiteSpaceURL } from '@/lib/sites';
-import type { SiteSection, SiteSectionGroup } from '@gitbook/api';
+import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
 import type { GitBookSiteContext, SiteSections } from '@v2/lib/context';
 
 export type ClientSiteSections = {
@@ -33,10 +33,14 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
                 title: item.title,
                 icon: item.icon,
                 object: item.object,
-                sections: item.sections.map((section) => encodeSection(context, section)),
+                sections: item.sections
+                    .filter((section) => shouldIncludeSection(context, section))
+                    .map((section) => encodeSection(context, section)),
             });
         } else {
-            clientSections.push(encodeSection(context, item));
+            if (shouldIncludeSection(context, item)) {
+                clientSections.push(encodeSection(context, item));
+            }
         }
     }
 
@@ -58,6 +62,28 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
 }
 
 /**
+ * Test if a section should be included in the list of sections.
+ */
+function shouldIncludeSection(context: GitBookSiteContext, section: SiteSection) {
+    if (context.site.id !== 'site_JOVzv') {
+        return true;
+    }
+
+    // Testing for a new mode of navigation where the multi-variants section are hidden
+    // if they do not include an equivalent of the current site space.
+
+    const { siteSpace: currentSiteSpace } = context;
+
+    if (section.siteSpaces.length === 1) {
+        return true;
+    }
+
+    return section.siteSpaces.some((siteSpace) =>
+        areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
+    );
+}
+
+/**
  * Find the best default site space to navigate to for a givent section:
  * 1. If we are on the default, continue on the default.
  * 2. If a site space has the same path as the current one, return it.
@@ -70,12 +96,19 @@ function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
         return getSectionURL(context, section);
     }
 
-    const bestMatch = section.siteSpaces.find(
-        (siteSpace) => siteSpace.path === currentSiteSpace.path
+    const bestMatch = section.siteSpaces.find((siteSpace) =>
+        areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
     );
     if (bestMatch) {
         return getSiteSpaceURL(context, bestMatch);
     }
 
     return getSectionURL(context, section);
+}
+
+/**
+ * Test if 2 site spaces are equivalent.
+ */
+function areSiteSpacesEquivalent(siteSpace1: SiteSpace, siteSpace2: SiteSpace) {
+    return siteSpace1.path === siteSpace2.path;
 }
