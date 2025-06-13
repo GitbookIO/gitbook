@@ -16,7 +16,7 @@ export function TableOfContents(props: {
     return (
         <>
             <div
-                className="fixed inset-0 z-40 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:pointer-events-none data-[state=closed]:invisible data-[state=closed]:animate-fadeOut data-[state=open]:animate-fadeIn data-[state=open]:animate-in lg:hidden dark:bg-tint-1/6"
+                className="fixed inset-0 z-40 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:pointer-events-none data-[state=closed]:invisible data-[state=closed]:animate-fadeOut data-[state=open]:animate-fadeIn lg:hidden dark:bg-tint-1/6"
                 data-state={open ? 'open' : 'closed'}
                 onClick={() => setOpen(false)}
             />
