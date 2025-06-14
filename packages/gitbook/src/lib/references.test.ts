@@ -21,7 +21,7 @@ describe('resolveContentRef', () => {
         );
 
         expect(result).not.toBeNull();
-        expect(result?.text).toBe('Current Page');
+        expect(result?.text).toBe('Page 1');
         expect(result?.href).toBe('/page/page-1');
     });
 
@@ -41,6 +41,25 @@ describe('resolveContentRef', () => {
         expect(result).not.toBeNull();
         expect(result?.text).toBe('https://example.com/some-page');
         expect(result?.href).toBe('https://example.com/some-page');
+    });
+});
+
+describe('resolveContentRef with reusable content', () => {
+    it('should resolve a relative page ref with reusable content', async () => {
+        const rcSpace = createMockSpace({ id: 'rc-parent-space' });
+        const context = createMockContext({ space: rcSpace, pages: [] });
+
+        const result = await resolveContentRef(
+            {
+                kind: 'page',
+                page: 'page-1',
+            },
+            context
+        );
+
+        expect(result).not.toBeNull();
+        expect(result?.text).toBe('Current Page');
+        expect(result?.href).toBe('/page/page-1');
     });
 });
 
