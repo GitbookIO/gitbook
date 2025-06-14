@@ -4,7 +4,7 @@ import {
     generateSitePageViewport,
 } from '@/components/SitePage';
 import type { RouteParams } from '@v2/app/utils';
-import { getPrefetchedDataFromLayoutParams } from '@v2/lib/data/memoize';
+import { getPrefetchedDataFromLayoutParams } from '@v2/lib/data/prefetch';
 
 import type { Metadata, Viewport } from 'next';
 

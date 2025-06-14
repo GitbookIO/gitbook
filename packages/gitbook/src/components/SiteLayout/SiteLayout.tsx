@@ -13,7 +13,7 @@ import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import type { PrefetchedLayoutData } from '@v2/lib/data/memoize';
+import type { PrefetchedLayoutData } from '@v2/lib/data/prefetch';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';

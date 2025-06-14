@@ -5,7 +5,7 @@ import {
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
 import { type RouteLayoutParams, getStaticSiteContext } from '@v2/app/utils';
-import { cachedDate, getPrefetchedDataFromLayoutParams } from '@v2/lib/data/memoize';
+import { getPrefetchedDataFromLayoutParams } from '@v2/lib/data/prefetch';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 
 interface SiteStaticLayoutProps {
@@ -16,8 +16,6 @@ export default async function SiteStaticLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
-    const startedAt = cachedDate();
-    console.info(`SiteStaticLayout: Starting to render static site layout at ${startedAt}`);
     const { context, visitorAuthClaims } = await getStaticSiteContext(await params);
 
     return (

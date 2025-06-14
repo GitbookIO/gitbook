@@ -10,7 +10,7 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import type { RouteParams } from '@v2/app/utils';
-import { getPrefetchedDataFromPageParams } from '@v2/lib/data/memoize';
+import { getPrefetchedDataFromPageParams } from '@v2/lib/data/prefetch';
 import { getResizedImageURL } from '@v2/lib/images';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
