@@ -60,6 +60,13 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
                   // and adapt the relative links to point to the correct variant.
                   pages: [],
                   shareKey: undefined,
+                  // Include parent space context for cross-space link resolution
+                  parentSpaceContext: {
+                      space: context.contentContext.space,
+                      revisionId: context.contentContext.revisionId,
+                      pages: context.contentContext.pages,
+                      shareKey: context.contentContext.shareKey,
+                  },
               };
 
     return (

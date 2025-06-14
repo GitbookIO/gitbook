@@ -92,6 +92,14 @@ export type GitBookSpaceContext = GitBookBaseContext & {
 
     /** Share key of the space. */
     shareKey: string | undefined;
+
+    /** Parent space context for reusable content cross-space resolution. */
+    parentSpaceContext?: {
+        space: Space;
+        revisionId: string;
+        pages: RevisionPage[];
+        shareKey: string | undefined;
+    };
 };
 
 export type SiteSections = {

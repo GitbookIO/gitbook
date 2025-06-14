@@ -83,6 +83,9 @@ export async function resolveContentRef(
 
     const activePage = 'page' in context ? context.page : undefined;
 
+    const DEBUG = contentRef.kind === 'page';
+    DEBUG && console.log(`resolving`, contentRef, context);
+
     switch (contentRef.kind) {
         case 'url': {
             return {
@@ -123,6 +126,17 @@ export async function resolveContentRef(
                         ? { page: activePage, ancestors: [] }
                         : undefined
                     : resolvePageId(pages, contentRef.page);
+
+            DEBUG && console.log('resolvePageResult', resolvePageResult);
+
+            // If page not found and we have parent space context, try resolving there
+            if (!resolvePageResult && 'parentSpaceContext' in context && context.parentSpaceContext) {
+                const parentResult = resolvePageId(context.parentSpaceContext.pages, contentRef.page);
+                if (parentResult) {
+                    // Return absolute URL to parent space page
+                    return resolveContentRefInSpace(context.parentSpaceContext.space.id, context, contentRef);
+                }
+            }
 
             const page = resolvePageResult?.page;
             const ancestors =
