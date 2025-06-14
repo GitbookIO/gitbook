@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Slot } from '@radix-ui/react-slot';
 
 import { Link, type LinkInsightsProps } from '../primitives';
 
@@ -25,12 +26,20 @@ export function DropdownMenu(props: {
     children: React.ReactNode;
     /** Custom styles */
     className?: ClassValue;
-    /** Open the dropdown on hover */
+    /** Open the dropdown on hover
+     * @default false
+     */
     openOnHover?: boolean;
+    /** Whether to render the dropdown menu in a portal
+     * @default true
+     */
+    withPortal?: boolean;
 }) {
-    const { button, children, className, openOnHover = false } = props;
+    const { button, children, className, openOnHover = false, withPortal = true } = props;
     const [hovered, setHovered] = useState(false);
     const [clicked, setClicked] = useState(false);
+
+    const Portal = withPortal ? RadixDropdownMenu.Portal : Slot;
 
     return (
         <RadixDropdownMenu.Root
@@ -48,7 +57,7 @@ export function DropdownMenu(props: {
                 {button}
             </RadixDropdownMenu.Trigger>
 
-            <RadixDropdownMenu.Portal>
+            <Portal>
                 <RadixDropdownMenu.Content
                     data-testid="dropdown-menu"
                     hideWhenDetached
@@ -56,7 +65,8 @@ export function DropdownMenu(props: {
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
                     align="start"
-                    className="z-40 animate-present pt-2"
+                    sideOffset={8}
+                    className="z-40 animate-present"
                 >
                     <div
                         className={tcls(
@@ -67,7 +77,7 @@ export function DropdownMenu(props: {
                         {children}
                     </div>
                 </RadixDropdownMenu.Content>
-            </RadixDropdownMenu.Portal>
+            </Portal>
         </RadixDropdownMenu.Root>
     );
 }
