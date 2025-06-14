@@ -8,8 +8,8 @@ const NOW = new Date();
 
 describe('resolveContentRef', () => {
     it('should resolve a relative page ref', async () => {
-        const currentSpace = createMockSpace('current-space', 'Current Space');
-        const currentPages = [createMockPage('page-1', 'Current Page')];
+        const currentSpace = createMockSpace({ id: 'current-space' });
+        const currentPages = [createMockPage({ id: 'page-1' })];
         const context = createMockContext({ space: currentSpace, pages: currentPages });
 
         const result = await resolveContentRef(
@@ -26,8 +26,8 @@ describe('resolveContentRef', () => {
     });
 
     it('should resolve a url', async () => {
-        const currentSpace = createMockSpace('current-space', 'Current Space');
-        const currentPages = [createMockPage('page-1', 'Current Page')];
+        const currentSpace = createMockSpace({ id: 'current-space' });
+        const currentPages = [createMockPage({ id: 'page-1' })];
         const context = createMockContext({ space: currentSpace, pages: currentPages });
 
         const result = await resolveContentRef(
@@ -44,15 +44,14 @@ describe('resolveContentRef', () => {
     });
 });
 
-const createMockSpace = (id: string, title: string): api.Space => ({
+const createMockSpace = (space: MandateProps<Partial<api.Space>, 'id'>): api.Space => ({
     object: 'space',
-    id,
-    title,
+    title: 'My Space',
     visibility: api.ContentVisibility.Public,
     urls: {
-        location: `https://api.gitbook.com/s/${id}`,
-        published: `https://example.com/space/${id}`,
-        app: `https://app.gitbook.com/s/${id}`,
+        location: `https://api.gitbook.com/s/${space.id}`,
+        published: `https://example.com/space/${space.id}`,
+        app: `https://app.gitbook.com/s/${space.id}`,
     },
     organization: 'org-1',
     revision: 'rev-1',
@@ -75,17 +74,19 @@ const createMockSpace = (id: string, title: string): api.Space => ({
         merge: true,
         review: true,
     },
+    ...space,
 });
 
-const createMockPage = (id: string, title: string): api.RevisionPage => ({
-    id,
-    title,
-    slug: title.toLowerCase().replace(/\s+/g, '-'),
+const createMockPage = (
+    page: MandateProps<Partial<api.RevisionPageDocument>, 'id'>
+): api.RevisionPageDocument => ({
+    title: 'Page 1',
+    slug: 'page-1',
     kind: 'sheet',
     type: 'document',
     layout: {},
     urls: {
-        app: `https://app.gitbook.com/s/${id}/page-1`,
+        app: `https://app.gitbook.com/s/${page.id}/page-1`,
     },
     path: '/page-1',
     pages: [],
@@ -94,6 +95,7 @@ const createMockPage = (id: string, title: string): api.RevisionPage => ({
         data: {},
         nodes: [],
     },
+    ...page,
 });
 
 const createMockContext = (
