@@ -1,5 +1,49 @@
 # gitbook
 
+## 0.13.0
+
+### Minor Changes
+
+- 7d3fe23: Add circular corners and depth styling
+- fa12f9e: Support dark-mode specific page cover image
+- c3b620e: Best effort at preserving current variant when navigating between sections by matching the pathname against site spaces in the new section.
+- 4fb2a4a: Rework full-width layout, add support for full-width page option
+
+### Patch Changes
+
+- 6aa3ff9: Fix three small visual issues
+
+  - Fix sidebar showing on `no-toc` pages in the gradient theme
+  - Fix variant selector truncating incorrectly in header when sections are present
+  - Fix page cover alignment on `lg` screens without TOC
+
+- 015615d: Respect fullWidth and defaultWidth for images
+- 7d5a6d2: fix nested a tag causing hydration error
+- b3a7ad6: fix href being empty in TOC
+- dc4268d: Fix navigation between sections/variants when previewing a site in v2
+- 7a00880: Improve support for OAuth2 security type
+- c0ee60e: Adds Columns layout block to GBO
+- 9316ccd: Update Models page styling
+- f58b904: encode customization header
+- 521052d: Fix concurrent execution in Vercel causing pages to not be attached to the proper tags.
+- a28a997: Add margin to adjacent buttons
+- c730845: Fix missing title on button to close the announcement banner.
+- 231167d: Make icons for page groups more contrasting
+- 57bb146: Make TOC height dynamic based on visible header and footer elements
+- c9373ef: Fix bold header links hover color
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- e7a591d: Fix border being added to cards
+- b6b5975: Reverse order of feedback smileys
+- fbfcca5: Fix ogimage using incorrect Google Font depending on language.
+- Updated dependencies [957afd9]
+- Updated dependencies [7a00880]
+- Updated dependencies [fbfcca5]
+- Updated dependencies [a0c06a7]
+- Updated dependencies [4c9a9d0]
+- Updated dependencies [40df91a]
+  - @gitbook/react-openapi@1.3.1
+  - @gitbook/fonts@0.1.0
+
 ## 0.12.0
 
 ### Minor Changes
