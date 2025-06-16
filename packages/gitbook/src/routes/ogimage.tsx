@@ -8,6 +8,7 @@ import { ImageResponse } from 'next/og';
 import { type PageParams, fetchPageData } from '@/components/SitePage';
 import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
+import { getExtension } from '@/lib/paths';
 import { filterOutNullable } from '@/lib/typescript';
 import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
@@ -32,7 +33,6 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     }
 
     // Compute all text to load only the necessary fonts
-    const contentTitle = customization.header.logo ? '' : site.title;
     const pageTitle = page
         ? page.title.length > 64
             ? `${page.title.slice(0, 64)}...`
@@ -52,7 +52,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             const fontFamily = customization.styling.font ?? CustomizationDefaultFont.Inter;
 
             const regularText = pageDescription;
-            const boldText = `${contentTitle}${pageTitle}`;
+            const boldText = `${site.title} ${pageTitle}`;
 
             const fonts = (
                 await Promise.all([
@@ -164,10 +164,28 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 )
             )
         );
+        if (!iconImage) {
+            throw new Error('Icon image should always been fetchable');
+        }
+
         return <img {...iconImage} alt="Icon" width={40} height={40} tw="mr-4" />;
     };
 
-    const [favicon, { fontFamily, fonts }] = await Promise.all([faviconLoader(), fontLoader()]);
+    const logoLoader = async () => {
+        if (!customization.header.logo) {
+            return null;
+        }
+
+        return await fetchImage(
+            useLightTheme ? customization.header.logo.light : customization.header.logo.dark
+        );
+    };
+
+    const [favicon, logo, { fontFamily, fonts }] = await Promise.all([
+        faviconLoader(),
+        logoLoader(),
+        fontLoader(),
+    ]);
 
     return new ImageResponse(
         <div
@@ -193,22 +211,14 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             />
 
             {/* Logo */}
-            {customization.header.logo ? (
+            {logo ? (
                 <div tw="flex flex-row">
-                    <img
-                        {...(await fetchImage(
-                            useLightTheme
-                                ? customization.header.logo.light
-                                : customization.header.logo.dark
-                        ))}
-                        alt="Logo"
-                        tw="h-[60px]"
-                    />
+                    <img {...logo} alt="Logo" tw="h-[60px]" />
                 </div>
             ) : (
                 <div tw="flex">
                     {favicon}
-                    <h3 tw="text-4xl my-0 font-bold">{contentTitle}</h3>
+                    <h3 tw="text-4xl my-0 font-bold">{site.title}</h3>
                 </div>
             )}
 
@@ -295,7 +305,9 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const staticCache = new Map<string, any>();
 
-// Do we need to limit the in-memory cache size? I think given the usage, we should be fine.
+/**
+ * Get or initialize a value in the static cache.
+ */
 async function getWithCache<T>(key: string, fn: () => Promise<T>) {
     const cached = staticCache.get(key) as T;
     if (cached) {
@@ -311,19 +323,46 @@ async function getWithCache<T>(key: string, fn: () => Promise<T>) {
  * Read a static image and cache it in memory.
  */
 async function fetchStaticImage(url: string) {
-    return getWithCache(`static-image:${url}`, () => fetchImage(url));
+    return getWithCache(`static-image:${url}`, async () => {
+        const image = await fetchImage(url);
+        if (!image) {
+            throw new Error('Failed to fetch static image');
+        }
+
+        return image;
+    });
 }
+
+/**
+ * @vercel/og supports the following image formats:
+ * Extracted from https://github.com/vercel/next.js/blob/canary/packages/next/src/compiled/%40vercel/og/index.node.js
+ */
+const UNSUPPORTED_IMAGE_EXTENSIONS = ['.avif', '.webp'];
+const SUPPORTED_IMAGE_TYPES = [
+    'image/png',
+    'image/apng',
+    'image/jpeg',
+    'image/gif',
+    'image/svg+xml',
+];
 
 /**
  * Fetch an image from a URL and return a base64 encoded string.
  * We do this as @vercel/og is otherwise failing on SVG images referenced by a URL.
  */
 async function fetchImage(url: string) {
+    // Skip early some images to avoid fetching them
+    const parsedURL = new URL(url);
+    if (UNSUPPORTED_IMAGE_EXTENSIONS.includes(getExtension(parsedURL.pathname).toLowerCase())) {
+        return null;
+    }
+
     const response = await fetch(url);
 
+    // Filter out unsupported image types
     const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.startsWith('image/')) {
-        throw new Error(`Invalid content type: ${contentType}`);
+    if (!contentType || !SUPPORTED_IMAGE_TYPES.some((type) => contentType.includes(type))) {
+        return null;
     }
 
     const arrayBuffer = await response.arrayBuffer();
@@ -334,8 +373,7 @@ async function fetchImage(url: string) {
     try {
         const { width, height } = imageSize(buffer);
         return { src, width, height };
-    } catch (error) {
-        console.error(`Error reading image size: ${error}`);
-        return { src };
+    } catch {
+        return null;
     }
 }
