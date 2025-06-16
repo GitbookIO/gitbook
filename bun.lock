@@ -169,6 +169,7 @@
         "assert-never": "^1.2.1",
         "jwt-decode": "^4.0.0",
         "next": "^15.3.2",
+        "object-identity": "^0.1.2",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "rison": "^0.1.1",
@@ -2437,6 +2438,8 @@
     "object-assign": ["object-assign@4.1.1", "", {}, "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg=="],
 
     "object-hash": ["object-hash@3.0.0", "", {}, "sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw=="],
+
+    "object-identity": ["object-identity@0.1.2", "", {}, "sha512-Px5puVllX5L2aBjbcfXpiG5xXeq6OE8RckryTeP2Zq+0PgYrCGJXmC6LblWgknKSJs11Je2W4U2NOWFj3t/QXQ=="],
 
     "object-inspect": ["object-inspect@1.13.2", "", {}, "sha512-IRZSRuzJiynemAXPYtPe5BoI/RESNYR7TYm50MC5Mqbd3Jmw5y790sErYw3V6SryFJD64b74qQQs9wn5Bg/k3g=="],
 
