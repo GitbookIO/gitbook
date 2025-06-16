@@ -20,7 +20,7 @@ export function cache<Args extends any[], Return>(fn: (...args: Args) => Return)
 /**
  * To ensure memory is garbage collected between each request, we use a per-request cache to store the ref maps.
  */
-const getWithStableRef = cache(withStableRef);
+const getWithStableRef = React.cache(withStableRef);
 
 /**
  * Create a function that converts a value to a stable reference.
