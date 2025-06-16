@@ -263,16 +263,18 @@ function getPlainCodeBlockLine(
         if (node.object === 'text') {
             content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
         } else {
-            const start = index + content.length;
-            content += getPlainCodeBlockLine(node, index + content.length, inlines);
-            const end = index + content.length;
+            if (node.type === 'annotation') {
+                const start = index + content.length;
+                content += getPlainCodeBlockLine(node, index + content.length, inlines);
+                const end = index + content.length;
 
-            if (inlines) {
-                inlines.push({
-                    inline: node,
-                    start,
-                    end,
-                });
+                if (inlines) {
+                    inlines.push({
+                        inline: node,
+                        start,
+                        end,
+                    });
+                }
             }
         }
     }
