@@ -165,7 +165,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             )
         );
         if (!iconImage) {
-            throw new Error('Icon image should always been fetchable');
+            throw new Error('Icon image should always be fetchable');
         }
 
         return <img {...iconImage} alt="Icon" width={40} height={40} tw="mr-4" />;
