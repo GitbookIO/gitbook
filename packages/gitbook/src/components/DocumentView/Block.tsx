@@ -46,7 +46,7 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
     style?: ClassValue;
 }
 
-export function renderBlock<T extends DocumentBlock>(props: BlockProps<T>) {
+export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
     const { block, style, isEstimatedOffscreen, context } = props;
 
     const content = (() => {

@@ -10,6 +10,7 @@ import { getNodeFragmentByName, isNodeEmpty } from '@/lib/document';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import type { DocumentContextProps } from './DocumentView';
+import { Inlines } from './Inlines';
 
 /**
  * Wrap a content of a block that has a potential caption.
@@ -61,6 +62,14 @@ export function Caption(
     return (
         <picture className={tcls('relative', style)}>
             <div className={tcls(wrapperStyle, 'mx-auto')}>{children}</div>
+            <figcaption className={tcls('text-sm', 'text-center', 'mt-2', 'text-tint')}>
+                <Inlines
+                    nodes={captionParagraph.nodes}
+                    document={document}
+                    context={context}
+                    ancestorInlines={[]}
+                />
+            </figcaption>
         </picture>
     );
 }

@@ -1,9 +1,10 @@
 import { type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
+import { Icon } from '@gitbook/icons';
 import { StyledLink } from '../primitives';
 import type { InlineProps } from './Inline';
-import { renderInlines } from './Inlines';
+import { Inlines } from './Inlines';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { inline, document, context, ancestorInlines } = props;
@@ -18,15 +19,16 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     if (!context.contentContext || !resolved) {
         return (
             <span title="Broken link" className="underline">
-                {renderInlines({
-                    context,
-                    document,
-                    nodes: inline.nodes,
-                    ancestorInlines: [...ancestorInlines, inline],
-                })}
+                <Inlines
+                    context={context}
+                    document={document}
+                    nodes={inline.nodes}
+                    ancestorInlines={[...ancestorInlines, inline]}
+                />
             </span>
         );
     }
+    const isExternal = inline.data.ref.kind === 'url';
 
     return (
         <StyledLink
@@ -39,12 +41,18 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                 },
             }}
         >
-            {renderInlines({
-                context,
-                document,
-                nodes: inline.nodes,
-                ancestorInlines: [...ancestorInlines, inline],
-            })}
+            <Inlines
+                context={context}
+                document={document}
+                nodes={inline.nodes}
+                ancestorInlines={[...ancestorInlines, inline]}
+            />
+            {isExternal ? (
+                <Icon
+                    icon="arrow-up-right"
+                    className="ml-0.5 inline size-3 links-accent:text-tint-subtle"
+                />
+            ) : null}
         </StyledLink>
     );
 }

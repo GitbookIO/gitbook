@@ -3,18 +3,14 @@ import type { DocumentBlockParagraph } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
-import { renderInlines } from './Inlines';
+import { Inlines } from './Inlines';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ...contextProps } = props;
 
     return (
         <p className={tcls(style)}>
-            {renderInlines({
-                ...contextProps,
-                nodes: block.nodes,
-                ancestorInlines: [],
-            })}
+            <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
     );
 }

@@ -5,7 +5,7 @@ import { resolveContentRef } from '@/lib/references';
 import type { GitBookSpaceContext } from '@v2/lib/context';
 import { getDataOrNull } from '@v2/lib/data';
 import type { BlockProps } from './Block';
-import { renderUnwrappedBlocks } from './Blocks';
+import { UnwrappedBlocks } from './Blocks';
 
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {
     const { block, context, ancestorBlocks } = props;
@@ -62,13 +62,15 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
                   shareKey: undefined,
               };
 
-    return renderUnwrappedBlocks({
-        nodes: document.nodes,
-        document: document,
-        ancestorBlocks: [...ancestorBlocks, block],
-        context: {
-            ...context,
-            contentContext: reusableContentContext,
-        },
-    });
+    return (
+        <UnwrappedBlocks
+            nodes={document.nodes}
+            document={document}
+            ancestorBlocks={[...ancestorBlocks, block]}
+            context={{
+                ...context,
+                contentContext: reusableContentContext,
+            }}
+        />
+    );
 }

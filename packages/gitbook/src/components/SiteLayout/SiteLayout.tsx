@@ -1,8 +1,3 @@
-import { CookiesToast } from '@/components/Cookies';
-import { LoadIntegrations } from '@/components/Integrations';
-import { SpaceLayout } from '@/components/SpaceLayout';
-import { buildVersion } from '@/lib/build';
-import { isSiteIndexable } from '@/lib/seo';
 import { CustomizationThemeMode } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import type { Metadata, Viewport } from 'next';
@@ -10,9 +5,17 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import { AdminToolbar } from '@/components/AdminToolbar';
+import { CookiesToast } from '@/components/Cookies';
+import { LoadIntegrations } from '@/components/Integrations';
+import { SpaceLayout } from '@/components/SpaceLayout';
+import { buildVersion } from '@/lib/build';
+import { isSiteIndexable } from '@/lib/seo';
+
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
 import { getResizedImageURL } from '@v2/lib/images';
+import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
 /**
@@ -45,30 +48,40 @@ export async function SiteLayout(props: {
 
     return (
         <NuqsAdapter>
-            <SpaceLayout
-                context={context}
-                withTracking={withTracking}
-                visitorAuthClaims={visitorAuthClaims}
+            <ClientContexts
+                nonce={nonce}
+                forcedTheme={
+                    forcedTheme ??
+                    (customization.themes.toggeable ? undefined : customization.themes.default)
+                }
             >
-                {children}
-            </SpaceLayout>
+                <SpaceLayout
+                    context={context}
+                    withTracking={withTracking}
+                    visitorAuthClaims={visitorAuthClaims}
+                >
+                    {children}
+                </SpaceLayout>
 
-            {scripts.length > 0 ? (
-                <>
-                    <LoadIntegrations />
-                    {scripts.map(({ script }) => (
-                        <script key={script} async src={script} nonce={nonce} />
-                    ))}
-                </>
-            ) : null}
+                {scripts.length > 0 ? (
+                    <>
+                        <LoadIntegrations />
+                        {scripts.map(({ script }) => (
+                            <script key={script} async src={script} nonce={nonce} />
+                        ))}
+                    </>
+                ) : null}
 
-            {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
-                <React.Suspense fallback={null}>
-                    <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
-                </React.Suspense>
-            ) : null}
+                {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
+                    <React.Suspense fallback={null}>
+                        <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
+                    </React.Suspense>
+                ) : null}
 
-            <RocketLoaderDetector nonce={nonce} />
+                <RocketLoaderDetector nonce={nonce} />
+
+                <AdminToolbar context={context} />
+            </ClientContexts>
         </NuqsAdapter>
     );
 }

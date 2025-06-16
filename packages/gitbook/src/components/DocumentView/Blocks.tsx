@@ -1,7 +1,8 @@
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
-import { renderBlock } from './Block';
+
+import { Block } from './Block';
 import type { DocumentContextProps } from './DocumentView';
 import { isBlockOffscreen } from './utils';
 
@@ -24,7 +25,7 @@ export function Blocks<TBlock extends DocumentBlock, Tag extends React.ElementTy
 
     return (
         <Tag {...wrapperProps} className={tcls(style)}>
-            {renderUnwrappedBlocks(blocksProps)}
+            <UnwrappedBlocks {...blocksProps} />
         </Tag>
     );
 }
@@ -49,13 +50,11 @@ type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps &
 /**
  * Renders a list of blocks without a wrapper element.
  */
-export function renderUnwrappedBlocks<TBlock extends DocumentBlock>(
-    props: UnwrappedBlocksProps<TBlock>
-) {
+export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBlocksProps<TBlock>) {
     const { nodes, blockStyle, isOffscreen: defaultIsOffscreen = false, ...contextProps } = props;
 
     let isOffscreen = defaultIsOffscreen;
-    return nodes.map((node) => {
+    return nodes.map((node, index) => {
         isOffscreen =
             isOffscreen ||
             isBlockOffscreen({
@@ -64,17 +63,20 @@ export function renderUnwrappedBlocks<TBlock extends DocumentBlock>(
                 ancestorBlocks: props.ancestorBlocks,
             });
 
-        return renderBlock({
-            block: node,
-            style: [
-                'mx-auto w-full decoration-primary/6',
-                node.data && 'fullWidth' in node.data && node.data.fullWidth
-                    ? 'max-w-screen-2xl'
-                    : 'page-full-width:ml-0 max-w-3xl',
-                blockStyle,
-            ],
-            isEstimatedOffscreen: isOffscreen,
-            ...contextProps,
-        });
+        return (
+            <Block
+                key={node.key || `${node.type}-${index}`}
+                block={node}
+                style={[
+                    'mx-auto w-full decoration-primary/6',
+                    node.data && 'fullWidth' in node.data && node.data.fullWidth
+                        ? 'max-w-screen-2xl'
+                        : 'page-full-width:ml-0 max-w-3xl',
+                    blockStyle,
+                ]}
+                isEstimatedOffscreen={isOffscreen}
+                {...contextProps}
+            />
+        );
     });
 }

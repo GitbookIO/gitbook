@@ -12,11 +12,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
-
-const UNORDERED_STYLE = {
-    '--font-family': 'inherit',
-    fontSize: 'min(1em, 24px)',
-};
+import { getBlockTextStyle } from './spacing';
 
 export function ListItem(props: BlockProps<DocumentBlockListItem>) {
     const { block, ancestorBlocks, ...contextProps } = props;
@@ -29,15 +25,31 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
         'Invalid parent list type'
     );
 
+    const blocksElement = (
+        <Blocks
+            {...contextProps}
+            nodes={block.nodes}
+            ancestorBlocks={[...ancestorBlocks, block]}
+            blockStyle={tcls(
+                'min-h-[1lh]',
+                // flip heading hash icon if list item is a heading
+                'flip-heading-hash',
+                // remove margin-top for the first heading in a list
+                '[&:is(h2)>div]:mt-0',
+                '[&:is(h3)>div]:mt-0',
+                '[&:is(h4)>div]:mt-0',
+                // Override the "mx-auto" class from UnwrappedBlocks
+                'mx-0'
+            )}
+            style="flex min-w-0 flex-1 flex-col space-y-2"
+        />
+    );
+
     switch (parent.type) {
         case 'list-tasks':
             return (
-                <li className={tcls('flex items-start')}>
-                    <div
-                        className={tcls(
-                            'mr-1 flex min-h-[1lh] min-w-6 items-center justify-center text-tint'
-                        )}
-                    >
+                <ListItemLI block={block}>
+                    <ListItemPrefix block={block}>
                         <Checkbox
                             id={block.key!}
                             disabled
@@ -45,117 +57,45 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                             className="relative"
                             size="small"
                         />
-                    </div>
+                    </ListItemPrefix>
 
                     <label htmlFor={block.key} className={tcls('flex-1')}>
-                        <Blocks
-                            {...contextProps}
-                            nodes={block.nodes}
-                            ancestorBlocks={[...ancestorBlocks, block]}
-                            blockStyle={tcls(
-                                'min-h-[1lh]',
-                                // flip heading hash icon if list item is a heading
-                                'flip-heading-hash',
-                                // remove margin-top for the first heading in a list
-                                '[&:is(h2)>div]:mt-0',
-                                '[&:is(h3)>div]:mt-0',
-                                '[&:is(h4)>div]:mt-0',
-                                // Override the "mx-auto" class from UnwrappedBlocks
-                                'mx-0'
-                            )}
-                            style="flex min-w-0 flex-1 flex-col space-y-2"
-                        />
+                        {blocksElement}
                     </label>
-                </li>
+                </ListItemLI>
             );
         case 'list-ordered':
             return (
-                <li className={tcls('flex items-start')}>
-                    <div
-                        className={tcls(
-                            'mr-1 flex min-h-[1lh] min-w-6 items-center justify-center text-tint'
-                        )}
-                    >
-                        <div
-                            className="before:font-var before:content-[--pseudoBefore--content]"
-                            style={
-                                {
-                                    '--pseudoBefore--content': `'${getOrderedListItemPrefixContent({
-                                        depth: getListItemDepth({
-                                            ancestorBlocks,
-                                            type: parent.type,
-                                        }),
-                                        block,
-                                        parent,
-                                    })}'`,
-                                    '--font-family': 'inherit',
-                                    fontSize: 'min(1em, 24px)',
-                                } as React.CSSProperties
-                            }
+                <ListItemLI block={block}>
+                    <ListItemPrefix block={block}>
+                        <PseudoBefore
+                            content={getOrderedListItemPrefixContent({
+                                depth: getListItemDepth({ ancestorBlocks, type: parent.type }),
+                                block,
+                                parent,
+                            })}
+                            style={{
+                                fontSize: 'min(1em, 24px)',
+                            }}
                         />
-                    </div>
-                    <Blocks
-                        {...contextProps}
-                        nodes={block.nodes}
-                        ancestorBlocks={[...ancestorBlocks, block]}
-                        blockStyle={tcls(
-                            'min-h-[1lh]',
-                            // flip heading hash icon if list item is a heading
-                            'flip-heading-hash',
-                            // remove margin-top for the first heading in a list
-                            '[&:is(h2)>div]:mt-0',
-                            '[&:is(h3)>div]:mt-0',
-                            '[&:is(h4)>div]:mt-0',
-                            // Override the "mx-auto" class from UnwrappedBlocks
-                            'mx-0'
-                        )}
-                        style="flex min-w-0 flex-1 flex-col space-y-2"
-                    />
-                </li>
+                    </ListItemPrefix>
+                    {blocksElement}
+                </ListItemLI>
             );
         case 'list-unordered':
             return (
-                <li className={tcls('flex items-start')}>
-                    <div
-                        className={tcls(
-                            'mr-1 flex min-h-[1lh] min-w-6 items-center justify-center text-tint'
-                        )}
-                    >
-                        <div
-                            className="before:font-var before:content-[--pseudoBefore--content]"
-                            style={
-                                {
-                                    '--pseudoBefore--content': `'${getUnorderedListItemsPrefixContent(
-                                        {
-                                            depth: getListItemDepth({
-                                                ancestorBlocks,
-                                                type: parent.type,
-                                            }),
-                                        }
-                                    )})}'`,
-                                    ...UNORDERED_STYLE,
-                                } as React.CSSProperties
-                            }
+                <ListItemLI block={block}>
+                    <ListItemPrefix block={block}>
+                        <PseudoBefore
+                            content={getUnorderedListItemsPrefixContent({
+                                depth: getListItemDepth({ ancestorBlocks, type: parent.type }),
+                            })}
+                            fontFamily="Arial"
+                            style={{ fontSize: 'min(1.5em, 24px)', lineHeight: 1 }}
                         />
-                    </div>
-                    <Blocks
-                        {...contextProps}
-                        nodes={block.nodes}
-                        ancestorBlocks={[...ancestorBlocks, block]}
-                        blockStyle={tcls(
-                            'min-h-[1lh]',
-                            // flip heading hash icon if list item is a heading
-                            'flip-heading-hash',
-                            // remove margin-top for the first heading in a list
-                            '[&:is(h2)>div]:mt-0',
-                            '[&:is(h3)>div]:mt-0',
-                            '[&:is(h4)>div]:mt-0',
-                            // Override the "mx-auto" class from UnwrappedBlocks
-                            'mx-0'
-                        )}
-                        style="flex min-w-0 flex-1 flex-col space-y-2"
-                    />
-                </li>
+                    </ListItemPrefix>
+                    {blocksElement}
+                </ListItemLI>
             );
         default:
             assertNever(parent);
@@ -183,6 +123,26 @@ function getListItemDepth(input: {
     }
 
     return depth;
+}
+
+function ListItemLI(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
+    const textStyle = getBlockTextStyle(props.block);
+    return <li className={tcls(textStyle.lineHeight, 'flex items-start')}>{props.children}</li>;
+}
+
+function ListItemPrefix(props: { block: DocumentBlockListItem; children: React.ReactNode }) {
+    const textStyle = getBlockTextStyle(props.block);
+    return (
+        <div
+            className={tcls(
+                textStyle.textSize,
+                textStyle.lineHeight,
+                'mr-1 flex min-h-[1lh] min-w-6 items-center justify-center text-tint'
+            )}
+        >
+            {props.children}
+        </div>
+    );
 }
 
 function getUnorderedListItemsPrefixContent(input: { depth: number }): string {

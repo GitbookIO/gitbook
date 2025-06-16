@@ -4,6 +4,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
 import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
+import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
@@ -45,7 +46,9 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     textStyle.lineHeight,
                     textStyle.marginTop
                 )}
-            ></div>
+            >
+                <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />
+            </div>
         </Tag>
     );
 }
