@@ -1,19 +1,17 @@
 import { type DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { Card } from '@/components/primitives';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import type { ResolvedContentRef } from '@/lib/references';
 
 import type { BlockProps } from './Block';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
 
-    const resolved = context.contentContext
-        ? await resolveContentRef(block.data.ref, context.contentContext, {
-              resolveAnchorText: true,
-              iconStyle: ['text-xl', 'text-tint'],
-          })
-        : null;
+    const resolved = await context.getContentRef(block.data.ref, {
+        resolveAnchorText: true,
+        iconStyle: ['text-xl', 'text-tint'],
+    });
 
     if (!resolved) {
         return null;
