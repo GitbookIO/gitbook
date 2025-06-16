@@ -27,7 +27,7 @@ export function PageBody(props: {
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
     document: JSONDocument | null;
-    prefetchedRef: Promise<Map<ContentRef, Promise<ResolvedContentRef | null>>>;
+    prefetchedRef?: Promise<Map<ContentRef, Promise<ResolvedContentRef | null>>>;
     withPageFeedback: boolean;
 }) {
     const { page, context, ancestors, document, withPageFeedback } = props;
@@ -46,7 +46,7 @@ export function PageBody(props: {
         if (!ref) {
             return null;
         }
-        if (options) {
+        if (options || !props.prefetchedRef) {
             return resolveContentRef(ref, context, options);
         }
         return props.prefetchedRef.then((prefetched) => prefetched.get(ref) ?? null);

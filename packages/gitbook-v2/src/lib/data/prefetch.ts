@@ -47,7 +47,7 @@ const cachedInitialDate = cache(() => Date.now());
 /**
  * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
  */
-async function getPageDataWithFallback(args: {
+export async function getPageDataWithFallback(args: {
     context: GitBookSiteContext;
     pagePathParams: PagePathParams;
 }) {
@@ -63,28 +63,35 @@ async function getPageDataWithFallback(args: {
     };
 }
 
+export async function getIcons(context: GitBookSiteContext): Promise<
+    {
+        url: string;
+        type: string;
+        media: string;
+    }[]
+> {
+    return Promise.all([getIcon(context, 'light'), getIcon(context, 'dark')]).then((urls) => [
+        {
+            url: urls[0],
+            type: 'image/png',
+            media: '(prefers-color-scheme: light)',
+        },
+        {
+            url: urls[1],
+            type: 'image/png',
+            media: '(prefers-color-scheme: dark)',
+        },
+    ]);
+}
+
 export const getPrefetchedDataFromLayoutParams = cache(
     (params: RouteLayoutParams): PrefetchedLayoutData => {
         const startingDate = cachedInitialDate();
         const staticSiteContext = getStaticSiteContext(params).finally(() => {
             console.log(`Finished fetching static site context in ${Date.now() - startingDate}ms`);
         });
-        const icons = Promise.all([
-            staticSiteContext.then(({ context }) => getIcon(context, 'light')),
-            staticSiteContext.then(({ context }) => getIcon(context, 'dark')),
-        ])
-            .then((urls) => [
-                {
-                    url: urls[0],
-                    type: 'image/png',
-                    media: '(prefers-color-scheme: light)',
-                },
-                {
-                    url: urls[1],
-                    type: 'image/png',
-                    media: '(prefers-color-scheme: dark)',
-                },
-            ])
+        const icons = staticSiteContext
+            .then(({ context }) => getIcons(context))
             .finally(() => {
                 console.log(`Finished fetching icons in ${Date.now() - startingDate}ms`);
             });
