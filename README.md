@@ -56,13 +56,19 @@ git clone https://github.com/gitbookIO/gitbook.git
 bun install
 ```
 
-4. Start your local development server.
+4. Run build.
+
+```
+bun build:v2
+```
+
+5. Start your local development server.
 
 ```
 bun dev:v2
 ```
 
-5. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
+6. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
 
 examples:
 
