@@ -69,6 +69,7 @@ export function TableOfContents(props: {
                     'page-no-toc:lg:basis-56',
 
                     'lg:sticky',
+                    'lg:z-[1]',
                     'lg:mr-12',
 
                     // Server-side static positioning
