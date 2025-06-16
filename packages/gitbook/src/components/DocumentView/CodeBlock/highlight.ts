@@ -12,6 +12,7 @@ import {
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
 
+import { nullIfNever } from '@/lib/typescript';
 import { plainHighlight } from './plain-highlight';
 
 export type HighlightLine = {
@@ -263,17 +264,27 @@ function getPlainCodeBlockLine(
         if (node.object === 'text') {
             content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
         } else {
-            if (node.type === 'annotation') {
-                const start = index + content.length;
-                content += getPlainCodeBlockLine(node, index + content.length, inlines);
-                const end = index + content.length;
+            switch (node.type) {
+                case 'annotation': {
+                    const start = index + content.length;
+                    content += getPlainCodeBlockLine(node, index + content.length, inlines);
+                    const end = index + content.length;
 
-                if (inlines) {
-                    inlines.push({
-                        inline: node,
-                        start,
-                        end,
-                    });
+                    if (inlines) {
+                        inlines.push({
+                            inline: node,
+                            start,
+                            end,
+                        });
+                    }
+                    break;
+                }
+                case 'expression': {
+                    break;
+                }
+                default: {
+                    nullIfNever(node);
+                    break;
                 }
             }
         }
