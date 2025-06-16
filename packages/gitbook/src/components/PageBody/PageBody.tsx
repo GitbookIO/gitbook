@@ -6,7 +6,11 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
-import type { ResolvedContentRef } from '@/lib/references';
+import {
+    type ResolveContentRefOptions,
+    type ResolvedContentRef,
+    resolveContentRef,
+} from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
@@ -34,6 +38,19 @@ export function PageBody(props: {
     const asFullWidth = pageFullWidth || contentFullWidth;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
+
+    const getContentRef = async (
+        ref?: ContentRef,
+        options?: ResolveContentRefOptions
+    ): Promise<ResolvedContentRef | null> => {
+        if (!ref) {
+            return null;
+        }
+        if (!options) {
+            return resolveContentRef(ref, context, options);
+        }
+        return props.prefetchedRef.then((prefetched) => prefetched.get(ref) ?? null);
+    };
 
     return (
         <>
@@ -70,7 +87,7 @@ export function PageBody(props: {
                             context={{
                                 mode: 'default',
                                 contentContext: context,
-                                contentRef: props.prefetchedRef,
+                                getContentRef: getContentRef,
                             }}
                         />
                     </React.Suspense>

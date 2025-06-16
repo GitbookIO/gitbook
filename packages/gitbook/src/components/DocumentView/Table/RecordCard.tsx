@@ -6,7 +6,6 @@ import {
 
 import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
-import { resolveContentRef } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
@@ -28,12 +27,8 @@ export async function RecordCard(
         : null;
 
     const [cover, target] = await Promise.all([
-        coverFile && context.contentContext
-            ? resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
-            : null,
-        targetRef && context.contentContext
-            ? resolveContentRef(targetRef, context.contentContext)
-            : null,
+        coverFile ? context.getContentRef({ kind: 'file', file: coverFile }) : null,
+        targetRef && context.getContentRef(targetRef),
     ]);
 
     const coverIsSquareOrPortrait =

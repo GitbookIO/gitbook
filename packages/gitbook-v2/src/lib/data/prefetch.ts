@@ -42,6 +42,8 @@ export interface PrefetchedPageData {
     prefetchedRef: Promise<Map<ContentRef, Promise<ResolvedContentRef | null>>>;
 }
 
+const cachedInitialDate = cache(() => Date.now());
+
 /**
  * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
  */
@@ -63,22 +65,29 @@ async function getPageDataWithFallback(args: {
 
 export const getPrefetchedDataFromLayoutParams = cache(
     (params: RouteLayoutParams): PrefetchedLayoutData => {
-        const staticSiteContext = getStaticSiteContext(params);
+        const startingDate = cachedInitialDate();
+        const staticSiteContext = getStaticSiteContext(params).finally(() => {
+            console.log(`Finished fetching static site context in ${Date.now() - startingDate}ms`);
+        });
         const icons = Promise.all([
             staticSiteContext.then(({ context }) => getIcon(context, 'light')),
             staticSiteContext.then(({ context }) => getIcon(context, 'dark')),
-        ]).then((urls) => [
-            {
-                url: urls[0],
-                type: 'image/png',
-                media: '(prefers-color-scheme: light)',
-            },
-            {
-                url: urls[1],
-                type: 'image/png',
-                media: '(prefers-color-scheme: dark)',
-            },
-        ]);
+        ])
+            .then((urls) => [
+                {
+                    url: urls[0],
+                    type: 'image/png',
+                    media: '(prefers-color-scheme: light)',
+                },
+                {
+                    url: urls[1],
+                    type: 'image/png',
+                    media: '(prefers-color-scheme: dark)',
+                },
+            ])
+            .finally(() => {
+                console.log(`Finished fetching icons in ${Date.now() - startingDate}ms`);
+            });
 
         return {
             staticSiteContext,
@@ -112,33 +121,43 @@ export const prefetchedDocumentRef = (
     if (document.nodes && Array.isArray(document.nodes)) {
         traverseNodes(document.nodes);
     }
-    console.log('Prefetched document references:', fetched.size);
     return fetched;
 };
 
 export const getPrefetchedDataFromPageParams = cache((params: RouteParams): PrefetchedPageData => {
+    const startingDate = cachedInitialDate();
     const { staticSiteContext } = getPrefetchedDataFromLayoutParams(params);
     const pathname = getPagePathFromParams(params);
-    const pageData = staticSiteContext.then(({ context }) =>
-        getPageDataWithFallback({
-            context,
-            pagePathParams: {
-                pathname,
-            },
+    const pageData = staticSiteContext
+        .then(({ context }) =>
+            getPageDataWithFallback({
+                context,
+                pagePathParams: {
+                    pathname,
+                },
+            })
+        )
+        .finally(() => {
+            console.log(`Finished fetching page data in ${Date.now() - startingDate}ms`);
+        });
+    const document = pageData
+        .then(({ context, pageTarget }) => {
+            if (!pageTarget?.page) {
+                return null;
+            }
+            return getPageDocument(context, pageTarget?.page);
         })
-    );
-    const document = pageData.then(({ context, pageTarget }) => {
-        if (!pageTarget?.page) {
-            return null;
-        }
-        return getPageDocument(context, pageTarget?.page);
-    });
-    const prefetchedRef = Promise.all([staticSiteContext, document]).then(
-        ([{ context }, document]) => {
+        .finally(() => {
+            console.log(`Finished fetching document in ${Date.now() - startingDate}ms`);
+        });
+    const prefetchedRef = Promise.all([staticSiteContext, document])
+        .then(([{ context }, document]) => {
             // Prefetch the references in the document
             return prefetchedDocumentRef(document, context);
-        }
-    );
+        })
+        .finally(() => {
+            console.log(`Finished prefetching references in ${Date.now() - startingDate}ms`);
+        });
     return {
         pageData,
         document,
