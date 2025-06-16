@@ -55,7 +55,7 @@ export function renderUnwrappedBlocks<TBlock extends DocumentBlock>(
     const { nodes, blockStyle, isOffscreen: defaultIsOffscreen = false, ...contextProps } = props;
 
     let isOffscreen = defaultIsOffscreen;
-    return nodes.map((node, index) => {
+    return nodes.map((node) => {
         isOffscreen =
             isOffscreen ||
             isBlockOffscreen({
@@ -65,7 +65,6 @@ export function renderUnwrappedBlocks<TBlock extends DocumentBlock>(
             });
 
         return renderBlock({
-            key: node.key || `${node.type}-${index}`,
             block: node,
             style: [
                 'mx-auto w-full decoration-primary/6',
