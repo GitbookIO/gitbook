@@ -4,9 +4,9 @@ import { getV1BaseContext } from '@/lib/v1';
 import { isV2 } from '@/lib/v2';
 import type { RenderIntegrationUI } from '@gitbook/api';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
-import { throwIfDataError } from '@v2/lib/data';
 import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { contentKitServerContext } from './contentkit';
+import { fetchSafeIntegrationUI } from './render';
 
 /**
  * Server action to render an integration UI request from <ContentKit />.
@@ -22,16 +22,19 @@ export async function renderIntegrationUi({
     request: RenderIntegrationUI;
 }) {
     const serverAction = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const output = await fetchSafeIntegrationUI(serverAction, {
+        integrationName: renderContext.integrationName,
+        request,
+    });
 
-    const output = await throwIfDataError(
-        serverAction.dataFetcher.renderIntegrationUi({
-            integrationName: renderContext.integrationName,
-            request,
-        })
-    );
+    if (output.error) {
+        return {
+            error: output.error.message,
+        };
+    }
 
     return {
-        children: <ContentKitOutput output={output} context={contentKitServerContext} />,
-        output: output,
+        children: <ContentKitOutput output={output.data} context={contentKitServerContext} />,
+        output: output.data,
     };
 }
