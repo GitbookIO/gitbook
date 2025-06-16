@@ -6,16 +6,21 @@ import * as React from 'react';
  * As `React.cache` only uses `Object.is` to compare arguments, it will not work with non-primitive arguments.
  */
 export function cache<Args extends any[], Return>(fn: (...args: Args) => Return) {
-    const toStableRef = withStableRef();
     const cached = React.cache(fn);
 
     return (...args: Args) => {
+        const toStableRef = getWithStableRef();
         const stableArgs = args.map((value) => {
             return toStableRef(value);
         }) as Args;
         return cached(...stableArgs);
     };
 }
+
+/**
+ * To ensure memory is garbage collected between each request, we use a per-request cache to store the ref maps.
+ */
+const getWithStableRef = cache(withStableRef);
 
 /**
  * Create a function that converts a value to a stable reference.
