@@ -43,10 +43,12 @@ interface FetchPlaceholderAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const [context, result] = await Promise.all([
+        isV2() ? getServerActionBaseContext() : getV1BaseContext(),
+        options.source === 'live' ? fetchAd(options) : getPlaceholderAd(),
+    ]);
 
     const mode = options.source === 'live' ? options.mode : 'classic';
-    const result = options.source === 'live' ? await fetchAd(options) : await getPlaceholderAd();
     if (!result || !result.ad.description || !result.ad.statlink) {
         return null;
     }
