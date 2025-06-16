@@ -47,11 +47,7 @@ export function getDataOrNull<T>(
         return response.then((result) => getDataOrNull(result, ignoreErrors));
     }
 
-    if (response.error) {
-        if (ignoreErrors.includes(response.error.code)) return null;
-        throw new DataFetcherError(response.error.message, response.error.code);
-    }
-    return response.data;
+    return ignoreDataFetcherErrors(response, ignoreErrors).data ?? null;
 }
 
 /**
@@ -91,6 +87,34 @@ export async function wrapDataFetcherError<T>(
             error: getExposableError(error as Error),
         };
     }
+}
+
+/**
+ * Ignore some data fetcher errors.
+ */
+export function ignoreDataFetcherErrors<T>(
+    response: DataFetcherResponse<T>,
+    ignoreErrors?: number[]
+): DataFetcherResponse<T>;
+export function ignoreDataFetcherErrors<T>(
+    response: Promise<DataFetcherResponse<T>>,
+    ignoreErrors?: number[]
+): Promise<DataFetcherResponse<T>>;
+export function ignoreDataFetcherErrors<T>(
+    response: DataFetcherResponse<T> | Promise<DataFetcherResponse<T>>,
+    ignoreErrors: number[] = [404]
+): DataFetcherResponse<T> | Promise<DataFetcherResponse<T>> {
+    if (response instanceof Promise) {
+        return response.then((result) => ignoreDataFetcherErrors(result, ignoreErrors));
+    }
+
+    if (response.error) {
+        if (ignoreErrors.includes(response.error.code)) {
+            return response;
+        }
+        throw new DataFetcherError(response.error.message, response.error.code);
+    }
+    return response;
 }
 
 /**
