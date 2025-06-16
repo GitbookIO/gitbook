@@ -1,0 +1,3 @@
+.headerLink {
+    @apply no-underline hover:underline text-xs tracking-wide font-semibold uppercase flex items-center gap-1.5 contrast-more:underline contrast-more:decoration-current;
+}

@@ -151,6 +151,23 @@
             z-index: 20;
         }
     }
+
+    .styled-link {
+        @apply underline
+               decoration-[max(0.07em,1px)]
+               underline-offset-2
+               links-accent:underline-offset-4
+               links-default:decoration-primary/6
+               links-default:text-primary-subtle
+               links-default:hover:text-primary-strong
+               links-default:contrast-more:text-primary
+               links-default:contrast-more:hover:text-primary-strong
+               links-accent:decoration-primary-subtle
+               links-accent:hover:decoration-[3px]
+               links-accent:hover:[text-decoration-skip-ink:none]
+               transition-all
+               duration-100;
+    }
 }
 
 html {

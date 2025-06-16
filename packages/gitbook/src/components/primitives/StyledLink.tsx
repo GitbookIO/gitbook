@@ -29,7 +29,7 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { className?: Class
     const { className, ...rest } = props;
 
     return (
-        <Link {...rest} className={tcls(linkStyles, className)}>
+        <Link {...rest} className={tcls('styled-link', className)}>
             {props.children}
         </Link>
     );

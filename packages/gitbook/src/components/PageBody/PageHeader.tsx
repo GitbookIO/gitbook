@@ -9,6 +9,8 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
+import style from './pageBody.module.css';
+
 export async function PageHeader(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
@@ -40,22 +42,7 @@ export async function PageHeader(props: {
                             return (
                                 <Fragment key={breadcrumb.id}>
                                     <li key={breadcrumb.id}>
-                                        <StyledLink
-                                            href={href}
-                                            className={tcls(
-                                                'no-underline',
-                                                'hover:underline',
-                                                'text-xs',
-                                                'tracking-wide',
-                                                'font-semibold',
-                                                'uppercase',
-                                                'flex',
-                                                'items-center',
-                                                'gap-1.5',
-                                                'contrast-more:underline',
-                                                'contrast-more:decoration-current'
-                                            )}
-                                        >
+                                        <StyledLink href={href} className={style.headerLink}>
                                             <PageIcon
                                                 page={breadcrumb}
                                                 style="flex size-4 items-center justify-center text-base leading-none"
