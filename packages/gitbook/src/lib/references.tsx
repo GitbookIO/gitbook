@@ -1,15 +1,20 @@
 import type {
     ContentRef,
     RevisionFile,
+    RevisionPage,
     RevisionPageDocument,
     RevisionReusableContent,
     SiteSpace,
     Space,
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
-import { type GitBookAnyContext, fetchSpaceContextByIds } from '@v2/lib/context';
+import {
+    type GitBookAnyContext,
+    type GitBookSpaceContext,
+    fetchSpaceContextByIds,
+} from '@v2/lib/context';
 import { getDataOrNull, getPageDocument, ignoreDataThrownError } from '@v2/lib/data';
-import { createLinker } from '@v2/lib/links';
+import { type GitBookLinker, createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import type React from 'react';
 
@@ -78,8 +83,8 @@ export async function resolveContentRef(
     context: GitBookAnyContext,
     options: ResolveContentRefOptions = {}
 ): Promise<ResolvedContentRef | null> {
-    const { resolveAnchorText = false, resolveAsAbsoluteURL = false, iconStyle } = options;
-    const { linker, dataFetcher, space, revisionId, pages } = context;
+    const { resolveAnchorText = false, iconStyle } = options;
+    const { linker, dataFetcher, space, revisionId } = context;
 
     const activePage = 'page' in context ? context.page : undefined;
 
@@ -116,6 +121,33 @@ export async function resolveContentRef(
             if (contentRef.space && contentRef.space !== space.id) {
                 return resolveContentRefInSpace(contentRef.space, context, contentRef);
             }
+
+            let resolveAsAbsoluteURL = options.resolveAsAbsoluteURL ?? false;
+            let linker = context.linker;
+
+            const pages: RevisionPage[] = await (async () => {
+                if (context.pages.length) {
+                    return context.pages;
+                }
+
+                const pages = await getDataOrNull(
+                    dataFetcher.getRevision({
+                        spaceId: space.id,
+                        revisionId,
+                        metadata: false,
+                    })
+                );
+
+                const ctx = await createLinkerForSpace(space.id, context);
+
+                if (!ctx) {
+                    return [];
+                }
+
+                resolveAsAbsoluteURL = true;
+                linker = ctx.linker;
+                return pages?.pages ?? [];
+            })();
 
             const resolvePageResult =
                 !contentRef.page || contentRef.page === activePage?.id
@@ -338,6 +370,8 @@ async function getBestTargetSpace(
             : null,
     ]);
 
+    console.log('publishedContentSite', context.site, context.shareKey, publishedContentSite);
+
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
     if (publishedContentSite) {
@@ -356,6 +390,50 @@ async function resolveContentRefInSpace(
     context: GitBookAnyContext,
     contentRef: ContentRef
 ) {
+    const ctx = await createLinkerForSpace(spaceId, context);
+
+    if (!ctx) {
+        return null;
+    }
+
+    const resolved = await resolveContentRef(
+        contentRef,
+        {
+            ...ctx.spaceContext,
+            space: ctx.space,
+            linker: ctx.linker,
+        },
+        {
+            // Resolve pages as absolute URLs as we are in a different site.
+            resolveAsAbsoluteURL: true,
+        }
+    );
+
+    if (!resolved) {
+        return null;
+    }
+
+    return {
+        ...resolved,
+        ancestors: [
+            {
+                label: ctx.space.title,
+                href: ctx.baseURL.toString(),
+            },
+            ...(resolved.ancestors ?? []),
+        ].filter(filterOutNullable),
+    };
+}
+
+async function createLinkerForSpace(
+    spaceId: string,
+    context: GitBookAnyContext
+): Promise<{
+    spaceContext: GitBookSpaceContext;
+    linker: GitBookLinker;
+    space: Space;
+    baseURL: URL;
+} | null> {
     const [spaceContext, bestTargetSpace] = await Promise.all([
         ignoreDataThrownError(
             fetchSpaceContextByIds(context, {
@@ -373,6 +451,8 @@ async function resolveContentRefInSpace(
 
     const space = bestTargetSpace?.space ?? spaceContext.space;
 
+    console.log('bestTargetSpace', bestTargetSpace, space);
+
     // Resolve URLs relative to the space.
     const baseURL = new URL(
         bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app
@@ -383,31 +463,10 @@ async function resolveContentRefInSpace(
         siteBasePath: baseURL.pathname,
     });
 
-    const resolved = await resolveContentRef(
-        contentRef,
-        {
-            ...spaceContext,
-            space,
-            linker,
-        },
-        {
-            // Resolve pages as absolute URLs as we are in a different site.
-            resolveAsAbsoluteURL: true,
-        }
-    );
-
-    if (!resolved) {
-        return null;
-    }
-
     return {
-        ...resolved,
-        ancestors: [
-            {
-                label: space.title,
-                href: baseURL.toString(),
-            },
-            ...(resolved.ancestors ?? []),
-        ].filter(filterOutNullable),
+        spaceContext,
+        linker,
+        space,
+        baseURL,
     };
 }

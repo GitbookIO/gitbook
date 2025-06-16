@@ -52,6 +52,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
             : {
                   ...context.contentContext,
                   dataFetcher,
+
                   space: resolved.reusableContent.space,
                   revisionId: resolved.reusableContent.revision,
                   // When the reusable content is in a different space, we don't resolve relative links to pages
@@ -59,7 +60,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
                   // In the future, we might expand the logic to look up the space from the list of all spaces in the site
                   // and adapt the relative links to point to the correct variant.
                   pages: [],
-                  shareKey: undefined,
+                  //   shareKey: undefined,
               };
 
     return (
