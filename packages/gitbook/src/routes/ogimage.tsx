@@ -1,6 +1,7 @@
 import { CustomizationDefaultFont, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { type FontWeight, getDefaultFont } from '@gitbook/fonts';
+import { imageSize } from 'image-size';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
@@ -156,14 +157,14 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
                 </span>
             );
-        const src = await readSelfImage(
+        const iconImage = await fetchImage(
             linker.toAbsoluteURL(
                 linker.toPathInSpace(
                     `~gitbook/icon?size=medium&theme=${customization.themes.default}`
                 )
             )
         );
-        return <img src={src} alt="Icon" width={40} height={40} tw="mr-4" />;
+        return <img {...iconImage} alt="Icon" width={40} height={40} tw="mr-4" />;
     };
 
     const [favicon, { fontFamily, fonts }] = await Promise.all([faviconLoader(), fontLoader()]);
@@ -187,21 +188,23 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             {/* Grid */}
             <img
                 tw="absolute inset-0 w-[100vw] h-[100vh]"
-                src={await readStaticImage(gridAsset)}
+                src={(await fetchStaticImage(gridAsset)).src}
                 alt="Grid"
             />
 
             {/* Logo */}
             {customization.header.logo ? (
-                <img
-                    alt="Logo"
-                    height={60}
-                    src={
-                        useLightTheme
-                            ? customization.header.logo.light
-                            : customization.header.logo.dark
-                    }
-                />
+                <div tw="flex flex-row">
+                    <img
+                        {...(await fetchImage(
+                            useLightTheme
+                                ? customization.header.logo.light
+                                : customization.header.logo.dark
+                        ))}
+                        alt="Logo"
+                        tw="h-[60px]"
+                    />
+                </div>
             ) : (
                 <div tw="flex">
                     {favicon}
@@ -289,34 +292,6 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
     };
 }
 
-/**
- * Temporary function to log some data on Cloudflare.
- * TODO: remove this when we found the issue
- */
-function logOnCloudflareOnly(message: string) {
-    if (process.env.DEBUG_CLOUDFLARE === 'true') {
-        // biome-ignore lint/suspicious/noConsole: <explanation>
-        console.log(message);
-    }
-}
-
-/**
- * Read an image from a response as a base64 encoded string.
- */
-async function readImage(response: Response) {
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.startsWith('image/')) {
-        logOnCloudflareOnly(`Invalid content type: ${contentType}, 
-            status: ${response.status}
-            rayId: ${response.headers.get('cf-ray')}`);
-        throw new Error(`Invalid content type: ${contentType}`);
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString('base64');
-    return `data:${contentType};base64,${base64}`;
-}
-
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const staticCache = new Map<string, any>();
 
@@ -335,16 +310,32 @@ async function getWithCache<T>(key: string, fn: () => Promise<T>) {
 /**
  * Read a static image and cache it in memory.
  */
-async function readStaticImage(url: string) {
-    logOnCloudflareOnly(`Reading static image: ${url}, cache size: ${staticCache.size}`);
-    return getWithCache(`static-image:${url}`, () => readSelfImage(url));
+async function fetchStaticImage(url: string) {
+    return getWithCache(`static-image:${url}`, () => fetchImage(url));
 }
 
 /**
- * Read an image from GitBook itself.
+ * Fetch an image from a URL and return a base64 encoded string.
+ * We do this as @vercel/og is otherwise failing on SVG images referenced by a URL.
  */
-async function readSelfImage(url: string) {
+async function fetchImage(url: string) {
     const response = await fetch(url);
-    const image = await readImage(response);
-    return image;
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.startsWith('image/')) {
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64 = buffer.toString('base64');
+    const src = `data:${contentType};base64,${base64}`;
+
+    try {
+        const { width, height } = imageSize(buffer);
+        return { src, width, height };
+    } catch (error) {
+        console.error(`Error reading image size: ${error}`);
+        return { src };
+    }
 }
