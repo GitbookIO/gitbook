@@ -11,7 +11,6 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@v2/lib/images';
-import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
 
@@ -65,7 +64,7 @@ export async function SitePage(props: SitePageProps) {
     const document = await getPageDocument(context, page);
 
     return (
-        <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
+        <>
             {withFullPageCover && page.cover ? (
                 <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
@@ -90,7 +89,7 @@ export async function SitePage(props: SitePageProps) {
             <React.Suspense fallback={null}>
                 <PageClientLayout withSections={withSections} />
             </React.Suspense>
-        </PageContextProvider>
+        </>
     );
 }
 

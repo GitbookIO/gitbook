@@ -6,7 +6,6 @@ import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
-import { Inlines } from '../Inlines';
 import { Details } from './Details';
 
 export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
@@ -53,12 +52,6 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                         'shrink-0',
                         'group-open/expandable:rotate-90'
                     )}
-                />
-                <Inlines
-                    nodes={titleParagraph.nodes}
-                    document={document}
-                    context={context}
-                    ancestorInlines={[]}
                 />
                 <a
                     href={`#${id}`}

@@ -3,7 +3,7 @@ import { Icon, type IconName } from '@gitbook/icons';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { Block, type BlockProps } from './Block';
+import type { BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
 
@@ -49,17 +49,6 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                     className={tcls('size-[1.2em]', 'mt-px', firstLine.lineHeight)}
                 />
             </div>
-            {hasHeading ? (
-                <Block
-                    style={tcls(
-                        'flip-heading-hash p-4 pl-3 text-[1em] *:mt-0',
-                        hasHeading ? hintStyle.header : null
-                    )}
-                    ancestorBlocks={[...ancestorBlocks, block]}
-                    {...contextProps}
-                    block={firstNode}
-                />
-            ) : null}
             <Blocks
                 {...contextProps}
                 ancestorBlocks={[...ancestorBlocks, block]}
