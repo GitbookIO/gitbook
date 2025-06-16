@@ -108,6 +108,7 @@
         "parse-cache-control": "^1.0.1",
         "partial-json": "^0.1.7",
         "react": "^19.0.0",
+        "react-aria": "^3.37.0",
         "react-dom": "^19.0.0",
         "react-hotkeys-hook": "^4.4.1",
         "rehype-sanitize": "^6.0.0",

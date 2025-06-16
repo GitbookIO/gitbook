@@ -3,6 +3,7 @@
 import { useMobileMenuSheet } from '@/components/MobileMenu';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+import { usePreventScroll } from 'react-aria';
 
 export function MobileMenuScript() {
     const pathname = usePathname();
@@ -13,14 +14,10 @@ export function MobileMenuScript() {
         setOpen(false);
     }, [pathname]);
 
-    useEffect(() => {
-        // If the menu is open, we add a class to the body to prevent scrolling
-        if (open) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-    }, [open]);
+    // Prevent scrolling when the menu is open
+    usePreventScroll({
+        isDisabled: !open,
+    });
 
     return null;
 }
