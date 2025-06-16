@@ -1,4 +1,4 @@
-import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
+import { type ContentRef, CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -9,6 +9,7 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
+import { type ResolveContentRefOptions, resolveContentRef } from '@/lib/references';
 import type { RouteParams } from '@v2/app/utils';
 import { getPageDocument } from '@v2/lib/data/pages';
 import { getPageDataWithFallback, getPrefetchedDataFromPageParams } from '@v2/lib/data/prefetch';
@@ -83,6 +84,13 @@ export async function SitePage(props: SitePageProps) {
         ? await prefetchedData.document
         : await getPageDocument(context, page);
 
+    const getContentRef = async (ref: ContentRef, options?: ResolveContentRefOptions) => {
+        if (prefetchedData) {
+            return prefetchedData.getPrefetchedRef(ref, options);
+        }
+        return resolveContentRef(ref, context, options);
+    };
+
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
             {withFullPageCover && page.cover ? (
@@ -104,7 +112,7 @@ export async function SitePage(props: SitePageProps) {
                     ancestors={ancestors}
                     document={document}
                     withPageFeedback={withPageFeedback}
-                    prefetchedRef={prefetchedData ? prefetchedData.prefetchedRef : undefined}
+                    getContentRef={getContentRef}
                 />
             </div>
             <React.Suspense fallback={null}>

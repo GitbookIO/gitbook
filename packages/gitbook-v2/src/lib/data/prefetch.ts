@@ -1,7 +1,11 @@
 import { type PagePathParams, fetchPageData } from '@/components/SitePage';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { AncestorRevisionPage } from '@/lib/pages';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import {
+    type ResolveContentRefOptions,
+    type ResolvedContentRef,
+    resolveContentRef,
+} from '@/lib/references';
 import type { ContentRef, JSONDocument, RevisionPageDocument } from '@gitbook/api';
 import {
     type RouteLayoutParams,
@@ -10,7 +14,8 @@ import {
     getPagePathFromParams,
     getStaticSiteContext,
 } from '@v2/app/utils';
-import { cache } from 'react';
+import { identify } from 'object-identity';
+import { cache } from '../cache';
 import type { GitBookSiteContext } from '../context';
 import { getPageDocument } from './pages';
 
@@ -39,7 +44,10 @@ export interface PrefetchedPageData {
         };
     }>;
     document: Promise<JSONDocument | null>;
-    prefetchedRef: Promise<Map<ContentRef, Promise<ResolvedContentRef | null>>>;
+    getPrefetchedRef: (
+        ref?: ContentRef,
+        options?: ResolveContentRefOptions
+    ) => Promise<ResolvedContentRef | null>;
 }
 
 const cachedInitialDate = cache(() => Date.now());
@@ -107,14 +115,38 @@ export const prefetchedDocumentRef = (
     document: JSONDocument | null,
     context: GitBookSiteContext
 ) => {
-    const fetched = new Map<ContentRef, Promise<ResolvedContentRef | null>>();
+    const fetched = new Map<string, Promise<ResolvedContentRef | null>>();
     if (!document) return fetched;
 
     const traverseNodes = (nodes: any[]): void => {
         for (const node of nodes) {
             // We try prefetching as many references as possible.
             if (node.data?.ref) {
-                fetched.set(node.data.ref, resolveContentRef(node.data.ref, context));
+                fetched.set(identify(node.data.ref), resolveContentRef(node.data.ref, context));
+            }
+            // Handle prefetching of references for cards
+            if (node.data?.view && node.data.view.type === 'cards') {
+                const view = node.data.view;
+                const records = Object.entries(node.data.records || {});
+
+                records.forEach(async (record: [string, any]) => {
+                    const coverFile = view.coverDefinition
+                        ? record[1].values[view.coverDefinition]?.[0]
+                        : null;
+                    const targetRef = view.targetDefinition
+                        ? (record[1].values[view.targetDefinition] as ContentRef)
+                        : null;
+                    if (targetRef) {
+                        fetched.set(identify(targetRef), resolveContentRef(targetRef, context));
+                    }
+                    if (coverFile) {
+                        const fileRef = {
+                            kind: 'file' as const,
+                            file: coverFile,
+                        };
+                        fetched.set(identify(fileRef), resolveContentRef(fileRef, context));
+                    }
+                });
             }
             if (node.nodes && Array.isArray(node.nodes)) {
                 traverseNodes(node.nodes);
@@ -165,9 +197,24 @@ export const getPrefetchedDataFromPageParams = cache((params: RouteParams): Pref
         .finally(() => {
             console.log(`Finished prefetching references in ${Date.now() - startingDate}ms`);
         });
+
+    const getContentRef = async (
+        ref?: ContentRef,
+        options?: ResolveContentRefOptions
+    ): Promise<ResolvedContentRef | null> => {
+        if (!ref) {
+            return null;
+        }
+        if (options) {
+            const { context } = await staticSiteContext;
+            return resolveContentRef(ref, context, options);
+        }
+        return prefetchedRef.then((prefetched) => prefetched.get(identify(ref)) ?? null);
+    };
+
     return {
         pageData,
         document,
-        prefetchedRef,
+        getPrefetchedRef: getContentRef,
     };
 });
