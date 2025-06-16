@@ -46,7 +46,7 @@ export function PageBody(props: {
         if (!ref) {
             return null;
         }
-        if (!options) {
+        if (options) {
             return resolveContentRef(ref, context, options);
         }
         return props.prefetchedRef.then((prefetched) => prefetched.get(ref) ?? null);

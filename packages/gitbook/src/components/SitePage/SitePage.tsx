@@ -42,7 +42,7 @@ export async function SitePage(props: SitePageProps) {
             notFound();
         }
     } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
-        console.log('Redirecting to page path', rawPathname, 'for page', pageTarget.page.id);
+        //TODO: Don't forget to uncomment the redirect when i'm done
         // redirect(
         //     context.linker.toPathForPage({
         //         pages: context.pages,
