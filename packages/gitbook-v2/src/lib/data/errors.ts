@@ -1,4 +1,5 @@
 import { GitBookAPIError } from '@gitbook/api';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
 export class DataFetcherError extends Error {
@@ -87,6 +88,22 @@ export async function wrapDataFetcherError<T>(
             error: getExposableError(error as Error),
         };
     }
+}
+
+/**
+ * Wrap an async execution to handle errors and return a DataFetcherResponse.
+ * This should be used inside 'use cache' functions.
+ */
+export async function wrapCacheDataFetcherError<T>(
+    fn: () => Promise<T>
+): Promise<DataFetcherResponse<T>> {
+    const result = await wrapDataFetcherError(fn);
+    if (result.error && result.error.code >= 500) {
+        // We don't want to cache errors for too long.
+        // as the API might
+        cacheLife('minutes');
+    }
+    return result;
 }
 
 /**
