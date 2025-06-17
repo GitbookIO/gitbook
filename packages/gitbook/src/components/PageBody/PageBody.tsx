@@ -4,7 +4,7 @@ import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { hasFullWidthBlock, hasMoreThan, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -28,6 +28,13 @@ export function PageBody(props: {
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+    const shouldRenderLinkPreviews = document
+        ? !hasMoreThan(
+              document,
+              (inline) => inline.object === 'inline' && inline.type === 'link',
+              100
+          )
+        : false;
     const pageFullWidth = page.id === 'wtthNFMqmEQmnt5LKR0q';
     const asFullWidth = pageFullWidth || contentFullWidth;
     const language = getSpaceLanguage(customization);
@@ -68,6 +75,7 @@ export function PageBody(props: {
                             context={{
                                 mode: 'default',
                                 contentContext: context,
+                                shouldRenderLinkPreviews,
                             }}
                         />
                     </React.Suspense>

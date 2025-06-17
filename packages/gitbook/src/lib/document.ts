@@ -30,6 +30,34 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
     return false;
 }
 
+export function hasMoreThan(
+    document: JSONDocument | DocumentBlock,
+    check: (block: DocumentBlock | DocumentInline) => boolean,
+    limit = 1
+): boolean {
+    let count = 0;
+    for (const node of 'nodes' in document ? document.nodes : []) {
+        if (node.object === 'text') {
+            continue; // Skip text nodes
+        }
+
+        if (check(node)) {
+            count++;
+            if (count > limit) {
+                return true;
+            }
+        }
+
+        if (node.object === 'block' && 'nodes' in node) {
+            const hasMore = hasMoreThan(node, check);
+            if (hasMore) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 /**
  * Get the text of a block/inline.
  */

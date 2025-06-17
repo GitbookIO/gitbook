@@ -4,6 +4,7 @@ import { resolveContentRef } from '@/lib/references';
 import { Icon } from '@gitbook/icons';
 import { StyledLink } from '../primitives';
 import type { InlineProps } from './Inline';
+import { InlineLinkTooltip } from './InlineLinkTooltip';
 import { Inlines } from './Inlines';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
@@ -29,8 +30,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         );
     }
     const isExternal = inline.data.ref.kind === 'url';
-
-    return (
+    const content = (
         <StyledLink
             href={resolved.href}
             insights={{
@@ -55,4 +55,14 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
             ) : null}
         </StyledLink>
     );
+
+    if (context.shouldRenderLinkPreviews) {
+        return (
+            <InlineLinkTooltip inline={inline} context={context.contentContext} resolved={resolved}>
+                {content}
+            </InlineLinkTooltip>
+        );
+    }
+
+    return content;
 }

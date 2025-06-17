@@ -345,6 +345,7 @@ async function transformAnswer(
                         mode: 'default',
                         contentContext: undefined,
                         wrapBlocksInSuspense: false,
+                        shouldRenderLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
                     style={['space-y-5']}
                 />
