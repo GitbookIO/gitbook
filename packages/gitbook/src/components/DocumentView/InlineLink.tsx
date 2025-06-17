@@ -5,7 +5,7 @@ import { Icon } from '@gitbook/icons';
 import { StyledLink } from '../primitives';
 import type { InlineProps } from './Inline';
 import { InlineLinkTooltip } from './InlineLinkTooltip';
-import { renderInlines } from './Inlines';
+import { Inlines } from './Inlines';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     const { inline, document, context, ancestorInlines } = props;
@@ -20,12 +20,12 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
     if (!context.contentContext || !resolved) {
         return (
             <span title="Broken link" className="underline">
-                {renderInlines({
-                    context,
-                    document,
-                    nodes: inline.nodes,
-                    ancestorInlines: [...ancestorInlines, inline],
-                })}
+                <Inlines
+                    context={context}
+                    document={document}
+                    nodes={inline.nodes}
+                    ancestorInlines={[...ancestorInlines, inline]}
+                />
             </span>
         );
     }
@@ -43,12 +43,12 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                     },
                 }}
             >
-                {renderInlines({
-                    context,
-                    document,
-                    nodes: inline.nodes,
-                    ancestorInlines: [...ancestorInlines, inline],
-                })}
+                <Inlines
+                    context={context}
+                    document={document}
+                    nodes={inline.nodes}
+                    ancestorInlines={[...ancestorInlines, inline]}
+                />
                 {isExternal ? (
                     <Icon
                         icon="arrow-up-right"
