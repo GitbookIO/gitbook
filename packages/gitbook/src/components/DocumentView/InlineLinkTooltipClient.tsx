@@ -6,7 +6,6 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Fragment } from 'react';
-import { AIPageLinkSummary } from '../Adaptive';
 import { Button, StyledLink } from '../primitives';
 
 export function InlineLinkTooltipClient(props: {
@@ -104,16 +103,6 @@ export function InlineLinkTooltipClient(props: {
                                     <p className="mt-1 text-sm text-tint">{target.subText}</p>
                                 ) : null}
                             </div>
-
-                            {aiSummary ? (
-                                <div className="border-tint-subtle border-t bg-tint p-4">
-                                    <AIPageLinkSummary
-                                        targetPageId={aiSummary.pageId}
-                                        targetSpaceId={aiSummary.spaceId}
-                                        showTrademark
-                                    />
-                                </div>
-                            ) : null}
                         </div>
                         <Tooltip.Arrow
                             className={
