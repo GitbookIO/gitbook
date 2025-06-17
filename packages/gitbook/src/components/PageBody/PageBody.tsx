@@ -17,6 +17,8 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 
+const LINK_PREVIEW_MAX_COUNT = 100;
+
 export function PageBody(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
@@ -32,7 +34,7 @@ export function PageBody(props: {
         ? !hasMoreThan(
               document,
               (inline) => inline.object === 'inline' && inline.type === 'link',
-              100
+              LINK_PREVIEW_MAX_COUNT
           )
         : false;
     const pageFullWidth = page.id === 'wtthNFMqmEQmnt5LKR0q';

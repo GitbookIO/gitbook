@@ -36,26 +36,24 @@ export function hasMoreThan(
     limit = 1
 ): boolean {
     let count = 0;
-    for (const node of 'nodes' in document ? document.nodes : []) {
-        if (node.object === 'text') {
-            continue; // Skip text nodes
-        }
 
-        if (check(node)) {
-            count++;
-            if (count > limit) {
-                return true;
+    function traverse(node: JSONDocument | DocumentBlock): boolean {
+        for (const child of 'nodes' in node ? node.nodes : []) {
+            if (child.object === 'text') continue;
+
+            if (check(child)) {
+                count++;
+                if (count > limit) return true;
+            }
+
+            if (child.object === 'block' && 'nodes' in child) {
+                if (traverse(child)) return true;
             }
         }
-
-        if (node.object === 'block' && 'nodes' in node) {
-            const hasMore = hasMoreThan(node, check);
-            if (hasMore) {
-                return true;
-            }
-        }
+        return false;
     }
-    return false;
+
+    return traverse(document);
 }
 
 /**
