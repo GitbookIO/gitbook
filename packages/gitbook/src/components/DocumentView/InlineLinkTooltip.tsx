@@ -6,7 +6,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
 import { languages } from '@/intl/translations';
 import { Icon } from '@gitbook/icons';
-import type { GitBookAnyContext, GitBookPageContext } from '@v2/lib/context';
+import type { GitBookAnyContext } from '@v2/lib/context';
 import { InlineLinkTooltipClient } from './InlineLinkTooltipClient';
 
 export function InlineLinkTooltip(props: {
@@ -52,12 +52,13 @@ export function InlineLinkTooltip(props: {
             return;
         }
 
+        if (!('page' in context) || !('page' in inline.data.ref)) {
+            return;
+        }
+
         if (inline.data.ref.kind === 'page' || inline.data.ref.kind === 'anchor') {
             return {
-                pageId:
-                    resolved.page?.id ??
-                    inline.data.ref.page ??
-                    (context as GitBookPageContext).page.id,
+                pageId: resolved.page?.id ?? inline.data.ref.page ?? context.page.id,
                 spaceId: inline.data.ref.space ?? context.space.id,
             };
         }
