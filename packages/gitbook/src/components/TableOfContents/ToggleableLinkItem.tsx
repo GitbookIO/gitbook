@@ -10,6 +10,8 @@ import { useCurrentPagePath } from '../hooks';
 import { Link, type LinkInsightsProps, type LinkProps } from '../primitives';
 import { useScrollToActiveTOCItem } from './TOCScroller';
 
+import styles from './toc.module.css';
+
 /**
  * Client component for a page document to toggle its children and be marked as active.
  */
@@ -67,40 +69,12 @@ function LinkItem(
             insights={insights}
             aria-current={isActive ? 'page' : undefined}
             className={tcls(
-                'group/toclink toclink relative transition-colors',
-                'flex flex-row justify-between',
-                'circular-corners:rounded-2xl rounded-md straight-corners:rounded-none p-1.5 pl-3',
-                'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
-                'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
-                'before:contents[] before:-left-px before:absolute before:inset-y-0',
-                'sidebar-list-line:rounded-l-none sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none [&+div_a]:pl-5 sidebar-list-default:[&+div_a]:before:w-px',
+                'group/toclink',
+                'toclink',
+                'before:contents[]',
+                styles.toggleableLink,
 
-                isActive && [
-                    'font-semibold',
-                    'sidebar-list-line:before:w-0.5',
-
-                    'before:bg-primary-solid',
-                    'text-primary-subtle',
-                    'contrast-more:text-primary',
-
-                    'sidebar-list-pill:bg-primary',
-                    '[html.sidebar-list-pill.theme-muted_&]:bg-primary-hover',
-                    '[html.sidebar-list-pill.theme-bold.tint_&]:bg-primary-hover',
-                    '[html.sidebar-filled.sidebar-list-pill.theme-muted_&]:bg-primary',
-                    '[html.sidebar-filled.sidebar-list-pill.theme-bold.tint_&]:bg-primary',
-
-                    'hover:bg-primary-hover',
-                    'hover:text-primary',
-                    'hover:before:bg-primary-solid-hover',
-                    'sidebar-list-pill:hover:bg-primary-hover',
-
-                    'contrast-more:text-primary',
-                    'contrast-more:hover:text-primary-strong',
-                    'contrast-more:bg-primary',
-                    'contrast-more:ring-1',
-                    'contrast-more:ring-primary',
-                    'contrast-more:hover:ring-primary-hover',
-                ]
+                isActive && styles.active
             )}
         >
             {children}
