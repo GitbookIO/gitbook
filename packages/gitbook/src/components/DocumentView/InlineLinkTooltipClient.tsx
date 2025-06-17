@@ -2,10 +2,16 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
 
+const LoadingValueContext = React.createContext<React.ReactNode>(null);
+
 const InlineLinkTooltipClientImpl = dynamic(
     () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
     {
         ssr: false,
+        loading: () => {
+            const children = React.useContext(LoadingValueContext);
+            return <>{children}</>;
+        },
     }
 );
 
@@ -36,9 +42,9 @@ export function InlineLinkTooltipClient(props: {
     }, []);
 
     return shouldLoad ? (
-        <React.Suspense fallback={children}>
+        <LoadingValueContext.Provider value={children}>
             <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
-        </React.Suspense>
+        </LoadingValueContext.Provider>
     ) : (
         children
     );
