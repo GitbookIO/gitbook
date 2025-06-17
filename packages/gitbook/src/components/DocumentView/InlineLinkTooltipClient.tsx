@@ -6,7 +6,6 @@ const InlineLinkTooltipClientImpl = dynamic(
     () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
     {
         ssr: false,
-        loading: () => null, // Don't render anything until loaded
     }
 );
 
