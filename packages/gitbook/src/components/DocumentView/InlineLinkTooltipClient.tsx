@@ -33,20 +33,24 @@ export function InlineLinkTooltipClient(props: {
     const { children, ...rest } = props;
     const [shouldLoad, setShouldLoad] = React.useState(false);
 
-    React.useEffect(() => {
-        if ('requestIdleCallback' in window) {
-            (window as globalThis.Window).requestIdleCallback(() => setShouldLoad(true));
-        } else {
-            // fallback for Safari or old browsers
-            setTimeout(() => setShouldLoad(true), 2000);
-        }
-    }, []);
+    // React.useEffect(() => {
+    //     if ('requestIdleCallback' in window) {
+    //         (window as globalThis.Window).requestIdleCallback(() => setShouldLoad(true));
+    //     } else {
+    //         // fallback for Safari or old browsers
+    //         setTimeout(() => setShouldLoad(true), 2000);
+    //     }
+    // }, []);
 
-    return shouldLoad ? (
-        <LoadingValueContext.Provider value={children}>
-            <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
-        </LoadingValueContext.Provider>
-    ) : (
-        children
+    return (
+        <span onMouseEnter={() => setShouldLoad(true)} onFocus={() => setShouldLoad(true)}>
+            {shouldLoad ? (
+                <LoadingValueContext.Provider value={children}>
+                    <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
+                </LoadingValueContext.Provider>
+            ) : (
+                children
+            )}
+        </span>
     );
 }
