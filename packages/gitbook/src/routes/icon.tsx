@@ -24,6 +24,11 @@ const SIZES = {
     },
 };
 
+type RenderIconOptions = {
+    size: keyof typeof SIZES;
+    theme: 'light' | 'dark';
+};
+
 /**
  * Generate an icon for a site content.
  */
@@ -31,7 +36,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
-    const { site, customization } = context;
+    const { customization } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     // If the site has a custom icon, redirect to it
@@ -45,9 +50,34 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
         );
     }
 
+    return new ImageResponse(<SiteDefaultIcon context={context} options={options} />, {
+        width: size.width,
+        height: size.height,
+        headers: {
+            'cache-tag': [
+                getCacheTag({
+                    tag: 'site',
+                    site: context.site.id,
+                }),
+            ].join(','),
+        },
+    });
+}
+
+/**
+ * Render the icon as a React node.
+ */
+export function SiteDefaultIcon(props: {
+    context: GitBookSiteContext;
+    options: RenderIconOptions;
+}) {
+    const { context, options } = props;
+    const size = SIZES[options.size];
+
+    const { site, customization } = context;
     const contentTitle = site.title;
 
-    return new ImageResponse(
+    return (
         <div
             tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
             style={{
@@ -70,19 +100,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
                     ? getEmojiForCode(customization.favicon.emoji)
                     : contentTitle.slice(0, 1).toUpperCase()}
             </h2>
-        </div>,
-        {
-            width: size.width,
-            height: size.height,
-            headers: {
-                'cache-tag': [
-                    getCacheTag({
-                        tag: 'site',
-                        site: context.site.id,
-                    }),
-                ].join(','),
-            },
-        }
+        </div>
     );
 }
 

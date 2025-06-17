@@ -14,6 +14,7 @@ import { filterOutNullable } from '@/lib/typescript';
 import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import { getResizedImageURL } from '@v2/lib/images';
+import { SiteDefaultIcon } from './icon';
 
 /**
  * Render the OpenGraph image for a site content.
@@ -142,34 +143,40 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     }
 
     const faviconLoader = async () => {
+        if (customization.header.logo) {
+            // Don't load the favicon if we have a logo
+            // as it'll not be used.
+            return null;
+        }
+
         if ('icon' in customization.favicon)
             return (
                 <img
-                    src={customization.favicon.icon[theme]}
+                    {...(await fetchImage(customization.favicon.icon[theme]))}
                     width={40}
                     height={40}
                     tw="mr-4"
                     alt="Icon"
                 />
             );
-        if ('emoji' in customization.favicon)
-            return (
-                <span tw="text-4xl mr-4">
-                    {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
-                </span>
-            );
-        const iconImage = await fetchImage(
-            linker.toAbsoluteURL(
-                linker.toPathInSpace(
-                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`
-                )
-            )
-        );
-        if (!iconImage) {
-            throw new Error('Icon image should always be fetchable');
-        }
 
-        return <img {...iconImage} alt="Icon" width={40} height={40} tw="mr-4" />;
+        return (
+            <div
+                tw="mr-4"
+                style={{
+                    width: 40,
+                    height: 40,
+                }}
+            >
+                <SiteDefaultIcon
+                    context={context}
+                    options={{
+                        size: 'medium',
+                        theme: customization.themes.default,
+                    }}
+                />
+            </div>
+        );
     };
 
     const logoLoader = async () => {
