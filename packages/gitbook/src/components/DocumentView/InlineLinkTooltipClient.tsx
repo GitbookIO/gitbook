@@ -1,18 +1,35 @@
 'use client';
-import * as Tooltip from '@radix-ui/react-tooltip';
 
-export function InlineLinkTooltipClient(props: {
-    trigger: React.ReactNode;
-    children: React.ReactNode;
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
+
+const InlineLinkTooltipClientImpl = dynamic(
+    () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
+    {
+        ssr: false,
+        loading: () => null, // Don't render anything until loaded
+    }
+);
+
+export function InlineLinkTooltipClient({
+    children,
+    trigger,
+}: {
+    children: ReactNode;
+    trigger: ReactNode;
 }) {
-    const { trigger, children } = props;
+    const [shouldLoad, setShouldLoad] = useState(false);
 
     return (
-        <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root>
-                <Tooltip.Trigger asChild>{trigger}</Tooltip.Trigger>
-                <Tooltip.Portal>{children}</Tooltip.Portal>
-            </Tooltip.Root>
-        </Tooltip.Provider>
+        <span onMouseEnter={() => setShouldLoad(true)} onFocus={() => setShouldLoad(true)}>
+            {shouldLoad ? (
+                <InlineLinkTooltipClientImpl trigger={trigger}>
+                    {children}
+                </InlineLinkTooltipClientImpl>
+            ) : (
+                children
+            )}
+        </span>
     );
 }
