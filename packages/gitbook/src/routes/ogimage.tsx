@@ -13,7 +13,13 @@ import { getExtension } from '@/lib/paths';
 import { filterOutNullable } from '@/lib/typescript';
 import { getCacheTag } from '@gitbook/cache-tags';
 import type { GitBookSiteContext } from '@v2/lib/context';
-import { getResizedImageURL } from '@v2/lib/images';
+import {
+    type ResizeImageOptions,
+    SizableImageAction,
+    checkIsSizableImageURL,
+    getResizedImageURL,
+    resizeImage,
+} from '@v2/lib/images';
 
 /**
  * Render the OpenGraph image for a site content.
@@ -178,7 +184,10 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
         }
 
         return await fetchImage(
-            useLightTheme ? customization.header.logo.light : customization.header.logo.dark
+            useLightTheme ? customization.header.logo.light : customization.header.logo.dark,
+            {
+                height: 60,
+            }
         );
     };
 
@@ -353,14 +362,22 @@ const SUPPORTED_IMAGE_TYPES = [
  * Fetch an image from a URL and return a base64 encoded string.
  * We do this as @vercel/og is otherwise failing on SVG images referenced by a URL.
  */
-async function fetchImage(url: string) {
+async function fetchImage(url: string, options?: ResizeImageOptions) {
     // Skip early some images to avoid fetching them
     const parsedURL = new URL(url);
     if (UNSUPPORTED_IMAGE_EXTENSIONS.includes(getExtension(parsedURL.pathname).toLowerCase())) {
         return null;
     }
 
-    const response = await fetch(url);
+    // We use the image resizer to normalize the image format to PNG.
+    // as @vercel/og can sometimes fail on some JPEG images.
+    const response =
+        checkIsSizableImageURL(url) !== SizableImageAction.Resize
+            ? await fetch(url)
+            : await resizeImage(url, {
+                  ...options,
+                  format: 'png',
+              });
 
     // Filter out unsupported image types
     const contentType = response.headers.get('content-type');
