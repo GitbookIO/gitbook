@@ -23,6 +23,7 @@ export function HeaderMobileMenuButton(
         <button
             {...props}
             aria-label={tString(language, 'table_of_contents_button_label')}
+            data-testid="mobile-menu-button"
             onClick={toggleNavigation}
             className={tcls(
                 'flex flex-row items-center rounded straight-corners:rounded-sm px-2 py-1',

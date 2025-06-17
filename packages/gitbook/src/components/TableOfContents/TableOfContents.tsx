@@ -50,7 +50,7 @@ export function TableOfContents(props: {
                     'max-lg:[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     'max-lg:[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
-                    'max-lg:py-2',
+                    'max-lg:pb-2',
                     'max-lg:w-10/12',
                     'max-lg:shadow-lg',
                     'max-lg:depth-flat:shadow-none',
@@ -107,7 +107,7 @@ export function TableOfContents(props: {
                         icon="close"
                         iconOnly
                         autoFocus={false}
-                        className="absolute top-2 right-2 z-50 bg-transparent text-tint opacity-8 shadow-none ring-transparent"
+                        className="absolute top-2 right-2 z-50 bg-transparent text-tint opacity-8 shadow-none ring-transparent lg:hidden"
                         onClick={() => setOpen(false)}
                     >
                         <span className="sr-only">Close</span>
