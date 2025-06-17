@@ -28,6 +28,8 @@ export interface DocumentContext {
      * @default true
      */
     wrapBlocksInSuspense?: boolean;
+
+    shouldRenderLinkPreviews?: boolean;
 }
 
 export interface DocumentContextProps {
