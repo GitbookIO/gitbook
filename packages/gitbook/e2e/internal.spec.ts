@@ -893,7 +893,7 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    const sharedSpaceLink = page.locator('a.underline');
+                    const sharedSpaceLink = page.locator('a.styled-link');
                     await sharedSpaceLink.click();
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'shared' })
@@ -914,7 +914,7 @@ const testCases: TestsCase[] = [
                 name: 'Navigation to shared space',
                 url: '',
                 run: async (page) => {
-                    await page.locator('a.underline').click();
+                    await page.locator('a.styled-link').click();
                     await expect(
                         page.getByRole('heading', { level: 1, name: 'shared' })
                     ).toBeVisible();
