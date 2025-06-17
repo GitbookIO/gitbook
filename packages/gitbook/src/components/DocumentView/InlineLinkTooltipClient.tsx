@@ -28,7 +28,7 @@ export function InlineLinkTooltipClient({
                     {children}
                 </InlineLinkTooltipClientImpl>
             ) : (
-                children
+                trigger
             )}
         </span>
     );
