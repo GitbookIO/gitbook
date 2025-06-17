@@ -21,10 +21,13 @@ export async function fetchSafeIntegrationUI(
             request,
         }),
 
-        // The API can respond with a 400 error if the integration is not installed
-        // and 404 if the integration is not found.
-        // The API can also respond with a 502 error if the integration is not generating a proper response.
-        [404, 400, 502]
+        // The API can respond with certain errors that are expected to happen.
+        [
+            404, // Integration has been uninstalled
+            400, // Integration is rejecting its own request
+            422, // Integration is triggering an invalid request, failing at the validation step
+            502, // Integration is failing in an unexpected way
+        ]
     );
 
     return output;
