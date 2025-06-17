@@ -17,7 +17,7 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 
-const LINK_PREVIEW_MAX_COUNT = 30000;
+const LINK_PREVIEW_MAX_COUNT = 100;
 
 export function PageBody(props: {
     context: GitBookSiteContext;
@@ -30,6 +30,8 @@ export function PageBody(props: {
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+
+    // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
     const shouldRenderLinkPreviews = document
         ? !hasMoreThan(
               document,

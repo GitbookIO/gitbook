@@ -29,6 +29,12 @@ export interface DocumentContext {
      */
     wrapBlocksInSuspense?: boolean;
 
+    /**
+     * True if link previews should be rendered.
+     * This is used to limit the number of link previews rendered in a document.
+     * If false, no link previews will be rendered.
+     * @default false
+     */
     shouldRenderLinkPreviews?: boolean;
 }
 

@@ -3,10 +3,10 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Fragment } from 'react';
-import { AIPageLinkSummary } from '../Adaptive';
-import { Button, StyledLink } from '../primitives';
+import { AIPageLinkSummary } from '../../Adaptive';
+import { Button, StyledLink } from '../../primitives';
 
-export function InlineLinkTooltipClientImpl(props: {
+export function InlineLinkTooltipImpl(props: {
     isSamePage: boolean;
     isExternal: boolean;
     aiSummary?: { pageId: string; spaceId: string };
