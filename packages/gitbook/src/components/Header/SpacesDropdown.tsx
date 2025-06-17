@@ -74,6 +74,7 @@ export function SpacesDropdown(props: {
                         url: getSiteSpaceURL(context, otherSiteSpace),
                     }}
                     active={otherSiteSpace.id === siteSpace.id}
+                    currentSpacePath={siteSpace.path}
                 />
             ))}
         </DropdownMenu>
