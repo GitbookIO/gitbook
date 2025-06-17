@@ -1,6 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const InlineLinkTooltipClientImpl = dynamic(
     () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
@@ -27,13 +27,18 @@ export function InlineLinkTooltipClient(props: {
     const { children, ...rest } = props;
     const [shouldLoad, setShouldLoad] = useState(false);
 
-    return (
-        <span onMouseEnter={() => setShouldLoad(true)} onFocus={() => setShouldLoad(true)}>
-            {shouldLoad ? (
-                <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
-            ) : (
-                children
-            )}
-        </span>
+    useEffect(() => {
+        if ('requestIdleCallback' in window) {
+            (window as globalThis.Window).requestIdleCallback(() => setShouldLoad(true));
+        } else {
+            // fallback for Safari or old browsers
+            setTimeout(() => setShouldLoad(true), 2000);
+        }
+    }, []);
+
+    return shouldLoad ? (
+        <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
+    ) : (
+        children
     );
 }
