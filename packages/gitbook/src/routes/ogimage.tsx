@@ -160,14 +160,12 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             height: 48,
         };
 
-        if ('icon' in customization.favicon)
-            return (
-                <img
-                    {...(await fetchImage(customization.favicon.icon[theme], faviconSize))}
-                    {...faviconSize}
-                    alt="Icon"
-                />
-            );
+        if ('icon' in customization.favicon) {
+            const faviconImage = await fetchImage(customization.favicon.icon[theme], faviconSize);
+            if (faviconImage) {
+                return <img {...faviconImage} {...faviconSize} alt="Icon" />;
+            }
+        }
 
         return (
             <SiteDefaultIcon
