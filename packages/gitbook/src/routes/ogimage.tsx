@@ -155,33 +155,30 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             return null;
         }
 
+        const faviconSize = {
+            width: 48,
+            height: 48,
+        };
+
         if ('icon' in customization.favicon)
             return (
                 <img
-                    {...(await fetchImage(customization.favicon.icon[theme]))}
-                    width={40}
-                    height={40}
-                    tw="mr-4"
+                    {...(await fetchImage(customization.favicon.icon[theme], faviconSize))}
+                    {...faviconSize}
+                    // tw="mr-4"
                     alt="Icon"
                 />
             );
 
         return (
-            <div
-                tw="mr-4"
-                style={{
-                    width: 40,
-                    height: 40,
+            <SiteDefaultIcon
+                context={context}
+                options={{
+                    size: 'small',
+                    theme,
                 }}
-            >
-                <SiteDefaultIcon
-                    context={context}
-                    options={{
-                        size: 'medium',
-                        theme: customization.themes.default,
-                    }}
-                />
-            </div>
+                style={faviconSize}
+            />
         );
     };
 
@@ -233,9 +230,9 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     <img {...logo} alt="Logo" tw="h-[60px]" />
                 </div>
             ) : (
-                <div tw="flex">
+                <div tw="flex flex-row items-center">
                     {favicon}
-                    <h3 tw="text-4xl my-0 font-bold">{transformText(site.title)}</h3>
+                    <h3 tw="text-4xl ml-4 my-0 font-bold">{transformText(site.title)}</h3>
                 </div>
             )}
 

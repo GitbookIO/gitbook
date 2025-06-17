@@ -70,8 +70,10 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
 export function SiteDefaultIcon(props: {
     context: GitBookSiteContext;
     options: RenderIconOptions;
+    style?: React.CSSProperties;
+    tw?: string;
 }) {
-    const { context, options } = props;
+    const { context, options, style, tw } = props;
     const size = SIZES[options.size];
 
     const { site, customization } = context;
@@ -79,13 +81,14 @@ export function SiteDefaultIcon(props: {
 
     return (
         <div
-            tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
+            tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle, tw)}
             style={{
                 width: '100%',
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                ...style,
             }}
         >
             <h2
