@@ -82,7 +82,8 @@
         "zod": "^3.24.2",
         "zod-to-json-schema": "^3.24.5",
         "zustand": "^5.0.3",
-        "image-size": "^2.0.2"
+        "image-size": "^2.0.2",
+        "direction": "^2.0.1"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.3",
