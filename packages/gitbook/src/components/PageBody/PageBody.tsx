@@ -28,7 +28,7 @@ export function PageBody(props: {
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
-    const pageFullWidth = page.id === 'wtthNFMqmEQmnt5LKR0q';
+    const pageFullWidth = page.layout.width === 'wide';
     const asFullWidth = pageFullWidth || contentFullWidth;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
