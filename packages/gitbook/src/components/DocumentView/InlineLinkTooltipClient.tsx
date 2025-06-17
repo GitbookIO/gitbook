@@ -1,8 +1,8 @@
 'use client';
 
+import type { TranslationLanguage } from '@/intl/translations';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import type { ReactNode } from 'react';
 
 const InlineLinkTooltipClientImpl = dynamic(
     () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
@@ -12,23 +12,29 @@ const InlineLinkTooltipClientImpl = dynamic(
     }
 );
 
-export function InlineLinkTooltipClient({
-    children,
-    trigger,
-}: {
-    children: ReactNode;
-    trigger: ReactNode;
+export function InlineLinkTooltipClient(props: {
+    isSamePage: boolean;
+    isExternal: boolean;
+    aiSummary?: { pageId: string; spaceId: string };
+    breadcrumbs: Array<{ href?: string; label: string; icon?: React.ReactNode }>;
+    target: {
+        href: string;
+        text: string;
+        subText?: string;
+        icon?: React.ReactNode;
+    };
+    language: TranslationLanguage;
+    children: React.ReactNode;
 }) {
+    const { children, ...rest } = props;
     const [shouldLoad, setShouldLoad] = useState(false);
 
     return (
         <span onMouseEnter={() => setShouldLoad(true)} onFocus={() => setShouldLoad(true)}>
             {shouldLoad ? (
-                <InlineLinkTooltipClientImpl trigger={trigger}>
-                    {children}
-                </InlineLinkTooltipClientImpl>
+                <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
             ) : (
-                trigger
+                children
             )}
         </span>
     );
