@@ -1,6 +1,7 @@
 import { CustomizationDefaultFont, CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
 import { type FontWeight, getDefaultFont } from '@gitbook/fonts';
+import { direction } from 'direction';
 import { imageSize } from 'image-size';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
@@ -218,7 +219,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             ) : (
                 <div tw="flex">
                     {favicon}
-                    <h3 tw="text-4xl my-0 font-bold">{site.title}</h3>
+                    <h3 tw="text-4xl my-0 font-bold">{transformText(site.title)}</h3>
                 </div>
             )}
 
@@ -227,10 +228,12 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 <h1
                     tw={`text-8xl my-0 tracking-tight leading-none text-left text-[${colors.title}] font-bold`}
                 >
-                    {pageTitle}
+                    {transformText(pageTitle)}
                 </h1>
                 {pageDescription ? (
-                    <h2 tw="text-4xl mb-0 mt-8 w-[75%] font-normal">{pageDescription}</h2>
+                    <h2 tw="text-4xl mb-0 mt-8 w-[75%] font-normal">
+                        {transformText(pageDescription)}
+                    </h2>
                 ) : null}
             </div>
         </div>,
@@ -376,4 +379,18 @@ async function fetchImage(url: string) {
     } catch {
         return null;
     }
+}
+
+/**
+ * @vercel/og doesn't support RTL text, so we need to transform with a HACK for now.
+ * We can remove it once support has been added.
+ * https://github.com/vercel/satori/issues/74
+ */
+function transformText(text: string) {
+    const dir = direction(text);
+    if (dir !== 'rtl') {
+        return text;
+    }
+
+    return '';
 }
