@@ -4,6 +4,8 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link, type LinkInsightsProps } from './Link';
 
+import styles from './card.module.css';
+
 export async function Card(
     props: {
         href: string;
@@ -17,7 +19,7 @@ export async function Card(
     const { title, leadingIcon, href, preTitle, postTitle, style, insights } = props;
 
     return (
-        <Link href={href} className={tcls('group', 'styled-card', style)} insights={insights}>
+        <Link href={href} className={tcls('group', styles.styledCard, style)} insights={insights}>
             {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (

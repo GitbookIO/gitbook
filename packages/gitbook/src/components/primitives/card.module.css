@@ -1,0 +1,3 @@
+.styledCard {
+    @apply flex flex-row justify-between items-center gap-4 ring-1 ring-tint-subtle rounded straight-corners:rounded-none circular-corners:rounded-2xl px-5 py-3 transition-shadow hover:ring-primary-hover;
+}

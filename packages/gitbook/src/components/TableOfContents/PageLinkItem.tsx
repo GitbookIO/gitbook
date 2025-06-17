@@ -8,7 +8,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { TOCPageIcon } from './TOCPageIcon';
 
-import style from './toc.module.css';
+import styles from './toc.module.css';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: GitBookSiteContext }) {
     const { page, context } = props;
@@ -19,7 +19,7 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Git
         <li className={tcls('flex', 'flex-col')}>
             <Link
                 href={resolved?.href ?? '#'}
-                className={style.pageLinkItem}
+                className={styles.pageLinkItem}
                 insights={{
                     type: 'link_click',
                     link: {

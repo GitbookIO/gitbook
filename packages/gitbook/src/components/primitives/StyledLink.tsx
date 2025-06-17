@@ -2,6 +2,8 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link, type LinkProps } from '../primitives/Link';
 
+import styles from './styledLink.module.css';
+
 export const linkStyles = [
     'underline',
     'decoration-[max(0.07em,1px)]', // Set the underline to be proportional to the font size, with a minimum. The default is too thin.
@@ -29,7 +31,7 @@ export function StyledLink(props: Omit<LinkProps, 'style'> & { className?: Class
     const { className, ...rest } = props;
 
     return (
-        <Link {...rest} className={tcls('styled-link', className)}>
+        <Link {...rest} className={tcls(styles.styledLink, className)}>
             {props.children}
         </Link>
     );

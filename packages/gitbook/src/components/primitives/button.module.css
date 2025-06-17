@@ -1,0 +1,40 @@
+.styledButton {
+    @apply inline-flex items-center gap-2 rounded-md straight-corners:rounded-none circular-corners:rounded-full ring-1 ring-tint hover:ring-tint-hover shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none depth-flat:shadow-none contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12 hover:scale-104 depth-flat:hover:scale-100 active:scale-100 transition-all grow-0 shrink-0 truncate;
+}
+
+.primary {
+    @apply bg-primary-solid
+        text-contrast-primary-solid
+        hover:bg-primary-solid-hover
+        hover:text-contrast-primary-solid-hover
+        ring-0
+        contrast-more:ring-1;
+}
+
+.blank {
+    @apply bg-transparent
+        text-tint
+        ring-0
+        shadow-none
+        hover:bg-primary-hover
+        hover:text-primary
+        hover:shadow-none
+        contrast-more:bg-tint-subtle;
+}
+
+.secondary {
+    @apply ring-0
+        contrast-more:ring-1;
+}
+
+.default {
+    @apply text-base font-semibold px-5 py-2 circular-corners:px-6;
+}
+
+.medium {
+    @apply text-sm px-3.5 py-1.5 circular-corners:px-4;
+}
+
+.small {
+    @apply text-xs py-2;
+}

@@ -9,7 +9,7 @@ import type { GitBookSiteContext } from '@v2/lib/context';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
-import style from './pageBody.module.css';
+import styles from './pageBody.module.css';
 
 export async function PageHeader(props: {
     context: GitBookSiteContext;
@@ -42,7 +42,7 @@ export async function PageHeader(props: {
                             return (
                                 <Fragment key={breadcrumb.id}>
                                     <li key={breadcrumb.id}>
-                                        <StyledLink href={href} className={style.headerLink}>
+                                        <StyledLink href={href} className={styles.headerLink}>
                                             <PageIcon
                                                 page={breadcrumb}
                                                 style="flex size-4 items-center justify-center text-base leading-none"
