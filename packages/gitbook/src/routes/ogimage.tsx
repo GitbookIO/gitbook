@@ -165,7 +165,6 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 <img
                     {...(await fetchImage(customization.favicon.icon[theme], faviconSize))}
                     {...faviconSize}
-                    // tw="mr-4"
                     alt="Icon"
                 />
             );
