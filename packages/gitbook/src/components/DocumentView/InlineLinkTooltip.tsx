@@ -70,7 +70,7 @@ export function InlineLinkTooltip(props: {
             isExternal={isExternal}
             isSamePage={isSamePage}
             aiSummary={aiSummary}
-            language={language}
+            openInNewTabLabel={tString(language, 'open_in_new_tab')}
             target={{
                 href: resolved.href,
                 text: resolved.text,

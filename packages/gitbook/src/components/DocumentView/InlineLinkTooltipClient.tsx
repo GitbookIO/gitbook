@@ -1,6 +1,4 @@
 'use client';
-
-import type { TranslationLanguage } from '@/intl/translations';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
@@ -23,7 +21,7 @@ export function InlineLinkTooltipClient(props: {
         subText?: string;
         icon?: React.ReactNode;
     };
-    language: TranslationLanguage;
+    openInNewTabLabel: string;
     children: React.ReactNode;
 }) {
     const { children, ...rest } = props;

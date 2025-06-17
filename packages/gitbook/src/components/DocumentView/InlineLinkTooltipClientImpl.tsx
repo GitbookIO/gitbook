@@ -1,6 +1,4 @@
 'use client';
-import { tString } from '@/intl/translate';
-import type { TranslationLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -19,10 +17,11 @@ export function InlineLinkTooltipClientImpl(props: {
         subText?: string;
         icon?: React.ReactNode;
     };
-    language: TranslationLanguage;
+    openInNewTabLabel: string;
     children: React.ReactNode;
 }) {
-    const { isSamePage, isExternal, aiSummary, language, target, breadcrumbs, children } = props;
+    const { isSamePage, isExternal, aiSummary, openInNewTabLabel, target, breadcrumbs, children } =
+        props;
 
     return (
         <Tooltip.Provider delayDuration={200}>
@@ -92,7 +91,7 @@ export function InlineLinkTooltipClientImpl(props: {
                                             variant="blank"
                                             href={target.href}
                                             target="_blank"
-                                            label={tString(language, 'open_in_new_tab')}
+                                            label={openInNewTabLabel}
                                             size="small"
                                             icon="arrow-up-right-from-square"
                                             iconOnly={true}
