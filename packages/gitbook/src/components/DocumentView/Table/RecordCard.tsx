@@ -7,11 +7,13 @@ import {
 import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
 import { getRecordValue } from './utils';
+
+import styles from './recordCard.module.css';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
@@ -143,35 +145,20 @@ export async function RecordCard(
         </div>
     );
 
-    const style = [
-        'group',
-        'grid',
-        'shadow-1xs',
-        'shadow-tint-9/1',
-        'depth-flat:shadow-none',
-        'rounded',
-        'straight-corners:rounded-none',
-        'circular-corners:rounded-xl',
-        'dark:shadow-transparent',
-
-        'before:pointer-events-none',
-        'before:grid-area-1-1',
-        'before:transition-shadow',
-        'before:w-full',
-        'before:h-full',
-        'before:rounded-[inherit]',
-        'before:ring-1',
-        'before:ring-tint-12/2',
-        'before:z-10',
-        'before:relative',
-    ] as ClassValue;
-
     if (target && targetRef) {
         return (
             // We don't use `Link` directly here because we could end up in a situation where
             // a link is rendered inside a link, which is not allowed in HTML.
             // It causes an hydration error in React.
-            <LinkBox href={target.href} className={tcls(style, 'hover:before:ring-tint-12/5')}>
+            <LinkBox
+                href={target.href}
+                className={tcls(
+                    styles.card,
+                    'hover:before:ring-tint-12/5',
+                    'group',
+                    'before:grid-area-1-1'
+                )}
+            >
                 <LinkOverlay
                     href={target.href}
                     insights={{
@@ -187,5 +174,5 @@ export async function RecordCard(
         );
     }
 
-    return <div className={tcls(style)}>{body}</div>;
+    return <div className={tcls('group', styles.card)}>{body}</div>;
 }

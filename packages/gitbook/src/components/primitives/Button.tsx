@@ -69,43 +69,7 @@ export function Button({
 
     const sizeClasses = sizes[size] || sizes.default;
 
-    const domClassName = tcls(
-        'button',
-        'inline-flex',
-        'items-center',
-        'gap-2',
-        'rounded-md',
-        'straight-corners:rounded-none',
-        'circular-corners:rounded-full',
-        // 'place-self-start',
-
-        'ring-1',
-        'ring-tint',
-        'hover:ring-tint-hover',
-
-        'shadow-sm',
-        'shadow-tint',
-        'dark:shadow-tint-1',
-        'hover:shadow-md',
-        'active:shadow-none',
-        'depth-flat:shadow-none',
-
-        'contrast-more:ring-tint-12',
-        'contrast-more:hover:ring-2',
-        'contrast-more:hover:ring-tint-12',
-
-        'hover:scale-104',
-        'depth-flat:hover:scale-100',
-        'active:scale-100',
-        'transition-all',
-
-        'grow-0',
-        'shrink-0',
-        'truncate',
-        variantClasses[variant],
-        sizeClasses,
-        className
-    );
+    const domClassName = tcls('styled-button', variantClasses[variant], sizeClasses, className);
 
     if (href) {
         return (

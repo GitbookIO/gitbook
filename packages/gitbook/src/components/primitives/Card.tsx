@@ -17,28 +17,7 @@ export async function Card(
     const { title, leadingIcon, href, preTitle, postTitle, style, insights } = props;
 
     return (
-        <Link
-            href={href}
-            className={tcls(
-                'group',
-                'flex',
-                'flex-row',
-                'justify-between',
-                'items-center',
-                'gap-4',
-                'ring-1',
-                'ring-tint-subtle',
-                'rounded',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
-                'px-5',
-                'py-3',
-                'transition-shadow',
-                'hover:ring-primary-hover',
-                style
-            )}
-            insights={insights}
-        >
+        <Link href={href} className={tcls('group', 'styled-card', style)} insights={insights}>
             {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (
