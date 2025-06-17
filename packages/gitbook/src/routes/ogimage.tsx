@@ -20,13 +20,14 @@ import {
     getResizedImageURL,
     resizeImage,
 } from '@v2/lib/images';
+import { SiteDefaultIcon } from './icon';
 
 /**
  * Render the OpenGraph image for a site content.
  */
 export async function serveOGImage(baseContext: GitBookSiteContext, params: PageParams) {
     const { context, pageTarget } = await fetchPageData(baseContext, params);
-    const { customization, site, linker, imageResizer } = context;
+    const { customization, site, imageResizer } = context;
     const page = pageTarget?.page;
 
     // If user configured a custom social preview, we redirect to it.
@@ -148,34 +149,36 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
     }
 
     const faviconLoader = async () => {
+        if (customization.header.logo) {
+            // Don't load the favicon if we have a logo
+            // as it'll not be used.
+            return null;
+        }
+
+        const faviconSize = {
+            width: 48,
+            height: 48,
+        };
+
         if ('icon' in customization.favicon)
             return (
                 <img
-                    src={customization.favicon.icon[theme]}
-                    width={40}
-                    height={40}
-                    tw="mr-4"
+                    {...(await fetchImage(customization.favicon.icon[theme], faviconSize))}
+                    {...faviconSize}
                     alt="Icon"
                 />
             );
-        if ('emoji' in customization.favicon)
-            return (
-                <span tw="text-4xl mr-4">
-                    {String.fromCodePoint(Number.parseInt(`0x${customization.favicon.emoji}`))}
-                </span>
-            );
-        const iconImage = await fetchImage(
-            linker.toAbsoluteURL(
-                linker.toPathInSpace(
-                    `~gitbook/icon?size=medium&theme=${customization.themes.default}`
-                )
-            )
-        );
-        if (!iconImage) {
-            throw new Error('Icon image should always be fetchable');
-        }
 
-        return <img {...iconImage} alt="Icon" width={40} height={40} tw="mr-4" />;
+        return (
+            <SiteDefaultIcon
+                context={context}
+                options={{
+                    size: 'small',
+                    theme,
+                }}
+                style={faviconSize}
+            />
+        );
     };
 
     const logoLoader = async () => {
@@ -226,9 +229,9 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                     <img {...logo} alt="Logo" tw="h-[60px]" />
                 </div>
             ) : (
-                <div tw="flex">
+                <div tw="flex flex-row items-center">
                     {favicon}
-                    <h3 tw="text-4xl my-0 font-bold">{transformText(site.title)}</h3>
+                    <h3 tw="text-4xl ml-4 my-0 font-bold">{transformText(site.title)}</h3>
                 </div>
             )}
 
