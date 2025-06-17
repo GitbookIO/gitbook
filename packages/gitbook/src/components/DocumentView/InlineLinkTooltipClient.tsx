@@ -20,14 +20,13 @@ export function InlineLinkTooltipClient(props: {
         icon?: React.ReactNode;
     };
     language: TranslationLanguage;
-    children: React.ReactNode;
 }) {
-    const { isSamePage, isExternal, aiSummary, language, target, breadcrumbs, children } = props;
+    const { isSamePage, isExternal, aiSummary, language, target, breadcrumbs } = props;
 
     return (
         <Tooltip.Provider delayDuration={200}>
             <Tooltip.Root>
-                <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+                <Tooltip.Trigger asChild>test</Tooltip.Trigger>
                 <Tooltip.Portal>
                     <Tooltip.Content className="z-40 w-screen max-w-md animate-present px-4 sm:w-auto">
                         <div className="overflow-hidden rounded-md straight-corners:rounded-none shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1 ">

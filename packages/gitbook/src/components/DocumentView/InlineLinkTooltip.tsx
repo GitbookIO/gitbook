@@ -15,7 +15,7 @@ export function InlineLinkTooltip(props: {
     children: React.ReactNode;
     resolved: ResolvedContentRef;
 }) {
-    const { inline, context, resolved, children } = props;
+    const { inline, context, resolved } = props;
 
     let breadcrumbs = resolved.ancestors ?? [];
     const language =
@@ -56,8 +56,6 @@ export function InlineLinkTooltip(props: {
             isExternal={isExternal}
             language={language}
             aiSummary={aiSummary}
-        >
-            {children}
-        </InlineLinkTooltipClient>
+        />
     );
 }
