@@ -1,6 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import React from 'react';
 
 const InlineLinkTooltipClientImpl = dynamic(
     () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
@@ -25,9 +25,9 @@ export function InlineLinkTooltipClient(props: {
     children: React.ReactNode;
 }) {
     const { children, ...rest } = props;
-    const [shouldLoad, setShouldLoad] = useState(false);
+    const [shouldLoad, setShouldLoad] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if ('requestIdleCallback' in window) {
             (window as globalThis.Window).requestIdleCallback(() => setShouldLoad(true));
         } else {
@@ -37,7 +37,9 @@ export function InlineLinkTooltipClient(props: {
     }, []);
 
     return shouldLoad ? (
-        <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
+        <React.Suspense fallback={children}>
+            <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
+        </React.Suspense>
     ) : (
         children
     );
