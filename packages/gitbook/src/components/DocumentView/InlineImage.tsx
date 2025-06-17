@@ -2,7 +2,7 @@ import type { DocumentInlineImage } from '@gitbook/api';
 import type { GitBookBaseContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { Image } from '../utils';
@@ -13,10 +13,8 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
     const { size = 'original' } = inline.data;
 
     const [src, darkSrc] = await Promise.all([
-        context.contentContext ? resolveContentRef(inline.data.ref, context.contentContext) : null,
-        inline.data.refDark && context.contentContext
-            ? resolveContentRef(inline.data.refDark, context.contentContext)
-            : null,
+        context.getContentRef(inline.data.ref),
+        inline.data.refDark ? context.getContentRef(inline.data.refDark) : null,
     ]);
 
     if (!src) {

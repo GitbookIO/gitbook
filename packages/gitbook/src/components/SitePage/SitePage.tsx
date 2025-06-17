@@ -1,6 +1,5 @@
-import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
+import { type ContentRef, CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
-import { getPageDocument } from '@v2/lib/data';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
@@ -10,26 +9,44 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
+import { type ResolveContentRefOptions, resolveContentRef } from '@/lib/references';
+import type { RouteParams } from '@v2/app/utils';
+import { getPageDocument } from '@v2/lib/data/pages';
+import { getPageDataWithFallback, getPrefetchedDataFromPageParams } from '@v2/lib/data/prefetch';
 import { getResizedImageURL } from '@v2/lib/images';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
-import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
+import { type PagePathParams, getPathnameParam } from './fetch';
 
 export type SitePageProps = {
     context: GitBookSiteContext;
-    pageParams: PagePathParams;
+    /**
+     * `RouteParams` is used in V2, `PagePathParams` is used in V1.
+     */
+    pageParams: RouteParams | PagePathParams;
 };
+
+function isV2(params: RouteParams | PagePathParams): params is RouteParams {
+    return 'pagePath' in params;
+}
 
 /**
  * Fetch and render a page.
  */
 export async function SitePage(props: SitePageProps) {
-    const { context, pageTarget } = await getPageDataWithFallback({
-        context: props.context,
-        pagePathParams: props.pageParams,
-    });
+    const prefetchedData = isV2(props.pageParams)
+        ? getPrefetchedDataFromPageParams(props.pageParams)
+        : null;
+    const { context, pageTarget } = prefetchedData
+        ? await prefetchedData.pageData
+        : await getPageDataWithFallback({
+              context: props.context,
+              pagePathParams: props.pageParams as PagePathParams,
+          });
 
-    const rawPathname = getPathnameParam(props.pageParams);
+    const rawPathname = getPathnameParam({
+        pathname: isV2(props.pageParams) ? props.pageParams.pagePath : props.pageParams.pathname,
+    });
     if (!pageTarget) {
         const pathname = rawPathname.toLowerCase();
         if (pathname !== rawPathname) {
@@ -40,12 +57,13 @@ export async function SitePage(props: SitePageProps) {
             notFound();
         }
     } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
-        redirect(
-            context.linker.toPathForPage({
-                pages: context.pages,
-                page: pageTarget.page,
-            })
-        );
+        //TODO: Don't forget to uncomment the redirect when i'm done
+        // redirect(
+        //     context.linker.toPathForPage({
+        //         pages: context.pages,
+        //         page: pageTarget.page,
+        //     })
+        // );
     }
 
     const { customization, sections } = context;
@@ -62,7 +80,16 @@ export async function SitePage(props: SitePageProps) {
     const withSections = Boolean(sections && sections.list.length > 0);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
-    const document = await getPageDocument(context, page);
+    const document = prefetchedData
+        ? await prefetchedData.document
+        : await getPageDocument(context, page);
+
+    const getContentRef = async (ref: ContentRef, options?: ResolveContentRefOptions) => {
+        if (prefetchedData) {
+            return prefetchedData.getPrefetchedRef(ref, options);
+        }
+        return resolveContentRef(ref, context, options);
+    };
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
@@ -85,6 +112,7 @@ export async function SitePage(props: SitePageProps) {
                     ancestors={ancestors}
                     document={document}
                     withPageFeedback={withPageFeedback}
+                    getContentRef={getContentRef}
                 />
             </div>
             <React.Suspense fallback={null}>
@@ -107,10 +135,12 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
-    const { context, pageTarget } = await getPageDataWithFallback({
-        context: props.context,
-        pagePathParams: props.pageParams,
-    });
+    const { context, pageTarget } = isV2(props.pageParams)
+        ? await getPrefetchedDataFromPageParams(props.pageParams).pageData
+        : await getPageDataWithFallback({
+              context: props.context,
+              pagePathParams: props.pageParams as PagePathParams,
+          });
 
     if (!pageTarget) {
         notFound();
@@ -142,24 +172,5 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             (await isSiteIndexable(context)) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
-    };
-}
-
-/**
- * Fetches the page data matching the requested pathname and fallback to root page when page is not found.
- */
-async function getPageDataWithFallback(args: {
-    context: GitBookSiteContext;
-    pagePathParams: PagePathParams;
-}) {
-    const { context: baseContext, pagePathParams } = args;
-    const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
-
-    return {
-        context: {
-            ...context,
-            page: pageTarget?.page,
-        },
-        pageTarget,
     };
 }

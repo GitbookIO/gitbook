@@ -20,6 +20,7 @@ import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { resolveContentRef } from '@/lib/references';
 import { isV2 } from '@/lib/v2';
 import type { IconName } from '@gitbook/icons';
 import { throwIfDataError } from '@v2/lib/data';
@@ -345,6 +346,9 @@ async function transformAnswer(
                         mode: 'default',
                         contentContext: undefined,
                         wrapBlocksInSuspense: false,
+                        // TODO: Use prefetched content references
+                        getContentRef: async (ref, options) =>
+                            resolveContentRef(ref, context, options),
                     }}
                     style={['space-y-5']}
                 />

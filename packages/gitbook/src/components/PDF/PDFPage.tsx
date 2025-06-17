@@ -28,6 +28,7 @@ import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
+import { resolveContentRef } from '@/lib/references';
 import { getPageDocument } from '@v2/lib/data';
 
 const DEFAULT_LIMIT = 100;
@@ -244,6 +245,8 @@ async function PDFPageDocument(props: {
                             ...context,
                             page,
                         },
+                        //TODO: Use prefetchedRef to avoid fetching the same content multiple times
+                        getContentRef: (ref, options) => resolveContentRef(ref, context, options),
                         getId: (id) => getPagePDFContainerId(page, id),
                     }}
                     // We consider all pages as offscreen in PDF mode

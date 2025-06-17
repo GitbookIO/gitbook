@@ -1,9 +1,5 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
-import {
-    SiteLayout,
-    generateSiteLayoutMetadata,
-    generateSiteLayoutViewport,
-} from '@/components/SiteLayout';
+import { SiteLayout, generateSiteLayoutViewport } from '@/components/SiteLayout';
 import { type RouteLayoutParams, getDynamicSiteContext } from '@v2/app/utils';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 import { getThemeFromMiddleware } from '@v2/lib/middleware';
@@ -38,7 +34,7 @@ export async function generateViewport({ params }: SiteDynamicLayoutProps) {
     return generateSiteLayoutViewport(context);
 }
 
-export async function generateMetadata({ params }: SiteDynamicLayoutProps) {
-    const { context } = await getDynamicSiteContext(await params);
-    return generateSiteLayoutMetadata(context);
-}
+// export async function generateMetadata({ params }: SiteDynamicLayoutProps) {
+//     const { context } = await getDynamicSiteContext(await params);
+//     return generateSiteLayoutMetadata(context);
+// }

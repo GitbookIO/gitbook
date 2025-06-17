@@ -1,7 +1,13 @@
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 import type { SiteAPIToken } from '@gitbook/api';
-import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@v2/lib/context';
+import {
+    type GitBookSiteContext,
+    type SiteURLData,
+    fetchSiteContextByURLLookup,
+    getBaseContext,
+} from '@v2/lib/context';
+import { getResizedImageURL } from '@v2/lib/images';
 import { jwtDecode } from 'jwt-decode';
 import { forbidden } from 'next/navigation';
 import rison from 'rison';
@@ -105,3 +111,15 @@ function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
     const decoded = decodeURIComponent(params.siteData);
     return rison.decode(decoded);
 }
+
+export const getIcon = async (context: GitBookSiteContext, theme: 'light' | 'dark') => {
+    const { linker, imageResizer, customization } = context;
+    const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
+    const faviconSize = 48;
+    return customIcon?.[theme]
+        ? await getResizedImageURL(imageResizer, customIcon[theme], {
+              width: faviconSize,
+              height: faviconSize,
+          })
+        : linker.toAbsoluteURL(linker.toPathInSpace('~gitbook/icon?size=small&theme=light'));
+};

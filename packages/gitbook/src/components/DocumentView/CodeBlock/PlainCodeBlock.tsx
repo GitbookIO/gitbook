@@ -48,6 +48,7 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
             document={document}
             context={{
                 mode: 'default',
+                getContentRef: async () => null, // No content references needed for plain code block
             }}
             block={block}
             ancestorBlocks={[]}

@@ -5,6 +5,7 @@ import {
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
 import { type RouteLayoutParams, getStaticSiteContext } from '@v2/app/utils';
+import { getPrefetchedDataFromLayoutParams } from '@v2/lib/data/prefetch';
 import { GITBOOK_DISABLE_TRACKING } from '@v2/lib/env';
 
 interface SiteStaticLayoutProps {
@@ -36,6 +37,6 @@ export async function generateViewport({ params }: SiteStaticLayoutProps) {
 }
 
 export async function generateMetadata({ params }: SiteStaticLayoutProps) {
-    const { context } = await getStaticSiteContext(await params);
-    return generateSiteLayoutMetadata(context);
+    const prefetchedData = getPrefetchedDataFromLayoutParams(await params);
+    return generateSiteLayoutMetadata(prefetchedData);
 }

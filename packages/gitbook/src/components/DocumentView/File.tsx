@@ -1,7 +1,6 @@
 import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSimplifiedContentType } from '@/lib/files';
-import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { Link } from '../primitives';
@@ -12,9 +11,8 @@ import { FileIcon } from './FileIcon';
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context } = props;
 
-    const contentRef = context.contentContext
-        ? await resolveContentRef(block.data.ref, context.contentContext)
-        : null;
+    const contentRef = await context.getContentRef(block.data.ref);
+
     const file = contentRef?.file;
 
     if (!file) {

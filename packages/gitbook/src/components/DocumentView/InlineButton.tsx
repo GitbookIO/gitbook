@@ -1,4 +1,3 @@
-import { resolveContentRef } from '@/lib/references';
 import * as api from '@gitbook/api';
 import { Button } from '../primitives';
 import type { InlineProps } from './Inline';
@@ -10,7 +9,7 @@ export async function InlineButton(props: InlineProps<api.DocumentInlineButton>)
         throw new Error('InlineButton requires a contentContext');
     }
 
-    const resolved = await resolveContentRef(inline.data.ref, context.contentContext);
+    const resolved = await context.getContentRef(inline.data.ref);
 
     if (!resolved) {
         return null;

@@ -3,7 +3,8 @@ import {
     generateSitePageMetadata,
     generateSitePageViewport,
 } from '@/components/SitePage';
-import { type RouteParams, getPagePathFromParams, getStaticSiteContext } from '@v2/app/utils';
+import type { RouteParams } from '@v2/app/utils';
+import { getPrefetchedDataFromLayoutParams } from '@v2/lib/data/prefetch';
 
 import type { Metadata, Viewport } from 'next';
 
@@ -15,24 +16,24 @@ type PageProps = {
 
 export default async function Page(props: PageProps) {
     const params = await props.params;
-    const { context } = await getStaticSiteContext(params);
-    const pathname = getPagePathFromParams(params);
+    const { staticSiteContext } = getPrefetchedDataFromLayoutParams(params);
+    const { context } = await staticSiteContext;
 
-    return <SitePage context={context} pageParams={{ pathname }} />;
+    return <SitePage context={context} pageParams={params} />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {
-    const { context } = await getStaticSiteContext(await props.params);
+    const params = await props.params;
+    const { context } = await getPrefetchedDataFromLayoutParams(params).staticSiteContext;
     return generateSitePageViewport(context);
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
-    const { context } = await getStaticSiteContext(params);
-    const pathname = getPagePathFromParams(params);
+    const { context } = await getPrefetchedDataFromLayoutParams(params).staticSiteContext;
 
     return generateSitePageMetadata({
         context,
-        pageParams: { pathname },
+        pageParams: params,
     });
 }

@@ -18,6 +18,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         ? context.contentContext.dataFetcher.withToken({ apiToken: block.meta.token })
         : context.contentContext.dataFetcher;
 
+    // TODO: prefetch the reusable content as well
     const resolved = await resolveContentRef(block.data.ref, {
         ...context.contentContext,
         dataFetcher,

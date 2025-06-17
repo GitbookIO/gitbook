@@ -34,6 +34,7 @@ export function FooterLinksGroup(props: {
 
 async function FooterLink(props: { link: CustomizationContentLink; context: GitBookAnyContext }) {
     const { link, context } = props;
+    // TODO: prefetch content ref outside of the main document
     const resolved = await resolveContentRef(link.to, context);
 
     if (!resolved) {

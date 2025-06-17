@@ -1,4 +1,4 @@
-import type { JSONDocument, RevisionPageDocument } from '@gitbook/api';
+import type { ContentRef, JSONDocument, RevisionPageDocument } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
@@ -6,6 +6,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
+import type { ResolveContentRefOptions, ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
@@ -22,6 +23,10 @@ export function PageBody(props: {
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
     document: JSONDocument | null;
+    getContentRef: (
+        ref: ContentRef,
+        options?: ResolveContentRefOptions
+    ) => Promise<ResolvedContentRef | null>;
     withPageFeedback: boolean;
 }) {
     const { page, context, ancestors, document, withPageFeedback } = props;
@@ -68,6 +73,7 @@ export function PageBody(props: {
                             context={{
                                 mode: 'default',
                                 contentContext: context,
+                                getContentRef: props.getContentRef,
                             }}
                         />
                     </React.Suspense>

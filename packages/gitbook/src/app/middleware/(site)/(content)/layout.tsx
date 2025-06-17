@@ -11,6 +11,7 @@ import { getVisitorAuthClaims } from '@/lib/adaptive';
 import { getSiteContentPointer } from '@/lib/pointer';
 import { shouldTrackEvents } from '@/lib/tracking';
 import { fetchV1ContextForSitePointer } from '@/lib/v1';
+import { getIcons } from '@v2/lib/data/prefetch';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -44,7 +45,14 @@ export async function generateViewport(): Promise<Viewport> {
 
 export async function generateMetadata(): Promise<Metadata> {
     const context = await fetchLayoutData();
-    return generateSiteLayoutMetadata(context);
+    const icons = getIcons(context);
+    return generateSiteLayoutMetadata({
+        staticSiteContext: Promise.resolve({
+            context,
+            visitorAuthClaims: {},
+        }),
+        icons,
+    });
 }
 
 async function fetchLayoutData() {
