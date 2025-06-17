@@ -4,7 +4,7 @@ import type { DocumentContextProps } from './DocumentView';
 import { Inline } from './Inline';
 import { Text } from './Text';
 
-export function Inlines<T extends DocumentInline | DocumentText>(
+export function renderInlines<T extends DocumentInline | DocumentText>(
     props: DocumentContextProps & {
         /**
          * Document being rendered.
