@@ -1,4 +1,5 @@
 import { GitBookAPIError } from '@gitbook/api';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
 export class DataFetcherError extends Error {
@@ -47,11 +48,7 @@ export function getDataOrNull<T>(
         return response.then((result) => getDataOrNull(result, ignoreErrors));
     }
 
-    if (response.error) {
-        if (ignoreErrors.includes(response.error.code)) return null;
-        throw new DataFetcherError(response.error.message, response.error.code);
-    }
-    return response.data;
+    return ignoreDataFetcherErrors(response, ignoreErrors).data ?? null;
 }
 
 /**
@@ -91,6 +88,50 @@ export async function wrapDataFetcherError<T>(
             error: getExposableError(error as Error),
         };
     }
+}
+
+/**
+ * Wrap an async execution to handle errors and return a DataFetcherResponse.
+ * This should be used inside 'use cache' functions.
+ */
+export async function wrapCacheDataFetcherError<T>(
+    fn: () => Promise<T>
+): Promise<DataFetcherResponse<T>> {
+    const result = await wrapDataFetcherError(fn);
+    if (result.error && result.error.code >= 500) {
+        // We don't want to cache errors for too long.
+        // as the API might
+        cacheLife('minutes');
+    }
+    return result;
+}
+
+/**
+ * Ignore some data fetcher errors.
+ */
+export function ignoreDataFetcherErrors<T>(
+    response: DataFetcherResponse<T>,
+    ignoreErrors?: number[]
+): DataFetcherResponse<T>;
+export function ignoreDataFetcherErrors<T>(
+    response: Promise<DataFetcherResponse<T>>,
+    ignoreErrors?: number[]
+): Promise<DataFetcherResponse<T>>;
+export function ignoreDataFetcherErrors<T>(
+    response: DataFetcherResponse<T> | Promise<DataFetcherResponse<T>>,
+    ignoreErrors: number[] = [404]
+): DataFetcherResponse<T> | Promise<DataFetcherResponse<T>> {
+    if (response instanceof Promise) {
+        return response.then((result) => ignoreDataFetcherErrors(result, ignoreErrors));
+    }
+
+    if (response.error) {
+        if (ignoreErrors.includes(response.error.code)) {
+            return response;
+        }
+        throw new DataFetcherError(response.error.message, response.error.code);
+    }
+    return response;
 }
 
 /**
