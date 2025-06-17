@@ -4,6 +4,7 @@ import React from 'react';
 
 const LoadingValueContext = React.createContext<React.ReactNode>(null);
 
+// https://github.com/vercel/next.js/issues/7906
 const InlineLinkTooltipClientImpl = dynamic(
     () => import('./InlineLinkTooltipClientImpl').then((mod) => mod.InlineLinkTooltipClientImpl),
     {
@@ -41,11 +42,15 @@ export function InlineLinkTooltipClient(props: {
         }
     }, []);
 
-    return shouldLoad ? (
-        <LoadingValueContext.Provider value={children}>
-            <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
-        </LoadingValueContext.Provider>
-    ) : (
-        children
+    return (
+        <span onMouseEnter={() => setShouldLoad(true)} onFocus={() => setShouldLoad(true)}>
+            {shouldLoad ? (
+                <LoadingValueContext.Provider value={children}>
+                    <InlineLinkTooltipClientImpl {...rest}>{children}</InlineLinkTooltipClientImpl>
+                </LoadingValueContext.Provider>
+            ) : (
+                children
+            )}
+        </span>
     );
 }
