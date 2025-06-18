@@ -4,24 +4,6 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link, type LinkInsightsProps } from './Link';
 
-export const CardStyles = [
-    'group',
-    'flex',
-    'flex-row',
-    'justify-between',
-    'items-center',
-    'gap-4',
-    'ring-1',
-    'ring-tint-subtle',
-    'rounded',
-    'straight-corners:rounded-none',
-    'circular-corners:rounded-2xl',
-    'px-5',
-    'py-3',
-    'transition-shadow',
-    'hover:ring-primary-hover',
-] as ClassValue[];
-
 export async function Card(
     props: {
         href: string;

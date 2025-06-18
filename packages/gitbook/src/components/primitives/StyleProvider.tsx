@@ -1,6 +1,5 @@
 'use client';
 import type { ClassValue } from '@/lib/tailwind';
-import React from 'react';
 
 import { RecordCardStyles } from '../DocumentView/Table/styles';
 import {
@@ -8,52 +7,26 @@ import {
     ToggleableLinkItemActiveStyles,
     ToggleableLinkItemStyles,
 } from '../TableOfContents/styles';
-import { ButtonStyles } from './Button';
-import { CardStyles } from './Card';
-import { linkStyles as LinkStyles } from './StyledLink';
+import { ButtonStyles, CardStyles, LinkStyles } from './styles';
 
-export type DesignTokenName =
-    | 'LinkStyles'
-    | 'CardStyles'
-    | 'ButtonStyles'
-    | 'RecordCardStyles'
-    | 'PageLinkItemStyles'
-    | 'ToggleableLinkItemStyles'
-    | 'ToggleableLinkItemActiveStyles';
+const styles = {
+    LinkStyles,
+    CardStyles,
+    ButtonStyles,
+    RecordCardStyles,
+    PageLinkItemStyles,
+    ToggleableLinkItemStyles,
+    ToggleableLinkItemActiveStyles,
+};
 
-const StyleContext = React.createContext<(names: DesignTokenName[]) => ClassValue[]>(() => []);
+export type DesignTokenName = keyof typeof styles;
 
-export function StyleProvider({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    const styles = React.useMemo(
-        () =>
-            ({
-                LinkStyles,
-                CardStyles,
-                ButtonStyles,
-                RecordCardStyles,
-                PageLinkItemStyles,
-                ToggleableLinkItemStyles,
-                ToggleableLinkItemActiveStyles,
-            }) as Record<DesignTokenName, ClassValue>,
-        []
-    );
-
-    return (
-        <StyleContext.Provider value={(names) => names.flatMap((name) => styles[name] || [])}>
-            {children}
-        </StyleContext.Provider>
-    );
-}
-
+/**
+ * Get the class names for the given design token names.
+ * TODO: remove this once we figure out a better solution. Likely with TW4.
+ * @param names The design token names to get class names for.
+ * @returns The class names for the given design token names.
+ */
 export function useClassnames(names: DesignTokenName[]): ClassValue[] {
-    const context = React.useContext(StyleContext);
-    if (!context) {
-        throw new Error('useStyles must be used within a StyleProvider');
-    }
-
-    return context(names);
+    return names.flatMap((name) => styles[name] || []);
 }

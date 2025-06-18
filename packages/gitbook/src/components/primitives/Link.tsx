@@ -26,7 +26,7 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
     LinkInsightsProps & {
         /** Enforce href is passed as a string (not a URL). */
         href: string;
-        /** */
+        /** This is a temporary solution designed to reduce the number of tailwind class passed to the client */
         classNames?: DesignTokenName[];
     };
 

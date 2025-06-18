@@ -7,7 +7,8 @@ import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import { CONTAINER_STYLE } from '../layout';
-import { Link, linkStyles } from '../primitives';
+import { Link } from '../primitives';
+import { LinkStyles } from '../primitives/styles';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 
 /**
@@ -58,7 +59,7 @@ export function AnnouncementBanner(props: {
                         <div>
                             {announcement.message}
                             {hasLink ? (
-                                <div className={tcls(linkStyles, style.link, 'ml-1 inline')}>
+                                <div className={tcls(LinkStyles, style.link, 'ml-1 inline')}>
                                     {contentRef?.icon ? (
                                         <span className="mr-1 ml-2 *:inline">
                                             {contentRef?.icon}
