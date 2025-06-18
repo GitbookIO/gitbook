@@ -4,7 +4,7 @@ import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, isNodeEmpty } from '@/lib/document';
+import { hasFullWidthBlock, hasMoreThan, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -17,6 +17,8 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 
+const LINK_PREVIEW_MAX_COUNT = 100;
+
 export function PageBody(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
@@ -28,6 +30,15 @@ export function PageBody(props: {
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+
+    // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
+    const shouldRenderLinkPreviews = document
+        ? !hasMoreThan(
+              document,
+              (inline) => inline.object === 'inline' && inline.type === 'link',
+              LINK_PREVIEW_MAX_COUNT
+          )
+        : false;
     const pageFullWidth = page.id === 'wtthNFMqmEQmnt5LKR0q';
     const asFullWidth = pageFullWidth || contentFullWidth;
     const language = getSpaceLanguage(customization);
@@ -68,6 +79,7 @@ export function PageBody(props: {
                             context={{
                                 mode: 'default',
                                 contentContext: context,
+                                shouldRenderLinkPreviews,
                             }}
                         />
                     </React.Suspense>
