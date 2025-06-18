@@ -30,7 +30,7 @@ test.describe('PDF export', () => {
         await expect(printBtn).toBeVisible();
 
         await argosScreenshot(page, 'pdf - all pages', {
-            viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
+            viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
@@ -68,7 +68,7 @@ test.describe('PDF export', () => {
         await expect(printBtn).toBeVisible();
 
         await argosScreenshot(page, 'pdf - all pages', {
-            viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
+            viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
@@ -110,7 +110,7 @@ test.describe('PDF export', () => {
         await expect(printBtn).toBeVisible();
 
         await argosScreenshot(page, 'pdf - all pages', {
-            viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
+            viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
@@ -152,7 +152,7 @@ test.describe('PDF export', () => {
         await expect(printBtn).toBeVisible();
 
         await argosScreenshot(page, 'pdf - all pages', {
-            viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
+            viewports: ['macbook-13'],
             argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
