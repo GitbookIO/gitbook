@@ -23,18 +23,18 @@ export async function RecordCard(
     const coverFile = view.coverDefinition
         ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
         : null;
-    const cover =
-        coverFile && context.contentContext
-            ? await resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
-            : null;
-
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
-    const target =
+
+    const [cover, target] = await Promise.all([
+        coverFile && context.contentContext
+            ? resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
+            : null,
         targetRef && context.contentContext
-            ? await resolveContentRef(targetRef, context.contentContext)
-            : null;
+            ? resolveContentRef(targetRef, context.contentContext)
+            : null,
+    ]);
 
     const coverIsSquareOrPortrait =
         cover?.file?.dimensions &&

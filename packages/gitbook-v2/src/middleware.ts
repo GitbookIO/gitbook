@@ -16,10 +16,9 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import {
     DataFetcherError,
-    getPublishedContentByURL,
     getVisitorAuthBasePath,
+    lookupPublishedContentByUrl,
     normalizeURL,
-    resolvePublishedContentByUrl,
     throwIfDataError,
 } from '@v2/lib/data';
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@v2/lib/env';
@@ -33,18 +32,6 @@ export const config = {
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
-
-/**
- * Temporary list of hosts to test adaptive content using the new resolution API.
- */
-const ADAPTIVE_CONTENT_HOSTS = [
-    'docs.gitbook.com',
-    'paypal.gitbook.com',
-    'adaptive-docs.gitbook-staging.com',
-    'enriched-content-playground.gitbook-staging.io',
-    'docs.testgitbook.com',
-    'launchdarkly-site.gitbook.education',
-];
 
 export async function middleware(request: NextRequest) {
     try {
@@ -104,11 +91,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     });
 
     const withAPIToken = async (apiToken: string | null) => {
-        const resolve = ADAPTIVE_CONTENT_HOSTS.includes(siteRequestURL.hostname)
-            ? resolvePublishedContentByUrl
-            : getPublishedContentByURL;
         const siteURLData = await throwIfDataError(
-            resolve({
+            lookupPublishedContentByUrl({
                 url: siteRequestURL.toString(),
                 visitorPayload: {
                     jwtToken: visitorToken?.token ?? undefined,
@@ -275,6 +259,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
+        rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
+
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
                 headers: requestHeaders,
