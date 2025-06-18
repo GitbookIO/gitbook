@@ -15,6 +15,7 @@ import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
+import { toSlimTrackEvent } from '../../Insights';
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
@@ -275,13 +276,13 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         <StyledLink
                             key={index}
                             href={resolved.href}
-                            insights={{
+                            insights={toSlimTrackEvent({
                                 type: 'link_click',
                                 link: {
                                     target: contentRef,
                                     position: SiteInsightsLinkPosition.Content,
                                 },
-                            }}
+                            })}
                         >
                             {resolved.text}
                         </StyledLink>

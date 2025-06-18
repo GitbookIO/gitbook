@@ -7,6 +7,7 @@ import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { toSlimTrackEvent } from '../Insights';
 
 import { Link } from '../primitives';
 
@@ -58,13 +59,13 @@ async function FooterLink(props: { link: CustomizationContentLink; context: GitB
                 'links-accent:decoration-primary-subtle',
                 'links-accent:decoration-[3px]'
             )}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'link_click',
                 link: {
                     target: link.to,
                     position: SiteInsightsLinkPosition.Footer,
                 },
-            }}
+            })}
         >
             {link.title}
         </Link>

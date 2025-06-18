@@ -3,6 +3,7 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import { HighlightQuery } from './HighlightQuery';
 import type { ComputedSectionResult } from './server-actions';
@@ -40,14 +41,11 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     'hover:bg-primary-hover',
                 ]
             )}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'search_open_result',
                 query,
-                result: {
-                    pageId: item.pageId,
-                    spaceId: item.spaceId,
-                },
-            }}
+                result: { pageId: item.pageId, spaceId: item.spaceId },
+            })}
         >
             <div
                 className={tcls(

@@ -2,6 +2,7 @@ import { type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api'
 
 import { resolveContentRef } from '@/lib/references';
 import { Icon } from '@gitbook/icons';
+import { toSlimTrackEvent } from '../Insights';
 import { StyledLink } from '../primitives';
 import type { InlineProps } from './Inline';
 import { InlineLinkTooltip } from './InlineLinkTooltip';
@@ -35,13 +36,13 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         <InlineLinkTooltip inline={inline} context={context.contentContext} resolved={resolved}>
             <StyledLink
                 href={resolved.href}
-                insights={{
+                insights={toSlimTrackEvent({
                     type: 'link_click',
                     link: {
                         target: inline.data.ref,
                         position: SiteInsightsLinkPosition.Content,
                     },
-                }}
+                })}
             >
                 <Inlines
                     context={context}

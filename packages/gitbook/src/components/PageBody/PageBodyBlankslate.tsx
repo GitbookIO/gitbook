@@ -8,6 +8,7 @@ import type { GitBookAnyContext } from '@v2/lib/context';
 import { Card } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { toSlimTrackEvent } from '../Insights';
 
 import { PageIcon } from '../PageIcon';
 
@@ -48,13 +49,13 @@ export async function PageBodyBlankslate(props: {
                         leadingIcon={icon}
                         title={child.title}
                         href={resolved.href}
-                        insights={{
+                        insights={toSlimTrackEvent({
                             type: 'link_click',
                             link: {
                                 target: child.target,
                                 position: SiteInsightsLinkPosition.Content,
                             },
-                        }}
+                        })}
                     />
                 );
             }

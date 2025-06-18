@@ -2,6 +2,7 @@ import { type DocumentInlineMention, SiteInsightsLinkPosition } from '@gitbook/a
 
 import { StyledLink } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
+import { toSlimTrackEvent } from '../Insights';
 
 import type { InlineProps } from './Inline';
 
@@ -21,13 +22,13 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
     return (
         <StyledLink
             href={resolved.href}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'link_click',
                 link: {
                     target: inline.data.ref,
                     position: SiteInsightsLinkPosition.Content,
                 },
-            }}
+            })}
         >
             {resolved.text}
         </StyledLink>

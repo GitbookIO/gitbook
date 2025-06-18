@@ -2,6 +2,7 @@ import { type DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook
 
 import { Card } from '@/components/primitives';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import { toSlimTrackEvent } from '../Insights';
 
 import type { BlockProps } from './Block';
 
@@ -34,13 +35,13 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
             href={resolved.href}
             title={resolved.text}
             style={style}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'link_click',
                 link: {
                     target: block.data.ref,
                     position: SiteInsightsLinkPosition.Content,
                 },
-            }}
+            })}
         />
     );
 }

@@ -32,9 +32,7 @@ export function PageFeedbackForm(props: {
 
         trackEvent({
             type: 'page_post_feedback',
-            feedback: {
-                rating,
-            },
+            feedback: { rating },
         });
     };
 
@@ -43,10 +41,7 @@ export function PageFeedbackForm(props: {
 
         trackEvent({
             type: 'page_post_feedback_comment',
-            feedback: {
-                rating,
-                comment,
-            },
+            feedback: { rating, comment },
         });
     };
 

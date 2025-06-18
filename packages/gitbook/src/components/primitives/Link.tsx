@@ -4,7 +4,7 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-import { type TrackEventInput, useTrackEvent } from '../Insights';
+import { type SlimTrackEventInput, expandSlimTrackEvent, useTrackEvent } from '../Insights';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
@@ -14,11 +14,7 @@ type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof N
 
 export type LinkInsightsProps = {
     /** Event to track when the link is clicked. */
-    insights?:
-        | TrackEventInput<'ad_click'>
-        | TrackEventInput<'link_click'>
-        | TrackEventInput<'trademark_click'>
-        | TrackEventInput<'search_open_result'>;
+    insights?: SlimTrackEventInput;
 };
 
 export type LinkProps = Omit<BaseLinkProps, 'href'> &
@@ -44,7 +40,7 @@ export const Link = React.forwardRef(function Link(
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         if (insights) {
-            trackEvent(insights, undefined, {
+            trackEvent(expandSlimTrackEvent(insights), undefined, {
                 immediate: isExternal,
             });
         }

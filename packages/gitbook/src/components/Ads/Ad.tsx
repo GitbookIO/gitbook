@@ -12,7 +12,7 @@ import * as React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { useTrackEvent } from '../Insights';
+import { toSlimTrackEvent, useTrackEvent } from '../Insights';
 import { useHasBeenInViewport } from '../hooks/useHasBeenInViewport';
 import { Link } from '../primitives';
 import { renderAd } from './renderAd';
@@ -137,10 +137,10 @@ function AdSponsoredLink(props: { spaceId: string }) {
                 target="_blank"
                 href={viaUrl.toString()}
                 className={tcls('hover:underline')}
-                insights={{
+                insights={toSlimTrackEvent({
                     type: 'trademark_click',
                     placement: SiteInsightsTrademarkPlacement.Ad,
-                }}
+                })}
             >
                 {t(language, 'sponsored_via_gitbook')}
             </Link>

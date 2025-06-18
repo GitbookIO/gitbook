@@ -8,6 +8,7 @@ import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
+import { toSlimTrackEvent } from '../../Insights';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
@@ -174,13 +175,13 @@ export async function RecordCard(
             <LinkBox href={target.href} className={tcls(style, 'hover:before:ring-tint-12/5')}>
                 <LinkOverlay
                     href={target.href}
-                    insights={{
+                    insights={toSlimTrackEvent({
                         type: 'link_click',
                         link: {
                             target: targetRef,
                             position: SiteInsightsLinkPosition.Content,
                         },
-                    }}
+                    })}
                 />
                 {body}
             </LinkBox>
