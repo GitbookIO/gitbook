@@ -3,6 +3,7 @@
 import type { CustomizationThemeMode } from '@gitbook/api';
 import { ThemeProvider } from 'next-themes';
 import type React from 'react';
+import { StyleProvider } from '../primitives/StyleProvider';
 
 export function ClientContexts(props: {
     nonce?: string;
@@ -22,7 +23,7 @@ export function ClientContexts(props: {
 
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
-            {children}
+            <StyleProvider>{children}</StyleProvider>
         </ThemeProvider>
     );
 }

@@ -1,6 +1,7 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import type { ClassValue } from '@/lib/tailwind';
 
 import { Link, type LinkProps } from '../primitives/Link';
+import type { DesignTokenName } from './StyleProvider';
 
 export const linkStyles = [
     'underline',
@@ -20,16 +21,18 @@ export const linkStyles = [
 
     'transition-all',
     'duration-100',
-];
+] as ClassValue[];
 
 /**
  * Styled version of Link component.
  */
 export function StyledLink(props: Omit<LinkProps, 'style'> & { className?: ClassValue }) {
-    const { className, ...rest } = props;
+    const { classNames, ...rest } = props;
+
+    const classNamesToForward: DesignTokenName[] = [...(classNames || []), 'LinkStyles'];
 
     return (
-        <Link {...rest} className={tcls(linkStyles, className)}>
+        <Link {...rest} classNames={classNamesToForward}>
             {props.children}
         </Link>
     );
