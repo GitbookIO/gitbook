@@ -5,6 +5,7 @@ import { getResizedImageURL } from '@v2/lib/images';
 
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import type { AdCover } from './types';
 
@@ -31,10 +32,10 @@ export async function AdCoverRendering({
             target="_blank"
             insights={
                 insightsAd
-                    ? {
+                    ? toSlimTrackEvent({
                           type: 'ad_click',
                           ad: insightsAd,
-                      }
+                      })
                     : undefined
             }
             className={tcls(

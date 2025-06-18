@@ -6,6 +6,7 @@ import { Link } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { TOCPageIcon } from './TOCPageIcon';
 
 export async function PageLinkItem(props: { page: RevisionPageLink; context: GitBookSiteContext }) {
@@ -36,13 +37,13 @@ export async function PageLinkItem(props: { page: RevisionPageLink; context: Git
                     'hover:bg-tint',
                     'hover:text-tint-strong'
                 )}
-                insights={{
+                insights={toSlimTrackEvent({
                     type: 'link_click',
                     link: {
                         target: page.target,
                         position: SiteInsightsLinkPosition.Sidebar,
                     },
-                }}
+                })}
             >
                 <TOCPageIcon page={page} />
                 {page.title}

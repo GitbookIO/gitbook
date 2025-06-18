@@ -4,6 +4,7 @@ import { getResizedImageURL } from '@v2/lib/images';
 
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import type { AdItem } from './types';
 
@@ -33,10 +34,10 @@ export async function AdClassicRendering({
             target="_blank"
             insights={
                 insightsAd
-                    ? {
+                    ? toSlimTrackEvent({
                           type: 'ad_click',
                           ad: insightsAd,
-                      }
+                      })
                     : undefined
             }
             className={tcls(

@@ -7,6 +7,7 @@ import {
 } from '@gitbook/api';
 import type { GitBookSiteContext } from '@v2/lib/context';
 
+import { toSlimTrackEvent } from '../Insights';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
@@ -28,7 +29,7 @@ export async function PageDocumentItem(props: {
             <ToggleableLinkItem
                 href={href}
                 pathname={getPagePath(rootPages, page)}
-                insights={{
+                insights={toSlimTrackEvent({
                     type: 'link_click',
                     link: {
                         target: {
@@ -37,7 +38,7 @@ export async function PageDocumentItem(props: {
                         },
                         position: SiteInsightsLinkPosition.Sidebar,
                     },
-                }}
+                })}
                 descendants={
                     hasPageVisibleDescendant(page) ? (
                         <PagesList

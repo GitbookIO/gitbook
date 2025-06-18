@@ -11,6 +11,7 @@ import assertNever from 'assert-never';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { Button, Link } from '../primitives';
 import {
     type DropdownButtonProps,
@@ -125,13 +126,13 @@ function HeaderItemButton(
                     ),
                 }[linkStyle]
             )}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'link_click',
                 link: {
                     target: linkTarget,
                     position: SiteInsightsLinkPosition.Header,
                 },
-            }}
+            })}
             label={title}
             {...rest}
         />
@@ -169,13 +170,13 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
         <Link
             href={href}
             className={getHeaderLinkClassName({ headerPreset })}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'link_click',
                 link: {
                     target: linkTarget,
                     position: SiteInsightsLinkPosition.Header,
                 },
-            }}
+            })}
             {...rest}
         >
             {title}
@@ -217,13 +218,13 @@ async function SubHeaderLink(props: {
     return (
         <DropdownMenuItem
             href={target.href}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'link_click',
                 link: {
                     target: link.to,
                     position: SiteInsightsLinkPosition.Header,
                 },
-            }}
+            })}
         >
             {link.title}
         </DropdownMenuItem>

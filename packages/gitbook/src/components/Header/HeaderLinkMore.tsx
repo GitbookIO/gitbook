@@ -10,6 +10,7 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { DropdownChevron, DropdownMenu, DropdownMenuItem, DropdownSubMenu } from './DropdownMenu';
 import styles from './headerLinks.module.css';
 
@@ -80,13 +81,13 @@ async function MoreMenuLink(props: {
             href={target?.href ?? null}
             insights={
                 link.to
-                    ? {
+                    ? toSlimTrackEvent({
                           type: 'link_click',
                           link: {
                               target: link.to,
                               position: SiteInsightsLinkPosition.Header,
                           },
-                      }
+                      })
                     : undefined
             }
         >

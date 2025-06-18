@@ -8,6 +8,7 @@ import { Icon } from '@gitbook/icons';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 
 /**
@@ -115,10 +116,10 @@ export function TrademarkLink(props: {
                 'transition-colors',
                 'pointer-events-auto'
             )}
-            insights={{
+            insights={toSlimTrackEvent({
                 type: 'trademark_click',
                 placement,
-            }}
+            })}
         >
             <Icon
                 icon="gitbook"

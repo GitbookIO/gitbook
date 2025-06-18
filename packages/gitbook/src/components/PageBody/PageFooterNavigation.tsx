@@ -7,6 +7,7 @@ import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSiteContext } from '@v2/lib/context';
+import { toSlimTrackEvent } from '../Insights';
 import { Link, type LinkInsightsProps } from '../primitives';
 
 /**
@@ -43,7 +44,7 @@ export async function PageFooterNavigation(props: {
                     label={t(language, 'previous_page')}
                     title={previous.title}
                     href={previousHref}
-                    insights={{
+                    insights={toSlimTrackEvent({
                         type: 'link_click',
                         link: {
                             target: {
@@ -52,7 +53,7 @@ export async function PageFooterNavigation(props: {
                             },
                             position: SiteInsightsLinkPosition.Content,
                         },
-                    }}
+                    })}
                     reversed
                 />
             ) : null}
@@ -62,7 +63,7 @@ export async function PageFooterNavigation(props: {
                     label={t(language, 'next_page')}
                     title={next.title}
                     href={nextHref}
-                    insights={{
+                    insights={toSlimTrackEvent({
                         type: 'link_click',
                         link: {
                             target: {
@@ -71,7 +72,7 @@ export async function PageFooterNavigation(props: {
                             },
                             position: SiteInsightsLinkPosition.Content,
                         },
-                    }}
+                    })}
                 />
             ) : null}
         </div>

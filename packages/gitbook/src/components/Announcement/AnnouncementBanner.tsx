@@ -6,6 +6,7 @@ import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
+import { toSlimTrackEvent } from '../Insights';
 import { CONTAINER_STYLE } from '../layout';
 import { Link, linkStyles } from '../primitives';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
@@ -41,13 +42,13 @@ export function AnnouncementBanner(props: {
                         )}
                         insights={
                             announcement.link
-                                ? {
+                                ? toSlimTrackEvent({
                                       type: 'link_click',
                                       link: {
                                           target: announcement.link.to,
                                           position: SiteInsightsLinkPosition.Announcement,
                                       },
-                                  }
+                                  })
                                 : undefined
                         }
                     >

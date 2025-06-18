@@ -173,7 +173,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                 className="flex flex-row items-center gap-2"
                                 insights={
                                     ref.file
-                                        ? {
+                                        ? toSlimTrackEvent({
                                               type: 'link_click',
                                               link: {
                                                   target: {
@@ -182,7 +182,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                                   },
                                                   position: SiteInsightsLinkPosition.Content,
                                               },
-                                          }
+                                          })
                                         : undefined
                                 }
                             >
@@ -236,13 +236,13 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             href={resolved.href}
                             insights={
                                 contentRef
-                                    ? {
+                                    ? toSlimTrackEvent({
                                           type: 'link_click',
                                           link: {
                                               target: contentRef,
                                               position: SiteInsightsLinkPosition.Content,
                                           },
-                                      }
+                                      })
                                     : undefined
                             }
                         >

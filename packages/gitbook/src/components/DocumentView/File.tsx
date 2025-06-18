@@ -4,6 +4,7 @@ import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { toSlimTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
@@ -28,13 +29,13 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
             <Link
                 href={file.downloadURL}
                 download={file.name}
-                insights={{
+                insights={toSlimTrackEvent({
                     type: 'link_click',
                     link: {
                         target: block.data.ref,
                         position: SiteInsightsLinkPosition.Content,
                     },
-                }}
+                })}
                 className={tcls('group/file', 'flex', 'flex-row', 'items-center', 'px-5', 'py-3')}
             >
                 <div
