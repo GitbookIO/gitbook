@@ -30,6 +30,9 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
     return false;
 }
 
+/**
+ * Returns true if the document has more than `limit` blocks and/or inlines that match the `check` predicate.
+ */
 export function hasMoreThan(
     document: JSONDocument | DocumentBlock,
     check: (block: DocumentBlock | DocumentInline) => boolean,
@@ -37,7 +40,7 @@ export function hasMoreThan(
 ): boolean {
     let count = 0;
 
-    function traverse(node: JSONDocument | DocumentBlock): boolean {
+    function traverse(node: JSONDocument | DocumentBlock | DocumentFragment): boolean {
         for (const child of 'nodes' in node ? node.nodes : []) {
             if (child.object === 'text') continue;
 
@@ -48,6 +51,12 @@ export function hasMoreThan(
 
             if (child.object === 'block' && 'nodes' in child) {
                 if (traverse(child)) return true;
+            }
+
+            if (child.object === 'block' && 'fragments' in child) {
+                for (const fragment of child.fragments) {
+                    if (traverse(fragment)) return true;
+                }
             }
         }
         return false;
