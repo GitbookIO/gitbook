@@ -5,6 +5,7 @@ import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
+import { type DesignTokenName, useClassnames } from './StyleProvider';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
@@ -25,6 +26,8 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
     LinkInsightsProps & {
         /** Enforce href is passed as a string (not a URL). */
         href: string;
+        /** This is a temporary solution designed to reduce the number of tailwind class passed to the client */
+        classNames?: DesignTokenName[];
     };
 
 /**
@@ -35,8 +38,9 @@ export const Link = React.forwardRef(function Link(
     props: LinkProps,
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { href, prefetch, children, insights, ...domProps } = props;
+    const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
     const trackEvent = useTrackEvent();
+    const forwardedClassNames = useClassnames(classNames || []);
 
     // Use a real anchor tag for external links,s and a Next.js Link for internal links.
     // If we use a NextLink for external links, Nextjs won't rerender the top-level layouts.
@@ -63,14 +67,27 @@ export const Link = React.forwardRef(function Link(
     // as this will be rendered on the server and it could result in a mismatch.
     if (isExternalLink(href)) {
         return (
-            <a ref={ref} {...domProps} href={href} onClick={onClick}>
+            <a
+                ref={ref}
+                className={tcls(...forwardedClassNames, className)}
+                {...domProps}
+                href={href}
+                onClick={onClick}
+            >
                 {children}
             </a>
         );
     }
 
     return (
-        <NextLink ref={ref} href={href} prefetch={prefetch} {...domProps} onClick={onClick}>
+        <NextLink
+            ref={ref}
+            href={href}
+            prefetch={prefetch}
+            className={tcls(...forwardedClassNames, className)}
+            {...domProps}
+            onClick={onClick}
+        >
             {children}
         </NextLink>
     );
@@ -81,12 +98,17 @@ export const Link = React.forwardRef(function Link(
  * It is used to create a clickable area that can contain other elements.
  */
 export const LinkBox = React.forwardRef(function LinkBox(
-    props: React.BaseHTMLAttributes<HTMLDivElement>,
+    props: React.BaseHTMLAttributes<HTMLDivElement> & { classNames?: DesignTokenName[] },
     ref: React.Ref<HTMLDivElement>
 ) {
-    const { children, className, ...domProps } = props;
+    const { children, className, classNames, ...domProps } = props;
+    const forwardedClassNames = useClassnames(classNames || []);
     return (
-        <div ref={ref} {...domProps} className={tcls('elevate-link relative', className)}>
+        <div
+            ref={ref}
+            {...domProps}
+            className={tcls('elevate-link relative', className, forwardedClassNames)}
+        >
             {children}
         </div>
     );
