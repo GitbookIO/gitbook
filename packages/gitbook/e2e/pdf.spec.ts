@@ -1,5 +1,6 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import { expect, test } from '@playwright/test';
+import { getContentTestURL } from '../tests/utils';
 import { waitForIcons } from './util';
 
 test.describe('PDF export', () => {
@@ -20,7 +21,9 @@ test.describe('PDF export', () => {
         });
 
         await page.goto(
-            'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/~gitbook/pdf?limit=10'
+            getContentTestURL(
+                'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/~gitbook/pdf?limit=10'
+            )
         );
 
         const printBtn = page.getByTestId('print-button');
@@ -59,7 +62,7 @@ test.describe('PDF export', () => {
             }
         });
 
-        await page.goto('https://gitbook.com/docs/~gitbook/pdf?limit=10');
+        await page.goto(getContentTestURL('https://gitbook.com/docs/~gitbook/pdf?limit=10'));
 
         const printBtn = page.getByTestId('print-button');
         await expect(printBtn).toBeVisible();
@@ -98,7 +101,9 @@ test.describe('PDF export', () => {
         });
 
         await page.goto(
-            'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/~gitbook/pdf?page=Bw7LjWwgTjV8nIV4s7rs&only=yes&limit=2'
+            getContentTestURL(
+                'https://gitbook-open-e2e-sites.gitbook.io/gitbook-doc/~gitbook/pdf?page=Bw7LjWwgTjV8nIV4s7rs&only=yes&limit=2'
+            )
         );
 
         const printBtn = page.getByTestId('print-button');
@@ -138,7 +143,9 @@ test.describe('PDF export', () => {
         });
 
         await page.goto(
-            'https://gitbook.com/docs/~gitbook/pdf?page=DfnNkU49mvLe2ythHAyx&only=yes&limit=2'
+            getContentTestURL(
+                'https://gitbook.com/docs/~gitbook/pdf?page=DfnNkU49mvLe2ythHAyx&only=yes&limit=2'
+            )
         );
 
         const printBtn = page.getByTestId('print-button');
