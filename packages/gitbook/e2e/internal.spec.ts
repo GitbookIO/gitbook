@@ -82,11 +82,11 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'PDF (all pages)',
-                url: '~gitbook/pdf?limit=100',
+                url: '~gitbook/pdf?limit=10',
             },
             {
                 name: 'PDF (only current page)',
-                url: '~gitbook/pdf?page=Bw7LjWwgTjV8nIV4s7rs&only=yes&limit=100',
+                url: '~gitbook/pdf?page=Bw7LjWwgTjV8nIV4s7rs&only=yes&limit=2',
             },
             {
                 name: 'Not found',
@@ -316,11 +316,11 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'PDF (all pages)',
-                url: '~gitbook/pdf?limit=100',
+                url: '~gitbook/pdf?limit=10',
             },
             {
                 name: 'PDF (only current page)',
-                url: '~gitbook/pdf?page=DfnNkU49mvLe2ythHAyx&only=yes&limit=100',
+                url: '~gitbook/pdf?page=DfnNkU49mvLe2ythHAyx&only=yes&limit=2', // limit 2 pages to catch any bugs with multiple pages
             },
             {
                 name: 'Not found',

@@ -259,11 +259,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
-
-        // Ensure all searchParams are brought over to the rewritten URL
-        request.nextUrl.searchParams.forEach((value, key) => {
-            rewrittenURL.searchParams.set(key, value);
-        });
+        rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
 
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
