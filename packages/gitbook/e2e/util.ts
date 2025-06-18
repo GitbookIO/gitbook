@@ -64,6 +64,10 @@ export interface Test {
      * Whether to only run this test.
      */
     only?: boolean;
+    /**
+     * Viewport to use for the test.
+     */
+    viewports?: ('macbook-16' | 'macbook-13' | 'ipad-2' | 'iphone-x')[];
 }
 
 export type TestsCase = {
@@ -159,7 +163,7 @@ export function runTestCases(testCases: TestsCase[]) {
 
         test.describe(testCase.name, () => {
             for (const testEntry of testCase.tests) {
-                const { mode = 'page' } = testEntry;
+                const { mode = 'page', viewports } = testEntry;
                 const testFn = testEntry.only ? test.only : test;
                 testFn(testEntry.name, async ({ page, context }) => {
                     const testEntryPathname =
@@ -204,13 +208,18 @@ export function runTestCases(testCases: TestsCase[]) {
                         const screenshotName = `${testCase.name} - ${testEntry.name}`;
                         if (mode === 'image') {
                             await argosScreenshot(page, screenshotName, {
-                                viewports: ['macbook-13'],
+                                viewports: viewports ?? ['macbook-13'],
                                 threshold: screenshotOptions?.threshold ?? undefined,
                                 fullPage: true,
                             });
                         } else {
                             await argosScreenshot(page, screenshotName, {
-                                viewports: ['macbook-16', 'macbook-13', 'ipad-2', 'iphone-x'],
+                                viewports: viewports ?? [
+                                    'macbook-16',
+                                    'macbook-13',
+                                    'ipad-2',
+                                    'iphone-x',
+                                ],
                                 argosCSS: `
                             /* Hide Intercom */
                             .intercom-lightweight-app {
