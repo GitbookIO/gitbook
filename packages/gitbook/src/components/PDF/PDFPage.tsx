@@ -53,7 +53,7 @@ export async function PDFPage(props: {
 }) {
     const baseContext = props.context;
     const searchParams = new URLSearchParams(props.searchParams);
-    const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
+    const pdfParams = getPDFSearchParams(searchParams);
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomization();
