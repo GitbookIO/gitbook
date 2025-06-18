@@ -346,7 +346,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
 /**
  * Wait for all icons present on the page to be loaded.
  */
-async function waitForIcons(page: Page) {
+export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
         const urlStates: Record<
             string,
