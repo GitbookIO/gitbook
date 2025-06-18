@@ -81,6 +81,14 @@ const testCases: TestsCase[] = [
                 screenshot: false,
             },
             {
+                name: 'PDF (all pages)',
+                url: '~gitbook/pdf?limit=100',
+            },
+            {
+                name: 'PDF (only current page)',
+                url: '~gitbook/pdf?page=Bw7LjWwgTjV8nIV4s7rs&only=yes&limit=100',
+            },
+            {
                 name: 'Not found',
                 url: 'content-not-found',
                 run: waitForCookiesDialog,
@@ -305,6 +313,14 @@ const testCases: TestsCase[] = [
                     });
                 },
                 screenshot: false,
+            },
+            {
+                name: 'PDF (all pages)',
+                url: '~gitbook/pdf?limit=100',
+            },
+            {
+                name: 'PDF (only current page)',
+                url: '~gitbook/pdf?page=DfnNkU49mvLe2ythHAyx&only=yes&limit=100',
             },
             {
                 name: 'Not found',
