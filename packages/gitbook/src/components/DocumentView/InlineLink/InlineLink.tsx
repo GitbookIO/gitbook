@@ -22,7 +22,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
 
     if (!context.contentContext || !resolved) {
         return (
-            <span title="Broken link" className="underline">
+            <span title="Page not found" className="underline">
                 <Inlines
                     context={context}
                     document={document}

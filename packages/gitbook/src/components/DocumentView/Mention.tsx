@@ -15,7 +15,7 @@ export async function Mention(props: InlineProps<DocumentInlineMention>) {
         : null;
 
     if (!resolved) {
-        return <span className="underline">Broken link</span>;
+        return <span className="underline">⚠️ Page not found</span>;
     }
 
     return (
