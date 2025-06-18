@@ -6,13 +6,18 @@ import { headers } from 'next/headers';
 export async function shouldTrackEvents(): Promise<boolean> {
     const headersList = await headers();
 
-    if (
-        process.env.NODE_ENV === 'development' ||
-        (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING &&
-            !headersList.has('x-gitbook-track-page-views'))
-    ) {
+    // No tracking in development mode
+    if (process.env.NODE_ENV === 'development') {
         return false;
     }
 
-    return true;
+    const headerValue = headersList.get('x-gitbook-track-page-views');
+
+    // No tracking if environment variable is set and header does not override it.
+    if (process.env.GITBOOK_BLOCK_PAGE_VIEWS_TRACKING && headerValue !== null) {
+        return false;
+    }
+
+    // Passing a 0 will disable tracking
+    return headerValue !== '0';
 }
