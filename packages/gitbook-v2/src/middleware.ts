@@ -43,6 +43,12 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(normalized.toString());
         }
 
+        // Reject malicious requests
+        const rejectResponse = await validateServerActionRequest(request);
+        if (rejectResponse) {
+            return rejectResponse;
+        }
+
         for (const handler of [serveSiteRoutes, serveSpacePDFRoutes]) {
             const result = await handler(requestURL, request);
             if (result) {
@@ -53,6 +59,25 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     } catch (error) {
         return serveErrorResponse(error as Error);
+    }
+}
+
+async function validateServerActionRequest(request: NextRequest) {
+    // We need to reject incorrect server actions requests
+    // We do not do it in cloudflare workers as there is a bug that prevents us from reading the request body.
+    if (request.headers.has('next-action') && process.env.GITBOOK_RUNTIME !== 'cloudflare') {
+        // We just test that the json body is parseable
+        try {
+            const clonedRequest = request.clone();
+            await clonedRequest.json();
+        } catch (e) {
+            console.warn('Invalid server action request', e);
+            // If the body is not parseable, we reject the request
+            return new Response('Invalid request', {
+                status: 400,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
     }
 }
 
@@ -79,6 +104,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
         return await serveResizedImage(request, {
             imagesContextId: imagesContextId,
+        });
+    }
+
+    // We want to filter hostnames that contains a port here as this is likely a malicious request.
+    if (siteRequestURL.host.includes(':')) {
+        return new Response('Invalid request', {
+            status: 400,
+            headers: { 'content-type': 'text/plain' },
         });
     }
 
