@@ -10,7 +10,7 @@ import React, {
 import { assert } from 'ts-essentials';
 
 interface TOCScrollContainerContextType {
-    onContainerMount: (listener: (element: HTMLDivElement) => void) => () => void;
+    getContainer: (listener: (element: HTMLDivElement) => void) => () => void;
 }
 
 const TOCScrollContainerContext = React.createContext<TOCScrollContainerContextType | null>(null);
@@ -27,23 +27,17 @@ function useTOCScrollContainerContext() {
 export function TOCScrollContainer(props: ComponentPropsWithoutRef<'div'>) {
     const ref = useRef<HTMLDivElement>(null);
     const listeners = useRef<((element: HTMLDivElement) => void)[]>([]);
-    const onContainerMount: TOCScrollContainerContextType['onContainerMount'] = useCallback(
-        (listener) => {
-            if (ref.current) {
-                listener(ref.current);
-                return () => {};
-            }
-            listeners.current.push(listener);
-            return () => {
-                listeners.current = listeners.current.filter((l) => l !== listener);
-            };
-        },
-        []
-    );
-    const value: TOCScrollContainerContextType = useMemo(
-        () => ({ onContainerMount }),
-        [onContainerMount]
-    );
+    const getContainer: TOCScrollContainerContextType['getContainer'] = useCallback((listener) => {
+        if (ref.current) {
+            listener(ref.current);
+            return () => {};
+        }
+        listeners.current.push(listener);
+        return () => {
+            listeners.current = listeners.current.filter((l) => l !== listener);
+        };
+    }, []);
+    const value: TOCScrollContainerContextType = useMemo(() => ({ getContainer }), [getContainer]);
     useEffect(() => {
         const element = ref.current;
         if (!element) {
@@ -73,18 +67,17 @@ export function useScrollToActiveTOCItem(props: {
     isActive: boolean;
 }) {
     const { isActive, anchorRef } = props;
-    const isInitialActiveRef = useRef(isActive);
-    const { onContainerMount } = useTOCScrollContainerContext();
+    const { getContainer } = useTOCScrollContainerContext();
     useEffect(() => {
         const anchor = anchorRef.current;
-        if (isInitialActiveRef.current && anchor) {
-            return onContainerMount((container) => {
+        if (isActive && anchor) {
+            return getContainer((container) => {
                 if (isOutOfView(anchor, container)) {
                     container.scrollTo({ top: anchor.offsetTop - TOC_ITEM_OFFSET });
                 }
             });
         }
-    }, [onContainerMount, anchorRef]);
+    }, [isActive, getContainer, anchorRef]);
 }
 
 function isOutOfView(element: HTMLElement, container: HTMLElement) {
