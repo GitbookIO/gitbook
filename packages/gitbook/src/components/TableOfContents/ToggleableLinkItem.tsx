@@ -16,15 +16,15 @@ import { useScrollToActiveTOCItem } from './TOCScroller';
 export function ToggleableLinkItem(
     props: {
         href: string;
-        pathname: string;
+        pathnames: string[];
         children: React.ReactNode;
         descendants: React.ReactNode;
     } & LinkInsightsProps
 ) {
-    const { href, children, descendants, pathname, insights } = props;
+    const { href, children, descendants, pathnames, insights } = props;
 
     const currentPagePath = useCurrentPagePath();
-    const isActive = currentPagePath === pathname;
+    const isActive = pathnames.some((pathname) => pathname === currentPagePath);
 
     if (!descendants) {
         return (
@@ -37,7 +37,9 @@ export function ToggleableLinkItem(
     return (
         <DescendantsRenderer
             descendants={descendants}
-            defaultIsOpen={isActive || currentPagePath.startsWith(`${pathname}/`)}
+            defaultIsOpen={
+                isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`))
+            }
         >
             {({ descendants, toggler }) => (
                 <>
