@@ -67,7 +67,7 @@ async function validateServerActionRequest(request: NextRequest) {
     if (request.headers.has('next-action')) {
         // We just test that the json body is parseable
         try {
-            const clonedRequest = request.clone();
+            const clonedRequest = new Request(request.url, request);
             await clonedRequest.json();
         } catch (e) {
             console.warn('Invalid server action request', e);
