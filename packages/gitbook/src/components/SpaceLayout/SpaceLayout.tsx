@@ -125,7 +125,7 @@ export function SpaceLayout(props: {
                                             sections={encodeClientSiteSections(context, sections)}
                                         />
                                     )}
-                                    {isMultiVariants && (
+                                    {isMultiVariants && !sections && (
                                         <SpacesDropdown
                                             context={context}
                                             siteSpace={siteSpace}
