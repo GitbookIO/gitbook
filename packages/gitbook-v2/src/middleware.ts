@@ -64,10 +64,11 @@ export async function middleware(request: NextRequest) {
 
 async function validateServerActionRequest(request: NextRequest) {
     // We need to reject incorrect server actions requests
-    if (request.headers.has('next-action')) {
+    // We do not do it in cloudflare workers as there is a bug that prevents us from reading the request body.
+    if (request.headers.has('next-action') && !request.cf) {
         // We just test that the json body is parseable
         try {
-            const clonedRequest = new Request(request.url, request);
+            const clonedRequest = request.clone();
             await clonedRequest.json();
         } catch (e) {
             console.warn('Invalid server action request', e);
