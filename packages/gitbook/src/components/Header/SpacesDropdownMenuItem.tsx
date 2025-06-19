@@ -10,6 +10,7 @@ interface VariantSpace {
     id: Space['id'];
     title: Space['title'];
     url: string;
+    isActive: boolean;
 }
 
 // When switching to a different variant space, we reconstruct the URL by swapping the space path.
@@ -55,9 +56,8 @@ export function SpacesDropdownMenuItem(props: {
 export function SpacesDropdownMenuItems(props: {
     slimSpaces: VariantSpace[];
     curPath: string;
-    curSpaceId: string;
 }) {
-    const { slimSpaces, curPath, curSpaceId } = props;
+    const { slimSpaces, curPath } = props;
 
     return (
         <>
@@ -65,7 +65,7 @@ export function SpacesDropdownMenuItems(props: {
                 <SpacesDropdownMenuItem
                     key={space.id}
                     variantSpace={space}
-                    active={space.id === curSpaceId}
+                    active={space.isActive}
                     currentSpacePath={curPath}
                 />
             ))}

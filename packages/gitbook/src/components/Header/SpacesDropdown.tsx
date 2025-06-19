@@ -70,9 +70,9 @@ export function SpacesDropdown(props: {
                     id: space.id,
                     title: space.title,
                     url: getSiteSpaceURL(context, space),
+                    isActive: space.id === siteSpace.id,
                 }))}
                 curPath={siteSpace.path}
-                curSpaceId={siteSpace.id}
             />
         </DropdownMenu>
     );
