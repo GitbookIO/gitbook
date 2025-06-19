@@ -9,9 +9,6 @@ import type { BlockProps } from '../Block';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightToken } from './highlight';
 
-import './theme.css';
-import './CodeBlockRenderer.css';
-
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     lines: HighlightLine[];
     'aria-busy'?: boolean;
@@ -58,7 +55,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 <code
                     id={id}
                     className={tcls(
-                        'inline-grid min-w-full grid-cols-[auto_1fr] p-2 [count-reset:line] print:whitespace-pre-wrap',
+                        'min-w-full p-2 [count-reset:line] print:whitespace-pre-wrap',
                         withWrap && 'whitespace-pre-wrap'
                     )}
                 >
