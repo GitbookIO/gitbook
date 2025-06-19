@@ -65,7 +65,7 @@ export async function middleware(request: NextRequest) {
 async function validateServerActionRequest(request: NextRequest) {
     // We need to reject incorrect server actions requests
     // We do not do it in cloudflare workers as there is a bug that prevents us from reading the request body.
-    if (request.headers.has('next-action') && !request.cf) {
+    if (request.headers.has('next-action') && process.env.GITBOOK_RUNTIME !== 'cloudflare') {
         // We just test that the json body is parseable
         try {
             const clonedRequest = request.clone();
