@@ -106,6 +106,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         });
     }
 
+    // We want to filter hostnames that contains a port here as this is likely a malicious request.
+    if (siteRequestURL.host.includes(':')) {
+        return new Response('Invalid request', {
+            status: 400,
+            headers: { 'content-type': 'text/plain' },
+        });
+    }
+
     //
     // Detect and extract the visitor authentication token from the request
     //
