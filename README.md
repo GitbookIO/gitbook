@@ -77,11 +77,6 @@ examples:
 
 Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
 
-### Other development commands
-
--   `bun format`: format the code
--   `bun lint`: lint the code
-
 ### CI and testing
 
 All pull-requests will be tested against both visual and performances testing to prevent regressions.

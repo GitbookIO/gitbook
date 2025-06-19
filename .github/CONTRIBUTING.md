@@ -53,11 +53,39 @@ After forking this repository, you'll want to [create a branch](https://docs.git
 
 #### 3. Install dependencies and run the project locally
 
-GitBook uses [Bun](https://bun.sh/) to run the project. Make sure you're using the specified version of `node` before running any of the development commands to ensure a smooth development experience.
+##### Prerequisites:
+- Node.js (Version: >=20.6)
+  - Use `nvm` for easy Node management
+- [Bun](https://bun.sh/) (Version: >=1.2.15)
+  - We use a text-based lockfile which isn't supported below 1.2.15
 
-You can easily do this by running the command `nvm use`.
+##### Setup steps:
 
-To start your local version of GitBook, run the command `bun dev`.
+1. Ensure you are using the project's version of Node:
+```bash
+nvm use
+```
+
+2. Install dependencies using Bun:
+```bash
+bun install
+```
+
+3. Build the project:
+```bash
+bun build:v2
+```
+
+4. Start the development server:
+```bash
+bun dev:v2
+```
+
+Additional development commands:
+- `bun format`: Format the code using Biome
+- `bun typecheck`: Run TypeScript type checking
+- `bun unit`: Run unit tests
+- `bun e2e`: Run end-to-end tests
 
 #### 4. Preview your changes
 
