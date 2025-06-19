@@ -141,6 +141,12 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
             icon: icons,
             apple: icons,
         },
+        appleWebApp: {
+            capable: true,
+            title: site.title,
+            statusBarStyle:
+                customization.themes.default === CustomizationThemeMode.Dark ? 'black' : 'default',
+        },
         robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
     };
 }
