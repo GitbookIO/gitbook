@@ -72,6 +72,7 @@ export function SpacesDropdown(props: {
                     url: getSiteSpaceURL(context, space),
                 }))}
                 curPath={siteSpace.path}
+                curSpaceId={siteSpace.id}
             />
         </DropdownMenu>
     );

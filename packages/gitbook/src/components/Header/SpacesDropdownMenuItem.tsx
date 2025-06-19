@@ -55,8 +55,9 @@ export function SpacesDropdownMenuItem(props: {
 export function SpacesDropdownMenuItems(props: {
     slimSpaces: VariantSpace[];
     curPath: string;
+    curSpaceId: string;
 }) {
-    const { slimSpaces, curPath } = props;
+    const { slimSpaces, curPath, curSpaceId } = props;
 
     return (
         <>
@@ -64,7 +65,7 @@ export function SpacesDropdownMenuItems(props: {
                 <SpacesDropdownMenuItem
                     key={space.id}
                     variantSpace={space}
-                    active={false}
+                    active={space.id === curSpaceId}
                     currentSpacePath={curPath}
                 />
             ))}
