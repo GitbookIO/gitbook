@@ -6,6 +6,7 @@ import type { BlockProps } from './Block';
 import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
+import { getTextAlignment } from './utils';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, context, ...rest } = props;
@@ -42,7 +43,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'grid-area-1-1',
                     'z-[1]',
                     'justify-self-start',
-                    'text-left',
+                    getTextAlignment(block.data.align),
                     textStyle.lineHeight,
                     textStyle.marginTop
                 )}

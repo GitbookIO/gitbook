@@ -614,6 +614,11 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
+                name: 'Buttons',
+                url: 'blocks/buttons',
+                run: waitForCookiesDialog,
+            },
+            {
                 name: 'Lists',
                 url: 'blocks/lists',
                 fullPage: true,
