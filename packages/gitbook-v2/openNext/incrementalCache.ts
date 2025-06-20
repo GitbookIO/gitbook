@@ -183,7 +183,14 @@ class GitbookIncrementalCache implements IncrementalCache {
     }
 
     // Utility function to generate keys for R2/Cache API
-    getR2Key(key: string, cacheType: CacheEntryType = 'cache'): string {
+    getR2Key(initialKey: string, cacheType: CacheEntryType = 'cache'): string {
+        let key = initialKey;
+        if (cacheType === 'composable') {
+            // For composable cache, we need to discard the build ID from the key
+            const [_buildId, ...restOfTheKey] = JSON.parse(initialKey);
+            key = JSON.stringify([...restOfTheKey]);
+        }
+
         const hash = createHash('sha256').update(key).digest('hex');
         return `${DEFAULT_PREFIX}/${cacheType === 'cache' ? process.env?.NEXT_BUILD_ID : 'dataCache'}/${hash}.${cacheType}`.replace(
             /\/+/g,
