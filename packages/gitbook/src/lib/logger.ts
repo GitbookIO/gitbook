@@ -1,5 +1,4 @@
 import { cache } from 'react';
-import 'server-only';
 /**
  * Creates a logger with the given name, the logger will prefix all log messages with the name in square brackets.
  * @param name The name of the logger, which can be used to create a sub-logger.
