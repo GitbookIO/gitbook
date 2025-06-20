@@ -1,5 +1,72 @@
 # gitbook
 
+## 0.13.0
+
+### Minor Changes
+
+- af98402: Add support for inline icons.
+- 7d3fe23: Add circular corners and depth styling
+- fa12f9e: Support dark-mode specific page cover image
+- df848ef: Add support for icons in buttons.
+- b7a0db3: Fix rendering of ogimage with SVG logos.
+- c3b620e: Best effort at preserving current variant when navigating between sections by matching the pathname against site spaces in the new section.
+- 4fb2a4a: Rework full-width layout, add support for full-width page option
+- df848ef: Add support for text alignment for headings and paragraphs.
+
+### Patch Changes
+
+- 42d88da: Fix UX issue about highlighting the search term in search result sections
+- 6aa3ff9: Fix three small visual issues
+
+  - Fix sidebar showing on `no-toc` pages in the gradient theme
+  - Fix variant selector truncating incorrectly in header when sections are present
+  - Fix page cover alignment on `lg` screens without TOC
+
+- 015615d: Respect fullWidth and defaultWidth for images
+- 4721403: Hide scrollbar on sections
+- 7d5a6d2: fix nested a tag causing hydration error
+- b3a7ad6: fix href being empty in TOC
+- dc4268d: Fix navigation between sections/variants when previewing a site in v2
+- 11a6511: Fix crash when integration script fails to render block.
+- 7a00880: Improve support for OAuth2 security type
+- c0ee60e: Adds Columns layout block to GBO
+- 9316ccd: Update Models page styling
+- 42d43e0: Show scrollbars
+- 88a35ed: Fix crash when integration is triggering invalid requests.
+- f58b904: encode customization header
+- 4f5fec7: Fix CodeBlock layout
+- a7a713b: Scroll to active TOC when clicking a link
+- 521052d: Fix concurrent execution in Vercel causing pages to not be attached to the proper tags.
+- 500c8cb: Don't crash ogimage generation on RTL text, as a workaround until we can support it.
+- 6859f7d: Fix rendering of ogimage when logo or icon are AVIF images.
+- a28a997: Add margin to adjacent buttons
+- 67998b6: Fix ogimage generation failing with some JPEG images.
+- 8c0a53a: Fix page group not expanded by default
+- c730845: Fix missing title on button to close the announcement banner.
+- 231167d: Make icons for page groups more contrasting
+- d99da6a: Ignore case while highlighting search results.
+- dae019c: Consistently show variant selector in section bar if site has sections
+- 57bb146: Make TOC height dynamic based on visible header and footer elements
+- 392f594: Fix InlineLinkTooltip having a negative impact on performance, especially on larger pages.
+- c9373ef: Fix bold header links hover color
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- e7a591d: Fix border being added to cards
+- 427f748: Add metadata for adding site to Apple devices home
+- a3a944d: Fix crash during rendering of ogimage for VA sites with default icon.
+- caaa692: Allow to zoom images on mobile if relevant
+- b6b5975: Reverse order of feedback smileys
+- fbfcca5: Fix ogimage using incorrect Google Font depending on language.
+- Updated dependencies [957afd9]
+- Updated dependencies [7a00880]
+- Updated dependencies [11a6511]
+- Updated dependencies [fbfcca5]
+- Updated dependencies [a0c06a7]
+- Updated dependencies [4c9a9d0]
+- Updated dependencies [40df91a]
+  - @gitbook/react-openapi@1.3.1
+  - @gitbook/react-contentkit@0.7.1
+  - @gitbook/fonts@0.1.0
+
 ## 0.12.0
 
 ### Minor Changes

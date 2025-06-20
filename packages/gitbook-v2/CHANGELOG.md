@@ -1,5 +1,26 @@
 # gitbook-v2
 
+## 0.3.1
+
+### Patch Changes
+
+- d410381: Add docs.testgitbook.com to ADAPTIVE_CONTENT_HOSTS list
+- c0ee60e: Adds Columns layout block to GBO
+- 72cd0e5: Optimize performances by using a smarter per-request cache arround data cached functions
+- af66ff7: add a force-revalidate api route to force bust the cache in case of errors
+- f58b904: encode customization header
+- ba0094a: fix ISR on preview env
+- 521052d: Fix concurrent execution in Vercel causing pages to not be attached to the proper tags.
+- 33726c8: Generate a llms-full.txt version of the docs site
+- dfa8a37: Don't cache unexpected API errors for more than a few minutes.
+- 73e0cbb: Fix an issue where PDF export URLs were not keeping their query params.
+- 6294bbb: add a global error boundary
+- 392f594: Fix InlineLinkTooltip having a negative impact on performance, especially on larger pages.
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- 4b67fe5: Add `urlObject.hash` to `linker.toLinkForContent` to pass through URL fragment identifiers, used in search
+- 902c3c6: apply customization for dynamic context
+- 2932077: remove trailing slash from linker
+
 ## 0.3.0
 
 ### Minor Changes
