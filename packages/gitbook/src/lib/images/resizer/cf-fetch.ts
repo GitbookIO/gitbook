@@ -1,4 +1,4 @@
-import { getLogger } from '@v2/app/utils';
+import { getLogger } from '@v2/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
 

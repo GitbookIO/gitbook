@@ -1,12 +1,9 @@
-import crypto from 'node:crypto';
 import { getVisitorAuthClaims, getVisitorAuthClaimsFromToken } from '@/lib/adaptive';
 import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@/lib/context';
 import { getDynamicCustomizationSettings } from '@/lib/customization';
-import { createLogger } from '@/lib/logger';
 import type { SiteAPIToken } from '@gitbook/api';
 import { jwtDecode } from 'jwt-decode';
 import { forbidden } from 'next/navigation';
-import { cache } from 'react';
 import rison from 'rison';
 
 export type RouteParamMode = 'url-host' | 'url';
@@ -108,8 +105,3 @@ function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
     const decoded = decodeURIComponent(params.siteData);
     return rison.decode(decoded);
 }
-
-export const getLogger = cache(() => {
-    const requestId = crypto.randomBytes(16).toString('hex');
-    return createLogger('GBOV2', requestId);
-});

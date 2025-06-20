@@ -1,7 +1,7 @@
 import 'server-only';
 
 import fnv1a from '@sindresorhus/fnv1a';
-import { getLogger } from '@v2/app/utils';
+import { getLogger } from '@v2/lib/logger';
 import type { MaybePromise } from 'p-map';
 import { assert } from 'ts-essentials';
 import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY } from '../env';

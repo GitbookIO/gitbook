@@ -1,10 +1,10 @@
-import { getLogger } from '@/app/utils';
 import {
     type GitBookDataFetcher,
     createDataFetcher,
     getDataOrNull,
     throwIfDataError,
 } from '@/lib/data';
+import { getLogger } from '@/lib/logger';
 import { getSiteStructureSections } from '@/lib/sites';
 import type {
     ChangeRequest,
@@ -20,7 +20,6 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
-
 import assertNever from 'assert-never';
 import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';

@@ -1,5 +1,5 @@
 import 'server-only';
-import { getLogger } from '@v2/app/utils';
+import { getLogger } from '@v2/lib/logger';
 import assertNever from 'assert-never';
 import { GITBOOK_IMAGE_RESIZE_MODE } from '../../env';
 import { SizableImageAction, checkIsSizableImageURL } from '../checkIsSizableImageURL';
