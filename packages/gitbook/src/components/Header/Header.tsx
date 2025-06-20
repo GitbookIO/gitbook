@@ -183,8 +183,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     <div
                         className={tcls(
                             'w-full',
-                            'overflow-x-scroll',
-                            'overflow-y-hidden',
+                            'overflow-x-auto',
+                            'no-scrollbar',
                             '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
                             !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
                         )}
