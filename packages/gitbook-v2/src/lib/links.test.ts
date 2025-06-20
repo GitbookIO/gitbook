@@ -36,7 +36,8 @@ describe('toPathInSpace', () => {
     });
 
     it('should not add a trailing slash', () => {
-        expect(root.toPathInSpace('')).toBe('');
+        // The index page should not be an empty path
+        expect(root.toPathInSpace('')).toBe('/');
         expect(variantInSection.toPathInSpace('')).toBe('/section/variant');
     });
 });
@@ -53,7 +54,8 @@ describe('toPathInSite', () => {
     });
 
     it('should not add a trailing slash', () => {
-        expect(root.toPathInSite('')).toBe('');
+        // The index page should not be an empty path
+        expect(root.toPathInSite('')).toBe('/');
         expect(siteGitBookIO.toPathInSite('')).toBe('/sitename');
     });
 });
