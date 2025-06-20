@@ -1,5 +1,15 @@
 # @gitbook/react-openapi
 
+## 1.3.1
+
+### Patch Changes
+
+- 957afd9: Add authorization header for OAuth2
+- 7a00880: Improve support for OAuth2 security type
+- a0c06a7: Indent JSON python code sample
+- 4c9a9d0: Handle nested deprecated properties in generateSchemaExample
+- 40df91a: Deduplicate path parameters from OpenAPI spec
+
 ## 1.3.0
 
 ### Minor Changes
