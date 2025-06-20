@@ -167,3 +167,111 @@ html.dark {
 html.announcement-hidden #announcement-banner {
     @apply hidden;
 }
+
+/* Shiki theme */
+:root {
+    --shiki-color-text: theme("colors.tint.11");
+    --shiki-token-punctuation: theme("colors.tint.11");
+    --shiki-token-comment: theme("colors.neutral.9/.7");
+    --shiki-token-link: theme("colors.primary.10");
+
+    --shiki-token-constant: theme("colors.warning.10");
+    --shiki-token-string: theme("colors.warning.10");
+    --shiki-token-string-expression: theme("colors.success.10");
+    --shiki-token-keyword: theme("colors.danger.10");
+    --shiki-token-parameter: theme("colors.warning.10");
+    --shiki-token-function: theme("colors.primary.10");
+
+    --shiki-token-inserted: theme("colors.success.10");
+    --shiki-token-deleted: theme("colors.danger.10");
+    --shiki-token-changed: theme("colors.tint.12");
+}
+
+@media (prefers-contrast: more) {
+    :root {
+        --shiki-color-text: theme("colors.tint.12");
+        --shiki-token-punctuation: theme("colors.tint.12");
+        --shiki-token-comment: theme("colors.neutral.11");
+        --shiki-token-link: theme("colors.primary.11");
+
+        --shiki-token-constant: theme("colors.warning.11");
+        --shiki-token-string: theme("colors.warning.11");
+        --shiki-token-string-expression: theme("colors.success.11");
+        --shiki-token-keyword: theme("colors.danger.11");
+        --shiki-token-parameter: theme("colors.warning.11");
+        --shiki-token-function: theme("colors.primary.11");
+
+        --shiki-token-inserted: theme("colors.success.11");
+        --shiki-token-deleted: theme("colors.danger.11");
+        --shiki-token-changed: theme("colors.tint.12");
+    }
+}
+
+html.dark {
+    /* Override select colors to have more contrast */
+    --shiki-token-comment: theme("colors.neutral.9");
+
+    --shiki-token-constant: theme("colors.warning.11");
+    --shiki-token-string: theme("colors.warning.11");
+    --shiki-token-string-expression: theme("colors.success.11");
+    --shiki-token-keyword: theme("colors.danger.11");
+    --shiki-token-parameter: theme("colors.warning.11");
+    --shiki-token-function: theme("colors.primary.11");
+}
+
+.code-monochrome {
+    --shiki-token-constant: theme("colors.tint.11");
+    --shiki-token-string: theme("colors.tint.12");
+    --shiki-token-string-expression: theme("colors.tint.12");
+    --shiki-token-keyword: theme("colors.primary.10");
+    --shiki-token-parameter: theme("colors.tint.9");
+    --shiki-token-function: theme("colors.primary.9");
+}
+
+html.dark.code-monochrome {
+    --shiki-token-constant: theme("colors.tint.11");
+    --shiki-token-string: theme("colors.tint.12");
+    --shiki-token-string-expression: theme("colors.tint.12");
+    --shiki-token-keyword: theme("colors.primary.11");
+    --shiki-token-parameter: theme("colors.tint.10");
+    --shiki-token-function: theme("colors.primary.10");
+}
+
+/* Code blocks */
+.highlight-line {
+    @apply grid [grid-template-columns:subgrid] col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-[1] rounded;
+    @apply only:hover:ring-transparent;
+    @apply [counter-increment:line];
+
+    &.highlighted {
+        @apply bg-tint-active;
+        @apply first:rounded-t-md *:first:mt-1;
+        @apply last:rounded-b-md *:last:mb-1;
+        @apply rounded-none;
+    }
+
+    &:not(.highlighted) + .highlighted {
+        @apply rounded-t-md *:mt-1;
+    }
+
+    &.highlighted:has(+ :not(.highlighted)) {
+        @apply rounded-b-md *:mb-1;
+    }
+
+    &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
+        @apply rounded-md;
+    }
+}
+
+.highlight-line-number {
+    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-tint-subtle contrast-more:from-tint-base theme-muted:from-tint-base [html.theme-bold.sidebar-filled_&]:from-tint-base to-transparent;
+    @apply before:text-tint before:content-[counter(line)];
+
+    .highlight-line.highlighted > & {
+        @apply before:text-tint bg-gradient-to-r from-80% from-tint-active to-transparent;
+    }
+}
+
+.highlight-line-content {
+    @apply ml-3 block text-sm;
+}
