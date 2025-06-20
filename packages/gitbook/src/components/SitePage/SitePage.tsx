@@ -40,13 +40,6 @@ export async function SitePage(props: SitePageProps) {
             notFound();
         }
     } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
-        const redirectTo = context.linker.toPathForPage({
-            pages: context.pages,
-            page: pageTarget.page,
-        });
-        if (redirectTo === '') {
-            redirect('/'); // Redirect to root if the path is empty
-        }
         redirect(
             context.linker.toPathForPage({
                 pages: context.pages,
