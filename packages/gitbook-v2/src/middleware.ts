@@ -123,7 +123,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         url: siteRequestURL,
     });
 
-    const withAPIToken = async (apiToken: string | null) => {
+    const withAPIToken = async (apiToken: string | null, headers?: { [key: string]: string }) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
                 url: siteRequestURL.toString(),
@@ -300,6 +300,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             },
         });
 
+        Object.entries(headers ?? {}).forEach(([key, value]) => {
+            response.headers.set(key, value);
+        });
+
         // Add Content Security Policy header
         response.headers.set('content-security-policy', getContentSecurityPolicy());
         // Basic security headers
@@ -319,7 +323,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             // We scope the API token to the site ID.
             `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
             request,
-            withAPIToken
+            (apiToken) =>
+                // Do not track page views for preview requests
+                withAPIToken(apiToken, {
+                    'x-gitbook-track-page-views': '0',
+                })
         );
     }
 
