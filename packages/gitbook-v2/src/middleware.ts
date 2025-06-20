@@ -5,6 +5,7 @@ import rison from 'rison';
 
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
+import { createLogger } from '@/lib/logger';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
@@ -32,6 +33,8 @@ export const config = {
 };
 
 type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
+
+const logger = createLogger('GBOV2:middleware');
 
 export async function middleware(request: NextRequest) {
     try {
@@ -71,7 +74,7 @@ async function validateServerActionRequest(request: NextRequest) {
             const clonedRequest = request.clone();
             await clonedRequest.json();
         } catch (e) {
-            console.warn('Invalid server action request', e);
+            logger.warn('Invalid server action request', e);
             // If the body is not parseable, we reject the request
             return new Response('Invalid request', {
                 status: 400,
@@ -153,8 +156,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Handle redirects
         //
         if ('redirect' in siteURLData) {
-            // biome-ignore lint/suspicious/noConsole: we want to log the redirect
-            console.log('redirect', siteURLData.redirect);
+            logger.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
                 let contentRedirect = new URL(siteURLData.redirect, request.url);
 
@@ -289,7 +291,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             pathname,
         ].join('/');
 
-        console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
+        logger.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
         rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
