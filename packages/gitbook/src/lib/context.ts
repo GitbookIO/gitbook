@@ -1,3 +1,4 @@
+import { getLogger } from '@/app/utils';
 import {
     type GitBookDataFetcher,
     createDataFetcher,
@@ -19,6 +20,7 @@ import type {
     SiteStructure,
     Space,
 } from '@gitbook/api';
+
 import assertNever from 'assert-never';
 import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
@@ -290,10 +292,11 @@ export async function fetchSiteContextByIds(
                 return siteSpaceSettings;
             }
 
+            const logger = getLogger().subLogger('fetchSiteContextByIds');
             // We got the pointer from an API and customizations from another.
             // It's possible that the two are unsynced leading to not found customizations for the space.
             // It's better to fallback on customization of the site that displaying an error.
-            console.warn('Customization not found for site space', ids.siteSpace);
+            logger.warn('Customization not found for site space', ids.siteSpace);
         }
 
         return customizations.site;

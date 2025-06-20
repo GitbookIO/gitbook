@@ -2,6 +2,7 @@ import { trace } from '@/lib/tracing';
 import type { NextModeTagCache } from '@opennextjs/aws/types/overrides.js';
 import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sharded-tag-cache';
 import { softTagFilter } from '@opennextjs/cloudflare/overrides/tag-cache/tag-cache-filter';
+import { getLogger } from '@v2/app/utils';
 
 const originalTagCache = doShardedTagCache({
     baseShardSize: 12,
@@ -23,8 +24,9 @@ export default {
     getLastRevalidated: async (tags: string[]) => {
         const tagsToCheck = tags.filter(softTagFilter);
         if (tagsToCheck.length === 0) {
+            const logger = getLogger().subLogger('gitbookTagCache');
             // If we reach here, it probably means that there is an issue that we'll need to address.
-            console.warn(
+            logger.warn(
                 'getLastRevalidated - No valid tags to check for last revalidation, original tags:',
                 tags
             );
@@ -43,8 +45,9 @@ export default {
     hasBeenRevalidated: async (tags: string[], lastModified?: number) => {
         const tagsToCheck = tags.filter(softTagFilter);
         if (tagsToCheck.length === 0) {
+            const logger = getLogger().subLogger('gitbookTagCache');
             // If we reach here, it probably means that there is an issue that we'll need to address.
-            console.warn(
+            logger.warn(
                 'hasBeenRevalidated - No valid tags to check for revalidation, original tags:',
                 tags
             );
@@ -70,7 +73,8 @@ export default {
             async () => {
                 const tagsToWrite = tags.filter(softTagFilter);
                 if (tagsToWrite.length === 0) {
-                    console.warn('writeTags - No valid tags to write');
+                    const logger = getLogger().subLogger('gitbookTagCache');
+                    logger.warn('writeTags - No valid tags to write');
                     return; // If no tags to write, exit early
                 }
                 // Write only the filtered tags

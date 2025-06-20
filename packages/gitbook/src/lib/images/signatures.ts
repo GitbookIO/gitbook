@@ -1,6 +1,7 @@
 import 'server-only';
 
 import fnv1a from '@sindresorhus/fnv1a';
+import { getLogger } from '@v2/app/utils';
 import type { MaybePromise } from 'p-map';
 import { assert } from 'ts-essentials';
 import { GITBOOK_IMAGE_RESIZE_SIGNING_KEY } from '../env';
@@ -33,8 +34,8 @@ export async function verifyImageSignature(
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);
 
-    // biome-ignore lint/suspicious/noConsole: we want to log the signature comparison
-    console.log(
+    const logger = getLogger().subLogger('image-signature');
+    logger.log(
         `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
     );
     return generated === signature;

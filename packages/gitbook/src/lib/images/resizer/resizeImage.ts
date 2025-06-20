@@ -1,4 +1,5 @@
 import 'server-only';
+import { getLogger } from '@v2/app/utils';
 import assertNever from 'assert-never';
 import { GITBOOK_IMAGE_RESIZE_MODE } from '../../env';
 import { SizableImageAction, checkIsSizableImageURL } from '../checkIsSizableImageURL';
@@ -34,7 +35,8 @@ export async function getImageSize(
             height: json.original.height,
         };
     } catch (error) {
-        console.warn(`Error getting image size for ${input}:`, error);
+        const logger = getLogger().subLogger('get-image-size');
+        logger.warn(`Error getting image size for ${input}:`, error);
         return null;
     }
 }
