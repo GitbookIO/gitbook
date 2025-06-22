@@ -3,6 +3,7 @@
 import type { CustomizationThemeMode } from '@gitbook/api';
 import { ThemeProvider } from 'next-themes';
 import type React from 'react';
+import { LinkSettingsContext } from '../primitives';
 
 export function ClientContexts(props: {
     nonce?: string;
@@ -22,7 +23,9 @@ export function ClientContexts(props: {
 
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
-            {children}
+            <LinkSettingsContext.Provider value={{ externalLinkTarget: 'blank' }}>
+                {children}
+            </LinkSettingsContext.Provider>
         </ThemeProvider>
     );
 }
