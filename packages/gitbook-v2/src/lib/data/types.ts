@@ -195,6 +195,8 @@ export interface GitBookDataFetcher {
     streamAIResponse(params: {
         organizationId: string;
         siteId: string;
+        instructions: string;
+        previousResponseId?: string;
         input: api.AIMessageInput[];
         output: api.AIOutputFormat;
         model: api.AIModel;

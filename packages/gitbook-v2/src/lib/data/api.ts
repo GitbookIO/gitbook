@@ -785,6 +785,8 @@ async function* streamAIResponse(
             input: params.input,
             output: params.output,
             model: params.model,
+            instructions: params.instructions,
+            previousResponseId: params.previousResponseId,
         },
         {
             ...noCacheFetchOptions,
