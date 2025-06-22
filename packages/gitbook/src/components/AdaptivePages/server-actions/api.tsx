@@ -83,19 +83,7 @@ export async function streamGenerateObject<T>(
 /**
  * Stream the generation of a document.
  */
-export async function streamGenerateDocument(
-    context: GitBookBaseContext,
-    input: StreamGenerateInput
-) {
-    const api = await context.dataFetcher.api();
-    const rawStream = await api.orgs.streamAiResponseInSite(input.organizationId, input.siteId, {
-        input: input.input,
-        output: { type: 'document' },
-        model: input.model,
-        instructions: input.instructions,
-        previousResponseId: input.previousResponseId,
-    });
-
+export async function streamGenerateDocument(rawStream: AsyncIterable<AIStreamResponse>) {
     const message: AIMessage = {
         id: '',
         role: AIMessageRole.Assistant,
@@ -131,7 +119,10 @@ export async function streamGenerateDocument(
         }
     };
 
-    return parseResponse<React.ReactNode>(rawStream, (event) => {
+    return parseResponse<{
+        content: React.ReactNode;
+        event: AIStreamResponse;
+    }>(rawStream, (event) => {
         switch (event.type) {
             /**
              * The agent is processing a tool call in a new message.
@@ -175,7 +166,10 @@ export async function streamGenerateDocument(
             }
         }
 
-        return <AIMessageView message={message} />;
+        return {
+            event,
+            content: <AIMessageView message={message} />,
+        };
     });
 }
 
