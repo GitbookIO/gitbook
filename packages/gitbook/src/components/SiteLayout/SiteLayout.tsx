@@ -54,6 +54,7 @@ export async function SiteLayout(props: {
                     forcedTheme ??
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
+                externalLinksTarget={customization.externalLinks.target}
             >
                 <SpaceLayout
                     context={context}

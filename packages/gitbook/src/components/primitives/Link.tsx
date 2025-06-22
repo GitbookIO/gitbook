@@ -4,6 +4,7 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { SiteExternalLinksTarget } from '@gitbook/api';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 
@@ -31,6 +32,15 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
     };
 
 /**
+ * Context to configure the default behavior of links.
+ */
+export const LinkSettingsContext = React.createContext<{
+    externalLinksTarget: SiteExternalLinksTarget;
+}>({
+    externalLinksTarget: SiteExternalLinksTarget.Self,
+});
+
+/**
  * Low-level Link component that handles navigation to external urls.
  * It does not contain any styling.
  */
@@ -39,6 +49,7 @@ export const Link = React.forwardRef(function Link(
     ref: React.Ref<HTMLAnchorElement>
 ) {
     const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
+    const { externalLinksTarget } = React.useContext(LinkSettingsContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
 
@@ -53,9 +64,14 @@ export const Link = React.forwardRef(function Link(
             });
         }
 
-        // When the page is embedded in an iframe, for security reasons other urls cannot be opened.
-        // In this case, we open the link in a new tab.
-        if (window.self !== window.top && isExternalLink(href, window.location.origin)) {
+        if (
+            isExternalLink(href, window.location.origin) &&
+            // When the page is embedded in an iframe, for security reasons other urls cannot be opened.
+            // In this case, we open the link in a new tab.
+            (window.self !== window.top ||
+                // If the site is configured to open links in a new tab
+                externalLinksTarget === SiteExternalLinksTarget.Blank)
+        ) {
             event.preventDefault();
             window.open(href, '_blank');
         }
@@ -73,6 +89,9 @@ export const Link = React.forwardRef(function Link(
                 {...domProps}
                 href={href}
                 onClick={onClick}
+                {...(externalLinksTarget === SiteExternalLinksTarget.Blank
+                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                    : {})}
             >
                 {children}
             </a>
