@@ -43,7 +43,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             aria-describedby={describedById}
             className={tcls(
                 'fixed',
-                'z-10',
+                'z-50',
                 'bg-tint-base',
                 'rounded',
                 'straight-corners:rounded-none',
