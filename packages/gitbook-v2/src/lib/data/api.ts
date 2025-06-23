@@ -313,17 +313,23 @@ const getRevisionPages = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; metadata: boolean }
     ) => {
+        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevisionPages(${params.spaceId}, ${params.revisionId})`, async () => {
-                const revision = await throwIfDataError(
-                    getRevision(input, {
-                        spaceId: params.spaceId,
-                        revisionId: params.revisionId,
-                        metadata: false,
-                    })
+                const api = apiClient(input);
+                const res = await api.spaces.listPagesInRevisionById(
+                    params.spaceId,
+                    params.revisionId,
+                    {
+                        metadata: params.metadata,
+                    },
+                    {
+                        ...noCacheFetchOptions,
+                    }
                 );
-
-                return revision.pages;
+                cacheTag(...getCacheTagsFromResponse(res));
+                cacheLife('max');
+                return res.data.pages;
             });
         });
     }
