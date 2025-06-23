@@ -10,8 +10,6 @@ import {
     type ComputedContentSource,
     GitBookAPI,
     GitBookAPIError,
-    type HttpResponse,
-    type List,
     type PublishedSiteContent,
     type PublishedSiteContentLookup,
     type RequestRenderIntegrationUI,
@@ -487,85 +485,6 @@ export const getRevisionPageDocument = cache({
 });
 
 /**
- * Resolve a file by its ID.
- * It should not be used directly, use `getRevisionFile` instead.
- */
-const getRevisionFileById = cache({
-    name: 'api.getRevisionFile.v3',
-    tag: (spaceId, revisionId) =>
-        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    tagImmutable: true,
-    get: async (
-        spaceId: string,
-        revisionId: string,
-        fileId: string,
-        options: CacheFunctionOptions
-    ) => {
-        try {
-            const apiCtx = await api();
-            const response = await apiCtx.client.spaces.getFileInRevisionById(
-                spaceId,
-                revisionId,
-                fileId,
-                {
-                    metadata: false,
-                },
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                }
-            );
-
-            return cacheResponse(response, cacheTtl_7days);
-        } catch (error: any) {
-            if (error instanceof GitBookAPIError && error.code === 404) {
-                return { data: null, ...cacheTtl_7days };
-            }
-
-            throw error;
-        }
-    },
-});
-
-const getRevisionReusableContentById = cache({
-    name: 'api.getRevisionReusableContentById.v1',
-    tag: (spaceId, revisionId) =>
-        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    tagImmutable: true,
-    getKeySuffix: getAPIContextId,
-    get: async (
-        spaceId: string,
-        revisionId: string,
-        reusableContentId: string,
-        options: CacheFunctionOptions
-    ) => {
-        try {
-            const apiCtx = await api();
-            const response = await apiCtx.client.spaces.getReusableContentInRevisionById(
-                spaceId,
-                revisionId,
-                reusableContentId,
-                {
-                    metadata: false,
-                },
-                {
-                    ...noCacheFetchOptions,
-                    signal: options.signal,
-                }
-            );
-
-            return cacheResponse(response, cacheTtl_7days);
-        } catch (error: any) {
-            if (error instanceof GitBookAPIError && error.code === 404) {
-                return { data: null, ...cacheTtl_7days };
-            }
-
-            throw error;
-        }
-    },
-});
-
-/**
  * Get a document by its ID.
  */
 export const getDocument = cache({
@@ -860,48 +779,4 @@ export function userAgent(): string {
     }
 
     return result;
-}
-
-/**
- * Iterate over a paginated API endpoint and return all the items.
- */
-async function getAll<T, E>(
-    getPage: (params: { page?: string; limit?: number }) => Promise<
-        HttpResponse<
-            List & {
-                items: T[];
-            },
-            E
-        >
-    >,
-    options: {
-        limit?: number;
-    } = {}
-): Promise<
-    HttpResponse<
-        List & {
-            items: T[];
-        },
-        E
-    >
-> {
-    const { limit = 100 } = options;
-
-    let page: string | undefined = undefined;
-    const result: T[] = [];
-
-    const maxPages = 100;
-    for (let i = 0; i < maxPages; i++) {
-        const response = await getPage({ page, limit });
-        result.push(...response.data.items);
-
-        if (response.data.next) {
-            page = response.data.next.page;
-        } else {
-            response.data.items = result;
-            return response;
-        }
-    }
-
-    throw new Error('Pagination limit reached');
 }
