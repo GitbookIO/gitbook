@@ -179,7 +179,7 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
             return withAPI(() =>
                 wrapDataFetcherError(async () => {
                     return getRevision(params.spaceId, params.revisionId, {
-                        metadata: params.metadata,
+                        metadata: true,
                     });
                 })
             );
