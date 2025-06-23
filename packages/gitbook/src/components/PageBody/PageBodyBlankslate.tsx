@@ -58,7 +58,10 @@ export async function PageBodyBlankslate(props: {
                     />
                 );
             }
-            const href = context.linker.toPathForPage({ pages: context.pages, page: child });
+            const href = context.linker.toPathForPage({
+                pages: context.revision.pages,
+                page: child,
+            });
             return <Card key={child.id} title={child.title} leadingIcon={icon} href={href} />;
         })
     );

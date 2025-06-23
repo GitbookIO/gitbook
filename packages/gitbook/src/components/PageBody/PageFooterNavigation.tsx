@@ -17,11 +17,13 @@ export async function PageFooterNavigation(props: {
     page: RevisionPageDocument;
 }) {
     const { context, page } = props;
-    const { customization, pages, linker } = context;
-    const { previous, next } = resolvePrevNextPages(pages, page);
+    const { customization, revision, linker } = context;
+    const { previous, next } = resolvePrevNextPages(revision.pages, page);
     const language = getSpaceLanguage(customization);
-    const previousHref = previous ? linker.toPathForPage({ pages, page: previous }) : '';
-    const nextHref = next ? linker.toPathForPage({ pages, page: next }) : '';
+    const previousHref = previous
+        ? linker.toPathForPage({ pages: revision.pages, page: previous })
+        : '';
+    const nextHref = next ? linker.toPathForPage({ pages: revision.pages, page: next }) : '';
 
     return (
         <div

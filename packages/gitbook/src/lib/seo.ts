@@ -35,7 +35,7 @@ export async function isSiteIndexable(context: GitBookSiteContext) {
     }
 
     // Prevent indexation of preview of revisions / change-requests
-    if (context.changeRequest || context.revisionId !== context.space.revision) {
+    if (context.changeRequest || context.revision.id !== context.space.revision) {
         return false;
     }
 

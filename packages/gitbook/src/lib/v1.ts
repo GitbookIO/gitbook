@@ -408,7 +408,7 @@ export function getSitePointerFromContext(context: GitBookSiteContext): SiteCont
         siteSectionId: context.sections?.current?.id,
         siteSpaceId: context.siteSpace.id,
         spaceId: context.space.id,
-        revisionId: context.revisionId,
+        revisionId: context.revision.id,
         changeRequestId: context.changeRequest?.id,
         siteShareKey: context.shareKey,
     };

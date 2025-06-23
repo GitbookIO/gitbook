@@ -5,3 +5,5 @@ export * from './errors';
 export * from './lookup';
 export * from './visitor';
 export * from './pages';
+export * from './files';
+export * from './reusable-contents';
