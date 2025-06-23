@@ -112,7 +112,6 @@ async function RevisionToolbar(props: { context: GitBookSiteContext }) {
         context.dataFetcher.getRevision({
             spaceId: space.id,
             revisionId,
-            metadata: true,
         })
     );
 

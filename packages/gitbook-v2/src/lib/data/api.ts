@@ -9,7 +9,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { cache } from '../cache';
-import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
+import { DataFetcherError, throwIfDataError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -73,7 +73,6 @@ export function createDataFetcher(
                 getRevision(input, {
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
-                    metadata: params.metadata,
                 })
             );
         },
@@ -282,10 +281,7 @@ const getChangeRequest = cache(
 );
 
 const getRevision = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; metadata: boolean }
-    ) => {
+    async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
         'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
@@ -294,7 +290,7 @@ const getRevision = cache(
                     params.spaceId,
                     params.revisionId,
                     {
-                        metadata: params.metadata,
+                        metadata: true,
                     },
                     {
                         ...noCacheFetchOptions,
@@ -340,24 +336,24 @@ const getRevisionFile = cache(
         input: DataFetcherInput,
         params: { spaceId: string; revisionId: string; fileId: string }
     ) => {
-        'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(
                 `getRevisionFile(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
                 async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getFileInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.fileId,
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
+                    const revision = await throwIfDataError(
+                        getRevision(input, {
+                            spaceId: params.spaceId,
+                            revisionId: params.revisionId,
+                        })
                     );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
-                    return res.data;
+
+                    const file = revision.files.find((file) => file.id === params.fileId);
+
+                    if (!file) {
+                        throw new DataFetcherError('File not found', 404);
+                    }
+
+                    return file;
                 }
             );
         });
