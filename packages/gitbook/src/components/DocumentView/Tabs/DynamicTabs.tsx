@@ -87,11 +87,11 @@ export function DynamicTabs(
     const orientation: string = 'horizontal'; // TODO: Get orientation from tab block options
     const position: string = 'start'; // TODO: Get position from tab block options
 
-    const description = null; //'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'; // null; // TODO: Get description from tabs
+    const description = null; // TODO: Get description from tabs
 
     // To avoid issue with hydration, we only use the state from localStorage
     // once the component has been mounted.
-    // Otherwise because of  the streaming/suspense approach, tabs can be first-rendered at different time
+    // Otherwise because of the streaming/suspense approach, tabs can be first-rendered at different time
     // and get stuck into an inconsistent state.
     const mounted = useIsMounted();
     const active = mounted ? activeState : tabs[0];
@@ -158,8 +158,6 @@ export function DynamicTabs(
                 orientation === 'vertical' && position === 'end' && 'md:flex-row-reverse',
 
                 style
-                // We need to inset the tabs container to make edge-to-edge scrolling work, since this container has overflow:hidden
-                // Also important to put this after the `style` to override those.
             )}
         >
             <div
@@ -168,34 +166,17 @@ export function DynamicTabs(
                     'group/tabs',
                     'flex',
                     tabs.length > 3 ? 'md:flex-wrap' : '',
-
                     'overflow-x-auto',
                     'md:overflow-hidden',
-                    // 'items-end',
-
                     'gap-x-1',
                     'flex-row',
-
                     orientation === 'vertical' && 'gap-1.5 md:max-w-[40%] md:flex-col',
                     'snap-x',
                     'snap-mandatory',
                     '-mb-px',
-
                     'peer',
-
                     orientation === 'vertical' && position === 'start' && 'md:-mr-px md:mb-0',
                     orientation === 'vertical' && position === 'end' && 'md:-ml-px md:mb-0'
-
-                    // We need to inset the tablist to make edge-to-edge scrolling work.
-                    // '-mx-4',
-                    // 'px-4',
-                    // 'scroll-px-4',
-                    // 'sm:-mx-6',
-                    // 'sm:px-6',
-                    // 'sm:scroll-px-6',
-                    // 'md:mx-0',
-                    // 'md:px-0',
-                    // 'md:scroll-px-0',
                 )}
             >
                 {tabs.map((tab) => (
@@ -213,7 +194,7 @@ export function DynamicTabs(
                         <button
                             type="button"
                             role="tab"
-                            aria-orientation={orientation}
+                            aria-orientation={orientation as 'horizontal' | 'vertical'}
                             aria-selected={active.id === tab.id}
                             aria-controls={getTabPanelId(tab.id)}
                             id={getTabButtonId(tab.id)}
@@ -223,14 +204,12 @@ export function DynamicTabs(
                             className={tcls(
                                 hashLinkButtonWrapperStyles,
                                 description ? 'p-4' : 'px-4 py-1.5',
-
                                 'grow',
                                 'transition-colors',
                                 'text-left',
                                 'flex',
                                 'flex-col',
                                 'gap-1',
-
                                 'rounded-md',
                                 'straight-corners:rounded-none',
                                 'circular-corners:rounded-2xl',
@@ -343,9 +322,6 @@ export function DynamicTabs(
                         'bg-tint-base',
                         position === 'start' && '!rounded-tl-none',
                         position === 'end' && '!rounded-tr-none',
-                        // index === 0 && active.id === tab.id
-                        //     ? '!rounded-tl-none'
-                        //     : '[.peer:has(.tab:first-child:hover)~&]:rounded-tl-none',
                         'transition-all',
                         'ring-1',
                         'ring-inset',
@@ -398,7 +374,6 @@ function getTabByTitle(input: TabsInput, state: TabsState): TabsItem | null {
                 };
             })
             .filter(({ score }) => score >= 0)
-            // .sortBy(({ score }) => -score)
             .sort(({ score: a }, { score: b }) => b - a)
             .map(({ item }) => item)[0] ?? null
     );
