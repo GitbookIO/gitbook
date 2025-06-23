@@ -39,6 +39,14 @@ export function getURLLookupAlternatives(input: URL) {
             return;
         }
 
+        // We don't want to push the url if it is the root proxy URL (either https://proxy.gitbook.site or https://proxy.gitbook.site/sites)
+        if (
+            adding.hostname === 'proxy.gitbook.site' &&
+            (adding.pathname === '/' || adding.pathname === '/sites/')
+        ) {
+            return;
+        }
+
         alternatives.push({
             url: adding.toString(),
             extraPath,
