@@ -86,7 +86,6 @@ export function DynamicTabs(
 
     const orientation: string = 'horizontal'; // TODO: Get orientation from tab block options
     const position: string = 'start'; // TODO: Get position from tab block options
-
     const description = null; // TODO: Get description from tabs
 
     // To avoid issue with hydration, we only use the state from localStorage
@@ -183,10 +182,10 @@ export function DynamicTabs(
                     <div
                         key={tab.id}
                         className={tcls(
-                            'tab -mx-4 flex overflow-hidden px-4 max-md:max-w-[calc(33.33%+1.75rem)] max-md:shrink-0 max-md:last:pr-0 [&:first-child>button]:before:hidden',
+                            'tab -mx-4 flex overflow-hidden px-4 max-md:shrink-0 max-md:last:pr-0 [&:first-child>button]:before:hidden',
                             active.id === tab.id && 'active-tab z-20',
                             description && [
-                                'min-w-56',
+                                'min-w-56 max-md:max-w-[calc(33.33%+1.75rem)]',
                                 orientation === 'horizontal' && 'md:max-w-[calc(33.33%+1.75rem)]',
                             ]
                         )}
@@ -220,35 +219,34 @@ export function DynamicTabs(
                                 'relative',
 
                                 // Flared corners
-                                orientation === 'horizontal' &&
-                                    position === 'start' && [
-                                        'before:absolute before:size-4 before:transition-all before:content-[""] focus-visible:before:hidden',
-                                        'before:end-full',
-                                        'before:bottom-0',
-                                        'before:rounded-ee-md',
-                                        'circular-corners:before:rounded-ee-2xl',
-                                        'before:border-e before:border-b',
-                                        'before:shadow-[4px_4px_0_1px_var(--tw-shadow-color)]',
+                                'before:absolute before:size-4 before:transition-all before:content-[""] focus-visible:before:hidden',
+                                'before:end-full',
+                                'before:bottom-0',
+                                'before:rounded-ee-md',
+                                'circular-corners:before:rounded-ee-2xl',
+                                'before:border-e before:border-b',
+                                'before:shadow-[4px_4px_0_1px_var(--tw-shadow-color)]',
 
-                                        'after:absolute after:size-4 after:transition-all after:content-[""] focus-visible:after:hidden',
-                                        'after:start-full',
-                                        'after:bottom-0',
-                                        'after:rounded-es-md',
-                                        'circular-corners:after:rounded-es-2xl',
-                                        'after:border-s after:border-b',
-                                        'after:shadow-[-4px_4px_0_1px_var(--tw-shadow-color)]',
+                                'after:absolute after:size-4 after:transition-all after:content-[""] focus-visible:after:hidden',
+                                'after:start-full',
+                                'after:bottom-0',
+                                'after:rounded-es-md',
+                                'circular-corners:after:rounded-es-2xl',
+                                'after:border-s after:border-b',
+                                'after:shadow-[-4px_4px_0_1px_var(--tw-shadow-color)]',
 
-                                        active.id === tab.id
-                                            ? [
-                                                  'before:border-tint-subtle after:border-tint-subtle',
-                                                  'before:shadow-tint-1 after:shadow-tint-1',
-                                              ]
-                                            : [
-                                                  'before:border-tint-subtle after:border-tint-subtle',
-                                                  'before:shadow-tint-2 after:shadow-tint-2',
-                                                  'hover:after:shadow-tint-4 hover:before:shadow-tint-4',
-                                              ],
-                                    ],
+                                active.id === tab.id
+                                    ? [
+                                          'before:border-tint-subtle after:border-tint-subtle',
+                                          'before:shadow-tint-1 after:shadow-tint-1',
+                                      ]
+                                    : [
+                                          'before:border-tint-subtle after:border-tint-subtle',
+                                          'before:shadow-tint-2 after:shadow-tint-2',
+                                          'hover:after:shadow-tint-4 hover:before:shadow-tint-4',
+                                      ],
+                                orientation === 'vertical' && 'md:after:hidden md:before:hidden',
+                                'straight-corners:before:hidden straight-corners:after:hidden',
 
                                 'max-md:!rounded-b-none max-md:border-b-0',
 
