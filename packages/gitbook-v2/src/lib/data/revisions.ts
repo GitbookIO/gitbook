@@ -1,6 +1,5 @@
-import type { Revision, RevisionFile, RevisionReusableContent, Space } from '@gitbook/api';
+import type { Revision, RevisionFile, RevisionReusableContent } from '@gitbook/api';
 import * as React from 'react';
-import type { GitBookDataFetcher } from './types';
 
 const getRevisionReusableContents = React.cache((revision: Revision) => {
     return new Map(
@@ -11,25 +10,6 @@ const getRevisionReusableContents = React.cache((revision: Revision) => {
 const getRevisionFiles = React.cache((revision: Revision) => {
     return new Map(revision.files.map((file) => [file.id, file]));
 });
-
-/**
- * Get a revision for a space.
- */
-export function getSpaceRevision(
-    dataFetcher: GitBookDataFetcher,
-    input: {
-        space: Space;
-        revisionId: string;
-    }
-) {
-    return dataFetcher.getRevision({
-        spaceId: input.space.id,
-        revisionId: input.revisionId,
-        // We only care about the Git metadata when the Git sync is enabled,
-        // otherwise we can optimize performance by not fetching it
-        metadata: !!input.space.gitSync,
-    });
-}
 
 /**
  * Get a revision file by its ID.

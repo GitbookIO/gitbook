@@ -147,7 +147,6 @@ export async function streamAskQuestion({
                                 context.dataFetcher.getRevision({
                                     spaceId: source.space,
                                     revisionId: source.revision,
-                                    metadata: false,
                                 })
                             )
                         );

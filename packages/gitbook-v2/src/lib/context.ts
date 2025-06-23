@@ -17,7 +17,6 @@ import {
     type GitBookDataFetcher,
     createDataFetcher,
     getDataOrNull,
-    getSpaceRevision,
     throwIfDataError,
 } from '@v2/lib/data';
 import assertNever from 'assert-never';
@@ -350,8 +349,8 @@ export async function fetchSpaceContextByIds(
     const revisionId = ids.revision ?? changeRequest?.revision ?? space.revision;
 
     const revision = await getDataOrNull(
-        getSpaceRevision(dataFetcher, {
-            space,
+        dataFetcher.getRevision({
+            spaceId: ids.space,
             revisionId,
         }),
 

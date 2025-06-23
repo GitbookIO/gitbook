@@ -3,7 +3,7 @@ import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
-import { getSpaceRevision, throwIfDataError } from '@v2/lib/data';
+import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
@@ -134,8 +134,8 @@ async function getNodesFromSiteSpaces(
                 return [];
             }
             const revision = await throwIfDataError(
-                getSpaceRevision(dataFetcher, {
-                    space: siteSpace.space,
+                dataFetcher.getRevision({
+                    spaceId: siteSpace.space.id,
                     revisionId: siteSpace.space.revision,
                 })
             );

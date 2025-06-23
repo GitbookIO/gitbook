@@ -5,7 +5,7 @@ import { getSiteStructureSections } from '@/lib/sites';
 import { checkIsAnchor, checkIsExternalURL } from '@/lib/urls';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
-import { getSpaceRevision, throwIfDataError } from '@v2/lib/data';
+import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import type { Link, Paragraph, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
@@ -102,8 +102,8 @@ async function streamMarkdownFromSiteSpaces(
             continue;
         }
         const revision = await throwIfDataError(
-            getSpaceRevision(dataFetcher, {
-                space: siteSpace.space,
+            dataFetcher.getRevision({
+                spaceId: siteSpace.space.id,
                 revisionId: siteSpace.space.revision,
             })
         );
