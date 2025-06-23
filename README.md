@@ -22,12 +22,12 @@
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
-- [Contributing](#contributing)
-  - [Types of contributions](#types-of-contributions)
-- [Licensing](#license)
-- [Acknowledgements](#acknowledgements)
-- [Legacy GitBook](#legacy-gitbook-deprecated)
+-   [Getting Started](#getting-started)
+-   [Contributing](#contributing)
+    -   [Types of contributions](#types-of-contributions)
+-   [Licensing](#license)
+-   [Acknowledgements](#acknowledgements)
+-   [Legacy GitBook](#legacy-gitbook-deprecated)
 
 ## Getting Started
 
@@ -35,10 +35,10 @@ To run a local version of this project, please follow these simple steps.
 
 ### Prerequisites
 
-- Node.js (Version: >=20.6)
-- Use nvm for easy Node management
-- Bun (Version: >=1.2.1)
-- We use a text-based lockfile which isn't supported below 1.2.1
+-   Node.js (Version: >=20.6)
+  - Use nvm for easy Node management
+-   Bun (Version: >=1.2.1)
+  - We use a text-based lockfile which isn't supported below 1.2.1
 
 ### Set up
 
@@ -49,6 +49,7 @@ git clone https://github.com/gitbookIO/gitbook.git
 ```
 
 2. Ensure you are using the project's version of `node`. Running `nvm use` will change your local version to the correct one.
+
 3. Install the project's dependencies through Bun.
 
 ```
@@ -71,15 +72,15 @@ bun dev:v2
 
 examples:
 
-- http://localhost:3000/url/gitbook.com/docs
-- http://localhost:3000/url/open-source.gitbook.io/midjourney
+-   http://localhost:3000/url/gitbook.com/docs
+-   http://localhost:3000/url/open-source.gitbook.io/midjourney
 
 Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
 
 ### Other development commands
 
-- `bun format`: format the code
-- `bun lint`: lint the code
+-   `bun format`: format the code
+-   `bun lint`: lint the code
 
 ### CI and testing
 
@@ -123,13 +124,13 @@ Encounter a bug or find an issue you'd like to fix? Helping us fix issues relate
 
 ## Deployment
 
-> [!WARNING]
+> [!WARNING]  
 > While it is possible to self-host this project, we do not recommend this unless you are certain this option fits your need.
-> 
+>
 > _Looking to add a specific feature in GitBook? Head to our [contributing guide](https://github.com/GitbookIO/gitbook/blob/main/.github/CONTRIBUTING.md) to get started._
-> 
+>
 > Self-hosting this project puts the responsibility of maintaining and merging future updates on **you**. We cannot guarantee support, maintenance, or updates to forked and self-hosted instances of this project.
-> 
+>
 > We want to make it as easy as possible for our community to collaborate and push the future of GitBook, which is why we encourage you to contribute to our product directly instead of creating your own version.
 
 This project allows you to self-host the rendering portion of your GitBook published content. Self-hosting has pros and cons.
@@ -174,10 +175,10 @@ HTML example:
 
 GitBook wouldn't be possible without these projects:
 
-- [Next.js](https://nextjs.org/)
-- [Bun](https://bun.sh/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.npmjs.com/package/framer-motion)
+-   [Next.js](https://nextjs.org/)
+-   [Bun](https://bun.sh/)
+-   [Tailwind CSS](https://tailwindcss.com/)
+-   [Framer Motion](https://www.npmjs.com/package/framer-motion)
 
 ## Contributors
 
@@ -188,4 +189,3 @@ GitBook wouldn't be possible without these projects:
 ## Legacy GitBook (Deprecated)
 
 Our previous version of GitBook and it's CLI tool are now deprecated. You can still view the old repository and it's commits on this [branch](https://github.com/GitbookIO/gitbook/tree/legacy).
-
