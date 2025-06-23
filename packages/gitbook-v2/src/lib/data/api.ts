@@ -73,7 +73,6 @@ export function createDataFetcher(
                 getRevision(input, {
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
-                    metadata: params.metadata,
                 })
             );
         },
@@ -255,10 +254,7 @@ const getChangeRequest = cache(
 );
 
 const getRevision = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; metadata: boolean }
-    ) => {
+    async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
         'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
@@ -267,7 +263,7 @@ const getRevision = cache(
                     params.spaceId,
                     params.revisionId,
                     {
-                        metadata: params.metadata,
+                        metadata: true,
                     },
                     {
                         ...noCacheFetchOptions,
