@@ -101,14 +101,13 @@ async function streamMarkdownFromSiteSpaces(
         if (!siteSpaceUrl) {
             continue;
         }
-        const rootPages = await throwIfDataError(
-            dataFetcher.getRevisionPages({
+        const revision = await throwIfDataError(
+            dataFetcher.getRevision({
                 spaceId: siteSpace.space.id,
                 revisionId: siteSpace.space.revision,
-                metadata: false,
             })
         );
-        const pages = getIndexablePages(rootPages);
+        const pages = getIndexablePages(revision.pages);
 
         for await (const markdown of pMapIterable(
             pages,
