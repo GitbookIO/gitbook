@@ -71,24 +71,6 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<api.Revision>>;
 
     /**
-     * Get the revision pages by its space ID and revision ID.
-     */
-    getRevisionPages(params: {
-        spaceId: string;
-        revisionId: string;
-        metadata: boolean;
-    }): Promise<DataFetcherResponse<api.RevisionPage[]>>;
-
-    /**
-     * Get a revision file by its space ID, revision ID and file ID.
-     */
-    getRevisionFile(params: {
-        spaceId: string;
-        revisionId: string;
-        fileId: string;
-    }): Promise<DataFetcherResponse<api.RevisionFile>>;
-
-    /**
      * Get a revision page by its path.
      */
     getRevisionPageByPath(params: {
@@ -131,15 +113,6 @@ export interface GitBookDataFetcher {
         source: api.ComputedContentSource;
         seed: string;
     }): Promise<DataFetcherResponse<api.JSONDocument>>;
-
-    /**
-     * Get a reusable content by its space ID, revision ID and reusable content ID.
-     */
-    getReusableContent(params: {
-        spaceId: string;
-        revisionId: string;
-        reusableContentId: string;
-    }): Promise<DataFetcherResponse<api.RevisionReusableContent>>;
 
     /**
      * Get the latest OpenAPI spec version content by its organization ID and slug.

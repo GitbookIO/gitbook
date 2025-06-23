@@ -17,6 +17,7 @@ import {
     type GitBookDataFetcher,
     createDataFetcher,
     getDataOrNull,
+    getSpaceRevision,
     throwIfDataError,
 } from '@v2/lib/data';
 import assertNever from 'assert-never';
@@ -349,12 +350,9 @@ export async function fetchSpaceContextByIds(
     const revisionId = ids.revision ?? changeRequest?.revision ?? space.revision;
 
     const revision = await getDataOrNull(
-        dataFetcher.getRevision({
-            spaceId: ids.space,
+        getSpaceRevision(dataFetcher, {
+            space,
             revisionId,
-            // We only care about the Git metadata when the Git sync is enabled,
-            // otherwise we can optimize performance by not fetching it
-            metadata: !!space.gitSync,
         }),
 
         // When trying to render a revision with an invalid / non-existing ID,

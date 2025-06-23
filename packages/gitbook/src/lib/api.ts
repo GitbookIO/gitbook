@@ -15,12 +15,8 @@ import {
     type PublishedSiteContent,
     type PublishedSiteContentLookup,
     type RequestRenderIntegrationUI,
-    type RevisionFile,
-    type RevisionReusableContent,
 } from '@gitbook/api';
 import { headers } from 'next/headers';
-
-import { batch } from './async';
 import { buildVersion } from './build';
 import {
     type CacheFunctionOptions,
@@ -412,42 +408,6 @@ export const getRevision = cache({
 });
 
 /**
- * Get all the pages in a revision of a space.
- */
-export const getRevisionPages = cache({
-    name: 'api.getRevisionPages.v4',
-    tag: (spaceId, revisionId) =>
-        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    tagImmutable: true,
-    getKeySuffix: getAPIContextId,
-    get: async (
-        spaceId: string,
-        revisionId: string,
-        fetchOptions: GetRevisionOptions,
-        options: CacheFunctionOptions
-    ) => {
-        const apiCtx = await api();
-        const response = await apiCtx.client.spaces.listPagesInRevisionById(
-            spaceId,
-            revisionId,
-            {
-                metadata: fetchOptions.metadata,
-            },
-            {
-                ...noCacheFetchOptions,
-                signal: options.signal,
-            }
-        );
-
-        return cacheResponse(response, {
-            ...(fetchOptions.metadata ? cacheTtl_7days : cacheTtl_1day),
-            data: response.data.pages,
-        });
-    },
-    getKeyArgs: (args) => [args[0], args[1]],
-});
-
-/**
  * Get a revision page by its path
  */
 export const getRevisionPageByPath = cache({
@@ -604,123 +564,6 @@ const getRevisionReusableContentById = cache({
         }
     },
 });
-
-/**
- * Get all the files in a revision of a space.
- * It should not be used directly, use `getRevisionFile` instead.
- */
-const getRevisionAllFiles = cache({
-    name: 'api.getRevisionAllFiles.v2',
-    tag: (spaceId, revisionId) =>
-        getCacheTag({ tag: 'revision', space: spaceId, revision: revisionId }),
-    tagImmutable: true,
-    get: async (spaceId: string, revisionId: string, options: CacheFunctionOptions) => {
-        const response = await getAll(
-            async (params) => {
-                const apiCtx = await api();
-                const response = await apiCtx.client.spaces.listFilesInRevisionById(
-                    spaceId,
-                    revisionId,
-                    {
-                        ...params,
-                        metadata: false,
-                    },
-                    {
-                        ...noCacheFetchOptions,
-                        signal: options.signal,
-                    }
-                );
-                return response;
-            },
-            {
-                limit: 1000,
-            }
-        );
-
-        const files: { [fileId: string]: RevisionFile } = {};
-        response.data.items.forEach((file) => {
-            files[file.id] = file;
-        });
-
-        return cacheResponse(response, { ...cacheTtl_7days, data: files });
-    },
-    timeout: 60 * 1000,
-});
-
-/**
- * Resolve a file by its ID.
- * The approach is optimized to use the entire list of files in the revision if it has been fetched
- * or to use a per-file approach if not.
- */
-export const getRevisionFile = batch<[string, string, string], RevisionFile | null>(
-    async (executions) => {
-        const [spaceId, revisionId] = executions[0];
-
-        const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
-            metadata: false,
-        });
-        const hasRevisionFilesInMemory = await getRevisionAllFiles.hasInMemory(spaceId, revisionId);
-
-        // When fetching more than 5 files, we should bundle them all into one call to get the entire revision
-        if (executions.length > 5 || hasRevisionFilesInMemory || hasRevisionInMemory) {
-            let files: Record<string, RevisionFile> = {};
-
-            if (hasRevisionInMemory) {
-                const revision = await getRevision(spaceId, revisionId, { metadata: false });
-                files = {};
-                revision.files.forEach((file) => {
-                    files[file.id] = file;
-                });
-            } else {
-                files = await getRevisionAllFiles(spaceId, revisionId);
-            }
-
-            return executions.map(([_spaceId, _revisionId, fileId]) => files[fileId] ?? null);
-        }
-        // Fetch file individually
-        return Promise.all(
-            executions.map(([spaceId, revisionId, fileId]) =>
-                getRevisionFileById(spaceId, revisionId, fileId)
-            )
-        );
-    },
-    {
-        delay: 20,
-        groupBy: (spaceId, revisionId) => `${spaceId}/${revisionId}`,
-        skip: async (spaceId, revisionId, fileId) => {
-            return (
-                (await getRevision.hasInMemory(spaceId, revisionId, {
-                    metadata: false,
-                })) ||
-                (await getRevisionAllFiles.hasInMemory(spaceId, revisionId)) ||
-                (await getRevisionFileById.hasInMemory(spaceId, revisionId, fileId))
-            );
-        },
-    }
-);
-
-/**
- * Get reusable content in a revision.
- */
-export const getReusableContent = async (
-    spaceId: string,
-    revisionId: string,
-    reusableContentId: string
-): Promise<RevisionReusableContent | null> => {
-    const hasRevisionInMemory = await getRevision.hasInMemory(spaceId, revisionId, {
-        metadata: false,
-    });
-
-    if (hasRevisionInMemory) {
-        const revision = await getRevision(spaceId, revisionId, { metadata: false });
-        return (
-            revision.reusableContents.find(
-                (reusableContent) => reusableContent.id === reusableContentId
-            ) ?? null
-        );
-    }
-    return getRevisionReusableContentById(spaceId, revisionId, reusableContentId);
-};
 
 /**
  * Get a document by its ID.

@@ -9,7 +9,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { GITBOOK_API_TOKEN, GITBOOK_API_URL, GITBOOK_USER_AGENT } from '@v2/lib/env';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { cache } from '../cache';
-import { DataFetcherError, throwIfDataError, wrapCacheDataFetcherError } from './errors';
+import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
 interface DataFetcherInput {
@@ -77,24 +77,6 @@ export function createDataFetcher(
                 })
             );
         },
-        getRevisionPages(params) {
-            return trace('getRevisionPages', () =>
-                getRevisionPages(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    metadata: params.metadata,
-                })
-            );
-        },
-        getRevisionFile(params) {
-            return trace('getRevisionFile', () =>
-                getRevisionFile(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    fileId: params.fileId,
-                })
-            );
-        },
         getRevisionPageByPath(params) {
             return trace('getRevisionPageByPath', () =>
                 getRevisionPageByPath(input, {
@@ -119,15 +101,6 @@ export function createDataFetcher(
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
                     pageId: params.pageId,
-                })
-            );
-        },
-        getReusableContent(params) {
-            return trace('getReusableContent', () =>
-                getReusableContent(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    reusableContentId: params.reusableContentId,
                 })
             );
         },
@@ -308,63 +281,6 @@ const getRevision = cache(
     }
 );
 
-const getRevisionPages = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; metadata: boolean }
-    ) => {
-        'use cache';
-        return wrapCacheDataFetcherError(async () => {
-            return trace(`getRevisionPages(${params.spaceId}, ${params.revisionId})`, async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.listPagesInRevisionById(
-                    params.spaceId,
-                    params.revisionId,
-                    {
-                        metadata: params.metadata,
-                    },
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data.pages;
-            });
-        });
-    }
-);
-
-const getRevisionFile = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; fileId: string }
-    ) => {
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `getRevisionFile(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
-                async () => {
-                    const revision = await throwIfDataError(
-                        getRevision(input, {
-                            spaceId: params.spaceId,
-                            revisionId: params.revisionId,
-                            metadata: false,
-                        })
-                    );
-
-                    const file = revision.files.find((file) => file.id === params.fileId);
-
-                    if (!file) {
-                        throw new DataFetcherError('File not found', 404);
-                    }
-
-                    return file;
-                }
-            );
-        });
-    }
-);
-
 const getRevisionPageMarkdown = cache(
     async (
         input: DataFetcherInput,
@@ -518,35 +434,6 @@ const getComputedDocument = cache(
                             source: params.source,
                             seed: params.seed,
                         },
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
-                    return res.data;
-                }
-            );
-        });
-    }
-);
-
-const getReusableContent = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; reusableContentId: string }
-    ) => {
-        'use cache';
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `getReusableContent(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
-                async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getReusableContentInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.reusableContentId,
                         {},
                         {
                             ...noCacheFetchOptions,
