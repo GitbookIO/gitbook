@@ -4,7 +4,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { RecordRow } from './RecordRow';
 import type { TableViewProps } from './Table';
-import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
 
 /* Columns are sized in 3 ways:
@@ -28,16 +27,16 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
         view.columns.some((columnId) => block.data.definition[columnId].title.trim().length > 0);
 
     return (
-        <div className={tcls(style, styles.tableWrapper)}>
+        <div className={tcls(style, 'table-wrapper')}>
             {/* Table */}
-            <div role="table" className={tcls('flex', 'flex-col')}>
+            <div role="table">
                 {/* Header */}
                 {withHeader && (
                     <div
                         role="rowgroup"
                         className={tcls(
                             tableWidth,
-                            styles.rowGroup,
+                            'row-group',
                             'straight-corners:rounded-none',
                             'circular-corners:rounded-xl'
                         )}
@@ -48,7 +47,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                                     key={column}
                                     role="columnheader"
                                     className={tcls(
-                                        styles.columnHeader,
+                                        'column-header',
                                         getColumnAlignment(block.data.definition[column])
                                     )}
                                     style={{
@@ -68,10 +67,7 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         </div>
                     </div>
                 )}
-                <div
-                    role="rowgroup"
-                    className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}
-                >
+                <div role="rowgroup" className={tcls(tableWidth, '[&>*+*]:border-t')}>
                     {records.map((record) => (
                         <RecordRow
                             key={record[0]}

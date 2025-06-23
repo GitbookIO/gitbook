@@ -1,11 +1,8 @@
 import type { DocumentTableViewGrid } from '@gitbook/api';
 
-import { tcls } from '@/lib/tailwind';
-
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
 import { getColumnWidth } from './ViewGrid';
-import styles from './table.module.css';
 import { getColumnVerticalAlignment } from './utils';
 
 export function RecordRow(
@@ -18,7 +15,7 @@ export function RecordRow(
     const { view, autoSizedColumns, fixedColumns, block, context } = props;
 
     return (
-        <div className={styles.row} role="row">
+        <div className="row" role="row">
             {view.columns.map((column) => {
                 const columnWidth = getColumnWidth({
                     column,
@@ -32,7 +29,7 @@ export function RecordRow(
                     <div
                         key={column}
                         role="cell"
-                        className={tcls(styles.cell)}
+                        className="cell"
                         style={{
                             width: columnWidth,
                             minWidth: columnWidth || '100px',
