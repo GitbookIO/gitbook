@@ -362,6 +362,28 @@ describe('getURLLookupAlternatives', () => {
             ],
         });
     });
+
+    it('should skip proxy root URLs', () => {
+        expect(
+            getURLLookupAlternatives(new URL('https://proxy.gitbook.site/site_123/doc1'))
+        ).toEqual({
+            revision: undefined,
+            changeRequest: undefined,
+            basePath: undefined,
+            urls: [
+                {
+                    url: 'https://proxy.gitbook.site/site_123',
+                    extraPath: 'doc1',
+                    primary: false,
+                },
+                {
+                    url: 'https://proxy.gitbook.site/site_123/doc1',
+                    extraPath: '',
+                    primary: true,
+                },
+            ],
+        });
+    });
 });
 
 describe('normalizeURL', () => {
