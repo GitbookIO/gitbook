@@ -22,6 +22,12 @@ import { FileIcon } from '../FileIcon';
 import type { TableRecordKV } from './Table';
 import { type VerticalAlignment, getColumnAlignment } from './utils';
 
+const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
+    'text-left': '[&_*]:text-left text-left',
+    'text-center': '[&_*]:text-center text-center',
+    'text-right': '[&_*]:text-right text-right',
+};
+
 /**
  * Render the value for a column in a record.
  */
@@ -115,11 +121,6 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 return <Tag className={tcls(['w-full', verticalAlignment])}>{''}</Tag>;
             }
 
-            const alignmentMap = {
-                'text-left': '[&_*]:text-left text-left',
-                'text-center': '[&_*]:text-center text-center',
-                'text-right': '[&_*]:text-right text-right',
-            };
             const horizontalAlignment = getColumnAlignment(definition);
             const horizontalClasses = alignmentMap[horizontalAlignment];
 
