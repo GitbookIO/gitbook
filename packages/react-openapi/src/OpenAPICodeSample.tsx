@@ -253,15 +253,11 @@ function getCustomCodeSamples(props: {
         if (customSamples && Array.isArray(customSamples)) {
             customCodeSamples = customSamples
                 .filter((sample) => {
-                    return (
-                        typeof sample.label === 'string' &&
-                        typeof sample.source === 'string' &&
-                        typeof sample.lang === 'string'
-                    );
+                    return typeof sample.source === 'string' && typeof sample.lang === 'string';
                 })
                 .map((sample, index) => ({
                     key: `custom-sample-${sample.lang}-${index}`,
-                    label: sample.label,
+                    label: sample.label || sample.lang,
                     body: context.renderCodeBlock({
                         code: sample.source,
                         syntax: sample.lang,
