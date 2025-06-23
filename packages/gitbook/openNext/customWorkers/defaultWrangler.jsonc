@@ -125,7 +125,8 @@
             "vars": {
                 // This is a bit misleading, but it means that we can have 500 concurrent revalidations
                 // This means that we'll have up to 100 durable objects instance running at the same time
-                "MAX_REVALIDATE_CONCURRENCY": "100"
+                "MAX_REVALIDATE_CONCURRENCY": "100",
+                "OPEN_NEXT_REQUEST_ID_HEADER": true
             },
             "r2_buckets": [
                 {
