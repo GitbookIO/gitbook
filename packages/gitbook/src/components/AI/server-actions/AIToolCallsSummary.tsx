@@ -30,10 +30,10 @@ function ToolCallSummary(props: {
     const { toolCall, context } = props;
 
     return (
-        <p className="text-slate-700 text-sm">
+        <p className="animate-fadeIn text-sm text-tint">
             <Icon
                 icon={getIconForToolCall(toolCall)}
-                className="mr-1 inline-block size-3 text-slate-300"
+                className="mr-1 inline-block size-3 text-tint-subtle/8"
             />
             {getDescriptionForToolCall(toolCall, context)}
         </p>

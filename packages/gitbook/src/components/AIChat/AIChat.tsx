@@ -30,18 +30,29 @@ export function AIChat(props: AIChatProps) {
             )}
         >
             <div className="flex h-full grow flex-col overflow-hidden rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
-                <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle p-4 font-bold text-tint-strong">
+                <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 font-bold text-tint-strong">
                     <Icon icon="gitbook" className="size-4" />
                     Chat
-                    <Button
-                        onClick={() => chatController.close()}
-                        iconOnly
-                        icon="close"
-                        label="Close"
-                        className="ml-auto px-2"
-                        variant="blank"
-                        size="default"
-                    />
+                    <div className="ml-auto flex gap-2">
+                        <Button
+                            onClick={() => {}}
+                            iconOnly
+                            icon="trash-list"
+                            label="Clear conversation"
+                            className="px-2"
+                            variant="blank"
+                            size="default"
+                        />
+                        <Button
+                            onClick={() => chatController.close()}
+                            iconOnly
+                            icon="close"
+                            label="Close"
+                            className="px-2"
+                            variant="blank"
+                            size="default"
+                        />
+                    </div>
                 </div>
                 <div className="grow overflow-y-auto p-4">
                     <AIChatMessages chat={chat} />

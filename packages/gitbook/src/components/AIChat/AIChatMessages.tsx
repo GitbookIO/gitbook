@@ -18,24 +18,25 @@ export function AIChatMessages(props: {
                         )}
                         key={index}
                     >
-                        {message.content}
+                        {message.content ? (
+                            message.content
+                        ) : (
+                            <div className="flex w-full flex-wrap gap-2">
+                                {Array.from({ length: 7 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="h-4 animate-[fadeIn_0.5s_both,pulse_1.5s_infinite] rounded-md bg-tint-4"
+                                        style={{
+                                            width: `calc(${(index % 4) * 20 + 10}% - 4px)`,
+                                            animationDelay: `${index * 0.2}s`,
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 );
             })}
-            {chat.loading ? (
-                <div className="flex w-full flex-wrap gap-2">
-                    {Array.from({ length: 6 }).map((_, index) => (
-                        <div
-                            key={index}
-                            className="h-4 animate-pulse rounded-md bg-tint-4"
-                            style={{
-                                width: `calc(${(index % 4) * 20 + 10}% - 4px)`,
-                                animationDelay: `${index * 0.2}s`,
-                            }}
-                        />
-                    ))}
-                </div>
-            ) : null}
         </div>
     );
 }
