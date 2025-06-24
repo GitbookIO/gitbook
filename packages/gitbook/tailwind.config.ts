@@ -473,7 +473,7 @@ const config: Config = {
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
-            addVariant('chat-open', 'body.chat-open &');
+            addVariant('chat-open', 'body:has(.ai-chat) &');
 
             /**
              * Variant when a header is displayed.

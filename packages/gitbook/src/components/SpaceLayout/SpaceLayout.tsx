@@ -65,12 +65,12 @@ export function SpaceLayout(props: {
                 visitorAuthClaims={visitorAuthClaims}
                 visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
             >
-                <div className="chat-open:mr-96 transition-all duration-300">
+                <div className="transition-all duration-300 lg:chat-open:mr-72 xl:chat-open:mr-96">
                     <Announcement context={context} />
                     <Header withTopHeader={withTopHeader} context={context} />
                 </div>
                 <AIChat />
-                <div className="chat-open:mr-96 transition-all duration-300">
+                <div className="transition-all duration-300 lg:chat-open:mr-72 xl:chat-open:mr-96">
                     <div
                         className={tcls(
                             'flex',

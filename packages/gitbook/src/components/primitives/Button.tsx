@@ -93,7 +93,7 @@ export function Button({
     return (
         <button
             type="button"
-            className={tcls(domClassName, buttonOnlyClassNames)}
+            className={tcls(buttonOnlyClassNames, domClassName)}
             aria-label={label}
             {...rest}
         >
