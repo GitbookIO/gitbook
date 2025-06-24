@@ -21,9 +21,9 @@ export class R2WriteBuffer extends DurableObject {
     }
 }
 
-export { DOQueueHandler } from '../../.open-next/.build/durable-objects/queue.js';
+export { DOQueueHandler } from './cloudflare/durable-objects/queue.js';
 
-export { DOShardedTagCache } from '../../.open-next/.build/durable-objects/sharded-tag-cache.js';
+export { DOShardedTagCache } from './cloudflare/durable-objects/sharded-tag-cache.js';
 
 export default {
     async fetch() {
