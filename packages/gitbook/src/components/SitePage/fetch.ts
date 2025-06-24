@@ -36,7 +36,7 @@ export async function fetchPageData(context: GitBookSiteContext, params: PagePar
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
 async function resolvePage(context: GitBookSiteContext, params: PagePathParams | PageIdParams) {
-    const { organizationId, site, space, revision, shareKey, linker } = context;
+    const { organizationId, site, space, revision, shareKey, linker, revisionId } = context;
 
     if ('pageId' in params) {
         return resolvePageId(revision.pages, params.pageId);
@@ -59,7 +59,7 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         const resolved = await getDataOrNull(
             context.dataFetcher.getRevisionPageByPath({
                 spaceId: space.id,
-                revisionId: revision.id,
+                revisionId: revisionId,
                 path: rawPathname,
             })
         );
