@@ -14,16 +14,16 @@ export async function* streamAIResponseById({
     responseId: string;
     options?: RenderAIMessageOptions;
 }) {
-    const { dataFetcher } = await getServerActionBaseContext();
+    const context = await getServerActionBaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const api = await dataFetcher.api();
-    const rawStream = await api.orgs.streamExistingAiResponseInSite(
+    const api = await context.dataFetcher.api();
+    const rawStream = api.orgs.streamExistingAiResponseInSite(
         siteURLData.organization,
         siteURLData.site,
         responseId
     );
-    const { stream } = await streamRenderAIMessage(rawStream, options);
+    const { stream } = await streamRenderAIMessage(context, rawStream, options);
 
     for await (const output of stream) {
         yield output;

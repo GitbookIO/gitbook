@@ -32,33 +32,29 @@ export async function* streamGenerateAIPage({
     previousResponseId?: string;
     options?: RenderAIMessageOptions;
 }) {
-    const { dataFetcher } = await getServerActionBaseContext();
+    const context = await getServerActionBaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
-    const api = await dataFetcher.api();
-    const rawStream = await api.orgs.streamAiResponseInSite(
-        siteURLData.organization,
-        siteURLData.site,
-        {
-            input: [
-                {
-                    role: AIMessageRole.User,
-                    content: query,
-                },
-            ],
-            output: { type: 'document' },
-            model: AIModel.ReasoningLow,
-            instructions: PROMPT,
-            previousResponseId,
-            tools: {
-                getPageContent: true,
-                getPages: true,
-                search: true,
+    const api = await context.dataFetcher.api();
+    const rawStream = api.orgs.streamAiResponseInSite(siteURLData.organization, siteURLData.site, {
+        input: [
+            {
+                role: AIMessageRole.User,
+                content: query,
             },
-        }
-    );
+        ],
+        output: { type: 'document' },
+        model: AIModel.ReasoningLow,
+        instructions: PROMPT,
+        previousResponseId,
+        tools: {
+            getPageContent: true,
+            getPages: true,
+            search: true,
+        },
+    });
 
-    const { stream } = await streamRenderAIMessage(rawStream, options);
+    const { stream } = await streamRenderAIMessage(context, rawStream, options);
 
     for await (const output of stream) {
         yield output;
