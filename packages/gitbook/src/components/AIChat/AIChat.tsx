@@ -3,10 +3,11 @@
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
-import { useAIChatController, useAIChatState } from '../AI/useAIChat';
+import { useAIChatController, useAIChatState } from '../AI';
 import { Button } from '../primitives';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
 interface AIChatProps {
     /** Optional className for styling */
@@ -58,6 +59,7 @@ export function AIChat(props: AIChatProps) {
                     <AIChatMessages chat={chat} />
                 </div>
                 <div className="flex border-tint-subtle border-t bg-tint-subtle p-4">
+                    <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
                     <AIChatInput
                         value={input}
                         onChange={setInput}
