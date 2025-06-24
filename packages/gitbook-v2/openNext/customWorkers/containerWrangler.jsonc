@@ -9,7 +9,7 @@
     "containers": [
         {
             "class_name": "OpenNextContainer",
-            "image": "./packages/gitbook-v2/.open-next/server-functions/default/Dockerfile",
+            "image": "./Dockerfile",
             "max_instances": 1,
             "name": "container-open-next"
         }
