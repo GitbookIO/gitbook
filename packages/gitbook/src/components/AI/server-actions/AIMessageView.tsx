@@ -1,5 +1,7 @@
 import type { AIMessage } from '@gitbook/api';
+import type { GitBookSiteContext } from '@v2/lib/context';
 import { DocumentView } from '../../DocumentView';
+import { AIToolCallsSummary } from './AIToolCallsSummary';
 import type { RenderAIMessageOptions } from './types';
 
 /**
@@ -8,9 +10,10 @@ import type { RenderAIMessageOptions } from './types';
 export function AIMessageView(
     props: RenderAIMessageOptions & {
         message: AIMessage;
+        context: GitBookSiteContext;
     }
 ) {
-    const { message } = props;
+    const { message, context } = props;
 
     return (
         <div className="flex flex-col gap-2">
@@ -26,6 +29,9 @@ export function AIMessageView(
                             }}
                             style={['space-y-5']}
                         />
+                        {step.toolCalls && step.toolCalls.length > 0 ? (
+                            <AIToolCallsSummary toolCalls={step.toolCalls} context={context} />
+                        ) : null}
                     </div>
                 );
             })}

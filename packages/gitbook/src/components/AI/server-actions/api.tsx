@@ -8,6 +8,7 @@ import {
     type AIStreamResponse,
 } from '@gitbook/api';
 import type { GitBookBaseContext } from '@v2/lib/context';
+import { fetchServerActionSiteContext } from '@v2/lib/server-actions';
 import { EventIterator } from 'event-iterator';
 import type { MaybePromise } from 'p-map';
 import * as partialJson from 'partial-json';
@@ -85,6 +86,7 @@ export async function streamGenerateAIObject<T>(
  * Stream the generation of a document.
  */
 export async function streamRenderAIMessage(
+    baseContext: GitBookBaseContext,
     rawStream: AsyncIterable<AIStreamResponse>,
     options?: RenderAIMessageOptions
 ) {
@@ -123,10 +125,13 @@ export async function streamRenderAIMessage(
         }
     };
 
+    // Fetch the full-context in the background to avoid blocking the stream.
+    const promiseContext = fetchServerActionSiteContext(baseContext);
+
     return parseResponse<{
         content: React.ReactNode;
         event: AIStreamResponse;
-    }>(rawStream, (event) => {
+    }>(rawStream, async (event) => {
         switch (event.type) {
             /**
              * The agent is processing a tool call in a new message.
@@ -172,7 +177,9 @@ export async function streamRenderAIMessage(
 
         return {
             event,
-            content: <AIMessageView message={message} {...options} />,
+            content: (
+                <AIMessageView message={message} context={await promiseContext} {...options} />
+            ),
         };
     });
 }
@@ -182,7 +189,7 @@ export async function streamRenderAIMessage(
  */
 function parseResponse<T>(
     responseStream: EventIterator<AIStreamResponse>,
-    parse: (response: AIStreamResponse) => T | undefined
+    parse: (response: AIStreamResponse) => T | undefined | Promise<T | undefined>
 ): {
     stream: EventIterator<T>;
     response: Promise<{ responseId: string }>;
@@ -197,14 +204,14 @@ function parseResponse<T>(
             let foundResponse = false;
 
             for await (const event of responseStream) {
+                const parsed = await parse(event);
+                if (parsed !== undefined) {
+                    queue.push(parsed);
+                }
+
                 if (event.type === 'response_finish') {
                     foundResponse = true;
                     resolveResponse({ responseId: event.responseId });
-                } else {
-                    const parsed = parse(event);
-                    if (parsed !== undefined) {
-                        queue.push(parsed);
-                    }
                 }
             }
 
