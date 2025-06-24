@@ -3,7 +3,7 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Fragment } from 'react';
-import { AIPageLinkSummary } from '../../Adaptive';
+import { AIPageLinkSummary } from '../../AIPageLinkSummary';
 import { Button, StyledLink } from '../../primitives';
 
 export function InlineLinkTooltipImpl(props: {

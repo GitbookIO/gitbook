@@ -306,10 +306,6 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
                 })
             );
         },
-
-        streamAIResponse() {
-            throw new Error('Not implemented in v1');
-        },
     };
 
     return dataFetcher;
