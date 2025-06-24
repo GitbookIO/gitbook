@@ -1,15 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import { useAIPage } from '../AI';
 import { SkeletonHeading, SkeletonParagraph } from '../primitives';
 import { MessageInput } from './MessageInput';
-import { useGeneratePage } from './useGeneratePage';
 
 export function AdaptivePage(props: {
     responseId?: string;
 }) {
     const [inputValue, setInputValue] = React.useState('');
-    const page = useGeneratePage({
+    const page = useAIPage({
         initialResponseId: props.responseId,
     });
 

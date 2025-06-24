@@ -2,7 +2,8 @@
 import { AIMessageRole, AIModel } from '@gitbook/api';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { getServerActionBaseContext } from '@v2/lib/server-actions';
-import { streamGenerateDocument } from './api';
+import { streamRenderAIMessage } from './api';
+import type { RenderAIMessageOptions } from './types';
 
 const MARKDOWN_SYNTAX_PROMPT = `
 ## Markdown syntax
@@ -67,12 +68,17 @@ You analyse the query, and the content of the site, and generate a page that wil
 ${MARKDOWN_SYNTAX_PROMPT}
 `;
 
-export async function* streamGeneratePage({
+/**
+ * Generate a page using AI.
+ */
+export async function* streamGenerateAIPage({
     query,
     previousResponseId,
+    options,
 }: {
     query: string;
     previousResponseId?: string;
+    options?: RenderAIMessageOptions;
 }) {
     const { dataFetcher } = await getServerActionBaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
@@ -95,28 +101,7 @@ export async function* streamGeneratePage({
         }
     );
 
-    const { stream } = await streamGenerateDocument(rawStream);
-
-    for await (const output of stream) {
-        yield output;
-    }
-}
-
-export async function* streamResponseById({
-    responseId,
-}: {
-    responseId: string;
-}) {
-    const { dataFetcher } = await getServerActionBaseContext();
-    const siteURLData = await getSiteURLDataFromMiddleware();
-
-    const api = await dataFetcher.api();
-    const rawStream = await api.orgs.streamExistingAiResponseInSite(
-        siteURLData.organization,
-        siteURLData.site,
-        responseId
-    );
-    const { stream } = await streamGenerateDocument(rawStream);
+    const { stream } = await streamRenderAIMessage(rawStream, options);
 
     for await (const output of stream) {
         yield output;

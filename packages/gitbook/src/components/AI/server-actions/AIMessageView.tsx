@@ -1,13 +1,16 @@
 import type { AIMessage } from '@gitbook/api';
 import { DocumentView } from '../../DocumentView';
+import type { RenderAIMessageOptions } from './types';
 
 /**
  * Render a message from the API backend.
  */
-export function AIMessageView(props: {
-    message: AIMessage;
-}) {
-    const { message } = props;
+export function AIMessageView(
+    props: RenderAIMessageOptions & {
+        message: AIMessage;
+    }
+) {
+    const { message, renderToolCalls = true } = props;
 
     return (
         <div className="flex flex-col gap-2">

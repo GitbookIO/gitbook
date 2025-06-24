@@ -15,6 +15,7 @@ import type { DeepPartial } from 'ts-essentials';
 import type { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { AIMessageView } from './AIMessageView';
+import type { RenderAIMessageOptions } from './types';
 
 type StreamGenerateInput = {
     organizationId: string;
@@ -51,7 +52,7 @@ export async function generate<T>(
 /**
  * Stream the generation of an object using the AI.
  */
-export async function streamGenerateObject<T>(
+export async function streamGenerateAIObject<T>(
     context: GitBookBaseContext,
     {
         schema,
@@ -83,7 +84,10 @@ export async function streamGenerateObject<T>(
 /**
  * Stream the generation of a document.
  */
-export async function streamGenerateDocument(rawStream: AsyncIterable<AIStreamResponse>) {
+export async function streamRenderAIMessage(
+    rawStream: AsyncIterable<AIStreamResponse>,
+    options?: RenderAIMessageOptions
+) {
     const message: AIMessage = {
         id: '',
         role: AIMessageRole.Assistant,
@@ -168,7 +172,7 @@ export async function streamGenerateDocument(rawStream: AsyncIterable<AIStreamRe
 
         return {
             event,
-            content: <AIMessageView message={message} />,
+            content: <AIMessageView message={message} {...options} />,
         };
     });
 }
