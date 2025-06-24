@@ -1,5 +1,5 @@
 'use server';
-import { AIMessageRole, AIModel } from '@gitbook/api';
+import { type AIMessageContext, AIMessageRole, AIModel } from '@gitbook/api';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { z } from 'zod';
@@ -38,10 +38,12 @@ Provide the suggestions as a JSON array with each suggestion as a string. Ensure
  */
 export async function* streamAIChatResponse({
     message,
+    messageContext,
     previousResponseId,
     options,
 }: {
     message: string;
+    messageContext: AIMessageContext;
     previousResponseId?: string;
     options?: RenderAIMessageOptions;
 }) {
@@ -54,6 +56,7 @@ export async function* streamAIChatResponse({
             {
                 role: AIMessageRole.User,
                 content: message,
+                context: messageContext,
             },
         ],
         output: { type: 'document' },
