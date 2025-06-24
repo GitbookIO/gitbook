@@ -13,6 +13,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
+import { AIChat } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -69,6 +70,7 @@ export function SpaceLayout(props: {
                 >
                     <Announcement context={context} />
                     <Header withTopHeader={withTopHeader} context={context} />
+                    <AIChat />
                     <div className="transition-all duration-300 lg:chat-open:mr-72 xl:chat-open:mr-96">
                         <div
                             className={tcls(
