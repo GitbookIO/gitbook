@@ -87,6 +87,9 @@ export type GitBookSpaceContext = GitBookBaseContext & {
     /** Revision of the space. */
     revision: Revision;
 
+    /** Identifier of the revision. Could be different than `revision.id` when using computed. */
+    revisionId: string;
+
     /** Share key of the space. */
     shareKey: string | undefined;
 };
@@ -367,6 +370,7 @@ export async function fetchSpaceContextByIds(
         organizationId: space.organization,
         space,
         revision,
+        revisionId,
         changeRequest,
         shareKey: ids.shareKey,
     };

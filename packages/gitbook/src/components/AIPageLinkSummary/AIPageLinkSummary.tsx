@@ -5,8 +5,8 @@ import { Icon } from '@gitbook/icons';
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { useVisitedPages } from '../Insights';
 import { usePageContext } from '../PageContext';
+import { useVisitedPages } from '../hooks';
 import { Loading } from '../primitives';
 import { streamLinkPageSummary } from './server-actions/streamLinkPageSummary';
 
@@ -116,7 +116,7 @@ export function AIPageLinkSummary(props: {
 
     const currentPage = usePageContext();
     const language = useLanguage();
-    const visitedPages = useVisitedPages((state) => state.pages);
+    const visitedPages = useVisitedPages();
     const { summary, streamSummary } = useSummaries(
         useShallow((state) => {
             return {

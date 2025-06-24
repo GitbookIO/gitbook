@@ -58,7 +58,7 @@ export async function AdminToolbar(props: AdminToolbarProps) {
         return <ChangeRequestToolbar context={context} />;
     }
 
-    if (context.revision.id !== context.space.revision) {
+    if (context.revisionId !== context.space.revision) {
         return <RevisionToolbar context={context} />;
     }
 
