@@ -20,7 +20,7 @@ import type { RenderAIMessageOptions } from './types';
 type StreamGenerateInput = {
     organizationId: string;
     siteId: string;
-    instructions: string;
+    instructions?: string;
     previousResponseId?: string;
     input: AIMessageInput[];
     model: AIModel;
