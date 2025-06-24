@@ -59,7 +59,7 @@ export function SpaceLayout(props: {
                 siteSectionId={context.sections?.current?.id ?? null}
                 siteSpaceId={context.siteSpace.id}
                 siteShareKey={context.shareKey ?? null}
-                revisionId={context.revision.id}
+                revisionId={context.revisionId}
                 spaceId={context.space.id}
                 visitorAuthClaims={visitorAuthClaims}
                 visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
