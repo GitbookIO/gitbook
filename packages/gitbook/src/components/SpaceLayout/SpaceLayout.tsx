@@ -13,7 +13,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
-import { AIChat } from '../Adaptive/AIChat';
+import { AIChat } from '../AIChat/AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
