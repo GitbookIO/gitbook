@@ -133,14 +133,13 @@ async function getNodesFromSiteSpaces(
             if (!siteSpaceUrl) {
                 return [];
             }
-            const rootPages = await throwIfDataError(
-                dataFetcher.getRevisionPages({
+            const revision = await throwIfDataError(
+                dataFetcher.getRevision({
                     spaceId: siteSpace.space.id,
                     revisionId: siteSpace.space.revision,
-                    metadata: false,
                 })
             );
-            const pages = getIndexablePages(rootPages);
+            const pages = getIndexablePages(revision.pages);
             const listChildren = await Promise.all(
                 pages.map(async ({ page }): Promise<ListItem> => {
                     const pageURL = new URL(siteSpaceUrl);

@@ -2,7 +2,7 @@ import { getSiteStructureSections } from '@/lib/sites';
 import type {
     ChangeRequest,
     PublishedSiteContent,
-    RevisionPage,
+    Revision,
     RevisionPageDocument,
     Site,
     SiteCustomizationSettings,
@@ -84,11 +84,11 @@ export type GitBookSpaceContext = GitBookBaseContext & {
     space: Space;
     changeRequest: ChangeRequest | null;
 
-    /** ID of the current revision. */
-    revisionId: string;
+    /** Revision of the space. */
+    revision: Revision;
 
-    /** Pages of the space. */
-    pages: RevisionPage[];
+    /** Identifier of the revision. Could be different than `revision.id` when using computed. */
+    revisionId: string;
 
     /** Share key of the space. */
     shareKey: string | undefined;
@@ -351,20 +351,17 @@ export async function fetchSpaceContextByIds(
 
     const revisionId = ids.revision ?? changeRequest?.revision ?? space.revision;
 
-    const pages = await getDataOrNull(
-        dataFetcher.getRevisionPages({
+    const revision = await getDataOrNull(
+        dataFetcher.getRevision({
             spaceId: ids.space,
             revisionId,
-            // We only care about the Git metadata when the Git sync is enabled,
-            // otherwise we can optimize performance by not fetching it
-            metadata: !!space.gitSync,
         }),
 
         // When trying to render a revision with an invalid / non-existing ID,
         // we should handle gracefully the 404 and throw notFound.
         ids.revision ? [404] : undefined
     );
-    if (!pages) {
+    if (!revision) {
         notFound();
     }
 
@@ -372,9 +369,9 @@ export async function fetchSpaceContextByIds(
         ...baseContext,
         organizationId: space.organization,
         space,
-        pages,
-        changeRequest,
+        revision,
         revisionId,
+        changeRequest,
         shareKey: ids.shareKey,
     };
 }

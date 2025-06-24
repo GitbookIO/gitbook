@@ -51,7 +51,7 @@ export function serveRootSitemap(context: GitBookSiteContext) {
  */
 export function servePagesSitemap(context: GitBookSiteContext) {
     const { linker } = context;
-    const pages = getIndexablePages(context.pages);
+    const pages = getIndexablePages(context.revision.pages);
 
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
@@ -64,7 +64,7 @@ export function servePagesSitemap(context: GitBookSiteContext) {
             priority: normalizedPriority,
             loc: linker.toAbsoluteURL(
                 linker.toPathForPage({
-                    pages: context.pages,
+                    pages: context.revision.pages,
                     page,
                 })
             ),

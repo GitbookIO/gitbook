@@ -53,14 +53,14 @@ export async function PDFPage(props: {
 }) {
     const baseContext = props.context;
     const searchParams = new URLSearchParams(props.searchParams);
-    const pdfParams = getPDFSearchParams(new URLSearchParams(searchParams));
+    const pdfParams = getPDFSearchParams(searchParams);
 
     const customization =
         'customization' in baseContext ? baseContext.customization : defaultCustomization();
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(baseContext.pages, pdfParams);
+    const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string]
     );
@@ -245,6 +245,7 @@ async function PDFPageDocument(props: {
                             page,
                         },
                         getId: (id) => getPagePDFContainerId(page, id),
+                        shouldRenderLinkPreviews: false, // We don't want to render link previews in the PDF.
                     }}
                     // We consider all pages as offscreen in PDF mode
                     // to ensure we can efficiently render as many pages as possible

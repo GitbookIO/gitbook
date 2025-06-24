@@ -51,6 +51,9 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         aiSearch: {
             enabled: true,
         },
+        externalLinks: {
+            target: api.SiteExternalLinksTarget.Self,
+        },
         advancedCustomization: {
             enabled: true,
         },

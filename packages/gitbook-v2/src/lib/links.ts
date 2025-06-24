@@ -128,7 +128,8 @@ export function createLinker(
 function joinPaths(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
     const suffixPath = path.startsWith('/') ? path.slice(1) : path;
-    return removeTrailingSlash(prefixPath + suffixPath);
+    const pathWithoutTrailingSlash = removeTrailingSlash(prefixPath + suffixPath);
+    return pathWithoutTrailingSlash === '' ? '/' : pathWithoutTrailingSlash;
 }
 
 function removeTrailingSlash(path: string): string {

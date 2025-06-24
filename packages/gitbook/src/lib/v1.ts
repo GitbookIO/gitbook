@@ -21,12 +21,9 @@ import {
     getEmbedByUrlInSpace,
     getLatestOpenAPISpecVersionContent,
     getPublishedContentSite,
-    getReusableContent,
     getRevision,
-    getRevisionFile,
     getRevisionPageByPath,
     getRevisionPageDocument,
-    getRevisionPages,
     getSiteRedirectBySource,
     getSpace,
     getUserById,
@@ -179,25 +176,8 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
             return withAPI(() =>
                 wrapDataFetcherError(async () => {
                     return getRevision(params.spaceId, params.revisionId, {
-                        metadata: params.metadata,
+                        metadata: true,
                     });
-                })
-            );
-        },
-
-        getRevisionFile(params) {
-            return withAPI(() =>
-                wrapDataFetcherError(async () => {
-                    const revisionFile = await getRevisionFile(
-                        params.spaceId,
-                        params.revisionId,
-                        params.fileId
-                    );
-                    if (!revisionFile) {
-                        throw new DataFetcherError('Revision file not found', 404);
-                    }
-
-                    return revisionFile;
                 })
             );
         },
@@ -232,16 +212,6 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
             );
         },
 
-        getRevisionPages(params) {
-            return withAPI(() =>
-                wrapDataFetcherError(async () => {
-                    return getRevisionPages(params.spaceId, params.revisionId, {
-                        metadata: params.metadata,
-                    });
-                })
-            );
-        },
-
         getRevisionPageDocument(params) {
             return withAPI(() =>
                 wrapDataFetcherError(async () => {
@@ -268,24 +238,6 @@ function getDataFetcherV1(apiTokenOverride?: string): GitBookDataFetcher {
                     }
 
                     return revisionPage;
-                })
-            );
-        },
-
-        getReusableContent(params) {
-            return withAPI(() =>
-                wrapDataFetcherError(async () => {
-                    const reusableContent = await getReusableContent(
-                        params.spaceId,
-                        params.revisionId,
-                        params.reusableContentId
-                    );
-
-                    if (!reusableContent) {
-                        throw new DataFetcherError('Reusable content not found', 404);
-                    }
-
-                    return reusableContent;
                 })
             );
         },
@@ -408,7 +360,7 @@ export function getSitePointerFromContext(context: GitBookSiteContext): SiteCont
         siteSectionId: context.sections?.current?.id,
         siteSpaceId: context.siteSpace.id,
         spaceId: context.space.id,
-        revisionId: context.revisionId,
+        revisionId: context.revision.id,
         changeRequestId: context.changeRequest?.id,
         siteShareKey: context.shareKey,
     };

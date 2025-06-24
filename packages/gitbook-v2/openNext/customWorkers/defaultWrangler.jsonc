@@ -122,6 +122,11 @@
             ]
         },
         "production": {
+            "vars": {
+                // This is a bit misleading, but it means that we can have 500 concurrent revalidations
+                // This means that we'll have up to 100 durable objects instance running at the same time
+                "MAX_REVALIDATE_CONCURRENCY": "100"
+            },
             "r2_buckets": [
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",

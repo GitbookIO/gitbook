@@ -456,6 +456,17 @@ const config: Config = {
         },
     },
     plugins: [
+        plugin(({ addUtilities }) => {
+            addUtilities({
+                '.no-scrollbar': {
+                    'scrollbar-width': 'none',
+                    '-ms-overflow-style': 'none',
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                },
+            });
+        }),
         plugin(({ addVariant }) => {
             /**
              * Variant when the Table of Content navigation is open.
