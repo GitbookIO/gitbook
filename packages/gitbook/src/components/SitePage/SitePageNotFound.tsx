@@ -46,7 +46,7 @@ export function SitePageNotFound() {
                 </div>
 
                 {/* Track the page not found as a page view */}
-                <TrackPageViewEvent pageId={null} />
+                <TrackPageViewEvent />
             </div>
         </CurrentPageProvider>
     );
