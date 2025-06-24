@@ -97,6 +97,11 @@ runs:
         #   run: |
         #       bun run ./packages/gitbook-v2/openNext/customWorkers/script/updateWrangler.ts ${{ steps.extract_server_version_id.outputs.version_id }}
 
+        - name: Copy server functions to custom workers
+          shell: bash
+          run: |
+            cp -r ./packages/gitbook-v2/.open-next/server-functions/default ./packages/gitbook-v2/openNext/customWorkers/default
+
         - id: deploy_container
           name: Deploy container to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0
