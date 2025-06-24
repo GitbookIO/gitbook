@@ -15,9 +15,8 @@ export default {
     async fetch(
         request: Request,
         env: { ON_CONTAINER: DurableObjectNamespace<OpenNextContainer> }
-    ): Promise<Response> {
+    ) {
         const idOne = env.ON_CONTAINER.idFromName('foo');
-        //@ts-ignore - Seems like types are broken for now
         const containerInstance = env.ON_CONTAINER.get(idOne);
 
         await containerInstance.start({

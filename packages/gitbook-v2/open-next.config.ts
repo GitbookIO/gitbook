@@ -8,7 +8,7 @@ export default {
             proxyExternalRequest: 'node',
             generateDockerfile: true,
             queue: 'dummy',
-            incrementalCache: () => import('./openNext/noOpCache').then((m) => m.default),
+            incrementalCache: () => import('./openNext/serverCache').then((m) => m.default),
             tagCache: 'dummy',
         },
     },

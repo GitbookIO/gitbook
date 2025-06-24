@@ -1,5 +1,5 @@
 {
-    "name": "container-worker",
+    "name": "on-container-worker",
     "main": "container.ts",
     "compatibility_date": "2025-05-06",
     "compatibility_flags": ["nodejs_compat"],
@@ -10,7 +10,7 @@
         {
             "class_name": "OpenNextContainer",
             "image": "../../.open-next/server-functions/default/Dockerfile",
-            "max_instances": 3,
+            "max_instances": 1,
             "name": "container-open-next"
         }
     ],

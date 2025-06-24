@@ -32,7 +32,6 @@ export default class extends WorkerEntrypoint {
             );
 
             const url = new URL(request.url);
-            console.log('Middleware URL:', url.pathname);
             if (url.pathname.startsWith('/_internal/')) {
                 // Incremental cache handling
                 if (url.pathname.startsWith('/_internal/set')) {
@@ -66,7 +65,6 @@ export default class extends WorkerEntrypoint {
             if (this.env.STAGE === 'dev') {
                 const modifiedUrl = new URL(reqOrResp.url);
                 modifiedUrl.host = this.env.PREVIEW_HOSTNAME;
-                console.log('Redirecting to preview hostname:', modifiedUrl.toString());
                 const nextRequest = new Request(modifiedUrl, reqOrResp);
                 nextRequest.headers.set('x-host', reqOrResp.host);
                 return fetch(nextRequest, {
@@ -76,27 +74,40 @@ export default class extends WorkerEntrypoint {
                 });
             }
 
-            if (this.env.STAGE !== 'preview') {
-                // https://developers.cloudflare.com/workers/configuration/versions-and-deployments/gradual-deployments/#version-affinity
+            if (this.env.STAGE === 'preview') {
+                // We just send the request to the container worker
                 reqOrResp.headers.set(
-                    'Cloudflare-Workers-Version-Overrides',
-                    `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
+                    'x-host',
+                    reqOrResp.headers.get('host') || this.env.PREVIEW_HOSTNAME
                 );
-                return this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
+                return this.env.CONTAINER_WORKER?.fetch(reqOrResp, {
                     cf: {
                         cacheEverything: false,
                     },
                 });
             }
-            // If we are in preview mode, we need to send the request to the preview URL
-            const modifiedUrl = new URL(reqOrResp.url);
-            modifiedUrl.hostname = this.env.PREVIEW_HOSTNAME;
-            const nextRequest = new Request(modifiedUrl, reqOrResp);
-            return fetch(nextRequest, {
-                cf: {
-                    cacheEverything: false,
-                },
-            });
+
+            // if (this.env.STAGE !== 'preview') {
+            //     // https://developers.cloudflare.com/workers/configuration/versions-and-deployments/gradual-deployments/#version-affinity
+            //     reqOrResp.headers.set(
+            //         'Cloudflare-Workers-Version-Overrides',
+            //         `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
+            //     );
+            //     return this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
+            //         cf: {
+            //             cacheEverything: false,
+            //         },
+            //     });
+            // }
+            // // If we are in preview mode, we need to send the request to the preview URL
+            // const modifiedUrl = new URL(reqOrResp.url);
+            // modifiedUrl.hostname = this.env.PREVIEW_HOSTNAME;
+            // const nextRequest = new Request(modifiedUrl, reqOrResp);
+            // return fetch(nextRequest, {
+            //     cf: {
+            //         cacheEverything: false,
+            //     },
+            // });
         });
     }
 }

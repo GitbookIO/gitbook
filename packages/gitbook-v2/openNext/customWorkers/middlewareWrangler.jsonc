@@ -69,6 +69,10 @@
                 {
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-preview"
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "on-container-worker"
                 }
             ],
             "durable_objects": {
