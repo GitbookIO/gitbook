@@ -11,6 +11,7 @@ import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { DateRelative } from '../primitives';
+import { SuspenseLoadedHint } from '../primitives/LoadingStateProvider';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
@@ -72,6 +73,7 @@ export function PageBody(props: {
                             />
                         }
                     >
+                        <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
                             style="grid [&>*+*]:mt-5"

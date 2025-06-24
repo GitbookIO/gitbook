@@ -8,9 +8,10 @@ export function useScrollActiveId(
     options: {
         rootMargin?: string;
         threshold?: number;
+        additionalEffects?: boolean;
     } = {}
 ) {
-    const { rootMargin, threshold = 0.5 } = options;
+    const { rootMargin, threshold = 0.5, additionalEffects } = options;
 
     const [activeId, setActiveId] = React.useState<string>(ids[0]);
     const sectionsIntersectingMap = React.useRef<Map<string, boolean>>(new Map());
@@ -70,7 +71,7 @@ export function useScrollActiveId(
         return () => {
             observer.disconnect();
         };
-    }, [ids, threshold, rootMargin]);
+    }, [ids, threshold, rootMargin, additionalEffects]);
 
     return activeId;
 }

@@ -1,0 +1,50 @@
+'use client';
+
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+
+export const LoadingStateProviderContext = createContext<{
+    bodyLoaded: boolean;
+    setBodyLoaded: (loaded: boolean) => void;
+}>({
+    bodyLoaded: false,
+    setBodyLoaded: () => {},
+});
+
+/**
+ * A provider that tracks the loading state of the body.
+ * This is used to determine when the body has finished loading.
+ * If we need to track more loading states in the future, we can extend this context.
+ */
+export function LoadingStateProvider({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const [bodyLoaded, setBodyLoaded] = useState(false);
+
+    return (
+        <LoadingStateProviderContext.Provider value={{ bodyLoaded, setBodyLoaded }}>
+            {children}
+        </LoadingStateProviderContext.Provider>
+    );
+}
+
+/** * Hook to get the current loading state of the body.
+ * Returns true if the body has finished loading inside the suspense boundary.
+ */
+export function useBodyLoaded() {
+    const context = useContext(LoadingStateProviderContext);
+    return useMemo(() => context.bodyLoaded, [context.bodyLoaded]);
+}
+
+/**
+ * A component that sets the body as loaded when it is mounted.
+ * It should be used inside a Suspense boundary to indicate that the body has finished loading.
+ */
+export function SuspenseLoadedHint() {
+    const context = useContext(LoadingStateProviderContext);
+    useEffect(() => {
+        context.setBodyLoaded(true);
+    }, [context]);
+    return null;
+}
