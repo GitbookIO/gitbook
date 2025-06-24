@@ -68,7 +68,7 @@ bun build:v2
 bun dev:v2
 ```
 
-6. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
+6. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/url`.
 
 examples:
 
