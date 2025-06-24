@@ -25,6 +25,26 @@ export function ToggleableLinkItem(
 
     const currentPagePath = useCurrentPagePath();
     const isActive = pathnames.some((pathname) => pathname === currentPagePath);
+    const defaultIsOpen =
+        isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`));
+    const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
+    const hasBeenToggled = useRef(false);
+
+    // Update the visibility of the children if one of the descendants becomes active.
+    React.useEffect(() => {
+        if (defaultIsOpen && !hasBeenToggled.current) {
+            setIsOpen(defaultIsOpen);
+        }
+    }, [defaultIsOpen]);
+
+    const handleToggle = (newState: boolean | ((prev: boolean) => boolean)) => {
+        hasBeenToggled.current = true;
+        if (typeof newState === 'function') {
+            setIsOpen(newState);
+        } else {
+            setIsOpen(newState);
+        }
+    };
 
     if (!descendants) {
         return (
@@ -35,15 +55,15 @@ export function ToggleableLinkItem(
     }
 
     return (
-        <DescendantsRenderer
-            descendants={descendants}
-            defaultIsOpen={
-                isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`))
-            }
-        >
+        <DescendantsRenderer descendants={descendants} isOpen={isOpen} setIsOpen={handleToggle}>
             {({ descendants, toggler }) => (
                 <>
-                    <LinkItem href={href} insights={insights} isActive={isActive}>
+                    <LinkItem
+                        href={href}
+                        insights={insights}
+                        isActive={isActive}
+                        onActiveClick={() => handleToggle(!isOpen)}
+                    >
                         {children}
                         {toggler}
                     </LinkItem>
@@ -57,11 +77,20 @@ export function ToggleableLinkItem(
 function LinkItem(
     props: Pick<LinkProps, 'href' | 'insights' | 'children'> & {
         isActive: boolean;
+        onActiveClick?: () => void;
     }
 ) {
-    const { isActive, href, insights, children } = props;
+    const { isActive, href, insights, children, onActiveClick } = props;
     const anchorRef = useRef<HTMLAnchorElement>(null);
     useScrollToActiveTOCItem({ anchorRef, isActive });
+
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (isActive && onActiveClick) {
+            event.preventDefault();
+            onActiveClick();
+        }
+    };
+
     return (
         <Link
             ref={anchorRef}
@@ -72,6 +101,7 @@ function LinkItem(
                 'ToggleableLinkItemStyles',
                 ...(isActive ? ['ToggleableLinkItemActiveStyles' as const] : []),
             ]}
+            onClick={handleClick}
         >
             {children}
         </Link>
@@ -79,24 +109,17 @@ function LinkItem(
 }
 
 function DescendantsRenderer(props: {
-    defaultIsOpen: boolean;
     descendants: React.ReactNode;
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     children: (renderProps: {
         descendants: React.ReactNode;
         toggler: React.ReactNode;
     }) => React.ReactNode;
 }) {
-    const { defaultIsOpen, children, descendants } = props;
-    const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
+    const { descendants, isOpen, setIsOpen } = props;
 
-    // Update the visibility of the children if one of the descendants becomes active.
-    React.useEffect(() => {
-        if (defaultIsOpen) {
-            setIsOpen(defaultIsOpen);
-        }
-    }, [defaultIsOpen]);
-
-    return children({
+    return props.children({
         toggler: (
             <Toggler
                 isLinkActive={isOpen}

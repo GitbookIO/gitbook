@@ -60,7 +60,7 @@ export async function PDFPage(props: {
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(baseContext.pages, pdfParams);
+    const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string]
     );

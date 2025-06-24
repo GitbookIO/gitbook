@@ -73,25 +73,6 @@ export function createDataFetcher(
                 getRevision(input, {
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
-                    metadata: params.metadata,
-                })
-            );
-        },
-        getRevisionPages(params) {
-            return trace('getRevisionPages', () =>
-                getRevisionPages(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    metadata: params.metadata,
-                })
-            );
-        },
-        getRevisionFile(params) {
-            return trace('getRevisionFile', () =>
-                getRevisionFile(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    fileId: params.fileId,
                 })
             );
         },
@@ -119,15 +100,6 @@ export function createDataFetcher(
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
                     pageId: params.pageId,
-                })
-            );
-        },
-        getReusableContent(params) {
-            return trace('getReusableContent', () =>
-                getReusableContent(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    reusableContentId: params.reusableContentId,
                 })
             );
         },
@@ -282,10 +254,7 @@ const getChangeRequest = cache(
 );
 
 const getRevision = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; metadata: boolean }
-    ) => {
+    async (input: DataFetcherInput, params: { spaceId: string; revisionId: string }) => {
         'use cache';
         return wrapCacheDataFetcherError(async () => {
             return trace(`getRevision(${params.spaceId}, ${params.revisionId})`, async () => {
@@ -294,7 +263,7 @@ const getRevision = cache(
                     params.spaceId,
                     params.revisionId,
                     {
-                        metadata: params.metadata,
+                        metadata: true,
                     },
                     {
                         ...noCacheFetchOptions,
@@ -304,62 +273,6 @@ const getRevision = cache(
                 cacheLife('max');
                 return res.data;
             });
-        });
-    }
-);
-
-const getRevisionPages = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; metadata: boolean }
-    ) => {
-        'use cache';
-        return wrapCacheDataFetcherError(async () => {
-            return trace(`getRevisionPages(${params.spaceId}, ${params.revisionId})`, async () => {
-                const api = apiClient(input);
-                const res = await api.spaces.listPagesInRevisionById(
-                    params.spaceId,
-                    params.revisionId,
-                    {
-                        metadata: params.metadata,
-                    },
-                    {
-                        ...noCacheFetchOptions,
-                    }
-                );
-                cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
-                return res.data.pages;
-            });
-        });
-    }
-);
-
-const getRevisionFile = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; fileId: string }
-    ) => {
-        'use cache';
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `getRevisionFile(${params.spaceId}, ${params.revisionId}, ${params.fileId})`,
-                async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getFileInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.fileId,
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
-                    return res.data;
-                }
-            );
         });
     }
 );
@@ -517,35 +430,6 @@ const getComputedDocument = cache(
                             source: params.source,
                             seed: params.seed,
                         },
-                        {},
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
-                    return res.data;
-                }
-            );
-        });
-    }
-);
-
-const getReusableContent = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; revisionId: string; reusableContentId: string }
-    ) => {
-        'use cache';
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `getReusableContent(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
-                async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.getReusableContentInRevisionById(
-                        params.spaceId,
-                        params.revisionId,
-                        params.reusableContentId,
                         {},
                         {
                             ...noCacheFetchOptions,
