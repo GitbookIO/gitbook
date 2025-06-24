@@ -128,7 +128,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 <Blocks
                     tag={Tag}
                     document={document}
-                    ancestorBlocks={[]}
+                    ancestorBlocks={[...props.ancestorBlocks, block]}
                     nodes={fragment.nodes}
                     style={[
                         'blocks',

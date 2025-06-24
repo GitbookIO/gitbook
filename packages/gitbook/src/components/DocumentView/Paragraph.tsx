@@ -7,10 +7,10 @@ import { Inlines } from './Inlines';
 import { getTextAlignment } from './utils';
 
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
-    const { block, style, ...contextProps } = props;
+    const { block, style, ancestorBlocks, ...contextProps } = props;
 
     return (
-        <p className={tcls(style, getTextAlignment(block.data?.align))}>
+        <p className={tcls(style, getTextAlignment(block.data?.align, ancestorBlocks))}>
             <Inlines {...contextProps} nodes={block.nodes} ancestorInlines={[]} />
         </p>
     );
