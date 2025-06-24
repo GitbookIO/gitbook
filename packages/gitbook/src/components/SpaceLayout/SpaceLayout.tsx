@@ -59,7 +59,7 @@ export function SpaceLayout(props: {
                 siteSectionId={context.sections?.current?.id ?? null}
                 siteSpaceId={context.siteSpace.id}
                 siteShareKey={context.shareKey ?? null}
-                revisionId={context.revisionId}
+                revisionId={context.revision.id}
                 spaceId={context.space.id}
                 visitorAuthClaims={visitorAuthClaims}
                 visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
@@ -125,7 +125,7 @@ export function SpaceLayout(props: {
                                             sections={encodeClientSiteSections(context, sections)}
                                         />
                                     )}
-                                    {isMultiVariants && (
+                                    {isMultiVariants && !sections && (
                                         <SpacesDropdown
                                             context={context}
                                             siteSpace={siteSpace}

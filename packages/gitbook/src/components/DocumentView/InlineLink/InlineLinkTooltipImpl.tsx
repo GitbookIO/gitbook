@@ -1,55 +1,27 @@
-import type { DocumentInlineLink } from '@gitbook/api';
-
-import type { ResolvedContentRef } from '@/lib/references';
-
-import { getSpaceLanguage } from '@/intl/server';
-import { tString } from '@/intl/translate';
-import { languages } from '@/intl/translations';
-import { getNodeText } from '@/lib/document';
+'use client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import type { GitBookAnyContext } from '@v2/lib/context';
 import { Fragment } from 'react';
-import { AIPageLinkSummary } from '../Adaptive/AIPageLinkSummary';
-import { Button, StyledLink } from '../primitives';
+import { AIPageLinkSummary } from '../../Adaptive';
+import { Button, StyledLink } from '../../primitives';
 
-export async function InlineLinkTooltip(props: {
-    inline: DocumentInlineLink;
-    context: GitBookAnyContext;
+export function InlineLinkTooltipImpl(props: {
+    isSamePage: boolean;
+    isExternal: boolean;
+    aiSummary?: { pageId: string; spaceId: string };
+    breadcrumbs: Array<{ href?: string; label: string; icon?: React.ReactNode }>;
+    target: {
+        href: string;
+        text: string;
+        subText?: string;
+        icon?: React.ReactNode;
+    };
+    openInNewTabLabel: string;
     children: React.ReactNode;
-    resolved: ResolvedContentRef;
 }) {
-    const { inline, context, resolved, children } = props;
-
-    let breadcrumbs = resolved.ancestors;
-    const language =
-        'customization' in context ? getSpaceLanguage(context.customization) : languages.en;
-    const isExternal = inline.data.ref.kind === 'url';
-    const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
-    if (isExternal) {
-        breadcrumbs = [
-            {
-                label: tString(language, 'link_tooltip_external_link'),
-            },
-        ];
-    }
-    if (isSamePage) {
-        breadcrumbs = [
-            {
-                label: tString(language, 'link_tooltip_page_anchor'),
-                icon: <Icon icon="arrow-down-short-wide" className="size-3" />,
-            },
-        ];
-        resolved.subText = undefined;
-    }
-
-    const hasAISummary =
-        !isExternal &&
-        !isSamePage &&
-        'customization' in context &&
-        context.customization.ai?.pageLinkSummaries.enabled &&
-        (inline.data.ref.kind === 'page' || inline.data.ref.kind === 'anchor');
+    const { isSamePage, isExternal, aiSummary, openInNewTabLabel, target, breadcrumbs, children } =
+        props;
 
     return (
         <Tooltip.Provider delayDuration={200}>
@@ -100,15 +72,15 @@ export async function InlineLinkTooltip(props: {
                                                 isExternal && 'text-sm [overflow-wrap:anywhere]'
                                             )}
                                         >
-                                            {resolved.icon ? (
+                                            {target.icon ? (
                                                 <div className="mt-1 text-tint-subtle empty:hidden">
-                                                    {resolved.icon}
+                                                    {target.icon}
                                                 </div>
                                             ) : null}
-                                            <h5 className="font-semibold">{resolved.text}</h5>
+                                            <h5 className="font-semibold">{target.text}</h5>
                                         </div>
                                     </div>
-                                    {!isSamePage && resolved.href ? (
+                                    {!isSamePage && target.href ? (
                                         <Button
                                             className={tcls(
                                                 '-mx-2 -my-2 ml-auto',
@@ -117,40 +89,35 @@ export async function InlineLinkTooltip(props: {
                                                     : null
                                             )}
                                             variant="blank"
-                                            href={resolved.href}
+                                            href={target.href}
                                             target="_blank"
-                                            label={tString(language, 'open_in_new_tab')}
+                                            label={openInNewTabLabel}
                                             size="small"
                                             icon="arrow-up-right-from-square"
                                             iconOnly={true}
                                         />
                                     ) : null}
                                 </div>
-                                {resolved.subText ? (
-                                    <p className="mt-1 text-sm text-tint">{resolved.subText}</p>
+                                {target.subText ? (
+                                    <p className="mt-1 text-sm text-tint">{target.subText}</p>
                                 ) : null}
                             </div>
 
-                            {hasAISummary && 'page' in context && 'page' in inline.data.ref ? (
+                            {aiSummary ? (
                                 <div className="border-tint-subtle border-t bg-tint p-4">
                                     <AIPageLinkSummary
-                                        targetPageId={
-                                            resolved.page?.id ??
-                                            inline.data.ref.page ??
-                                            context.page.id
-                                        }
-                                        targetSpaceId={inline.data.ref.space ?? context.space.id}
-                                        linkTitle={getNodeText(inline)}
-                                        linkPreview={`**${resolved.text}**: ${resolved.subText}`}
-                                        showTrademark={
-                                            'customization' in context &&
-                                            context.customization.trademark.enabled
-                                        }
+                                        targetPageId={aiSummary.pageId}
+                                        targetSpaceId={aiSummary.spaceId}
+                                        showTrademark
                                     />
                                 </div>
                             ) : null}
                         </div>
-                        <Tooltip.Arrow className={hasAISummary ? 'fill-tint-3' : 'fill-tint-1'} />
+                        <Tooltip.Arrow
+                            className={
+                                typeof aiSummary !== 'undefined' ? 'fill-tint-3' : 'fill-tint-1'
+                            }
+                        />
                     </Tooltip.Content>
                 </Tooltip.Portal>
             </Tooltip.Root>

@@ -98,7 +98,11 @@
         },
         "production": {
             "vars": {
+                // R2 is strongly consistent, so we can disable SQLite
                 "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                // We don't want to pollute the memory with broken cache entries
+                // Most of the time, those are fake requests.
+                "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "1",
                 "STAGE": "production"
             },
             "r2_buckets": [

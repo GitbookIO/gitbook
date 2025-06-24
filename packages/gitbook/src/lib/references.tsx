@@ -1,5 +1,6 @@
 import type {
     ContentRef,
+    Revision,
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
@@ -8,7 +9,13 @@ import type {
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
 import { type GitBookAnyContext, fetchSpaceContextByIds } from '@v2/lib/context';
-import { getDataOrNull, getPageDocument, ignoreDataThrownError } from '@v2/lib/data';
+import {
+    getDataOrNull,
+    getPageDocument,
+    getRevisionFile,
+    getRevisionReusableContent,
+    ignoreDataThrownError,
+} from '@v2/lib/data';
 import { createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import type React from 'react';
@@ -45,7 +52,7 @@ export interface ResolvedContentRef {
     reusableContent?: {
         revisionReusableContent: RevisionReusableContent;
         space: Space;
-        revision: string;
+        revision: Revision;
     };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
@@ -79,7 +86,7 @@ export async function resolveContentRef(
     options: ResolveContentRefOptions = {}
 ): Promise<ResolvedContentRef | null> {
     const { resolveAnchorText = false, resolveAsAbsoluteURL = false, iconStyle } = options;
-    const { linker, dataFetcher, space, revisionId, pages } = context;
+    const { linker, dataFetcher, space, revision } = context;
 
     const activePage = 'page' in context ? context.page : undefined;
 
@@ -93,13 +100,7 @@ export async function resolveContentRef(
         }
 
         case 'file': {
-            const file = await getDataOrNull(
-                dataFetcher.getRevisionFile({
-                    spaceId: space.id,
-                    revisionId,
-                    fileId: contentRef.file,
-                })
-            );
+            const file = getRevisionFile({ revision, fileId: contentRef.file });
             if (file) {
                 return {
                     href: file.downloadURL,
@@ -122,7 +123,7 @@ export async function resolveContentRef(
                     ? activePage
                         ? { page: activePage, ancestors: [] }
                         : undefined
-                    : resolvePageId(pages, contentRef.page);
+                    : resolvePageId(revision.pages, contentRef.page);
 
             const page = resolvePageResult?.page;
             const ancestors =
@@ -130,8 +131,10 @@ export async function resolveContentRef(
                     label: ancestor.title,
                     icon: <PageIcon page={ancestor} style={iconStyle} />,
                     href: resolveAsAbsoluteURL
-                        ? linker.toAbsoluteURL(linker.toPathForPage({ page: ancestor, pages }))
-                        : linker.toPathForPage({ page: ancestor, pages }),
+                        ? linker.toAbsoluteURL(
+                              linker.toPathForPage({ page: ancestor, pages: revision.pages })
+                          )
+                        : linker.toPathForPage({ page: ancestor, pages: revision.pages }),
                 })) ?? [];
             if (!page) {
                 return null;
@@ -143,7 +146,7 @@ export async function resolveContentRef(
             let text = '';
             let icon: React.ReactNode | undefined = undefined;
             let emoji: string | undefined = undefined;
-            const href = linker.toPathForPage({ page, pages, anchor });
+            const href = linker.toPathForPage({ page, pages: revision.pages, anchor });
 
             // Compute the text to display for the link
             if (anchor) {
@@ -236,44 +239,45 @@ export async function resolveContentRef(
 
         case 'reusable-content': {
             // Figure out which space and revision the reusable content is in.
-            const container: { space: Space; revision: string } | null = await (async () => {
+            const container = await (async () => {
                 // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
                 if (!contentRef.space || contentRef.space === context.space.id) {
-                    return { space: context.space, revision: revisionId };
+                    return context;
                 }
 
-                const space = await getDataOrNull(
-                    dataFetcher.getSpace({
-                        spaceId: contentRef.space,
+                const otherContext = await ignoreDataThrownError(
+                    fetchSpaceContextByIds(context, {
+                        space: contentRef.space,
                         shareKey: undefined,
+                        changeRequest: undefined,
+                        revision: undefined,
                     })
                 );
 
-                if (!space) {
+                if (!otherContext) {
                     return null;
                 }
 
-                return { space, revision: space.revision };
+                return otherContext;
             })();
 
             if (!container) {
                 return null;
             }
 
-            const reusableContent = await getDataOrNull(
-                dataFetcher.getReusableContent({
-                    spaceId: container.space.id,
-                    revisionId: container.revision,
-                    reusableContentId: contentRef.reusableContent,
-                })
-            );
+            const reusableContent = getRevisionReusableContent({
+                revision: container.revision,
+                reusableContentId: contentRef.reusableContent,
+            });
 
             if (!reusableContent) {
                 return null;
             }
 
             return {
-                href: getGitBookAppHref(`/s/${container.space}/~/reusable/${reusableContent.id}`),
+                href: getGitBookAppHref(
+                    `/s/${container.space.id}/~/reusable/${reusableContent.id}`
+                ),
                 text: reusableContent.title,
                 active: false,
                 reusableContent: {

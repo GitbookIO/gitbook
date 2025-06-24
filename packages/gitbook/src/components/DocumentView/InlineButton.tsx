@@ -1,5 +1,6 @@
 import { resolveContentRef } from '@/lib/references';
 import * as api from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
 import { Button } from '../primitives';
 import type { InlineProps } from './Inline';
 
@@ -25,6 +26,7 @@ export async function InlineButton(props: InlineProps<api.DocumentInlineButton>)
                 // TODO: use a variant specifically for user-defined buttons.
                 variant={inline.data.kind}
                 className="leading-normal"
+                icon={inline.data.icon as IconName | undefined}
                 insights={{
                     type: 'link_click',
                     link: {

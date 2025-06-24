@@ -1,4 +1,4 @@
-import { getPagePath, hasPageVisibleDescendant } from '@/lib/pages';
+import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import {
     type RevisionPage,
@@ -27,7 +27,7 @@ export async function PageDocumentItem(props: {
         <li className="flex flex-col">
             <ToggleableLinkItem
                 href={href}
-                pathname={getPagePath(rootPages, page)}
+                pathnames={getPagePaths(rootPages, page)}
                 insights={{
                     type: 'link_click',
                     link: {

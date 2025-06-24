@@ -4,7 +4,6 @@ import { headers } from 'next/headers';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-import { throwIfDataError } from '@v2/lib/data';
 
 import { DateRelative } from '../primitives';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
@@ -59,7 +58,7 @@ export async function AdminToolbar(props: AdminToolbarProps) {
         return <ChangeRequestToolbar context={context} />;
     }
 
-    if (context.revisionId !== context.space.revision) {
+    if (context.revision.id !== context.space.revision) {
         return <RevisionToolbar context={context} />;
     }
 
@@ -106,15 +105,7 @@ async function ChangeRequestToolbar(props: { context: GitBookSiteContext }) {
 
 async function RevisionToolbar(props: { context: GitBookSiteContext }) {
     const { context } = props;
-    const { space, revisionId } = context;
-
-    const revision = await throwIfDataError(
-        context.dataFetcher.getRevision({
-            spaceId: space.id,
-            revisionId,
-            metadata: true,
-        })
-    );
+    const { revision } = context;
 
     return (
         <ToolbarLayout>

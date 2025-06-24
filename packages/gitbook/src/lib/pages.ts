@@ -121,6 +121,20 @@ export function getPagePath(
 }
 
 /**
+ * Get all possible paths for a page.
+ */
+export function getPagePaths(
+    rootPages: Revision['pages'],
+    page: RevisionPageDocument | RevisionPageGroup
+): string[] {
+    const path = getPagePath(rootPages, page);
+    if (path === page.path) {
+        return [path];
+    }
+    return [path, page.path];
+}
+
+/**
  * Test if a page has at least one descendant.
  */
 export function hasPageVisibleDescendant(page: RevisionPageGroup | RevisionPageDocument): boolean {

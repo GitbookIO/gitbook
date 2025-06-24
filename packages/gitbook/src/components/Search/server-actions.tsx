@@ -5,6 +5,7 @@ import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 import type {
+    Revision,
     RevisionPage,
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
@@ -128,7 +129,7 @@ export async function streamAskQuestion({
             { format: 'document' }
         );
 
-        const spacePromises = new Map<string, Promise<RevisionPage[]>>();
+        const spacePromises = new Map<string, Promise<Revision>>();
         for await (const chunk of stream) {
             const answer = chunk.answer;
 
@@ -143,10 +144,9 @@ export async function streamAskQuestion({
                         spacePromises.set(
                             source.space,
                             throwIfDataError(
-                                context.dataFetcher.getRevisionPages({
+                                context.dataFetcher.getRevision({
                                     spaceId: source.space,
                                     revisionId: source.revision,
-                                    metadata: false,
                                 })
                             )
                         );
@@ -159,8 +159,8 @@ export async function streamAskQuestion({
             // Get the pages for all spaces referenced by this answer.
             const pages = await Promise.all(
                 spaces.map(async (space) => {
-                    const pages = await spacePromises.get(space);
-                    return { space, pages };
+                    const revision = await spacePromises.get(space);
+                    return { space, pages: revision?.pages };
                 })
             ).then((results) => {
                 return results.reduce((map, result) => {
@@ -345,6 +345,7 @@ async function transformAnswer(
                         mode: 'default',
                         contentContext: undefined,
                         wrapBlocksInSuspense: false,
+                        shouldRenderLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
                     style={['space-y-5']}
                 />
