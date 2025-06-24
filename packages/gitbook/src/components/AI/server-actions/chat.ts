@@ -3,32 +3,28 @@ import { AIMessageRole, AIModel } from '@gitbook/api';
 import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { streamRenderAIMessage } from './api';
-import { MARKDOWN_SYNTAX_PROMPT } from './prompts';
 import type { RenderAIMessageOptions } from './types';
 
 const PROMPT = `
-You are GitBook AI, a helpful docs assistant that can generate an optimized page for a given query.
+You are GitBook AI, a helpful docs assistant that answers questions from the user.
 
 You analyse the query, and the content of the site, and generate a page that will help the user understand the content of the site.
 
 # Instructions
 
-- Generate a complete page formatted in markdown
-- Always start the page with a markdown heading 1 (\`# Title of the page\`)
-- Use the provided tools to understand the site content.
-
-${MARKDOWN_SYNTAX_PROMPT}
+- Generate a response formatted in markdown
+- Always use the provided tools to understand the docs knowledge base, do not make up information.
 `;
 
 /**
- * Generate a page using AI.
+ * Generate a response to a chat message.
  */
-export async function* streamGenerateAIPage({
-    query,
+export async function* streamAIChatResponse({
+    message,
     previousResponseId,
     options,
 }: {
-    query: string;
+    message: string;
     previousResponseId?: string;
     options?: RenderAIMessageOptions;
 }) {
@@ -43,7 +39,7 @@ export async function* streamGenerateAIPage({
             input: [
                 {
                     role: AIMessageRole.User,
-                    content: query,
+                    content: message,
                 },
             ],
             output: { type: 'document' },

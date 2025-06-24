@@ -1,9 +1,30 @@
+'use client';
+
 import React from 'react';
 import {
     type AIMessageRenderStream,
     streamAIResponseById,
     streamGenerateAIPage,
 } from './server-actions';
+
+export type AIPageState = {
+    /**
+     * The body of the page.
+     */
+    body: React.ReactNode;
+
+    /**
+     * The ID of the latest AI response.
+     */
+    responseId: string | null;
+};
+
+export type AIPageController = {
+    /**
+     * Generate a new page for a query.
+     */
+    generate: (query: string) => void;
+};
 
 /**
  * Hook to generate a page using AI.
@@ -12,11 +33,12 @@ export function useAIPage(
     props: {
         initialResponseId?: string;
     } = {}
-) {
+): [AIPageState, AIPageController] {
     const { initialResponseId } = props;
     const [responseId, setResponseId] = React.useState<string | null>(null);
     const [body, setBody] = React.useState<React.ReactNode>('');
     const currentStreamRef = React.useRef<AIMessageRenderStream | null>(null);
+    const lastResponseIdRef = React.useRef<string | undefined>(props.initialResponseId);
 
     /**
      * Update the page body with the content of the stream.
@@ -43,6 +65,7 @@ export function useAIPage(
 
                     switch (data.event.type) {
                         case 'response_finish':
+                            lastResponseIdRef.current = data.event.responseId;
                             setResponseId(data.event.responseId);
                             break;
                     }
@@ -73,21 +96,35 @@ export function useAIPage(
     /**
      * Generate a new page for a query.
      */
-    const generate = async (query: string) => {
-        generateFromStream(
-            streamGenerateAIPage({
-                query,
-                previousResponseId: responseId ?? props.initialResponseId,
-                options: {
-                    renderToolCalls: false,
-                },
-            })
-        );
-    };
+    const generate = React.useCallback(
+        async (query: string) => {
+            generateFromStream(
+                streamGenerateAIPage({
+                    query,
+                    previousResponseId: lastResponseIdRef.current,
+                    options: {
+                        renderToolCalls: false,
+                    },
+                })
+            );
+        },
+        [generateFromStream]
+    );
 
-    return {
-        body,
-        responseId,
-        generate,
-    };
+    const state = React.useMemo(
+        () => ({
+            body,
+            responseId,
+        }),
+        [body, responseId]
+    );
+
+    const controller = React.useMemo(
+        () => ({
+            generate,
+        }),
+        [generate]
+    );
+
+    return [state, controller];
 }
