@@ -96,7 +96,7 @@ export function AIChat(props: AIChatProps) {
                         <AIChatMessages chat={chat} />
                     )}
                 </div>
-                <div className="flex p-4">
+                <div className="flex flex-col gap-2 p-4">
                     <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
                     <AIChatInput
                         value={input}

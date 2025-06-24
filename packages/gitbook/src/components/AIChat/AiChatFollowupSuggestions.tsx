@@ -14,12 +14,12 @@ export function AIChatFollowupSuggestions(props: {
     }
 
     return (
-        <div className="flex flex-row flex-wrap gap-4">
+        <div className="flex flex-row flex-wrap justify-end gap-2">
             {chat.followUpSuggestions.map((suggestion) => (
                 <button
                     key={suggestion}
                     type="button"
-                    className="rounded-md bg-tint px-4 py-2"
+                    className="rounded-md bg-tint px-3 py-2 text-sm"
                     onClick={() => {
                         chatController.postMessage({ message: suggestion });
                     }}
