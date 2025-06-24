@@ -470,10 +470,6 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
-    if (pathname.match(/^~adaptive\/\S+$/) || pathname === '~adaptive') {
-        return { pathname, routeType: 'dynamic' };
-    }
-
     // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
     if (pathname.match(/\.md$/)) {
         const pagePathWithoutMD = pathname.slice(0, -3);
