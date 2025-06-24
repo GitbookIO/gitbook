@@ -19,9 +19,9 @@ export function OpenAPIWebhookExample(props: {
         }
 
         return Object.entries(
-            operation.requestBody.content as Record<string, OpenAPIV3.MediaTypeObject>
+            operation.requestBody.content as Record<string, OpenAPIV3.MediaTypeObject | null>
         ).map(([key, value]) => {
-            const schema = value.schema;
+            const schema = value?.schema;
 
             if (!schema) {
                 return {
