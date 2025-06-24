@@ -49,7 +49,13 @@ export function PageAside(props: {
                 'hidden',
                 'xl:flex',
                 'chat-open:xl:hidden',
+                'chat-open:xl:opacity-0',
                 'chat-open:3xl:flex',
+                'chat-open:3xl:opacity-11',
+
+                'transition-all duration-300',
+                '[transition-behavior:allow-discrete]',
+
                 'flex-col',
                 'basis-56',
                 'xl:ml-12',

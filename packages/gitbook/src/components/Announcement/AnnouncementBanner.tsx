@@ -29,7 +29,10 @@ export function AnnouncementBanner(props: {
     const style = BANNER_STYLES[announcement.style];
 
     return (
-        <div id="announcement-banner" className="theme-bold:bg-header-background pt-4 pb-2">
+        <div
+            id="announcement-banner"
+            className="theme-bold:bg-header-background pt-4 pb-2 transition-all duration-300 lg:chat-open:pr-72 xl:chat-open:pr-96"
+        >
             <div className="">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
                     <Tag

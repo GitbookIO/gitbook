@@ -294,16 +294,19 @@ const config: Config = {
                     ])
                 ),
             },
+            transitionTimingFunction: {
+                quint: 'cubic-bezier(0.83, 0, 0.17, 1)',
+            },
             animation: {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
-                scaleIn: 'scaleIn 200ms ease',
-                scaleOut: 'scaleOut 200ms ease',
-                fadeIn: 'fadeIn 200ms ease forwards',
-                fadeOut: 'fadeOut 200ms ease forwards',
-                enterFromLeft: 'enterFromLeft 250ms ease both',
-                enterFromRight: 'enterFromRight 250ms ease both',
-                exitToLeft: 'exitToLeft 250ms ease both',
-                exitToRight: 'exitToRight 250ms ease both',
+                scaleIn: 'scaleIn 200ms ease both',
+                scaleOut: 'scaleOut 200ms ease both',
+                fadeIn: 'fadeIn 200ms ease both',
+                fadeOut: 'fadeOut 200ms ease both',
+                enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
             },
             keyframes: {
                 pulseAlt: {
@@ -407,20 +410,20 @@ const config: Config = {
                     },
                 },
                 enterFromRight: {
-                    from: { opacity: '0', transform: 'translateX(200px)', display: 'none' },
+                    from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                     to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
                 },
                 enterFromLeft: {
-                    from: { opacity: '0', transform: 'translateX(-200px)', display: 'none' },
+                    from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                     to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
                 },
                 exitToRight: {
                     from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
-                    to: { opacity: '0', transform: 'translateX(200px)', display: 'none' },
+                    to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
                     from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
-                    to: { opacity: '0', transform: 'translateX(-200px)', display: 'none' },
+                    to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
                     from: { opacity: '0', transform: 'rotateX(-10deg) scale(0.9)' },

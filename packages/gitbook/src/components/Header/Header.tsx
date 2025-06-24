@@ -45,7 +45,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
 
                 withTopHeader ? null : 'mobile-only lg:hidden',
                 'text-sm',
-                'backdrop-blur-lg'
+                'backdrop-blur-lg',
+                'transition-all duration-300 lg:chat-open:pr-72 xl:chat-open:pr-96'
             )}
         >
             <div

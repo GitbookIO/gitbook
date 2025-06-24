@@ -115,26 +115,28 @@ export function DropdownButton(props: {
  */
 export function DropdownMenuItem(
     props: {
-        href: string | null;
+        href?: string;
         active?: boolean;
         className?: ClassValue;
         children: React.ReactNode;
-    } & LinkInsightsProps
+    } & LinkInsightsProps &
+        RadixDropdownMenu.DropdownMenuItemProps
 ) {
-    const { children, active = false, href, className, insights } = props;
+    const { children, active = false, href, className, insights, ...rest } = props;
 
     const itemClassName = tcls(
-        'rounded straight-corners:rounded-sm px-3 py-1 text-sm',
+        'rounded straight-corners:rounded-sm px-3 py-1 text-sm flex gap-2 items-center',
         active
             ? 'bg-primary text-primary-strong data-[highlighted]:bg-primary-hover'
             : 'data-[highlighted]:bg-tint-hover',
         'focus:outline-none',
+        props.disabled ? 'opacity-7 cursor-not-allowed' : 'cursor-pointer',
         className
     );
 
     if (href) {
         return (
-            <RadixDropdownMenu.Item asChild>
+            <RadixDropdownMenu.Item {...rest} asChild>
                 <Link href={href} insights={insights} className={itemClassName}>
                     {children}
                 </Link>
@@ -143,9 +145,7 @@ export function DropdownMenuItem(
     }
 
     return (
-        <RadixDropdownMenu.Item
-            className={tcls('px-3 py-1 font-medium text-tint text-xs', className)}
-        >
+        <RadixDropdownMenu.Item {...rest} className={tcls('px-3 py-1', itemClassName, className)}>
             {children}
         </RadixDropdownMenu.Item>
     );
