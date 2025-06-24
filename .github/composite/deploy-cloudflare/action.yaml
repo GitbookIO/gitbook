@@ -97,6 +97,16 @@ runs:
         #   run: |
         #       bun run ./packages/gitbook-v2/openNext/customWorkers/script/updateWrangler.ts ${{ steps.extract_server_version_id.outputs.version_id }}
 
+        - id: deploy_container
+          name: Deploy container to Cloudflare
+          uses: cloudflare/wrangler-action@v3.14.0
+          with:
+              apiToken: ${{ inputs.apiToken }}
+              accountId: ${{ inputs.accountId }}
+              workingDirectory: ./
+              wranglerVersion: '4.21.0'
+              command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/containerWrangler.jsonc
+
         - id: upload_middleware
           name: Upload middleware to Cloudflare
           uses: cloudflare/wrangler-action@v3.14.0
@@ -107,16 +117,6 @@ runs:
               wranglerVersion: '4.21.0'
               environment: ${{ inputs.environment }}
               command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
-        
-        - id: deploy_container
-          name: Deploy container to Cloudflare
-          uses: cloudflare/wrangler-action@v3.14.0
-          with:
-              apiToken: ${{ inputs.apiToken }}
-              accountId: ${{ inputs.accountId }}
-              workingDirectory: ./
-              wranglerVersion: '4.21.0'
-              command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/containerWrangler.jsonc
 
         # - name: Extract middleware version worker ID
         #   shell: bash
