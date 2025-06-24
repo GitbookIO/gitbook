@@ -2,8 +2,10 @@
 
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import type React from 'react';
-import { useState } from 'react';
+import React from 'react';
+import { useAIChatController, useAIChatState } from '../AI/useAIChat';
+import { AIChatInput } from './AIChatInput';
+import { AIChatMessages } from './AIChatMessages';
 
 interface AIChatProps {
     /** Optional className for styling */
@@ -14,12 +16,10 @@ interface AIChatProps {
 
 export function AIChat(props: AIChatProps): React.ReactElement {
     const { className } = props;
-    const [isOpen, setIsOpen] = useState(false);
 
-    function handleClick() {
-        setIsOpen(!isOpen);
-        document.body.classList.toggle('chat-open', !isOpen);
-    }
+    const [input, setInput] = React.useState('');
+    const chatController = useAIChatController();
+    const chat = useAIChatState();
 
     return (
         <div
@@ -28,19 +28,24 @@ export function AIChat(props: AIChatProps): React.ReactElement {
                 'animate-exitToRight chat-open:animate-enterFromRight',
                 className
             )}
-            onClick={handleClick}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                    handleClick();
-                }
-            }}
         >
             <div className="flex items-center gap-2 p-4 font-bold text-sm text-tint-strong">
                 <Icon icon="gitbook" className="size-4" />
                 Chat
                 <Icon
-                    icon={isOpen ? 'chevron-down' : 'chevron-up'}
+                    icon={chat.opened ? 'chevron-down' : 'chevron-up'}
                     className="ml-auto size-4 text-tint-subtle"
+                />
+            </div>
+            <div>
+                <AIChatMessages chat={chat} />
+                <AIChatInput
+                    value={input}
+                    onChange={setInput}
+                    onSubmit={() => {
+                        chatController.postMessage({ message: input });
+                        setInput('');
+                    }}
                 />
             </div>
         </div>
