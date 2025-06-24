@@ -169,10 +169,6 @@ export function createDataFetcher(
         getUserById(userId) {
             return trace('getUserById', () => getUserById(input, { userId }));
         },
-
-        streamAIResponse(params) {
-            return streamAIResponse(input, params);
-        },
     };
 }
 
@@ -656,31 +652,6 @@ const renderIntegrationUi = cache(
         });
     }
 );
-
-async function* streamAIResponse(
-    input: DataFetcherInput,
-    params: Parameters<GitBookDataFetcher['streamAIResponse']>[0]
-) {
-    const api = apiClient(input);
-    const res = await api.orgs.streamAiResponseInSite(
-        params.organizationId,
-        params.siteId,
-        {
-            input: params.input,
-            output: params.output,
-            model: params.model,
-            instructions: params.instructions,
-            previousResponseId: params.previousResponseId,
-        },
-        {
-            ...noCacheFetchOptions,
-        }
-    );
-
-    for await (const event of res) {
-        yield event;
-    }
-}
 
 /**
  * Create a new API client.
