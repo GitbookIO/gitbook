@@ -10,7 +10,7 @@ export function AIMessageView(
         message: AIMessage;
     }
 ) {
-    const { message, renderToolCalls = true } = props;
+    const { message } = props;
 
     return (
         <div className="flex flex-col gap-2">
