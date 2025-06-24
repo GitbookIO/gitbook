@@ -27,27 +27,31 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
         view.columns.some((columnId) => block.data.definition[columnId].title.trim().length > 0);
 
     return (
-        <div className={tcls(style, 'table-wrapper')}>
+        <div
+            className={tcls(
+                'relative mx-auto grid w-full overflow-x-auto overflow-y-hidden border-tint-subtle',
+                'table-wrapper',
+                style
+            )}
+        >
             {/* Table */}
-            <div role="table">
+            <div role="table" className="flex flex-col">
                 {/* Header */}
                 {withHeader && (
                     <div
                         role="rowgroup"
                         className={tcls(
-                            tableWidth,
-                            'row-group',
-                            'straight-corners:rounded-none',
-                            'circular-corners:rounded-xl'
+                            'mb-1 flex flex-col circular-corners:rounded-xl rounded-lg straight-corners:rounded-none border border-tint-subtle bg-tint',
+                            tableWidth
                         )}
                     >
-                        <div role="row" className={tcls('flex', 'w-full')}>
+                        <div role="row" className="flex w-full">
                             {view.columns.map((column) => (
                                 <div
                                     key={column}
                                     role="columnheader"
                                     className={tcls(
-                                        'column-header',
+                                        'px-3 py-2 font-medium text-sm text-tint-strong',
                                         getColumnAlignment(block.data.definition[column])
                                     )}
                                     style={{

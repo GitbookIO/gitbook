@@ -15,7 +15,7 @@ export function RecordRow(
     const { view, autoSizedColumns, fixedColumns, block, context } = props;
 
     return (
-        <div className="row" role="row">
+        <div className="flex border-tint-subtle transition-colors hover:bg-tint-hover" role="row">
             {view.columns.map((column) => {
                 const columnWidth = getColumnWidth({
                     column,
@@ -29,7 +29,7 @@ export function RecordRow(
                     <div
                         key={column}
                         role="cell"
-                        className="cell"
+                        className="relative flex h-full flex-1 border-tint-subtle px-3 py-2 align-middle text-sm [&:not(:last-child)]:border-r"
                         style={{
                             width: columnWidth,
                             minWidth: columnWidth || '100px',
