@@ -79,17 +79,17 @@ export function AIChat(props: AIChatProps) {
                 <div className="grow overflow-y-auto p-4">
                     {chat.messages.length === 0 ? (
                         <div className="flex h-full w-full flex-col items-center justify-center">
-                            <div className="flex size-32 animate-[fadeIn_500ms_both] animate-scaleIn items-center justify-center self-center justify-self-center rounded-full bg-tint-subtle">
+                            <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center self-center justify-self-center rounded-full bg-tint-subtle">
                                 <Icon
                                     icon="robot"
-                                    className="size-16 animate-[fadeIn_500ms_200ms_both]"
+                                    className="size-16 animate-[present_500ms_200ms_both]"
                                 />
                             </div>
                             <h5 className="mt-4 animate-[fadeIn_500ms_400ms_both] text-center font-bold text-lg text-tint-strong">
-                                Hey Samy!
+                                Good evening Samy
                             </h5>
                             <p className="animate-[fadeIn_500ms_500ms_both] text-center text-tint">
-                                I'm here to help you with your docs.
+                                I'm here to help you with the GitBook docs.
                             </p>
                         </div>
                     ) : (
