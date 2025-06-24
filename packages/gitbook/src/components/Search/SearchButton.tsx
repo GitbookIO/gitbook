@@ -19,16 +19,20 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     const [, setSearchState] = useSearch();
     const trackEvent = useTrackEvent();
 
-    const onClick = () => {
-        setSearchState({
-            ask: false,
-            global: false,
-            query: '',
-        });
+    const [isOpen, setIsOpen] = useState(false);
 
-        trackEvent({
-            type: 'search_open',
-        });
+    const onClick = () => {
+        setIsOpen(!isOpen);
+        document.body.classList.toggle('chat-open', isOpen);
+        // setSearchState({
+        //     ask: false,
+        //     global: false,
+        //     query: '',
+        // });
+
+        // trackEvent({
+        //     type: 'search_open',
+        // });
     };
 
     return (

@@ -13,6 +13,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
+import { AIChat } from '../Adaptive/AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -64,9 +65,12 @@ export function SpaceLayout(props: {
                 visitorAuthClaims={visitorAuthClaims}
                 visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
             >
-                <Announcement context={context} />
-                <Header withTopHeader={withTopHeader} context={context} />
-                <div className="scroll-nojump">
+                <div className="chat-open:mr-96 transition-all duration-300">
+                    <Announcement context={context} />
+                    <Header withTopHeader={withTopHeader} context={context} />
+                </div>
+                <AIChat />
+                <div className="chat-open:mr-96 transition-all duration-300">
                     <div
                         className={tcls(
                             'flex',

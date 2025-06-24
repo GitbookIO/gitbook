@@ -48,6 +48,8 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
+                'chat-open:xl:hidden',
+                'chat-open:3xl:flex',
                 'flex-col',
                 'basis-56',
                 'xl:ml-12',

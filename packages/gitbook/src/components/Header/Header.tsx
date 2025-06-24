@@ -55,7 +55,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="scroll-nojump">
+                <div className="">
                     <div
                         className={tcls(
                             'gap-4',
@@ -179,7 +179,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
             </div>
 
             {sections || siteSpaces.length > 1 ? (
-                <div className="scroll-nojump">
+                <div className="">
                     <div
                         className={tcls(
                             'w-full',

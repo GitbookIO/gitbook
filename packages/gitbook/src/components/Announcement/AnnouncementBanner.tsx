@@ -30,7 +30,7 @@ export function AnnouncementBanner(props: {
 
     return (
         <div id="announcement-banner" className="theme-bold:bg-header-background pt-4 pb-2">
-            <div className="scroll-nojump">
+            <div className="">
                 <div className={tcls('relative', CONTAINER_STYLE)}>
                     <Tag
                         href={contentRef?.href ?? ''}
