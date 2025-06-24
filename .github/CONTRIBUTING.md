@@ -89,9 +89,9 @@ Additional development commands:
 
 #### 4. Preview your changes
 
-When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/`.
+When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/url`.
 
-For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/gitbook.com/docs` after running the development server.
+For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/url/gitbook.com/docs` after running the development server.
 
 You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://gitbook.com/docs/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
 
