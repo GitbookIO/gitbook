@@ -58,7 +58,7 @@ export function SpaceLayout(props: {
                 siteSpaceId={context.siteSpace.id}
                 siteShareKey={context.shareKey ?? null}
                 spaceId={context.space.id}
-                revisionId={context.revision.id}
+                revisionId={context.revisionId}
                 visitorAuthClaims={visitorAuthClaims}
             >
                 <InsightsProvider

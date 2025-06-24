@@ -16,7 +16,7 @@ export async function getPageDocument(
         return getDataOrNull(
             dataFetcher.getRevisionPageDocument({
                 spaceId: space.id,
-                revisionId: space.revision,
+                revisionId: context.revisionId,
                 pageId: page.id,
             })
         );

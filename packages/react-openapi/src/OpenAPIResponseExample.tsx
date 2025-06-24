@@ -99,7 +99,7 @@ export function OpenAPIResponseExample(props: {
 function OpenAPIResponse(props: {
     context: OpenAPIContext;
     content: {
-        [media: string]: OpenAPIV3.MediaTypeObject;
+        [media: string]: OpenAPIV3.MediaTypeObject | null;
     };
 }) {
     const { context, content } = props;
@@ -113,6 +113,15 @@ function OpenAPIResponse(props: {
 
     const tabs = entries.map((entry) => {
         const [mediaType, mediaTypeObject] = entry;
+
+        if (!mediaTypeObject) {
+            return {
+                key: mediaType,
+                label: mediaType,
+                body: <OpenAPIEmptyExample context={context} />,
+            };
+        }
+
         return {
             key: mediaType,
             label: mediaType,
