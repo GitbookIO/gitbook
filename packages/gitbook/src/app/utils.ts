@@ -14,7 +14,7 @@ export type RouteLayoutParams = {
     /** URL encoded site URL */
     siteURL: string;
 
-    /** URL and Rison encoded site data from getPublishedContentByUrl */
+    /** URL and Rison encoded site data from resolvePublishedContentByUrl */
     siteData: string;
 };
 
