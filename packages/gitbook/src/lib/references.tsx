@@ -2,7 +2,6 @@ import type {
     ContentRef,
     Revision,
     RevisionFile,
-    RevisionPage,
     RevisionPageDocument,
     RevisionReusableContent,
     SiteSpace,
@@ -74,12 +73,6 @@ export interface ResolveContentRefOptions {
      * Styles to apply to the icon.
      */
     iconStyle?: ClassValue;
-
-    /**
-     * Resolve the content URL as absolute.
-     * @default false
-     */
-    resolveAsAbsoluteURL?: boolean;
 }
 
 /**
@@ -123,33 +116,8 @@ export async function resolveContentRef(
                 return resolveContentRefInSpace(contentRef.space, context, contentRef);
             }
 
-            let resolveAsAbsoluteURL = options.resolveAsAbsoluteURL ?? false;
-            let linker = context.linker;
-
-            const pages: RevisionPage[] = await (async () => {
-                if (context.pages.length) {
-                    return context.pages;
-                }
-
-                const pages = await getDataOrNull(
-                    dataFetcher.getRevision({
-                        spaceId: space.id,
-                        revisionId,
-                        metadata: false,
-                    })
-                );
-
-                const ctx = await createLinkerForSpace(space.id, context);
-
-                if (!ctx) {
-                    return [];
-                }
-
-                resolveAsAbsoluteURL = true;
-                linker = ctx.linker;
-                return pages?.pages ?? [];
-            })();
-
+            // console.log(`resolve`, contentRef);
+            // console.log(`context`, context);
             const resolvePageResult =
                 !contentRef.page || contentRef.page === activePage?.id
                     ? activePage
@@ -157,16 +125,14 @@ export async function resolveContentRef(
                         : undefined
                     : resolvePageId(revision.pages, contentRef.page);
 
+            // console.log(`resolvePageResult`, resolvePageResult);
+
             const page = resolvePageResult?.page;
             const ancestors =
                 resolvePageResult?.ancestors.map((ancestor) => ({
                     label: ancestor.title,
                     icon: <PageIcon page={ancestor} style={iconStyle} />,
-                    href: resolveAsAbsoluteURL
-                        ? linker.toAbsoluteURL(
-                              linker.toPathForPage({ page: ancestor, pages: revision.pages })
-                          )
-                        : linker.toPathForPage({ page: ancestor, pages: revision.pages }),
+                    href: linker.toPathForPage({ page: ancestor, pages: revision.pages }),
                 })) ?? [];
             if (!page) {
                 return null;
@@ -186,7 +152,7 @@ export async function resolveContentRef(
                 ancestors.push({
                     label: page.title,
                     icon: <PageIcon page={page} style={iconStyle} />,
-                    href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
+                    href,
                 });
 
                 if (resolveAnchorText) {
@@ -211,7 +177,7 @@ export async function resolveContentRef(
             }
 
             return {
-                href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
+                href,
                 text,
                 subText: page.description,
                 ancestors: ancestors,
@@ -398,18 +364,11 @@ async function resolveContentRefInSpace(
         return null;
     }
 
-    const resolved = await resolveContentRef(
-        contentRef,
-        {
-            ...ctx.spaceContext,
-            space: ctx.space,
-            linker: ctx.linker,
-        },
-        {
-            // Resolve pages as absolute URLs as we are in a different site.
-            resolveAsAbsoluteURL: true,
-        }
-    );
+    const resolved = await resolveContentRef(contentRef, {
+        ...ctx.spaceContext,
+        space: ctx.space,
+        linker: ctx.linker,
+    });
 
     if (!resolved) {
         return null;
@@ -427,7 +386,7 @@ async function resolveContentRefInSpace(
     };
 }
 
-async function createLinkerForSpace(
+export async function createLinkerForSpace(
     spaceId: string,
     context: GitBookAnyContext
 ): Promise<{
@@ -457,11 +416,15 @@ async function createLinkerForSpace(
     const baseURL = new URL(
         bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app
     );
-    const linker = createLinker({
-        host: baseURL.host,
-        spaceBasePath: baseURL.pathname,
-        siteBasePath: baseURL.pathname,
-    });
+    const linker = createLinker(
+        {
+            host: baseURL.host,
+            spaceBasePath: baseURL.pathname,
+            siteBasePath: baseURL.pathname,
+        },
+        // Resolve pages as absolute URLs as we are in a different site.
+        { alwaysAbsolute: true }
+    );
 
     return {
         spaceContext,

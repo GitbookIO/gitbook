@@ -66,47 +66,60 @@ export function createLinker(
 
         /** The base path of the site */
         siteBasePath: string;
-    }
+    },
+    linkerOptions: {
+        alwaysAbsolute?: boolean;
+    } = {}
 ): GitBookLinker {
     warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
+
+    const alwaysAbsolute = linkerOptions.alwaysAbsolute ?? false;
 
     const siteBasePath = withTrailingSlash(withLeadingSlash(servedOn.siteBasePath));
     const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
 
+    function wrapInAbsolute(str: string): string {
+        return alwaysAbsolute ? toAbsoluteURL(str) : str;
+    }
+
+    function toAbsoluteURL(absolutePath: string): string {
+        // If the path is already a full URL, we return it as is.
+        if (URL.canParse(absolutePath)) {
+            return absolutePath;
+        }
+
+        if (!servedOn.host) {
+            return absolutePath;
+        }
+
+        return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
+    }
+
     const linker: GitBookLinker = {
         toPathInSpace(relativePath: string): string {
-            return joinPaths(spaceBasePath, relativePath);
+            return wrapInAbsolute(joinPaths(spaceBasePath, relativePath));
         },
 
         toPathInSite(relativePath: string): string {
-            return joinPaths(siteBasePath, relativePath);
+            return wrapInAbsolute(joinPaths(siteBasePath, relativePath));
         },
 
         toRelativePathInSite(absolutePath: string): string {
             const normalizedPath = withLeadingSlash(absolutePath);
 
             if (!normalizedPath.startsWith(servedOn.siteBasePath)) {
-                return normalizedPath;
+                return wrapInAbsolute(normalizedPath);
             }
 
-            return normalizedPath.slice(servedOn.siteBasePath.length);
-        },
-
-        toAbsoluteURL(absolutePath: string): string {
-            // If the path is already a full URL, we return it as is.
-            if (URL.canParse(absolutePath)) {
-                return absolutePath;
-            }
-
-            if (!servedOn.host) {
-                return absolutePath;
-            }
-
-            return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
+            return wrapInAbsolute(normalizedPath.slice(servedOn.siteBasePath.length));
         },
 
         toPathForPage({ pages, page, anchor }) {
             return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+        },
+
+        toAbsoluteURL(absolutePath: string): string {
+            return toAbsoluteURL(absolutePath);
         },
 
         toLinkForContent(rawURL: string): string {
