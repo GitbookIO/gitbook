@@ -4,6 +4,7 @@ import { createLinkerForSpace, resolveContentRef } from '@/lib/references';
 
 import type { GitBookSpaceContext } from '@v2/lib/context';
 import { getDataOrNull } from '@v2/lib/data';
+import { createLinker } from '@v2/lib/links';
 import { assert } from 'ts-essentials';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
@@ -60,7 +61,31 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         const ctx = await createLinkerForSpace(reusableContent.space.id, context.contentContext);
 
         if (!ctx) {
-            throw new Error(`Could not create context for space ${reusableContent.space.id}`);
+            // TODO: we should never have to reach this point - it means we couldn't resolve the space context for the reusable content
+            // but that should never happen as we've already fetched it at this point.
+            // Rather than throw, resolving using app URLs if needed.
+            const baseURL = new URL(
+                reusableContent.space.urls.published ?? reusableContent.space.urls.app
+            );
+
+            const linker = createLinker(
+                {
+                    host: baseURL.host,
+                    spaceBasePath: baseURL.pathname,
+                    siteBasePath: baseURL.pathname,
+                },
+                // Resolve pages as absolute URLs as we are in a different site.
+                { alwaysAbsolute: true }
+            );
+
+            return {
+                ...context.contentContext,
+                linker,
+                dataFetcher,
+                revision: context.contentContext.revision,
+                space: context.contentContext.space,
+                shareKey: undefined,
+            };
         }
 
         return {

@@ -116,16 +116,12 @@ export async function resolveContentRef(
                 return resolveContentRefInSpace(contentRef.space, context, contentRef);
             }
 
-            // console.log(`resolve`, contentRef);
-            // console.log(`context`, context);
             const resolvePageResult =
                 !contentRef.page || contentRef.page === activePage?.id
                     ? activePage
                         ? { page: activePage, ancestors: [] }
                         : undefined
                     : resolvePageId(revision.pages, contentRef.page);
-
-            // console.log(`resolvePageResult`, resolvePageResult);
 
             const page = resolvePageResult?.page;
             const ancestors =
