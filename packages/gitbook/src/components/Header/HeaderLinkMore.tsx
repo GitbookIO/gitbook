@@ -77,7 +77,7 @@ async function MoreMenuLink(props: {
         </DropdownSubMenu>
     ) : (
         <DropdownMenuItem
-            href={target?.href ?? null}
+            href={target?.href}
             insights={
                 link.to
                     ? {
