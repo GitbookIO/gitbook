@@ -1,6 +1,7 @@
 'use server';
 
-import { getChangeRequest } from '@/lib/api';
+import { getDataOrNull } from '@/lib/data';
+import { getServerActionBaseContext } from '@/lib/server-actions';
 
 /**
  * Return true if a change-request has been updated.
@@ -10,7 +11,10 @@ export async function hasContentBeenUpdated(props: {
     changeRequestId: string;
     revisionId: string;
 }) {
-    const changeRequest = await getChangeRequest.revalidate(props.spaceId, props.changeRequestId);
+    const context = await getServerActionBaseContext();
+    const changeRequest = await getDataOrNull(
+        context.dataFetcher.getChangeRequest(props.spaceId, props.changeRequestId)
+    );
     if (!changeRequest) {
         return false;
     }

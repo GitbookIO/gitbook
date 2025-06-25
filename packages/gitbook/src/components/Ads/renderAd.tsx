@@ -3,10 +3,7 @@
 import type { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
-import { getV1BaseContext } from '@/lib/v1';
-
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { isV2 } from '@/lib/v2';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
@@ -44,7 +41,7 @@ interface FetchPlaceholderAdOptions {
  */
 export async function renderAd(options: FetchAdOptions) {
     const [context, result] = await Promise.all([
-        isV2() ? getServerActionBaseContext() : getV1BaseContext(),
+        getServerActionBaseContext(),
         options.source === 'live' ? fetchAd(options) : getPlaceholderAd(),
     ]);
 

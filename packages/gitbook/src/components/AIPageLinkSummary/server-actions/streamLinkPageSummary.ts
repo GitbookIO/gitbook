@@ -2,8 +2,6 @@
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { filterOutNullable } from '@/lib/typescript';
-import { getV1BaseContext } from '@/lib/v1';
-import { isV2 } from '@/lib/v2';
 import { AIMessageRole, AIModel } from '@gitbook/api';
 import { z } from 'zod';
 import { streamGenerateAIObject } from '../../AI/server-actions/api';
@@ -29,7 +27,7 @@ export async function* streamLinkPageSummary({
     linkTitle?: string;
     visitedPages?: Array<{ spaceId: string; pageId: string }>;
 }) {
-    const baseContext = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const baseContext = await getServerActionBaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
     const { stream } = await streamGenerateAIObject(baseContext, {

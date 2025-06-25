@@ -3,7 +3,7 @@ import { checkIsSecurityError } from './security-error';
 /**
  * Get an item from local storage safely.
  */
-export function getItem<T>(key: string, defaultValue: T): T {
+export function getLocalStorageItem<T>(key: string, defaultValue: T): T {
     try {
         if (typeof localStorage !== 'undefined' && localStorage && 'getItem' in localStorage) {
             const stored = localStorage.getItem(key);
@@ -21,7 +21,7 @@ export function getItem<T>(key: string, defaultValue: T): T {
 /**
  * Set an item in local storage safely.
  */
-export function setItem(key: string, value: unknown) {
+export function setLocalStorageItem(key: string, value: unknown) {
     try {
         if (typeof localStorage !== 'undefined' && localStorage && 'setItem' in localStorage) {
             localStorage.setItem(key, JSON.stringify(value));
