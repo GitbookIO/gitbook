@@ -71,14 +71,9 @@ nvm use
 bun install
 ```
 
-3. Build the project:
+3. Start the development server:
 ```bash
-bun build:v2
-```
-
-4. Start the development server:
-```bash
-bun dev:v2
+bun dev
 ```
 
 Additional development commands:
