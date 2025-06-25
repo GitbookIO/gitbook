@@ -153,7 +153,8 @@
                 // TODO: remove this once the issue is fixed
                 "DEBUG_CLOUDFLARE": "true",
                 "WORKER_VERSION_ID": "TO_REPLACE",
-                "STAGE": "production"
+                "STAGE": "production",
+                "OPEN_NEXT_REQUEST_ID_HEADER": true
             },
             "routes": [
                 {

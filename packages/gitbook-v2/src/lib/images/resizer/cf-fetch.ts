@@ -1,3 +1,4 @@
+import { getLogger } from '@v2/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
 
@@ -15,8 +16,8 @@ export async function resizeImageWithCFFetch(
 ): Promise<Response> {
     const { signal, ...resizeOptions } = options;
 
-    // biome-ignore lint/suspicious/noConsole: this log is useful for debugging
-    console.log(`resize image using cf-fetch: ${input}`);
+    const logger = getLogger().subLogger('resize-image-cf-fetch');
+    logger.log(`resize image using cf-fetch: ${input}`);
 
     return copyImageResponse(
         await fetch(input, {
