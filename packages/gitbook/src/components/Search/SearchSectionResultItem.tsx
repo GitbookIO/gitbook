@@ -88,12 +88,12 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
 });
 
 function highlightQueryInBody(body: string, query: string) {
-    const idx = body.indexOf(query);
+    const idx = body.toLocaleLowerCase().indexOf(query.toLocaleLowerCase());
 
     // Ensure the query to be highlighted is visible in the body.
     return (
         <p className={tcls('text-sm', 'line-clamp-3', 'relative')}>
-            <HighlightQuery query={query} text={idx < 20 ? body : `...${body.slice(idx - 15)}`} />
+            <HighlightQuery query={query} text={idx < 20 ? body : `...${body.slice(idx - 10)}`} />
         </p>
     );
 }

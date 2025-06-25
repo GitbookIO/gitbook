@@ -54,6 +54,7 @@ export async function SiteLayout(props: {
                     forcedTheme ??
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
+                externalLinksTarget={customization.externalLinks.target}
             >
                 <SpaceLayout
                     context={context}
@@ -140,6 +141,12 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
         icons: {
             icon: icons,
             apple: icons,
+        },
+        appleWebApp: {
+            capable: true,
+            title: site.title,
+            statusBarStyle:
+                customization.themes.default === CustomizationThemeMode.Dark ? 'black' : 'default',
         },
         robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
     };

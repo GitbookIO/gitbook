@@ -1,4 +1,4 @@
-import { waitUntil } from '@/lib/waitUntil';
+import { isV2 } from '@/lib/v2';
 import type { JSONDocument, RevisionPageDocument } from '@gitbook/api';
 import type { GitBookSiteContext, GitBookSpaceContext } from '../context';
 import { getDataOrNull } from './errors';
@@ -12,14 +12,11 @@ export async function getPageDocument(
 ): Promise<JSONDocument | null> {
     const { dataFetcher, space } = context;
 
-    if (
-        'site' in context &&
-        (context.site.id === 'site_JOVzv' || context.site.id === 'site_IxAYj')
-    ) {
+    if (isV2()) {
         return getDataOrNull(
             dataFetcher.getRevisionPageDocument({
                 spaceId: space.id,
-                revisionId: space.revision,
+                revisionId: context.revisionId,
                 pageId: page.id,
             })
         );
@@ -41,33 +38,5 @@ export async function getPageDocument(
         );
     }
 
-    // Pre-fetch the document to start filling the cache before we migrate to this API.
-    if (process.env.NODE_ENV === 'development') {
-        // Disable for now to investigate side-effects
-        if (isInPercentRollout(space.id, 10) || process.env.VERCEL_ENV === 'preview') {
-            await waitUntil(
-                getDataOrNull(
-                    dataFetcher.getRevisionPageDocument({
-                        spaceId: space.id,
-                        revisionId: space.revision,
-                        pageId: page.id,
-                    })
-                )
-            );
-        }
-    }
-
     return null;
-}
-
-function isInPercentRollout(value: string, rollout: number) {
-    return getRandomPercent(value) < rollout;
-}
-
-function getRandomPercent(value: string) {
-    const hash = value.split('').reduce((acc, char) => {
-        return acc + char.charCodeAt(0);
-    }, 0);
-
-    return hash % 100;
 }

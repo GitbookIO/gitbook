@@ -680,9 +680,7 @@ body:has(.openapi-select-popover) {
 /* Tabs */
 .openapi-panel-header,
 .openapi-tabs-list {
-    @apply flex flex-row gap-1.5 py-1.5 px-2.5 w-full overflow-x-scroll;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    @apply flex flex-row gap-1.5 py-1.5 px-2.5 w-full overflow-x-auto no-scrollbar;
 }
 
 .openapi-tabs-tab {

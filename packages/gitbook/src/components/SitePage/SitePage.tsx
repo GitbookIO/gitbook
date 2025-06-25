@@ -39,10 +39,10 @@ export async function SitePage(props: SitePageProps) {
         } else {
             notFound();
         }
-    } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
+    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
         redirect(
             context.linker.toPathForPage({
-                pages: context.pages,
+                pages: context.revision.pages,
                 page: pageTarget.page,
             })
         );
@@ -117,7 +117,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, pages, linker, imageResizer } = context;
+    const { site, customization, revision, linker, imageResizer } = context;
 
     return {
         title: [page.title, site.title].filter(Boolean).join(' | '),
@@ -125,7 +125,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior
             canonical: linker
-                .toAbsoluteURL(linker.toPathForPage({ pages, page }))
+                .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
                 .replace(/\/+$/, ''),
         },
         openGraph: {
