@@ -1,13 +1,13 @@
 'use client';
 
-import type { ClientTOCPage } from './encodeClientTableOfContents';
+import type { ClientTOCPageGroup } from './encodeClientTableOfContents';
 
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 
-export function PageGroupItem(props: { page: ClientTOCPage }) {
+export function PageGroupItem(props: { page: ClientTOCPageGroup }) {
     const { page } = props;
 
     return (
