@@ -1,6 +1,6 @@
 'use client';
 
-import * as storage from '@/lib/local-storage';
+import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 
 import { generateRandomId } from './utils';
 
@@ -24,7 +24,7 @@ export function getSession(): Session {
     }
 
     try {
-        const session = storage.getItem<unknown | null>(SESSION_KEY, null);
+        const session = getLocalStorageItem<unknown | null>(SESSION_KEY, null);
 
         if (
             session &&
@@ -66,6 +66,6 @@ export function touchSession() {
  */
 export function saveSession() {
     if (currentSession) {
-        storage.setItem(SESSION_KEY, currentSession);
+        setLocalStorageItem(SESSION_KEY, currentSession);
     }
 }

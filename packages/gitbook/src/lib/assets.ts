@@ -1,4 +1,4 @@
-import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@v2/lib/env';
+import { GITBOOK_ASSETS_URL, GITBOOK_URL } from '@/lib/env';
 import { joinPath, joinPathWithBaseURL } from './paths';
 
 /**

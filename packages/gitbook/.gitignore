@@ -1,3 +1,4 @@
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # testing
@@ -31,3 +32,8 @@ screenshots/
 # Generated public files
 /public/~gitbook/static/*
 !/public/~gitbook/static/images
+
+# cloudflare
+.open-next
+.wrangler
+worker-configuration.d.ts

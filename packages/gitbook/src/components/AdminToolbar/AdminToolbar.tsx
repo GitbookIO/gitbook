@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 import React from 'react';
 

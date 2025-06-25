@@ -1,8 +1,8 @@
 import { Link } from '@/components/primitives';
+import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import type { AIToolCall, ContentRef } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type * as React from 'react';
 
 /**

@@ -1,4 +1,4 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 
 import { Image } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';

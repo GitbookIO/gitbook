@@ -1,5 +1,5 @@
+import type { GitBookAnyContext } from '@/lib/context';
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
-import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { getNodeText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';

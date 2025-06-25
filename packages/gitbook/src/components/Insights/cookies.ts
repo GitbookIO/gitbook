@@ -1,6 +1,6 @@
 'use client';
 
-import { getBrowserCookie, setBrowserCookie } from '@/lib/browser-cookies';
+import { getBrowserCookie, setBrowserCookie } from '@/lib/browser';
 
 const GRANTED_COOKIE = '__gitbook_cookie_granted';
 

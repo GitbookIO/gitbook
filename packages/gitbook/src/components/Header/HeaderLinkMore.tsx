@@ -1,10 +1,10 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type CustomizationContentLink,
     type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';

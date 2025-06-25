@@ -1,5 +1,5 @@
+import { MiddlewareHeaders } from '@/lib/middleware';
 import type { SiteCustomizationSettings } from '@gitbook/api';
-import { MiddlewareHeaders } from '@v2/lib/middleware';
 import { headers } from 'next/headers';
 import rison from 'rison';
 

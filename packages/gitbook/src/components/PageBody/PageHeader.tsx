@@ -2,9 +2,9 @@ import type { RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';

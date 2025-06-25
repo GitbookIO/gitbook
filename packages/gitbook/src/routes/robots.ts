@@ -1,5 +1,5 @@
+import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { isSiteIndexable } from '@/lib/seo';
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
 
 /**
  * Generate a robots.txt for a site.

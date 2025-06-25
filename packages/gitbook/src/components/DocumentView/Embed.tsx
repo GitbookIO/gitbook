@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { Card } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
-import { getDataOrNull } from '@v2/lib/data';
+import { getDataOrNull } from '@/lib/data';
 import { Image } from '../utils';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';

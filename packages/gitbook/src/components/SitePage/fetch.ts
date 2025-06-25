@@ -1,9 +1,9 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 import { redirect } from 'next/navigation';
 
+import { getDataOrNull } from '@/lib/data';
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
-import { getDataOrNull } from '@v2/lib/data';
 
 export interface PagePathParams {
     pathname?: string | string[];

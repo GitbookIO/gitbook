@@ -1,5 +1,5 @@
 ---
-"gitbook": patch
+gitbook: patch
 ---
 
 Add margin to adjacent buttons

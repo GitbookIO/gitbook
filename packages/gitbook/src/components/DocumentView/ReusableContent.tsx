@@ -2,8 +2,8 @@ import type { DocumentBlockReusableContent } from '@gitbook/api';
 
 import { resolveContentRef } from '@/lib/references';
 
-import type { GitBookSpaceContext } from '@v2/lib/context';
-import { getDataOrNull } from '@v2/lib/data';
+import type { GitBookSpaceContext } from '@/lib/context';
+import { getDataOrNull } from '@/lib/data';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
 

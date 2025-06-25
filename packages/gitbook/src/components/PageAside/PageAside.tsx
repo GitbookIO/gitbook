@@ -1,3 +1,4 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type JSONDocument,
     type RevisionPageDocument,
@@ -6,7 +7,6 @@ import {
     type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 import urlJoin from 'url-join';
 

@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { AnnouncementBanner } from './AnnouncementBanner';
 
 /**

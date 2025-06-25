@@ -7,53 +7,6 @@ on:
 env:
     NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
-    deploy-v1-cloudflare:
-        name: Deploy v1 to Cloudflare Pages
-        runs-on: ubuntu-latest
-        environment:
-          name: ${{ github.ref == 'refs/heads/main' && '1c-production' || '1c-preview' }}
-          url: ${{ steps.deploy.outputs.deployment-url }}
-        permissions:
-            contents: read
-            deployments: write
-            issues: write
-            pull-requests: write
-            checks: write
-            statuses: write
-        outputs:
-            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
-            deployment-alias-url: ${{ steps.deploy.outputs.deployment-alias-url }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Bun
-              uses: ./.github/composite/setup-bun
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-              env:
-                  PUPPETEER_SKIP_DOWNLOAD: 1
-            - name: Sets env vars for production
-              if: github.ref == 'refs/heads/main'
-              run: |
-                echo "GITBOOK_ASSETS_PREFIX=https://static.gitbook.com" >> $GITHUB_ENV
-            - name: Build Next.js with next-on-pages
-              run: bun run turbo gitbook#build:cloudflare
-              env:
-                  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
-                  GITBOOK_RUNTIME: cloudflare
-            - id: deploy
-              name: Deploy to Cloudflare
-              uses: cloudflare/wrangler-action@v3.14.0
-              with:
-                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  workingDirectory: ./
-                  wranglerVersion: '3.112.0'
-                  command: pages deploy ./packages/gitbook/.vercel/output/static --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.pull_request.number) }}
-            - name: Outputs
-              run: |
-                  echo "URL: ${{ steps.deploy.outputs.deployment-url }}"
-                  echo "Alias URL: ${{ steps.deploy.outputs.deployment-alias-url }}"
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
@@ -114,7 +67,6 @@ jobs:
         name: Comment Deployments (preview)
         if: always() && !startsWith(github.ref, 'refs/heads/main')
         needs:
-            - deploy-v1-cloudflare
             - deploy-v2-vercel
             - deploy-v2-cloudflare
         steps:
@@ -134,15 +86,6 @@ jobs:
                   body: |
                       Summary of the deployments:
 
-                      ### Version 1
-
-                      | Version | URL | Status |
-                      | --- | --- | --- |
-                      | Latest commit | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}) | ${{ needs.deploy-v1-cloudflare.result == 'success' && '✅' || '❌' }} |
-                      | PR | [${{ needs.deploy-v1-cloudflare.outputs.deployment-alias-url }}](${{ needs.deploy-v1-cloudflare.outputs.deployment-alias-url }}) | ${{ needs.deploy-v1-cloudflare.result == 'success' && '✅' || '❌' }} |
-
-                      ### Version 2
-
                       | Version | URL | Status |
                       | --- | --- | --- |
                       | Vercel | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}](${{ needs.deploy-v2-vercel.outputs.deployment-url }}) | ${{ needs.deploy-v2-vercel.result == 'success' && '✅' || '❌' }} |
@@ -150,30 +93,11 @@ jobs:
 
                       ### Test content
 
-                      | Site | `v1` | `2v` | `2c` |
-                      | --- | --- | --- | --- |
-                      | GitBook | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.com/docs](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.com/docs) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs) |
-                      | E2E | [${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
+                      | Site | `2v` | `2c` |
+                      | --- | --- | --- |
+                      | GitBook | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.com/docs) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.com/docs) |
+                      | E2E | [${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) | [${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open](${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/gitbook.gitbook.io/test-gitbook-open) |
                   edit-mode: replace
-    visual-testing-v1:
-        runs-on: ubuntu-latest
-        name: Visual Testing v1
-        needs: deploy-v1-cloudflare
-        timeout-minutes: 10
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Bun
-              uses: ./.github/composite/setup-bun
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-            - name: Setup Playwright
-              uses: ./.github/actions/setup-playwright
-            - name: Run Playwright tests
-              run: bun e2e
-              env:
-                  BASE_URL: ${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}
-                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
     visual-testing-v2-vercel:
         runs-on: ubuntu-latest
         name: Visual Testing v2
@@ -216,26 +140,6 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'v2-cloudflare'
-    visual-testing-customers-v1:
-        runs-on: ubuntu-latest
-        name: Visual Testing Customers v1
-        needs: deploy-v1-cloudflare
-        timeout-minutes: 10
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Bun
-              uses: ./.github/composite/setup-bun
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-            - name: Setup Playwright
-              uses: ./.github/actions/setup-playwright
-            - name: Run Playwright tests
-              run: bun e2e-customers
-              env:
-                  BASE_URL: ${{ needs.deploy-v1-cloudflare.outputs.deployment-url }}
-                  ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-                  ARGOS_BUILD_NAME: 'customers-v1'
     visual-testing-customers-v2:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
@@ -278,10 +182,10 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
-    pagespeed-testing-v1:
+    pagespeed-testing-v2:
         runs-on: ubuntu-latest
         name: PageSpeed Testing v1
-        needs: deploy-v1-cloudflare
+        needs: deploy-v2-vercel
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -294,5 +198,5 @@ jobs:
             - name: Run pagespeed tests
               run: bun ./packages/gitbook/tests/pagespeed-testing.ts
               env:
-                  BASE_URL: ${{needs.deploy-v1-cloudflare.outputs.deployment-url}}
+                  BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}

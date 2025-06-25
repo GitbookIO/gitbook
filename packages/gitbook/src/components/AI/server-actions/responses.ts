@@ -1,6 +1,6 @@
 'use server';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
-import { getServerActionBaseContext } from '@v2/lib/server-actions';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
 

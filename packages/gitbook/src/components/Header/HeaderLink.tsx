@@ -1,3 +1,4 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type ContentRef,
     type CustomizationContentLink,
@@ -5,7 +6,6 @@ import {
     type CustomizationHeaderPreset,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
 import { resolveContentRef } from '@/lib/references';

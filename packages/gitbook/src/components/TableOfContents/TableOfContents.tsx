@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';

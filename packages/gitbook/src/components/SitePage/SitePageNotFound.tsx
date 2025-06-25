@@ -18,7 +18,7 @@ export function SitePageNotFound() {
     const searchParams = useSearchParams();
 
     // If ?fallback=true, redirect to the root page.
-    const fallback = searchParams.get('fallback');
+    const fallback = searchParams?.get('fallback');
     useEffect(() => {
         if (fallback) {
             router.replace(basePath);

@@ -1,6 +1,6 @@
+import type { GitBookSiteContext, SiteSections } from '@/lib/context';
 import { getSectionURL, getSiteSpaceURL } from '@/lib/sites';
 import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
-import type { GitBookSiteContext, SiteSections } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
 export type ClientSiteSections = {

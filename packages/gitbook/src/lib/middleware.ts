@@ -1,45 +1,116 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
+import { CustomizationThemeMode } from '@gitbook/api';
+import { headers } from 'next/headers';
+import type { SiteURLData } from './context';
 
-/*
- * This code is ONLY for v1.
- */
+export enum MiddlewareHeaders {
+    /**
+     * Type of the route (static or dynamic)
+     */
+    RouteType = 'x-gitbook-route-type',
 
-/**
- * Set a header on the middleware response.
- * We do this because of https://github.com/opennextjs/opennextjs-cloudflare/issues/92
- * It can be removed as soon as we move to opennext where hopefully this is fixed.
- */
-export function setMiddlewareHeader(response: Response, name: string, value: string) {
-    const responseHeadersLocalStorage =
-        // @ts-ignore
-        globalThis.responseHeadersLocalStorage as AsyncLocalStorage<Headers> | undefined;
-    const responseHeaders = responseHeadersLocalStorage?.getStore();
-    response.headers.set(name, value);
+    /**
+     * The URL of the site (without the pathname)
+     */
+    SiteURL = 'x-gitbook-site-url',
 
-    if (responseHeaders) {
-        responseHeaders.set(name, value);
-    }
+    /**
+     * The data associated with the URL.
+     */
+    SiteURLData = 'x-gitbook-site-url-data',
+
+    /**
+     * The mode of the URL (url or url-host)
+     */
+    URLMode = 'x-gitbook-url-mode',
+
+    /**
+     * The theme of the page (light or dark)
+     */
+    Theme = 'x-gitbook-theme',
+
+    /**
+     * The customization override to apply.
+     */
+    Customization = 'x-gitbook-customization',
+
+    /**
+     * The API token used to fetch the content.
+     * This should only be passed for non-site dynamic routes.
+     */
+    APIToken = 'x-gitbook-api-token',
 }
 
 /**
- * Wrap some middleware with a the storage to store headers.
+ * Get the URL mode from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
  */
-export async function withMiddlewareHeadersStorage(
-    handler: () => Promise<Response>
-): Promise<Response> {
-    const responseHeadersLocalStorage =
-        // @ts-ignore
-        (globalThis.responseHeadersLocalStorage as AsyncLocalStorage<Headers>) ??
-        new AsyncLocalStorage<Headers>();
-    // @ts-ignore
-    globalThis.responseHeadersLocalStorage = responseHeadersLocalStorage;
-
-    const responseHeaders = new Headers();
-    const response = await responseHeadersLocalStorage.run(responseHeaders, handler);
-
-    for (const [name, value] of responseHeaders.entries()) {
-        response.headers.set(name, value);
+export async function getURLModeFromMiddleware(): Promise<'url' | 'url-host'> {
+    const headersList = await headers();
+    const mode = headersList.get(MiddlewareHeaders.URLMode);
+    if (!mode) {
+        throw new Error('URL mode is not set by the middleware');
     }
 
-    return response;
+    return mode as 'url' | 'url-host';
+}
+
+/**
+ * Get the site URL data from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
+ */
+export async function getSiteURLDataFromMiddleware(): Promise<SiteURLData> {
+    const headersList = await headers();
+    const siteURLData = headersList.get(MiddlewareHeaders.SiteURLData);
+
+    if (!siteURLData) {
+        throw new Error(
+            'Site URL data is not set by the middleware. This should only be called in a server action or a dynamic route.'
+        );
+    }
+
+    return JSON.parse(siteURLData);
+}
+
+/**
+ * Get the URL from the middleware headers.
+ * This function should only be called in a server action or a dynamic route.
+ */
+export async function getSiteURLFromMiddleware(): Promise<string> {
+    const headersList = await headers();
+    const siteURL = headersList.get(MiddlewareHeaders.SiteURL);
+    if (!siteURL) {
+        throw new Error('URL mode is not set by the middleware');
+    }
+
+    return siteURL;
+}
+
+/**
+ * For preview, the theme can be set via query string (?theme=light).
+ * This function should only be called in a dynamic route.
+ */
+export async function getThemeFromMiddleware() {
+    const headersList = await headers();
+    const queryStringTheme = headersList.get(MiddlewareHeaders.Theme);
+    if (!queryStringTheme) {
+        return null;
+    }
+
+    return queryStringTheme === 'light'
+        ? CustomizationThemeMode.Light
+        : CustomizationThemeMode.Dark;
+}
+
+/**
+ * Get the API token from the middleware headers.
+ * This function should only be called in a dynamic route.
+ */
+export async function getAPITokenFromMiddleware(): Promise<string> {
+    const headersList = await headers();
+    const apiToken = headersList.get(MiddlewareHeaders.APIToken);
+    if (!apiToken) {
+        throw new Error('API token is not set by the middleware');
+    }
+
+    return apiToken;
 }
