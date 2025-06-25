@@ -24,7 +24,7 @@ export function AIMessageView(
                             document={step.content}
                             context={{
                                 mode: 'default',
-                                contentContext: undefined,
+                                contentContext: context,
                                 wrapBlocksInSuspense: false,
                             }}
                             style={['space-y-5']}
