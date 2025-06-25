@@ -1,13 +1,13 @@
+import type { GitBookSiteContext } from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
 import { resolvePagePath } from '@/lib/pages';
 import { RevisionPageType } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { throwIfDataError } from '@v2/lib/data';
 
 /**
  * Generate a markdown version of a page.
  */
 export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
-    const pageLookup = resolvePagePath(context.pages, pagePath);
+    const pageLookup = resolvePagePath(context.revision.pages, pagePath);
     if (!pageLookup) {
         return new Response(`Page "${pagePath}" not found`, { status: 404 });
     }
@@ -21,7 +21,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
     const markdown = await throwIfDataError(
         context.dataFetcher.getRevisionPageMarkdown({
             spaceId: context.space.id,
-            revisionId: context.revisionId,
+            revisionId: context.revision.id,
             pageId: page.id,
         })
     );

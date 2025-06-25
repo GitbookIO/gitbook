@@ -20,19 +20,10 @@
             "dependsOn": ["^build", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
-        // Build the package for v2
-        "build:v2": {
-            "dependsOn": ["^build:v2", "^build", "generate"],
-            "outputs": [".next/**", "!.next/cache/**", "dist"]
-        },
-        // Build the package for v2 (cloudflare)
-        "build:v2:cloudflare": {
-            "dependsOn": ["^build:v2:cloudflare", "^build:v2", "generate"],
-            "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next/**"]
-        },
-        // Build the package for Cloudflare Pages
+        // Build the package for Cloudflare
         "build:cloudflare": {
-            "dependsOn": ["^build", "generate"]
+            "dependsOn": ["^build", "generate"],
+            "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next/**"]
         },
         // Check the package for type errors
         "typecheck": {
@@ -56,14 +47,8 @@
             "dependsOn": ["^e2e-customers"],
             "env": ["BASE_URL", "SITE_BASE_URL"]
         },
-        // Start the package in development mode
-        "dev": {
-            "persistent": true,
-            "cache": false,
-            "dependsOn": ["generate"]
-        },
         // Start the package in development mode for v2
-        "dev:v2": {
+        "dev": {
             "persistent": true,
             "cache": false,
             "dependsOn": ["generate"]
@@ -71,11 +56,6 @@
         // Script run when the package is deployed
         "release": {
             "dependsOn": ["^release", "build"],
-            "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
-        },
-        // Script to run when deploying on main to preview/staging
-        "release:preview": {
-            "dependsOn": ["^release:preview", "build"],
             "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
         },
         // Clean up the package

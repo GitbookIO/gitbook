@@ -11,14 +11,13 @@
     "overrides": {
         "@codemirror/state": "6.4.1",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "esbuild": "0.25.4"
     },
     "private": true,
     "scripts": {
         "dev": "turbo run dev",
-        "dev:v2": "turbo run dev:v2",
         "build": "turbo run build",
-        "build:v2": "turbo run build:v2",
         "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",
         "typecheck": "turbo run typecheck",
         "format": "biome check --write ./",
@@ -29,7 +28,6 @@
         "changeset": "changeset",
         "changeset-version": "changeset version && bun run format",
         "release": "turbo run release && changeset publish",
-        "release:preview": "turbo run release:preview",
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },

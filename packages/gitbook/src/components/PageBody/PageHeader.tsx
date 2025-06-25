@@ -2,9 +2,9 @@ import type { RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Fragment } from 'react';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
@@ -15,7 +15,7 @@ export async function PageHeader(props: {
     ancestors: AncestorRevisionPage[];
 }) {
     const { context, page, ancestors } = props;
-    const { pages, linker } = context;
+    const { revision, linker } = context;
 
     if (!page.layout.title && !page.layout.description) {
         return null;
@@ -36,7 +36,10 @@ export async function PageHeader(props: {
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
                         {ancestors.map((breadcrumb, index) => {
-                            const href = linker.toPathForPage({ pages, page: breadcrumb });
+                            const href = linker.toPathForPage({
+                                pages: revision.pages,
+                                page: breadcrumb,
+                            });
                             return (
                                 <Fragment key={breadcrumb.id}>
                                     <li key={breadcrumb.id}>

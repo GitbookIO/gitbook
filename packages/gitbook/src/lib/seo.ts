@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 
 /**

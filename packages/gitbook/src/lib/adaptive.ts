@@ -1,5 +1,5 @@
+import type { SiteURLData } from '@/lib/context';
 import type { SiteAPIToken } from '@gitbook/api';
-import type { SiteURLData } from '@v2/lib/context';
 import { jwtDecode } from 'jwt-decode';
 
 /**
@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 export type VisitorAuthClaims = Record<string, any>;
 
 /**
- * Get the visitor auth claims from the API response obtained from `getPublishedContentByUrl`.
+ * Get the visitor auth claims from the API response obtained from `resolvePublishedContentByUrl`.
  */
 export function getVisitorAuthClaims(siteData: SiteURLData): VisitorAuthClaims {
     const { apiToken } = siteData;

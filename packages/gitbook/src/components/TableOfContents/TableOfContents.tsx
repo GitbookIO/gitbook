@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -15,7 +15,7 @@ export function TableOfContents(props: {
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
     const { innerHeader, context, header } = props;
-    const { space, customization, pages } = context;
+    const { space, customization, revision } = context;
 
     return (
         <>
@@ -106,8 +106,8 @@ export function TableOfContents(props: {
                         )}
                     >
                         <PagesList
-                            rootPages={pages}
-                            pages={pages}
+                            rootPages={revision.pages}
+                            pages={revision.pages}
                             context={context}
                             style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                         />

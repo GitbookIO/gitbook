@@ -1,3 +1,5 @@
+import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
+import type { GitBookLinker } from '@/lib/links';
 import {
     type Revision,
     type RevisionPageDocument,
@@ -8,8 +10,6 @@ import {
     type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext, GitBookSpaceContext } from '@v2/lib/context';
-import type { GitBookLinker } from '@v2/lib/links';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import * as React from 'react';
@@ -28,7 +28,7 @@ import { PageControlButtons } from './PageControlButtons';
 import { PrintButton } from './PrintButton';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
-import { getPageDocument } from '@v2/lib/data';
+import { getPageDocument } from '@/lib/data';
 
 const DEFAULT_LIMIT = 100;
 
@@ -60,7 +60,7 @@ export async function PDFPage(props: {
     const language = getSpaceLanguage(customization);
 
     // Compute the pages to render
-    const { pages, total } = selectPages(baseContext.pages, pdfParams);
+    const { pages, total } = selectPages(baseContext.revision.pages, pdfParams);
     const pageIds = pages.map(
         ({ page }) => [page.id, getPagePDFContainerId(page)] as [string, string]
     );

@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { JSONDocument, RevisionPageDocument } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
@@ -10,6 +10,7 @@ import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
 import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
+import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { DateRelative } from '../primitives';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
@@ -45,7 +46,7 @@ export function PageBody(props: {
     const updatedAt = page.updatedAt ?? page.createdAt;
 
     return (
-        <>
+        <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
@@ -106,7 +107,7 @@ export function PageBody(props: {
                 </div>
             </main>
 
-            <TrackPageViewEvent pageId={page.id} />
-        </>
+            <TrackPageViewEvent />
+        </CurrentPageProvider>
     );
 }
