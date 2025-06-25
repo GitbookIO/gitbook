@@ -1,16 +1,15 @@
 import { parseOpenAPI } from '@gitbook/openapi-parser';
 
-import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
+import { noCacheFetchOptions } from '@/lib/data';
+import { resolveContentRef } from '@/lib/references';
+import { assert } from 'ts-essentials';
+import { enrichFilesystem } from './enrich';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
     ResolveOpenAPIBlockArgs,
-} from '@/lib/openapi/types';
-import { assert } from 'ts-essentials';
-import { resolveContentRef } from '../references';
-import { isV2 } from '../v2';
-import { enrichFilesystem } from './enrich';
+} from './types';
 import type { FetchOpenAPIFilesystemResult } from './types';
 
 type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock;
@@ -44,29 +43,7 @@ export async function fetchOpenAPIFilesystem(
     };
 }
 
-function fetchFilesystem(url: string) {
-    if (isV2()) {
-        return fetchFilesystemUseCache(url);
-    }
-
-    return fetchFilesystemV1(url);
-}
-
-const fetchFilesystemV1 = cache({
-    name: 'openapi.fetch.v6',
-    get: async (url: string, options: CacheFunctionOptions) => {
-        const richFilesystem = await fetchFilesystemUncached(url, options);
-        return {
-            // Cache for 24 hours
-            ttl: 24 * 60 * 60,
-            // Revalidate every 2 hours
-            revalidateBefore: 22 * 60 * 60,
-            data: richFilesystem,
-        };
-    },
-});
-
-const fetchFilesystemUseCache = async (url: string) => {
+const fetchFilesystem = async (url: string) => {
     'use cache';
     return fetchFilesystemUncached(url);
 };
