@@ -1,4 +1,5 @@
 import type { AIChatController, AIChatState } from '../AI';
+import { Button } from '../primitives';
 
 /**
  * Display follow-up suggestions for the user to pick from.
@@ -14,18 +15,18 @@ export function AIChatFollowupSuggestions(props: {
     }
 
     return (
-        <div className="flex flex-row flex-wrap justify-end gap-2">
-            {chat.followUpSuggestions.map((suggestion) => (
-                <button
-                    key={suggestion}
-                    type="button"
-                    className="rounded-md bg-tint px-3 py-2 text-sm"
+        <div className="flex flex-row flex-wrap justify-end gap-2 pt-8">
+            {chat.followUpSuggestions.map((suggestion, index) => (
+                <Button
+                    key={index}
                     onClick={() => {
                         chatController.postMessage({ message: suggestion });
                     }}
-                >
-                    {suggestion}
-                </button>
+                    label={suggestion}
+                    className="animate-present"
+                    size="medium"
+                    variant="secondary"
+                />
             ))}
         </div>
     );

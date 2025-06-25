@@ -1,4 +1,6 @@
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
+import { useEffect, useRef } from 'react';
 import { Button } from '../primitives';
 
 export function AIChatInput(props: {
@@ -7,49 +9,59 @@ export function AIChatInput(props: {
     onSubmit: (value: string) => void;
 }) {
     const { value, onChange, onSubmit } = props;
+
+    const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const textarea = event.currentTarget;
+        onChange(textarea.value);
+
+        // Auto-resize
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    };
+
+    useEffect(() => {
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 300);
+    }, []);
+
     return (
-        <div className="relative flex w-full">
+        <div className="relative flex flex-col overflow-hidden rounded-corners:rounded-md bg-tint-base/9 ring-1 ring-tint-subtle backdrop-blur-lg transition-all has-[textarea:focus]:shadow-lg has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base">
             <textarea
+                ref={inputRef}
                 className={tcls(
                     'resize-none',
-                    'bg-tint-base',
-                    'rounded-md',
-                    'circular-corners:rounded-2xl',
-                    'flex-1',
-                    'ring-1',
-                    'ring-tint-subtle',
-                    // 'border',
-                    // 'border-tint-subtle',
                     'focus:outline-none',
-                    'pl-4',
-                    'pr-10',
-                    'pt-3.5',
-                    'pb-3.5',
-                    'transition-all',
-                    'focus:shadow-lg',
-                    'focus:ring-primary',
-                    'focus:ring-2',
-                    'focus:shadow-tint-subtle'
+                    'focus:ring-0',
+                    'w-full',
+                    'px-4',
+                    'py-3',
+                    'pb-14',
+                    'h-auto',
+                    'bg-transparent',
+                    'max-h-48',
+                    'placeholder:text-tint/8'
                 )}
                 value={value}
                 rows={1}
                 placeholder="Ask, search, or take action..."
-                onChange={(event) => {
-                    onChange(event.currentTarget.value);
-                }}
+                onChange={handleInput}
                 onKeyDown={(event) => {
                     if (event.key === 'Enter' && !event.shiftKey) {
                         event.preventDefault();
+                        event.currentTarget.style.height = 'auto';
                         onSubmit(value);
                     }
                 }}
             />
-            <Button
-                icon="arrow-up"
-                label="Send"
-                iconOnly
-                className="!px-2 -translate-y-1/2 absolute top-1/2 right-2"
-            />
+            <div className="absolute inset-x-0 bottom-0 flex items-center px-4 py-2">
+                <span className="flex items-center gap-1 text-tint/7 text-xs">
+                    <Icon icon="glasses-round" className="size-3.5" /> Based on your context
+                </span>
+                <Button label="Send" size="medium" className="-mr-2 ml-auto" />
+            </div>
         </div>
     );
 }

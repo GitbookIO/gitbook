@@ -17,12 +17,49 @@ interface AIChatProps {
     children?: React.ReactNode;
 }
 
+const getTimeGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+};
+
 export function AIChat(props: AIChatProps) {
     const { className } = props;
 
     const [input, setInput] = React.useState('');
     const chatController = useAIChatController();
     const chat = useAIChatState();
+
+    // Ref for the scrollable container
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+    // Ref for the last user message element
+    const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
+    const inputRef = React.useRef<HTMLDivElement>(null);
+
+    const [inputHeight, setInputHeight] = React.useState(0);
+
+    // Auto-scroll to the latest user message when messages change
+    React.useEffect(() => {
+        if (chat.messages.length > 0 && lastUserMessageRef.current) {
+            lastUserMessageRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+    }, [chat.messages.length]);
+
+    React.useEffect(() => {
+        const observer = new ResizeObserver((entries) => {
+            entries.forEach((entry) => {
+                setInputHeight(entry.contentRect.height + 32);
+            });
+        });
+        if (inputRef.current) {
+            observer.observe(inputRef.current);
+        }
+        return () => observer.disconnect();
+    }, [chat.opened]);
 
     return chat.opened ? (
         <div
@@ -31,7 +68,7 @@ export function AIChat(props: AIChatProps) {
                 className
             )}
         >
-            <div className="flex h-full grow flex-col overflow-hidden rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
+            <div className="relative flex h-full grow flex-col overflow-hidden rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <Icon icon="robot" className="size-4" />
                     <span className="font-bold">Docs Assistant</span>
@@ -76,7 +113,13 @@ export function AIChat(props: AIChatProps) {
                         />
                     </div>
                 </div>
-                <div className="grow overflow-y-auto p-4">
+                <div
+                    ref={scrollContainerRef}
+                    className="flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
+                    style={{
+                        paddingBottom: `${inputHeight}px`,
+                    }}
+                >
                     {chat.messages.length === 0 ? (
                         <div className="flex h-full w-full flex-col items-center justify-center">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center self-center justify-self-center rounded-full bg-tint-subtle">
@@ -86,17 +129,20 @@ export function AIChat(props: AIChatProps) {
                                 />
                             </div>
                             <h5 className="mt-4 animate-[fadeIn_500ms_400ms_both] text-center font-bold text-lg text-tint-strong">
-                                Good evening Samy
+                                {getTimeGreeting()} Samy
                             </h5>
                             <p className="animate-[fadeIn_500ms_500ms_both] text-center text-tint">
-                                I'm here to help you with the GitBook docs.
+                                I'm here to help you with the docs.
                             </p>
                         </div>
                     ) : (
-                        <AIChatMessages chat={chat} />
+                        <AIChatMessages chat={chat} lastUserMessageRef={lastUserMessageRef} />
                     )}
                 </div>
-                <div className="flex flex-col gap-2 p-4">
+                <div
+                    ref={inputRef}
+                    className="absolute inset-x-0 bottom-0 mr-2 flex flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
+                >
                     <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
                     <AIChatInput
                         value={input}
