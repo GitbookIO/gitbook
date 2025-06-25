@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuItem } from '../Header/DropdownMenu';
 import { Button } from '../primitives';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
+import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
 interface AIChatProps {
@@ -31,7 +32,7 @@ export function AIChat(props: AIChatProps) {
     const chatController = useAIChatController();
     const chat = useAIChatState();
 
-    // Ref for the scrollable container
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
     // Ref for the last user message element
     const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
@@ -50,6 +51,11 @@ export function AIChat(props: AIChatProps) {
     }, [chat.messages.length]);
 
     React.useEffect(() => {
+        containerRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+
         const observer = new ResizeObserver((entries) => {
             entries.forEach((entry) => {
                 setInputHeight(entry.contentRect.height + 32);
@@ -64,11 +70,12 @@ export function AIChat(props: AIChatProps) {
     return chat.opened ? (
         <div
             className={tcls(
-                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-enterFromRight px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-72 lg:pr-4 lg:pl-0 xl:w-96',
+                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-72 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96',
                 className
             )}
+            ref={containerRef}
         >
-            <div className="relative flex h-full grow flex-col overflow-hidden rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
+            <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <Icon icon="robot" className="size-4" />
                     <span className="font-bold">Docs Assistant</span>
@@ -86,13 +93,6 @@ export function AIChat(props: AIChatProps) {
                                 />
                             }
                         >
-                            <DropdownMenuItem onClick={() => {}} disabled>
-                                <Icon
-                                    icon="arrow-up-from-bracket"
-                                    className="size-3 text-tint-subtle"
-                                />
-                                Share conversation
-                            </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => {
                                     chatController.clear();
@@ -100,6 +100,13 @@ export function AIChat(props: AIChatProps) {
                             >
                                 <Icon icon="broom-wide" className="size-3 text-tint-subtle" />
                                 Clear conversation
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {}} disabled>
+                                <Icon
+                                    icon="arrow-up-from-bracket"
+                                    className="size-3 text-tint-subtle"
+                                />
+                                Share conversation
                             </DropdownMenuItem>
                         </DropdownMenu>
                         <Button
@@ -121,19 +128,22 @@ export function AIChat(props: AIChatProps) {
                     }}
                 >
                     {chat.messages.length === 0 ? (
-                        <div className="flex h-full w-full flex-col items-center justify-center">
+                        <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center self-center justify-self-center rounded-full bg-tint-subtle">
                                 <Icon
                                     icon="robot"
                                     className="size-16 animate-[present_500ms_200ms_both]"
                                 />
                             </div>
-                            <h5 className="mt-4 animate-[fadeIn_500ms_400ms_both] text-center font-bold text-lg text-tint-strong">
-                                {getTimeGreeting()} Samy
-                            </h5>
-                            <p className="animate-[fadeIn_500ms_500ms_both] text-center text-tint">
-                                I'm here to help you with the docs.
-                            </p>
+                            <div className="animate-[fadeIn_500ms_400ms_both]">
+                                <h5 className=" text-center font-bold text-lg text-tint-strong">
+                                    {getTimeGreeting()}
+                                </h5>
+                                <p className="text-center text-tint">
+                                    I'm here to help you with the docs.
+                                </p>
+                            </div>
+                            <AIChatSuggestedQuestions chatController={chatController} />
                         </div>
                     ) : (
                         <AIChatMessages chat={chat} lastUserMessageRef={lastUserMessageRef} />

@@ -1,10 +1,11 @@
 'use client';
 
-import { useAIChatController } from '../AI/useAIChat';
+import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
 
 export default function AIChatButton() {
     const chatController = useAIChatController();
+    const chat = useAIChatState();
 
     return (
         <Button
@@ -13,9 +14,13 @@ export default function AIChatButton() {
             size="default"
             variant="secondary"
             className="!px-3 bg-tint-base py-2.5"
-            label="Ask AI"
+            label="Docs Assistant"
             onClick={() => {
-                chatController.open();
+                if (chat.opened) {
+                    chatController.close();
+                } else {
+                    chatController.open();
+                }
             }}
         />
     );

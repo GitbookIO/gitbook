@@ -5,9 +5,9 @@ import type { HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Icon, type IconName } from '@gitbook/icons';
-import * as Tooltip from '@radix-ui/react-tooltip';
 import { Link, type LinkInsightsProps } from './Link';
 import { useClassnames } from './StyleProvider';
+import { Tooltip } from './Tooltip';
 
 type ButtonProps = {
     href?: string;
@@ -103,21 +103,5 @@ export function Button({
         </button>
     );
 
-    return iconOnly ? (
-        <Tooltip.Provider delayDuration={300}>
-            <Tooltip.Root>
-                <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
-                <Tooltip.Portal>
-                    <Tooltip.Content
-                        sideOffset={4}
-                        className="z-50 rounded-md bg-tint-12 px-2 py-1 text-contrast-tint-12 text-sm"
-                    >
-                        {label}
-                    </Tooltip.Content>
-                </Tooltip.Portal>
-            </Tooltip.Root>
-        </Tooltip.Provider>
-    ) : (
-        button
-    );
+    return iconOnly ? <Tooltip label={label}>{button}</Tooltip> : button;
 }
