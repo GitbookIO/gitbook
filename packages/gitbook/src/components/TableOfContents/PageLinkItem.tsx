@@ -1,31 +1,19 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { type RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
+'use client';
+
 import { Icon } from '@gitbook/icons';
+import type { ClientTOCPage } from './encodeClientTableOfContents';
 
 import { Link } from '@/components/primitives';
-import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
 import { TOCPageIcon } from './TOCPageIcon';
 
-export async function PageLinkItem(props: { page: RevisionPageLink; context: GitBookSiteContext }) {
-    const { page, context } = props;
-
-    const resolved = await resolveContentRef(page.target, context);
+export function PageLinkItem(props: { page: ClientTOCPage }) {
+    const { page } = props;
 
     return (
         <li className={tcls('flex', 'flex-col')}>
-            <Link
-                href={resolved?.href ?? '#'}
-                classNames={['PageLinkItemStyles']}
-                insights={{
-                    type: 'link_click',
-                    link: {
-                        target: page.target,
-                        position: SiteInsightsLinkPosition.Sidebar,
-                    },
-                }}
-            >
+            <Link href={page.href} classNames={['PageLinkItemStyles']} insights={page.insights}>
                 <TOCPageIcon page={page} />
                 {page.title}
                 <Icon

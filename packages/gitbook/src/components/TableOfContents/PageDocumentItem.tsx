@@ -1,48 +1,25 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
+'use client';
+
 import { tcls } from '@/lib/tailwind';
-import {
-    type RevisionPage,
-    type RevisionPageDocument,
-    SiteInsightsLinkPosition,
-} from '@gitbook/api';
+import type { ClientTOCPage } from './encodeClientTableOfContents';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
 
-export async function PageDocumentItem(props: {
-    rootPages: RevisionPage[];
-    page: RevisionPageDocument;
-    context: GitBookSiteContext;
-}) {
-    const { rootPages, page, context } = props;
-    let href = context.linker.toPathForPage({ pages: rootPages, page });
-    // toPathForPage can returns an empty path, this will cause all links to point to the current page.
-    if (href === '') {
-        href = '/';
-    }
+export function PageDocumentItem(props: { page: ClientTOCPage }) {
+    const { page } = props;
 
     return (
         <li className="flex flex-col">
             <ToggleableLinkItem
-                href={href}
-                pathnames={getPagePaths(rootPages, page)}
-                insights={{
-                    type: 'link_click',
-                    link: {
-                        target: {
-                            kind: 'page',
-                            page: page.id,
-                        },
-                        position: SiteInsightsLinkPosition.Sidebar,
-                    },
-                }}
+                href={page.href}
+                pathnames={page.pathnames}
+                insights={page.insights}
                 descendants={
-                    hasPageVisibleDescendant(page) ? (
+                    page.descendants && page.descendants.length > 0 ? (
                         <PagesList
-                            rootPages={rootPages}
-                            pages={page.pages}
+                            pages={page.descendants}
                             style={tcls(
                                 'ml-5',
                                 'my-2',
@@ -50,7 +27,6 @@ export async function PageDocumentItem(props: {
                                 'sidebar-list-default:border-l',
                                 'sidebar-list-line:border-l'
                             )}
-                            context={context}
                         />
                     ) : null
                 }
