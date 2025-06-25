@@ -3,6 +3,7 @@
 import { tcls } from '@/lib/tailwind';
 import type { ClientTOCPage } from './encodeClientTableOfContents';
 
+import { SiteInsightsLinkPosition } from '@gitbook/api';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
@@ -15,7 +16,13 @@ export function PageDocumentItem(props: { page: ClientTOCPage }) {
             <ToggleableLinkItem
                 href={page.href ?? '#'}
                 pathnames={page.pathnames}
-                insights={page.insights}
+                insights={{
+                    type: 'link_click',
+                    link: {
+                        target: { kind: 'page', page: page.id },
+                        position: SiteInsightsLinkPosition.Sidebar,
+                    },
+                }}
                 descendants={
                     page.descendants && page.descendants.length > 0 ? (
                         <PagesList

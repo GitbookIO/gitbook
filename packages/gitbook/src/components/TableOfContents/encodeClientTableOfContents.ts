@@ -1,9 +1,8 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
-import { type RevisionPage, SiteInsightsLinkPosition } from '@gitbook/api';
+import type { ContentRef, RevisionPage } from '@gitbook/api';
 import assertNever from 'assert-never';
-import type { TrackEventInput } from '../Insights';
 
 export type ClientTOCPage = {
     id: string;
@@ -12,8 +11,8 @@ export type ClientTOCPage = {
     emoji?: string;
     icon?: string;
     pathnames: string[];
-    insights?: TrackEventInput<'link_click'>;
     descendants?: ClientTOCPage[];
+    target?: ContentRef;
     type: 'document' | 'link' | 'group';
 };
 
@@ -52,13 +51,6 @@ export async function encodeClientTableOfContents(
                         emoji: page.emoji,
                         icon: page.icon,
                         pathnames: getPagePaths(rootPages, page),
-                        insights: {
-                            type: 'link_click',
-                            link: {
-                                target: { kind: 'page', page: page.id },
-                                position: SiteInsightsLinkPosition.Sidebar,
-                            },
-                        },
                         descendants,
                         type: 'document',
                     })
@@ -74,14 +66,8 @@ export async function encodeClientTableOfContents(
                         href: resolved?.href ?? '#',
                         emoji: page.emoji,
                         icon: page.icon,
+                        target: page.target,
                         pathnames: [],
-                        insights: {
-                            type: 'link_click',
-                            link: {
-                                target: page.target,
-                                position: SiteInsightsLinkPosition.Sidebar,
-                            },
-                        },
                         type: 'link',
                     })
                 );
