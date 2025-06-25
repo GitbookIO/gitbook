@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 export type VisitorAuthClaims = Record<string, any>;
 
 /**
- * Get the visitor auth claims from the API response obtained from `getPublishedContentByUrl`.
+ * Get the visitor auth claims from the API response obtained from `resolvePublishedContentByUrl`.
  */
 export function getVisitorAuthClaims(siteData: SiteURLData): VisitorAuthClaims {
     const { apiToken } = siteData;
