@@ -1,5 +1,5 @@
 ---
-"gitbook-v2": patch
+"gitbook": patch
 ---
 
 Fix viewing a page from a revision

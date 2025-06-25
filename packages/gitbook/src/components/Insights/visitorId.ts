@@ -1,6 +1,6 @@
 'use client';
 
-import { getBrowserCookie } from '@/lib/browser-cookies';
+import { getBrowserCookie } from '@/lib/browser';
 
 import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';

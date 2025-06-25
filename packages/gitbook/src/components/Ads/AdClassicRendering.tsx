@@ -1,6 +1,6 @@
+import type { GitBookBaseContext } from '@/lib/context';
+import { getResizedImageURL } from '@/lib/images';
 import type { SiteInsightsAd } from '@gitbook/api';
-import type { GitBookBaseContext } from '@v2/lib/context';
-import { getResizedImageURL } from '@v2/lib/images';
 
 import { tcls } from '@/lib/tailwind';
 

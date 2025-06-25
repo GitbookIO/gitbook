@@ -1,10 +1,8 @@
 'use server';
 
-import { getV1BaseContext } from '@/lib/v1';
-import { isV2 } from '@/lib/v2';
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import type { RenderIntegrationUI } from '@gitbook/api';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
-import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 
@@ -21,7 +19,7 @@ export async function renderIntegrationUi({
     };
     request: RenderIntegrationUI;
 }) {
-    const serverAction = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const serverAction = await getServerActionBaseContext();
     const output = await fetchSafeIntegrationUI(serverAction, {
         integrationName: renderContext.integrationName,
         request,

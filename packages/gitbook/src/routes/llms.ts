@@ -1,9 +1,9 @@
+import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
-import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';

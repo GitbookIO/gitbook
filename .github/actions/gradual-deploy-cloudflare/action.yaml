@@ -32,7 +32,7 @@ runs:
             workingDirectory: ./
             wranglerVersion: '4.10.0'
             environment: ${{ inputs.environment }}
-            command: deployments status --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
+            command: deployments status --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
       # This step is used to get the version ID that is currently deployed to Cloudflare.
       - id: extract_current_version
@@ -51,7 +51,7 @@ runs:
             workingDirectory: ./
             wranglerVersion: '4.10.0'
             environment: ${{ inputs.environment }}
-            command: versions deploy ${{ steps.extract_current_version.outputs.version_id }}@100% ${{ inputs.serverVersionId }}@0% -y --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
+            command: versions deploy ${{ steps.extract_current_version.outputs.version_id }}@100% ${{ inputs.serverVersionId }}@0% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
       # Since we use version overrides headers, we can directly deploy the middleware to 100%.
       - id: deploy_middleware
@@ -63,7 +63,7 @@ runs:
             workingDirectory: ./
             wranglerVersion: '4.10.0'
             environment: ${{ inputs.environment }}
-            command: versions deploy ${{ inputs.middlewareVersionId }}@100% -y --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
+            command: versions deploy ${{ inputs.middlewareVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/middlewareWrangler.jsonc
 
       - name: Deploy server to Cloudflare at 100%
         uses: cloudflare/wrangler-action@v3.14.0
@@ -73,7 +73,7 @@ runs:
             workingDirectory: ./
             wranglerVersion: '4.10.0'
             environment: ${{ inputs.environment }}
-            command: versions deploy ${{ inputs.serverVersionId }}@100% -y --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
+            command: versions deploy ${{ inputs.serverVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
       - name: Outputs
         shell: bash

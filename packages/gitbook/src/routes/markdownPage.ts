@@ -1,7 +1,7 @@
+import type { GitBookSiteContext } from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
 import { resolvePagePath } from '@/lib/pages';
 import { RevisionPageType } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { throwIfDataError } from '@v2/lib/data';
 
 /**
  * Generate a markdown version of a page.

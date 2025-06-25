@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { RevisionPage, RevisionPageGroup } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { hasPageVisibleDescendant } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';

@@ -1,40 +1,21 @@
 import { describe, expect, it } from 'bun:test';
-import { getProxyModeBasePath } from './proxy';
+import { getProxyRequestIdentifier, isProxyRequest } from './proxy';
 
-describe('getProxyModeBasePath', () => {
-    it('should return the base path for proxy mode (base = /, path = /)', () => {
-        const input = new URL('https://example.com/docs');
-        const resolved = { basePath: '/', pathname: '/' };
-        expect(getProxyModeBasePath(input, resolved)).toEqual('/docs/');
+describe('isProxyRequest', () => {
+    it('should return true for proxy requests', () => {
+        const proxyRequestURL = new URL('https://proxy.gitbook.site/sites/site_foo/hello/world');
+        expect(isProxyRequest(proxyRequestURL)).toBe(true);
     });
 
-    it('should return the base path for proxy mode (base = /, path = /hello/world)', () => {
-        const input = new URL('https://example.com/docs/hello/world');
-        const resolved = { basePath: '/', pathname: '/hello/world' };
-        expect(getProxyModeBasePath(input, resolved)).toEqual('/docs/');
+    it('should return false for non-proxy requests', () => {
+        const nonProxyRequestURL = new URL('https://example.com/docs/foo/hello/world');
+        expect(isProxyRequest(nonProxyRequestURL)).toBe(false);
     });
+});
 
-    it('should return the base path for proxy mode (base = /v1, path = /)', () => {
-        const input = new URL('https://example.com/docs/v1');
-        const resolved = { basePath: '/v1', pathname: '/' };
-        expect(getProxyModeBasePath(input, resolved)).toEqual('/docs/v1/');
-    });
-
-    it('should return the base path for proxy mode (base = /v1/, path = /)', () => {
-        const input = new URL('https://example.com/docs/v1/');
-        const resolved = { basePath: '/v1/', pathname: '/' };
-        expect(getProxyModeBasePath(input, resolved)).toEqual('/docs/v1/');
-    });
-
-    it('should return the base path for proxy mode (base = /v1, path = /hello/world)', () => {
-        const input = new URL('https://example.com/docs/v1/hello/world');
-        const resolved = { basePath: '/v1', pathname: '/hello/world' };
-        expect(getProxyModeBasePath(input, resolved)).toEqual('/docs/v1/');
-    });
-
-    it('should return the base path for proxy mode (base = /v1/, path = /hello/world)', () => {
-        const input = new URL('https://example.com/docs/v1/hello/world');
-        const resolved = { basePath: '/v1/', pathname: '/hello/world' };
-        expect(getProxyModeBasePath(input, resolved)).toEqual('/docs/v1/');
+describe('getProxyRequestIdentifier', () => {
+    it('should return the correct identifier for proxy requests', () => {
+        const proxyRequestURL = new URL('https://proxy.gitbook.site/sites/site_foo/hello/world');
+        expect(getProxyRequestIdentifier(proxyRequestURL)).toBe('sites/site_foo');
     });
 });

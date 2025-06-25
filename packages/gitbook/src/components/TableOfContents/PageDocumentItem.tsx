@@ -1,3 +1,4 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import {
@@ -5,7 +6,6 @@ import {
     type RevisionPageDocument,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';

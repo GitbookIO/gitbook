@@ -1,5 +1,5 @@
+import type { SiteURLData } from '@/lib/context';
 import type { SiteAPIToken } from '@gitbook/api';
-import type { SiteURLData } from '@v2/lib/context';
 import { jwtDecode } from 'jwt-decode';
 
 /**
