@@ -36,3 +36,4 @@ screenshots/
 # cloudflare
 .open-next
 .wrangler
+worker-configuration.d.ts
