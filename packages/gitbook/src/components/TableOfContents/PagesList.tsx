@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { RevisionPage } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 

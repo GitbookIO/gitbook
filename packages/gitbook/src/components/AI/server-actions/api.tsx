@@ -1,4 +1,6 @@
 'use server';
+import type { GitBookBaseContext } from '@/lib/context';
+import { fetchServerActionSiteContext } from '@/lib/server-actions';
 import {
     type AIMessage,
     type AIMessageInput,
@@ -7,8 +9,6 @@ import {
     type AIModel,
     type AIStreamResponse,
 } from '@gitbook/api';
-import type { GitBookBaseContext } from '@v2/lib/context';
-import { fetchServerActionSiteContext } from '@v2/lib/server-actions';
 import { EventIterator } from 'event-iterator';
 import type { MaybePromise } from 'p-map';
 import * as partialJson from 'partial-json';

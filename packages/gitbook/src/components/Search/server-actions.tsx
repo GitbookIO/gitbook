@@ -1,9 +1,10 @@
 'use server';
 
+import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
-import { getV1BaseContext } from '@/lib/v1';
 import type {
     Revision,
     RevisionPage,
@@ -15,16 +16,13 @@ import type {
     SiteSectionGroup,
     Space,
 } from '@gitbook/api';
-import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
+import { throwIfDataError } from '@/lib/data';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { isV2 } from '@/lib/v2';
 import type { IconName } from '@gitbook/icons';
-import { throwIfDataError } from '@v2/lib/data';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
@@ -70,7 +68,7 @@ export interface AskAnswerResult {
  * Server action to search content in the entire site.
  */
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const context = await getServerActionBaseContext();
 
     return await searchSiteContent(context, {
         query,
@@ -82,7 +80,7 @@ export async function searchAllSiteContent(query: string): Promise<OrderedComput
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const context = await getServerActionBaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
     return await searchSiteContent(context, {
@@ -106,9 +104,7 @@ export async function streamAskQuestion({
     const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
     (async () => {
-        const context = await fetchServerActionSiteContext(
-            isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
-        );
+        const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
 
         const apiClient = await context.dataFetcher.api();
 
@@ -192,7 +188,7 @@ export async function streamAskQuestion({
  */
 export async function streamRecommendedQuestions() {
     const siteURLData = await getSiteURLDataFromMiddleware();
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const context = await getServerActionBaseContext();
 
     const responseStream = createStreamableValue<SearchAIRecommendedQuestionStream | undefined>();
 

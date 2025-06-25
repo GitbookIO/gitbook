@@ -1,7 +1,7 @@
 'use server';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import { type AIMessageContext, AIMessageRole, AIModel } from '@gitbook/api';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
-import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { z } from 'zod';
 import { streamGenerateAIObject, streamRenderAIMessage } from './api';
 import { MARKDOWN_LINKS_PROMPT } from './prompts';

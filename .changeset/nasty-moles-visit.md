@@ -1,5 +1,5 @@
 ---
-"gitbook-v2": patch
+"gitbook": patch
 ---
 
 fix ISR on preview env

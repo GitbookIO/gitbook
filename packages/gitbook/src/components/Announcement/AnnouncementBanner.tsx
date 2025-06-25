@@ -1,7 +1,7 @@
 'use client';
 
 import { tString, useLanguage } from '@/intl/client';
-import * as storage from '@/lib/local-storage';
+import { setLocalStorageItem } from '@/lib/browser';
 import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
@@ -101,7 +101,7 @@ export function AnnouncementBanner(props: {
  * @see AnnouncementScript
  */
 function dismissAnnouncement() {
-    storage.setItem(ANNOUNCEMENT_STORAGE_KEY, {
+    setLocalStorageItem(ANNOUNCEMENT_STORAGE_KEY, {
         visible: false,
         at: Date.now(),
     });

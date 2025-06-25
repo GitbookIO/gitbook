@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { CustomizationHeaderPreset } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -12,7 +12,7 @@ import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@v2/lib/env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';

@@ -1,3 +1,16 @@
+import {
+    type GitBookAnyContext,
+    type GitBookSpaceContext,
+    fetchSpaceContextByIds,
+} from '@/lib/context';
+import {
+    getDataOrNull,
+    getPageDocument,
+    getRevisionFile,
+    getRevisionReusableContent,
+    ignoreDataThrownError,
+} from '@/lib/data';
+import { type GitBookLinker, createLinker } from '@/lib/links';
 import type {
     ContentRef,
     Revision,
@@ -8,19 +21,6 @@ import type {
     Space,
 } from '@gitbook/api';
 import type { Filesystem } from '@gitbook/openapi-parser';
-import {
-    type GitBookAnyContext,
-    type GitBookSpaceContext,
-    fetchSpaceContextByIds,
-} from '@v2/lib/context';
-import {
-    getDataOrNull,
-    getPageDocument,
-    getRevisionFile,
-    getRevisionReusableContent,
-    ignoreDataThrownError,
-} from '@v2/lib/data';
-import { type GitBookLinker, createLinker } from '@v2/lib/links';
 import assertNever from 'assert-never';
 import type React from 'react';
 

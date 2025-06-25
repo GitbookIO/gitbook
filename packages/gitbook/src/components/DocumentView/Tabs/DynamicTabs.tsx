@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo } from 'react';
 
 import { useHash, useIsMounted } from '@/components/hooks';
-import * as storage from '@/lib/local-storage';
+import { getLocalStorageItem, setLocalStorageItem } from '@/lib/browser';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import type { DocumentBlockTabs } from '@gitbook/api';
 import { HashLinkButton, hashLinkButtonWrapperStyles } from '../HashLinkButton';
@@ -20,7 +20,7 @@ const defaultTabsState: TabsState = {
     activeTitles: [],
 };
 
-let globalTabsState = storage.getItem('@gitbook/tabsState', defaultTabsState);
+let globalTabsState = getLocalStorageItem('@gitbook/tabsState', defaultTabsState);
 const listeners = new Set<() => void>();
 
 function useTabsState() {
@@ -33,7 +33,7 @@ function useTabsState() {
 
     const setTabsState = useCallback((updater: (previous: TabsState) => TabsState) => {
         globalTabsState = updater(globalTabsState);
-        storage.setItem('@gitbook/tabsState', globalTabsState);
+        setLocalStorageItem('@gitbook/tabsState', globalTabsState);
         listeners.forEach((listener) => listener());
     }, []);
     const state = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);

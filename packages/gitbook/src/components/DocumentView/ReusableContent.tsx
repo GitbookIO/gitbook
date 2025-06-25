@@ -2,9 +2,9 @@ import type { DocumentBlockReusableContent } from '@gitbook/api';
 
 import { createLinkerForSpace, resolveContentRef } from '@/lib/references';
 
-import type { GitBookSpaceContext } from '@v2/lib/context';
-import { getDataOrNull } from '@v2/lib/data';
-import { createLinker } from '@v2/lib/links';
+import type { GitBookSpaceContext } from '@/lib/context';
+import { getDataOrNull } from '@/lib/data';
+import { createLinker } from '@/lib/links';
 import { assert } from 'ts-essentials';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';

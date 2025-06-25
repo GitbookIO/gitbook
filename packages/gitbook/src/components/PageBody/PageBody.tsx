@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { JSONDocument, RevisionPageDocument } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';

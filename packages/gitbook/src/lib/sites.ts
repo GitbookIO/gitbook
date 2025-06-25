@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { joinPath } from './paths';
 
 /**

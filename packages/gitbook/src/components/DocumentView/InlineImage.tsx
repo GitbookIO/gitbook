@@ -1,5 +1,5 @@
+import type { GitBookBaseContext } from '@/lib/context';
 import type { DocumentInlineImage } from '@gitbook/api';
-import type { GitBookBaseContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
