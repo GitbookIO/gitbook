@@ -32,6 +32,7 @@ export function PageControlButtons(props: {
     }, [pageIds]);
     const activeDivId = useScrollActiveId(divIds, {
         threshold: 0,
+        active: true,
     });
     const activeIndex = (activeDivId ? divIds.indexOf(activeDivId) : 0) + 1;
     const activePageId = pageIds[activeIndex - 1]?.[0];

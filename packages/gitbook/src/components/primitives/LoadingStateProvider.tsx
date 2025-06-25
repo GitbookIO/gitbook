@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-export const LoadingStateProviderContext = createContext<{
+// We don't export this context directly, you are supposed to use one of the hooks or components provided by this file.
+const LoadingStateProviderContext = createContext<{
     bodyLoaded: boolean;
     setBodyLoaded: (loaded: boolean) => void;
 }>({
