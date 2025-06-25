@@ -68,6 +68,7 @@ export function createLinker(
         siteBasePath: string;
     },
     linkerOptions: {
+        /** If true, any links returned by this linker will be absolute. */
         alwaysAbsolute?: boolean;
     } = {}
 ): GitBookLinker {

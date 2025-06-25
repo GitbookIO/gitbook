@@ -50,12 +50,13 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     const reusableContentContext: GitBookSpaceContext = await (async () => {
         assert(context.contentContext);
 
-        // Reusable Content in the same space resolves the same as any other reference.
+        // References inside reusable content in the same space resolve the same as any other reference.
         if (context.contentContext.space.id === reusableContent.space.id) {
             return context.contentContext;
         }
 
-        // Reusable Content in a different space needs to resolve the space context and linker.
+        // References inside reusable content from a different space need to resolve in the parent space.
+        // Create a linker that ensures links are resolved with the correct parent, and are kept absolute.
         const ctx = await createLinkerForSpace(reusableContent.space.id, context.contentContext);
 
         if (!ctx) {
@@ -68,10 +69,6 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
             dataFetcher,
             space: ctx.space,
             linker: ctx.linker,
-            // When the reusable content is in a different space, we don't resolve relative links to pages
-            // as this space might not be part of the current site.
-            // In the future, we might expand the logic to look up the space from the list of all spaces in the site
-            // and adapt the relative links to point to the correct variant.
             revision: reusableContent.revision,
             shareKey: undefined,
         };
