@@ -4,3 +4,5 @@ export * from './useHash';
 export * from './useIsMounted';
 export * from './useToggleAnimation';
 export * from './useCurrentPagePath';
+export * from './useCurrentContent';
+export * from './useCurrentPage';

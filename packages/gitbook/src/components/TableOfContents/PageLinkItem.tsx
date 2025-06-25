@@ -1,6 +1,6 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { type RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
 import { Link } from '@/components/primitives';
 import { resolveContentRef } from '@/lib/references';
