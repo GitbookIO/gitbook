@@ -1,21 +1,47 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
+import { removeUndefined } from '@/lib/typescript';
 import type { ContentRef, RevisionPage } from '@gitbook/api';
 import assertNever from 'assert-never';
 
-export type ClientTOCPage = {
+export type ClientTOCPageLink = {
+    type: 'link';
     id: string;
     title: string;
-    href?: string;
+    href: string;
+    emoji?: string;
+    icon?: string;
+    target: ContentRef;
+};
+
+export type ClientTOCPageDocument = {
+    type: 'document';
+    id: string;
+    title: string;
+    href: string;
     emoji?: string;
     icon?: string;
     pathnames: string[];
     descendants?: ClientTOCPage[];
-    target?: ContentRef;
-    type: 'document' | 'link' | 'group';
 };
 
+export type ClientTOCPageGroup = {
+    type: 'group';
+    id: string;
+    title: string;
+    emoji?: string;
+    icon?: string;
+    descendants?: ClientTOCPage[];
+};
+
+export type ClientTOCPage = ClientTOCPageLink | ClientTOCPageDocument | ClientTOCPageGroup;
+
+/**
+ *
+ * Encodes a table of contents for client components.
+ * We do this to reduce the amount of data sent as RSC, we only send the encoded ClientTableOfContents once to a single client component.
+ */
 export async function encodeClientTableOfContents(
     context: GitBookSiteContext,
     rootPages: RevisionPage[],
@@ -67,7 +93,6 @@ export async function encodeClientTableOfContents(
                         emoji: page.emoji,
                         icon: page.icon,
                         target: page.target,
-                        pathnames: [],
                         type: 'link',
                     })
                 );
@@ -84,7 +109,6 @@ export async function encodeClientTableOfContents(
                         title: page.title,
                         emoji: page.emoji,
                         icon: page.icon,
-                        pathnames: [],
                         descendants,
                         type: 'group',
                     })
@@ -93,19 +117,6 @@ export async function encodeClientTableOfContents(
             }
             default:
                 assertNever(page);
-        }
-    }
-
-    return result;
-}
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-function removeUndefined<T extends Record<string, any>>(obj: T): any {
-    const result: Partial<T> = {};
-
-    for (const [key, value] of Object.entries(obj)) {
-        if (value !== undefined) {
-            result[key as keyof T] = value;
         }
     }
 

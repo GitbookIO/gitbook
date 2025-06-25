@@ -1,14 +1,14 @@
 'use client';
 
 import { tcls } from '@/lib/tailwind';
-import type { ClientTOCPage } from './encodeClientTableOfContents';
+import type { ClientTOCPageDocument } from './encodeClientTableOfContents';
 
 import { SiteInsightsLinkPosition } from '@gitbook/api';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 import { ToggleableLinkItem } from './ToggleableLinkItem';
 
-export function PageDocumentItem(props: { page: ClientTOCPage }) {
+export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     const { page } = props;
 
     return (

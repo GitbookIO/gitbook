@@ -26,7 +26,6 @@ export function PagesList(props: { pages: ClientTOCPage[]; style?: ClassValue })
                         return <PageGroupItem key={page.id} page={page} />;
 
                     default:
-                        //@ts-ignore Just for testing
                         assertNever(page);
                 }
             })}

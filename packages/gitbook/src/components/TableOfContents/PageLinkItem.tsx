@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import type { ClientTOCPage } from './encodeClientTableOfContents';
+import type { ClientTOCPageLink } from './encodeClientTableOfContents';
 
 import { Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
@@ -9,7 +9,7 @@ import { tcls } from '@/lib/tailwind';
 import { SiteInsightsLinkPosition } from '@gitbook/api';
 import { TOCPageIcon } from './TOCPageIcon';
 
-export function PageLinkItem(props: { page: ClientTOCPage }) {
+export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const { page } = props;
 
     return (
@@ -17,17 +17,13 @@ export function PageLinkItem(props: { page: ClientTOCPage }) {
             <Link
                 href={page.href ?? '#'}
                 classNames={['PageLinkItemStyles']}
-                insights={
-                    page.target
-                        ? {
-                              type: 'link_click',
-                              link: {
-                                  target: page.target,
-                                  position: SiteInsightsLinkPosition.Sidebar,
-                              },
-                          }
-                        : undefined
-                }
+                insights={{
+                    type: 'link_click',
+                    link: {
+                        target: page.target,
+                        position: SiteInsightsLinkPosition.Sidebar,
+                    },
+                }}
             >
                 <TOCPageIcon page={page} />
                 {page.title}
