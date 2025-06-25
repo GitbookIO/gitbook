@@ -365,19 +365,26 @@ describe('getURLLookupAlternatives', () => {
 
     it('should skip proxy root URLs', () => {
         expect(
-            getURLLookupAlternatives(new URL('https://proxy.gitbook.site/site_123/doc1'))
+            getURLLookupAlternatives(
+                new URL('https://proxy.gitbook.site/sites/site_foo/hello/world')
+            )
         ).toEqual({
             revision: undefined,
             changeRequest: undefined,
             basePath: undefined,
             urls: [
                 {
-                    url: 'https://proxy.gitbook.site/site_123',
-                    extraPath: 'doc1',
+                    url: 'https://proxy.gitbook.site/sites/site_foo',
+                    extraPath: 'hello/world',
                     primary: false,
                 },
                 {
-                    url: 'https://proxy.gitbook.site/site_123/doc1',
+                    url: 'https://proxy.gitbook.site/sites/site_foo/hello',
+                    extraPath: 'world',
+                    primary: false,
+                },
+                {
+                    url: 'https://proxy.gitbook.site/sites/site_foo/hello/world',
                     extraPath: '',
                     primary: true,
                 },
