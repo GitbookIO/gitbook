@@ -13,7 +13,11 @@ export function PageLinkItem(props: { page: ClientTOCPage }) {
 
     return (
         <li className={tcls('flex', 'flex-col')}>
-            <Link href={page.href} classNames={['PageLinkItemStyles']} insights={page.insights}>
+            <Link
+                href={page.href ?? '#'}
+                classNames={['PageLinkItemStyles']}
+                insights={page.insights}
+            >
                 <TOCPageIcon page={page} />
                 {page.title}
                 <Icon

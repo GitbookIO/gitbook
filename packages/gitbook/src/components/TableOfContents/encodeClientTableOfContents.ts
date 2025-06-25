@@ -9,8 +9,8 @@ export type ClientTOCPage = {
     id: string;
     title: string;
     href?: string;
-    emoji?: string | null;
-    icon?: string | null;
+    emoji?: string;
+    icon?: string;
     pathnames: string[];
     insights?: TrackEventInput<'link_click'>;
     descendants?: ClientTOCPage[];
@@ -44,43 +44,47 @@ export async function encodeClientTableOfContents(
                     ? await encodeClientTableOfContents(context, rootPages, page.pages)
                     : undefined;
 
-                result.push({
-                    id: page.id,
-                    title: page.title,
-                    href,
-                    emoji: page.emoji,
-                    icon: page.icon,
-                    pathnames: getPagePaths(rootPages, page),
-                    insights: {
-                        type: 'link_click',
-                        link: {
-                            target: { kind: 'page', page: page.id },
-                            position: SiteInsightsLinkPosition.Sidebar,
+                result.push(
+                    removeUndefined({
+                        id: page.id,
+                        title: page.title,
+                        href,
+                        emoji: page.emoji,
+                        icon: page.icon,
+                        pathnames: getPagePaths(rootPages, page),
+                        insights: {
+                            type: 'link_click',
+                            link: {
+                                target: { kind: 'page', page: page.id },
+                                position: SiteInsightsLinkPosition.Sidebar,
+                            },
                         },
-                    },
-                    descendants,
-                    type: 'document',
-                });
+                        descendants,
+                        type: 'document',
+                    })
+                );
                 break;
             }
             case 'link': {
                 const resolved = await resolveContentRef(page.target, context);
-                result.push({
-                    id: page.id,
-                    title: page.title,
-                    href: resolved?.href ?? '#',
-                    emoji: page.emoji,
-                    icon: page.icon,
-                    pathnames: [],
-                    insights: {
-                        type: 'link_click',
-                        link: {
-                            target: page.target,
-                            position: SiteInsightsLinkPosition.Sidebar,
+                result.push(
+                    removeUndefined({
+                        id: page.id,
+                        title: page.title,
+                        href: resolved?.href ?? '#',
+                        emoji: page.emoji,
+                        icon: page.icon,
+                        pathnames: [],
+                        insights: {
+                            type: 'link_click',
+                            link: {
+                                target: page.target,
+                                position: SiteInsightsLinkPosition.Sidebar,
+                            },
                         },
-                    },
-                    type: 'link',
-                });
+                        type: 'link',
+                    })
+                );
                 break;
             }
             case 'group': {
@@ -88,19 +92,34 @@ export async function encodeClientTableOfContents(
                     ? await encodeClientTableOfContents(context, rootPages, page.pages)
                     : undefined;
 
-                result.push({
-                    id: page.id,
-                    title: page.title,
-                    emoji: page.emoji,
-                    icon: page.icon,
-                    pathnames: [],
-                    descendants,
-                    type: 'group',
-                });
+                result.push(
+                    removeUndefined({
+                        id: page.id,
+                        title: page.title,
+                        emoji: page.emoji,
+                        icon: page.icon,
+                        pathnames: [],
+                        descendants,
+                        type: 'group',
+                    })
+                );
                 break;
             }
             default:
                 assertNever(page);
+        }
+    }
+
+    return result;
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+function removeUndefined<T extends Record<string, any>>(obj: T): any {
+    const result: Partial<T> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined) {
+            result[key as keyof T] = value;
         }
     }
 
