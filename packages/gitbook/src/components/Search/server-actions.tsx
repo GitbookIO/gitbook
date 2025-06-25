@@ -2,7 +2,7 @@
 
 import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
-import { getServerActionBaseContext } from '@/lib/server-actions';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import type {
@@ -104,7 +104,7 @@ export async function streamAskQuestion({
     const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
     (async () => {
-        const context = await getServerActionBaseContext();
+        const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
 
         const apiClient = await context.dataFetcher.api();
 

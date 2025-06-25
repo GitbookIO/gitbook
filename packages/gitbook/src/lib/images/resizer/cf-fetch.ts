@@ -4,8 +4,6 @@ import { copyImageResponse } from './utils';
 /**
  * Resize an image by doing a request to the image itself using the Cloudflare fetch.
  * https://developers.cloudflare.com/images/transform-images/transform-via-workers/
- *
- * This method doesn't work in Cloudflare Pages and is only supported in workers.
  */
 export async function resizeImageWithCFFetch(
     input: string,

@@ -5,7 +5,7 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import { getAllBrowserCookiesMap } from '@/lib/browser-cookies';
+import { getAllBrowserCookiesMap } from '@/lib/browser';
 import { type CurrentContentContext, useCurrentContent } from '../hooks';
 import { getSession } from './sessions';
 import { getVisitorId } from './visitorId';

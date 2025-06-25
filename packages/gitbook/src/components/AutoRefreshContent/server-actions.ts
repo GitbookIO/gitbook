@@ -13,7 +13,10 @@ export async function hasContentBeenUpdated(props: {
 }) {
     const context = await getServerActionBaseContext();
     const changeRequest = await getDataOrNull(
-        context.dataFetcher.getChangeRequest(props.spaceId, props.changeRequestId)
+        context.dataFetcher.getChangeRequest({
+            spaceId: props.spaceId,
+            changeRequestId: props.changeRequestId,
+        })
     );
     if (!changeRequest) {
         return false;
