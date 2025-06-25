@@ -21,7 +21,8 @@
         "dev": {
             "vars": {
                 "STAGE": "dev",
-                "NEXT_PRIVATE_DEBUG_CACHE": "true"
+                "NEXT_PRIVATE_DEBUG_CACHE": "true",
+                "PREVIEW_HOSTNAME": "localhost:3000"
             },
             "r2_buckets": [
                 {
@@ -38,7 +39,15 @@
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-dev"
                 }
-            ]
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            }
         },
         "preview": {
             "vars": {
@@ -60,6 +69,10 @@
                 {
                     "binding": "DEFAULT_WORKER",
                     "service": "gitbook-open-v2-server-preview"
+                },
+                {
+                    "binding": "CONTAINER_WORKER",
+                    "service": "on-container-worker"
                 }
             ],
             "durable_objects": {

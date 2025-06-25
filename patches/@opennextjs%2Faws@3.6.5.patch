@@ -1,0 +1,13 @@
+diff --git a/dist/build.js b/dist/build.js
+index 0c6fee9d01db1ed9f9f0ceaa0a61242f624e7b46..9e727163f7cec8ba50627c2854f5071d9f076ad7 100644
+--- a/dist/build.js
++++ b/dist/build.js
+@@ -35,7 +35,7 @@ export async function build(openNextConfigPath, nodeExternals) {
+     // Compile cache.ts
+     compileCache(options);
+     // Compile middleware
+-    await createMiddleware(options);
++    await createMiddleware(options, { forceOnlyBuildOnce: true });
+     createStaticAssets(options);
+     if (config.dangerous?.disableIncrementalCache !== true) {
+         const { useTagCache } = createCacheAssets(options);

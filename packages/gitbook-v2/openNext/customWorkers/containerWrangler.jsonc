@@ -1,0 +1,31 @@
+{
+    "name": "on-container-worker",
+    "main": "container.ts",
+    "compatibility_date": "2025-05-06",
+    "compatibility_flags": ["nodejs_compat"],
+    "observability": {
+        "enabled": true
+    },
+    "containers": [
+        {
+            "class_name": "OpenNextContainer",
+            "image": "./Dockerfile",
+            "max_instances": 1,
+            "name": "container-open-next"
+        }
+    ],
+    "durable_objects": {
+        "bindings": [
+            {
+                "class_name": "OpenNextContainer",
+                "name": "ON_CONTAINER"
+            }
+        ]
+    },
+    "migrations": [
+        {
+            "new_sqlite_classes": ["OpenNextContainer"],
+            "tag": "v1"
+        }
+    ]
+}

@@ -30,6 +30,10 @@
             "dependsOn": ["^build:v2:cloudflare", "^build:v2", "generate"],
             "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next/**"]
         },
+        "build:v2:container": {
+            "dependsOn": ["^build:v2:cloudflare", "^build:v2", "generate"],
+            "outputs": [".next/**", "!.next/cache/**", "dist", ".open-next/**"]
+        },
         // Build the package for Cloudflare Pages
         "build:cloudflare": {
             "dependsOn": ["^build", "generate"]
