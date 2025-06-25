@@ -1,5 +1,5 @@
 ---
-"gitbook": patch
+gitbook: patch
 ---
 
 Show scrollbars

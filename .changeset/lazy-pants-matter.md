@@ -1,6 +1,6 @@
 ---
-"gitbook": patch
-"gitbook": patch
+gitbook: patch
+gitbook: patch
 ---
 
 encode customization header

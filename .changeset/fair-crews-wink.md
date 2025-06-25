@@ -1,5 +1,5 @@
 ---
-"gitbook": minor
+gitbook: minor
 ---
 
 Add circular corners and depth styling
