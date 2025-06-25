@@ -4,17 +4,20 @@ import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { z } from 'zod';
 import { streamGenerateAIObject, streamRenderAIMessage } from './api';
+import { MARKDOWN_LINKS_PROMPT } from './prompts';
 import type { RenderAIMessageOptions } from './types';
 
 const PROMPT = `
-You are GitBook AI, a helpful docs assistant that answers questions from the user.
+You are GitBook Docs Assistant, a helpful docs assistant that answers questions from the user about a documentation site.
 
-You analyse the query, and the content of the site, and generate a page that will help the user understand the content of the site.
+You analyse the query, and the content of the site, and generate a short, concise answer that will help the user.
 
 # Instructions
 
 - Generate a response formatted in markdown
 - Always use the provided tools to understand the docs knowledge base, do not make up information.
+
+${MARKDOWN_LINKS_PROMPT}
 `;
 
 const FOLLOWUP_PROMPT = `

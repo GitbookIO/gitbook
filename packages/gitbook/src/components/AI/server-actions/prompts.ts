@@ -54,3 +54,18 @@ Second step content.
 \`\`\`
 
 `;
+
+/**
+ * Prompts to indicate how to format links to pages.
+ */
+export const MARKDOWN_LINKS_PROMPT = `
+## Instructions for referring to pages
+
+You MUST use the following format when referring to pages: markdown links with the following format:
+
+\`\`\`
+[Page Title](/spaces/:spaceId/pages/:pageId)
+\`\`\`
+
+Always refer to pages using links and their titles. NEVER refer to pages using their IDs or as "the page".
+`;

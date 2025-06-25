@@ -13,7 +13,7 @@ export function AIMessageView(
         context: GitBookSiteContext;
     }
 ) {
-    const { message, context } = props;
+    const { message, context, renderToolCalls = true } = props;
 
     return (
         <div className="flex flex-col gap-2">
@@ -29,7 +29,7 @@ export function AIMessageView(
                             }}
                             style={['space-y-5']}
                         />
-                        {step.toolCalls && step.toolCalls.length > 0 ? (
+                        {renderToolCalls && step.toolCalls && step.toolCalls.length > 0 ? (
                             <AIToolCallsSummary toolCalls={step.toolCalls} context={context} />
                         ) : null}
                     </div>
