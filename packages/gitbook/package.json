@@ -16,7 +16,6 @@
         "server-only": "^0.0.1",
         "warn-once": "^0.1.1",
         "object-identity": "^0.1.2",
-        "@gitbook/cache-do": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/icons": "workspace:*",
