@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { useAIChatController } from '../AI/useAIChat';
 import { useTrackEvent } from '../Insights';
 import { useSearch } from './useSearch';
 
@@ -17,22 +15,19 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
     const { style, children } = props;
 
     const language = useLanguage();
-    const chat = useAIChatController();
     const [, setSearchState] = useSearch();
     const trackEvent = useTrackEvent();
 
     const onClick = () => {
-        chat.open();
-        document.body.classList.toggle('chat-open', true);
-        // setSearchState({
-        //     ask: false,
-        //     global: false,
-        //     query: '',
-        // });
+        setSearchState({
+            ask: false,
+            global: false,
+            query: '',
+        });
 
-        // trackEvent({
-        //     type: 'search_open',
-        // });
+        trackEvent({
+            type: 'search_open',
+        });
     };
 
     return (

@@ -5,6 +5,7 @@ import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
+import AIChatButton from '../AIChat/AIChatButton';
 import { SearchButton } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -98,6 +99,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                 'shrink-0',
                                 'md:basis-56',
                                 'justify-self-end',
+                                'items-center',
+                                'gap-2',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
@@ -155,6 +158,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     </span>
                                 </SearchButton>
                             </Suspense>
+                            <AIChatButton />
                         </div>
 
                         {customization.header.links.length > 0 && (
