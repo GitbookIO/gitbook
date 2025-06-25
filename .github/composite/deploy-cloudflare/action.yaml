@@ -70,7 +70,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '4.21.0'
+              wranglerVersion: '4.21.1'
               environment: ${{ inputs.environment }}
               command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/doWrangler.jsonc
 
@@ -104,7 +104,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '4.21.0'
+              wranglerVersion: '4.21.1'
               command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/containerWrangler.jsonc
 
         - id: upload_middleware
@@ -114,7 +114,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '4.21.0'
+              wranglerVersion: '4.21.1'
               environment: ${{ inputs.environment }}
               command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
 
