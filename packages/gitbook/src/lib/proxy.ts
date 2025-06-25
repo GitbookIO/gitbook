@@ -13,3 +13,17 @@ export function getProxyRequestIdentifier(requestURL: URL): string {
     const pathname = requestURL.pathname.slice(1).split('/');
     return pathname.slice(0, 2).join('/');
 }
+
+/**
+ * Check if the request is for the root of the proxy site (i.e. https://proxy.gitbook.site/ or https://proxy.gitbook.site/sites).
+ * @param requestURL The URL of the request to check if it is a proxy root request.
+ */
+export function isProxyRootRequest(requestURL: URL): boolean {
+    // Check if the request is for the root of the proxy site
+    return (
+        isProxyRequest(requestURL) &&
+        (requestURL.pathname === '/' ||
+            requestURL.pathname === '/sites' ||
+            requestURL.pathname === '/sites/')
+    );
+}
