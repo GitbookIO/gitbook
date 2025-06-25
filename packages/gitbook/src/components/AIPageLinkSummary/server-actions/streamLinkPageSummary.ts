@@ -1,10 +1,10 @@
 'use server';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
 import { isV2 } from '@/lib/v2';
 import { AIMessageRole, AIModel } from '@gitbook/api';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
-import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { z } from 'zod';
 import { streamGenerateAIObject } from '../../AI/server-actions/api';
 

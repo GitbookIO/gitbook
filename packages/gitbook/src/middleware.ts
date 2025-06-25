@@ -1,874 +1,518 @@
-import { type ContentAPITokenPayload, CustomizationThemeMode, GitBookAPI } from '@gitbook/api';
-import { getURLLookupAlternatives, normalizeURL } from '@v2/lib/data';
-import assertNever from 'assert-never';
-import jwt from 'jsonwebtoken';
-import { type NextRequest, NextResponse } from 'next/server';
-import hash from 'object-hash';
+import { CustomizationThemeMode } from '@gitbook/api';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import rison from 'rison';
 
-import {
-    DEFAULT_API_ENDPOINT,
-    type PublishedContentWithCache,
-    api,
-    getPublishedContentByUrl,
-    getPublishedContentSite,
-    getSpace,
-    userAgent,
-    withAPI,
-} from '@/lib/api';
-import { race } from '@/lib/async';
-import { buildVersion } from '@/lib/build';
 import { getContentSecurityPolicy } from '@/lib/csp';
 import { validateSerializedCustomization } from '@/lib/customization';
-import { setMiddlewareHeader } from '@/lib/middleware';
+import {
+    DataFetcherError,
+    getVisitorAuthBasePath,
+    lookupPublishedContentByUrl,
+    normalizeURL,
+    throwIfDataError,
+} from '@/lib/data';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { getImageResizingContextId } from '@/lib/images';
+import { MiddlewareHeaders } from '@/lib/middleware';
+import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
-    type VisitorTokenLookup,
+    getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
     normalizeVisitorAuthURL,
 } from '@/lib/visitors';
-
-import { joinPath, withLeadingSlash } from '@/lib/paths';
-import { getProxyModeBasePath } from '@/lib/proxy';
-import { MiddlewareHeaders } from '@v2/lib/middleware';
-import { addResponseCacheTag } from './lib/cache/response';
-
+import { serveResizedImage } from '@/routes/image';
+import type { SiteURLData } from './lib/context';
 export const config = {
-    matcher:
-        '/((?!_next/static|_next/image|~gitbook/revalidate|~gitbook/image|~gitbook/monitoring|~gitbook/static|~scalar/proxy).*)',
-    skipTrailingSlashRedirect: true,
+    matcher: [
+        '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
+    ],
 };
 
-type URLLookupMode =
-    /**
-     * Only a single space is served on this instance, defined by the env GITBOOK_SPACE_ID.
-     * This mode is useful when self-hosting a single space.
-     */
-    | 'single'
-    /**
-     * Mode when a site is being proxied on a different base URL.
-     * - x-gitbook-site-url is used to determine the site to serve.
-     * - host / x-forwarded-host / x-gitbook-host + x-gitbook-basepath is used to determine the base URL.
-     */
-    | 'proxy'
-    /**
-     * Spaces are located using the incoming URL (using forwarded host headers).
-     * This mode is the default one when serving on the GitBook infrastructure.
-     */
-    | 'multi'
-    /**
-     * Spaces are located using the first segments of the url (open.gitbook.com/docs.mycompany.com).
-     * This mode is the default one when developing.
-     */
-    | 'multi-path'
-    /**
-     * Sites or Spaces are located using an ID stored in the first segments of the URL (open.gitbook.com/~site|~space/:id/)
-     * This mode is automatically detected and doesn't need to be configured.
-     * When this mode is used, an authentication token should be passed as a query parameter (`token`).
-     */
-    | 'multi-id';
+type URLWithMode = { url: URL; mode: 'url' | 'url-host' };
 
-export type LookupResult = PublishedContentWithCache & {
-    /** API endpoint to use for the content post lookup */
-    apiEndpoint?: string;
-    /** Cookies to store on the response */
-    cookies?: ResponseCookies;
-    /** Visitor authentication token */
-    visitorToken?: string;
-    /** URL of the site */
-    siteURL?: string;
-};
+export async function middleware(request: NextRequest) {
+    try {
+        const requestURL = new URL(request.url);
+
+        // Redirect to normalize the URL
+        const normalized = normalizeURL(requestURL);
+        if (normalized.toString() !== requestURL.toString()) {
+            return NextResponse.redirect(normalized.toString());
+        }
+
+        // Reject malicious requests
+        const rejectResponse = await validateServerActionRequest(request);
+        if (rejectResponse) {
+            return rejectResponse;
+        }
+
+        for (const handler of [serveSiteRoutes, serveSpacePDFRoutes]) {
+            const result = await handler(requestURL, request);
+            if (result) {
+                return result;
+            }
+        }
+
+        return NextResponse.next();
+    } catch (error) {
+        return serveErrorResponse(error as Error);
+    }
+}
+
+async function validateServerActionRequest(request: NextRequest) {
+    // We need to reject incorrect server actions requests
+    // We do not do it in cloudflare workers as there is a bug that prevents us from reading the request body.
+    if (request.headers.has('next-action') && process.env.GITBOOK_RUNTIME !== 'cloudflare') {
+        // We just test that the json body is parseable
+        try {
+            const clonedRequest = request.clone();
+            await clonedRequest.json();
+        } catch (e) {
+            console.warn('Invalid server action request', e);
+            // If the body is not parseable, we reject the request
+            return new Response('Invalid request', {
+                status: 400,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
+    }
+}
 
 /**
- * Middleware to lookup the site to render.
- * It takes as input a request with an URL, and a set of headers:
- *   - x-gitbook-api: the API endpoint to use, if undefined, the default one is used
- *   - x-gitbook-basepath: base in the path that should be ignored for routing
- *
- * Once the site has been looked-up, the middleware passes the info to the rendering
- * using a rewrite with a set of headers. This is the only way in next.js to do this (basically similar to AsyncLocalStorage).
- *
- * The middleware also takes care of persisting the visitor authentication state.
+ * Handle request that are targetting the site routes group.
  */
-export async function middleware(request: NextRequest) {
-    const { url, mode } = getInputURL(request);
-    const isServerAction = request.headers.has('Next-Action');
-
-    // Redirect to normalize the URL
-    const normalized = normalizeURL(url);
-    if (normalized.toString() !== url.toString()) {
-        return NextResponse.redirect(normalized.toString());
+async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
+    const match = getSiteURLFromRequest(request);
+    if (!match) {
+        return null;
     }
 
-    // The API endpoint can be passed as a header, making it possible to use the same GitBook Open target
-    // accross multiple GitBook instances.
-    let apiEndpoint = request.headers.get('x-gitbook-api') ?? DEFAULT_API_ENDPOINT;
-    const originBasePath = request.headers.get('x-gitbook-basepath') ?? '';
+    const { url: siteRequestURL, mode } = match;
+    const imagesContextId = getImageResizingContextId(siteRequestURL);
 
-    const inputURL = mode === 'proxy' ? url : stripURLBasePath(url, originBasePath);
-
-    const resolved = await withAPI(
-        {
-            client: new GitBookAPI({
-                endpoint: apiEndpoint,
-                authToken: getDefaultAPIToken(apiEndpoint),
-                userAgent: userAgent(),
-            }),
-            contextId: undefined,
-        },
-        () => lookupSiteForURL(mode, request, inputURL)
-    );
-    if ('error' in resolved) {
-        return new NextResponse(resolved.error.message, {
-            status: resolved.error.code,
-            headers: {
-                'x-gitbook-version': buildVersion(),
-            },
+    /**
+     * Serve image resizing requests (all requests containing `/~gitbook/image`).
+     * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
+     * and serve from a single route handler.
+     *
+     * In GitBook v1: image resizing was done at the root of the hostname (docs.company.com/~gitbook/image)
+     * In GitBook v2: image resizing is done at the content level (docs.company.com/section/variant/~gitbook/image)
+     */
+    if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
+        return await serveResizedImage(request, {
+            imagesContextId: imagesContextId,
         });
     }
 
-    if ('redirect' in resolved) {
-        return writeCookies(NextResponse.redirect(resolved.redirect), resolved.cookies);
+    // We want to filter hostnames that contains a port here as this is likely a malicious request.
+    if (siteRequestURL.host.includes(':')) {
+        return new Response('Invalid request', {
+            status: 400,
+            headers: { 'content-type': 'text/plain' },
+        });
     }
 
-    // Make sure the URL is clean of any va token after a successful lookup
-    // The token is stored in a cookie that is set on the redirect response
-    const normalizedVA = normalizeVisitorAuthURL(normalized);
-    if (normalizedVA.toString() !== normalized.toString()) {
-        return writeCookies(NextResponse.redirect(normalizedVA.toString()), resolved.cookies);
-    }
-
-    // Because of how Next will encode, we need to encode ourselves the pathname before rewriting to it.
-    const rewritePathname = withLeadingSlash(encodePathname(resolved.pathname));
-
-    // Resolution might have changed the API endpoint
-    apiEndpoint = resolved.apiEndpoint ?? apiEndpoint;
-
-    const contextId = 'site' in resolved ? resolved.contextId : undefined;
-    const csp = getContentSecurityPolicy();
-
-    const headers = new Headers(request.headers);
-    headers.set('content-security-policy', csp);
-    // Pass a x-forwarded-host and origin to ensure Next doesn't block server actions when proxied
-    headers.set('x-forwarded-host', inputURL.host);
-    headers.set('origin', inputURL.origin);
-    headers.set('x-gitbook-token', resolved.apiToken);
-    if (contextId) {
-        headers.set('x-gitbook-token-context', contextId);
-    }
-    headers.set('x-gitbook-mode', mode);
-    headers.set('x-gitbook-origin-basepath', originBasePath);
-    headers.set(
-        'x-gitbook-basepath',
-        mode === 'proxy'
-            ? getProxyModeBasePath(inputURL, resolved)
-            : joinPath(originBasePath, resolved.basePath)
-    );
-    headers.set('x-gitbook-site-basepath', joinPath(originBasePath, resolved.siteBasePath));
-    headers.set('x-gitbook-content-space', resolved.space);
-    if ('site' in resolved) {
-        headers.set('x-gitbook-content-organization', resolved.organization);
-        headers.set('x-gitbook-content-site', resolved.site);
-        if (resolved.siteSection) {
-            headers.set('x-gitbook-content-site-section', resolved.siteSection);
-        }
-        if (resolved.siteSpace) {
-            headers.set('x-gitbook-content-site-space', resolved.siteSpace);
-        }
-        if (resolved.shareKey) {
-            headers.set('x-gitbook-content-site-share-key', resolved.shareKey);
-        }
-
-        // For server actions that use v2 code
-        headers.set(MiddlewareHeaders.SiteURLData, JSON.stringify(resolved));
-    }
-
-    // For tests, we make it possible to enable search indexation
-    // using a query parameter.
-    const xGitBookSearchIndexation =
-        headers.get('x-gitbook-search-indexation') ??
-        url.searchParams.has('x-gitbook-search-indexation');
-    if (xGitBookSearchIndexation) {
-        headers.set('x-gitbook-search-indexation', 'true');
-    }
-
-    if (resolved.revision) {
-        headers.set('x-gitbook-content-revision', resolved.revision);
-    }
-    if (resolved.changeRequest) {
-        headers.set('x-gitbook-content-changerequest', resolved.changeRequest);
-    }
-
-    const customization = url.searchParams.get('customization');
-    if (customization && validateSerializedCustomization(customization)) {
-        // We need to encode the customization to ensure it is properly encoded in vercel.
-        // We do it here as well so that we have a single method to decode it later.
-        headers.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
-    }
-
-    const theme = url.searchParams.get('theme');
-    if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
-        headers.set(MiddlewareHeaders.Theme, theme);
-    }
-
-    if (apiEndpoint) {
-        headers.set('x-gitbook-api', apiEndpoint);
-    }
-
-    const target = new URL(joinPath('/middleware', rewritePathname), request.nextUrl.toString());
-    target.search = url.search;
-
-    const response = writeCookies(
-        NextResponse.rewrite(target, {
-            request: {
-                headers,
-            },
-        }),
-        // A long-standing bug in Nextjs causes modifying cookies in Server Actions to refresh the page and cause root rerenders.
-        // https://github.com/vercel/next.js/issues/50163
-        // We don't set the cookies if we're in a server action.
-        isServerAction ? undefined : resolved.cookies
-    );
-
-    // Add method so Cloudflare can use it for caching
-    setMiddlewareHeader(response, 'x-http-method', request.method);
-
-    setMiddlewareHeader(response, 'x-gitbook-version', buildVersion());
-
-    // Add Content Security Policy header
-    setMiddlewareHeader(response, 'content-security-policy', csp);
-    // Basic security headers
-    setMiddlewareHeader(response, 'strict-transport-security', 'max-age=31536000');
-    setMiddlewareHeader(response, 'referrer-policy', 'no-referrer-when-downgrade');
-    setMiddlewareHeader(response, 'x-content-type-options', 'nosniff');
-
-    const cacheControl = (() => {
-        // For Server Actions, we don't want to cache the response on the server.
-        // We don't want to store responses either.
-        if (isServerAction) {
-            return 'no-cache, no-store';
-        }
-
-        // When the request is authenticated, we don't want to cache the response on the server.
-        // Allow storing so that revalidation still happens with server.
-        if (resolved.visitorToken) {
-            return 'no-cache, no-store';
-        }
-
-        if (typeof resolved.cacheMaxAge === 'number') {
-            return `public, max-age=0, s-maxage=${resolved.cacheMaxAge}, stale-if-error=0`;
-        }
-    })();
-
-    if (cacheControl) {
-        if (process.env.GITBOOK_OUTPUT_CACHE === 'true' && process.env.NODE_ENV !== 'development') {
-            setMiddlewareHeader(response, 'cache-control', cacheControl);
-            setMiddlewareHeader(response, 'Cloudflare-CDN-Cache-Control', cacheControl);
-        } else {
-            setMiddlewareHeader(response, 'x-gitbook-cache-control', cacheControl);
-        }
-    }
-
-    if (resolved.cacheTags) {
-        addResponseCacheTag(...resolved.cacheTags);
-    }
-
-    return response;
-}
-
-/**
- * Compute the input URL the user is trying to access.
- */
-function getInputURL(request: NextRequest): {
-    url: URL;
-    mode: URLLookupMode;
-} {
-    const url = new URL(request.url);
-    let mode: URLLookupMode =
-        (process.env.GITBOOK_MODE as URLLookupMode | undefined) ?? 'multi-path';
-
-    // When developing locally using something.localhost:3000, the url only contains http://localhost:3000
-    if (url.hostname === 'localhost') {
-        url.host = request.headers.get('host') ?? url.hostname;
-    }
-
-    // When request is proxied, the host is passed in the x-forwarded-host header
-    const xForwardedHost = request.headers.get('x-forwarded-host');
-    if (xForwardedHost) {
-        url.port = '';
-        url.host = xForwardedHost;
-    }
-
-    // When request is proxied by the GitBook infrastructure, we always force the mode as 'multi'.
-    const xGitbookHost = request.headers.get('x-gitbook-host');
-    if (xGitbookHost) {
-        mode = 'multi';
-        url.port = '';
-        url.host = xGitbookHost;
-    }
-
-    // When request started with ~space/:id or ~site/:id, we force the mode as 'multi-id'.
-    if (url.pathname.startsWith('/~space/') || url.pathname.startsWith('/~site/')) {
-        mode = 'multi-id';
-    }
-
-    // When passing a x-gitbook-site-url header, this URL is used instead of the request URL
-    // to determine the site to serve.
-    const xGitbookSite = request.headers.get('x-gitbook-site-url');
-    if (xGitbookSite) {
-        return {
-            mode: 'proxy',
-            url: new URL(xGitbookSite),
-        };
-    }
-
-    return { url, mode };
-}
-
-async function lookupSiteForURL(
-    mode: URLLookupMode,
-    request: NextRequest,
-    url: URL
-): Promise<LookupResult> {
-    switch (mode) {
-        case 'single': {
-            return await lookupSiteInSingleMode(url);
-        }
-        case 'multi': {
-            return await lookupSiteInMultiMode(request, url);
-        }
-        case 'multi-path': {
-            return await lookupSiteInMultiPathMode(request, url);
-        }
-        case 'multi-id': {
-            return await lookupSiteOrSpaceInMultiIdMode(request, url);
-        }
-        case 'proxy':
-            return await lookupSiteInProxy(request, url);
-        default:
-            assertNever(mode);
-    }
-}
-
-/**
- * GITBOOK_MODE=single
- * When serving a single space, configured using GITBOOK_SPACE_ID and GITBOOK_TOKEN.
- */
-async function lookupSiteInSingleMode(url: URL): Promise<LookupResult> {
-    const spaceId = process.env.GITBOOK_SPACE_ID;
-    if (!spaceId) {
-        throw new Error(
-            'Missing GITBOOK_SPACE_ID environment variable. It should be passed when using GITBOOK_MODE=single.'
-        );
-    }
-
-    const apiCtx = await api();
-    const apiToken = getDefaultAPIToken(apiCtx.client.endpoint);
-    if (!apiToken) {
-        throw new Error(
-            'Missing GITBOOK_TOKEN environment variable. It should be passed when using GITBOOK_MODE=single.'
-        );
-    }
-
-    return {
-        kind: 'space',
-        space: spaceId,
-        basePath: '',
-        siteBasePath: '',
-        pathname: url.pathname,
-        apiToken,
-        visitorToken: undefined,
-    };
-}
-
-/**
- * GITBOOK_MODE=proxy
- * When proxying a site on a different base URL.
- */
-async function lookupSiteInProxy(request: NextRequest, url: URL): Promise<LookupResult> {
-    return await lookupSiteInMultiMode(request, url);
-}
-
-/**
- * GITBOOK_MODE=multi
- * When serving multi spaces based on the current URL.
- */
-async function lookupSiteInMultiMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    const { visitorToken } = getVisitorData({
-        cookies: request.cookies.getAll(),
-        url,
-    });
-    const lookup = await lookupSiteByAPI(url, visitorToken);
-    return {
-        ...lookup,
-        ...('basePath' in lookup && visitorToken
-            ? getLookupResultForVisitorAuth(lookup.basePath, visitorToken)
-            : {}),
-        visitorToken: visitorToken?.token,
-    };
-}
-
-/**
- * GITBOOK_MODE=multi-id
- * When serving multi spaces with the ID passed in the path.
- *
- * The format of the path is:
- *   - /~space|~site/:id/:path
- *   - /~space|~site/:id/~/changes/:changeId/:path
- *   - /~space|~site/:id/~/revisions/:revisionId/:path
- */
-async function lookupSiteOrSpaceInMultiIdMode(
-    request: NextRequest,
-    url: URL
-): Promise<LookupResult> {
-    const basePathParts: string[] = [];
-    const pathSegments = url.pathname.slice(1).split('/');
-
-    const eatPathId = (...prefixes: string[]): string | undefined => {
-        const match = prefixes.every((prefix, index) => pathSegments[index] === prefix);
-        if (!match || pathSegments.length < prefixes.length + 1) {
-            return;
-        }
-
-        // Remove the prefix from the path segments
-        pathSegments.splice(0, prefixes.length);
-
-        // Add the prefix to the base path
-        basePathParts.push(...prefixes);
-
-        const id = pathSegments.shift();
-        basePathParts.push(id!);
-
-        return id;
-    };
-
-    const spaceId = eatPathId('~space');
-    const siteId = eatPathId('~site');
-    const source: { kind: 'space' | 'site'; id: string } | undefined = spaceId
-        ? { kind: 'space', id: spaceId }
-        : siteId
-          ? { kind: 'site', id: siteId }
-          : undefined;
-
-    if (!source) {
-        return {
-            error: {
-                code: 400,
-                message: 'Missing site or space ID in the path',
-            },
-        };
-    }
-
-    // Extract the change request or revision ID from the path
-    const changeRequestId = eatPathId('~', 'changes');
-    const revisionId = eatPathId('~', 'revisions');
-
-    // Get the auth token from the URL query
-    const AUTH_TOKEN_QUERY = 'token';
-    const API_ENDPOINT_QUERY = 'api';
-    const cookieName = `gitbook-token-${source.id}`;
-
-    const { apiToken, apiEndpoint } = url.searchParams.has(AUTH_TOKEN_QUERY)
-        ? {
-              apiToken: url.searchParams.get(AUTH_TOKEN_QUERY) ?? '',
-              apiEndpoint: url.searchParams.get(API_ENDPOINT_QUERY) ?? undefined,
-          }
-        : (decodeGitBookTokenCookie(source.id, request.cookies.get(cookieName)?.value) ?? {
-              apiToken: undefined,
-              apiEndpoint: undefined,
-          });
-
-    if (!apiToken) {
-        return {
-            error: {
-                code: 400,
-                message: 'Missing token query parameter',
-            },
-        };
-    }
-
-    const decoded = jwt.decode(apiToken) as ContentAPITokenPayload;
-    if (decoded.kind === 'collection') {
-        throw new Error('Collection is not supported in multi-id mode');
-    }
-
-    // The claims property in the content API token is included when
-    // visitor attributes/assertions are passed to the site preview URL.
     //
-    // When it's present, we generate a hash using the same method as
-    // getPublishedContentByURL to get the context ID so the cache can be
-    // invalidated when trying to preview the site with different visitor
-    // attributes.
-    const contextId = decoded.claims ? hash(decoded.claims) : undefined;
-    const apiCtx = await api();
-    const gitbookAPI = new GitBookAPI({
-        endpoint: apiEndpoint ?? apiCtx.client.endpoint,
-        authToken: apiToken,
-        userAgent: userAgent(),
+    // Detect and extract the visitor authentication token from the request
+    //
+    const { visitorToken, unsignedClaims, visitorParamsCookie } = getVisitorData({
+        cookies: request.cookies.getAll(),
+        url: siteRequestURL,
     });
 
-    // Verify access to the space to avoid leaking cached data in this mode
-    // (the cache is not dependend on the auth token, so it could leak data)
-    if (source.kind === 'space') {
-        await withAPI({ client: gitbookAPI, contextId }, () =>
-            getSpace.revalidate(source.id, undefined)
-        );
-    }
+    const withAPIToken = async (apiToken: string | null) => {
+        const siteURLData = await throwIfDataError(
+            lookupPublishedContentByUrl({
+                url: siteRequestURL.toString(),
+                visitorPayload: {
+                    jwtToken: visitorToken?.token ?? undefined,
+                    unsignedClaims,
+                },
+                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+                // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
+                // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
+                redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
 
-    // Verify access to the site to avoid leaking cached data in this mode
-    // (the cache is not dependend on the auth token, so it could leak data)
-    if (source.kind === 'site') {
-        await withAPI({ client: gitbookAPI, contextId }, () =>
-            getPublishedContentSite.revalidate({
-                organizationId: decoded.organization,
-                siteId: source.id,
-                siteShareKey: undefined,
+                // Use the API token passed in the request, if any
+                // as it could be used for .preview hostnames
+                apiToken,
             })
         );
-    }
 
-    const cookies: ResponseCookies = [
-        {
-            name: cookieName,
-            value: encodeGitBookTokenCookie(source.id, apiToken, apiEndpoint),
-            options: {
-                httpOnly: true,
-                maxAge: 60 * 30,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
-            },
-        },
-    ];
+        const cookies: ResponseCookies = visitorParamsCookie
+            ? [
+                  // If visitor.* params were passed to the site URL, include a session cookie to persist these params across navigation.
+                  visitorParamsCookie,
+              ]
+            : [];
 
-    // Get rid of the token from the URL
-    if (url.searchParams.has(AUTH_TOKEN_QUERY) || url.searchParams.has(API_ENDPOINT_QUERY)) {
-        const withoutToken = new URL(url);
-        withoutToken.searchParams.delete(AUTH_TOKEN_QUERY);
-        withoutToken.searchParams.delete(API_ENDPOINT_QUERY);
+        //
+        // Handle redirects
+        //
+        if ('redirect' in siteURLData) {
+            // biome-ignore lint/suspicious/noConsole: we want to log the redirect
+            console.log('redirect', siteURLData.redirect);
+            if (siteURLData.target === 'content') {
+                let contentRedirect = new URL(siteURLData.redirect, request.url);
 
-        return {
-            target: 'external',
-            redirect: withoutToken.toString(),
-            cookies,
-        };
-    }
-
-    const basePath = withLeadingSlash(basePathParts.join('/'));
-    return {
-        // In multi-id mode, complete is always considered true because there is no URL to resolve
-        ...(decoded.kind === 'site' ? { ...decoded, complete: true } : decoded),
-        changeRequest: changeRequestId,
-        revision: revisionId,
-        siteBasePath: basePath,
-        basePath,
-        pathname: withLeadingSlash(pathSegments.join('/')),
-        apiToken,
-        apiEndpoint,
-        contextId,
-        cookies,
-        canonicalUrl: url.toString(),
-    };
-}
-
-/**
- * GITBOOK_MODE=multi-path
- * When serving multi spaces with the url passed in the path.
- */
-async function lookupSiteInMultiPathMode(request: NextRequest, url: URL): Promise<LookupResult> {
-    // Skip useless requests
-    if (
-        url.pathname === '/favicon.ico' ||
-        url.pathname === '/robots.txt' ||
-        url.pathname === '/sitemap.xml'
-    ) {
-        return {
-            error: {
-                code: 404,
-                message: 'favicon.ico, robots.txt, sitemap.xml should be accessed under a content',
-            },
-        };
-    }
-    // Only match something that starts with a domain like
-    if (!url.pathname.match(/^.+\..+/)) {
-        return {
-            error: {
-                code: 404,
-                message: 'Invalid URL in the path, should start with a domain',
-            },
-        };
-    }
-
-    const targetStr = `https://${url.pathname}`;
-
-    if (!URL.canParse(targetStr)) {
-        return {
-            error: {
-                code: 404,
-                message: 'Invalid URL in the path',
-            },
-        };
-    }
-    const target = new URL(targetStr);
-    target.search = url.search;
-
-    const { visitorToken } = getVisitorData({
-        cookies: request.cookies.getAll(),
-        url: target,
-    });
-
-    const lookup = await lookupSiteByAPI(target, visitorToken);
-    if ('error' in lookup) {
-        return lookup;
-    }
-
-    if ('redirect' in lookup) {
-        if (lookup.target === 'content') {
-            // Redirect to the content URL in the same application
-            const redirect = new URL(lookup.redirect);
-            redirect.search = url.search;
-
-            return {
-                target: 'content',
-                redirect: new URL(
-                    `/${redirect.hostname}${redirect.pathname}${redirect.search}`,
-                    url
-                ).toString(),
-            };
-        }
-
-        return lookup;
-    }
-
-    return {
-        ...lookup,
-        siteBasePath: joinPath(target.host, lookup.siteBasePath),
-        basePath: joinPath(target.host, lookup.basePath),
-        ...('basePath' in lookup && visitorToken
-            ? getLookupResultForVisitorAuth(lookup.basePath, visitorToken)
-            : {}),
-        visitorToken: visitorToken?.token,
-    };
-}
-
-/**
- * Lookup a space by its URL using the GitBook API.
- * To optimize caching, we try multiple lookup alternatives and return the first one that matches.
- */
-async function lookupSiteByAPI(
-    lookupURL: URL,
-    visitorTokenLookup: VisitorTokenLookup
-): Promise<LookupResult> {
-    const url = stripURLSearch(lookupURL);
-    const lookup = getURLLookupAlternatives(url);
-
-    // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
-    // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
-    // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
-    const redirectOnError = visitorTokenLookup?.source === 'visitor-auth-cookie';
-
-    const result = await race(lookup.urls, async (alternative, { signal }) => {
-        const data = await getPublishedContentByUrl(
-            alternative.url,
-            visitorTokenLookup?.token,
-            redirectOnError || undefined,
-            {
-                signal,
-            }
-        );
-
-        if ('error' in data) {
-            if (alternative.primary) {
-                // We only return an error for the primary alternative (full URL),
-                // as other parts could result in errors due to the URL being incomplete (share links, etc).
-                return data;
-            }
-            return null;
-        }
-
-        if ('redirect' in data) {
-            if (alternative.primary) {
-                // Append the path to the redirect URL
-                // because we might have matched a shorter path and the redirect is relative to it
-                if (alternative.extraPath) {
-                    if (data.target === 'content') {
-                        const redirect = new URL(data.redirect);
-                        redirect.pathname = joinPath(redirect.pathname, alternative.extraPath);
-                        data.redirect = redirect.toString();
-                    } else {
-                        const redirect = new URL(data.redirect);
-                        if (redirect.searchParams.has('location')) {
-                            redirect.searchParams.set(
-                                'location',
-                                joinPath(
-                                    redirect.searchParams.get('location') ?? '',
-                                    alternative.extraPath
-                                )
-                            );
-                            data.redirect = redirect.toString();
-                        }
-                    }
+                // For content redirects, we redirect using the /url/:url format
+                // during development and testing in 'url' mode.
+                if (mode === 'url') {
+                    const urlObject = new URL(siteURLData.redirect);
+                    contentRedirect = new URL(
+                        `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`,
+                        request.url
+                    );
                 }
 
-                return data;
+                // Keep the same search params as the original request
+                // as it might contain a VA token
+                contentRedirect.search = request.nextUrl.search;
+
+                return NextResponse.redirect(contentRedirect);
             }
 
-            return null;
+            return NextResponse.redirect(siteURLData.redirect);
         }
 
-        /**
-         * We use the following criteria to determine if the lookup result is the right one:
-         * - the primary alternative was resolved (because that's the longest or most inclusive path)
-         * - the resolution of the site URL is complete (because we want to resolve the deepest path possible)
-         *
-         * In both cases, the idea is to use the deepest/longest/most inclusive path to resolve the content.
-         */
-        if (alternative.primary || ('site' in data && data.complete)) {
-            const changeRequest = data.changeRequest ?? lookup.changeRequest;
-            return {
-                space: data.space,
-                changeRequest,
-                revision: data.revision ?? lookup.revision,
-                siteBasePath: data.siteBasePath,
-                basePath: joinPath(data.basePath, lookup.basePath ?? ''),
-                pathname: joinPath(data.pathname, alternative.extraPath),
-                apiToken: data.apiToken,
-                // We don't cache change requests as they often change and we want to have consistent previews
-                // Purging the CDN cache will not be efficient enough.
-                cacheMaxAge: changeRequest ? 0 : data.cacheMaxAge,
-                cacheTags: data.cacheTags,
-                ...('site' in data
-                    ? {
-                          site: data.site,
-                          siteSection: data.siteSection,
-                          siteSpace: data.siteSpace,
-                          organization: data.organization,
-                          shareKey: data.shareKey,
-                          ...(data.contextId ? { contextId: data.contextId } : {}),
-                      }
-                    : {}),
-            } as PublishedContentWithCache;
+        cookies.push(
+            ...getResponseCookiesForVisitorAuth(
+                getVisitorAuthBasePath(siteRequestURL, siteURLData),
+                visitorToken
+            )
+        );
+
+        // We use the host/origin from the canonical URL to ensure the links are
+        // correctly generated when the site is proxied. e.g. https://proxy.gitbook.com/site/siteId/...
+        const siteCanonicalURL = new URL(siteURLData.canonicalUrl);
+
+        let incomingURL = requestURL;
+        // For cases where the site is proxied, we use the canonical URL
+        // as the incoming URL along with all the search params from the request.
+        if (mode !== 'url') {
+            incomingURL = siteCanonicalURL;
+            incomingURL.search = requestURL.search;
+        }
+        //
+        // Make sure the URL is clean of any va token after a successful lookup
+        // The token is stored in a cookie that is set on the redirect response
+        //
+        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
+        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
+            return writeResponseCookies(
+                NextResponse.redirect(incomingURLWithoutToken.toString()),
+                cookies
+            );
         }
 
+        //
+        // Render and serve the content
+        //
+
+        // The route is static, except when using dynamic parameters from query params
+        // (customization override, theme, etc)
+        let routeType: 'dynamic' | 'static' = 'static';
+
+        // We pick only stable data from the siteURL data to prevent re-rendering of
+        // the root layout when changing pages..
+        const stableSiteURLData: SiteURLData = {
+            site: siteURLData.site,
+            siteSection: siteURLData.siteSection,
+            siteSpace: siteURLData.siteSpace,
+            siteBasePath: siteURLData.siteBasePath,
+            basePath: siteURLData.basePath,
+            space: siteURLData.space,
+            organization: siteURLData.organization,
+            changeRequest: siteURLData.changeRequest,
+            revision: siteURLData.revision,
+            shareKey: siteURLData.shareKey,
+            apiToken: siteURLData.apiToken,
+            imagesContextId: imagesContextId,
+        };
+
+        const requestHeaders = new Headers(request.headers);
+        requestHeaders.set(MiddlewareHeaders.RouteType, routeType);
+        requestHeaders.set(MiddlewareHeaders.URLMode, mode);
+        requestHeaders.set(
+            MiddlewareHeaders.SiteURL,
+            `${siteCanonicalURL.origin}${siteURLData.basePath}`
+        );
+        requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
+
+        // Preview of customization/theme
+        const customization = siteRequestURL.searchParams.get('customization');
+        if (customization && validateSerializedCustomization(customization)) {
+            routeType = 'dynamic';
+            // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
+            requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
+        }
+        const theme = siteRequestURL.searchParams.get('theme');
+        if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
+            routeType = 'dynamic';
+            requestHeaders.set(MiddlewareHeaders.Theme, theme);
+        }
+
+        // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
+        // This is useful for testing dynamic routes.
+        if (request.cookies.has('gitbook-dynamic-route')) {
+            routeType = 'dynamic';
+        }
+
+        // Pass a x-forwarded-host and origin that are equal to ensure Next doesn't block server actions when proxied
+        requestHeaders.set('x-forwarded-host', request.nextUrl.host);
+        requestHeaders.set('origin', request.nextUrl.origin);
+
+        const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
+        const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
+            siteURLData.pathname
+        );
+        routeType = routeTypeFromPathname ?? routeType;
+
+        const route = [
+            'sites',
+            routeType,
+            mode,
+            encodeURIComponent(siteURLWithoutProtocol),
+            encodeURIComponent(
+                rison.encode(
+                    // rison can't encode undefined values
+                    Object.fromEntries(
+                        Object.entries(stableSiteURLData).filter(
+                            ([_, v]) => typeof v !== 'undefined'
+                        )
+                    )
+                )
+            ),
+            pathname,
+        ].join('/');
+
+        console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
+
+        const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
+        rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
+
+        const response = NextResponse.rewrite(rewrittenURL, {
+            request: {
+                headers: requestHeaders,
+            },
+        });
+
+        // Add Content Security Policy header
+        response.headers.set('content-security-policy', getContentSecurityPolicy());
+        // Basic security headers
+        response.headers.set('strict-transport-security', 'max-age=31536000');
+        response.headers.set('referrer-policy', 'no-referrer-when-downgrade');
+        response.headers.set('x-content-type-options', 'nosniff');
+        // Debug header
+        response.headers.set('x-gitbook-route-type', routeType);
+        response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
+
+        return writeResponseCookies(response, cookies);
+    };
+
+    // For https://preview/<siteURL> requests,
+    if (siteRequestURL.hostname === 'preview') {
+        return serveWithQueryAPIToken(
+            // We scope the API token to the site ID.
+            `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
+            request,
+            withAPIToken
+        );
+    }
+
+    return withAPIToken(null);
+}
+
+/**
+ * Serve routes for PDF export for a space: /~space/:spaceId/~gitbook/pdf
+ */
+async function serveSpacePDFRoutes(requestURL: URL, request: NextRequest) {
+    const pathnameParts = requestURL.pathname.slice(1).split('/');
+    if (pathnameParts[0] !== '~space' && pathnameParts[0] !== '~site') {
         return null;
-    });
-
-    if (result) {
-        if ('site' in result) {
-            return {
-                ...result,
-                siteURL: `${lookupURL.origin}${result.basePath}`,
-            };
-        }
-
-        return result;
     }
 
-    return {
-        error: {
-            code: 404,
-            message: 'No content found',
-        },
-    };
+    return serveWithQueryAPIToken(
+        pathnameParts.slice(0, 2).join('/'),
+        request,
+        async (apiToken) => {
+            // Handle the rest with the router default logic
+            return NextResponse.next({
+                headers: {
+                    [MiddlewareHeaders.APIToken]: apiToken,
+                },
+            });
+        }
+    );
 }
 
 /**
- * Return the lookup result for content served with visitor auth. It basically disables caching
- * and sets a cookie with the visitor auth token.
+ * Serve an error response.
  */
-function getLookupResultForVisitorAuth(
-    basePath: string,
-    visitorTokenLookup: VisitorTokenLookup
-): Partial<LookupResult> {
-    return {
-        // No caching for content served with visitor auth
-        cacheMaxAge: undefined,
-        cacheTags: [],
-        cookies: getResponseCookiesForVisitorAuth(basePath, visitorTokenLookup),
-    };
+function serveErrorResponse(error: Error) {
+    if (error instanceof DataFetcherError) {
+        return new Response(error.message, {
+            status: error.code,
+            headers: { 'content-type': 'text/plain' },
+        });
+    }
+
+    throw error;
 }
 
 /**
- * Get the default API token for an API endpoint.
- * The default token is configured globally in the instance using `GITBOOK_TOKEN`,
- * but it's scoped to the default API endpoint.
+ * Server a response with an API token obtained from the query params.
  */
-function getDefaultAPIToken(apiEndpoint: string): string | undefined {
-    const defaultToken = process.env.GITBOOK_TOKEN;
-    if (!defaultToken) {
-        return;
+async function serveWithQueryAPIToken(
+    scopePath: string,
+    request: NextRequest,
+    serve: (apiToken: string) => Promise<NextResponse>
+) {
+    // We store the API token in a cookie that is scoped to the specific route
+    // to avoid errors when multiple previews are opened in different tabs.
+    const cookieName = getPathScopedCookieName('gitbook-api-token', scopePath);
+
+    // Extract a potential GitBook API token passed in the request
+    // If found, we redirect to the same URL but with the token in the cookie
+    const queryAPIToken = request.nextUrl.searchParams.get('token');
+    if (queryAPIToken) {
+        request.nextUrl.searchParams.delete('token');
+        return writeResponseCookies(NextResponse.redirect(request.nextUrl.toString()), [
+            {
+                name: cookieName,
+                value: queryAPIToken,
+                options: {
+                    httpOnly: true,
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : undefined,
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: 60 * 60, // 1 hour
+                },
+            },
+        ]);
     }
 
-    if (apiEndpoint !== DEFAULT_API_ENDPOINT) {
-        // The default token is only used for the default API endpoint
-        return;
+    const apiToken = request.cookies.get(cookieName)?.value;
+    if (!apiToken) {
+        throw new DataFetcherError('Missing API token', 400);
     }
 
-    return defaultToken;
+    return serve(apiToken);
 }
 
-function stripBasePath(pathname: string, basePath: string): string {
-    if (basePath === '') {
-        return pathname;
+/**
+ * The URL of the GitBook content can be passed in 3 different ways (in order of priority):
+ * - The request has a `X-GitBook-URL` header:
+ *      URL is taken from the header.
+ * - The request has a `X-Forwarded-Host` header:
+ *      Host is taken from the header, pathname is taken from the request URL.
+ * - The request URL is matching `/url/:url`:
+ *      URL is taken from the pathname.
+ */
+function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
+    const xGitbookUrl = request.headers.get('x-gitbook-url');
+    if (xGitbookUrl) {
+        return {
+            url: appendQueryParams(new URL(xGitbookUrl), request.nextUrl.searchParams),
+            mode: 'url-host',
+        };
     }
 
-    if (!pathname.startsWith(basePath)) {
-        throw new Error(`Invalid pathname ${pathname} for basePath ${basePath}`);
+    const isMainHost = isGitBookHostURL(request.url);
+    const isAssetsHost = isGitBookAssetsHostURL(request.url);
+
+    // /url/:url requests on the main host
+    const prefix = '/url/';
+    if (isMainHost && request.nextUrl.pathname.startsWith(prefix)) {
+        return {
+            url: appendQueryParams(
+                new URL(`https://${request.nextUrl.pathname.slice(prefix.length)}`),
+                request.nextUrl.searchParams
+            ),
+            mode: 'url',
+        };
     }
 
-    pathname = pathname.slice(basePath.length);
-    if (!pathname.startsWith('/')) {
-        pathname = `/${pathname}`;
+    // Skip other requests to main hosts
+    if (isMainHost || isAssetsHost) {
+        return null;
     }
 
-    return pathname;
-}
-
-function stripURLBasePath(url: URL, basePath: string): URL {
-    const stripped = new URL(url.toString());
-    stripped.pathname = stripBasePath(stripped.pathname, basePath);
-    return stripped;
-}
-
-function stripURLSearch(url: URL): URL {
-    const stripped = new URL(url.toString());
-    stripped.search = '';
-    return stripped;
-}
-
-function encodePathname(pathname: string): string {
-    return pathname.split('/').map(encodeURIComponent).join('/');
-}
-
-function decodeGitBookTokenCookie(
-    sourceId: string,
-    cookie: string | undefined
-): { apiToken: string; apiEndpoint: string | undefined } | undefined {
-    if (!cookie) {
-        return;
+    const xForwardedHost = request.headers.get('x-forwarded-host');
+    // The x-forwarded-host is set by Vercel for all requests
+    // so we ignore it if the hostname is the same as the instance one.
+    if (xForwardedHost) {
+        return {
+            url: appendQueryParams(
+                new URL(`https://${xForwardedHost}${request.nextUrl.pathname}`),
+                request.nextUrl.searchParams
+            ),
+            mode: 'url-host',
+        };
     }
 
-    try {
-        const parsed = JSON.parse(cookie);
-        if (typeof parsed.t === 'string' && parsed.s === sourceId) {
-            return {
-                apiToken: parsed.t,
-                apiEndpoint: typeof parsed.e === 'string' ? parsed.e : undefined,
-            };
-        }
-    } catch (_error) {
-        // ignore
+    return null;
+}
+
+/**
+ * Encode path in a site content.
+ * Special paths are not encoded and passed to be handled by the route handlers.
+ */
+function encodePathInSiteContent(rawPathname: string): {
+    pathname: string;
+    routeType?: 'static' | 'dynamic';
+} {
+    const pathname = removeLeadingSlash(removeTrailingSlash(rawPathname));
+
+    if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
+        return { pathname };
+    }
+
+    // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
+    if (pathname.match(/\.md$/)) {
+        const pagePathWithoutMD = pathname.slice(0, -3);
+        return {
+            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+            routeType: 'static',
+        };
+    }
+
+    switch (pathname) {
+        case '~gitbook/icon':
+            return { pathname };
+        case 'llms.txt':
+        case 'sitemap.xml':
+        case 'sitemap-pages.xml':
+        case 'robots.txt':
+            // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
+            // as they only depend on the site structure / pages.
+            return { pathname, routeType: 'static' };
+        case '~gitbook/pdf':
+            // PDF routes are always dynamic as they depend on the search params.
+            return { pathname, routeType: 'dynamic' };
+        default:
+            return { pathname: encodeURIComponent(pathname || '/') };
     }
 }
 
-function encodeGitBookTokenCookie(
-    spaceId: string,
-    token: string,
-    apiEndpoint: string | undefined
-): string {
-    return JSON.stringify({ s: spaceId, t: token, e: apiEndpoint });
+/**
+ * Append all the query params from a URL to another URL.
+ */
+function appendQueryParams(url: URL, from: URLSearchParams) {
+    for (const [key, value] of from.entries()) {
+        url.searchParams.set(key, value);
+    }
+
+    return url;
 }
 
-function writeCookies<R extends NextResponse>(response: R, cookies: ResponseCookies = []): R {
+/**
+ * Write the cookies to a response.
+ */
+function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
     cookies.forEach((cookie) => {
         response.cookies.set(cookie.name, cookie.value, cookie.options);
     });

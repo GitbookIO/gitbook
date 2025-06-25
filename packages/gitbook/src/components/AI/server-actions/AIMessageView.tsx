@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { AIMessage } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { DocumentView } from '../../DocumentView';
 import { AIToolCallsSummary } from './AIToolCallsSummary';
 import type { RenderAIMessageOptions } from './types';

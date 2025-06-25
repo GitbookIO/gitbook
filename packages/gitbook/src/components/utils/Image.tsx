@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import type { ImageResizer } from '@v2/lib/images';
+import type { ImageResizer } from '@/lib/images';
 import ReactDOM from 'react-dom';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';

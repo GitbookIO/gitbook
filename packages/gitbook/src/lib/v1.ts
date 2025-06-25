@@ -3,13 +3,13 @@ import {
     type GitBookSiteContext,
     fetchSiteContextByIds,
     fetchSpaceContextByIds,
-} from '@v2/lib/context';
-import type { GitBookDataFetcher } from '@v2/lib/data/types';
-import { createImageResizer } from '@v2/lib/images';
-import { createLinker } from '@v2/lib/links';
+} from '@/lib/context';
+import type { GitBookDataFetcher } from '@/lib/data/types';
+import { createImageResizer } from '@/lib/images';
+import { createLinker } from '@/lib/links';
 
+import { DataFetcherError, wrapDataFetcherError } from '@/lib/data';
 import { GitBookAPI } from '@gitbook/api';
-import { DataFetcherError, wrapDataFetcherError } from '@v2/lib/data';
 import { headers } from 'next/headers';
 import {
     type SiteContentPointer,

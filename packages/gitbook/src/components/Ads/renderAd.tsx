@@ -5,8 +5,8 @@ import { headers } from 'next/headers';
 
 import { getV1BaseContext } from '@/lib/v1';
 
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import { isV2 } from '@/lib/v2';
-import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';

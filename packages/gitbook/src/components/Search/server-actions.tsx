@@ -1,6 +1,8 @@
 'use server';
 
+import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
 import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import { getV1BaseContext } from '@/lib/v1';
@@ -15,16 +17,14 @@ import type {
     SiteSectionGroup,
     Space,
 } from '@gitbook/api';
-import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
+import { throwIfDataError } from '@/lib/data';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
 import { isV2 } from '@/lib/v2';
 import type { IconName } from '@gitbook/icons';
-import { throwIfDataError } from '@v2/lib/data';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;

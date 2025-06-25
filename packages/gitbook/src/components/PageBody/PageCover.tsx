@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type { StaticImageData } from 'next/image';
 
 import { Image, type ImageSize } from '@/components/utils';

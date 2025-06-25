@@ -1,10 +1,10 @@
 'use server';
 
+import { getServerActionBaseContext } from '@/lib/server-actions';
 import { getV1BaseContext } from '@/lib/v1';
 import { isV2 } from '@/lib/v2';
 import type { RenderIntegrationUI } from '@gitbook/api';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
-import { getServerActionBaseContext } from '@v2/lib/server-actions';
 import { contentKitServerContext } from './contentkit';
 import { fetchSafeIntegrationUI } from './render';
 

@@ -1,6 +1,6 @@
+import { getCloudflareContext as getCloudflareContextV2 } from '@/lib/data/cloudflare';
+import { GITBOOK_RUNTIME } from '@/lib/env';
 import type { ExecutionContext, IncomingRequestCfProperties } from '@cloudflare/workers-types';
-import { getCloudflareContext as getCloudflareContextV2 } from '@v2/lib/data/cloudflare';
-import { GITBOOK_RUNTIME } from '@v2/lib/env';
 import { isV2 } from './v2';
 
 let pendings: Array<Promise<unknown>> = [];

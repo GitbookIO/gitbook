@@ -1,4 +1,4 @@
-import { GITBOOK_ASSETS_URL } from '@v2/lib/env';
+import { GITBOOK_ASSETS_URL } from '@/lib/env';
 
 /**
  * Return the Content Security Policy for the current environment.
