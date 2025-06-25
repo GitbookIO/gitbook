@@ -5,27 +5,12 @@ import { OpenAPIOperationContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { getAllBrowserCookiesMap } from '@/lib/browser-cookies';
+import { type CurrentContentContext, useCurrentContent } from '../hooks';
 import { getSession } from './sessions';
-import { useVisitedPages } from './useVisitedPages';
 import { getVisitorId } from './visitorId';
 
 export type InsightsEventName = api.SiteInsightsEvent['type'];
-
-/**
- * Global context for all events in the session.
- */
-type InsightsEventContext = {
-    organizationId: string;
-    siteId: string;
-    siteSectionId: string | null;
-    siteSpaceId: string | null;
-    siteShareKey: string | null;
-    spaceId: string;
-    revisionId: string;
-    visitorAuthClaims: VisitorAuthClaims;
-};
 
 /**
  * Context for an event on a page.
@@ -63,7 +48,7 @@ type TrackEventCallback = <EventName extends InsightsEventName>(
 
 const InsightsContext = React.createContext<TrackEventCallback>(() => {});
 
-interface InsightsProviderProps extends InsightsEventContext {
+interface InsightsProviderProps {
     /** If true, the events will be sent to the server. */
     enabled: boolean;
 
@@ -84,16 +69,16 @@ interface InsightsProviderProps extends InsightsEventContext {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled, ...context } = props;
+    const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled } = props;
 
-    const addVisitedPage = useVisitedPages((state) => state.addPage);
+    const currentContent = useCurrentContent();
     const visitorIdRef = React.useRef<string | null>(null);
     const eventsRef = React.useRef<{
         [pathname: string]:
             | {
                   url: string;
                   events: TrackEventInput<InsightsEventName>[];
-                  context: InsightsEventContext;
+                  context: CurrentContentContext;
                   pageContext?: InsightsEventPageContext;
               }
             | undefined;
@@ -124,7 +109,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 ...transformEvents({
                     url: eventsForPathname.url,
                     events: eventsForPathname.events,
-                    context,
+                    context: currentContent,
                     pageContext: eventsForPathname.pageContext,
                     visitorId,
                     sessionId: session.id,
@@ -136,22 +121,14 @@ export function InsightsProvider(props: InsightsProviderProps) {
                 ...eventsForPathname,
                 events: [],
             };
-
-            // Mark the page as visited in our local state
-            if (eventsForPathname.pageContext.pageId) {
-                addVisitedPage({
-                    spaceId: context.spaceId,
-                    pageId: eventsForPathname.pageContext.pageId,
-                });
-            }
         }
 
         if (allEvents.length > 0) {
             if (enabled) {
                 sendEvents({
                     apiHost,
-                    organizationId: context.organizationId,
-                    siteId: context.siteId,
+                    organizationId: currentContent.organizationId,
+                    siteId: currentContent.siteId,
                     events: allEvents,
                 });
             } else {
@@ -185,7 +162,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                         timestamp: new Date().toISOString(),
                     },
                 ],
-                context,
+                context: currentContent,
             };
 
             if (eventsRef.current[pathname].pageContext !== undefined) {
@@ -222,7 +199,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
                     trackEvent({ type: 'api_client_open', operation });
                 }}
             >
-                {props.children}
+                {children}
             </OpenAPIOperationContextProvider>
         </InsightsContext.Provider>
     );
@@ -269,7 +246,7 @@ function sendEvents(args: {
 function transformEvents(input: {
     url: string;
     events: TrackEventInput<InsightsEventName>[];
-    context: InsightsEventContext;
+    context: CurrentContentContext;
     pageContext: InsightsEventPageContext;
     visitorId: string;
     sessionId: string;
