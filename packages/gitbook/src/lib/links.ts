@@ -119,9 +119,7 @@ export function createLinker(
             return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
 
-        toAbsoluteURL(absolutePath: string): string {
-            return toAbsoluteURL(absolutePath);
-        },
+        toAbsoluteURL,
 
         toLinkForContent(rawURL: string): string {
             const url = new URL(rawURL);

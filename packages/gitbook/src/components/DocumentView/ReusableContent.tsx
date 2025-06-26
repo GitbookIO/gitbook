@@ -4,7 +4,6 @@ import { createLinkerForSpace, resolveContentRef } from '@/lib/references';
 
 import type { GitBookSpaceContext } from '@/lib/context';
 import { getDataOrNull } from '@/lib/data';
-import { createLinker } from '@/lib/links';
 import { assert } from 'ts-essentials';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
@@ -48,7 +47,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     // Create a new context for reusable content block, including
     // the data fetcher with the token from the block meta and the correct
     // space and revision pointers.
-    const reusableContentContext: GitBookSpaceContext = await (async () => {
+    const reusableContentContext: GitBookSpaceContext | null = await (async () => {
         assert(context.contentContext);
 
         // References inside reusable content in the same space resolve the same as any other reference.
@@ -64,40 +63,22 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
             // TODO: we should never have to reach this point - it means we couldn't resolve the space context for the reusable content
             // but that should never happen as we've already fetched it at this point.
             // Rather than throw, resolving using app URLs if needed.
-            const baseURL = new URL(
-                reusableContent.space.urls.published ?? reusableContent.space.urls.app
-            );
-
-            const linker = createLinker(
-                {
-                    host: baseURL.host,
-                    spaceBasePath: baseURL.pathname,
-                    siteBasePath: baseURL.pathname,
-                },
-                // Resolve pages as absolute URLs as we are in a different site.
-                { alwaysAbsolute: true }
-            );
-
-            return {
-                ...context.contentContext,
-                linker,
-                dataFetcher,
-                revision: context.contentContext.revision,
-                space: context.contentContext.space,
-                shareKey: undefined,
-            };
+            return null;
         }
 
         return {
             ...context.contentContext,
             ...ctx.spaceContext,
             dataFetcher,
-            space: ctx.space,
             linker: ctx.linker,
             revision: reusableContent.revision,
             shareKey: undefined,
         };
     })();
+
+    if (!reusableContentContext) {
+        return null;
+    }
 
     return (
         <UnwrappedBlocks

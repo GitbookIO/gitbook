@@ -362,7 +362,6 @@ async function resolveContentRefInSpace(
 
     const resolved = await resolveContentRef(contentRef, {
         ...ctx.spaceContext,
-        space: ctx.space,
         linker: ctx.linker,
     });
 
@@ -374,7 +373,7 @@ async function resolveContentRefInSpace(
         ...resolved,
         ancestors: [
             {
-                label: ctx.space.title,
+                label: ctx.spaceContext.space.title,
                 href: ctx.baseURL.toString(),
             },
             ...(resolved.ancestors ?? []),
@@ -382,13 +381,18 @@ async function resolveContentRefInSpace(
     };
 }
 
+/**
+ * Create a new linker for a specific spaceId.
+ *
+ * As the resolved space may not be the same as the given spaceId, this function also
+ * returns the new space context and the base URL used for the linker.
+ */
 export async function createLinkerForSpace(
     spaceId: string,
     context: GitBookAnyContext
 ): Promise<{
     spaceContext: GitBookSpaceContext;
     linker: GitBookLinker;
-    space: Space;
     baseURL: URL;
 } | null> {
     const [spaceContext, bestTargetSpace] = await Promise.all([
@@ -425,7 +429,6 @@ export async function createLinkerForSpace(
     return {
         spaceContext,
         linker,
-        space,
         baseURL,
     };
 }
