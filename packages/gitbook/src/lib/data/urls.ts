@@ -1,3 +1,5 @@
+import { isProxyRootRequest } from '../proxy';
+
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
  * The approach is optimized to aim at reusing cached lookup results as much as possible.
@@ -36,6 +38,11 @@ export function getURLLookupAlternatives(input: URL) {
                     }`
                 );
             }
+            return;
+        }
+
+        // We don't want to push the url if it is the root proxy URL (either https://proxy.gitbook.site or https://proxy.gitbook.site/sites)
+        if (isProxyRootRequest(adding)) {
             return;
         }
 

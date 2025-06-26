@@ -131,7 +131,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,
                 },
-                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling getPublishedContentByUrl to allow
+                // When the visitor auth token is pulled from the cookie, set redirectOnError when calling resolvePublishedContentByUrl to allow
                 // redirecting when the token is invalid as we could be dealing with stale token stored in the cookie.
                 // For example when the VA backend signature has changed but the token stored in the cookie is not yet expired.
                 redirectOnError: visitorToken?.source === 'visitor-auth-cookie',
