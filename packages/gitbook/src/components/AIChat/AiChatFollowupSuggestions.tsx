@@ -24,7 +24,7 @@ export function AIChatFollowupSuggestions(props: {
                     }}
                     label={suggestion}
                     className="max-w-full animate-[present_500ms_both] whitespace-normal text-right"
-                    size="medium"
+                    size="small"
                     variant="secondary"
                     style={{
                         animationDelay: `${250 + Math.min(index * 50, 150)}ms`,

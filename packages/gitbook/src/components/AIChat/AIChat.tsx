@@ -6,6 +6,7 @@ import React from 'react';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { DropdownMenu, DropdownMenuItem } from '../Header/DropdownMenu';
 import { Button } from '../primitives';
+import AIChatIcon from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
@@ -77,7 +78,7 @@ export function AIChat(props: AIChatProps) {
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
-                    <Icon icon="robot" className="size-4" />
+                    <AIChatIcon />
                     <span className="font-bold">Docs Assistant</span>
                     <div className="ml-auto flex gap-2">
                         <DropdownMenu
@@ -97,6 +98,7 @@ export function AIChat(props: AIChatProps) {
                                 onClick={() => {
                                     chatController.clear();
                                 }}
+                                disabled={chat.messages.length === 0}
                             >
                                 <Icon icon="broom-wide" className="size-3 text-tint-subtle" />
                                 Clear conversation
@@ -123,10 +125,7 @@ export function AIChat(props: AIChatProps) {
                     {chat.messages.length === 0 ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center self-center justify-self-center rounded-full bg-tint-subtle">
-                                <Icon
-                                    icon="robot"
-                                    className="size-16 animate-[present_500ms_200ms_both]"
-                                />
+                                <AIChatIcon className="size-16 animate-[present_500ms_200ms_both]" />
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
                                 <h5 className=" text-center font-bold text-lg text-tint-strong">

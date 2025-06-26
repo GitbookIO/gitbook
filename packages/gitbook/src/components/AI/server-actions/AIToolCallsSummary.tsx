@@ -1,3 +1,4 @@
+import { AISearchResults } from '@/components/AIChat/AISearchResults';
 import { StyledLink } from '@/components/primitives';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
@@ -23,31 +24,31 @@ export function AIToolCallsSummary(props: {
     );
 }
 
-function ToolCallSummary(props: {
+async function ToolCallSummary(props: {
     toolCall: AIToolCall;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
     return (
-        <p className="text-sm text-tint">
+        <div className="flex items-start gap-2 text-sm text-tint">
             <Icon
                 icon={getIconForToolCall(toolCall)}
-                className="mr-1 inline-block size-3 text-tint-subtle/8"
+                className="mt-1 size-3 shrink-0 text-tint-subtle/8"
             />
-            {getDescriptionForToolCall(toolCall, context)}
-        </p>
+            {await getDescriptionForToolCall(toolCall, context)}
+        </div>
     );
 }
 
-function getDescriptionForToolCall(
+async function getDescriptionForToolCall(
     toolCall: AIToolCall,
     context: GitBookSiteContext
-): React.ReactNode {
+): Promise<React.ReactNode> {
     switch (toolCall.tool) {
         case 'getPageContent':
             return (
-                <>
+                <p>
                     Read page{' '}
                     <ContentRefLink
                         contentRef={{
@@ -59,21 +60,39 @@ function getDescriptionForToolCall(
                         fallback={toolCall.page.title}
                     />
                     <OtherSpaceLink spaceId={toolCall.spaceId} context={context} />
-                </>
+                </p>
             );
         case 'search':
-            // TODO: Show in a popover the results using the list `toolCall.results`.
             return (
-                <>
-                    Searched <strong>{toolCall.query}</strong>
-                </>
+                <AISearchResults
+                    query={toolCall.query}
+                    results={
+                        await Promise.all(
+                            toolCall.results.map(async (result) => {
+                                const resolved = await resolveContentRef(
+                                    {
+                                        kind: 'page',
+                                        page: result.pageId,
+                                        space: result.spaceId,
+                                    },
+                                    context
+                                );
+
+                                return {
+                                    ...result,
+                                    href: resolved?.href || '#',
+                                };
+                            })
+                        )
+                    }
+                />
             );
         case 'getPages':
             return (
-                <>
+                <p>
                     Listed the pages
                     <OtherSpaceLink spaceId={toolCall.spaceId} context={context} />
-                </>
+                </p>
             );
         default:
             return <>{toolCall.tool}</>;

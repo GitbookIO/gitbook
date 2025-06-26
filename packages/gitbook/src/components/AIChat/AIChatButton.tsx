@@ -1,7 +1,7 @@
 'use client';
-
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
+import AIChatIcon from './AIChatIcon';
 
 export default function AIChatButton() {
     const chatController = useAIChatController();
@@ -9,7 +9,7 @@ export default function AIChatButton() {
 
     return (
         <Button
-            icon="robot"
+            icon={<AIChatIcon />}
             iconOnly
             size="default"
             variant="secondary"

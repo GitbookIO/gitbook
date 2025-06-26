@@ -12,7 +12,7 @@ import { Tooltip } from './Tooltip';
 type ButtonProps = {
     href?: string;
     variant?: 'primary' | 'secondary' | 'blank';
-    icon?: IconName;
+    icon?: IconName | React.ReactNode;
     iconOnly?: boolean;
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
@@ -85,7 +85,13 @@ export function Button({
                 target={target}
                 {...rest}
             >
-                {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
+                {icon ? (
+                    typeof icon === 'string' ? (
+                        <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                    ) : (
+                        icon
+                    )
+                ) : null}
                 {iconOnly ? null : label}
             </Link>
         );
@@ -98,7 +104,13 @@ export function Button({
             aria-label={label}
             {...rest}
         >
-            {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
+            {icon ? (
+                typeof icon === 'string' ? (
+                    <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                ) : (
+                    icon
+                )
+            ) : null}
             {iconOnly ? null : label}
         </button>
     );
