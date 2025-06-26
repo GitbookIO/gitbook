@@ -21,7 +21,9 @@ export function LoadingStateProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const [bodyLoaded, setBodyLoaded] = useState(false);
+    const [bodyLoadedState, setBodyLoaded] = useState(false);
+
+    const bodyLoaded = useMemo(() => bodyLoadedState, [bodyLoadedState]);
 
     return (
         <LoadingStateProviderContext.Provider value={{ bodyLoaded, setBodyLoaded }}>

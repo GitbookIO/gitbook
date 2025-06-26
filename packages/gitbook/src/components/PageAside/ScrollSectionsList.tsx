@@ -31,12 +31,12 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
         });
     }, [sections]);
 
-    const active = useBodyLoaded();
+    const enabled = useBodyLoaded();
 
     const activeId = useScrollActiveId(ids, {
         rootMargin: `-${HEADER_HEIGHT_DESKTOP}px 0px -40% 0px`,
         threshold: SECTION_INTERSECTING_THRESHOLD,
-        active,
+        enabled,
     });
 
     return (
