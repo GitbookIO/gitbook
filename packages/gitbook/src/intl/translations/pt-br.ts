@@ -43,6 +43,7 @@ export const pt_br = {
     cookies_accept: 'Aceitar',
     cookies_reject: 'Rejeitar',
     close: 'Fechar',
+    view: 'Ver',
     edit_on_git: 'Editar no ${1}',
     notfound_title: 'Página não encontrada',
     notfound: 'A página que você está procurando não existe.',

@@ -33,7 +33,7 @@ async function ToolCallSummary(props: {
     const { toolCall, context } = props;
 
     return (
-        <div className="flex items-start gap-2 text-sm text-tint">
+        <div className="flex items-start gap-2 text-sm text-tint-subtle">
             <Icon
                 icon={getIconForToolCall(toolCall)}
                 className="mt-1 size-3 shrink-0 text-tint-subtle/8"
@@ -100,10 +100,14 @@ async function getDescriptionForToolCall(
                                     : t(language, 'search_no_results')}
                             </p>
                         </div>
-                        <Icon
-                            icon="chevron-right"
-                            className="ml-auto size-3 shrink-0 transition-transform group-open:rotate-90"
-                        />
+                        <div className="ml-auto flex items-center gap-1">
+                            <span className="block group-open:hidden">{t(language, 'view')}</span>
+                            <span className="hidden group-open:block">{t(language, 'close')}</span>
+                            <Icon
+                                icon="chevron-right"
+                                className="size-3 shrink-0 transition-transform group-open:rotate-90"
+                            />
+                        </div>
                     </summary>
                     <div className="max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all group-open:max-h-96 group-open:opacity-11">
                         <ol className="space-y-1">

@@ -43,6 +43,7 @@ export const en = {
     cookies_accept: 'Accept',
     cookies_reject: 'Reject',
     close: 'Close',
+    view: 'View',
     edit_on_git: 'Edit on ${1}',
     notfound_title: 'Page not found',
     notfound: "The page you are looking for doesn't exist.",

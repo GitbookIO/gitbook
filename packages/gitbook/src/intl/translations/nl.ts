@@ -45,6 +45,7 @@ export const nl: TranslationLanguage = {
     cookies_accept: 'Accepteren',
     cookies_reject: 'Weigeren',
     close: 'Sluiten',
+    view: 'Bekijken',
     edit_on_git: 'Bewerk op ${1}',
     notfound_title: 'Pagina niet gevonden',
     notfound: 'De pagina die je zoekt, bestaat niet.',

@@ -45,6 +45,7 @@ export const fr: TranslationLanguage = {
     cookies_accept: 'Accepter',
     cookies_reject: 'Rejeter',
     close: 'Fermer',
+    view: 'Voir',
     edit_on_git: 'Modifier sur ${1}',
     notfound_title: 'Page non trouvée',
     notfound: "La page que vous cherchez n'existe pas.",

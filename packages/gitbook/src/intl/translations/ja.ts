@@ -45,6 +45,7 @@ export const ja: TranslationLanguage = {
     cookies_accept: '同意する',
     cookies_reject: '拒否する',
     close: '閉じる',
+    view: '表示',
     edit_on_git: '${1}で編集',
     notfound_title: 'ページが見つかりません',
     notfound: 'お探しのページは存在しません。',

@@ -80,7 +80,7 @@ export function AIChat(props: AIChatProps) {
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
-                    <AIChatIcon />
+                    <AIChatIcon className="size-6" />
                     <span className="font-bold">Docs Assistant</span>
                     <div className="ml-auto flex gap-2">
                         <DropdownMenu

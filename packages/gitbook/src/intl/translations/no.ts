@@ -45,6 +45,7 @@ export const no: TranslationLanguage = {
     cookies_accept: 'Godta',
     cookies_reject: 'Avslå',
     close: 'Lukk',
+    view: 'Vis',
     edit_on_git: 'Rediger på ${1}',
     notfound_title: 'Siden ble ikke funnet',
     notfound: 'Siden du leter etter eksisterer ikke.',
