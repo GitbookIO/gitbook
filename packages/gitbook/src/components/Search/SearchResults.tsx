@@ -224,7 +224,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const noResults = (
         <div className={tcls('text', 'text-tint', 'p-8', 'text-center')}>
-            {t(language, 'search_no_results', query)}
+            {t(language, 'search_no_results_for', query)}
         </div>
     );
 

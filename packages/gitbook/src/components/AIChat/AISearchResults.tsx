@@ -11,13 +11,9 @@ export function AISearchResults({
         <details className="-ml-5 group flex w-full flex-col gap-2">
             <summary className="-mx-2 -mt-2 flex cursor-pointer list-none items-center gap-2 rounded-corners:rounded-md py-2 pr-4 pl-7 transition-colors marker:hidden hover:bg-primary-hover">
                 <div className="flex flex-col">
-                    <p>
-                        Searched for <strong>{query}</strong>
-                    </p>
+                    <p>Searched for {query}</p>
                     <p className="text-tint-subtle text-xs">
-                        {results.length
-                            ? `${results.length} results — Click to view`
-                            : 'No results'}
+                        {results.length ? `${results.length} results` : 'No results'}
                     </p>
                 </div>
                 <Icon

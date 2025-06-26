@@ -1,5 +1,6 @@
 'use client';
 
+import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
@@ -19,13 +20,6 @@ interface AIChatProps {
     children?: React.ReactNode;
 }
 
-const getTimeGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-};
-
 export function AIChat(props: AIChatProps) {
     const { className } = props;
 
@@ -40,6 +34,14 @@ export function AIChat(props: AIChatProps) {
     const inputRef = React.useRef<HTMLDivElement>(null);
 
     const [inputHeight, setInputHeight] = React.useState(0);
+    const language = useLanguage();
+
+    const getTimeGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return tString(language, 'ai_chat_assistant_greeting_morning');
+        if (hour < 18) return tString(language, 'ai_chat_assistant_greeting_afternoon');
+        return tString(language, 'ai_chat_assistant_greeting_evening');
+    };
 
     // Auto-scroll to the latest user message when messages change
     React.useEffect(() => {
@@ -87,7 +89,7 @@ export function AIChat(props: AIChatProps) {
                                     onClick={() => {}}
                                     iconOnly
                                     icon="ellipsis"
-                                    label="More actions"
+                                    label={tString(language, 'more')}
                                     className="!px-2"
                                     variant="blank"
                                     size="default"
@@ -101,14 +103,14 @@ export function AIChat(props: AIChatProps) {
                                 disabled={chat.messages.length === 0}
                             >
                                 <Icon icon="broom-wide" className="size-3 text-tint-subtle" />
-                                Clear conversation
+                                {t(language, 'ai_chat_clear_conversation')}
                             </DropdownMenuItem>
                         </DropdownMenu>
                         <Button
                             onClick={() => chatController.close()}
                             iconOnly
                             icon="close"
-                            label="Close"
+                            label={tString(language, 'close')}
                             className="!px-2"
                             variant="blank"
                             size="default"
@@ -132,7 +134,7 @@ export function AIChat(props: AIChatProps) {
                                     {getTimeGreeting()}
                                 </h5>
                                 <p className="text-center text-tint">
-                                    I'm here to help you with the docs.
+                                    {t(language, 'ai_chat_assistant_description')}
                                 </p>
                             </div>
                             <AIChatSuggestedQuestions chatController={chatController} />

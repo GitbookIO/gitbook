@@ -1,14 +1,16 @@
+import { tString, useLanguage } from '@/intl/client';
 import type { AIChatController } from '../AI/useAIChat';
 import { Button } from '../primitives';
 
-const DEFAULT_SUGGESTED_QUESTIONS = [
-    'What is this page about?',
-    'What should I read next?',
-    'Can you give an example?',
-];
-
 export default function AIChatSuggestedQuestions(props: { chatController: AIChatController }) {
     const { chatController } = props;
+    const language = useLanguage();
+
+    const DEFAULT_SUGGESTED_QUESTIONS = [
+        tString(language, 'ai_chat_suggested_questions_about_this_page'),
+        tString(language, 'ai_chat_suggested_questions_read_next'),
+        tString(language, 'ai_chat_suggested_questions_example'),
+    ];
 
     return (
         <div className="flex flex-col items-center gap-2">
