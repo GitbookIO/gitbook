@@ -101,13 +101,6 @@ export function AIChat(props: AIChatProps) {
                                 <Icon icon="broom-wide" className="size-3 text-tint-subtle" />
                                 Clear conversation
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {}} disabled>
-                                <Icon
-                                    icon="arrow-up-from-bracket"
-                                    className="size-3 text-tint-subtle"
-                                />
-                                Share conversation
-                            </DropdownMenuItem>
                         </DropdownMenu>
                         <Button
                             onClick={() => chatController.close()}
@@ -157,6 +150,7 @@ export function AIChat(props: AIChatProps) {
                     <AIChatInput
                         value={input}
                         onChange={setInput}
+                        disabled={chat.loading}
                         onSubmit={() => {
                             chatController.postMessage({ message: input });
                             setInput('');

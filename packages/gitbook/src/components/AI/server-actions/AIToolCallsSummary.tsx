@@ -1,4 +1,4 @@
-import { Link } from '@/components/primitives';
+import { StyledLink } from '@/components/primitives';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
 import type { AIToolCall, ContentRef } from '@gitbook/api';
@@ -30,7 +30,7 @@ function ToolCallSummary(props: {
     const { toolCall, context } = props;
 
     return (
-        <p className="animate-fadeIn text-sm text-tint">
+        <p className="text-sm text-tint">
             <Icon
                 icon={getIconForToolCall(toolCall)}
                 className="mr-1 inline-block size-3 text-tint-subtle/8"
@@ -134,9 +134,5 @@ async function ContentRefLink(props: {
         return <span>{fallback}</span>;
     }
 
-    return (
-        <Link href={resolved.href} className="text-inherit underline decoration-dashed">
-            {resolved.text}
-        </Link>
-    );
+    return <StyledLink href={resolved.href}>{resolved.text}</StyledLink>;
 }

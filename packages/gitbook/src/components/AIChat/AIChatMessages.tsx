@@ -20,19 +20,22 @@ export function AIChatMessages(props: {
                     <div
                         ref={isLastUserMessage ? lastUserMessageRef : undefined}
                         className={tcls(
-                            'animate-present',
+                            message.content ? 'animate-[fadeIn_500ms_both]' : '',
                             'shrink-0',
                             'last:min-h-[calc(100%-5rem)]',
                             message.role === AIMessageRole.User
                                 ? 'max-w-[80%] self-end rounded-md bg-tint px-4 py-2'
                                 : ''
                         )}
+                        style={{
+                            animationDelay: `${Math.min(index * 0.05, 0.5)}s`,
+                        }}
                         key={index}
                     >
                         {message.content ? (
                             message.content
                         ) : (
-                            <div className="flex w-full flex-wrap gap-2">
+                            <div className="flex w-full animate-[fadeIn_500ms_both] flex-wrap gap-2">
                                 {Array.from({ length: 7 }).map((_, index) => (
                                     <div
                                         key={index}

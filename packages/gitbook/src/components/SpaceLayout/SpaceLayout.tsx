@@ -50,6 +50,8 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
+    const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <CurrentContentProvider
@@ -70,7 +72,7 @@ export function SpaceLayout(props: {
                 >
                     <Announcement context={context} />
                     <Header withTopHeader={withTopHeader} context={context} />
-                    <AIChat />
+                    {withAIChat && <AIChat />}
                     <div className="transition-all duration-300 lg:chat-open:mr-72 xl:chat-open:mr-96">
                         <div
                             className={tcls(

@@ -22,6 +22,8 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
     const { context, withTopHeader } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
+    const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
+
     return (
         <header
             id="site-header"
@@ -158,7 +160,7 @@ export function Header(props: { context: GitBookSiteContext; withTopHeader?: boo
                                     </span>
                                 </SearchButton>
                             </Suspense>
-                            <AIChatButton />
+                            {withAIChat && <AIChatButton />}
                         </div>
 
                         {customization.header.links.length > 0 && (

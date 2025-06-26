@@ -1,6 +1,6 @@
 'use client';
 
-import type { HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -62,7 +62,7 @@ export function Button({
     icon,
     iconOnly = false,
     ...rest
-}: ButtonProps & { target?: HTMLAttributeAnchorTarget }) {
+}: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
         default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
         medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
