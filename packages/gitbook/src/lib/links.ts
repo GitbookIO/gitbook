@@ -66,60 +66,48 @@ export function createLinker(
 
         /** The base path of the site */
         siteBasePath: string;
-    },
-    linkerOptions: {
-        /** If true, any links returned by this linker will be absolute. */
-        alwaysAbsolute?: boolean;
-    } = {}
+    }
 ): GitBookLinker {
     warnOnce(!servedOn.host, 'No host provided to createLinker. It can lead to issues with links.');
-
-    const alwaysAbsolute = linkerOptions.alwaysAbsolute ?? false;
 
     const siteBasePath = withTrailingSlash(withLeadingSlash(servedOn.siteBasePath));
     const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
 
-    function wrapInAbsolute(str: string): string {
-        return alwaysAbsolute ? toAbsoluteURL(str) : str;
-    }
-
-    function toAbsoluteURL(absolutePath: string): string {
-        // If the path is already a full URL, we return it as is.
-        if (URL.canParse(absolutePath)) {
-            return absolutePath;
-        }
-
-        if (!servedOn.host) {
-            return absolutePath;
-        }
-
-        return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
-    }
-
     const linker: GitBookLinker = {
         toPathInSpace(relativePath: string): string {
-            return wrapInAbsolute(joinPaths(spaceBasePath, relativePath));
+            return joinPaths(spaceBasePath, relativePath);
         },
 
         toPathInSite(relativePath: string): string {
-            return wrapInAbsolute(joinPaths(siteBasePath, relativePath));
+            return joinPaths(siteBasePath, relativePath);
         },
 
         toRelativePathInSite(absolutePath: string): string {
             const normalizedPath = withLeadingSlash(absolutePath);
 
             if (!normalizedPath.startsWith(servedOn.siteBasePath)) {
-                return wrapInAbsolute(normalizedPath);
+                return normalizedPath;
             }
 
-            return wrapInAbsolute(normalizedPath.slice(servedOn.siteBasePath.length));
+            return normalizedPath.slice(servedOn.siteBasePath.length);
         },
 
         toPathForPage({ pages, page, anchor }) {
             return linker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
 
-        toAbsoluteURL,
+        toAbsoluteURL(absolutePath: string): string {
+            // If the path is already a full URL, we return it as is.
+            if (URL.canParse(absolutePath)) {
+                return absolutePath;
+            }
+
+            if (!servedOn.host) {
+                return absolutePath;
+            }
+
+            return `${servedOn.protocol ?? 'https:'}//${joinPaths(servedOn.host, absolutePath)}`;
+        },
 
         toLinkForContent(rawURL: string): string {
             const url = new URL(rawURL);
@@ -135,6 +123,18 @@ export function createLinker(
     };
 
     return linker;
+}
+
+/**
+ * Make a linker always return absolute URLs.
+ */
+export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
+    return {
+        ...linker,
+        toPathInSpace: (path) => linker.toAbsoluteURL(linker.toPathInSpace(path)),
+        toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
+        toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
+    };
 }
 
 function joinPaths(prefix: string, path: string): string {

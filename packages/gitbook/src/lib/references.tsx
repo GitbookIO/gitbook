@@ -10,7 +10,7 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import { type GitBookLinker, createLinker } from '@/lib/links';
+import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import type {
     ContentRef,
     Revision,
@@ -416,14 +416,14 @@ export async function createLinkerForSpace(
     const baseURL = new URL(
         bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app
     );
-    const linker = createLinker(
-        {
+
+    // Resolve pages as absolute URLs as we are in a different site.
+    const linker = linkerWithAbsoluteURLs(
+        createLinker({
             host: baseURL.host,
             spaceBasePath: baseURL.pathname,
             siteBasePath: baseURL.pathname,
-        },
-        // Resolve pages as absolute URLs as we are in a different site.
-        { alwaysAbsolute: true }
+        })
     );
 
     return {
