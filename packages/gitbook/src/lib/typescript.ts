@@ -21,7 +21,7 @@ type WithoutUndefined<T> = {
  * This is useful for RSC serialization, as it avoids sending `"$undefined"` values.
  *
  */
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: can't avoid for the generic
 export function removeUndefined<T extends Record<string, any>>(obj: T): WithoutUndefined<T> {
     const result: Partial<T> = {};
 
