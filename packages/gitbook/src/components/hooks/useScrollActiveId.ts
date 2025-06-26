@@ -8,9 +8,10 @@ export function useScrollActiveId(
     options: {
         rootMargin?: string;
         threshold?: number;
-    } = {}
+        enabled: boolean;
+    } = { enabled: true }
 ) {
-    const { rootMargin, threshold = 0.5 } = options;
+    const { rootMargin, threshold = 0.5, enabled } = options;
 
     const [activeId, setActiveId] = React.useState<string>(ids[0]);
     const sectionsIntersectingMap = React.useRef<Map<string, boolean>>(new Map());
@@ -18,6 +19,9 @@ export function useScrollActiveId(
     React.useEffect(() => {
         const defaultActiveId = ids[0];
         setActiveId((activeId) => (ids.indexOf(activeId) !== -1 ? activeId : defaultActiveId));
+        if (!enabled) {
+            return;
+        }
 
         if (typeof IntersectionObserver === 'undefined') {
             return;
@@ -70,7 +74,7 @@ export function useScrollActiveId(
         return () => {
             observer.disconnect();
         };
-    }, [ids, threshold, rootMargin]);
+    }, [ids, threshold, rootMargin, enabled]);
 
     return activeId;
 }
