@@ -22,7 +22,7 @@ export async function RecordCard(
     const { view, record, context, block, isOffscreen } = props;
 
     const coverFile = view.coverDefinition
-        ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
+        ? getRecordValue<ContentRef[] | string[]>(record[1], view.coverDefinition)?.[0]
         : null;
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
@@ -30,7 +30,7 @@ export async function RecordCard(
 
     const [cover, target] = await Promise.all([
         coverFile && context.contentContext
-            ? resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
+            ? resolveContentRef(getCoverFileContentRef(coverFile), context.contentContext)
             : null,
         targetRef && context.contentContext
             ? resolveContentRef(targetRef, context.contentContext)
@@ -166,4 +166,17 @@ export async function RecordCard(
     }
 
     return <div className={tcls(RecordCardStyles)}>{body}</div>;
+}
+
+/**
+ * Resolve the cover file content-ref.
+ * If the value is a string, it means it's a file ID (legacy).
+ * Otherwise, it's a content-ref (File|URL).
+ */
+function getCoverFileContentRef(value: ContentRef | string): ContentRef {
+    if (typeof value === 'string') {
+        return { kind: 'file', file: value };
+    }
+
+    return value;
 }
