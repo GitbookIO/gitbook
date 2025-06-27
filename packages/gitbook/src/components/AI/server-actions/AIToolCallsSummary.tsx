@@ -4,7 +4,13 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import type { GitBookSiteContext } from '@/lib/context';
 import { resolveContentRef } from '@/lib/references';
-import type { AIToolCall, ContentRef } from '@gitbook/api';
+import type {
+    AIToolCall,
+    AIToolCallGetPageContent,
+    AIToolCallGetPages,
+    AIToolCallSearch,
+    ContentRef,
+} from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import type * as React from 'react';
 
@@ -26,13 +32,8 @@ export function AIToolCallsSummary(props: {
     );
 }
 
-async function ToolCallSummary(props: {
-    toolCall: AIToolCall;
-    context: GitBookSiteContext;
-}) {
+function ToolCallSummary(props: { toolCall: AIToolCall; context: GitBookSiteContext }) {
     const { toolCall, context } = props;
-
-    const description = await getDescriptionForToolCall(toolCall, context);
 
     return (
         <div className="flex items-start gap-2 text-sm text-tint-subtle">
@@ -40,15 +41,12 @@ async function ToolCallSummary(props: {
                 icon={getIconForToolCall(toolCall)}
                 className="mt-1 size-3 shrink-0 text-tint-subtle/8"
             />
-            {description}
+            {getDescriptionForToolCall(toolCall, context)}
         </div>
     );
 }
 
-async function getDescriptionForToolCall(
-    toolCall: AIToolCall,
-    context: GitBookSiteContext
-): Promise<React.ReactNode> {
+function getDescriptionForToolCall(toolCall: AIToolCall, context: GitBookSiteContext) {
     switch (toolCall.tool) {
         case 'getPageContent':
             return <DescriptionForPageContentToolCall toolCall={toolCall} context={context} />;
@@ -62,15 +60,12 @@ async function getDescriptionForToolCall(
 }
 
 function DescriptionForPageContentToolCall(props: {
-    toolCall: AIToolCall;
+    toolCall: AIToolCallGetPageContent;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
     const language = getSpaceLanguage(context.customization);
-    if (toolCall.tool !== 'getPageContent') {
-        return null;
-    }
 
     return (
         <p>
@@ -95,15 +90,12 @@ function DescriptionForPageContentToolCall(props: {
 }
 
 async function DescriptionForSearchToolCall(props: {
-    toolCall: AIToolCall;
+    toolCall: AIToolCallSearch;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
     const language = getSpaceLanguage(context.customization);
-    if (toolCall.tool !== 'search') {
-        return null;
-    }
 
     // Resolve all hrefs for search results in parallel
     const searchResultsWithHrefs = await Promise.all(
@@ -198,15 +190,12 @@ async function DescriptionForSearchToolCall(props: {
 }
 
 function DescriptionForGetPagesToolCall(props: {
-    toolCall: AIToolCall;
+    toolCall: AIToolCallGetPages;
     context: GitBookSiteContext;
 }) {
     const { toolCall, context } = props;
 
     const language = getSpaceLanguage(context.customization);
-    if (toolCall.tool !== 'getPages') {
-        return null;
-    }
 
     return (
         <p>
