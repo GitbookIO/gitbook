@@ -1,12 +1,17 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
-import { isNodeEmpty } from '@/lib/document';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 import { type RevisionPageDocument, type RevisionPageGroup, RevisionPageType } from '@gitbook/api';
 import type { Root } from 'mdast';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
+import { gfmFromMarkdown } from 'mdast-util-gfm';
 import { toMarkdown } from 'mdast-util-to-markdown';
+import { frontmatter } from 'micromark-extension-frontmatter';
+import { gfm } from 'micromark-extension-gfm';
+import { remove } from 'unist-util-remove';
 
 /**
  * Generate a markdown version of a page.
@@ -26,13 +31,11 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
         return new Response(`Page "${pagePath}" is not a document or group`, { status: 404 });
     }
 
-    // Handle group pages and empty document pages with children
-    const isGroupPage = await shouldTreatAsGroupPage(context, page);
-    if (isGroupPage) {
+    // Handle group pages
+    if (page.type === RevisionPageType.Group) {
         return servePageGroup(context, page);
     }
 
-    // Handle regular document pages
     const markdown = await throwIfDataError(
         context.dataFetcher.getRevisionPageMarkdown({
             spaceId: context.space.id,
@@ -40,6 +43,11 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
             pageId: page.id,
         })
     );
+
+    // Handle empty document pages which have children
+    if (isEmptyPage(markdown) && page.pages.length > 0) {
+        return servePageGroup(context, page);
+    }
 
     return new Response(markdown, {
         headers: {
@@ -49,28 +57,29 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
 }
 
 /**
- * Determine if a page should be treated as a group page.
- * A page is treated as a group if:
- * 1. It's explicitly a group page type, OR
- * 2. It's a document page but has empty content (acts as a container)
+ * Determine if a page is empty.
+ * A page is empty if it has no content or only a title.
  */
-async function shouldTreatAsGroupPage(
-    context: GitBookSiteContext,
-    page: RevisionPageDocument | RevisionPageGroup
-): Promise<boolean> {
-    if (page.type === RevisionPageType.Group) {
+function isEmptyPage(pageMarkdown: string): boolean {
+    const trimmedMarkdown = pageMarkdown.trim();
+
+    // Check if the markdown is empty
+    if (!trimmedMarkdown) {
         return true;
     }
 
-    const document = await throwIfDataError(
-        context.dataFetcher.getRevisionPageDocument({
-            spaceId: context.space.id,
-            revisionId: context.revision.id,
-            pageId: page.id,
-        })
-    );
+    // Parse the markdown to check if it only contains a title
 
-    return isNodeEmpty(document);
+    const tree = fromMarkdown(pageMarkdown, {
+        extensions: [frontmatter(['yaml']), gfm()],
+        mdastExtensions: [frontmatterFromMarkdown(['yaml']), gfmFromMarkdown()],
+    });
+
+    // Remove frontmatter
+    remove(tree, 'yaml');
+
+    // If the page has no content or only a title, it is empty
+    return tree.children.length <= 1 && tree.children[0]?.type === 'heading';
 }
 
 /**
@@ -88,6 +97,7 @@ async function servePageGroup(
 
     const indexablePages = getIndexablePages(page.pages);
 
+    // Create a markdown tree with the page title as heading and a list of child pages
     const markdownTree: Root = {
         type: 'root',
         children: [

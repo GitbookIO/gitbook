@@ -8,8 +8,8 @@ import {
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
-type ResolvedPageDocument = {
-    page: RevisionPageDocument;
+type ResolvedPagePath<Page extends RevisionPageDocument | RevisionPageGroup> = {
+    page: Page;
     ancestors: AncestorRevisionPage[];
 };
 
@@ -19,7 +19,7 @@ type ResolvedPageDocument = {
 export function resolvePagePath(
     rootPages: Revision['pages'],
     pagePath: string
-): ResolvedPageDocument | undefined {
+): ResolvedPagePath<RevisionPageDocument> | undefined {
     const result = findPageByPath(rootPages, pagePath);
 
     if (!result) {
@@ -29,11 +29,6 @@ export function resolvePagePath(
     return resolvePageDocument(result.page, result.ancestors);
 }
 
-type ResolvedPageDocumentOrGroup = {
-    page: RevisionPageDocument | RevisionPageGroup;
-    ancestors: AncestorRevisionPage[];
-};
-
 /**
  * Resolve a page path to a page document or group.
  * Similar to resolvePagePath but returns both documents and groups.
@@ -41,7 +36,7 @@ type ResolvedPageDocumentOrGroup = {
 export function resolvePagePathDocumentOrGroup(
     rootPages: Revision['pages'],
     pagePath: string
-): ResolvedPageDocumentOrGroup | undefined {
+): ResolvedPagePath<RevisionPageDocument | RevisionPageGroup> | undefined {
     const result = findPageByPath(rootPages, pagePath);
 
     if (!result) {
@@ -57,7 +52,7 @@ export function resolvePagePathDocumentOrGroup(
 function findPageByPath(
     rootPages: Revision['pages'],
     pagePath: string
-): ResolvedPageDocumentOrGroup | undefined {
+): ResolvedPagePath<RevisionPageDocument | RevisionPageGroup> | undefined {
     if (!pagePath) {
         const firstPage = resolveFirstDocument(rootPages, []);
         if (!firstPage) {
@@ -69,7 +64,7 @@ function findPageByPath(
     const iteratePages = (
         pages: RevisionPage[],
         ancestors: AncestorRevisionPage[]
-    ): ResolvedPageDocumentOrGroup | undefined => {
+    ): ResolvedPagePath<RevisionPageDocument | RevisionPageGroup> | undefined => {
         for (const page of pages) {
             if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
                 continue;

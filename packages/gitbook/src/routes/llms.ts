@@ -141,12 +141,28 @@ async function getNodesFromSiteSpaces(
                 })
             );
             const pages = getIndexablePages(revision.pages);
-            return getMarkdownForPagesTree(pages, {
-                siteSpaceUrl,
-                linker,
-                heading: options.heading ? siteSpace.title : undefined,
-                withMarkdownPages: options.withMarkdownPages,
-            });
+
+            const nodes: RootContent[] = [];
+
+            // Add the space title as a heading
+            if (options.heading) {
+                nodes.push({
+                    type: 'heading',
+                    depth: 2,
+                    children: [{ type: 'text', value: siteSpace.title }],
+                });
+            }
+
+            // Add the pages as a list
+            nodes.push(
+                ...(await getMarkdownForPagesTree(pages, {
+                    siteSpaceUrl,
+                    linker,
+                    withMarkdownPages: options.withMarkdownPages,
+                }))
+            );
+
+            return nodes;
         })
     );
     return all.flat();
@@ -160,7 +176,6 @@ export async function getMarkdownForPagesTree(
     options: {
         siteSpaceUrl: string;
         linker: GitBookLinker;
-        heading?: string;
         withMarkdownPages?: boolean;
     }
 ): Promise<RootContent[]> {
@@ -192,13 +207,6 @@ export async function getMarkdownForPagesTree(
         })
     );
     const nodes: RootContent[] = [];
-    if (options.heading) {
-        nodes.push({
-            type: 'heading',
-            depth: 2,
-            children: [{ type: 'text', value: options.heading }],
-        });
-    }
     nodes.push({
         type: 'list',
         spread: false,
