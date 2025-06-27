@@ -1,5 +1,5 @@
 import { fetchOpenAPIFilesystem } from '@/lib/openapi/fetch';
-import { OpenAPIParseError } from '@gitbook/openapi-parser';
+import type { OpenAPIParseError } from '@gitbook/openapi-parser';
 import { type OpenAPIOperationData, resolveOpenAPIOperation } from '@gitbook/react-openapi';
 import type {
     AnyOpenAPIOperationsBlock,
@@ -55,8 +55,8 @@ async function baseResolveOpenAPIOperationBlock(
 
         return { data, specUrl };
     } catch (error) {
-        if (error instanceof OpenAPIParseError) {
-            return { error };
+        if (error instanceof Error && error.name === 'OpenAPIParseError') {
+            return { error: error as OpenAPIParseError };
         }
 
         throw error;
