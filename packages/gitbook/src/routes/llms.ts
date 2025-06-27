@@ -1,11 +1,11 @@
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
-import { joinPath } from '@/lib/paths';
+import { getPagesTree } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
-import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
+import type { Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
 /**
@@ -140,45 +140,12 @@ async function getNodesFromSiteSpaces(
                 })
             );
             const pages = getIndexablePages(revision.pages);
-            const listChildren = await Promise.all(
-                pages.map(async ({ page }): Promise<ListItem> => {
-                    const pageURL = new URL(siteSpaceUrl);
-                    pageURL.pathname = joinPath(pageURL.pathname, page.path);
-                    if (options.withMarkdownPages) {
-                        pageURL.pathname = `${pageURL.pathname}.md`;
-                    }
-
-                    const url = linker.toLinkForContent(pageURL.toString());
-                    const children: Paragraph['children'] = [
-                        {
-                            type: 'link',
-                            url,
-                            children: [{ type: 'text', value: page.title }],
-                        },
-                    ];
-                    if (page.description) {
-                        children.push({ type: 'text', value: `: ${page.description}` });
-                    }
-                    return {
-                        type: 'listItem',
-                        children: [{ type: 'paragraph', children }],
-                    };
-                })
-            );
-            const nodes: RootContent[] = [];
-            if (options.heading) {
-                nodes.push({
-                    type: 'heading',
-                    depth: 2,
-                    children: [{ type: 'text', value: siteSpace.title }],
-                });
-            }
-            nodes.push({
-                type: 'list',
-                spread: false,
-                children: listChildren,
+            return getPagesTree(pages, {
+                siteSpaceUrl,
+                linker,
+                heading: options.heading ? siteSpace.title : undefined,
+                withMarkdownPages: options.withMarkdownPages,
             });
-            return nodes;
         })
     );
     return all.flat();
