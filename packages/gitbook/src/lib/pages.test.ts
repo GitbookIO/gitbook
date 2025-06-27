@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import type { RevisionPage } from '@gitbook/api';
 
-import { resolveFirstDocument, resolvePagePath } from './pages';
+import { resolveFirstDocument, resolvePagePath, resolvePagePathDocumentOrGroup } from './pages';
 
 describe('resolveFirstDocument', () => {
     it('should go into the first group', () => {
@@ -196,7 +196,7 @@ describe('resolvePagePath', () => {
             },
         ];
 
-        const page = resolvePagePath(pages, 'sales');
+        const page = resolvePagePathDocumentOrGroup(pages, 'sales');
         expect(page).toMatchObject({
             ancestors: [],
             page: {
