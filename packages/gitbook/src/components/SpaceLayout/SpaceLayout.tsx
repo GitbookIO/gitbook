@@ -73,7 +73,7 @@ export function SpaceLayout(props: {
                     <Announcement context={context} />
                     <Header withTopHeader={withTopHeader} context={context} />
                     {withAIChat && <AIChat />}
-                    <div className="transition-all duration-300 lg:chat-open:mr-72 xl:chat-open:mr-96">
+                    <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                         <div
                             className={tcls(
                                 'flex',

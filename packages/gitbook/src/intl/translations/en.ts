@@ -69,6 +69,7 @@ export const en = {
     ai_chat_assistant_greeting_morning: 'Good morning',
     ai_chat_assistant_greeting_afternoon: 'Good afternoon',
     ai_chat_assistant_greeting_evening: 'Good evening',
+    ai_chat_assistant_greeting_night: 'Good night',
     ai_chat_clear_conversation: 'Clear conversation',
     ai_chat_context_title: 'Based on your context',
     ai_chat_context_description:

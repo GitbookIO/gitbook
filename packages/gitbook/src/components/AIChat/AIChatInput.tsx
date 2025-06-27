@@ -27,9 +27,11 @@ export function AIChatInput(props: {
     };
 
     useEffect(() => {
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 300);
+        if (!disabled) {
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 300);
+        }
     }, [disabled]);
 
     return (
@@ -90,10 +92,10 @@ export function AIChatInput(props: {
                     }
                     arrow
                 >
-                    <span className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2 py-1 text-tint/7 text-xs transition-all hover:bg-tint">
+                    <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2 py-1 text-tint/7 text-xs transition-all hover:bg-tint">
                         <Icon icon="glasses-round" className="size-3.5" />{' '}
-                        {t(language, 'ai_chat_context_title')}
-                    </span>
+                        <span>{t(language, 'ai_chat_context_title')}</span>
+                    </div>
                 </Tooltip>
                 <Button
                     label={tString(language, 'send')}

@@ -36,8 +36,11 @@ export function AIChat(props: AIChatProps) {
     const [inputHeight, setInputHeight] = React.useState(0);
     const language = useLanguage();
 
+    const isEmpty = !chat.messages.length;
+
     const getTimeGreeting = () => {
         const hour = new Date().getHours();
+        if (hour < 6) return tString(language, 'ai_chat_assistant_greeting_night');
         if (hour < 12) return tString(language, 'ai_chat_assistant_greeting_morning');
         if (hour < 18) return tString(language, 'ai_chat_assistant_greeting_afternoon');
         return tString(language, 'ai_chat_assistant_greeting_evening');
@@ -70,10 +73,14 @@ export function AIChat(props: AIChatProps) {
         return () => observer.disconnect();
     }, [chat.opened]);
 
-    return chat.opened ? (
+    if (!chat.opened) {
+        return null;
+    }
+
+    return (
         <div
             className={tcls(
-                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-72 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96',
+                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96',
                 className
             )}
             ref={containerRef}
@@ -100,7 +107,7 @@ export function AIChat(props: AIChatProps) {
                                 onClick={() => {
                                     chatController.clear();
                                 }}
-                                disabled={chat.messages.length === 0}
+                                disabled={isEmpty}
                             >
                                 <Icon icon="broom-wide" className="size-3 text-tint-subtle" />
                                 {t(language, 'ai_chat_clear_conversation')}
@@ -124,9 +131,9 @@ export function AIChat(props: AIChatProps) {
                         paddingBottom: `${inputHeight}px`,
                     }}
                 >
-                    {chat.messages.length === 0 ? (
+                    {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
-                            <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center self-center justify-self-center rounded-full bg-tint-subtle">
+                            <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center rounded-full bg-tint-subtle">
                                 <AIChatIcon className="size-16 animate-[present_500ms_200ms_both]" />
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
@@ -160,5 +167,5 @@ export function AIChat(props: AIChatProps) {
                 </div>
             </div>
         </div>
-    ) : null;
+    );
 }
