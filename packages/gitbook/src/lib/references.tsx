@@ -10,10 +10,9 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
+import { createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import type {
     ContentRef,
-    Revision,
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
@@ -54,9 +53,8 @@ export interface ResolvedContentRef {
     page?: RevisionPageDocument;
     /** Resolved reusable content, if the ref points to reusable content on a revision. Also contains the space and revision used for resolution. */
     reusableContent?: {
+        context: GitBookSpaceContext;
         revisionReusableContent: RevisionReusableContent;
-        space: Space;
-        revision: Revision;
     };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
@@ -239,20 +237,14 @@ export async function resolveContentRef(
                     return context;
                 }
 
-                const otherContext = await ignoreDataThrownError(
-                    fetchSpaceContextByIds(context, {
-                        space: contentRef.space,
-                        shareKey: undefined,
-                        changeRequest: undefined,
-                        revision: undefined,
-                    })
-                );
-
-                if (!otherContext) {
+                // References inside reusable content from a different space need to resolve in the parent space.
+                // Create a context and a linker that ensures links are resolved with the correct parent, and are kept absolute.
+                const ctx = await createContextForSpace(contentRef.space, context);
+                if (!ctx) {
                     return null;
                 }
 
-                return otherContext;
+                return ctx.spaceContext;
             })();
 
             if (!container) {
@@ -275,9 +267,8 @@ export async function resolveContentRef(
                 text: reusableContent.title,
                 active: false,
                 reusableContent: {
+                    context: container,
                     revisionReusableContent: reusableContent,
-                    space: container.space,
-                    revision: container.revision,
                 },
             };
         }
@@ -354,16 +345,13 @@ async function resolveContentRefInSpace(
     context: GitBookAnyContext,
     contentRef: ContentRef
 ) {
-    const ctx = await createLinkerForSpace(spaceId, context);
+    const ctx = await createContextForSpace(spaceId, context);
 
     if (!ctx) {
         return null;
     }
 
-    const resolved = await resolveContentRef(contentRef, {
-        ...ctx.spaceContext,
-        linker: ctx.linker,
-    });
+    const resolved = await resolveContentRef(contentRef, ctx.spaceContext);
 
     if (!resolved) {
         return null;
@@ -382,17 +370,16 @@ async function resolveContentRefInSpace(
 }
 
 /**
- * Create a new linker for a specific spaceId.
+ * Create a new context for a specific spaceId.
  *
  * As the resolved space may not be the same as the given spaceId, this function also
  * returns the new space context and the base URL used for the linker.
  */
-export async function createLinkerForSpace(
+async function createContextForSpace(
     spaceId: string,
     context: GitBookAnyContext
 ): Promise<{
     spaceContext: GitBookSpaceContext;
-    linker: GitBookLinker;
     baseURL: URL;
 } | null> {
     const [spaceContext, bestTargetSpace] = await Promise.all([
@@ -427,8 +414,10 @@ export async function createLinkerForSpace(
     );
 
     return {
-        spaceContext,
-        linker,
+        spaceContext: {
+            ...spaceContext,
+            linker,
+        },
         baseURL,
     };
 }
