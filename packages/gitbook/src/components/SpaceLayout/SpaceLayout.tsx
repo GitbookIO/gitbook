@@ -13,6 +13,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
+import { AIChat } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -49,6 +50,8 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
+    const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <CurrentContentProvider
@@ -68,8 +71,13 @@ export function SpaceLayout(props: {
                     visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
-                    <Header withTopHeader={withTopHeader} context={context} />
-                    <div className="scroll-nojump">
+                    <Header
+                        withTopHeader={withTopHeader}
+                        withAIChat={withAIChat}
+                        context={context}
+                    />
+                    {withAIChat ? <AIChat /> : null}
+                    <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                         <div
                             className={tcls(
                                 'flex',
@@ -156,6 +164,7 @@ export function SpaceLayout(props: {
                         <SearchModal
                             spaceTitle={siteSpace.title}
                             withAsk={customization.aiSearch.enabled}
+                            withAIChat={withAIChat}
                             isMultiVariants={isMultiVariants}
                         />
                     </React.Suspense>

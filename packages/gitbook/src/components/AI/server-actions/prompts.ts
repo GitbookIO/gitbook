@@ -9,9 +9,10 @@
 export const MARKDOWN_SYNTAX_PROMPT = `
 ## Markdown syntax
 
-You can use all the markdown syntax supported by GitHub Flavored Markdown (headings, paragraphs, code blocks, lists, tables, etc).
+- You can use all the markdown syntax supported by GitHub Flavored Markdown (headings, paragraphs, code blocks, lists, tables, etc).
+- DO NOT recreate elements with text that can be achieved with blocks (e.g. do not use bullet points to represent lists, use a markdown list instead).
 
-And you also can use advanced blocks using Liquid syntax, the supported advanced blocks are:
+You can also use advanced blocks using Liquid syntax, the supported advanced blocks are:
 
 #### Tabs
 
@@ -68,4 +69,5 @@ You MUST use the following format when referring to pages: markdown links with t
 \`\`\`
 
 Always refer to pages using links and their titles. NEVER refer to pages using their IDs or as "the page".
+Make sure the link you provide is valid and points to a page that exists. Only provide pageIds that you have seen before, do not write new ones.
 `;

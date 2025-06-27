@@ -17,7 +17,7 @@ import {
     DropdownChevron,
     DropdownMenu,
     DropdownMenuItem,
-} from './DropdownMenu';
+} from '../primitives/DropdownMenu';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;

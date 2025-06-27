@@ -1,17 +1,18 @@
 'use client';
 
-import type { HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Icon, type IconName } from '@gitbook/icons';
 import { Link, type LinkInsightsProps } from './Link';
 import { useClassnames } from './StyleProvider';
+import { Tooltip } from './Tooltip';
 
 type ButtonProps = {
     href?: string;
     variant?: 'primary' | 'secondary' | 'blank';
-    icon?: IconName;
+    icon?: IconName | React.ReactNode;
     iconOnly?: boolean;
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
@@ -61,7 +62,7 @@ export function Button({
     icon,
     iconOnly = false,
     ...rest
-}: ButtonProps & { target?: HTMLAttributeAnchorTarget }) {
+}: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
         default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
         medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
@@ -84,21 +85,35 @@ export function Button({
                 target={target}
                 {...rest}
             >
-                {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
+                {icon ? (
+                    typeof icon === 'string' ? (
+                        <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                    ) : (
+                        icon
+                    )
+                ) : null}
                 {iconOnly ? null : label}
             </Link>
         );
     }
 
-    return (
+    const button = (
         <button
             type="button"
-            className={tcls(domClassName, buttonOnlyClassNames)}
+            className={tcls(buttonOnlyClassNames, domClassName)}
             aria-label={label}
             {...rest}
         >
-            {icon ? <Icon icon={icon} className={tcls('size-[1em]')} /> : null}
+            {icon ? (
+                typeof icon === 'string' ? (
+                    <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                ) : (
+                    icon
+                )
+            ) : null}
             {iconOnly ? null : label}
         </button>
     );
+
+    return iconOnly ? <Tooltip label={label}>{button}</Tooltip> : button;
 }
