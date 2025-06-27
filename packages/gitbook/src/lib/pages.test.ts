@@ -196,7 +196,7 @@ describe('resolvePagePath', () => {
             },
         ];
 
-        const page = resolvePagePath(pages, 'sales', { includePageGroup: true });
+        const page = resolvePagePath(pages, 'sales');
         expect(page).toMatchObject({
             ancestors: [],
             page: {

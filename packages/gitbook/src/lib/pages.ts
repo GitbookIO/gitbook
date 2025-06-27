@@ -1,6 +1,3 @@
-import type { GitBookLinker } from '@/lib/links';
-import { joinPath } from '@/lib/paths';
-import type { FlatPageEntry } from '@/lib/sitemap';
 import {
     type Revision,
     type RevisionPage,
@@ -8,92 +5,91 @@ import {
     type RevisionPageGroup,
     RevisionPageType,
 } from '@gitbook/api';
-import type { ListItem, Paragraph, RootContent } from 'mdast';
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
-interface ResolvePageOptions {
-    /**
-     * Whether to include page groups in the results.
-     */
-    includePageGroup?: boolean;
-}
+type ResolvedPageDocument = {
+    page: RevisionPageDocument;
+    ancestors: AncestorRevisionPage[];
+};
 
 /**
- * Resolves a page path to find the corresponding page document or group.
+ * Resolve a page path to a page document.
  */
 export function resolvePagePath(
     rootPages: Revision['pages'],
-    pagePath: string,
-    options?: { includePageGroup: true }
-):
-    | { page: RevisionPageGroup | RevisionPageDocument; ancestors: AncestorRevisionPage[] }
-    | undefined;
-export function resolvePagePath(
-    rootPages: Revision['pages'],
-    pagePath: string,
-    options?: ResolvePageOptions
-): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined;
-export function resolvePagePath(
-    rootPages: Revision['pages'],
-    pagePath: string,
-    options?: ResolvePageOptions
-):
-    | { page: RevisionPageGroup | RevisionPageDocument; ancestors: AncestorRevisionPage[] }
-    | undefined {
-    // Handle empty path by returning the first document page
-    if (!pagePath) {
-        const firstPage = resolveFirstDocument(rootPages, []);
-        return firstPage ?? undefined;
+    pagePath: string
+): ResolvedPageDocument | undefined {
+    const result = findPageByPath(rootPages, pagePath);
+
+    if (!result) {
+        return undefined;
     }
 
-    return findPageByPath(rootPages, [], pagePath, options);
+    return resolvePageDocument(result.page, result.ancestors);
+}
+
+type ResolvedPageDocumentOrGroup = {
+    page: RevisionPageDocument | RevisionPageGroup;
+    ancestors: AncestorRevisionPage[];
+};
+
+/**
+ * Resolve a page path to a page document or group.
+ * Similar to resolvePagePath but returns both documents and groups.
+ */
+export function resolvePagePathDocumentOrGroup(
+    rootPages: Revision['pages'],
+    pagePath: string
+): ResolvedPageDocumentOrGroup | undefined {
+    const result = findPageByPath(rootPages, pagePath);
+
+    if (!result) {
+        return undefined;
+    }
+
+    return { page: result.page, ancestors: result.ancestors };
 }
 
 /**
- * Recursively searches through pages to find one matching the given path.
+ * Helper function to find a page by path, handling empty paths and page iteration.
  */
 function findPageByPath(
-    pages: RevisionPage[],
-    ancestors: AncestorRevisionPage[],
-    targetPath: string,
-    options: ResolvePageOptions = {}
-):
-    | { page: RevisionPageGroup | RevisionPageDocument; ancestors: AncestorRevisionPage[] }
-    | undefined {
-    for (const page of pages) {
-        // Skip non-navigable page types
-        if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
-            continue;
+    rootPages: Revision['pages'],
+    pagePath: string
+): ResolvedPageDocumentOrGroup | undefined {
+    if (!pagePath) {
+        const firstPage = resolveFirstDocument(rootPages, []);
+        if (!firstPage) {
+            return undefined;
         }
-
-        // If this isn't the target path, search recursively in child pages
-        if (page.path !== targetPath) {
-            const childResult = findPageByPath(
-                page.pages,
-                [...ancestors, page],
-                targetPath,
-                options
-            );
-            if (childResult) {
-                return childResult;
-            }
-            continue;
-        }
-
-        // Found the target path - handle based on page type and options
-        const { includePageGroup = false } = options;
-
-        if (page.type === RevisionPageType.Group && includePageGroup) {
-            return { page, ancestors };
-        }
-
-        // For document pages, or when we need to resolve a group to its first document
-        const resolvedPage = resolvePageDocument(page, ancestors);
-        return resolvedPage ?? undefined;
+        return { page: firstPage.page, ancestors: firstPage.ancestors };
     }
 
-    return undefined;
+    const iteratePages = (
+        pages: RevisionPage[],
+        ancestors: AncestorRevisionPage[]
+    ): ResolvedPageDocumentOrGroup | undefined => {
+        for (const page of pages) {
+            if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
+                continue;
+            }
+
+            if (page.path !== pagePath) {
+                // TODO: can be optimized to count the number of slashes and skip the entire subtree
+                const result = iteratePages(page.pages, [...ancestors, page]);
+                if (result) {
+                    return result;
+                }
+
+                continue;
+            }
+
+            return { page, ancestors };
+        }
+    };
+
+    return iteratePages(rootPages, []);
 }
 
 /**
@@ -259,56 +255,4 @@ function flattenPages(
     }
 
     return result;
-}
-
-export async function getPagesTree(
-    pages: FlatPageEntry[],
-    options: {
-        siteSpaceUrl: string;
-        linker: GitBookLinker;
-        heading?: string;
-        withMarkdownPages?: boolean;
-    }
-): Promise<RootContent[]> {
-    const { siteSpaceUrl, linker } = options;
-
-    const listChildren = await Promise.all(
-        pages.map(async ({ page }): Promise<ListItem> => {
-            const pageURL = new URL(siteSpaceUrl);
-            pageURL.pathname = joinPath(pageURL.pathname, page.path);
-            if (options.withMarkdownPages) {
-                pageURL.pathname = `${pageURL.pathname}.md`;
-            }
-
-            const url = linker.toLinkForContent(pageURL.toString());
-            const children: Paragraph['children'] = [
-                {
-                    type: 'link',
-                    url,
-                    children: [{ type: 'text', value: page.title }],
-                },
-            ];
-            if (page.description) {
-                children.push({ type: 'text', value: `: ${page.description}` });
-            }
-            return {
-                type: 'listItem',
-                children: [{ type: 'paragraph', children }],
-            };
-        })
-    );
-    const nodes: RootContent[] = [];
-    if (options.heading) {
-        nodes.push({
-            type: 'heading',
-            depth: 2,
-            children: [{ type: 'text', value: options.heading }],
-        });
-    }
-    nodes.push({
-        type: 'list',
-        spread: false,
-        children: listChildren,
-    });
-    return nodes;
 }

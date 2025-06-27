@@ -1,8 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
 import { isNodeEmpty } from '@/lib/document';
-import { getPagesTree, resolvePagePath } from '@/lib/pages';
+import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { getIndexablePages } from '@/lib/sitemap';
+import { getMarkdownForPagesTree } from '@/routes/llms';
 import { type RevisionPageDocument, type RevisionPageGroup, RevisionPageType } from '@gitbook/api';
 import type { Root } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
@@ -12,9 +13,7 @@ import { toMarkdown } from 'mdast-util-to-markdown';
  * Handles both regular document pages and group pages (pages with child pages).
  */
 export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
-    const pageLookup = resolvePagePath(context.revision.pages, pagePath, {
-        includePageGroup: true,
-    });
+    const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, pagePath);
 
     if (!pageLookup) {
         return new Response(`Page "${pagePath}" not found`, { status: 404 });
@@ -97,7 +96,7 @@ async function servePageGroup(
                 depth: 1,
                 children: [{ type: 'text', value: page.title }],
             },
-            ...(await getPagesTree(indexablePages, {
+            ...(await getMarkdownForPagesTree(indexablePages, {
                 siteSpaceUrl,
                 linker: context.linker,
                 withMarkdownPages: true,
