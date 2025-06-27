@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { createLinker } from './links';
+import { createLinker, linkerWithAbsoluteURLs, linkerWithOtherSpaceBasePath } from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
@@ -91,6 +91,27 @@ describe('toLinkForContent', () => {
     it('should preserve an absolute URL if the site is not the same', () => {
         expect(siteGitBookIO.toLinkForContent('https://org.gitbook.io/anothersite/some/path')).toBe(
             'https://org.gitbook.io/anothersite/some/path'
+        );
+    });
+});
+
+describe('linkerWithAbsoluteURLs', () => {
+    it('should return a new linker that always returns absolute URLs', () => {
+        const absoluteLinker = linkerWithAbsoluteURLs(root);
+        expect(absoluteLinker.toPathInSpace('some/path')).toBe(
+            'https://docs.company.com/some/path'
+        );
+        expect(absoluteLinker.toPathInSite('some/path')).toBe('https://docs.company.com/some/path');
+    });
+});
+
+describe('linkerWithOtherSpaceBasePath', () => {
+    it('should return a new linker that resolves links relative to a new spaceBasePath in the current site', () => {
+        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(root, {
+            spaceBasePath: '/section/variant',
+        });
+        expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe(
+            '/section/variant/some/path'
         );
     });
 });

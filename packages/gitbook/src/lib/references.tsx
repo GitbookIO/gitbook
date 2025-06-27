@@ -1,4 +1,8 @@
-import { type GitBookAnyContext, fetchSpaceContextByIds } from '@/lib/context';
+import {
+    type GitBookAnyContext,
+    type GitBookSpaceContext,
+    fetchSpaceContextByIds,
+} from '@/lib/context';
 import {
     getDataOrNull,
     getPageDocument,
@@ -6,10 +10,14 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import { createLinker } from '@/lib/links';
+import {
+    type GitBookLinker,
+    createLinker,
+    linkerWithAbsoluteURLs,
+    linkerWithOtherSpaceBasePath,
+} from '@/lib/links';
 import type {
     ContentRef,
-    Revision,
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
@@ -25,7 +33,7 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceById } from './sites';
+import { findSiteSpaceById, getFallbackSiteSpacePath } from './sites';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
 
@@ -50,9 +58,8 @@ export interface ResolvedContentRef {
     page?: RevisionPageDocument;
     /** Resolved reusable content, if the ref points to reusable content on a revision. Also contains the space and revision used for resolution. */
     reusableContent?: {
+        context: GitBookSpaceContext;
         revisionReusableContent: RevisionReusableContent;
-        space: Space;
-        revision: Revision;
     };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
@@ -69,12 +76,6 @@ export interface ResolveContentRefOptions {
      * Styles to apply to the icon.
      */
     iconStyle?: ClassValue;
-
-    /**
-     * Resolve the content URL as absolute.
-     * @default false
-     */
-    resolveAsAbsoluteURL?: boolean;
 }
 
 /**
@@ -85,7 +86,7 @@ export async function resolveContentRef(
     context: GitBookAnyContext,
     options: ResolveContentRefOptions = {}
 ): Promise<ResolvedContentRef | null> {
-    const { resolveAnchorText = false, resolveAsAbsoluteURL = false, iconStyle } = options;
+    const { resolveAnchorText = false, iconStyle } = options;
     const { linker, dataFetcher, space, revision } = context;
 
     const activePage = 'page' in context ? context.page : undefined;
@@ -130,11 +131,7 @@ export async function resolveContentRef(
                 resolvePageResult?.ancestors.map((ancestor) => ({
                     label: ancestor.title,
                     icon: <PageIcon page={ancestor} style={iconStyle} />,
-                    href: resolveAsAbsoluteURL
-                        ? linker.toAbsoluteURL(
-                              linker.toPathForPage({ page: ancestor, pages: revision.pages })
-                          )
-                        : linker.toPathForPage({ page: ancestor, pages: revision.pages }),
+                    href: linker.toPathForPage({ page: ancestor, pages: revision.pages }),
                 })) ?? [];
             if (!page) {
                 return null;
@@ -154,7 +151,7 @@ export async function resolveContentRef(
                 ancestors.push({
                     label: page.title,
                     icon: <PageIcon page={page} style={iconStyle} />,
-                    href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
+                    href,
                 });
 
                 if (resolveAnchorText) {
@@ -179,7 +176,7 @@ export async function resolveContentRef(
             }
 
             return {
-                href: resolveAsAbsoluteURL ? linker.toAbsoluteURL(href) : href,
+                href,
                 text,
                 subText: page.description,
                 ancestors: ancestors,
@@ -245,20 +242,14 @@ export async function resolveContentRef(
                     return context;
                 }
 
-                const otherContext = await ignoreDataThrownError(
-                    fetchSpaceContextByIds(context, {
-                        space: contentRef.space,
-                        shareKey: undefined,
-                        changeRequest: undefined,
-                        revision: undefined,
-                    })
-                );
-
-                if (!otherContext) {
+                // References inside reusable content from a different space need to resolve in the parent space.
+                // Create a context and a linker that ensures links are resolved with the correct parent, and are kept absolute.
+                const ctx = await createContextForSpace(contentRef.space, context);
+                if (!ctx) {
                     return null;
                 }
 
-                return otherContext;
+                return ctx.spaceContext;
             })();
 
             if (!container) {
@@ -281,9 +272,8 @@ export async function resolveContentRef(
                 text: reusableContent.title,
                 active: false,
                 reusableContent: {
+                    context: container,
                     revisionReusableContent: reusableContent,
-                    space: container.space,
-                    revision: container.revision,
                 },
             };
         }
@@ -322,34 +312,22 @@ async function getBestTargetSpace(
 ): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
     const { dataFetcher } = context;
 
-    const [fetchedSpace, publishedContentSite] = await Promise.all([
-        getDataOrNull(
-            dataFetcher.getSpace({
-                spaceId,
-                shareKey: context?.shareKey,
-            }),
-            [404, 403]
-        ),
-        'site' in context
-            ? getDataOrNull(
-                  dataFetcher.getPublishedContentSite({
-                      organizationId: context.organizationId,
-                      siteId: context.site.id,
-                      siteShareKey: context.shareKey,
-                  }),
-                  [404, 403]
-              )
-            : null,
-    ]);
-
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
-    if (publishedContentSite) {
-        const siteSpace = findSiteSpaceById(publishedContentSite.structure, spaceId);
+    if ('site' in context) {
+        const siteSpace = findSiteSpaceById(context.structure, spaceId);
         if (siteSpace) {
             return { space: siteSpace.space, siteSpace };
         }
     }
+
+    const fetchedSpace = await getDataOrNull(
+        dataFetcher.getSpace({
+            spaceId,
+            shareKey: context?.shareKey,
+        }),
+        [404, 403]
+    );
 
     // Else we try return the fetched space from the API.
     return fetchedSpace ? { space: fetchedSpace, siteSpace: null } : undefined;
@@ -360,6 +338,43 @@ async function resolveContentRefInSpace(
     context: GitBookAnyContext,
     contentRef: ContentRef
 ) {
+    const ctx = await createContextForSpace(spaceId, context);
+
+    if (!ctx) {
+        return null;
+    }
+
+    const resolved = await resolveContentRef(contentRef, ctx.spaceContext);
+
+    if (!resolved) {
+        return null;
+    }
+
+    return {
+        ...resolved,
+        ancestors: [
+            {
+                label: ctx.spaceContext.space.title,
+                href: ctx.baseURL.toString(),
+            },
+            ...(resolved.ancestors ?? []),
+        ].filter(filterOutNullable),
+    };
+}
+
+/**
+ * Create a new context for a specific spaceId.
+ *
+ * As the resolved space may not be the same as the given spaceId, this function also
+ * returns the new space context and the base URL used for the linker.
+ */
+async function createContextForSpace(
+    spaceId: string,
+    context: GitBookAnyContext
+): Promise<{
+    spaceContext: GitBookSpaceContext;
+    baseURL: URL;
+} | null> {
     const [spaceContext, bestTargetSpace] = await Promise.all([
         ignoreDataThrownError(
             fetchSpaceContextByIds(context, {
@@ -377,41 +392,34 @@ async function resolveContentRefInSpace(
 
     const space = bestTargetSpace?.space ?? spaceContext.space;
 
+    let linker: GitBookLinker;
+
     // Resolve URLs relative to the space.
     const baseURL = new URL(
         bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app
     );
-    const linker = createLinker({
-        host: baseURL.host,
-        spaceBasePath: baseURL.pathname,
-        siteBasePath: baseURL.pathname,
-    });
 
-    const resolved = await resolveContentRef(
-        contentRef,
-        {
-            ...spaceContext,
-            space,
-            linker,
-        },
-        {
-            // Resolve pages as absolute URLs as we are in a different site.
-            resolveAsAbsoluteURL: true,
-        }
-    );
-
-    if (!resolved) {
-        return null;
+    if (bestTargetSpace?.siteSpace && 'site' in context) {
+        // If we found the space ID in the current site context, we can resolve links relative to it in the site.
+        linker = linkerWithOtherSpaceBasePath(context.linker, {
+            spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
+        });
+    } else {
+        // Otherwise we generate absolute URLs as we are pointing to a different site.
+        linker = linkerWithAbsoluteURLs(
+            createLinker({
+                host: baseURL.host,
+                spaceBasePath: baseURL.pathname,
+                siteBasePath: baseURL.pathname,
+            })
+        );
     }
 
     return {
-        ...resolved,
-        ancestors: [
-            {
-                label: space.title,
-                href: baseURL.toString(),
-            },
-            ...(resolved.ancestors ?? []),
-        ].filter(filterOutNullable),
+        spaceContext: {
+            ...spaceContext,
+            linker,
+        },
+        baseURL,
     };
 }
