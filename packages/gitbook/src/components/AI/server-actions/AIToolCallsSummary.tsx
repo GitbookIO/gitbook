@@ -51,18 +51,22 @@ async function getDescriptionForToolCall(
 ): Promise<React.ReactNode> {
     switch (toolCall.tool) {
         case 'getPageContent':
-            return getDescriptionForPageContentToolCall(toolCall, context);
-        case 'search': {
-            return getDescriptionForSearchToolCall(toolCall, context);
-        }
+            return <DescriptionForPageContentToolCall toolCall={toolCall} context={context} />;
+        case 'search':
+            return <DescriptionForSearchToolCall toolCall={toolCall} context={context} />;
         case 'getPages':
-            return getDescriptionForGetPagesToolCall(toolCall, context);
+            return <DescriptionForGetPagesToolCall toolCall={toolCall} context={context} />;
         default:
             return <>{toolCall.tool}</>;
     }
 }
 
-function getDescriptionForPageContentToolCall(toolCall: AIToolCall, context: GitBookSiteContext) {
+function DescriptionForPageContentToolCall(props: {
+    toolCall: AIToolCall;
+    context: GitBookSiteContext;
+}) {
+    const { toolCall, context } = props;
+
     const language = getSpaceLanguage(context.customization);
     if (toolCall.tool !== 'getPageContent') {
         return null;
@@ -90,7 +94,12 @@ function getDescriptionForPageContentToolCall(toolCall: AIToolCall, context: Git
     );
 }
 
-async function getDescriptionForSearchToolCall(toolCall: AIToolCall, context: GitBookSiteContext) {
+async function DescriptionForSearchToolCall(props: {
+    toolCall: AIToolCall;
+    context: GitBookSiteContext;
+}) {
+    const { toolCall, context } = props;
+
     const language = getSpaceLanguage(context.customization);
     if (toolCall.tool !== 'search') {
         return null;
@@ -100,17 +109,23 @@ async function getDescriptionForSearchToolCall(toolCall: AIToolCall, context: Gi
     const searchResultsWithHrefs = await Promise.all(
         toolCall.results.map(async (result) => {
             const resolved = await resolveContentRef(
-                {
-                    kind: 'page',
-                    page: result.pageId,
-                    space: result.spaceId,
-                },
+                result.anchor
+                    ? {
+                          kind: 'anchor',
+                          page: result.pageId,
+                          space: result.spaceId,
+                          anchor: result.anchor,
+                      }
+                    : {
+                          kind: 'page',
+                          page: result.pageId,
+                          space: result.spaceId,
+                      },
                 context
             );
-            const anchor = result.anchor ? `#${result.anchor}` : '';
             return {
                 ...result,
-                href: resolved?.href ? `${resolved.href}${anchor}` : '#',
+                href: resolved?.href || '#',
             };
         })
     );
@@ -135,7 +150,7 @@ async function getDescriptionForSearchToolCall(toolCall: AIToolCall, context: Gi
                     />
                 </div>
             </summary>
-            <div className="max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all group-open:max-h-96 group-open:opacity-11">
+            <div className="max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all duration-500 [transition-behavior:allow-discrete] group-open:max-h-96 group-open:opacity-11">
                 <ol className="space-y-1">
                     {searchResultsWithHrefs.map((result, index) => (
                         <li
@@ -169,6 +184,10 @@ async function getDescriptionForSearchToolCall(toolCall: AIToolCall, context: Gi
                                         </p>
                                     )}
                                 </div>
+                                <Icon
+                                    icon="chevron-right"
+                                    className="ml-auto size-3 shrink-0 self-center"
+                                />
                             </Link>
                         </li>
                     ))}
@@ -178,7 +197,12 @@ async function getDescriptionForSearchToolCall(toolCall: AIToolCall, context: Gi
     );
 }
 
-function getDescriptionForGetPagesToolCall(toolCall: AIToolCall, context: GitBookSiteContext) {
+function DescriptionForGetPagesToolCall(props: {
+    toolCall: AIToolCall;
+    context: GitBookSiteContext;
+}) {
+    const { toolCall, context } = props;
+
     const language = getSpaceLanguage(context.customization);
     if (toolCall.tool !== 'getPages') {
         return null;

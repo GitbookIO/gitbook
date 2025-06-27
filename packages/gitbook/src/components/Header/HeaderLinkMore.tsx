@@ -10,7 +10,12 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { DropdownChevron, DropdownMenu, DropdownMenuItem, DropdownSubMenu } from './DropdownMenu';
+import {
+    DropdownChevron,
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownSubMenu,
+} from '../primitives/DropdownMenu';
 import styles from './headerLinks.module.css';
 
 /**

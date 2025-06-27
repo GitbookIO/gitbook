@@ -1,31 +1,33 @@
 'use client';
 
 import { t, tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
-import { useAIChatController, useAIChatState } from '../AI/useAIChat';
-import { DropdownMenu, DropdownMenuItem } from '../Header/DropdownMenu';
+import { type AIChatState, useAIChatController, useAIChatState } from '../AI/useAIChat';
+import { useNow } from '../hooks';
 import { Button } from '../primitives';
+import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
 import AIChatIcon from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
-interface AIChatProps {
-    /** Optional className for styling */
-    className?: string;
-    /** Children components */
-    children?: React.ReactNode;
+export function AIChat() {
+    const chat = useAIChatState();
+
+    if (!chat.opened) {
+        return null;
+    }
+
+    return <AIChatWindow chat={chat} />;
 }
 
-export function AIChat(props: AIChatProps) {
-    const { className } = props;
+export function AIChatWindow(props: { chat: AIChatState }) {
+    const { chat } = props;
 
     const [input, setInput] = React.useState('');
     const chatController = useAIChatController();
-    const chat = useAIChatState();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -35,16 +37,17 @@ export function AIChat(props: AIChatProps) {
 
     const [inputHeight, setInputHeight] = React.useState(0);
     const language = useLanguage();
+    const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
     const isEmpty = !chat.messages.length;
 
-    const getTimeGreeting = () => {
-        const hour = new Date().getHours();
+    const timeGreeting = React.useMemo(() => {
+        const hour = new Date(now).getHours();
         if (hour < 6) return tString(language, 'ai_chat_assistant_greeting_night');
         if (hour < 12) return tString(language, 'ai_chat_assistant_greeting_morning');
         if (hour < 18) return tString(language, 'ai_chat_assistant_greeting_afternoon');
         return tString(language, 'ai_chat_assistant_greeting_evening');
-    };
+    }, [now, language]);
 
     // Auto-scroll to the latest user message when messages change
     React.useEffect(() => {
@@ -57,11 +60,14 @@ export function AIChat(props: AIChatProps) {
     }, [chat.messages.length]);
 
     React.useEffect(() => {
+        // When the chat is opened, scroll to it (applicable on mobile, where it's displayed above the content)
         containerRef.current?.scrollIntoView({
             behavior: 'smooth',
             block: 'start',
         });
 
+        // We want the chat messages to scroll underneath the input, but they should scroll past the input when scrolling all the way down.
+        // The best way to do this is to observe the input height and adjust the padding bottom of the scroll container accordingly.
         const observer = new ResizeObserver((entries) => {
             entries.forEach((entry) => {
                 setInputHeight(entry.contentRect.height + 32);
@@ -73,16 +79,9 @@ export function AIChat(props: AIChatProps) {
         return () => observer.disconnect();
     }, [chat.opened]);
 
-    if (!chat.opened) {
-        return null;
-    }
-
     return (
         <div
-            className={tcls(
-                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96',
-                className
-            )}
+            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96"
             ref={containerRef}
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
@@ -138,7 +137,7 @@ export function AIChat(props: AIChatProps) {
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
                                 <h5 className=" text-center font-bold text-lg text-tint-strong">
-                                    {getTimeGreeting()}
+                                    {timeGreeting}
                                 </h5>
                                 <p className="text-center text-tint">
                                     {t(language, 'ai_chat_assistant_description')}

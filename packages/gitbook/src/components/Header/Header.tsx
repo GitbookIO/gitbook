@@ -5,7 +5,7 @@ import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
-import AIChatButton from '../AIChat/AIChatButton';
+import { AIChatButton } from '../AIChat/AIChatButton';
 import { SearchButton } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -18,11 +18,13 @@ import { SpacesDropdown } from './SpacesDropdown';
 /**
  * Render the header for the space.
  */
-export function Header(props: { context: GitBookSiteContext; withTopHeader?: boolean }) {
-    const { context, withTopHeader } = props;
+export function Header(props: {
+    context: GitBookSiteContext;
+    withTopHeader?: boolean;
+    withAIChat?: boolean;
+}) {
+    const { context, withTopHeader, withAIChat } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
-
-    const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
 
     return (
         <header

@@ -4,7 +4,10 @@ import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
 import AIChatIcon from './AIChatIcon';
 
-export default function AIChatButton() {
+/**
+ * Button to open/close the AI chat.
+ */
+export function AIChatButton() {
     const chatController = useAIChatController();
     const chat = useAIChatState();
 

@@ -8,7 +8,7 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 
-import { Link, type LinkInsightsProps } from '../primitives';
+import { Link, type LinkInsightsProps } from '.';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -56,7 +56,7 @@ export function DropdownMenu(props: {
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
                     align="start"
-                    className="z-40 animate-present pt-2"
+                    className="z-40 animate-scaleIn pt-2"
                 >
                     <div
                         className={tcls(
