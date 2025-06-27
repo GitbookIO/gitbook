@@ -5,13 +5,9 @@ import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 import { type RevisionPageDocument, type RevisionPageGroup, RevisionPageType } from '@gitbook/api';
 import type { Root } from 'mdast';
-import { fromMarkdown } from 'mdast-util-from-markdown';
-import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
-import { gfmFromMarkdown } from 'mdast-util-gfm';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { frontmatter } from 'micromark-extension-frontmatter';
-import { gfm } from 'micromark-extension-gfm';
-import { remove } from 'unist-util-remove';
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
 
 /**
  * Generate a markdown version of a page.
@@ -45,7 +41,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
     );
 
     // Handle empty document pages which have children
-    if (isEmptyPage(markdown) && page.pages.length > 0) {
+    if (isEmptyMarkdownPage(markdown) && page.pages.length > 0) {
         return servePageGroup(context, page);
     }
 
@@ -60,26 +56,51 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
  * Determine if a page is empty.
  * A page is empty if it has no content or only a title.
  */
-function isEmptyPage(pageMarkdown: string): boolean {
-    const trimmedMarkdown = pageMarkdown.trim();
+function isEmptyMarkdownPage(markdown: string): boolean {
+    // Remove frontmatter
+    const stripped = markdown
+        .trim()
+        .replace(/^---\n[\s\S]*?\n---\n?/g, '')
+        .trim();
 
-    // Check if the markdown is empty
-    if (!trimmedMarkdown) {
-        return true;
+    // Fast path: try to quickly detect obvious matches
+    if (/^[ \t]*# .+$/m.test(stripped)) {
+        // If there's a single heading line or empty lines, and no other content
+        return (
+            /^#{1,6} .+\s*$/.test(stripped) &&
+            !/\n\S+/g.test(stripped.split('\n').slice(1).join('\n'))
+        );
     }
 
-    // Parse the markdown to check if it only contains a title
+    // Fallback: parse with remark for safety
+    const tree = unified().use(remarkParse).parse(stripped) as Root;
 
-    const tree = fromMarkdown(pageMarkdown, {
-        extensions: [frontmatter(['yaml']), gfm()],
-        mdastExtensions: [frontmatterFromMarkdown(['yaml']), gfmFromMarkdown()],
-    });
+    let seenHeading = false;
 
-    // Remove frontmatter
-    remove(tree, 'yaml');
+    for (const node of tree.children) {
+        if (node.type === 'heading') {
+            if (seenHeading) {
+                return false;
+            }
+            seenHeading = true;
+            continue;
+        }
 
-    // If the page has no content or only a title, it is empty
-    return tree.children.length <= 1 && tree.children[0]?.type === 'heading';
+        // Allow empty whitespace-only text nodes (e.g., extra newlines)
+        if (
+            node.type === 'paragraph' &&
+            node.children.length === 1 &&
+            node.children[0].type === 'text' &&
+            !node.children[0].value.trim()
+        ) {
+            continue;
+        }
+
+        // Anything else is disallowed
+        return false;
+    }
+
+    return seenHeading;
 }
 
 /**
