@@ -84,14 +84,21 @@ export function getSectionURL(context: GitBookSiteContext, section: SiteSection)
  * To ensure navigation works in preview, we compute a relative URL from the siteSpace path.
  */
 export function getSiteSpaceURL(context: GitBookSiteContext, siteSpace: SiteSpace) {
-    const { linker, sections } = context;
+    const { linker } = context;
     if (siteSpace.urls.published) {
         return linker.toLinkForContent(siteSpace.urls.published);
     }
 
-    return linker.toPathInSite(
-        sections?.current ? joinPath(sections.current.path, siteSpace.path) : siteSpace.path
-    );
+    return linker.toPathInSite(getFallbackSiteSpacePath(context, siteSpace));
+}
+
+/**
+ * Get the path of a site space in the current site.
+ * This doesn't return the most optimized path, as it doesn't take into account which one is the default one.
+ */
+export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace: SiteSpace) {
+    const { sections } = context;
+    return sections?.current ? joinPath(sections.current.path, siteSpace.path) : siteSpace.path;
 }
 
 function findSiteSpaceByIdInSections(sections: SiteSection[], spaceId: string): SiteSpace | null {

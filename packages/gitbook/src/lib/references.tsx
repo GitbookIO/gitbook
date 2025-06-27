@@ -10,7 +10,12 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import { createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
+import {
+    type GitBookLinker,
+    createLinker,
+    linkerWithAbsoluteURLs,
+    linkerWithOtherSpaceBasePath,
+} from '@/lib/links';
 import type {
     ContentRef,
     RevisionFile,
@@ -28,7 +33,7 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceById } from './sites';
+import { findSiteSpaceById, getFallbackSiteSpacePath } from './sites';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
 
@@ -307,34 +312,22 @@ async function getBestTargetSpace(
 ): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
     const { dataFetcher } = context;
 
-    const [fetchedSpace, publishedContentSite] = await Promise.all([
-        getDataOrNull(
-            dataFetcher.getSpace({
-                spaceId,
-                shareKey: context?.shareKey,
-            }),
-            [404, 403]
-        ),
-        'site' in context
-            ? getDataOrNull(
-                  dataFetcher.getPublishedContentSite({
-                      organizationId: context.organizationId,
-                      siteId: context.site.id,
-                      siteShareKey: context.shareKey,
-                  }),
-                  [404, 403]
-              )
-            : null,
-    ]);
-
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
-    if (publishedContentSite) {
-        const siteSpace = findSiteSpaceById(publishedContentSite.structure, spaceId);
+    if ('site' in context) {
+        const siteSpace = findSiteSpaceById(context.structure, spaceId);
         if (siteSpace) {
             return { space: siteSpace.space, siteSpace };
         }
     }
+
+    const fetchedSpace = await getDataOrNull(
+        dataFetcher.getSpace({
+            spaceId,
+            shareKey: context?.shareKey,
+        }),
+        [404, 403]
+    );
 
     // Else we try return the fetched space from the API.
     return fetchedSpace ? { space: fetchedSpace, siteSpace: null } : undefined;
@@ -399,19 +392,28 @@ async function createContextForSpace(
 
     const space = bestTargetSpace?.space ?? spaceContext.space;
 
+    let linker: GitBookLinker;
+
     // Resolve URLs relative to the space.
     const baseURL = new URL(
         bestTargetSpace?.siteSpace?.urls.published ?? space.urls.published ?? space.urls.app
     );
 
-    // Resolve pages as absolute URLs as we are in a different site.
-    const linker = linkerWithAbsoluteURLs(
-        createLinker({
-            host: baseURL.host,
-            spaceBasePath: baseURL.pathname,
-            siteBasePath: baseURL.pathname,
-        })
-    );
+    if (bestTargetSpace?.siteSpace && 'site' in context) {
+        // If we found the space ID in the current site context, we can resolve links relative to it in the site.
+        linker = linkerWithOtherSpaceBasePath(context.linker, {
+            spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
+        });
+    } else {
+        // Otherwise we generate absolute URLs as we are pointing to a different site.
+        linker = linkerWithAbsoluteURLs(
+            createLinker({
+                host: baseURL.host,
+                spaceBasePath: baseURL.pathname,
+                siteBasePath: baseURL.pathname,
+            })
+        );
+    }
 
     return {
         spaceContext: {

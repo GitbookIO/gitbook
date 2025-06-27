@@ -126,7 +126,7 @@ export function createLinker(
 }
 
 /**
- * Make a linker always return absolute URLs.
+ * Create a new linker that always returns absolute URLs.
  */
 export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
     return {
@@ -135,6 +135,26 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
         toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
         toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
     };
+}
+
+/**
+ * Create a new linker that resolves links relative to a new spaceBasePath in the current site.
+ */
+export function linkerWithOtherSpaceBasePath(
+    linker: GitBookLinker,
+    { spaceBasePath }: { spaceBasePath: string }
+): GitBookLinker {
+    const newLinker: GitBookLinker = {
+        ...linker,
+        toPathInSpace(relativePath: string): string {
+            return joinPaths(spaceBasePath, relativePath);
+        },
+        toPathForPage({ pages, page, anchor }) {
+            return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
+        },
+    };
+
+    return newLinker;
 }
 
 function joinPaths(prefix: string, path: string): string {
