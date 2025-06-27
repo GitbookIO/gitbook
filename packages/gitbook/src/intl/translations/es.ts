@@ -73,6 +73,7 @@ export const es: TranslationLanguage = {
     ai_chat_assistant_greeting_morning: 'Buenos días',
     ai_chat_assistant_greeting_afternoon: 'Buenas tardes',
     ai_chat_assistant_greeting_evening: 'Buenas noches',
+    ai_chat_assistant_greeting_night: 'Buenas noches',
     ai_chat_clear_conversation: 'Limpiar conversación',
     ai_chat_context_title: 'Basado en tu contexto',
     ai_chat_context_description:

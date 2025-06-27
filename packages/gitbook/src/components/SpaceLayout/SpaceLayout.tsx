@@ -160,6 +160,7 @@ export function SpaceLayout(props: {
                         <SearchModal
                             spaceTitle={siteSpace.title}
                             withAsk={customization.aiSearch.enabled}
+                            withAIChat={withAIChat}
                             isMultiVariants={isMultiVariants}
                         />
                     </React.Suspense>

@@ -71,6 +71,7 @@ export const pt_br = {
     ai_chat_assistant_greeting_morning: 'Bom dia',
     ai_chat_assistant_greeting_afternoon: 'Boa tarde',
     ai_chat_assistant_greeting_evening: 'Boa noite',
+    ai_chat_assistant_greeting_night: 'Boa noite',
     ai_chat_clear_conversation: 'Limpar conversa',
     ai_chat_context_title: 'Baseado no seu contexto',
     ai_chat_context_description:

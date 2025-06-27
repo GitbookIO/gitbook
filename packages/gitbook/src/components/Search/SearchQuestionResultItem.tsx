@@ -4,8 +4,9 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { useAIChatController } from '../AI';
 import { Link } from '../primitives';
-import { useSearchLink } from './useSearch';
+import { useSearch, useSearchLink } from './useSearch';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {
@@ -13,17 +14,29 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         active: boolean;
         onClick: () => void;
         recommended?: boolean;
+        withAIChat: boolean;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { question, recommended = false, active, onClick } = props;
+    const { question, recommended = false, active, onClick, withAIChat } = props;
     const language = useLanguage();
     const getLinkProp = useSearchLink();
+    const chatController = useAIChatController();
+    const [, setSearchState] = useSearch();
 
     return (
         <Link
             ref={ref}
-            onClick={onClick}
+            onClick={() => {
+                if (withAIChat) {
+                    // If AI Chat is enabled, hijack to open the chat and post the question
+                    chatController.open();
+                    chatController.postMessage({ message: question });
+                    setSearchState(null); // Close the search modal
+                } else {
+                    onClick();
+                }
+            }}
             data-testid="search-result-item"
             className={tcls(
                 'flex',
@@ -39,10 +52,12 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     'hover:bg-primary-hover',
                 ]
             )}
-            {...getLinkProp({
-                ask: true,
-                query: question,
-            })}
+            {...(withAIChat
+                ? { href: '#' }
+                : getLinkProp({
+                      ask: true,
+                      query: question,
+                  }))}
         >
             <Icon
                 icon={recommended ? 'search' : 'sparkles'}

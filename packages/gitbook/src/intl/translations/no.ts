@@ -71,6 +71,7 @@ export const no: TranslationLanguage = {
     ai_chat_assistant_greeting_morning: 'God morgen',
     ai_chat_assistant_greeting_afternoon: 'God ettermiddag',
     ai_chat_assistant_greeting_evening: 'God kveld',
+    ai_chat_assistant_greeting_night: 'God natt',
     ai_chat_clear_conversation: 'Tøm samtale',
     ai_chat_context_title: 'Basert på din kontekst',
     ai_chat_context_description:

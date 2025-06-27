@@ -72,6 +72,7 @@ export const ja: TranslationLanguage = {
     ai_chat_assistant_greeting_morning: 'おはようございます',
     ai_chat_assistant_greeting_afternoon: 'こんにちは',
     ai_chat_assistant_greeting_evening: 'こんばんは',
+    ai_chat_assistant_greeting_night: 'おやすみ',
     ai_chat_clear_conversation: '会話をクリア',
     ai_chat_context_title: 'あなたのコンテキストに基づいて',
     ai_chat_context_description:

@@ -71,6 +71,7 @@ export const nl: TranslationLanguage = {
     ai_chat_assistant_greeting_morning: 'Goedemorgen',
     ai_chat_assistant_greeting_afternoon: 'Goedemiddag',
     ai_chat_assistant_greeting_evening: 'Goedenavond',
+    ai_chat_assistant_greeting_night: 'Goedenacht',
     ai_chat_clear_conversation: 'Gesprek wissen',
     ai_chat_context_title: 'Gebaseerd op je context',
     ai_chat_context_description:

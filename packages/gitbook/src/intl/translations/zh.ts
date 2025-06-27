@@ -69,6 +69,7 @@ export const zh: TranslationLanguage = {
     ai_chat_assistant_greeting_morning: '早上好',
     ai_chat_assistant_greeting_afternoon: '下午好',
     ai_chat_assistant_greeting_evening: '晚上好',
+    ai_chat_assistant_greeting_night: '晚安',
     ai_chat_clear_conversation: '清空对话',
     ai_chat_context_title: '基于您的上下文',
     ai_chat_context_description: '文档助手使用您的上下文来生成答案并执行操作。',
