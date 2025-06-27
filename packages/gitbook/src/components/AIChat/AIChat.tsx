@@ -86,8 +86,24 @@ export function AIChatWindow(props: { chat: AIChatState }) {
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
-                    <AIChatIcon className="size-5 text-tint" />
-                    <span className="font-bold">Docs Assistant</span>
+                    <AIChatIcon
+                        className={`size-5 text-tint ${chat.loading ? 'animate-pulse' : ''}`}
+                        state={chat.loading ? 'thinking' : 'default'}
+                    />
+                    <div className="flex flex-col">
+                        <div className="font-bold">Docs Assistant</div>
+                        <div
+                            className={`text-tint text-xs leading-none transition-all duration-500 ${
+                                chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'
+                            }`}
+                        >
+                            {chat.loading
+                                ? chat.messages[chat.messages.length - 1].content
+                                    ? t(language, 'ai_chat_working')
+                                    : t(language, 'ai_chat_thinking')
+                                : ''}
+                        </div>
+                    </div>
                     <div className="ml-auto flex gap-2">
                         <DropdownMenu
                             button={

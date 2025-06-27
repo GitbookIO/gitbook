@@ -1,3 +1,4 @@
+import { useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type React from 'react';
@@ -8,6 +9,7 @@ export function AIChatMessages(props: {
     lastUserMessageRef?: React.RefObject<HTMLDivElement>;
 }) {
     const { chat, lastUserMessageRef } = props;
+    const language = useLanguage();
 
     return (
         <>

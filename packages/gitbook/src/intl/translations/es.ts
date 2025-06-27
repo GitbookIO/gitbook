@@ -75,6 +75,8 @@ export const es: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: 'Buenas noches',
     ai_chat_assistant_greeting_night: 'Buenas noches',
     ai_chat_clear_conversation: 'Limpiar conversación',
+    ai_chat_thinking: 'Pensando...',
+    ai_chat_working: 'Trabajando...',
     ai_chat_context_title: 'Basado en tu contexto',
     ai_chat_context_description:
         'El Asistente de Docs usa tu contexto para generar respuestas y realizar acciones.',
