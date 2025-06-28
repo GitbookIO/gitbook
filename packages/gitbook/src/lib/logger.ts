@@ -1,4 +1,3 @@
-import { cache } from 'react';
 export type LogLabelValue = string | number | undefined | boolean;
 
 export type LogLabels = { [key: string]: LogLabelValue };
@@ -44,13 +43,18 @@ export const createLogger = (name: string, options: LoggerOptions) => {
 
 export type GitbookLogger = ReturnType<typeof createLogger>;
 
-export const getLogger = cache(() => {
-    // This is not cryptographically secure, but it's fine for logging purposes.
-    // It allows us to identify logs from the same request.
-    // If we are in the middleware, we don't set a request ID because cache won't work well there.
-    const requestId =
-        process.env.NEXT_RUNTIME === 'edge'
-            ? undefined
-            : Math.random().toString(36).substring(2, 15);
-    return createLogger('GBOV2', { requestId });
-});
+const getRequestId = (fallbackRequestId?: string) => {
+    // We are in OpenNext and we should have access to the request ID.
+    if ((globalThis as any).__openNextAls) {
+        return (globalThis as any).__openNextAls.getStore()?.requestId;
+    }
+    return fallbackRequestId;
+};
+
+export const getLogger =
+    process.env.NEXT_RUNTIME === 'edge'
+        ? () => createLogger('GBOV2', { requestId: getRequestId() })
+        : () =>
+              createLogger('GBOV2', {
+                  requestId: getRequestId(Math.random().toString(36).substring(2, 15)),
+              });

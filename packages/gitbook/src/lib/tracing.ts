@@ -1,4 +1,4 @@
-import { getLogger } from '@v2/lib/logger';
+import { getLogger } from '@/lib/logger';
 
 export interface TraceSpan {
     setAttribute: (label: string, value: boolean | string | number) => void;
