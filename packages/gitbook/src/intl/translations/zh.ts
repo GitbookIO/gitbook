@@ -71,6 +71,8 @@ export const zh: TranslationLanguage = {
     ai_chat_assistant_greeting_evening: '晚上好',
     ai_chat_assistant_greeting_night: '晚安',
     ai_chat_clear_conversation: '清空对话',
+    ai_chat_thinking: '思考中...',
+    ai_chat_working: '工作中...',
     ai_chat_context_title: '基于您的上下文',
     ai_chat_context_description: '文档助手使用您的上下文来生成答案并执行操作。',
     ai_chat_context_pages_youve_read: '您已阅读的页面',

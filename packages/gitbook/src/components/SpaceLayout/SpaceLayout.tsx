@@ -77,84 +77,86 @@ export function SpaceLayout(props: {
                         context={context}
                     />
                     {withAIChat ? <AIChat /> : null}
-                    <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
-                        <div
-                            className={tcls(
-                                'flex',
-                                'flex-col',
-                                'lg:flex-row',
-                                CONTAINER_STYLE,
-                                'site-full-width:max-w-full',
+                    <div className="scroll-nojump">
+                        <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+                            <div
+                                className={tcls(
+                                    'flex',
+                                    'flex-col',
+                                    'lg:flex-row',
+                                    CONTAINER_STYLE,
+                                    'site-full-width:max-w-full',
 
-                                // Ensure the footer is display below the viewport even if the content is not enough
-                                withFooter && 'min-h-[calc(100vh-64px)]',
-                                withTopHeader ? null : 'lg:min-h-screen'
-                            )}
-                        >
-                            <TableOfContents
-                                context={context}
-                                header={
-                                    withTopHeader ? null : (
-                                        <div
-                                            className={tcls(
-                                                'hidden',
-                                                'pr-4',
-                                                'lg:flex',
-                                                'grow-0',
-                                                'flex-wrap',
-                                                'dark:shadow-light/1',
-                                                'text-base/tight'
-                                            )}
-                                        >
-                                            <HeaderLogo context={context} />
-                                        </div>
-                                    )
-                                }
-                                innerHeader={
-                                    // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                                    <>
-                                        {!withTopHeader && (
-                                            <div className={tcls('hidden', 'lg:block')}>
-                                                <React.Suspense fallback={null}>
-                                                    <SearchButton>
-                                                        <span className={tcls('flex-1')}>
-                                                            {t(
-                                                                getSpaceLanguage(customization),
-                                                                customization.aiSearch.enabled
-                                                                    ? 'search_or_ask'
-                                                                    : 'search'
-                                                            )}
-                                                            ...
-                                                        </span>
-                                                    </SearchButton>
-                                                </React.Suspense>
-                                            </div>
-                                        )}
-                                        {!withTopHeader && withSections && sections && (
-                                            <SiteSectionList
-                                                className={tcls('hidden', 'lg:block')}
-                                                sections={encodeClientSiteSections(
-                                                    context,
-                                                    sections
-                                                )}
-                                            />
-                                        )}
-                                        {isMultiVariants && !sections && (
-                                            <SpacesDropdown
-                                                context={context}
-                                                siteSpace={siteSpace}
-                                                siteSpaces={siteSpaces}
+                                    // Ensure the footer is display below the viewport even if the content is not enough
+                                    withFooter && 'min-h-[calc(100vh-64px)]',
+                                    withTopHeader ? null : 'lg:min-h-screen'
+                                )}
+                            >
+                                <TableOfContents
+                                    context={context}
+                                    header={
+                                        withTopHeader ? null : (
+                                            <div
                                                 className={tcls(
-                                                    'w-full',
-                                                    'page-no-toc:hidden',
-                                                    'site-header-none:page-no-toc:flex'
+                                                    'hidden',
+                                                    'pr-4',
+                                                    'lg:flex',
+                                                    'grow-0',
+                                                    'flex-wrap',
+                                                    'dark:shadow-light/1',
+                                                    'text-base/tight'
                                                 )}
-                                            />
-                                        )}
-                                    </>
-                                }
-                            />
-                            <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+                                            >
+                                                <HeaderLogo context={context} />
+                                            </div>
+                                        )
+                                    }
+                                    innerHeader={
+                                        // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                                        <>
+                                            {!withTopHeader && (
+                                                <div className={tcls('hidden', 'lg:block')}>
+                                                    <React.Suspense fallback={null}>
+                                                        <SearchButton>
+                                                            <span className={tcls('flex-1')}>
+                                                                {t(
+                                                                    getSpaceLanguage(customization),
+                                                                    customization.aiSearch.enabled
+                                                                        ? 'search_or_ask'
+                                                                        : 'search'
+                                                                )}
+                                                                ...
+                                                            </span>
+                                                        </SearchButton>
+                                                    </React.Suspense>
+                                                </div>
+                                            )}
+                                            {!withTopHeader && withSections && sections && (
+                                                <SiteSectionList
+                                                    className={tcls('hidden', 'lg:block')}
+                                                    sections={encodeClientSiteSections(
+                                                        context,
+                                                        sections
+                                                    )}
+                                                />
+                                            )}
+                                            {isMultiVariants && !sections && (
+                                                <SpacesDropdown
+                                                    context={context}
+                                                    siteSpace={siteSpace}
+                                                    siteSpaces={siteSpaces}
+                                                    className={tcls(
+                                                        'w-full',
+                                                        'page-no-toc:hidden',
+                                                        'site-header-none:page-no-toc:flex'
+                                                    )}
+                                                />
+                                            )}
+                                        </>
+                                    }
+                                />
+                                <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+                            </div>
                         </div>
                     </div>
 

@@ -73,6 +73,8 @@ export const pt_br = {
     ai_chat_assistant_greeting_evening: 'Boa noite',
     ai_chat_assistant_greeting_night: 'Boa noite',
     ai_chat_clear_conversation: 'Limpar conversa',
+    ai_chat_thinking: 'Pensando...',
+    ai_chat_working: 'Trabalhando...',
     ai_chat_context_title: 'Baseado no seu contexto',
     ai_chat_context_description:
         'O Assistente de Docs usa seu contexto para gerar respostas e realizar ações.',

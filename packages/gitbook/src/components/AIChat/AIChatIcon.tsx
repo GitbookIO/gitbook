@@ -3,9 +3,15 @@ import type React from 'react';
 interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
     size?: number;
+    state?: 'thinking' | 'default';
 }
 
-const AIChatIcon = ({ className = 'size-4', size, ...props }: AIChatIconProps) => {
+const AIChatIcon = ({
+    className = 'size-4',
+    size,
+    state = 'default',
+    ...props
+}: AIChatIconProps) => {
     return (
         <svg
             width="16"
@@ -23,6 +29,8 @@ const AIChatIcon = ({ className = 'size-4', size, ...props }: AIChatIconProps) =
                 stroke="currentColor"
                 strokeWidth="1.2"
                 strokeLinejoin="round"
+                className={state === 'thinking' ? 'animate-spin' : ''}
+                style={{ transformOrigin: '13px 3.5px' }}
             />
             <path
                 d="M9.479 10.2734C9.479 11.2369 8.6115 11.2578 7.54138 11.2578C6.47126 11.2578 5.60376 11.2369 5.60376 10.2734"
