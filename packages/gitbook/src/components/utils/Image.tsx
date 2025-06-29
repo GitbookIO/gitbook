@@ -16,7 +16,7 @@ type ImageSource = {
     aspectRatio?: string;
 };
 
-type ImageSourceSized = {
+export type ImageSourceSized = {
     src: string;
     size: ImageSize | null;
     aspectRatio?: string;
@@ -244,7 +244,7 @@ async function ImagePictureSized(
  * Get the attributes for an image.
  * src, srcSet, sizes, width, height, etc.
  */
-async function getImageAttributes(params: {
+export async function getImageAttributes(params: {
     sizes: ImageResponsiveSize[];
     source: ImageSourceSized;
     quality: number;
