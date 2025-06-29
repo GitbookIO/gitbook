@@ -101,6 +101,7 @@ export async function PageCover(props: {
         >
             <PageCoverImage
                 imgs={{
+                    // biome-ignore lint/style/noNonNullAssertion: light image is always defined
                     light: light!,
                     dark,
                 }}

@@ -26,14 +26,16 @@ function useGetTop(
     img?: ImageAttributes
 ) {
     const top = useMemo(() => {
-        if (!img) return 0;
+        // When the size of the image hasn't been determined, we fallback to the center position
+        if (!img || !img.size || y === 0) return '50%';
         const ratio =
             img?.size && container.height && container.width
                 ? Math.max(container.width / img.size.width, container.height / img.size.height)
                 : 1;
-        if (!img) return 0;
         const scaledHeight = img.size ? img.size.height * ratio : PAGE_COVER_SIZE.height;
-        return container.height && img.size ? (container.height - scaledHeight) / 2 + y * ratio : y;
+        const top =
+            container.height && img.size ? (container.height - scaledHeight) / 2 + y * ratio : y;
+        return `${top}px`;
     }, [container.width, container.height, img, y]);
 
     return top;
@@ -60,7 +62,7 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                 className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{
                     aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                    objectPosition: `50% ${topLight}px`,
+                    objectPosition: `50% ${topLight}`,
                 }}
             />
             {imgs.dark && (
@@ -72,7 +74,7 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                     className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
                     style={{
                         aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                        objectPosition: `50% ${topDark}px`,
+                        objectPosition: `50% ${topDark}`,
                     }}
                 />
             )}
