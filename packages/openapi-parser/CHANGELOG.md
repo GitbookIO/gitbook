@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.1.5
+
+### Patch Changes
+
+- 1e013cd: Optional label in OpenAPI x-codeSamples
+
 ## 2.1.4
 
 ### Patch Changes

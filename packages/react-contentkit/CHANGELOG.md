@@ -1,5 +1,11 @@
 # @gitbook/react-contentkit
 
+## 0.7.1
+
+### Patch Changes
+
+- 11a6511: Add basic error handling when transitioning between states.
+
 ## 0.7.0
 
 ### Minor Changes
