@@ -1,6 +1,6 @@
 'use client';
 import { tcls } from '@/lib/tailwind';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 import type { ImageSize } from '../utils';
 
@@ -25,25 +25,20 @@ function useGetTop(
     y: number,
     img?: ImageAttributes
 ) {
-    const top = useMemo(() => {
-        // When the size of the image hasn't been determined, we fallback to the center position
-        if (!img || !img.size || y === 0) return '50%';
-        const ratio =
-            img?.size && container.height && container.width
-                ? Math.max(container.width / img.size.width, container.height / img.size.height)
-                : 1;
-        const scaledHeight = img.size ? img.size.height * ratio : PAGE_COVER_SIZE.height;
-        const top =
-            container.height && img.size ? (container.height - scaledHeight) / 2 + y * ratio : y;
-        return `${top}px`;
-    }, [container.width, container.height, img, y]);
-
-    return top;
+    // When the size of the image hasn't been determined, we fallback to the center position
+    if (!img || !img.size || y === 0) return '50%';
+    const ratio =
+        img?.size && container.height && container.width
+            ? Math.max(container.width / img.size.width, container.height / img.size.height)
+            : 1;
+    const scaledHeight = img.size ? img.size.height * ratio : PAGE_COVER_SIZE.height;
+    const top =
+        container.height && img.size ? (container.height - scaledHeight) / 2 + y * ratio : y;
+    return `${top}px`;
 }
 
 export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const imageRef = useRef<HTMLImageElement>(null);
 
     const container = useResizeObserver({
         ref: containerRef,
@@ -55,7 +50,6 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
     return (
         <div className="h-full w-full overflow-hidden" ref={containerRef}>
             <img
-                ref={imageRef}
                 src={imgs.light.src}
                 fetchPriority="high"
                 alt="Page cover"
@@ -67,7 +61,6 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
             />
             {imgs.dark && (
                 <img
-                    ref={imageRef}
                     src={imgs.dark.src}
                     fetchPriority="low"
                     alt="Page cover"

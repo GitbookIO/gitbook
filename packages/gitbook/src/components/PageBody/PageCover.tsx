@@ -6,6 +6,7 @@ import { getImageAttributes } from '@/components/utils';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { assert } from 'ts-essentials';
 import { PageCoverImage } from './PageCoverImage';
 import defaultPageCoverSVG from './default-page-cover.svg';
 
@@ -42,28 +43,28 @@ export async function PageCover(props: {
 
     const getImage = async (resolved: ResolvedContentRef | null, returnNull = false) => {
         if (!resolved && returnNull) return;
-        const attrs = await getImageAttributes({
-            sizes,
-            source: resolved
-                ? {
-                      src: resolved.href,
-                      size: resolved.file?.dimensions ?? null,
-                  }
-                : {
-                      src: defaultPageCover.src,
-                      size: {
-                          width: defaultPageCover.width,
-                          height: defaultPageCover.height,
+        const [attrs, size] = await Promise.all([
+            getImageAttributes({
+                sizes,
+                source: resolved
+                    ? {
+                          src: resolved.href,
+                          size: resolved.file?.dimensions ?? null,
+                      }
+                    : {
+                          src: defaultPageCover.src,
+                          size: {
+                              width: defaultPageCover.width,
+                              height: defaultPageCover.height,
+                          },
                       },
-                  },
-            quality: 100,
-            resize: context.imageResizer ?? false,
-        });
-        const size =
-            (await context.imageResizer?.getImageSize(
-                resolved?.href || defaultPageCover.src,
-                {}
-            )) ?? undefined;
+                quality: 100,
+                resize: context.imageResizer ?? false,
+            }),
+            context.imageResizer
+                ?.getImageSize(resolved?.href || defaultPageCover.src, {})
+                .then((size) => size ?? undefined),
+        ]);
         return {
             ...attrs,
             size,
@@ -72,6 +73,7 @@ export async function PageCover(props: {
 
     const images = await Promise.all([getImage(resolved), getImage(resolvedDark, true)]);
     const [light, dark] = images;
+    assert(light, 'Light image should be defined');
 
     return (
         <div
@@ -101,8 +103,7 @@ export async function PageCover(props: {
         >
             <PageCoverImage
                 imgs={{
-                    // biome-ignore lint/style/noNonNullAssertion: light image is always defined
-                    light: light!,
+                    light,
                     dark,
                 }}
                 y={cover.yPos}
