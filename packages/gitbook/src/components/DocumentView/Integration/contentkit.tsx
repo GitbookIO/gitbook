@@ -22,6 +22,7 @@ export const contentKitServerContext: ContentKitServerContext = {
         lock: (props) => <Icon icon="lock" {...props} />,
         check: (props) => <Icon icon="check" {...props} />,
         'check-circle': (props) => <Icon icon="check-circle" {...props} />,
+        'eye-off': (props) => <Icon icon="eye-slash" {...props} />,
     },
     codeBlock: (props) => {
         return <PlainCodeBlock code={props.code} syntax={props.syntax} />;
