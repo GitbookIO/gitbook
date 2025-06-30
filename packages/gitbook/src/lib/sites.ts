@@ -122,12 +122,13 @@ export function getSiteSpaceURL(context: GitBookSiteContext, siteSpace: SiteSpac
 
 /**
  * Get the path of a site space in the current site.
- * This doesn't return the most optimized path, as it doesn't take into account which one is the default one.
  */
 export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace: SiteSpace) {
     const found = findSiteSpaceBy(context.structure, (entry) => entry.id === siteSpace.id);
+    // don't include the path for the default site space
     const siteSpacePath = siteSpace.default ? '' : siteSpace.path;
 
+    // for non-default site sections, include the section path.
     if (found?.siteSection && !found?.siteSection.default) {
         return joinPath(found.siteSection.path, siteSpacePath);
     }
