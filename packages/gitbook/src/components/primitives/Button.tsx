@@ -39,6 +39,7 @@ export const variantClasses = {
         'hover:scale-1',
         'hover:shadow-none',
         'contrast-more:bg-tint-subtle',
+        'depth-subtle:hover:translate-y-0',
     ],
     secondary: [
         'bg-tint',

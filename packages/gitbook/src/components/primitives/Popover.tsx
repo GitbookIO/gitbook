@@ -4,30 +4,28 @@ import * as RadixPopover from '@radix-ui/react-popover';
 export function Popover(props: {
     children: React.ReactNode;
     content?: string | React.ReactNode;
+    rootProps?: RadixPopover.PopoverProps;
     triggerProps?: RadixPopover.PopoverTriggerProps;
     contentProps?: RadixPopover.PopoverContentProps;
     arrow?: boolean;
-    className?: string;
 }) {
-    const { children, content, triggerProps, contentProps, arrow = false, className } = props;
+    const { children, content, rootProps, triggerProps, contentProps, arrow = false } = props;
 
     return (
-        <RadixPopover.Root>
-            <RadixPopover.Trigger asChild {...triggerProps}>
-                {children}
-            </RadixPopover.Trigger>
+        <RadixPopover.Root {...rootProps}>
+            <RadixPopover.Trigger {...triggerProps}>{children}</RadixPopover.Trigger>
             <RadixPopover.Portal>
                 <RadixPopover.Content
-                    collisionPadding={16}
-                    sideOffset={4}
+                    {...contentProps}
+                    collisionPadding={contentProps?.collisionPadding ?? 16}
+                    sideOffset={contentProps?.sideOffset ?? 4}
                     className={tcls(
-                        'z-50 max-w-xs animate-scaleIn overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-3 text-sm text-tint shadow-md outline-none ring-1 ring-tint',
-                        className
+                        'z-50 max-h-[var(--radix-popover-content-available-height)] max-w-xs animate-scaleIn overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-3 text-sm text-tint shadow-md outline-none ring-1 ring-tint',
+                        contentProps?.className
                     )}
                     style={{
-                        maxHeight: 'var(--radix-popover-content-available-height)',
+                        ...contentProps?.style,
                     }}
-                    {...contentProps}
                 >
                     {content}
                     {arrow && (

@@ -25,9 +25,9 @@ export const ButtonStyles = [
     'contrast-more:hover:ring-2',
     'contrast-more:hover:ring-tint-12',
 
-    'hover:scale-104',
-    'depth-flat:hover:scale-100',
-    'active:scale-100',
+    'depth-subtle:hover:-translate-y-px',
+    // 'depth-flat:hover:scale-100',
+    // 'active:scale-100',
     'transition-all',
 
     'grow-0',

@@ -1,107 +1,85 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
-import { type ClassValue, tcls } from '@/lib/tailwind';
-import { useTrackEvent } from '../Insights';
-import { useSearch } from './useSearch';
+import { tcls } from '@/lib/tailwind';
+import { useHotkeys } from 'react-hotkeys-hook';
+
+interface SearchButtonProps {
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+    onFocus: () => void;
+    onBlur: () => void;
+    value: string;
+    withAsk?: boolean;
+}
 
 /**
  * Button to open the search modal.
  */
-export function SearchButton(props: { children?: React.ReactNode; style?: ClassValue }) {
-    const { style, children } = props;
+export function SearchButton(props: SearchButtonProps) {
+    const { onChange, onKeyDown, onFocus, onBlur, value, withAsk = false } = props;
 
     const language = useLanguage();
-    const [, setSearchState] = useSearch();
-    const trackEvent = useTrackEvent();
 
-    const onClick = () => {
-        setSearchState({
-            ask: false,
-            global: false,
-            query: '',
-        });
+    const inputRef = useRef<HTMLInputElement>(null);
 
-        trackEvent({
-            type: 'search_open',
-        });
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleFocus = () => {
+        onFocus();
+        setIsOpen(true);
     };
 
+    const handleBlur = () => {
+        onBlur();
+        setIsOpen(false);
+    };
+
+    useEffect(() => {
+        if (isOpen === true) {
+            inputRef.current?.focus();
+        }
+    }, [isOpen]);
+
+    useHotkeys(
+        'mod+k',
+        (e) => {
+            e.preventDefault();
+            handleFocus();
+        },
+        []
+    );
+
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-label={tString(language, 'search')}
-            className={tcls(
-                'flex',
-                'flex-1',
-                'flex-row',
-                'justify-center',
-                'items-center',
-                'w-full',
-                'py-2.5',
-                'md:py-2',
-                'px-3',
-                'circular-corners:px-4',
-                'gap-2',
-
-                'bg-tint-base',
-
-                'ring-1',
-                'ring-tint-12/2',
-                'depth-flat:ring-tint-subtle',
-
-                'shadow-sm',
-                'shadow-tint-12/3',
-                'dark:shadow-none',
-                'depth-flat:shadow-none',
-
-                'text-tint',
-
-                'rounded-lg',
-                'straight-corners:rounded-sm',
-                'circular-corners:rounded-full',
-
-                'contrast-more:ring-tint-12',
-                'contrast-more:text-tint-strong',
-
-                'transition-all',
-                'hover:bg-tint-subtle',
-                'hover:shadow-md',
-                'hover:scale-102',
-                'depth-flat:hover:scale-100',
-                'hover:ring-tint-hover',
-                'hover:text-tint-strong',
-                'focus:shadow-md',
-                'focus:scale-102',
-                'depth-flat:focus:scale-100',
-                'focus:ring-tint-hover',
-                'focus:text-tint-strong',
-
-                'contrast-more:hover:ring-2',
-                'contrast-more:hover:ring-tint-12',
-                'contrast-more:focus:ring-2',
-                'contrast-more:focus:ring-tint-12',
-
-                'active:shadow-sm',
-                'active:scale-100',
-
-                'md:justify-start',
-                'md:w-full',
-                'text-sm',
-                style
-            )}
+        // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+        <div
+            onClick={handleFocus}
+            className="depth-subtle:hover:-translate-y-px depth-subtle:has-[:focus]:-translate-y-px relative flex h-9 grow items-center rounded-corners:rounded-md bg-tint-base px-3 shadow-sm shadow-tint ring-1 ring-tint transition-all hover:shadow-md hover:shadow-tint-subtle has-[:focus]:ring-2 has-[:focus]:ring-primary-hover"
         >
             <Icon
                 icon="magnifying-glass"
-                className={tcls('text-tint-subtle', 'shrink-0', 'size-4')}
+                className="size-4 text-tint-subtle peer-focus:text-red-500"
             />
-            <div className={tcls('w-full', 'hidden', 'md:block', 'text-left')}>{children}</div>
+            <input
+                type="text"
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                onKeyDown={onKeyDown}
+                onChange={onChange}
+                value={value}
+                placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
+                className={tcls(
+                    'peer grow bg-transparent py-2 text-tint-strong outline-none transition-all duration-500 placeholder:text-tint/9 md:transition-colors',
+                    isOpen ? 'max-w-[32rem] px-3' : 'max-w-0 md:block md:max-w-[32rem] md:px-3'
+                )}
+                ref={inputRef}
+            />
             <Shortcut />
-        </button>
+        </div>
     );
 }
 

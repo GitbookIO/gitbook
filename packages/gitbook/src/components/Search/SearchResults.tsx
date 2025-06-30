@@ -79,7 +79,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             let cancelled = false;
 
             // Silently fetch the recommended questions, instead of showing a spinner
-            setResultsState({ results: [], fetching: false });
+            setResultsState({ results: [], fetching: true });
 
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.

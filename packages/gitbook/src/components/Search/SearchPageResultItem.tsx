@@ -86,7 +86,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                               ]
                             : breadcrumbs
                         ).map((crumb, index) => (
-                            <>
+                            <div key={crumb.key}>
                                 {index !== 0 ? (
                                     <Icon
                                         key={`${crumb.key}-icon`}
@@ -94,10 +94,8 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                                         className="size-3"
                                     />
                                 ) : null}
-                                <span key={crumb.key} className="line-clamp-1">
-                                    {crumb}
-                                </span>
-                            </>
+                                <span className="line-clamp-1">{crumb}</span>
+                            </div>
                         ))}
                     </div>
                 ) : null}

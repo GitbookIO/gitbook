@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
-import { SearchButton, SearchModal } from '@/components/Search';
+import { SearchButton } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { getSpaceLanguage } from '@/intl/server';
@@ -161,15 +161,6 @@ export function SpaceLayout(props: {
                     </div>
 
                     {withFooter ? <Footer context={context} /> : null}
-
-                    <React.Suspense fallback={null}>
-                        <SearchModal
-                            spaceTitle={siteSpace.title}
-                            withAsk={customization.aiSearch.enabled}
-                            withAIChat={withAIChat}
-                            isMultiVariants={isMultiVariants}
-                        />
-                    </React.Suspense>
                 </InsightsProvider>
             </CurrentContentProvider>
         </SpaceLayoutContextProvider>
