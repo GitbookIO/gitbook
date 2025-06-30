@@ -147,7 +147,8 @@ export function linkerWithOtherSpaceBasePath(
     const newLinker: GitBookLinker = {
         ...linker,
         toPathInSpace(relativePath: string): string {
-            return joinPaths(spaceBasePath, relativePath);
+            // space is in another site space, so base path is always relative to the root of the site
+            return `/${joinPaths(spaceBasePath, relativePath)}`;
         },
         toPathForPage({ pages, page, anchor }) {
             return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
