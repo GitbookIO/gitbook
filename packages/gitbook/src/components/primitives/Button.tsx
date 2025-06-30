@@ -17,6 +17,7 @@ type ButtonProps = {
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
     label?: string;
+    children?: React.ReactNode;
 } & LinkInsightsProps &
     HTMLAttributes<HTMLElement>;
 
@@ -33,11 +34,10 @@ export const variantClasses = {
         'bg-transparent',
         'text-tint',
         'ring-0',
-        'shadow-none',
+        '!shadow-none',
         'hover:bg-primary-hover',
         'hover:text-primary',
         'hover:scale-1',
-        'hover:shadow-none',
         'contrast-more:bg-tint-subtle',
         'depth-subtle:hover:translate-y-0',
     ],
@@ -62,6 +62,7 @@ export function Button({
     label,
     icon,
     iconOnly = false,
+    children,
     ...rest
 }: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
@@ -112,7 +113,7 @@ export function Button({
                     icon
                 )
             ) : null}
-            {iconOnly ? null : label}
+            {iconOnly ? null : (children ?? label)}
         </button>
     );
 

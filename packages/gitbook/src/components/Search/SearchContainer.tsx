@@ -1,12 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useTrackEvent } from '../Insights';
 import { Popover } from '../primitives';
 import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
-import { SearchButton } from './SearchButton';
+import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { useSearch } from './useSearch';
 
@@ -24,6 +25,7 @@ export function SearchContainer(props: SearchContainerProps) {
     const { withAsk, withAIChat } = props;
 
     const [state, setSearchState] = useSearch();
+    const [open, setOpen] = useState(false);
     const searchAsk = useSearchAskState();
     // const [askState] = searchAsk;
     const router = useRouter();
@@ -31,11 +33,32 @@ export function SearchContainer(props: SearchContainerProps) {
     const resultsRef = useRef<SearchResultsRef>(null);
 
     const onClose = async (to?: string) => {
-        await setSearchState(null);
+        if (!state?.query) {
+            await setSearchState(null);
+        }
+        setOpen(false);
+
         if (to) {
             router.push(to);
         }
     };
+
+    React.useEffect(() => {
+        if (state === null) {
+            setOpen(false);
+        } else {
+            setOpen(true);
+        }
+    }, [state]);
+
+    useHotkeys(
+        'mod+k',
+        (e) => {
+            e.preventDefault();
+            onOpen();
+        },
+        []
+    );
 
     const onOpen = () => {
         setSearchState({
@@ -43,6 +66,7 @@ export function SearchContainer(props: SearchContainerProps) {
             global: false,
             query: state?.query ?? '',
         });
+        setOpen(true);
 
         trackEvent({
             type: 'search_open',
@@ -108,7 +132,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     </React.Suspense>
                 }
                 rootProps={{
-                    open: state !== null,
+                    open: open,
                 }}
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),
@@ -119,17 +143,19 @@ export function SearchContainer(props: SearchContainerProps) {
                     sideOffset: 8,
                 }}
                 triggerProps={{
-                    className: 'grow',
+                    asChild: true,
                 }}
             >
-                <SearchButton
-                    value={state?.query ?? ''}
-                    onFocus={onOpen}
-                    onBlur={onClose}
-                    onChange={onChange}
-                    onKeyDown={onKeyDown}
-                    withAsk={withAsk}
-                />
+                <div className="flex grow">
+                    <SearchInput
+                        value={state?.query}
+                        onFocus={onOpen}
+                        onChange={onChange}
+                        onKeyDown={onKeyDown}
+                        withAsk={withAsk}
+                        isOpen={open}
+                    />
+                </div>
             </Popover>
         </SearchAskProvider>
     );

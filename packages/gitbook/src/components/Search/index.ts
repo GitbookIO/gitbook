@@ -1,2 +1,1 @@
-export * from './SearchButton';
-export * from './SearchModal';
+export * from './SearchInput';

@@ -89,6 +89,7 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                         query: '',
                         ask: false,
                         global: false,
+                        open: false,
                         ...(prev ?? {}),
                         ...query,
                     }));
