@@ -142,13 +142,22 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
  */
 export function linkerWithOtherSpaceBasePath(
     linker: GitBookLinker,
-    { spaceBasePath }: { spaceBasePath: string }
+    {
+        spaceBasePath,
+    }: {
+        /**
+         * The base path of the space. It should be relative to the root of the site.
+         */
+        spaceBasePath: string;
+    }
 ): GitBookLinker {
     const newLinker: GitBookLinker = {
         ...linker,
         toPathInSpace(relativePath: string): string {
-            return joinPaths(spaceBasePath, relativePath);
+            return linker.toPathInSite(joinPaths(spaceBasePath, relativePath));
         },
+        // implementation matches the base linker toPathForPage, but decouples from using `this` to
+        // ensure we always use the updates `toPathInSpace` method.
         toPathForPage({ pages, page, anchor }) {
             return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
