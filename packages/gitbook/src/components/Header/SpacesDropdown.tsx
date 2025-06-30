@@ -1,9 +1,9 @@
 import type { SiteSpace } from '@gitbook/api';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import { getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { DropdownChevron, DropdownMenu } from './DropdownMenu';
+import { DropdownChevron, DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
 
 export function SpacesDropdown(props: {

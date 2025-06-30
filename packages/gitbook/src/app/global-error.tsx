@@ -2,7 +2,12 @@
 
 import NextError from 'next/error';
 
-export default function GlobalError() {
+export default function GlobalError({
+    error,
+}: {
+    error: Error & { digest?: string };
+}) {
+    console.error('Global error:', error);
     return (
         <html lang="en">
             <body>

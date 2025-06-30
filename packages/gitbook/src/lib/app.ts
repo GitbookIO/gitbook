@@ -1,4 +1,4 @@
-import { GITBOOK_APP_URL } from '@v2/lib/env';
+import { GITBOOK_APP_URL } from '@/lib/env';
 
 /**
  * Create an absolute href in the GitBook application.

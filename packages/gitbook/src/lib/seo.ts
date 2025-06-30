@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { type RevisionPageDocument, type RevisionPageGroup, SiteVisibility } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 
 /**
@@ -35,7 +35,7 @@ export async function isSiteIndexable(context: GitBookSiteContext) {
     }
 
     // Prevent indexation of preview of revisions / change-requests
-    if (context.changeRequest || context.revision.id !== context.space.revision) {
+    if (context.changeRequest || context.revisionId !== context.space.revision) {
         return false;
     }
 

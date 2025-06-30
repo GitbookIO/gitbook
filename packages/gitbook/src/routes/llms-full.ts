@@ -1,11 +1,11 @@
 import path from 'node:path';
+import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import { checkIsAnchor, checkIsExternalURL } from '@/lib/urls';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
-import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import type { Link, Paragraph, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';

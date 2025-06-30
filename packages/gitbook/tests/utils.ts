@@ -52,7 +52,7 @@ export async function getSiteAPIToken(url: string) {
     const api = new GitBookAPI({
         endpoint: 'https://api.gitbook.com/cache',
     });
-    const { data } = await api.urls.getPublishedContentByUrl({
+    const { data } = await api.urls.resolvePublishedContentByUrl({
         url,
     });
 

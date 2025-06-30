@@ -20,6 +20,7 @@ interface SearchModalProps {
     spaceTitle: string;
     isMultiVariants: boolean;
     withAsk: boolean;
+    withAIChat: boolean;
 }
 
 /**
@@ -141,7 +142,8 @@ function SearchModalBody(
         onClose: (to?: string) => void;
     }
 ) {
-    const { spaceTitle, withAsk, isMultiVariants, state, setSearchState, onClose } = props;
+    const { spaceTitle, withAsk, withAIChat, isMultiVariants, state, setSearchState, onClose } =
+        props;
 
     const language = useLanguage();
     const resultsRef = React.useRef<SearchResultsRef>(null);
@@ -295,6 +297,7 @@ function SearchModalBody(
                     global={isMultiVariants && state.global}
                     query={normalizedQuery}
                     withAsk={withAsk}
+                    withAIChat={withAIChat}
                     onSwitchToAsk={onSwitchToAsk}
                 />
             ) : null}

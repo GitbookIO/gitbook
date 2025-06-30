@@ -1,6 +1,6 @@
+import type { GitBookSiteContext } from '@/lib/context';
+import { getPageDocument } from '@/lib/data';
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { getPageDocument } from '@v2/lib/data';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
@@ -10,7 +10,7 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
-import { getResizedImageURL } from '@v2/lib/images';
+import { getResizedImageURL } from '@/lib/images';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';

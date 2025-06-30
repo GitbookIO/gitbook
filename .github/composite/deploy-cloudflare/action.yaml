@@ -59,7 +59,7 @@ runs:
             GITBOOK_ASSETS_PREFIX: ${{ inputs.opItem }}/GITBOOK_ASSETS_PREFIX
             GITBOOK_FONTS_URL: ${{ inputs.opItem }}/GITBOOK_FONTS_URL
         - name: Build worker
-          run: bun run turbo build:v2:cloudflare
+          run: bun run turbo build:cloudflare
           env:
             GITBOOK_RUNTIME: cloudflare
           shell: bash
@@ -72,7 +72,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
-              command: deploy --config ./packages/gitbook-v2/openNext/customWorkers/doWrangler.jsonc
+              command: deploy --config ./packages/gitbook/openNext/customWorkers/doWrangler.jsonc
 
         - id: upload_server
           name: Upload server to Cloudflare
@@ -83,7 +83,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
-              command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/defaultWrangler.jsonc
+              command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
         - name: Extract server version worker ID
           shell: bash
@@ -95,7 +95,7 @@ runs:
         - name: Run updateWrangler scripts
           shell: bash
           run: |
-              bun run ./packages/gitbook-v2/openNext/customWorkers/script/updateWrangler.ts ${{ steps.extract_server_version_id.outputs.version_id }}
+              bun run ./packages/gitbook/openNext/customWorkers/script/updateWrangler.ts ${{ steps.extract_server_version_id.outputs.version_id }}
 
         - id: upload_middleware
           name: Upload middleware to Cloudflare
@@ -106,7 +106,7 @@ runs:
               workingDirectory: ./
               wranglerVersion: '4.10.0'
               environment: ${{ inputs.environment }}
-              command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook-v2/openNext/customWorkers/middlewareWrangler.jsonc
+              command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook/openNext/customWorkers/middlewareWrangler.jsonc
         
         - name: Extract middleware version worker ID
           shell: bash

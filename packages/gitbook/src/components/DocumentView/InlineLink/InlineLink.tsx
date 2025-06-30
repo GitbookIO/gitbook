@@ -2,9 +2,9 @@ import { type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api'
 
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { languages } from '@/intl/translations';
+import type { GitBookAnyContext } from '@/lib/context';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { Icon } from '@gitbook/icons';
-import type { GitBookAnyContext } from '@v2/lib/context';
 import { StyledLink } from '../../primitives';
 import type { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';

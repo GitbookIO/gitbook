@@ -8,7 +8,7 @@ import {
     parseImageAPIURL,
     resizeImage,
     verifyImageSignature,
-} from '@v2/lib/images';
+} from '@/lib/images';
 import { NextResponse } from 'next/server';
 
 /**

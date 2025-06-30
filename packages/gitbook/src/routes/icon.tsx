@@ -1,11 +1,11 @@
 import { notFound, redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import { getEmojiForCode } from '@/lib/emojis';
+import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 import { getCacheTag } from '@gitbook/cache-tags';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { getResizedImageURL } from '@v2/lib/images';
 
 const SIZES = {
     /** Size for a favicon */

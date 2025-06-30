@@ -1,18 +1,14 @@
-import type { RevisionPage, RevisionPageGroup } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
+'use client';
 
-import { hasPageVisibleDescendant } from '@/lib/pages';
+import type { ClientTOCPageGroup } from './encodeClientTableOfContents';
+
 import { tcls } from '@/lib/tailwind';
 
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 
-export function PageGroupItem(props: {
-    rootPages: RevisionPage[];
-    page: RevisionPageGroup;
-    context: GitBookSiteContext;
-}) {
-    const { rootPages, page, context } = props;
+export function PageGroupItem(props: { page: ClientTOCPageGroup }) {
+    const { page } = props;
 
     return (
         <li className="group/page-group-item flex flex-col">
@@ -36,8 +32,8 @@ export function PageGroupItem(props: {
                 <TOCPageIcon page={page} />
                 {page.title}
             </div>
-            {hasPageVisibleDescendant(page) ? (
-                <PagesList rootPages={rootPages} pages={page.pages} context={context} />
+            {page.descendants && page.descendants.length > 0 ? (
+                <PagesList pages={page.descendants} />
             ) : null}
         </li>
     );

@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { CustomizationThemeMode } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type { Metadata, Viewport } from 'next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import React from 'react';
@@ -13,8 +13,8 @@ import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
-import { getResizedImageURL } from '@v2/lib/images';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
+import { getResizedImageURL } from '@/lib/images';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 

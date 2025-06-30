@@ -33,6 +33,13 @@ export const ButtonStyles = [
     'grow-0',
     'shrink-0',
     'truncate',
+
+    'disabled:opacity-50',
+    'disabled:cursor-not-allowed',
+    'disabled:bg-tint',
+    'disabled:text-tint/8',
+    'disabled:shadow-none',
+    'disabled:hover:scale-100',
 ] as ClassValue[];
 
 export const CardStyles = [

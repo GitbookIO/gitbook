@@ -5,7 +5,7 @@
             "outputs": ["public/~gitbook/static/icons/**/*", "public/~gitbook/static/math/**/*"]
         },
         "typecheck": {
-            "dependsOn": ["^typecheck"]
+            "dependsOn": ["^typecheck", "generate"]
         }
     }
 }

@@ -6,7 +6,7 @@ import { getSpaceLanguage, t } from '@/intl/server';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 import { Link, type LinkInsightsProps } from '../primitives';
 
 /**

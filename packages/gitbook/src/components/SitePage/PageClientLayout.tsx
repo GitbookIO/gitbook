@@ -31,7 +31,7 @@ function useStripFallbackQueryParam() {
     const searchParams = useSearchParams();
 
     React.useEffect(() => {
-        if (searchParams.has('fallback')) {
+        if (searchParams?.has('fallback')) {
             const params = new URLSearchParams(searchParams.toString());
             params.delete('fallback');
             router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);

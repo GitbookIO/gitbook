@@ -48,11 +48,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
         query: string;
         global: boolean;
         withAsk: boolean;
+        withAIChat: boolean;
         onSwitchToAsk: () => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, withAsk, global, onSwitchToAsk } = props;
+    const { children, query, withAsk, withAIChat, global, onSwitchToAsk } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -224,7 +225,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     const noResults = (
         <div className={tcls('text', 'text-tint', 'p-8', 'text-center')}>
-            {t(language, 'search_no_results', query)}
+            {t(language, 'search_no_results_for', query)}
         </div>
     );
 
@@ -259,6 +260,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             ref={(ref) => {
                                                 refs.current[index] = ref;
                                             }}
+                                            withAIChat={withAIChat}
                                             key={item.id}
                                             question={query}
                                             active={index === cursor}
@@ -273,6 +275,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                 refs.current[index] = ref;
                                             }}
                                             key={item.id}
+                                            withAIChat={withAIChat}
                                             question={item.question}
                                             active={index === cursor}
                                             onClick={onSwitchToAsk}

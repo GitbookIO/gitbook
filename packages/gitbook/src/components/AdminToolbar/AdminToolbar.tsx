@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import { headers } from 'next/headers';
 import React from 'react';
 
@@ -58,7 +58,7 @@ export async function AdminToolbar(props: AdminToolbarProps) {
         return <ChangeRequestToolbar context={context} />;
     }
 
-    if (context.revision.id !== context.space.revision) {
+    if (context.revisionId !== context.space.revision) {
         return <RevisionToolbar context={context} />;
     }
 
