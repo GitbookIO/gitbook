@@ -88,4 +88,5 @@ export const en = {
     searched_for: 'Searched for ${1}',
     ai_chat_tools_listed_pages: 'Browsed the docs',
     ai_chat_tools_read_page: 'Read page ${1}',
+    ai_chat_tools_mcp_tool: 'Called ${1}',
 };

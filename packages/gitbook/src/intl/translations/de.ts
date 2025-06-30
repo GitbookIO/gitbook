@@ -90,4 +90,5 @@ export const de = {
     searched_for: 'Gesucht nach ${1}',
     ai_chat_tools_listed_pages: 'Docs durchsucht',
     ai_chat_tools_read_page: 'Seite ${1} gelesen',
+    ai_chat_tools_mcp_tool: 'Aufgerufen ${1}',
 };

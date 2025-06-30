@@ -87,4 +87,5 @@ export const zh: TranslationLanguage = {
     searched_for: '搜索了 ${1}',
     ai_chat_tools_listed_pages: '浏览了文档',
     ai_chat_tools_read_page: '已读取页面 ${1}',
+    ai_chat_tools_mcp_tool: '调用了 ${1}',
 };
