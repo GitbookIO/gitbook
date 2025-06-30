@@ -156,6 +156,8 @@ export function linkerWithOtherSpaceBasePath(
         toPathInSpace(relativePath: string): string {
             return linker.toPathInSite(joinPaths(spaceBasePath, relativePath));
         },
+        // implementation matches the base linker toPathForPage, but decouples from using `this` to
+        // ensure we always use the updates `toPathInSpace` method.
         toPathForPage({ pages, page, anchor }) {
             return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
         },
