@@ -142,13 +142,19 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
  */
 export function linkerWithOtherSpaceBasePath(
     linker: GitBookLinker,
-    { spaceBasePath }: { spaceBasePath: string }
+    {
+        spaceBasePath,
+    }: {
+        /**
+         * The base path of the space. It should be relative to the root of the site.
+         */
+        spaceBasePath: string;
+    }
 ): GitBookLinker {
     const newLinker: GitBookLinker = {
         ...linker,
         toPathInSpace(relativePath: string): string {
-            // space is in another site space, so base path is always relative to the root of the site
-            return ensureLeadingSlash(joinPaths(spaceBasePath, relativePath));
+            return linker.toPathInSite(joinPaths(spaceBasePath, relativePath));
         },
         toPathForPage({ pages, page, anchor }) {
             return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
@@ -167,8 +173,4 @@ function joinPaths(prefix: string, path: string): string {
 
 function removeTrailingSlash(path: string): string {
     return path.endsWith('/') ? path.slice(0, -1) : path;
-}
-
-function ensureLeadingSlash(path: string): string {
-    return path.startsWith('/') ? path : `/${path}`;
 }
