@@ -48,18 +48,46 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
 /**
  * Find a site space by its spaceId in a site structure.
  */
-export function findSiteSpaceById(siteStructure: SiteStructure, spaceId: string): SiteSpace | null {
+export function findSiteSpaceBy(
+    siteStructure: SiteStructure,
+    predicate: (siteSpace: SiteSpace) => boolean
+): {
+    siteSpace: SiteSpace;
+    siteSection: SiteSection | null;
+    siteSectionGroup: SiteSectionGroup | null;
+} | null {
     if (siteStructure.type === 'siteSpaces') {
-        return siteStructure.structure.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+        const siteSpace = siteStructure.structure.find(predicate) ?? null;
+        if (siteSpace) {
+            return {
+                siteSpace,
+                siteSection: null,
+                siteSectionGroup: null,
+            };
+        }
+
+        return null;
     }
 
     for (const section of siteStructure.structure) {
-        const siteSpace =
-            section.object === 'site-section'
-                ? findSiteSpaceByIdInSiteSpaces(section.siteSpaces, spaceId)
-                : findSiteSpaceByIdInSections(section.sections, spaceId);
-        if (siteSpace) {
-            return siteSpace;
+        if (section.object === 'site-section') {
+            const siteSpace = findSiteSpaceByIdInSiteSpaces(section.siteSpaces, predicate);
+            if (siteSpace) {
+                return {
+                    siteSpace,
+                    siteSection: null,
+                    siteSectionGroup: null,
+                };
+            }
+        } else {
+            const found = findSiteSpaceByIdInSections(section.sections, predicate);
+            if (found) {
+                return {
+                    siteSpace: found.siteSpace,
+                    siteSection: found.siteSection,
+                    siteSectionGroup: null,
+                };
+            }
         }
     }
 
@@ -97,22 +125,31 @@ export function getSiteSpaceURL(context: GitBookSiteContext, siteSpace: SiteSpac
  * This doesn't return the most optimized path, as it doesn't take into account which one is the default one.
  */
 export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace: SiteSpace) {
-    const { sections } = context;
-    return sections?.current ? joinPath(sections.current.path, siteSpace.path) : siteSpace.path;
+    const found = findSiteSpaceBy(context.structure, (entry) => entry.id === siteSpace.id);
+    if (found?.siteSection) {
+        return joinPath(found.siteSection.path, siteSpace.path);
+    }
+
+    return siteSpace.path;
 }
 
-function findSiteSpaceByIdInSections(sections: SiteSection[], spaceId: string): SiteSpace | null {
-    for (const section of sections) {
-        const siteSpace =
-            section.siteSpaces.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+function findSiteSpaceByIdInSections(
+    sections: SiteSection[],
+    predicate: (siteSpace: SiteSpace) => boolean
+): { siteSpace: SiteSpace; siteSection: SiteSection } | null {
+    for (const siteSection of sections) {
+        const siteSpace = siteSection.siteSpaces.find(predicate) ?? null;
         if (siteSpace) {
-            return siteSpace;
+            return { siteSpace, siteSection };
         }
     }
 
     return null;
 }
 
-function findSiteSpaceByIdInSiteSpaces(siteSpaces: SiteSpace[], spaceId: string): SiteSpace | null {
-    return siteSpaces.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+function findSiteSpaceByIdInSiteSpaces(
+    siteSpaces: SiteSpace[],
+    predicate: (siteSpace: SiteSpace) => boolean
+): SiteSpace | null {
+    return siteSpaces.find(predicate) ?? null;
 }
