@@ -1,7 +1,8 @@
-import { parseOpenAPI } from '@gitbook/openapi-parser';
+import { OpenAPIParseError, parseOpenAPI } from '@gitbook/openapi-parser';
 
 import { noCacheFetchOptions } from '@/lib/data';
 import { resolveContentRef } from '@/lib/references';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
 import { assert } from 'ts-essentials';
 import { enrichFilesystem } from './enrich';
 import type {
@@ -37,6 +38,10 @@ export async function fetchOpenAPIFilesystem(
         return fetchFilesystem(resolved.href);
     })();
 
+    if ('error' in filesystem) {
+        throw new OpenAPIParseError(filesystem.error.message, { code: filesystem.error.code });
+    }
+
     return {
         filesystem,
         specUrl: resolved.href,
@@ -45,7 +50,17 @@ export async function fetchOpenAPIFilesystem(
 
 const fetchFilesystem = async (url: string) => {
     'use cache';
-    return fetchFilesystemUncached(url);
+    try {
+        return await fetchFilesystemUncached(url);
+    } catch (error) {
+        // Throwing an error inside a "use cache" function obfuscates the error,
+        // so we need to handle it here and recreates the error outside the cache function.
+        if (error instanceof OpenAPIParseError) {
+            cacheLife('seconds');
+            return { error: { code: error.code, message: error.message } };
+        }
+        throw error;
+    }
 };
 
 async function fetchFilesystemUncached(
