@@ -69,23 +69,23 @@ export function findSiteSpaceBy(
         return null;
     }
 
-    for (const section of siteStructure.structure) {
-        if (section.object === 'site-section') {
-            const siteSpace = findSiteSpaceByIdInSiteSpaces(section.siteSpaces, predicate);
+    for (const sectionOrGroup of siteStructure.structure) {
+        if (sectionOrGroup.object === 'site-section') {
+            const siteSpace = findSiteSpaceByIdInSiteSpaces(sectionOrGroup.siteSpaces, predicate);
             if (siteSpace) {
                 return {
                     siteSpace,
-                    siteSection: null,
+                    siteSection: sectionOrGroup,
                     siteSectionGroup: null,
                 };
             }
         } else {
-            const found = findSiteSpaceByIdInSections(section.sections, predicate);
+            const found = findSiteSpaceByIdInSections(sectionOrGroup.sections, predicate);
             if (found) {
                 return {
                     siteSpace: found.siteSpace,
                     siteSection: found.siteSection,
-                    siteSectionGroup: null,
+                    siteSectionGroup: sectionOrGroup,
                 };
             }
         }
@@ -126,11 +126,13 @@ export function getSiteSpaceURL(context: GitBookSiteContext, siteSpace: SiteSpac
  */
 export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace: SiteSpace) {
     const found = findSiteSpaceBy(context.structure, (entry) => entry.id === siteSpace.id);
-    if (found?.siteSection) {
-        return joinPath(found.siteSection.path, siteSpace.path);
+    const siteSpacePath = siteSpace.default ? '' : siteSpace.path;
+
+    if (found?.siteSection && !found?.siteSection.default) {
+        return joinPath(found.siteSection.path, siteSpacePath);
     }
 
-    return siteSpace.path;
+    return siteSpacePath;
 }
 
 function findSiteSpaceByIdInSections(
