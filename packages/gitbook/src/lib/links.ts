@@ -148,7 +148,7 @@ export function linkerWithOtherSpaceBasePath(
         ...linker,
         toPathInSpace(relativePath: string): string {
             // space is in another site space, so base path is always relative to the root of the site
-            return `/${joinPaths(spaceBasePath, relativePath)}`;
+            return ensureLeadingSlash(joinPaths(spaceBasePath, relativePath));
         },
         toPathForPage({ pages, page, anchor }) {
             return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
@@ -167,4 +167,8 @@ function joinPaths(prefix: string, path: string): string {
 
 function removeTrailingSlash(path: string): string {
     return path.endsWith('/') ? path.slice(0, -1) : path;
+}
+
+function ensureLeadingSlash(path: string): string {
+    return path.startsWith('/') ? path : `/${path}`;
 }
