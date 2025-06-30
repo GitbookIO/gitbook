@@ -33,7 +33,7 @@ import { PageIcon } from '@/components/PageIcon';
 import { getGitBookAppHref } from './app';
 import { getBlockById, getBlockTitle } from './document';
 import { resolvePageId } from './pages';
-import { findSiteSpaceById, getFallbackSiteSpacePath } from './sites';
+import { findSiteSpaceBy, getFallbackSiteSpacePath } from './sites';
 import type { ClassValue } from './tailwind';
 import { filterOutNullable } from './typescript';
 
@@ -315,9 +315,12 @@ async function getBestTargetSpace(
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
     if ('site' in context) {
-        const siteSpace = findSiteSpaceById(context.structure, spaceId);
-        if (siteSpace) {
-            return { space: siteSpace.space, siteSpace };
+        const found = findSiteSpaceBy(
+            context.structure,
+            (siteSpace) => siteSpace.space.id === spaceId
+        );
+        if (found) {
+            return { space: found.siteSpace.space, siteSpace: found.siteSpace };
         }
     }
 

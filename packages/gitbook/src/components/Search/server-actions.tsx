@@ -3,7 +3,7 @@
 import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
 import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
-import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
+import { findSiteSpaceBy } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
 import type {
     Revision,
@@ -256,24 +256,20 @@ async function searchSiteContent(
     return (
         await Promise.all(
             searchResults.map(async (spaceItem) => {
-                const sections = getSiteStructureSections(structure).flatMap((item) =>
-                    item.object === 'site-section-group' ? [item, ...item.sections] : item
+                const found = findSiteSpaceBy(
+                    structure,
+                    (siteSpace) => siteSpace.space.id === spaceItem.id
                 );
-                const siteSpace = findSiteSpaceById(structure, spaceItem.id);
-                const siteSection = sections.find(
-                    (section) => section.id === siteSpace?.section
-                ) as SiteSection;
-                const siteSectionGroup = siteSection?.sectionGroup
-                    ? sections.find((sectionGroup) => sectionGroup.id === siteSection.sectionGroup)
-                    : null;
+                const siteSection = found?.siteSection;
+                const siteSectionGroup = found?.siteSectionGroup;
 
                 return Promise.all(
                     spaceItem.pages.map((pageItem) =>
                         transformSitePageResult(context, {
                             pageItem,
                             spaceItem,
-                            space: siteSpace?.space,
-                            spaceURL: siteSpace?.urls.published,
+                            space: found?.siteSpace.space,
+                            spaceURL: found?.siteSpace.urls.published,
                             siteSection: siteSection ?? undefined,
                             siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
                         })
@@ -313,8 +309,11 @@ async function transformAnswer(
                 }
 
                 // Find the siteSpace in case it is nested in a site section so we can resolve the URL appropriately
-                const siteSpace = findSiteSpaceById(context.structure, source.space);
-                const spaceURL = siteSpace?.urls.published;
+                const found = findSiteSpaceBy(
+                    context.structure,
+                    (siteSpace) => siteSpace.space.id === source.space
+                );
+                const spaceURL = found?.siteSpace.urls.published;
 
                 const href = spaceURL
                     ? joinPathWithBaseURL(spaceURL, page.page.path)
