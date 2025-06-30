@@ -20,15 +20,11 @@ interface Images {
 
 const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
-function useGetTop(
-    container: { height?: number; width?: number },
-    y: number,
-    img?: ImageAttributes
-) {
+function getTop(container: { height?: number; width?: number }, y: number, img: ImageAttributes) {
     // When the size of the image hasn't been determined, we fallback to the center position
-    if (!img || !img.size || y === 0) return '50%';
+    if (!img.size || y === 0) return '50%';
     const ratio =
-        img?.size && container.height && container.width
+        container.height && container.width
             ? Math.max(container.width / img.size.width, container.height / img.size.height)
             : 1;
     const scaledHeight = img.size ? img.size.height * ratio : PAGE_COVER_SIZE.height;
@@ -44,9 +40,6 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
         ref: containerRef,
     });
 
-    const topLight = useGetTop(container, y, imgs.light);
-    const topDark = useGetTop(container, y, imgs.dark);
-
     return (
         <div className="h-full w-full overflow-hidden" ref={containerRef}>
             <img
@@ -56,7 +49,7 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                 className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{
                     aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                    objectPosition: `50% ${topLight}`,
+                    objectPosition: `50% ${getTop(container, y, imgs.light)}`,
                 }}
             />
             {imgs.dark && (
@@ -67,7 +60,7 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                     className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
                     style={{
                         aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                        objectPosition: `50% ${topDark}`,
+                        objectPosition: `50% ${getTop(container, y, imgs.dark)}`,
                     }}
                 />
             )}
