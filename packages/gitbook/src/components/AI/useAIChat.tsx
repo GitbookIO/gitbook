@@ -4,6 +4,7 @@ import * as zustand from 'zustand';
 
 import { AIMessageRole } from '@gitbook/api';
 import * as React from 'react';
+import { useTrackEvent } from '../Insights';
 import { streamAIChatFollowUpResponses, streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
@@ -86,6 +87,7 @@ export function useAIChatState(): AIChatState {
 export function useAIChatController(): AIChatController {
     const messageContextRef = useAIMessageContextRef();
     const setState = zustand.useStore(globalState, (state) => state.setState);
+    const trackEvent = useTrackEvent();
 
     return React.useMemo(() => {
         /**
@@ -113,6 +115,7 @@ export function useAIChatController(): AIChatController {
                     responseId: null,
                 })),
             postMessage: async (input: { message: string }) => {
+                trackEvent({ type: 'ask_question', query: input.message });
                 setState((state) => {
                     return {
                         ...state,
@@ -168,5 +171,5 @@ export function useAIChatController(): AIChatController {
                 }));
             },
         };
-    }, [messageContextRef, setState]);
+    }, [messageContextRef, setState, trackEvent]);
 }
