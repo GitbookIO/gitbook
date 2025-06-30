@@ -11,6 +11,10 @@ import { useAIMessageContextRef } from './useAIMessageContext';
 export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
+    /**
+     * When true, the message represents an error returned by the client-side logic.
+     */
+    error?: boolean;
 };
 
 export type AIChatState = {
@@ -124,56 +128,61 @@ export function useAIChatController(): AIChatController {
                     };
                 });
 
-                const stream = await streamAIChatResponse({
-                    message: input.message,
-                    messageContext: messageContextRef.current,
-                    previousResponseId: globalState.getState().state.responseId ?? undefined,
-                });
+                try {
+                    const stream = await streamAIChatResponse({
+                        message: input.message,
+                        messageContext: messageContextRef.current,
+                        previousResponseId: globalState.getState().state.responseId ?? undefined,
+                    });
 
-                for await (const data of stream) {
-                    if (!data) continue;
+                    for await (const data of stream) {
+                        if (!data) continue;
 
-                    const event = data.event;
+                        const event = data.event;
 
-                    switch (event.type) {
-                        case 'response_finish': {
-                            setState((state) => ({
-                                ...state,
-                                responseId: event.responseId,
-                                // Mark as not loading when the response is finished
-                                // Even if the stream might continue as we receive 'response_followup_suggestion'
-                                loading: false,
-                            }));
-                            break;
+                        switch (event.type) {
+                            case 'response_finish': {
+                                setState((state) => ({
+                                    ...state,
+                                    responseId: event.responseId,
+                                    // Mark as not loading when the response is finished
+                                    // Even if the stream might continue as we receive 'response_followup_suggestion'
+                                    loading: false,
+                                }));
+                                break;
+                            }
+                            case 'response_followup_suggestion': {
+                                setState((state) => ({
+                                    ...state,
+                                    followUpSuggestions: [
+                                        ...state.followUpSuggestions,
+                                        ...event.suggestions,
+                                    ],
+                                }));
+                                break;
+                            }
                         }
-                        case 'response_followup_suggestion': {
-                            setState((state) => ({
-                                ...state,
-                                followUpSuggestions: [
-                                    ...state.followUpSuggestions,
-                                    ...event.suggestions,
-                                ],
-                            }));
-                            break;
-                        }
+
+                        setState((state) => ({
+                            ...state,
+                            loading: false,
+                        }));
                     }
-
+                } catch {
+                    // Replace the placeholder assistant message with an error message.
                     setState((state) => ({
                         ...state,
+                        loading: false,
                         messages: [
                             ...state.messages.slice(0, -1),
                             {
                                 role: AIMessageRole.Assistant,
-                                content: data.content,
+                                content: 'Something went wrong. Please try again.',
+                                error: true,
                             },
                         ],
                     }));
                 }
-
-                setState((state) => ({
-                    ...state,
-                    loading: false,
-                }));
             },
         };
     }, [messageContextRef, setState, trackEvent]);
