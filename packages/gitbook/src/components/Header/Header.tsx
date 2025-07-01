@@ -19,7 +19,6 @@ export function Header(props: {
     withTopHeader?: boolean;
     search?: React.ReactNode;
 }) {
-    const { context, withTopHeader, withAIChat } = props;
     const { context, withTopHeader, search } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 

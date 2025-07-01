@@ -17,14 +17,13 @@ interface SearchContainerProps {
     isMultiVariants: boolean;
     withAsk: boolean;
     withAIChat: boolean;
-    className?: string;
 }
 
 /**
  * Client component to render the search modal when the url contains a search query.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { withAsk, withAIChat, className } = props;
+    const { withAsk, withAIChat } = props;
 
     const [state, setSearchState] = useSearch();
     const [open, setOpen] = useState(false);
@@ -132,7 +131,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     </React.Suspense>
                 }
                 rootProps={{
-                    open: open,
+                    open: open && !!(state?.query || withAsk),
                 }}
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),

@@ -26,13 +26,6 @@ export function SearchInput(props: SearchButtonProps) {
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // useEffect(() => {
-    //     if (value) {
-    //         inputRef.current?.focus();
-    //         onFocus();
-    //     }
-    // }, [value, onFocus]);
-
     useEffect(() => {
         if (isOpen) {
             inputRef.current?.focus();
