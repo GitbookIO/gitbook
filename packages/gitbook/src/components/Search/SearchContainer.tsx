@@ -138,7 +138,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base w-[32rem] p-3 h-[32rem] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        'bg-tint-base scroll-py-6 w-[32rem] p-2 h-[32rem] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
                 }}

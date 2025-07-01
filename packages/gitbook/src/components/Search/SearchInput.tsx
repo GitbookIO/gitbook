@@ -43,7 +43,7 @@ export function SearchInput(props: SearchButtonProps) {
     return (
         <Button
             onClick={onFocus}
-            className="has-[input:focus]:-translate-y-px grow bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-md has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover"
+            className="has-[input:focus]:-translate-y-px grow gap-0 bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-md has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover"
             icon="magnifying-glass"
             size="medium"
             variant="secondary"
@@ -58,7 +58,9 @@ export function SearchInput(props: SearchButtonProps) {
                 placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
                 className={tcls(
                     'peer grow cursor-pointer bg-transparent py-0.5 text-tint-strong outline-none transition-all duration-500 placeholder:text-tint/9 md:transition-colors',
-                    value !== undefined ? 'max-w-[32rem]' : 'max-w-0 md:block md:max-w-[32rem]'
+                    value !== undefined
+                        ? 'max-w-[40rem] px-3 opacity-11'
+                        : 'max-w-0 px-0 opacity-0 md:max-w-[40rem] md:px-3 md:opacity-11'
                 )}
                 ref={inputRef}
             />

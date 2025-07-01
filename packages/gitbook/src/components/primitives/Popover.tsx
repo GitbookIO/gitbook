@@ -20,7 +20,7 @@ export function Popover(props: {
                     collisionPadding={contentProps?.collisionPadding ?? 16}
                     sideOffset={contentProps?.sideOffset ?? 4}
                     className={tcls(
-                        'z-50 max-h-[var(--radix-popover-content-available-height)] max-w-xs animate-scaleIn overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-3 text-sm text-tint shadow-md outline-none ring-1 ring-tint',
+                        'z-50 max-h-[var(--radix-popover-content-available-height)] max-w-xs animate-scaleIn overflow-y-auto circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint px-4 py-3 text-sm text-tint shadow-md outline-none ring-1 ring-tint',
                         contentProps?.className
                     )}
                     style={{

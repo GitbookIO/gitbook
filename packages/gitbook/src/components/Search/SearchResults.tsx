@@ -7,8 +7,9 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { Icon } from '@gitbook/icons';
 import { useTrackEvent } from '../Insights';
-import { Loading } from '../primitives';
+import { Button, Link, Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
@@ -238,7 +239,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 ) : null
             ) : (
                 <>
-                    <div data-testid="search-results">
+                    <div data-testid="search-results" className="flex flex-col gap-y-1">
                         {results.map((item, index) => {
                             switch (item.type) {
                                 case 'page': {
@@ -320,3 +321,69 @@ function withQuestionResult(results: ResultType[], query: string): ResultType[] 
 
     return [{ type: 'question', id: 'question', query }, ...(without ?? [])];
 }
+
+export const SearchResultItem = React.forwardRef(function SearchResultItem(
+    props: {
+        children: React.ReactNode;
+        href: string;
+        action: string;
+        active: boolean;
+        className?: string;
+        size?: 'small' | 'medium';
+        leadingIcon?: React.ReactNode;
+    } & React.ComponentProps<typeof Link>,
+    ref: React.Ref<HTMLAnchorElement>
+) {
+    const {
+        children,
+        href,
+        active,
+        className,
+        leadingIcon,
+        size = 'medium',
+        action,
+        ...rest
+    } = props;
+
+    return (
+        <Link
+            ref={ref}
+            href={href}
+            className={tcls(
+                'flex',
+                'items-center',
+                'gap-3',
+                'group',
+                'px-4',
+                size === 'small' ? 'py-1.5' : 'py-3',
+                'text-tint',
+                'hover:bg-tint',
+                'hover:text-tint-strong',
+                'group',
+                'transition-colors',
+                'rounded-corners:rounded-md',
+                'circular-corners:rounded-2xl',
+                active
+                    ? ['is-active', 'bg-primary', 'text-primary-strong', 'hover:bg-primary']
+                    : null,
+                className
+            )}
+            {...rest}
+        >
+            <div className="size-4 shrink-0 text-tint-subtle">{leadingIcon}</div>
+            <div className="grow">{children}</div>
+            {active ? (
+                <Button
+                    label={action}
+                    variant="primary"
+                    size="medium"
+                    icon="arrow-turn-down-left"
+                />
+            ) : (
+                <div className="flex h-8 items-center text-tint-subtle">
+                    <Icon icon="chevron-right" className="size-3" />
+                </div>
+            )}
+        </Link>
+    );
+});

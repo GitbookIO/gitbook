@@ -156,7 +156,9 @@ export function Header(props: {
                                         // ]}
                                     />
                                 </Suspense>
-                                {withAIChat && <AIChatButton />}
+                                {withAIChat && (
+                                    <AIChatButton className="theme-gradient:bg-tint-base theme-muted:bg-tint-base" />
+                                )}
                             </div>
 
                             {customization.header.links.length > 0 && (

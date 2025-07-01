@@ -1,5 +1,6 @@
 'use client';
 import { tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
 import AIChatIcon from './AIChatIcon';
@@ -7,7 +8,7 @@ import AIChatIcon from './AIChatIcon';
 /**
  * Button to open/close the AI chat.
  */
-export function AIChatButton() {
+export function AIChatButton(props: { className?: string }) {
     const chatController = useAIChatController();
     const chat = useAIChatState();
 
@@ -19,7 +20,7 @@ export function AIChatButton() {
             iconOnly
             size="default"
             variant="secondary"
-            className="!px-3 bg-tint-base py-2.5"
+            className={tcls('!px-3 bg-tint-base py-2.5', props.className)}
             label={tString(language, 'ai_chat_assistant_name')}
             onClick={() => {
                 if (chat.opened) {
