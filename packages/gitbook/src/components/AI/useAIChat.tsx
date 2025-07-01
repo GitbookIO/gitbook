@@ -11,10 +11,6 @@ import { useAIMessageContextRef } from './useAIMessageContext';
 export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
-    /**
-     * When true, the message represents an error returned by the client-side logic.
-     */
-    error?: boolean;
 };
 
 export type AIChatState = {

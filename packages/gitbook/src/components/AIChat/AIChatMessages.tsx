@@ -1,6 +1,5 @@
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import type React from 'react';
 import type { AIChatState } from '../AI/useAIChat';
 
@@ -26,18 +25,13 @@ export function AIChatMessages(props: {
                             'last:min-h-[calc(100%-5rem)]',
                             message.role === AIMessageRole.User
                                 ? 'max-w-[80%] self-end rounded-md bg-tint px-4 py-2'
-                                : message.error
-                                  ? '!min-h-fit flex max-w-[80%] gap-2 rounded-md border border-warning bg-warning px-4 py-2 text-warning'
-                                  : ''
+                                : ''
                         )}
                         style={{
                             animationDelay: `${Math.min(index * 0.05, 0.5)}s`,
                         }}
                         key={index}
                     >
-                        {message.error ? (
-                            <Icon icon="exclamation-triangle" className="mt-0.5 size-3.5" />
-                        ) : null}
                         {message.content ? (
                             message.content
                         ) : (
