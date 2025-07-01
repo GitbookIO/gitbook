@@ -19,8 +19,8 @@ export function AIChatButton(props: { className?: string }) {
             icon={<AIChatIcon />}
             iconOnly
             size="default"
-            variant="secondary"
-            className={tcls('!px-3 bg-tint-base py-2.5', props.className)}
+            variant="header"
+            className={tcls('!px-3 py-2.5', props.className)}
             label={tString(language, 'ai_chat_assistant_name')}
             onClick={() => {
                 if (chat.opened) {

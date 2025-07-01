@@ -38,12 +38,13 @@ export function SearchInput(props: SearchButtonProps) {
         <Button
             onClick={onFocus}
             className={tcls(
-                'has-[input:focus]:-translate-y-px grow gap-0 bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
+                'has-[input:focus]:-translate-y-px grow gap-0 hover:text-tint-strong has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
+                'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
                 className
             )}
             icon="magnifying-glass"
             size="medium"
-            variant="secondary"
+            variant="header"
             tabIndex={-1}
         >
             <input
@@ -54,7 +55,7 @@ export function SearchInput(props: SearchButtonProps) {
                 value={value ?? ''}
                 placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
                 className={tcls(
-                    'peer grow cursor-pointer bg-transparent py-0.5 text-tint-strong outline-none transition-all duration-500 placeholder:text-tint/9 md:transition-colors',
+                    'peer grow cursor-pointer bg-transparent py-0.5 outline-none transition-all duration-500 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7 md:transition-colors',
                     value !== undefined
                         ? 'max-w-[40rem] px-3 opacity-11'
                         : 'max-w-0 px-0 opacity-0 md:max-w-[40rem] md:px-3 md:opacity-11'
@@ -86,9 +87,9 @@ function Shortcut() {
         <div
             aria-busy={operatingSystem === null ? 'true' : undefined}
             className={tcls(
-                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
+                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
                 operatingSystem
-                    ? 'motion-safe:animate-fadeIn motion-reduce:opacity-100'
+                    ? 'motion-safe:animate-fadeIn motion-reduce:opacity-11'
                     : 'opacity-0'
             )}
         >
@@ -97,7 +98,7 @@ function Shortcut() {
             >
                 {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
             </kbd>
-            <kbd className="flex size-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background">
+            <kbd className="flex size-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1">
                 K
             </kbd>
         </div>

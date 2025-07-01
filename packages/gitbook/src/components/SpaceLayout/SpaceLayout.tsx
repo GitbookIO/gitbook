@@ -61,9 +61,7 @@ export function SpaceLayout(props: {
                     spaceTitle={siteSpace.title}
                 />
             </React.Suspense>
-            {withAIChat ? (
-                <AIChatButton className="theme-gradient:bg-tint-base theme-muted:bg-tint-base" />
-            ) : null}
+            {withAIChat ? <AIChatButton /> : null}
         </div>
     );
 

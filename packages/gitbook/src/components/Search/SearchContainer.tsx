@@ -17,13 +17,14 @@ interface SearchContainerProps {
     isMultiVariants: boolean;
     withAsk: boolean;
     withAIChat: boolean;
+    className?: string;
 }
 
 /**
  * Client component to render the search modal when the url contains a search query.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { withAsk, withAIChat } = props;
+    const { withAsk, withAIChat, className } = props;
 
     const [state, setSearchState] = useSearch();
     const [open, setOpen] = useState(false);
@@ -34,9 +35,7 @@ export function SearchContainer(props: SearchContainerProps) {
     const resultsRef = useRef<SearchResultsRef>(null);
 
     const onClose = async (to?: string) => {
-        if (!state?.query) {
-            await setSearchState(null);
-        }
+        await setSearchState(null);
         setOpen(false);
 
         if (to) {
@@ -154,6 +153,7 @@ export function SearchContainer(props: SearchContainerProps) {
                         onKeyDown={onKeyDown}
                         withAsk={withAsk}
                         isOpen={open}
+                        className={className}
                     />
                 </div>
             </Popover>
