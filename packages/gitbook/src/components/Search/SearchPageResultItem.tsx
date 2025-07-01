@@ -51,6 +51,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         'transition-colors',
                         'font-normal',
                         'uppercase',
+                        'leading-none',
                         'tracking-wider',
                         'mb-1',
                         'flex',
@@ -81,7 +82,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     ))}
                 </div>
             ) : null}
-            <p className="line-clamp-2 font-medium text-base text-tint-strong">
+            <p className="line-clamp-2 font-semibold text-base text-tint-strong leading-snug">
                 <HighlightQuery query={query} text={item.title} />
             </p>
         </SearchResultItem>

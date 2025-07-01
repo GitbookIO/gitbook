@@ -35,7 +35,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
         >
             <div className="grow border-tint-subtle border-l-2 pl-4">
                 {item.title ? (
-                    <h5 className="font-medium">
+                    <h5 className="font-semibold">
                         <HighlightQuery query={query} text={item.title} />
                     </h5>
                 ) : null}

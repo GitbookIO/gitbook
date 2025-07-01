@@ -48,8 +48,10 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             leadingIcon={
                 recommended ? (
                     <Icon icon="search" className="size-4" />
-                ) : (
+                ) : withAIChat ? (
                     <AIChatIcon className="size-4" />
+                ) : (
+                    <Icon icon="sparkles" className="size-4" />
                 )
             }
             className={recommended && active ? 'pr-1.5' : ''}
@@ -58,7 +60,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 question
             ) : (
                 <>
-                    <div className="font-medium text-base text-tint-strong">
+                    <div className="font-semibold text-base text-tint-strong leading-tight">
                         {t(language, 'search_ask', [question])}
                     </div>
                     <div className="text-sm text-tint-subtle">

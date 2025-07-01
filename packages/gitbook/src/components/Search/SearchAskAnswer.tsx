@@ -88,20 +88,22 @@ export function SearchAskAnswer(props: { query: string }) {
     }, [setAskState]);
 
     const loading = (
-        <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-            <Loading className={tcls('w-6', 'py-8', 'text-primary-subtle')} />
+        <div className="flex grow items-center justify-center">
+            <Loading className={tcls('size-6', 'text-tint/6')} />
         </div>
     );
 
     return (
-        <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
+        <div className="flex min-h-full p-4">
             {askState?.type === 'answer' ? (
                 <React.Suspense fallback={loading}>
                     <TransitionAnswerBody answer={askState.answer} placeholder={loading} />
                 </React.Suspense>
             ) : null}
             {askState?.type === 'error' ? (
-                <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
+                <div className={tcls('grow p-4 text-center')}>
+                    {t(language, 'search_ask_error')}
+                </div>
             ) : null}
             {askState?.type === 'loading' ? loading : null}
         </div>
@@ -138,10 +140,7 @@ function AnswerBody(props: { answer: AskAnswerResult }) {
 
     return (
         <>
-            <div
-                data-testid="search-ask-answer"
-                className={tcls('my-4', 'sm:mt-6', 'px-4', 'sm:px-12', 'text-tint-strong')}
-            >
+            <div data-testid="search-ask-answer" className="text-tint-strong">
                 {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
@@ -213,7 +212,6 @@ function AnswerSources(props: {
                 'mt-4',
                 'sm:mt-6',
                 'py-4',
-                'px-4',
                 'border-t',
                 'border-subtle'
             )}

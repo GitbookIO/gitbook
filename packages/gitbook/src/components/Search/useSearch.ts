@@ -78,8 +78,8 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
         (query) => {
             const searchParams = new URLSearchParams();
             searchParams.set('q', query.query ?? '');
-            query.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
-            query.global ? searchParams.set('global', 'on') : searchParams.delete('global');
+            query.ask ? searchParams.set('ask', 'true') : searchParams.delete('ask');
+            query.global ? searchParams.set('global', 'true') : searchParams.delete('global');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -89,7 +89,6 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                         query: '',
                         ask: false,
                         global: false,
-                        open: false,
                         ...(prev ?? {}),
                         ...query,
                     }));

@@ -5,6 +5,7 @@ import React, { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useTrackEvent } from '../Insights';
 import { Popover } from '../primitives';
+import { SearchAskAnswer } from './SearchAskAnswer';
 import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
 import { SearchInput } from './SearchInput';
@@ -109,9 +110,9 @@ export function SearchContainer(props: SearchContainerProps) {
         });
     };
 
-    // const onSwitchToAsk = () => {
-    //     setSearchState((state) => (state ? { ...state, ask: true } : null));
-    // };
+    const onSwitchToAsk = () => {
+        setSearchState((state) => (state ? { ...state, ask: true } : null));
+    };
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
     const normalizedQuery = state?.query.trim() ?? '';
@@ -121,16 +122,17 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     <React.Suspense fallback={null}>
-                        {state !== null ? (
+                        {state !== null && !state.ask ? (
                             <SearchResults
                                 ref={resultsRef}
                                 query={normalizedQuery}
                                 global={state?.global ?? false}
                                 withAsk={withAsk}
                                 withAIChat={withAIChat}
-                                onSwitchToAsk={() => {}}
+                                onSwitchToAsk={onSwitchToAsk}
                             />
                         ) : null}
+                        {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
                     </React.Suspense>
                 }
                 rootProps={{
@@ -140,7 +142,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base has-[.empty]:hidden scroll-py-6 w-[32rem] p-2 h-[32rem] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        'bg-tint-base has-[.empty]:hidden scroll-py-6 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
                 }}
