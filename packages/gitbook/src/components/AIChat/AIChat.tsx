@@ -159,7 +159,9 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                                     {t(language, 'ai_chat_assistant_description')}
                                 </p>
                             </div>
-                            <AIChatSuggestedQuestions chatController={chatController} />
+                            {!chat.error ? (
+                                <AIChatSuggestedQuestions chatController={chatController} />
+                            ) : null}
                         </div>
                     ) : (
                         <AIChatMessages chat={chat} lastUserMessageRef={lastUserMessageRef} />
@@ -169,11 +171,21 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                     ref={inputRef}
                     className="absolute inset-x-0 bottom-0 mr-2 flex flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
                 >
-                    <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
+                    {/* Display an error banner when something went wrong. */}
+                    {chat.error ? (
+                        <div className="flex animate-[fadeIn_500ms_both] items-start gap-2 rounded-md bg-warning p-3 text-sm text-warning ring-1 ring-warning">
+                            <Icon icon="exclamation-triangle" className="mt-0.5 size-3.5" />
+                            {t(language, 'search_ask_error')}
+                        </div>
+                    ) : (
+                        <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
+                    )}
+
                     <AIChatInput
                         value={input}
                         onChange={setInput}
-                        disabled={chat.loading}
+                        isLoading={chat.loading}
+                        disabled={chat.error}
                         onSubmit={() => {
                             chatController.postMessage({ message: input });
                             setInput('');

@@ -38,6 +38,13 @@ export type AIChatState = {
      * If true, the session is in progress.
      */
     loading: boolean;
+
+    /**
+     * Set to true when an error occurred while communicating with the server. When
+     * this flag is true, the chat input should be read-only and the UI should
+     * display an error alert. Clearing the conversation will reset this flag.
+     */
+    error: boolean;
 };
 
 export type AIChatController = {
@@ -68,6 +75,7 @@ const globalState = zustand.create<{
             messages: [],
             followUpSuggestions: [],
             loading: false,
+            error: false,
         },
         setState: (fn) => set((state) => ({ state: { ...state.state, ...fn(state.state) } })),
     };
@@ -100,6 +108,7 @@ export function useAIChatController(): AIChatController {
                     messages: [],
                     followUpSuggestions: [],
                     responseId: null,
+                    error: false,
                 })),
             postMessage: async (input: { message: string }) => {
                 trackEvent({ type: 'ask_question', query: input.message });
@@ -121,6 +130,7 @@ export function useAIChatController(): AIChatController {
                         ],
                         followUpSuggestions: [],
                         loading: true,
+                        error: false,
                     };
                 });
 

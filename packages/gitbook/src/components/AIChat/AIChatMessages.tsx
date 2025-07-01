@@ -34,7 +34,7 @@ export function AIChatMessages(props: {
                     >
                         {message.content ? (
                             message.content
-                        ) : (
+                        ) : chat.loading ? (
                             <div className="flex w-full animate-[fadeIn_500ms_both] flex-wrap gap-2">
                                 {Array.from({ length: 7 }).map((_, index) => (
                                     <div
@@ -47,7 +47,7 @@ export function AIChatMessages(props: {
                                     />
                                 ))}
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 );
             })}

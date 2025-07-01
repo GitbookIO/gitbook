@@ -7,11 +7,15 @@ import { Tooltip } from '../primitives/Tooltip';
 
 export function AIChatInput(props: {
     value: string;
-    disabled: boolean;
+    disabled?: boolean;
+    /**
+     * When true, the input is disabled
+     */
+    isLoading: boolean;
     onChange: (value: string) => void;
     onSubmit: (value: string) => void;
 }) {
-    const { value, onChange, onSubmit, disabled } = props;
+    const { value, onChange, onSubmit, disabled, isLoading } = props;
 
     const language = useLanguage();
 
@@ -38,7 +42,8 @@ export function AIChatInput(props: {
         <div className="relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base">
             <textarea
                 ref={inputRef}
-                disabled={disabled}
+                disabled={disabled || isLoading}
+                data-loading={isLoading}
                 className={tcls(
                     'resize-none',
                     'focus:outline-none',
@@ -55,7 +60,9 @@ export function AIChatInput(props: {
                     'disabled:bg-tint-subtle',
                     'delay-300',
                     'disabled:delay-0',
-                    'disabled:cursor-progress'
+                    'disabled:cursor-not-allowed',
+                    'data-[loading=true]:cursor-progress',
+                    'data-[loading=true]:opacity-50'
                 )}
                 value={value}
                 rows={1}
