@@ -74,6 +74,7 @@ export const nl: TranslationLanguage = {
     ai_chat_thinking: 'Denkt na...',
     ai_chat_working: 'Werkt...',
     ai_chat_context_badge: 'AI',
+    ai_chat_error: 'Er is iets misgegaan.',
     ai_chat_context_title: 'Gebaseerd op je context',
     ai_chat_context_description:
         'De Docs Assistent gebruikt AI en je context om antwoorden te genereren en acties uit te voeren.',

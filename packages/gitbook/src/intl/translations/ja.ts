@@ -74,6 +74,7 @@ export const ja: TranslationLanguage = {
     ai_chat_thinking: '考え中...',
     ai_chat_working: '作業中...',
     ai_chat_context_badge: 'AI',
+    ai_chat_error: '何らかのエラーが発生しました。',
     ai_chat_context_title: 'あなたのコンテキストに基づいて',
     ai_chat_context_description:
         'ドキュメントアシスタントはAIとあなたのコンテキストを使用して回答を生成し、アクションを実行します。',

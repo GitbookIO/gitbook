@@ -74,6 +74,7 @@ export const pt_br = {
     ai_chat_thinking: 'Pensando...',
     ai_chat_working: 'Trabalhando...',
     ai_chat_context_badge: 'IA',
+    ai_chat_error: 'Algo deu errado.',
     ai_chat_context_title: 'Baseado no seu contexto',
     ai_chat_context_description:
         'O Assistente de Docs usa IA e seu contexto para gerar respostas e realizar ações.',

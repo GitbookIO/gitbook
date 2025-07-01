@@ -3,7 +3,12 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
-import { type AIChatState, useAIChatController, useAIChatState } from '../AI/useAIChat';
+import {
+    type AIChatController,
+    type AIChatState,
+    useAIChatController,
+    useAIChatState,
+} from '../AI/useAIChat';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
@@ -173,10 +178,7 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                 >
                     {/* Display an error banner when something went wrong. */}
                     {chat.error ? (
-                        <div className="flex animate-[fadeIn_500ms_both] items-start gap-2 rounded-md bg-warning p-3 text-sm text-warning ring-1 ring-warning">
-                            <Icon icon="exclamation-triangle" className="mt-0.5 size-3.5" />
-                            {t(language, 'search_ask_error')}
-                        </div>
+                        <AIChatError chatController={chatController} />
                     ) : (
                         <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
                     )}
@@ -185,13 +187,39 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                         value={input}
                         onChange={setInput}
                         isLoading={chat.loading}
-                        disabled={chat.error}
+                        disabled={chat.loading || chat.error}
                         onSubmit={() => {
                             chatController.postMessage({ message: input });
                             setInput('');
                         }}
                     />
                 </div>
+            </div>
+        </div>
+    );
+}
+
+function AIChatError(props: { chatController: AIChatController }) {
+    const language = useLanguage();
+    const { chatController } = props;
+
+    return (
+        <div className="flex flex-wrap justify-between gap-2 rounded-md bg-danger p-3 text-danger text-sm ring-1 ring-danger">
+            <div className="flex items-center gap-2">
+                <Icon icon="exclamation-triangle" className="size-3.5" />
+                <span className="flex items-center gap-1">{t(language, 'ai_chat_error')}</span>
+            </div>
+            <div className="flex justify-end">
+                <Button
+                    variant="blank"
+                    size="small"
+                    icon="refresh"
+                    label={tString(language, 'unexpected_error_retry')}
+                    onClick={() => {
+                        chatController.clear();
+                    }}
+                    className="!text-danger hover:bg-danger-5"
+                />
             </div>
         </div>
     );
