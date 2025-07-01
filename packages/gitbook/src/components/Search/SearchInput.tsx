@@ -43,7 +43,7 @@ export function SearchInput(props: SearchButtonProps) {
     return (
         <Button
             onClick={onFocus}
-            className="has-[input:focus]:-translate-y-px grow gap-0 bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-md has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover"
+            className="has-[input:focus]:-translate-y-px grow gap-0 bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover"
             icon="magnifying-glass"
             size="medium"
             variant="secondary"

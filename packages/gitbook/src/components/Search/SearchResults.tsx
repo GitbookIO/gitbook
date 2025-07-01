@@ -79,8 +79,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
             let cancelled = false;
 
-            // Silently fetch the recommended questions, instead of showing a spinner
-            setResultsState({ results: [], fetching: true });
+            // setResultsState({ results: [], fetching: true });
 
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.
@@ -218,25 +217,27 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     if (resultsState.fetching) {
         return (
-            <div className={tcls('flex', 'items-center', 'justify-center', 'py-8')}>
-                <Loading className={tcls('w-6', 'text-primary')} />
+            <div className={tcls('flex', 'items-center', 'justify-center', 'py-8', 'h-full')}>
+                <Loading className={tcls('w-6', 'text-tint/6')} />
             </div>
         );
     }
 
     const noResults = (
-        <div className={tcls('text', 'text-tint', 'p-8', 'text-center')}>
+        <div className={tcls('flex', 'items-center', 'justify-center', 'py-8', 'h-full')}>
             {t(language, 'search_no_results_for', query)}
         </div>
     );
 
     return (
-        <div className={tcls('overflow-auto')}>
+        <div className={tcls('min-h-full')}>
             {children}
             {results.length === 0 ? (
                 query ? (
                     noResults
-                ) : null
+                ) : (
+                    <div className="empty" />
+                )
             ) : (
                 <>
                     <div data-testid="search-results" className="flex flex-col gap-y-1">

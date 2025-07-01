@@ -61,16 +61,18 @@ export function SearchContainer(props: SearchContainerProps) {
     );
 
     const onOpen = () => {
-        setSearchState({
-            ask: false,
-            global: false,
-            query: state?.query ?? '',
-        });
-        setOpen(true);
+        if (withAsk || state?.query !== '') {
+            setSearchState({
+                ask: false,
+                global: false,
+                query: state?.query ?? '',
+            });
+            setOpen(true);
 
-        trackEvent({
-            type: 'search_open',
-        });
+            trackEvent({
+                type: 'search_open',
+            });
+        }
     };
 
     React.useEffect(() => {
@@ -138,7 +140,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base scroll-py-6 w-[32rem] p-2 h-[32rem] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        'bg-tint-base has-[.empty]:hidden scroll-py-6 w-[32rem] p-2 h-[32rem] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
                 }}
