@@ -1,5 +1,6 @@
 'use client';
 
+import { tcls } from '@/lib/tailwind';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -17,13 +18,14 @@ interface SearchContainerProps {
     isMultiVariants: boolean;
     withAsk: boolean;
     withAIChat: boolean;
+    className?: string;
 }
 
 /**
  * Client component to render the search modal when the url contains a search query.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { withAsk, withAIChat } = props;
+    const { withAsk, withAIChat, className } = props;
 
     const [state, setSearchState] = useSearch();
     const [open, setOpen] = useState(false);
@@ -110,10 +112,6 @@ export function SearchContainer(props: SearchContainerProps) {
         });
     };
 
-    const onSwitchToAsk = () => {
-        setSearchState((state) => (state ? { ...state, ask: true } : null));
-    };
-
     // We trim the query to avoid invalidating the search when the user is typing between words.
     const normalizedQuery = state?.query.trim() ?? '';
 
@@ -129,7 +127,6 @@ export function SearchContainer(props: SearchContainerProps) {
                                 global={state?.global ?? false}
                                 withAsk={withAsk}
                                 withAIChat={withAIChat}
-                                onSwitchToAsk={onSwitchToAsk}
                             />
                         ) : null}
                         {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
@@ -141,8 +138,10 @@ export function SearchContainer(props: SearchContainerProps) {
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
-                    className:
+                    className: tcls(
                         'bg-tint-base has-[.empty]:hidden scroll-py-6 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        className
+                    ),
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
                 }}
@@ -158,6 +157,7 @@ export function SearchContainer(props: SearchContainerProps) {
                         onKeyDown={onKeyDown}
                         withAsk={withAsk}
                         isOpen={open}
+                        className={className}
                     />
                 </div>
             </Popover>

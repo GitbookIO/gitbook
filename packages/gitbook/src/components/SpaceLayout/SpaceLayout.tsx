@@ -4,11 +4,8 @@ import React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
-import { SearchButton } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { getSpaceLanguage } from '@/intl/server';
-import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
@@ -17,6 +14,7 @@ import { AIChat } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
+import { SearchContainer } from '../Search/SearchContainer';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
@@ -115,21 +113,15 @@ export function SpaceLayout(props: {
                                         // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                                         <>
                                             {!withTopHeader && (
-                                                <div className={tcls('hidden', 'lg:block')}>
-                                                    <React.Suspense fallback={null}>
-                                                        <SearchButton>
-                                                            <span className={tcls('flex-1')}>
-                                                                {t(
-                                                                    getSpaceLanguage(customization),
-                                                                    customization.aiSearch.enabled
-                                                                        ? 'search_or_ask'
-                                                                        : 'search'
-                                                                )}
-                                                                ...
-                                                            </span>
-                                                        </SearchButton>
-                                                    </React.Suspense>
-                                                </div>
+                                                <React.Suspense fallback={null}>
+                                                    <SearchContainer
+                                                        withAsk={customization.aiSearch.enabled}
+                                                        withAIChat={withAIChat ?? false}
+                                                        isMultiVariants={siteSpaces.length > 1}
+                                                        spaceTitle={siteSpace.title}
+                                                        className="max-lg:hidden"
+                                                    />
+                                                </React.Suspense>
                                             )}
                                             {!withTopHeader && withSections && sections && (
                                                 <SiteSectionList

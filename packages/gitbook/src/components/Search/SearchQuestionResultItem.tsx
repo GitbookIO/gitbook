@@ -11,13 +11,12 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
     props: {
         question: string;
         active: boolean;
-        onClick: () => void;
         recommended?: boolean;
         withAIChat: boolean;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { question, recommended = false, active, onClick, withAIChat } = props;
+    const { question, recommended = false, active, withAIChat } = props;
     const language = useLanguage();
     const getLinkProp = useSearchLink();
     const chatController = useAIChatController();
@@ -28,6 +27,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             size={recommended ? 'small' : 'medium'}
             action={tString(language, 'ask', '')}
             ref={ref}
+            data-testid="search-result-item"
             {...(withAIChat
                 ? { href: '#' }
                 : getLinkProp({
@@ -40,8 +40,6 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     chatController.open();
                     chatController.postMessage({ message: question });
                     setSearchState(null); // Close the search modal
-                } else {
-                    onClick();
                 }
             }}
             active={active}

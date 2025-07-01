@@ -128,32 +128,33 @@ export function Header(props: {
                                         withAIChat={withAIChat ?? false}
                                         isMultiVariants={siteSpaces.length > 1}
                                         spaceTitle={siteSpace.title}
-                                        // style={[
-                                        //     'theme-bold:bg-header-link/2',
-                                        //     'theme-bold:hover:bg-header-link/3',
+                                        className={tcls([
+                                            'theme-bold:bg-header-link/2',
+                                            'theme-bold:hover:bg-header-link/3',
 
-                                        //     'theme-bold:text-header-link/8',
-                                        //     'theme-bold:hover:text-header-link',
+                                            'theme-bold:text-header-link/8',
+                                            'theme-bold:hover:text-header-link',
 
-                                        //     'theme-bold:ring-header-link/4',
-                                        //     'theme-bold:hover:ring-header-link/5',
+                                            'theme-bold:ring-header-link/4',
+                                            'theme-bold:hover:ring-header-link/5',
 
-                                        //     'theme-bold:[&_svg]:text-header-link/10',
-                                        //     'theme-bold:[&_.shortcut]:text-header-link/8',
+                                            'theme-bold:[&_svg]:text-header-link/10',
+                                            'theme-bold:[&_.shortcut]:text-header-link/8',
 
-                                        //     'theme-bold:contrast-more:bg-header-background',
-                                        //     'theme-bold:contrast-more:text-header-link',
-                                        //     'theme-bold:contrast-more:ring-header-link',
-                                        //     'theme-bold:contrast-more:hover:bg-header-background',
-                                        //     'theme-bold:contrast-more:hover:ring-header-link',
-                                        //     'theme-bold:contrast-more:focus:text-header-link',
-                                        //     'theme-bold:contrast-more:focus:bg-header-background',
-                                        //     'theme-bold:contrast-more:focus:ring-header-link',
+                                            'theme-bold:contrast-more:bg-header-background',
+                                            'theme-bold:contrast-more:text-header-link',
+                                            'theme-bold:contrast-more:ring-header-link',
+                                            'theme-bold:contrast-more:hover:bg-header-background',
+                                            'theme-bold:contrast-more:hover:ring-header-link',
+                                            'theme-bold:contrast-more:focus:text-header-link',
+                                            'theme-bold:contrast-more:focus:bg-header-background',
+                                            'theme-bold:contrast-more:focus:ring-header-link',
 
-                                        //     'theme-bold:shadow-none',
-                                        //     'theme-bold:hover:shadow-none',
-                                        //     'whitespace-nowrap',
-                                        // ]}
+                                            'theme-bold:shadow-none',
+                                            'theme-bold:hover:shadow-none',
+                                            'whitespace-nowrap',
+                                            withTopHeader ? null : 'lg:hidden',
+                                        ])}
                                     />
                                 </Suspense>
                                 {withAIChat && (

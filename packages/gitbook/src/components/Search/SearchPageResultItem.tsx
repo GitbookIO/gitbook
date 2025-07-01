@@ -69,7 +69,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                           ]
                         : breadcrumbs
                     ).map((crumb, index) => (
-                        <React.Fragment key={crumb.key}>
+                        <React.Fragment key={index}>
                             {index !== 0 ? (
                                 <Icon
                                     key={`${crumb.key}-icon`}

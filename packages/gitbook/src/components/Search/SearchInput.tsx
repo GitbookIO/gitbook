@@ -13,13 +13,14 @@ interface SearchButtonProps {
     value?: string;
     withAsk?: boolean;
     isOpen: boolean;
+    className?: string;
 }
 
 /**
  * Input to trigger search.
  */
 export function SearchInput(props: SearchButtonProps) {
-    const { onChange, onKeyDown, onFocus, value, withAsk = false, isOpen } = props;
+    const { onChange, onKeyDown, onFocus, value, withAsk = false, isOpen, className } = props;
 
     const language = useLanguage();
 
@@ -43,7 +44,10 @@ export function SearchInput(props: SearchButtonProps) {
     return (
         <Button
             onClick={onFocus}
-            className="has-[input:focus]:-translate-y-px grow gap-0 bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover"
+            className={tcls(
+                'has-[input:focus]:-translate-y-px grow gap-0 bg-tint-base theme-gradient:bg-tint-base theme-muted:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
+                className
+            )}
             icon="magnifying-glass"
             size="medium"
             variant="secondary"

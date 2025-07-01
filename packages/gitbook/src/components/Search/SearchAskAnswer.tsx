@@ -211,7 +211,7 @@ function AnswerSources(props: {
                 'gap-2',
                 'mt-4',
                 'sm:mt-6',
-                'py-4',
+                'pt-4',
                 'border-t',
                 'border-subtle'
             )}
