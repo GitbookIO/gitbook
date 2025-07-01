@@ -77,10 +77,17 @@ export async function highlight(
         themes: [theme],
     });
 
+    let tokenizeMaxLineLength = 400;
+    // In some cases, people will use unindented code blocks with a single line.
+    // In this case, we can safely increase the max line length to avoid not highlighting the code.
+    if (block.nodes.length === 1) {
+        tokenizeMaxLineLength = 5000;
+    }
+
     const lines = highlighter.codeToTokensBase(code, {
         lang: langName,
         theme,
-        tokenizeMaxLineLength: 400,
+        tokenizeMaxLineLength,
     });
 
     let currentIndex = 0;
