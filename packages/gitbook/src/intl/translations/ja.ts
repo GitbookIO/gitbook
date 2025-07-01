@@ -91,4 +91,5 @@ export const ja: TranslationLanguage = {
     searched_for: '${1}を検索しました',
     ai_chat_tools_listed_pages: 'ドキュメントを閲覧',
     ai_chat_tools_read_page: 'ページ ${1} を読みました',
+    ai_chat_tools_mcp_tool: '${1} を呼び出しました',
 };

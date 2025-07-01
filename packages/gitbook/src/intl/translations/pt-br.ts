@@ -90,4 +90,5 @@ export const pt_br = {
     searched_for: 'Pesquisou por ${1}',
     ai_chat_tools_listed_pages: 'Navegou pelos docs',
     ai_chat_tools_read_page: 'Leu a página ${1}',
+    ai_chat_tools_mcp_tool: 'Chamou ${1}',
 };

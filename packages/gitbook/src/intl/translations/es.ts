@@ -92,4 +92,5 @@ export const es: TranslationLanguage = {
     searched_for: 'Buscado ${1}',
     ai_chat_tools_listed_pages: 'Exploró los docs',
     ai_chat_tools_read_page: 'Leyó la página ${1}',
+    ai_chat_tools_mcp_tool: 'Llamó a ${1}',
 };

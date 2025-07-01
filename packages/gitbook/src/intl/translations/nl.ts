@@ -90,4 +90,5 @@ export const nl: TranslationLanguage = {
     searched_for: 'Gezocht naar ${1}',
     ai_chat_tools_listed_pages: 'Docs doorzocht',
     ai_chat_tools_read_page: 'Pagina ${1} gelezen',
+    ai_chat_tools_mcp_tool: '${1} aangeroepen',
 };
