@@ -144,7 +144,7 @@ export async function waitForCookiesDialog(page: Page) {
     await expect(dialog).toBeVisible();
 }
 
-export async function waitForNotFound(_page: Page, response: Response | null) {
+export function waitForNotFound(_page: Page, response: Response | null) {
     expect(response).not.toBeNull();
     expect(response?.status()).toBe(404);
 }

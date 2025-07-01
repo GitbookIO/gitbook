@@ -12,7 +12,7 @@ import { Link, type LinkInsightsProps } from '../primitives';
 /**
  * Show cards to go to previous/next pages at the bottom.
  */
-export async function PageFooterNavigation(props: {
+export function PageFooterNavigation(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
 }) {

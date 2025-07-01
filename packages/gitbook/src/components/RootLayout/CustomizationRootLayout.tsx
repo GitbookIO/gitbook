@@ -39,7 +39,7 @@ import { AnnouncementDismissedScript } from '../Announcement';
  * Layout shared between the content and the PDF renderer.
  * It takes care of setting the theme and the language.
  */
-export async function CustomizationRootLayout(props: {
+export function CustomizationRootLayout(props: {
     forcedTheme?: CustomizationThemeMode | null;
     customization: SiteCustomizationSettings;
     children: React.ReactNode;

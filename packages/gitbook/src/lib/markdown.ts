@@ -8,7 +8,7 @@ import { unified } from 'unified';
 /**
  * Parse markdown and output HTML.
  */
-export async function parseMarkdown(markdown: string): Promise<string> {
+export function parseMarkdown(markdown: string): Promise<string> {
     const promise = unified()
         .use(remarkParse)
         .use(remarkGfm)

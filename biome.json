@@ -82,7 +82,8 @@
                 "noControlCharactersInRegex": "warn",
                 "noPrototypeBuiltins": "warn",
                 "noAssignInExpressions": "warn",
-                "noArrayIndexKey": "warn"
+                "noArrayIndexKey": "warn",
+                "useAwait": "error"
             },
             "a11y": {
                 "useSemanticElements": "warn",
@@ -152,6 +153,13 @@
             "include": ["*.test.ts", "packages/gitbook/tests/**/*"],
             "javascript": {
                 "globals": ["Bun"]
+            },
+            "linter": {
+                "rules": {
+                    "suspicious": {
+                        "useAwait": "off"
+                    }
+                }
             }
         },
         {
@@ -169,6 +177,16 @@
                     "Fetcher",
                     "ExportedHandler"
                 ]
+            }
+        },
+        {
+            "include": ["packages/gitbook/openNext/**/*"],
+            "linter": {
+                "rules": {
+                    "suspicious": {
+                        "useAwait": "off"
+                    }
+                }
             }
         }
     ]

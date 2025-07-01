@@ -4,7 +4,7 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { Link, type LinkInsightsProps } from './Link';
 
-export async function Card(
+export function Card(
     props: {
         href: string;
         leadingIcon?: React.ReactNode;

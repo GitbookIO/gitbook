@@ -7,7 +7,7 @@ import { parseOpenAPIV3 } from './v3';
 /**
  * Convert a Swagger 2.0 schema to an OpenAPI 3.0 schema.
  */
-export async function convertOpenAPIV2ToOpenAPIV3(
+export function convertOpenAPIV2ToOpenAPIV3(
     input: ParseOpenAPIInput
 ): Promise<Filesystem<OpenAPIV3xDocument>> {
     const { value, rootURL } = input;

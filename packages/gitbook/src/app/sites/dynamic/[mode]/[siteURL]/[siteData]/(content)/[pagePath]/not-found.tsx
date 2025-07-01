@@ -1,5 +1,5 @@
 import { SitePageNotFound } from '@/components/SitePage';
 
-export default async function NotFound() {
+export default function NotFound() {
     return <SitePageNotFound />;
 }
