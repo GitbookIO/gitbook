@@ -112,8 +112,7 @@ async function getPlaceholderAd(): Promise<{ ad: AdItem; ip: string }> {
             ad_via_link: '',
             bannerid: '',
             creativeid: '',
-            description:
-                'Your docs could be this good.\nPublish incredible open source docs for free with GitBook',
+            description: 'Published for free with GitBook’s Community Plan',
             evenodd: '0',
             external_id: '',
             height: '0',
