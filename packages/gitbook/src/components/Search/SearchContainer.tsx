@@ -1,6 +1,5 @@
 'use client';
 
-import { tcls } from '@/lib/tailwind';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -138,12 +137,11 @@ export function SearchContainer(props: SearchContainerProps) {
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
-                    className: tcls(
+                    className:
                         'bg-tint-base has-[.empty]:hidden scroll-py-6 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
-                        className
-                    ),
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
+                    hideWhenDetached: true,
                 }}
                 triggerProps={{
                     asChild: true,
@@ -157,7 +155,6 @@ export function SearchContainer(props: SearchContainerProps) {
                         onKeyDown={onKeyDown}
                         withAsk={withAsk}
                         isOpen={open}
-                        className={className}
                     />
                 </div>
             </Popover>

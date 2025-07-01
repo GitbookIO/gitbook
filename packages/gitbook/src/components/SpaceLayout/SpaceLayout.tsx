@@ -11,6 +11,7 @@ import { tcls } from '@/lib/tailwind';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
 import { AIChat } from '../AIChat';
+import { AIChatButton } from '../AIChat/AIChatButton';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -50,6 +51,22 @@ export function SpaceLayout(props: {
 
     const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
 
+    const searchAndAI = (
+        <div className="flex grow items-center gap-2">
+            <React.Suspense fallback={null}>
+                <SearchContainer
+                    withAsk={customization.aiSearch.enabled}
+                    withAIChat={withAIChat ?? false}
+                    isMultiVariants={siteSpaces.length > 1}
+                    spaceTitle={siteSpace.title}
+                />
+            </React.Suspense>
+            {withAIChat ? (
+                <AIChatButton className="theme-gradient:bg-tint-base theme-muted:bg-tint-base" />
+            ) : null}
+        </div>
+    );
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <CurrentContentProvider
@@ -69,11 +86,7 @@ export function SpaceLayout(props: {
                     visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
-                    <Header
-                        withTopHeader={withTopHeader}
-                        withAIChat={withAIChat}
-                        context={context}
-                    />
+                    <Header withTopHeader={withTopHeader} context={context} search={searchAndAI} />
                     {withAIChat ? <AIChat /> : null}
                     <div className="scroll-nojump">
                         <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
@@ -98,7 +111,7 @@ export function SpaceLayout(props: {
                                                 className={tcls(
                                                     'hidden',
                                                     'pr-4',
-                                                    'lg:flex',
+                                                    'md:flex',
                                                     'grow-0',
                                                     'flex-wrap',
                                                     'dark:shadow-light/1',
@@ -112,17 +125,7 @@ export function SpaceLayout(props: {
                                     innerHeader={
                                         // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                                         <>
-                                            {!withTopHeader && (
-                                                <React.Suspense fallback={null}>
-                                                    <SearchContainer
-                                                        withAsk={customization.aiSearch.enabled}
-                                                        withAIChat={withAIChat ?? false}
-                                                        isMultiVariants={siteSpaces.length > 1}
-                                                        spaceTitle={siteSpace.title}
-                                                        className="max-lg:hidden"
-                                                    />
-                                                </React.Suspense>
-                                            )}
+                                            {!withTopHeader && searchAndAI}
                                             {!withTopHeader && withSections && sections && (
                                                 <SiteSectionList
                                                     className={tcls('hidden', 'lg:block')}
