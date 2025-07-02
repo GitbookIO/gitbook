@@ -98,10 +98,21 @@ export async function wrapCacheDataFetcherError<T>(
     fn: () => Promise<T>
 ): Promise<DataFetcherResponse<T>> {
     const result = await wrapDataFetcherError(fn);
-    if (result.error && result.error.code >= 500) {
-        // We don't want to cache errors for too long.
-        // as the API might
-        cacheLife('minutes');
+    if (result.error) {
+        // We only want to cache 404 errors for "long", because that's an expected error.
+        if (result.error.code === 404) {
+            cacheLife({
+                stale: 60,
+                revalidate: 60 * 60, // 1 hour
+                expire: 60 * 60 * 24, // 1 day
+            });
+        } else {
+            cacheLife({
+                stale: 60, // This one is only for the client
+                revalidate: 30, // we don't want to cache it for too long, but at least 30 seconds to avoid hammering the API
+                expire: 90, // we want to revalidate this error after 90 seconds for sure
+            });
+        }
     }
     return result;
 }
