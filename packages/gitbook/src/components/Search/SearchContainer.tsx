@@ -25,7 +25,7 @@ interface SearchContainerProps {
  * Client component to render the search modal when the url contains a search query.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { spaceTitle, withAsk, withAIChat, className } = props;
+    const { spaceTitle, isMultiVariants, withAsk, withAIChat, className } = props;
 
     const [state, setSearchState] = useSearch();
     const [open, setOpen] = useState(false);
@@ -120,7 +120,7 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     <React.Suspense fallback={null}>
-                        <SearchScopeToggle spaceTitle={spaceTitle} />
+                        {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
                         {state !== null && !state.ask ? (
                             <SearchResults
                                 ref={resultsRef}
