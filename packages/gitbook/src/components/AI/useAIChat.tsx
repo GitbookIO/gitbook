@@ -137,7 +137,13 @@ export function useAIChatController(): AIChatController {
 
                     switch (event.type) {
                         case 'response_finish': {
-                            setState((state) => ({ ...state, responseId: event.responseId }));
+                            setState((state) => ({
+                                ...state,
+                                responseId: event.responseId,
+                                // Mark as not loading when the response is finished
+                                // Even if the stream might continue as we receive 'response_followup_suggestion'
+                                loading: false,
+                            }));
                             break;
                         }
                         case 'response_followup_suggestion': {
