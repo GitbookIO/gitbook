@@ -99,18 +99,19 @@ export async function wrapCacheDataFetcherError<T>(
 ): Promise<DataFetcherResponse<T>> {
     const result = await wrapDataFetcherError(fn);
     if (result.error) {
-        // We only want to cache 404 errors for "long", because that's an expected error.
+        const cacheValue = result.error.cache;
+        // We only want to cache 404 errors for "long", because that's an "expected" error.
         if (result.error.code === 404) {
             cacheLife({
                 stale: 60,
-                revalidate: 60 * 60, // 1 hour
-                expire: 60 * 60 * 24, // 1 day
+                revalidate: cacheValue?.maxAge ?? 60 * 60, // 1 hour
+                expire: cacheValue?.staleWhileRevalidate ?? 60 * 60 * 24, // 1 day
             });
         } else {
             cacheLife({
                 stale: 60, // This one is only for the client
-                revalidate: 30, // we don't want to cache it for too long, but at least 30 seconds to avoid hammering the API
-                expire: 90, // we want to revalidate this error after 90 seconds for sure
+                revalidate: cacheValue?.maxAge ?? 30, // we don't want to cache it for too long, but at least 30 seconds to avoid hammering the API
+                expire: cacheValue?.staleWhileRevalidate ?? 90, // we want to revalidate this error after 90 seconds for sure
             });
         }
     }
@@ -146,6 +147,39 @@ export function ignoreDataFetcherErrors<T>(
 }
 
 /**
+ * Extract cache control information from a GitBookAPIError.
+ * If the error does not have a response or no cache-control, it returns undefined.
+ */
+export function extractCacheControl(error: GitBookAPIError) {
+    try {
+        if (!error.response) {
+            return undefined;
+        }
+
+        const cacheControl = error.response.headers.get('cache-control');
+        if (!cacheControl) {
+            return undefined;
+        }
+
+        const maxAgeMatch = cacheControl.match(/max-age=(\d+)/i);
+        const staleWhileRevalidateMatch = cacheControl.match(/stale-while-revalidate=(\d+)/i);
+
+        const maxAge = maxAgeMatch ? Number.parseInt(maxAgeMatch[1], 10) : undefined;
+        const staleWhileRevalidate = staleWhileRevalidateMatch
+            ? Number.parseInt(staleWhileRevalidateMatch[1], 10)
+            : undefined;
+
+        return {
+            // If maxAge is 0, we want to apply the default, not 0
+            maxAge: maxAge === 0 ? undefined : maxAge,
+            staleWhileRevalidate,
+        };
+    } catch {
+        return undefined;
+    }
+}
+
+/**
  * Get a data fetcher exposable error from a JS error.
  */
 export function getExposableError(error: Error): DataFetcherErrorData {
@@ -153,10 +187,12 @@ export function getExposableError(error: Error): DataFetcherErrorData {
         if (error.code >= 500) {
             throw error;
         }
+        const cache = extractCacheControl(error);
 
         return {
             code: error.code,
             message: error.errorMessage,
+            cache,
         };
     }
 
