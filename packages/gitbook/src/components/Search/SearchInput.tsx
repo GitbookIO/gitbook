@@ -29,6 +29,10 @@ export function SearchInput(props: SearchButtonProps) {
     useEffect(() => {
         if (isOpen) {
             inputRef.current?.focus();
+            if (value) {
+                // Place cursor at the end of the input
+                inputRef.current?.setSelectionRange(value.length, value.length);
+            }
         } else {
             inputRef.current?.blur();
         }

@@ -52,7 +52,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     <Icon icon="sparkles" className="size-4" />
                 )
             }
-            className={recommended && active ? 'pr-1.5' : ''}
+            className={recommended ? 'pr-1.5' : ''}
         >
             {recommended ? (
                 question

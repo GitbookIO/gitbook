@@ -35,7 +35,9 @@ export function SearchContainer(props: SearchContainerProps) {
     const resultsRef = useRef<SearchResultsRef>(null);
 
     const onClose = async (to?: string) => {
-        await setSearchState(null);
+        if (state?.query === '') {
+            await setSearchState(null);
+        }
         setOpen(false);
 
         if (to) {
@@ -62,11 +64,11 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onOpen = () => {
         if (withAsk || state?.query !== '') {
-            setSearchState({
-                ask: false,
-                global: false,
-                query: state?.query ?? '',
-            });
+            setSearchState((prev) => ({
+                ask: prev?.ask ?? false,
+                global: prev?.global ?? false,
+                query: prev?.query ?? '',
+            }));
             setOpen(true);
 
             trackEvent({
@@ -136,7 +138,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base has-[.empty]:hidden scroll-py-6 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        'bg-tint-base has-[.empty]:hidden scroll-py-2 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
                     hideWhenDetached: true,

@@ -382,12 +382,13 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
             {active ? (
                 <Button
                     label={action}
+                    iconOnly
                     variant="primary"
-                    size="medium"
+                    className="p-2"
                     icon="arrow-turn-down-left"
                 />
             ) : (
-                <div className="flex h-8 items-center text-tint-subtle">
+                <div className="flex size-8 shrink-0 items-center justify-center text-tint-subtle">
                     <Icon icon="chevron-right" className="size-3" />
                 </div>
             )}

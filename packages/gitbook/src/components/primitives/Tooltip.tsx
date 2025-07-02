@@ -7,6 +7,7 @@ export function Tooltip(props: {
     providerProps?: RadixTooltip.TooltipProviderProps;
     triggerProps?: RadixTooltip.TooltipTriggerProps;
     contentProps?: RadixTooltip.TooltipContentProps;
+    rootProps?: RadixTooltip.TooltipProps;
     arrow?: boolean;
     className?: string;
 }) {
@@ -16,13 +17,14 @@ export function Tooltip(props: {
         providerProps,
         triggerProps,
         contentProps,
+        rootProps,
         arrow = false,
         className,
     } = props;
 
     return (
         <RadixTooltip.Provider delayDuration={300} {...providerProps}>
-            <RadixTooltip.Root>
+            <RadixTooltip.Root {...rootProps}>
                 <RadixTooltip.Trigger asChild {...triggerProps}>
                     {children}
                 </RadixTooltip.Trigger>
