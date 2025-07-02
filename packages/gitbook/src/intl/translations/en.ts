@@ -61,8 +61,6 @@ export const en = {
     more: 'More',
     link_tooltip_external_link: 'External link to',
     link_tooltip_page_anchor: 'Jump to section',
-    link_tooltip_ai_summary: 'Page highlight',
-    link_tooltip_ai_summary_description: 'Based on your context. May contain mistakes.',
     open_in_new_tab: 'Open in new tab',
     ai_chat_assistant_name: 'Docs Assistant',
     ai_chat_assistant_description: "I'm here to help you with the docs.",
