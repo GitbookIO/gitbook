@@ -7,7 +7,7 @@ import { getServerActionBaseContext } from '@/lib/server-actions';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
-import adRainbow from './assets/ad-rainbow.svg';
+import adGitbookSponsored from './assets/ad-gitbook-sponsored.svg';
 import type { AdItem, AdsResponse } from './types';
 
 type FetchAdOptions = FetchLiveAdOptions | FetchPlaceholderAdOptions;
@@ -122,7 +122,7 @@ async function getPlaceholderAd(): Promise<{ ad: AdItem; ip: string }> {
             longlink: '',
             num_slots: '1',
             rendering: 'carbon',
-            smallImage: adRainbow.src,
+            smallImage: adGitbookSponsored.src,
             statimp: '',
             statlink:
                 'https://www.gitbook.com/solutions/open-source?utm_campaign=sponsored-content&utm_medium=ad&utm_source=content',
