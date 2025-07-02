@@ -94,8 +94,8 @@ export function AIChatInput(props: {
                     arrow
                 >
                     <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2 py-1 text-tint/7 text-xs transition-all hover:bg-tint">
-                        <span className="-ml-1 rounded-corners:rounded bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
-                            {t(language, 'ai_chat_context_badge')}
+                        <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
+                            AI
                         </span>{' '}
                         <span>{t(language, 'ai_chat_context_title')}</span>
                     </div>
