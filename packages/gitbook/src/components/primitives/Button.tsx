@@ -1,6 +1,7 @@
 'use client';
 
 import type { ButtonHTMLAttributes, HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
+import { forwardRef } from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -80,46 +81,74 @@ const activeClasses = {
     header: 'bg-header-link/3',
 };
 
-export function Button({
-    href,
-    variant = 'primary',
-    size = 'default',
-    className,
-    insights,
-    target,
-    label,
-    icon,
-    iconOnly = false,
-    children,
-    active,
-    trailing,
-    ...rest
-}: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }) {
-    const sizes = {
-        default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
-        medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
-        small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
-    };
+export const Button = forwardRef<
+    HTMLButtonElement | HTMLAnchorElement,
+    ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }
+>(
+    (
+        {
+            href,
+            variant = 'primary',
+            size = 'default',
+            className,
+            insights,
+            target,
+            label,
+            icon,
+            iconOnly = false,
+            children,
+            active,
+            trailing,
+            ...rest
+        },
+        ref
+    ) => {
+        const sizes = {
+            default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
+            medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
+            small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
+        };
 
-    const sizeClasses = sizes[size] || sizes.default;
+        const sizeClasses = sizes[size] || sizes.default;
 
-    const domClassName = tcls(
-        variantClasses[variant],
-        sizeClasses,
-        active && activeClasses[variant],
-        className
-    );
-    const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
+        const domClassName = tcls(
+            variantClasses[variant],
+            sizeClasses,
+            active && activeClasses[variant],
+            className
+        );
+        const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
-    if (href) {
-        return (
-            <Link
-                href={href}
-                className={domClassName}
-                classNames={['ButtonStyles']}
-                insights={insights}
+        if (href) {
+            return (
+                <Link
+                    ref={ref as React.Ref<HTMLAnchorElement>}
+                    href={href}
+                    className={domClassName}
+                    classNames={['ButtonStyles']}
+                    insights={insights}
+                    aria-label={label}
+                    target={target}
+                    {...rest}
+                >
+                    {icon ? (
+                        typeof icon === 'string' ? (
+                            <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                        ) : (
+                            icon
+                        )
+                    ) : null}
+                    {iconOnly ? null : label}
+                </Link>
+            );
+        }
+
+        const button = (
+            <button
+                ref={ref as React.Ref<HTMLButtonElement>}
+                type="button"
+                className={tcls(buttonOnlyClassNames, domClassName)}
                 aria-label={label}
-                target={target}
                 {...rest}
             >
                 {icon ? (
@@ -129,29 +158,11 @@ export function Button({
                         icon
                     )
                 ) : null}
-                {iconOnly ? null : label}
-            </Link>
+                {iconOnly ? null : (children ?? label)}
+                {trailing}
+            </button>
         );
+
+        return iconOnly ? <Tooltip label={label}>{button}</Tooltip> : button;
     }
-
-    const button = (
-        <button
-            type="button"
-            className={tcls(buttonOnlyClassNames, domClassName)}
-            aria-label={label}
-            {...rest}
-        >
-            {icon ? (
-                typeof icon === 'string' ? (
-                    <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
-                ) : (
-                    icon
-                )
-            ) : null}
-            {iconOnly ? null : (children ?? label)}
-            {trailing}
-        </button>
-    );
-
-    return iconOnly ? <Tooltip label={label}>{button}</Tooltip> : button;
-}
+);

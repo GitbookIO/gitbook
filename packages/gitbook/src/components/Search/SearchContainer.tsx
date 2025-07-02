@@ -34,6 +34,7 @@ export function SearchContainer(props: SearchContainerProps) {
     const router = useRouter();
     const trackEvent = useTrackEvent();
     const resultsRef = useRef<SearchResultsRef>(null);
+    const searchInputRef = useRef<HTMLButtonElement>(null);
 
     const onClose = async (to?: string) => {
         if (state?.query === '') {
@@ -64,18 +65,21 @@ export function SearchContainer(props: SearchContainerProps) {
     );
 
     const onOpen = () => {
-        if (withAsk || state?.query !== '') {
-            setSearchState((prev) => ({
-                ask: prev?.ask ?? false,
-                global: prev?.global ?? false,
-                query: prev?.query ?? '',
-            }));
-            setOpen(true);
-
-            trackEvent({
-                type: 'search_open',
-            });
+        // Don't re-open if already open to prevent flickering
+        if (open) {
+            return;
         }
+
+        setSearchState((prev) => ({
+            ask: prev?.ask ?? false,
+            global: prev?.global ?? false,
+            query: prev?.query ?? '',
+        }));
+        setOpen(true);
+
+        trackEvent({
+            type: 'search_open',
+        });
     };
 
     React.useEffect(() => {
@@ -134,14 +138,20 @@ export function SearchContainer(props: SearchContainerProps) {
                     </React.Suspense>
                 }
                 rootProps={{
-                    open: open && !!(state?.query || withAsk),
+                    open: open,
                 }}
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
                         'bg-tint-base has-[.empty]:hidden scroll-py-2 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
-                    onInteractOutside: () => onClose(),
+                    onInteractOutside: (event) => {
+                        // Don't close if clicking on the search input itself
+                        if (searchInputRef.current?.contains(event.target as Node)) {
+                            return;
+                        }
+                        onClose();
+                    },
                     sideOffset: 8,
                     collisionPadding: {
                         top: 16,
@@ -155,17 +165,16 @@ export function SearchContainer(props: SearchContainerProps) {
                     asChild: true,
                 }}
             >
-                <div className="flex grow">
-                    <SearchInput
-                        value={state?.query}
-                        onFocus={onOpen}
-                        onChange={onChange}
-                        onKeyDown={onKeyDown}
-                        withAsk={withAsk}
-                        isOpen={open}
-                        className={className}
-                    />
-                </div>
+                <SearchInput
+                    ref={searchInputRef}
+                    value={state?.query}
+                    onFocus={onOpen}
+                    onChange={onChange}
+                    onKeyDown={onKeyDown}
+                    withAsk={withAsk}
+                    isOpen={open}
+                    className={className}
+                />
             </Popover>
         </SearchAskProvider>
     );
