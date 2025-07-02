@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import { Button } from '../primitives';
+import { Button, variantClasses } from '../primitives';
+import { useClassnames } from '../primitives/StyleProvider';
 
 interface SearchButtonProps {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -20,41 +21,53 @@ interface SearchButtonProps {
 /**
  * Input to trigger search.
  */
-export const SearchInput = React.forwardRef(function SearchInput(
-    props: SearchButtonProps,
-    ref: React.Ref<HTMLButtonElement>
-) {
-    const { onChange, onKeyDown, onFocus, value, withAsk = false, isOpen, className } = props;
-    const inputRef = useRef<HTMLInputElement>(null);
+export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
+    function SearchInput(props, ref) {
+        const { onChange, onKeyDown, onFocus, value, withAsk = false, isOpen, className } = props;
+        const inputRef = useRef<HTMLInputElement>(null);
 
-    const language = useLanguage();
+        const language = useLanguage();
+        const buttonStyles = useClassnames(['ButtonStyles']);
 
-    useEffect(() => {
-        if (isOpen) {
-            inputRef.current?.focus();
-            if (value) {
-                // Place cursor at the end of the input
-                inputRef.current?.setSelectionRange(value.length, value.length);
+        // Size classes for medium size button
+        const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'];
+
+        useEffect(() => {
+            if (isOpen) {
+                inputRef.current?.focus();
+                if (value) {
+                    // Place cursor at the end of the input
+                    inputRef.current?.setSelectionRange(value.length, value.length);
+                }
+            } else {
+                inputRef.current?.blur();
             }
-        } else {
-            inputRef.current?.blur();
-        }
-    }, [isOpen]);
+        }, [isOpen]);
 
-    return (
-        <div className="relative flex size-9 grow">
-            <Button
-                ref={ref}
-                onClick={onFocus}
-                className={tcls(
-                    'has-[input:focus]:-translate-y-px h-9 grow px-3 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
-                    'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
-                    'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
-                    'relative z-30 max-md:absolute max-md:right-0',
-                    className
-                )}
-                icon={
-                    value ? (
+        return (
+            <div className="relative flex size-9 grow">
+                <div
+                    ref={ref}
+                    onClick={onFocus}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            onFocus();
+                        }
+                    }}
+                    className={tcls(
+                        // Apply button styles
+                        buttonStyles,
+                        variantClasses.header,
+                        sizeClasses,
+                        // Additional custom styles
+                        'has-[input:focus]:-translate-y-px h-9 grow cursor-pointer px-2.5 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
+                        'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
+                        'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
+                        'relative z-30 max-md:absolute max-md:right-0',
+                        className
+                    )}
+                >
+                    {value ? (
                         <Button
                             variant="blank"
                             label="Clear"
@@ -71,33 +84,30 @@ export const SearchInput = React.forwardRef(function SearchInput(
                         />
                     ) : (
                         <Icon icon="magnifying-glass" className="size-4 animate-scaleIn" />
-                    )
-                }
-                size="medium"
-                variant="header"
-                tabIndex={-1}
-            >
-                <input
-                    type="text"
-                    onFocus={onFocus}
-                    onKeyDown={onKeyDown}
-                    onChange={onChange}
-                    value={value ?? ''}
-                    size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and limits the min-width, so we set it to a sensible minimum and control width ourselves.
-                    placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
-                    className={tcls(
-                        'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                        value !== undefined
-                            ? 'w-40 md:w-32'
-                            : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
                     )}
-                    ref={inputRef}
-                />
-                <Shortcut />
-            </Button>
-        </div>
-    );
-});
+
+                    <input
+                        type="text"
+                        onFocus={onFocus}
+                        onKeyDown={onKeyDown}
+                        onChange={onChange}
+                        value={value ?? ''}
+                        size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and limits the min-width, so we set it to a sensible minimum and control width ourselves.
+                        placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
+                        className={tcls(
+                            'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
+                            value !== undefined
+                                ? 'w-40 md:w-32'
+                                : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
+                        )}
+                        ref={inputRef}
+                    />
+                    <Shortcut />
+                </div>
+            </div>
+        );
+    }
+);
 
 function Shortcut() {
     const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
