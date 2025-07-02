@@ -108,37 +108,11 @@ function InlineLinkTooltipWrapper(props: {
         resolved.subText = undefined;
     }
 
-    const aiSummary: { pageId: string; spaceId: string } | undefined = (() => {
-        if (isExternal) {
-            return;
-        }
-
-        if (isSamePage) {
-            return;
-        }
-
-        if (!('customization' in context) || !context.customization.ai?.pageLinkSummaries.enabled) {
-            return;
-        }
-
-        if (!('page' in context) || !('page' in inline.data.ref)) {
-            return;
-        }
-
-        if (inline.data.ref.kind === 'page' || inline.data.ref.kind === 'anchor') {
-            return {
-                pageId: resolved.page?.id ?? inline.data.ref.page ?? context.page.id,
-                spaceId: inline.data.ref.space ?? context.space.id,
-            };
-        }
-    })();
-
     return (
         <InlineLinkTooltip
             breadcrumbs={breadcrumbs}
             isExternal={isExternal}
             isSamePage={isSamePage}
-            aiSummary={aiSummary}
             openInNewTabLabel={tString(language, 'open_in_new_tab')}
             target={{
                 href: resolved.href,

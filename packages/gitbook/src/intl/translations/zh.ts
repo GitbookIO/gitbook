@@ -62,8 +62,6 @@ export const zh: TranslationLanguage = {
     more: '更多',
     link_tooltip_external_link: '外部链接到',
     link_tooltip_page_anchor: '跳转到页面',
-    link_tooltip_ai_summary: '页面要点',
-    link_tooltip_ai_summary_description: '基于您的上下文。可能包含错误。',
     open_in_new_tab: '在新标签页中打开',
     ai_chat_assistant_name: '文档助手',
     ai_chat_assistant_description: '我在这里帮助您了解文档。',
@@ -88,4 +86,5 @@ export const zh: TranslationLanguage = {
     searched_for: '搜索了 ${1}',
     ai_chat_tools_listed_pages: '浏览了文档',
     ai_chat_tools_read_page: '已读取页面 ${1}',
+    ai_chat_tools_mcp_tool: '调用了 ${1}',
 };

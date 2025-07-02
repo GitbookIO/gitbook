@@ -64,8 +64,6 @@ export const pt_br = {
     more: 'Mais',
     link_tooltip_external_link: 'Link externo para',
     link_tooltip_page_anchor: 'Pular para a seção',
-    link_tooltip_ai_summary: 'Resumo da página',
-    link_tooltip_ai_summary_description: 'Baseado no seu contexto. Pode conter erros.',
     open_in_new_tab: 'Abrir em uma nova guia',
     ai_chat_assistant_name: 'Assistente de Docs',
     ai_chat_assistant_description: 'Estou aqui para ajudá-lo com a documentação.',
@@ -91,4 +89,5 @@ export const pt_br = {
     searched_for: 'Pesquisou por ${1}',
     ai_chat_tools_listed_pages: 'Navegou pelos docs',
     ai_chat_tools_read_page: 'Leu a página ${1}',
+    ai_chat_tools_mcp_tool: 'Chamou ${1}',
 };

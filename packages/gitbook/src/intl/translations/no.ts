@@ -64,8 +64,6 @@ export const no: TranslationLanguage = {
     more: 'Mer',
     link_tooltip_external_link: 'Ekstern lenke til',
     link_tooltip_page_anchor: 'Hopp til seksjon',
-    link_tooltip_ai_summary: 'Sidesammendrag',
-    link_tooltip_ai_summary_description: 'Basert på din kontekst. Kan inneholde feil.',
     open_in_new_tab: 'Åpne i ny fane',
     ai_chat_assistant_name: 'Docs-assistent',
     ai_chat_assistant_description: 'Jeg er her for å hjelpe deg med docs.',
@@ -91,4 +89,5 @@ export const no: TranslationLanguage = {
     searched_for: 'Søkte etter ${1}',
     ai_chat_tools_listed_pages: 'Bladde gjennom docs',
     ai_chat_tools_read_page: 'Leste side ${1}',
+    ai_chat_tools_mcp_tool: 'Kallte ${1}',
 };

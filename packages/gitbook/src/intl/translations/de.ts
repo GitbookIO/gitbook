@@ -64,8 +64,6 @@ export const de = {
     more: 'Mehr',
     link_tooltip_external_link: 'Externe Verlinkung zu',
     link_tooltip_page_anchor: 'Zum Abschnitt springen',
-    link_tooltip_ai_summary: 'Seitenhighlight',
-    link_tooltip_ai_summary_description: 'Basierend auf Ihrem Kontext. Kann Fehler enthalten.',
     open_in_new_tab: 'In neuem Tab öffnen',
     ai_chat_assistant_name: 'Docs-Assistent',
     ai_chat_assistant_description: 'Ich helfe Ihnen bei der Dokumentation.',
@@ -91,4 +89,5 @@ export const de = {
     searched_for: 'Gesucht nach ${1}',
     ai_chat_tools_listed_pages: 'Docs durchsucht',
     ai_chat_tools_read_page: 'Seite ${1} gelesen',
+    ai_chat_tools_mcp_tool: 'Aufgerufen ${1}',
 };

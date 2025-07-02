@@ -53,27 +53,12 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
 
     // We don't test path that are too long as GitBook doesn't support them and will return a 404 anyway.
     if (rawPathname.length <= 512) {
-        // If page can't be found, we try with the API, in case we have a redirect at space level.
-        // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
-        // The page rendering will take care of redirecting to a normalized pathname.
-        const resolved = await getDataOrNull(
-            context.dataFetcher.getRevisionPageByPath({
-                spaceId: space.id,
-                revisionId: revisionId,
-                path: rawPathname,
-            })
-        );
-        if (resolved) {
-            return resolvePageId(revision.pages, resolved.id);
-        }
-
-        // If a page still can't be found, we try with the API, in case we have a redirect at site level.
+        // Duplicated the regex pattern from SiteRedirectSourcePath API type.
+        const SITE_REDIRECT_SOURCE_PATH_REGEX =
+            /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/;
         const redirectPathname = withLeadingSlash(rawPathname);
-        if (
-            /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/.test(
-                redirectPathname
-            )
-        ) {
+        // If a page can't be found, we try with the API, in case we have a redirect at site level.
+        if (SITE_REDIRECT_SOURCE_PATH_REGEX.test(redirectPathname)) {
             const redirectSources = new Set<string>([
                 // Test the pathname relative to the root
                 // For example hello/world -> section/variant/hello/world
@@ -97,6 +82,20 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                     return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
                 }
             }
+        }
+
+        // If page still can't be found, we try with the API, in case we have a redirect at space level.
+        // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
+        // The page rendering will take care of redirecting to a normalized pathname.
+        const resolved = await getDataOrNull(
+            context.dataFetcher.getRevisionPageByPath({
+                spaceId: space.id,
+                revisionId: revisionId,
+                path: rawPathname,
+            })
+        );
+        if (resolved) {
+            return resolvePageId(revision.pages, resolved.id);
         }
     }
 

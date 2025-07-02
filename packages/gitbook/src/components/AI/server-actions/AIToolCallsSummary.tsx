@@ -8,6 +8,7 @@ import type {
     AIToolCall,
     AIToolCallGetPageContent,
     AIToolCallGetPages,
+    AIToolCallMCP,
     AIToolCallSearch,
     ContentRef,
 } from '@gitbook/api';
@@ -54,6 +55,8 @@ function getDescriptionForToolCall(toolCall: AIToolCall, context: GitBookSiteCon
             return <DescriptionForSearchToolCall toolCall={toolCall} context={context} />;
         case 'getPages':
             return <DescriptionForGetPagesToolCall toolCall={toolCall} context={context} />;
+        case 'mcp':
+            return <DescriptionForMCPToolCall toolCall={toolCall} context={context} />;
         default:
             return <>{toolCall.tool}</>;
     }
@@ -84,6 +87,25 @@ function DescriptionForPageContentToolCall(props: {
                     />
                     <OtherSpaceLink spaceId={toolCall.spaceId} context={context} />
                 </>
+            )}
+        </p>
+    );
+}
+
+function DescriptionForMCPToolCall(props: {
+    toolCall: AIToolCallMCP;
+    context: GitBookSiteContext;
+}) {
+    const { toolCall, context } = props;
+
+    const language = getSpaceLanguage(context.customization);
+
+    return (
+        <p>
+            {t(
+                language,
+                'ai_chat_tools_mcp_tool',
+                <strong>{toolCall.mcpToolTitle ?? toolCall.mcpToolName}</strong>
             )}
         </p>
     );

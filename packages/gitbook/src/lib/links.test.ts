@@ -114,4 +114,27 @@ describe('linkerWithOtherSpaceBasePath', () => {
             '/section/variant/some/path'
         );
     });
+
+    it('should return a new linker that resolves links relative to a new spaceBasePath in the current site', () => {
+        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(root, {
+            spaceBasePath: '/section/variant',
+        });
+        expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe(
+            '/section/variant/some/path'
+        );
+    });
+
+    it('should use a basepath relative to the site', () => {
+        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(siteGitBookIO, {
+            spaceBasePath: 'a/b',
+        });
+        expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');
+    });
+
+    it('should use a basepath relative to the site (with trailing slash)', () => {
+        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(siteGitBookIO, {
+            spaceBasePath: '/a/b',
+        });
+        expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');
+    });
 });
