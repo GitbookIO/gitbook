@@ -47,10 +47,10 @@ export const SearchInput = React.forwardRef(function SearchInput(
                 ref={ref}
                 onClick={onFocus}
                 className={tcls(
-                    'has-[input:focus]:-translate-y-px h-9 grow cursor-text px-3 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
+                    'has-[input:focus]:-translate-y-px h-9 grow px-3 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
                     'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
-                    'relative theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background',
-                    'z-30 max-md:absolute max-md:right-0',
+                    'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
+                    'relative z-30 max-md:absolute max-md:right-0',
                     className
                 )}
                 icon={
@@ -61,7 +61,7 @@ export const SearchInput = React.forwardRef(function SearchInput(
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-mx-1.5 animate-scaleIn px-1.5"
+                            className="-mx-1.5 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
                                 onChange({
                                     target: { value: '' },
@@ -86,8 +86,10 @@ export const SearchInput = React.forwardRef(function SearchInput(
                     size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and limits the min-width, so we set it to a sensible minimum and control width ourselves.
                     placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
                     className={tcls(
-                        'peer grow bg-transparent py-0.5 text-tint-strong outline-none transition-all duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                        value !== undefined ? 'w-32' : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
+                        'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
+                        value !== undefined
+                            ? 'w-40 md:w-32'
+                            : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
                     )}
                     ref={inputRef}
                 />
