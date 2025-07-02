@@ -63,8 +63,6 @@ export const de = {
     more: 'Mehr',
     link_tooltip_external_link: 'Externe Verlinkung zu',
     link_tooltip_page_anchor: 'Zum Abschnitt springen',
-    link_tooltip_ai_summary: 'Seitenhighlight',
-    link_tooltip_ai_summary_description: 'Basierend auf Ihrem Kontext. Kann Fehler enthalten.',
     open_in_new_tab: 'In neuem Tab öffnen',
     ai_chat_assistant_name: 'Docs-Assistent',
     ai_chat_assistant_description: 'Ich helfe Ihnen bei der Dokumentation.',

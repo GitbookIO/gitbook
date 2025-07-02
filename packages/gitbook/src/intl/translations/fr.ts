@@ -63,8 +63,6 @@ export const fr: TranslationLanguage = {
     more: 'Plus',
     link_tooltip_external_link: 'Lien externe à',
     link_tooltip_page_anchor: 'Sauter à la section',
-    link_tooltip_ai_summary: 'Résumé de la page',
-    link_tooltip_ai_summary_description: 'Basé sur votre contexte. Peut contenir des erreurs.',
     open_in_new_tab: 'Ouvrir dans un nouvel onglet',
     ai_chat_assistant_name: 'Assistant Docs',
     ai_chat_assistant_description: 'Je suis là pour vous aider avec la documentation.',
