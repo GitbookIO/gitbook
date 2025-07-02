@@ -19,6 +19,7 @@ type ButtonProps = {
     label?: string;
     trailing?: React.ReactNode;
     children?: React.ReactNode;
+    active?: boolean;
 } & LinkInsightsProps &
     HTMLAttributes<HTMLElement>;
 
@@ -37,7 +38,7 @@ export const variantClasses = {
         'ring-0',
         '!shadow-none',
         'hover:bg-primary-hover',
-        'hover:text-primary',
+        'hover:text-primary-strong',
         'hover:scale-1',
         'contrast-more:bg-tint-subtle',
         'depth-subtle:hover:translate-y-0',
@@ -72,6 +73,13 @@ export const variantClasses = {
     ],
 };
 
+const activeClasses = {
+    primary: 'bg-primary-solid-hover',
+    blank: 'bg-primary-active text-primary-strong font-medium hover:text-primary-strong hover:bg-primary-active',
+    secondary: 'bg-tint-active',
+    header: 'bg-header-link/3',
+};
+
 export function Button({
     href,
     variant = 'primary',
@@ -83,6 +91,7 @@ export function Button({
     icon,
     iconOnly = false,
     children,
+    active,
     trailing,
     ...rest
 }: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }) {
@@ -94,7 +103,12 @@ export function Button({
 
     const sizeClasses = sizes[size] || sizes.default;
 
-    const domClassName = tcls(variantClasses[variant], sizeClasses, className);
+    const domClassName = tcls(
+        variantClasses[variant],
+        sizeClasses,
+        active && activeClasses[variant],
+        className
+    );
     const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
     if (href) {

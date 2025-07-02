@@ -45,6 +45,7 @@ export function SearchInput(props: SearchButtonProps) {
                 className={tcls(
                     'has-[input:focus]:-translate-y-px h-9 grow px-3 hover:text-tint-strong has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
                     'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
+                    'relative theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background',
                     'z-30 max-md:absolute max-md:right-0',
                     className
                 )}
@@ -63,7 +64,7 @@ export function SearchInput(props: SearchButtonProps) {
                     placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
                     className={tcls(
                         'peer grow cursor-pointer bg-transparent py-0.5 outline-none transition-all duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                        value !== undefined ? 'w-40' : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
+                        value !== undefined ? 'w-32' : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
                     )}
                     ref={inputRef}
                 />
