@@ -63,8 +63,6 @@ export const nl: TranslationLanguage = {
     more: 'Meer',
     link_tooltip_external_link: 'Externe link naar',
     link_tooltip_page_anchor: 'Spring naar sectie',
-    link_tooltip_ai_summary: 'Pagina-samenvatting',
-    link_tooltip_ai_summary_description: 'Gebaseerd op je context. Kan fouten bevatten.',
     open_in_new_tab: 'Open in nieuw tabblad',
     ai_chat_assistant_name: 'Docs Assistent',
     ai_chat_assistant_description: 'Ik help je met de documentatie.',

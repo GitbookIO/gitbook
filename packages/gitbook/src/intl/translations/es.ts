@@ -65,8 +65,6 @@ export const es: TranslationLanguage = {
     more: 'Más',
     link_tooltip_external_link: 'Enlace externo a',
     link_tooltip_page_anchor: 'Saltar a la sección',
-    link_tooltip_ai_summary: 'Resumen de la página',
-    link_tooltip_ai_summary_description: 'Basado en tu contexto. Puede contener errores.',
     open_in_new_tab: 'Abrir en una nueva pestaña',
     ai_chat_assistant_name: 'Asistente de Docs',
     ai_chat_assistant_description: 'Estoy aquí para ayudarte con la documentación.',
