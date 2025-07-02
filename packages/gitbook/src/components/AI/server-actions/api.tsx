@@ -3,84 +3,13 @@ import type { GitBookBaseContext } from '@/lib/context';
 import { fetchServerActionSiteContext } from '@/lib/server-actions';
 import {
     type AIMessage,
-    type AIMessageInput,
     AIMessageRole,
     type AIMessageStep,
-    type AIModel,
     type AIStreamResponse,
 } from '@gitbook/api';
 import { EventIterator } from 'event-iterator';
-import type { MaybePromise } from 'p-map';
-import * as partialJson from 'partial-json';
-import type { DeepPartial } from 'ts-essentials';
-import type { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 import { AIMessageView } from './AIMessageView';
 import type { RenderAIMessageOptions } from './types';
-
-type StreamGenerateInput = {
-    organizationId: string;
-    siteId: string;
-    instructions?: string;
-    previousResponseId?: string;
-    input: AIMessageInput[];
-    model: AIModel;
-};
-
-/**
- * Get the latest value from a stream and the response id.
- */
-export async function generate<T>(
-    promise: MaybePromise<{
-        stream: EventIterator<T>;
-        response: Promise<{ responseId: string }>;
-    }>
-) {
-    const input = await promise;
-    let value: T | undefined;
-
-    for await (const event of input.stream) {
-        value = event;
-    }
-
-    const { responseId } = await input.response;
-    return {
-        responseId,
-        value,
-    };
-}
-
-/**
- * Stream the generation of an object using the AI.
- */
-export async function streamGenerateAIObject<T>(
-    context: GitBookBaseContext,
-    {
-        schema,
-        ...input
-    }: StreamGenerateInput & {
-        schema: z.ZodSchema<T>;
-    }
-) {
-    const api = await context.dataFetcher.api();
-    const rawStream = await api.orgs.streamAiResponseInSite(input.organizationId, input.siteId, {
-        input: input.input,
-        output: { type: 'object', schema: zodToJsonSchema(schema) },
-        model: input.model,
-        instructions: input.instructions,
-        previousResponseId: input.previousResponseId,
-    });
-
-    let json = '';
-    return parseResponse<DeepPartial<T>>(rawStream, (event) => {
-        if (event.type === 'response_object') {
-            json += event.jsonChunk;
-
-            const parsed = partialJson.parse(json, partialJson.ALL);
-            return parsed;
-        }
-    });
-}
 
 /**
  * Stream the generation of a document.
