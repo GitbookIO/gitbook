@@ -653,7 +653,7 @@ function mergeRequiredFields(
     );
 }
 
-function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
+export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     // Otherwise try to infer a nice title
     let type = 'any';
 
