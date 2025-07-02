@@ -50,7 +50,9 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
+    const withAIChat =
+        context.customization.aiSearch.enabled &&
+        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv');
 
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
