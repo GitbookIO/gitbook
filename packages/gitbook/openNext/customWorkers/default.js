@@ -22,7 +22,7 @@ export class R2WriteBuffer extends DurableObject {
 }
 
 export default {
-    async fetch(request, env, ctx) {
+    fetch(request, env, ctx) {
         return runWithCloudflareRequestContext(request, env, ctx, async () => {
             // We can't move the handler import to the top level, otherwise the runtime will not be properly initialized
             const { handler } = await import(

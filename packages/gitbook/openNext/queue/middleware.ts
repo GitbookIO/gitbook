@@ -5,8 +5,8 @@ import doQueue from '@opennextjs/cloudflare/overrides/queue/do-queue';
 
 export default {
     name: 'GitbookISRQueue',
-    send: async (msg) => {
-        return trace({ operation: 'gitbookISRQueueSend', name: msg.MessageBody.url }, async () => {
+    send: (msg) => {
+        return trace({ operation: 'gitbookISRQueueSend', name: msg.MessageBody.url }, () => {
             const { ctx } = getCloudflareContext();
             ctx.waitUntil(doQueue.send(msg));
         });

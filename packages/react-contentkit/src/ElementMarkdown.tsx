@@ -10,9 +10,9 @@ export function ElementMarkdown(props: ContentKitServerElementProps<ContentKitMa
 
     const initialMarkdown = resolveDynamicBinding(state, element.content);
 
-    async function renderMarkdown(markdown: string) {
+    function renderMarkdown(markdown: string) {
         'use server';
-        return <Markdown className="contentkit-markdown" markdown={markdown} />;
+        return Promise.resolve(<Markdown className="contentkit-markdown" markdown={markdown} />);
     }
 
     return (

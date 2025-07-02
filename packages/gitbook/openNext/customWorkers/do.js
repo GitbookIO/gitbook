@@ -26,7 +26,7 @@ export { DOQueueHandler } from '../../.open-next/.build/durable-objects/queue.js
 export { DOShardedTagCache } from '../../.open-next/.build/durable-objects/sharded-tag-cache.js';
 
 export default {
-    async fetch() {
+    fetch() {
         // This worker does not handle any requests, it only provides Durable Objects
         return new Response('This worker is not meant to handle requests directly', {
             status: 400,

@@ -6,7 +6,7 @@ import { CustomizationThemeMode } from '@gitbook/api';
 /**
  * Layout to be used for rendering the PDF.
  */
-export async function PDFRootLayout(props: {
+export function PDFRootLayout(props: {
     context: GitBookSpaceContext | GitBookSiteContext;
     children: React.ReactNode;
 }) {

@@ -97,7 +97,7 @@ export function useAIPage(
      * Generate a new page for a query.
      */
     const generate = React.useCallback(
-        async (query: string) => {
+        (query: string) => {
             generateFromStream(
                 streamGenerateAIPage({
                     query,

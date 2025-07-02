@@ -19,7 +19,7 @@ import {
 /**
  * Output the public environment variables for this deployment
  */
-export async function GET(_req: NextRequest) {
+export function GET(_req: NextRequest) {
     return NextResponse.json({
         GITBOOK_URL,
         GITBOOK_APP_URL,

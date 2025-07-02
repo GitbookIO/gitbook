@@ -20,7 +20,7 @@ const originalTagCache = doShardedTagCache({
 export default {
     name: 'GitbookTagCache',
     mode: 'nextMode',
-    getLastRevalidated: async (tags: string[]) => {
+    getLastRevalidated: (tags: string[]) => {
         const tagsToCheck = tags.filter(softTagFilter);
         if (tagsToCheck.length === 0) {
             // If we reach here, it probably means that there is an issue that we'll need to address.
@@ -40,7 +40,7 @@ export default {
             }
         );
     },
-    hasBeenRevalidated: async (tags: string[], lastModified?: number) => {
+    hasBeenRevalidated: (tags: string[], lastModified?: number) => {
         const tagsToCheck = tags.filter(softTagFilter);
         if (tagsToCheck.length === 0) {
             // If we reach here, it probably means that there is an issue that we'll need to address.
@@ -61,7 +61,7 @@ export default {
             }
         );
     },
-    writeTags: async (tags: string[]) => {
+    writeTags: (tags: string[]) => {
         return trace(
             {
                 operation: 'gitbookTagCacheWriteTags',

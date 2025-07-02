@@ -11,7 +11,7 @@ interface JsonBody {
  * Revalidate cached data based on tags.
  * The body should be a JSON with { tags: string[] }
  */
-export async function POST(req: NextRequest) {
+export function POST(req: NextRequest) {
     return withVerifySignature<JsonBody>(req, async (body) => {
         if (!body.tags || !Array.isArray(body.tags)) {
             return NextResponse.json(

@@ -5,7 +5,7 @@ import { getDataOrNull } from './errors';
 /**
  * Get the document for a page.
  */
-export async function getPageDocument(
+export function getPageDocument(
     context: GitBookSpaceContext | GitBookSiteContext,
     page: RevisionPageDocument
 ): Promise<JSONDocument | null> {

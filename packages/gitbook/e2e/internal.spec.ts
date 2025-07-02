@@ -425,7 +425,7 @@ const testCases: TestsCase[] = [
                 name: 'Text page',
                 url: 'text-page.md',
                 screenshot: false,
-                run: async (_page, response) => {
+                run: (_page, response) => {
                     expect(response?.status()).toBe(200);
                     expect(response?.headers()['content-type']).toContain('text/markdown');
                 },
@@ -441,7 +441,7 @@ const testCases: TestsCase[] = [
                 name: 'llms.txt',
                 url: 'llms.txt',
                 screenshot: false,
-                run: async (_page, response) => {
+                run: (_page, response) => {
                     expect(response?.status()).toBe(200);
                     expect(response?.headers()['content-type']).toContain('text/markdown');
                 },
@@ -457,7 +457,7 @@ const testCases: TestsCase[] = [
                 name: 'llms-full.txt',
                 url: 'llms-full.txt',
                 screenshot: false,
-                run: async (_page, response) => {
+                run: (_page, response) => {
                     expect(response?.status()).toBe(200);
                     expect(response?.headers()['content-type']).toContain('text/markdown');
                 },
@@ -473,7 +473,7 @@ const testCases: TestsCase[] = [
                 name: 'blocks.md',
                 url: 'blocks.md',
                 screenshot: false,
-                run: async (_page, response) => {
+                run: (_page, response) => {
                     expect(response?.status()).toBe(200);
                     expect(response?.headers()['content-type']).toContain('text/markdown');
                 },

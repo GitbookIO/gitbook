@@ -9,7 +9,7 @@ import type { InlineProps } from './Inline';
 
 const assetsUrl = getAssetURL('math');
 
-export async function BlockMath(props: BlockProps<DocumentBlockMath>) {
+export function BlockMath(props: BlockProps<DocumentBlockMath>) {
     const { block, style } = props;
 
     return (
@@ -22,7 +22,7 @@ export async function BlockMath(props: BlockProps<DocumentBlockMath>) {
     );
 }
 
-export async function InlineMath(props: InlineProps<DocumentInlineMath>) {
+export function InlineMath(props: InlineProps<DocumentInlineMath>) {
     const { inline } = props;
 
     return <MathFormula formula={inline.data.formula} inline={true} assetsUrl={assetsUrl} />;

@@ -54,7 +54,7 @@ const nextConfig = {
         ],
     },
 
-    async headers() {
+    headers() {
         return [
             {
                 source: '/~gitbook/static/:path*',

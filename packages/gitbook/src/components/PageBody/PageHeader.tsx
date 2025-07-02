@@ -9,7 +9,7 @@ import { tcls } from '@/lib/tailwind';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
-export async function PageHeader(props: {
+export function PageHeader(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];

@@ -14,7 +14,7 @@ interface HeaderLogoProps {
  * Render the logo for a space using the customization settings.
  */
 
-export async function HeaderLogo(props: HeaderLogoProps) {
+export function HeaderLogo(props: HeaderLogoProps) {
     const { context } = props;
     const { customization, linker } = context;
 
