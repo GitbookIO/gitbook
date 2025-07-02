@@ -123,19 +123,24 @@ export function SearchContainer(props: SearchContainerProps) {
         <SearchAskProvider value={searchAsk}>
             <Popover
                 content={
-                    <React.Suspense fallback={null}>
-                        {isMultiVariants ? <SearchScopeToggle spaceTitle={spaceTitle} /> : null}
-                        {state !== null && !state.ask ? (
-                            <SearchResults
-                                ref={resultsRef}
-                                query={normalizedQuery}
-                                global={state?.global ?? false}
-                                withAsk={withAsk}
-                                withAIChat={withAIChat}
-                            />
-                        ) : null}
-                        {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
-                    </React.Suspense>
+                    // Only show content if there's a query or Ask is enabled
+                    state?.query || withAsk ? (
+                        <React.Suspense fallback={null}>
+                            {isMultiVariants && !state?.ask ? (
+                                <SearchScopeToggle spaceTitle={spaceTitle} />
+                            ) : null}
+                            {state !== null && !state.ask ? (
+                                <SearchResults
+                                    ref={resultsRef}
+                                    query={normalizedQuery}
+                                    global={state?.global ?? false}
+                                    withAsk={withAsk}
+                                    withAIChat={withAIChat}
+                                />
+                            ) : null}
+                            {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
+                        </React.Suspense>
+                    ) : null
                 }
                 rootProps={{
                     open: open,
