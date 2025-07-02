@@ -17,6 +17,7 @@ type ButtonProps = {
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
     label?: string;
+    trailing?: React.ReactNode;
     children?: React.ReactNode;
 } & LinkInsightsProps &
     HTMLAttributes<HTMLElement>;
@@ -82,6 +83,7 @@ export function Button({
     icon,
     iconOnly = false,
     children,
+    trailing,
     ...rest
 }: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }) {
     const sizes = {
@@ -133,6 +135,7 @@ export function Button({
                 )
             ) : null}
             {iconOnly ? null : (children ?? label)}
+            {trailing}
         </button>
     );
 

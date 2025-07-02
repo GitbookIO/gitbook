@@ -1,6 +1,5 @@
-import { t, useLanguage } from '@/intl/client';
+import { useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
 import { useSearch } from './useSearch';
 
 /**
@@ -20,9 +19,9 @@ export function SearchScopeToggle(props: { spaceTitle: string }) {
         <div
             role="toolbar"
             aria-orientation="horizontal"
-            className={tcls('flex', 'flex-row', 'mr-4')}
+            className={tcls('flex', 'flex-row', 'mb-2')}
         >
-            <ToggleButton
+            {/* <ToggleButton
                 active={!state.global}
                 onClick={() => {
                     setSearchState({
@@ -43,7 +42,7 @@ export function SearchScopeToggle(props: { spaceTitle: string }) {
                 }}
             >
                 {t(language, 'search_scope_all')}
-            </ToggleButton>
+            </ToggleButton> */}
         </div>
     );
 }

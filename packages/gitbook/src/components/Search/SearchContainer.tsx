@@ -10,6 +10,7 @@ import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
 import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
+import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 
 interface SearchContainerProps {
@@ -24,7 +25,7 @@ interface SearchContainerProps {
  * Client component to render the search modal when the url contains a search query.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { withAsk, withAIChat, className } = props;
+    const { spaceTitle, withAsk, withAIChat, className } = props;
 
     const [state, setSearchState] = useSearch();
     const [open, setOpen] = useState(false);
@@ -104,11 +105,11 @@ export function SearchContainer(props: SearchContainerProps) {
     };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchState({
+        setSearchState((prev) => ({
             ask: false, // When typing, we go back to the default search mode
             query: event.target.value,
-            global: state?.global ?? false,
-        });
+            global: prev?.global ?? false,
+        }));
     };
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
@@ -119,6 +120,7 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     <React.Suspense fallback={null}>
+                        <SearchScopeToggle spaceTitle={spaceTitle} />
                         {state !== null && !state.ask ? (
                             <SearchResults
                                 ref={resultsRef}
@@ -141,6 +143,12 @@ export function SearchContainer(props: SearchContainerProps) {
                         'bg-tint-base has-[.empty]:hidden scroll-py-2 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: () => onClose(),
                     sideOffset: 8,
+                    collisionPadding: {
+                        top: 16,
+                        right: 16,
+                        bottom: 32,
+                        left: 16,
+                    },
                     hideWhenDetached: true,
                 }}
                 triggerProps={{

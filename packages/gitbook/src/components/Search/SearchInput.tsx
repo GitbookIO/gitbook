@@ -39,35 +39,37 @@ export function SearchInput(props: SearchButtonProps) {
     }, [isOpen]);
 
     return (
-        <Button
-            onClick={onFocus}
-            className={tcls(
-                'has-[input:focus]:-translate-y-px grow gap-0 hover:text-tint-strong has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
-                'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
-                className
-            )}
-            icon="magnifying-glass"
-            size="medium"
-            variant="header"
-            tabIndex={-1}
-        >
-            <input
-                type="text"
-                onFocus={onFocus}
-                onKeyDown={onKeyDown}
-                onChange={onChange}
-                value={value ?? ''}
-                placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
+        <div className="relative flex size-9 grow">
+            <Button
+                onClick={onFocus}
                 className={tcls(
-                    'peer grow cursor-pointer bg-transparent py-0.5 outline-none transition-all duration-500 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7 md:transition-colors',
-                    value !== undefined
-                        ? 'max-w-[40rem] px-3 opacity-11'
-                        : 'max-w-0 px-0 opacity-0 md:max-w-[40rem] md:px-3 md:opacity-11'
+                    'has-[input:focus]:-translate-y-px h-9 grow px-3 hover:text-tint-strong has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
+                    'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
+                    'z-30 max-md:absolute max-md:right-0',
+                    className
                 )}
-                ref={inputRef}
-            />
-            <Shortcut />
-        </Button>
+                icon="magnifying-glass"
+                size="medium"
+                variant="header"
+                tabIndex={-1}
+            >
+                <input
+                    type="text"
+                    onFocus={onFocus}
+                    onKeyDown={onKeyDown}
+                    onChange={onChange}
+                    value={value ?? ''}
+                    size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and limits the min-width, so we set it to a sensible minimum and control width ourselves.
+                    placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
+                    className={tcls(
+                        'peer grow cursor-pointer bg-transparent py-0.5 outline-none transition-all duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
+                        value !== undefined ? 'w-40' : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
+                    )}
+                    ref={inputRef}
+                />
+                <Shortcut />
+            </Button>
+        </div>
     );
 }
 
