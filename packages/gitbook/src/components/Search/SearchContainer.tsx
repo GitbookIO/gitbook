@@ -34,7 +34,7 @@ export function SearchContainer(props: SearchContainerProps) {
     const router = useRouter();
     const trackEvent = useTrackEvent();
     const resultsRef = useRef<SearchResultsRef>(null);
-    const searchInputRef = useRef<HTMLButtonElement>(null);
+    const searchInputRef = useRef<HTMLDivElement>(null);
 
     const onClose = async (to?: string) => {
         if (state?.query === '') {
