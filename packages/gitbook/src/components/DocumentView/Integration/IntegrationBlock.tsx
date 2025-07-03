@@ -1,7 +1,7 @@
+import { GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
 import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
-import { GITBOOK_INTEGRATIONS_HOST } from '@v2/lib/env';
 
 import type { BlockProps } from '../Block';
 import './contentkit.css';

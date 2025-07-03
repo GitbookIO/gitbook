@@ -59,7 +59,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'left-16',
                 'max-w-md',
                 'text-balance',
-                'sm:left-auto'
+                'sm:left-auto',
+                'lg:chat-open:mr-80',
+                'xl:chat-open:mr-[25rem]',
+                'transition-all',
+                'duration-300'
             )}
         >
             <p id={describedById} className={tcls('text-sm')}>

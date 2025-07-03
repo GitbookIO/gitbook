@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
 import { useTrackEvent } from '../Insights';
 import { useSearch } from './useSearch';
 
@@ -43,7 +42,8 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 'justify-center',
                 'items-center',
                 'w-full',
-                'py-2',
+                'py-2.5',
+                'md:py-2',
                 'px-3',
                 'circular-corners:px-4',
                 'gap-2',

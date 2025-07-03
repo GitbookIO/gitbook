@@ -4,7 +4,7 @@ import type { Space } from '@gitbook/api';
 
 import { joinPath } from '@/lib/paths';
 import { useCurrentPagePath } from '../hooks';
-import { DropdownMenuItem } from './DropdownMenu';
+import { DropdownMenuItem } from '../primitives/DropdownMenu';
 
 interface VariantSpace {
     id: Space['id'];

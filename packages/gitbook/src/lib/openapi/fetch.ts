@@ -1,16 +1,16 @@
-import { parseOpenAPI } from '@gitbook/openapi-parser';
+import { OpenAPIParseError, parseOpenAPI } from '@gitbook/openapi-parser';
 
-import { type CacheFunctionOptions, cache, noCacheFetchOptions } from '@/lib/cache';
+import { noCacheFetchOptions } from '@/lib/data';
+import { resolveContentRef } from '@/lib/references';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
+import { assert } from 'ts-essentials';
+import { enrichFilesystem } from './enrich';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
     ResolveOpenAPIBlockArgs,
-} from '@/lib/openapi/types';
-import { assert } from 'ts-essentials';
-import { resolveContentRef } from '../references';
-import { isV2 } from '../v2';
-import { enrichFilesystem } from './enrich';
+} from './types';
 import type { FetchOpenAPIFilesystemResult } from './types';
 
 type AnyOpenAPIBlock = AnyOpenAPIOperationsBlock | OpenAPISchemasBlock | OpenAPIWebhookBlock;
@@ -38,37 +38,29 @@ export async function fetchOpenAPIFilesystem(
         return fetchFilesystem(resolved.href);
     })();
 
+    if ('error' in filesystem) {
+        throw new OpenAPIParseError(filesystem.error.message, { code: filesystem.error.code });
+    }
+
     return {
         filesystem,
         specUrl: resolved.href,
     };
 }
 
-function fetchFilesystem(url: string) {
-    if (isV2()) {
-        return fetchFilesystemUseCache(url);
-    }
-
-    return fetchFilesystemV1(url);
-}
-
-const fetchFilesystemV1 = cache({
-    name: 'openapi.fetch.v6',
-    get: async (url: string, options: CacheFunctionOptions) => {
-        const richFilesystem = await fetchFilesystemUncached(url, options);
-        return {
-            // Cache for 24 hours
-            ttl: 24 * 60 * 60,
-            // Revalidate every 2 hours
-            revalidateBefore: 22 * 60 * 60,
-            data: richFilesystem,
-        };
-    },
-});
-
-const fetchFilesystemUseCache = async (url: string) => {
+const fetchFilesystem = async (url: string) => {
     'use cache';
-    return fetchFilesystemUncached(url);
+    try {
+        return await fetchFilesystemUncached(url);
+    } catch (error) {
+        // Throwing an error inside a "use cache" function obfuscates the error,
+        // so we need to handle it here and recreates the error outside the cache function.
+        if (error instanceof OpenAPIParseError) {
+            cacheLife('seconds');
+            return { error: { code: error.code, message: error.message } };
+        }
+        throw error;
+    }
 };
 
 async function fetchFilesystemUncached(

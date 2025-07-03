@@ -35,7 +35,6 @@ const InlineLinkTooltipImpl = dynamic(
 export function InlineLinkTooltip(props: {
     isSamePage: boolean;
     isExternal: boolean;
-    aiSummary?: { pageId: string; spaceId: string };
     breadcrumbs: Array<{ href?: string; label: string; icon?: React.ReactNode }>;
     target: {
         href: string;

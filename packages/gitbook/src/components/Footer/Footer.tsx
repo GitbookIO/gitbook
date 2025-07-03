@@ -1,4 +1,4 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 import React from 'react';
 
 import { Image } from '@/components/utils';

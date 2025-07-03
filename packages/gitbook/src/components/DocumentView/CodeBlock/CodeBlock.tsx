@@ -1,7 +1,6 @@
 import type { DocumentBlockCode } from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
-import { isV2 } from '@/lib/v2';
 
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
@@ -36,7 +35,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
         return { inline, body };
     });
 
-    if (isV2() && !isEstimatedOffscreen) {
+    if (!isEstimatedOffscreen) {
         // In v2, we render the code block server-side
         const lines = await highlight(block, richInlines);
         return <CodeBlockRenderer block={block} style={style} lines={lines} />;

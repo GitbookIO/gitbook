@@ -12,12 +12,12 @@ import { Heading } from '../Heading';
 import './scalar.css';
 import './style.css';
 import { DEFAULT_LOCALE, getCustomizationLocale } from '@/intl/server';
+import type { GitBookAnyContext } from '@/lib/context';
 import type {
     AnyOpenAPIOperationsBlock,
     OpenAPISchemasBlock,
     OpenAPIWebhookBlock,
 } from '@/lib/openapi/types';
-import type { GitBookAnyContext } from '@v2/lib/context';
 
 /**
  * Get the OpenAPI context to render a block.

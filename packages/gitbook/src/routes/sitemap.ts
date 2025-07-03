@@ -2,11 +2,11 @@ import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
 
+import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
 
 /**
  * Generate a root sitemap that point to all sitemap-pages.xml.

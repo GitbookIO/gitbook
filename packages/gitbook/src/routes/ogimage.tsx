@@ -9,17 +9,17 @@ import { ImageResponse } from 'next/og';
 import { type PageParams, fetchPageData } from '@/components/SitePage';
 import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
-import { getExtension } from '@/lib/paths';
-import { filterOutNullable } from '@/lib/typescript';
-import { getCacheTag } from '@gitbook/cache-tags';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type ResizeImageOptions,
     SizableImageAction,
     checkIsSizableImageURL,
     getResizedImageURL,
     resizeImage,
-} from '@v2/lib/images';
+} from '@/lib/images';
+import { getExtension } from '@/lib/paths';
+import { filterOutNullable } from '@/lib/typescript';
+import { getCacheTag } from '@gitbook/cache-tags';
 import { SiteDefaultIcon } from './icon';
 
 /**

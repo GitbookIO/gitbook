@@ -1,3 +1,4 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type JSONDocument,
     type RevisionPageDocument,
@@ -6,7 +7,6 @@ import {
     type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 import urlJoin from 'url-join';
 
@@ -48,6 +48,16 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
+                'chat-open:xl:max-3xl:hidden',
+                'chat-open:xl:max-3xl:opacity-0',
+                'max-w-56',
+                'chat-open:xl:max-3xl:*:w-56',
+                'chat-open:xl:max-3xl:max-w-0',
+                'chat-open:xl:max-3xl:ml-0',
+
+                'transition-all duration-300',
+                '[transition-behavior:allow-discrete]',
+
                 'flex-col',
                 'basis-56',
                 'xl:ml-12',
