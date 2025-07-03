@@ -35,10 +35,10 @@ To run a local version of this project, please follow these simple steps.
 
 ### Prerequisites
 
--   Node.js (Version: >=20.6)
+- Node.js (Version: >=20.6)
     - Use nvm for easy Node management
--   Bun (Version: >=1.2.1)
-    - We use a text-based lockfile which isn't supported below 1.2.1
+- [Bun](https://bun.sh/) (Version: >=1.2.15)
+  - We use a text-based lockfile which isn't supported below 1.2.15
 
 ### Set up
 
