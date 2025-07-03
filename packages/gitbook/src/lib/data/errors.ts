@@ -2,6 +2,8 @@ import { GitBookAPIError } from '@gitbook/api';
 import { unstable_cacheLife as cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
+import parseCacheControl from 'parse-cache-control';
+
 export class DataFetcherError extends Error {
     constructor(
         message: string,
@@ -160,11 +162,12 @@ export function extractCacheControl(error: GitBookAPIError) {
         if (!cacheControl) {
             return undefined;
         }
+        const parsed = parseCacheControl(cacheControl);
 
-        const maxAgeMatch = cacheControl.match(/max-age=(\d+)/i);
+        //parseCacheControl does not support stale-while-revalidate, so we need to parse it manually
         const staleWhileRevalidateMatch = cacheControl.match(/stale-while-revalidate=(\d+)/i);
 
-        const maxAge = maxAgeMatch ? Number.parseInt(maxAgeMatch[1], 10) : undefined;
+        const maxAge = parsed?.['max-age'];
         const staleWhileRevalidate = staleWhileRevalidateMatch
             ? Number.parseInt(staleWhileRevalidateMatch[1], 10)
             : undefined;
