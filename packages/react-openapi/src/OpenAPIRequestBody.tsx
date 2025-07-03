@@ -30,7 +30,6 @@ export function OpenAPIRequestBody(props: {
                     context={context}
                     data={data}
                     stateKey={stateKey}
-                    key={stateKey}
                 />
             }
             className="openapi-requestbody"

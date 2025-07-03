@@ -16,7 +16,7 @@ import { retrocycle } from './decycle';
 import { getDisclosureLabel } from './getDisclosureLabel';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
+import { checkIsReference, getSchemaTitle, resolveDescription, resolveFirstExample } from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -651,41 +651,4 @@ function mergeRequiredFields(
     return Array.from(
         new Set([...(latestAncestor?.required || []), ...(schemaOrRef.required || [])])
     );
-}
-
-export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
-    // Otherwise try to infer a nice title
-    let type = 'any';
-
-    if (schema.enum || schema['x-enumDescriptions'] || schema['x-gitbook-enum']) {
-        type = `${schema.type} · enum`;
-        // check array AND schema.items as this is sometimes null despite what the type indicates
-    } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(schema.items)}[]`;
-    } else if (Array.isArray(schema.type)) {
-        type = schema.type.join(' | ');
-    } else if (schema.type || schema.properties) {
-        type = schema.type ?? 'object';
-
-        if (schema.format) {
-            type += ` · ${schema.format}`;
-        }
-
-        // Only add the title if it's an object (no need for the title of a string, number, etc.)
-        if (type === 'object' && schema.title) {
-            type += ` · ${schema.title.replaceAll(' ', '')}`;
-        }
-    }
-
-    if ('anyOf' in schema) {
-        type = 'any of';
-    } else if ('oneOf' in schema) {
-        type = 'one of';
-    } else if ('allOf' in schema) {
-        type = 'all of';
-    } else if ('not' in schema) {
-        type = 'not';
-    }
-
-    return type;
 }
