@@ -154,6 +154,7 @@ export function useAIChatController(): AIChatController {
                                     // Mark as not loading when the response is finished
                                     // Even if the stream might continue as we receive 'response_followup_suggestion'
                                     loading: false,
+                                    error: false,
                                 }));
                                 break;
                             }
@@ -171,22 +172,26 @@ export function useAIChatController(): AIChatController {
 
                         setState((state) => ({
                             ...state,
-                            loading: false,
+                            messages: [
+                                ...state.messages.slice(0, -1),
+                                {
+                                    role: AIMessageRole.Assistant,
+                                    content: data.content,
+                                },
+                            ],
                         }));
                     }
-                } catch {
-                    // Replace the placeholder assistant message with an error message.
+
                     setState((state) => ({
                         ...state,
                         loading: false,
-                        messages: [
-                            ...state.messages.slice(0, -1),
-                            {
-                                role: AIMessageRole.Assistant,
-                                content: 'Something went wrong. Please try again.',
-                                error: true,
-                            },
-                        ],
+                        error: false,
+                    }));
+                } catch {
+                    setState((state) => ({
+                        ...state,
+                        loading: false,
+                        error: true,
                     }));
                 }
             },
