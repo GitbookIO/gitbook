@@ -294,16 +294,19 @@ const config: Config = {
                     ])
                 ),
             },
+            transitionTimingFunction: {
+                quint: 'cubic-bezier(0.83, 0, 0.17, 1)',
+            },
             animation: {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
-                scaleIn: 'scaleIn 200ms ease',
-                scaleOut: 'scaleOut 200ms ease',
-                fadeIn: 'fadeIn 200ms ease forwards',
-                fadeOut: 'fadeOut 200ms ease forwards',
-                enterFromLeft: 'enterFromLeft 250ms ease',
-                enterFromRight: 'enterFromRight 250ms ease',
-                exitToLeft: 'exitToLeft 250ms ease',
-                exitToRight: 'exitToRight 250ms ease',
+                scaleIn: 'scaleIn 200ms ease both',
+                scaleOut: 'scaleOut 200ms ease both',
+                fadeIn: 'fadeIn 200ms ease both',
+                fadeOut: 'fadeOut 200ms ease both',
+                enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
             },
             keyframes: {
                 pulseAlt: {
@@ -407,20 +410,20 @@ const config: Config = {
                     },
                 },
                 enterFromRight: {
-                    from: { opacity: '0', transform: 'translateX(200px)' },
-                    to: { opacity: '1', transform: 'translateX(0)' },
+                    from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
                 },
                 enterFromLeft: {
-                    from: { opacity: '0', transform: 'translateX(-200px)' },
-                    to: { opacity: '1', transform: 'translateX(0)' },
+                    from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)' },
-                    to: { opacity: '0', transform: 'translateX(200px)' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)' },
-                    to: { opacity: '0', transform: 'translateX(-200px)' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
                     from: { opacity: '0', transform: 'rotateX(-10deg) scale(0.9)' },
@@ -453,14 +456,27 @@ const config: Config = {
             lg: '1024px',
             xl: '1280px',
             '2xl': '1536px',
+            '3xl': '1920px',
         },
     },
     plugins: [
+        plugin(({ addUtilities }) => {
+            addUtilities({
+                '.no-scrollbar': {
+                    'scrollbar-width': 'none',
+                    '-ms-overflow-style': 'none',
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                },
+            });
+        }),
         plugin(({ addVariant }) => {
             /**
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
+            addVariant('chat-open', 'body:has(.ai-chat) &');
 
             /**
              * Variant when a header is displayed.

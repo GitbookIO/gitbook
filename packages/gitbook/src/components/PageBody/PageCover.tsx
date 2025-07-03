@@ -1,15 +1,16 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { RevisionPageDocument, RevisionPageDocumentCover } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type { StaticImageData } from 'next/image';
 
-import { Image, type ImageSize } from '@/components/utils';
-import { resolveContentRef } from '@/lib/references';
+import { getImageAttributes } from '@/components/utils';
+import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { assert } from 'ts-essentials';
+import { PageCoverImage } from './PageCoverImage';
 import defaultPageCoverSVG from './default-page-cover.svg';
 
 const defaultPageCover = defaultPageCoverSVG as StaticImageData;
-const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
 /**
  * Cover for the page.
@@ -21,8 +22,58 @@ export async function PageCover(props: {
     context: GitBookSiteContext;
 }) {
     const { as, page, cover, context } = props;
-    const resolved = cover.ref ? await resolveContentRef(cover.ref, context) : null;
-    const resolvedDark = cover.refDark ? await resolveContentRef(cover.refDark, context) : null;
+    const [resolved, resolvedDark] = await Promise.all([
+        cover.ref ? resolveContentRef(cover.ref, context) : null,
+        cover.refDark ? resolveContentRef(cover.refDark, context) : null,
+    ]);
+
+    const sizes = [
+        // Cover takes the full width on mobile/table
+        {
+            media: '(max-width: 768px)',
+            width: 768,
+        },
+        {
+            media: '(max-width: 1024px)',
+            width: 1024,
+        },
+        // Maximum size of the cover
+        { width: 1248 },
+    ];
+
+    const getImage = async (resolved: ResolvedContentRef | null, returnNull = false) => {
+        if (!resolved && returnNull) return;
+        const [attrs, size] = await Promise.all([
+            getImageAttributes({
+                sizes,
+                source: resolved
+                    ? {
+                          src: resolved.href,
+                          size: resolved.file?.dimensions ?? null,
+                      }
+                    : {
+                          src: defaultPageCover.src,
+                          size: {
+                              width: defaultPageCover.width,
+                              height: defaultPageCover.height,
+                          },
+                      },
+                quality: 100,
+                resize: context.imageResizer ?? false,
+            }),
+            context.imageResizer
+                ?.getImageSize(resolved?.href || defaultPageCover.src, {})
+                .then((size) => size ?? undefined),
+        ]);
+        return {
+            ...attrs,
+            size,
+        };
+    };
+
+    const images = await Promise.all([getImage(resolved), getImage(resolvedDark, true)]);
+    const [light, dark] = images;
+    assert(light, 'Light image should be defined');
 
     return (
         <div
@@ -50,47 +101,12 @@ export async function PageCover(props: {
                       ]
             )}
         >
-            <Image
-                alt="Page cover image"
-                sources={{
-                    light: resolved
-                        ? {
-                              src: resolved.href,
-                              size: resolved.file?.dimensions,
-                          }
-                        : {
-                              src: defaultPageCover.src,
-                              size: {
-                                  width: defaultPageCover.width,
-                                  height: defaultPageCover.height,
-                              },
-                          },
-                    dark: resolvedDark
-                        ? {
-                              src: resolvedDark.href,
-                              size: resolvedDark.file?.dimensions,
-                          }
-                        : null,
+            <PageCoverImage
+                imgs={{
+                    light,
+                    dark,
                 }}
-                resize={
-                    // When using the default cover, we don't want to resize as it's a SVG
-                    resolved ? context.imageResizer : false
-                }
-                sizes={[
-                    // Cover takes the full width on mobile/table
-                    {
-                        media: '(max-width: 768px)',
-                        width: 768,
-                    },
-                    {
-                        media: '(max-width: 1024px)',
-                        width: 1024,
-                    },
-                    // Maximum size of the cover
-                    { width: 1248 },
-                ]}
-                className={tcls('w-full', 'object-cover', 'object-center')}
-                inlineStyle={{ aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}` }}
+                y={cover.yPos}
             />
         </div>
     );

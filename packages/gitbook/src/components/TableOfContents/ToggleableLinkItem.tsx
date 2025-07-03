@@ -16,15 +16,35 @@ import { useScrollToActiveTOCItem } from './TOCScroller';
 export function ToggleableLinkItem(
     props: {
         href: string;
-        pathname: string;
+        pathnames: string[];
         children: React.ReactNode;
         descendants: React.ReactNode;
     } & LinkInsightsProps
 ) {
-    const { href, children, descendants, pathname, insights } = props;
+    const { href, children, descendants, pathnames, insights } = props;
 
     const currentPagePath = useCurrentPagePath();
-    const isActive = currentPagePath === pathname;
+    const isActive = pathnames.some((pathname) => pathname === currentPagePath);
+    const defaultIsOpen =
+        isActive || pathnames.some((pathname) => currentPagePath.startsWith(`${pathname}/`));
+    const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
+    const hasBeenToggled = useRef(false);
+
+    // Update the visibility of the children if one of the descendants becomes active.
+    React.useEffect(() => {
+        if (defaultIsOpen && !hasBeenToggled.current) {
+            setIsOpen(defaultIsOpen);
+        }
+    }, [defaultIsOpen]);
+
+    const handleToggle = (newState: boolean | ((prev: boolean) => boolean)) => {
+        hasBeenToggled.current = true;
+        if (typeof newState === 'function') {
+            setIsOpen(newState);
+        } else {
+            setIsOpen(newState);
+        }
+    };
 
     if (!descendants) {
         return (
@@ -35,13 +55,15 @@ export function ToggleableLinkItem(
     }
 
     return (
-        <DescendantsRenderer
-            descendants={descendants}
-            defaultIsOpen={isActive || currentPagePath.startsWith(`${pathname}/`)}
-        >
+        <DescendantsRenderer descendants={descendants} isOpen={isOpen} setIsOpen={handleToggle}>
             {({ descendants, toggler }) => (
                 <>
-                    <LinkItem href={href} insights={insights} isActive={isActive}>
+                    <LinkItem
+                        href={href}
+                        insights={insights}
+                        isActive={isActive}
+                        onActiveClick={() => handleToggle(!isOpen)}
+                    >
                         {children}
                         {toggler}
                     </LinkItem>
@@ -55,53 +77,31 @@ export function ToggleableLinkItem(
 function LinkItem(
     props: Pick<LinkProps, 'href' | 'insights' | 'children'> & {
         isActive: boolean;
+        onActiveClick?: () => void;
     }
 ) {
-    const { isActive, href, insights, children } = props;
+    const { isActive, href, insights, children, onActiveClick } = props;
     const anchorRef = useRef<HTMLAnchorElement>(null);
     useScrollToActiveTOCItem({ anchorRef, isActive });
+
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (isActive && onActiveClick) {
+            event.preventDefault();
+            onActiveClick();
+        }
+    };
+
     return (
         <Link
             ref={anchorRef}
             href={href}
             insights={insights}
             aria-current={isActive ? 'page' : undefined}
-            className={tcls(
-                'group/toclink toclink relative transition-colors',
-                'flex flex-row justify-between',
-                'circular-corners:rounded-2xl rounded-md straight-corners:rounded-none p-1.5 pl-3',
-                'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
-                'hover:contrast-more:text-tint-strong hover:contrast-more:ring-1 hover:contrast-more:ring-tint-12',
-                'before:contents[] before:-left-px before:absolute before:inset-y-0',
-                'sidebar-list-line:rounded-l-none sidebar-list-line:before:w-px sidebar-list-default:[&+div_a]:rounded-l-none [&+div_a]:pl-5 sidebar-list-default:[&+div_a]:before:w-px',
-
-                isActive && [
-                    'font-semibold',
-                    'sidebar-list-line:before:w-0.5',
-
-                    'before:bg-primary-solid',
-                    'text-primary-subtle',
-                    'contrast-more:text-primary',
-
-                    'sidebar-list-pill:bg-primary',
-                    '[html.sidebar-list-pill.theme-muted_&]:bg-primary-hover',
-                    '[html.sidebar-list-pill.theme-bold.tint_&]:bg-primary-hover',
-                    '[html.sidebar-filled.sidebar-list-pill.theme-muted_&]:bg-primary',
-                    '[html.sidebar-filled.sidebar-list-pill.theme-bold.tint_&]:bg-primary',
-
-                    'hover:bg-primary-hover',
-                    'hover:text-primary',
-                    'hover:before:bg-primary-solid-hover',
-                    'sidebar-list-pill:hover:bg-primary-hover',
-
-                    'contrast-more:text-primary',
-                    'contrast-more:hover:text-primary-strong',
-                    'contrast-more:bg-primary',
-                    'contrast-more:ring-1',
-                    'contrast-more:ring-primary',
-                    'contrast-more:hover:ring-primary-hover',
-                ]
-            )}
+            classNames={[
+                'ToggleableLinkItemStyles',
+                ...(isActive ? ['ToggleableLinkItemActiveStyles' as const] : []),
+            ]}
+            onClick={handleClick}
         >
             {children}
         </Link>
@@ -109,24 +109,17 @@ function LinkItem(
 }
 
 function DescendantsRenderer(props: {
-    defaultIsOpen: boolean;
     descendants: React.ReactNode;
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     children: (renderProps: {
         descendants: React.ReactNode;
         toggler: React.ReactNode;
     }) => React.ReactNode;
 }) {
-    const { defaultIsOpen, children, descendants } = props;
-    const [isOpen, setIsOpen] = React.useState(defaultIsOpen);
+    const { descendants, isOpen, setIsOpen } = props;
 
-    // Update the visibility of the children if one of the descendants becomes active.
-    React.useEffect(() => {
-        if (defaultIsOpen) {
-            setIsOpen(defaultIsOpen);
-        }
-    }, [defaultIsOpen]);
-
-    return children({
+    return props.children({
         toggler: (
             <Toggler
                 isLinkActive={isOpen}

@@ -1,5 +1,4 @@
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
-import React from 'react';
 
 import {
     SkeletonCard,
@@ -47,7 +46,7 @@ export interface BlockProps<Block extends DocumentBlock> extends DocumentContext
 }
 
 export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
-    const { block, style, isEstimatedOffscreen, context } = props;
+    const { block } = props;
 
     const content = (() => {
         switch (block.type) {
@@ -116,17 +115,7 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
         }
     })();
 
-    if (!isEstimatedOffscreen || context.wrapBlocksInSuspense === false) {
-        // When blocks are estimated to be on the initial viewport, we render them immediately
-        // to avoid a flash of a loading skeleton.
-        return content;
-    }
-
-    return (
-        <React.Suspense fallback={<BlockSkeleton block={block} style={style} />}>
-            {content}
-        </React.Suspense>
-    );
+    return content;
 }
 
 /**

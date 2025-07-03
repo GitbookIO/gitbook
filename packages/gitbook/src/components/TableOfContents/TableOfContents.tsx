@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -8,14 +8,17 @@ import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
+import { encodeClientTableOfContents } from './encodeClientTableOfContents';
 
-export function TableOfContents(props: {
+export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
     const { innerHeader, context, header } = props;
-    const { space, customization, pages } = context;
+    const { space, customization, revision } = context;
+
+    const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
 
     return (
         <>
@@ -106,9 +109,7 @@ export function TableOfContents(props: {
                         )}
                     >
                         <PagesList
-                            rootPages={pages}
                             pages={pages}
-                            context={context}
                             style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                         />
                         {customization.trademark.enabled ? (

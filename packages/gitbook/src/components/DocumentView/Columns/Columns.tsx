@@ -18,7 +18,6 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
                             document={document}
                             ancestorBlocks={[...ancestorBlocks, block, columnBlock]}
                             context={context}
-                            blockStyle="flip-heading-hash"
                             style="w-full space-y-4 *:max-w-full"
                         />
                     </Column>

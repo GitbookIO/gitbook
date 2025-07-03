@@ -11,14 +11,14 @@ import { parameterToProperty, resolveDescription } from './utils';
  */
 export function OpenAPIResponse(props: {
     response: OpenAPIV3.ResponseObject;
-    mediaType: OpenAPIV3.MediaTypeObject;
+    mediaType: OpenAPIV3.MediaTypeObject | null;
     context: OpenAPIClientContext;
 }) {
     const { response, context, mediaType } = props;
     const headers = Object.entries(response.headers ?? {}).map(
         ([name, header]) => [name, header ?? {}] as const
     );
-    const content = Object.entries(mediaType.schema ?? {});
+    const content = Object.entries(mediaType?.schema ?? {});
 
     const description = resolveDescription(response);
 
@@ -62,7 +62,7 @@ export function OpenAPIResponse(props: {
                     />
                 </OpenAPIDisclosure>
             ) : null}
-            {mediaType.schema && (
+            {mediaType?.schema && (
                 <div className="openapi-responsebody">
                     <OpenAPISchemaProperties
                         id={`response-${context.blockKey}`}

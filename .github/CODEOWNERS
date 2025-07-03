@@ -1,0 +1,3 @@
+# Changes to the API data cache functions can invalidate all existing data cache
+# causing a massive amount of revalidation, impacting our API.
+packages/gitbook/src/lib/data/api.ts   @SamyPesse

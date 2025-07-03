@@ -1,6 +1,6 @@
+import type { GitBookBaseContext } from '@/lib/context';
+import { getResizedImageURL } from '@/lib/images';
 import type { SiteInsightsAd } from '@gitbook/api';
-import type { GitBookBaseContext } from '@v2/lib/context';
-import { getResizedImageURL } from '@v2/lib/images';
 
 import { tcls } from '@/lib/tailwind';
 
@@ -19,14 +19,14 @@ export async function AdClassicRendering({
     insightsAd: SiteInsightsAd | null;
     context: GitBookBaseContext;
 }) {
-    const smallImgSrc =
+    const [smallImgSrc, logoSrc] = await Promise.all([
         'smallImage' in ad
-            ? await getResizedImageURL(context.imageResizer, ad.smallImage, { width: 192, dpr: 2 })
-            : null;
-    const logoSrc =
+            ? getResizedImageURL(context.imageResizer, ad.smallImage, { width: 192, dpr: 2 })
+            : null,
         'logo' in ad
-            ? await getResizedImageURL(context.imageResizer, ad.logo, { width: 192 - 48, dpr: 2 })
-            : null;
+            ? getResizedImageURL(context.imageResizer, ad.logo, { width: 192 - 48, dpr: 2 })
+            : null,
+    ]);
     return (
         <Link
             rel="sponsored noopener"

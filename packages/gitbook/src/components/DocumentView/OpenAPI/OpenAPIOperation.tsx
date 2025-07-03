@@ -23,7 +23,7 @@ export async function OpenAPIOperation(props: BlockProps<AnyOpenAPIOperationsBlo
 }
 
 async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>) {
-    const { block, context } = props;
+    const { block, context, style } = props;
 
     if (!context.contentContext) {
         return null;
@@ -36,11 +36,9 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
 
     if (error) {
         return (
-            <div className="hidden">
-                <p>
-                    Error with {specUrl}: {error.message}
-                </p>
-            </div>
+            <p aria-hidden className={tcls(style)}>
+                Error while loading OpenAPI operation — {error.message}
+            </p>
         );
     }
 

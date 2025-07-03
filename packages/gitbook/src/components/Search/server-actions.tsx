@@ -1,10 +1,12 @@
 'use server';
 
+import type { GitBookBaseContext, GitBookSiteContext } from '@/lib/context';
 import { resolvePageId } from '@/lib/pages';
-import { findSiteSpaceById, getSiteStructureSections } from '@/lib/sites';
+import { fetchServerActionSiteContext, getServerActionBaseContext } from '@/lib/server-actions';
+import { findSiteSpaceBy } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
-import { getV1BaseContext } from '@/lib/v1';
 import type {
+    Revision,
     RevisionPage,
     SearchAIAnswer,
     SearchAIRecommendedQuestionStream,
@@ -14,16 +16,13 @@ import type {
     SiteSectionGroup,
     Space,
 } from '@gitbook/api';
-import type { GitBookBaseContext, GitBookSiteContext } from '@v2/lib/context';
-import { fetchServerActionSiteContext, getServerActionBaseContext } from '@v2/lib/server-actions';
 import { createStreamableValue } from 'ai/rsc';
 import type * as React from 'react';
 
+import { throwIfDataError } from '@/lib/data';
+import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { isV2 } from '@/lib/v2';
 import type { IconName } from '@gitbook/icons';
-import { throwIfDataError } from '@v2/lib/data';
-import { getSiteURLDataFromMiddleware } from '@v2/lib/middleware';
 import { DocumentView } from '../DocumentView';
 
 export type OrderedComputedResult = ComputedPageResult | ComputedSectionResult;
@@ -69,7 +68,7 @@ export interface AskAnswerResult {
  * Server action to search content in the entire site.
  */
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const context = await getServerActionBaseContext();
 
     return await searchSiteContent(context, {
         query,
@@ -81,7 +80,7 @@ export async function searchAllSiteContent(query: string): Promise<OrderedComput
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const context = await getServerActionBaseContext();
     const siteURLData = await getSiteURLDataFromMiddleware();
 
     return await searchSiteContent(context, {
@@ -105,9 +104,7 @@ export async function streamAskQuestion({
     const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
     (async () => {
-        const context = await fetchServerActionSiteContext(
-            isV2() ? await getServerActionBaseContext() : await getV1BaseContext()
-        );
+        const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
 
         const apiClient = await context.dataFetcher.api();
 
@@ -128,7 +125,7 @@ export async function streamAskQuestion({
             { format: 'document' }
         );
 
-        const spacePromises = new Map<string, Promise<RevisionPage[]>>();
+        const spacePromises = new Map<string, Promise<Revision>>();
         for await (const chunk of stream) {
             const answer = chunk.answer;
 
@@ -143,10 +140,9 @@ export async function streamAskQuestion({
                         spacePromises.set(
                             source.space,
                             throwIfDataError(
-                                context.dataFetcher.getRevisionPages({
+                                context.dataFetcher.getRevision({
                                     spaceId: source.space,
                                     revisionId: source.revision,
-                                    metadata: false,
                                 })
                             )
                         );
@@ -159,8 +155,8 @@ export async function streamAskQuestion({
             // Get the pages for all spaces referenced by this answer.
             const pages = await Promise.all(
                 spaces.map(async (space) => {
-                    const pages = await spacePromises.get(space);
-                    return { space, pages };
+                    const revision = await spacePromises.get(space);
+                    return { space, pages: revision?.pages };
                 })
             ).then((results) => {
                 return results.reduce((map, result) => {
@@ -192,7 +188,7 @@ export async function streamAskQuestion({
  */
 export async function streamRecommendedQuestions() {
     const siteURLData = await getSiteURLDataFromMiddleware();
-    const context = isV2() ? await getServerActionBaseContext() : await getV1BaseContext();
+    const context = await getServerActionBaseContext();
 
     const responseStream = createStreamableValue<SearchAIRecommendedQuestionStream | undefined>();
 
@@ -260,24 +256,20 @@ async function searchSiteContent(
     return (
         await Promise.all(
             searchResults.map(async (spaceItem) => {
-                const sections = getSiteStructureSections(structure).flatMap((item) =>
-                    item.object === 'site-section-group' ? [item, ...item.sections] : item
+                const found = findSiteSpaceBy(
+                    structure,
+                    (siteSpace) => siteSpace.space.id === spaceItem.id
                 );
-                const siteSpace = findSiteSpaceById(structure, spaceItem.id);
-                const siteSection = sections.find(
-                    (section) => section.id === siteSpace?.section
-                ) as SiteSection;
-                const siteSectionGroup = siteSection?.sectionGroup
-                    ? sections.find((sectionGroup) => sectionGroup.id === siteSection.sectionGroup)
-                    : null;
+                const siteSection = found?.siteSection;
+                const siteSectionGroup = found?.siteSectionGroup;
 
                 return Promise.all(
                     spaceItem.pages.map((pageItem) =>
                         transformSitePageResult(context, {
                             pageItem,
                             spaceItem,
-                            space: siteSpace?.space,
-                            spaceURL: siteSpace?.urls.published,
+                            space: found?.siteSpace.space,
+                            spaceURL: found?.siteSpace.urls.published,
                             siteSection: siteSection ?? undefined,
                             siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
                         })
@@ -317,8 +309,11 @@ async function transformAnswer(
                 }
 
                 // Find the siteSpace in case it is nested in a site section so we can resolve the URL appropriately
-                const siteSpace = findSiteSpaceById(context.structure, source.space);
-                const spaceURL = siteSpace?.urls.published;
+                const found = findSiteSpaceBy(
+                    context.structure,
+                    (siteSpace) => siteSpace.space.id === source.space
+                );
+                const spaceURL = found?.siteSpace.urls.published;
 
                 const href = spaceURL
                     ? joinPathWithBaseURL(spaceURL, page.page.path)
@@ -345,6 +340,7 @@ async function transformAnswer(
                         mode: 'default',
                         contentContext: undefined,
                         wrapBlocksInSuspense: false,
+                        shouldRenderLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
                     style={['space-y-5']}
                 />

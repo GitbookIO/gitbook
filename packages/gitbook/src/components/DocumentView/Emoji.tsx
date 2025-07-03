@@ -4,7 +4,7 @@ import { Emoji as EmojiPrimitive } from '@/components/primitives';
 
 import type { InlineProps } from './Inline';
 
-export async function Emoji(props: InlineProps<DocumentInlineEmoji>) {
+export function Emoji(props: InlineProps<DocumentInlineEmoji>) {
     const { inline } = props;
 
     return <EmojiPrimitive code={inline.data.code} />;

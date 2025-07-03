@@ -465,6 +465,22 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: '[page].md',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'blocks.md',
+                url: 'blocks.md',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
         name: 'Site subdirectory (proxy)',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         contentBaseURL: 'https://nextjs-gbo-proxy.vercel.app/documentation/',
@@ -604,8 +620,18 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
+                name: 'Icons',
+                url: 'blocks/icons',
+                run: waitForCookiesDialog,
+            },
+            {
                 name: 'Links',
                 url: 'blocks/links',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Buttons',
+                url: 'blocks/buttons',
                 run: waitForCookiesDialog,
             },
             {
@@ -900,7 +926,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -920,7 +946,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },

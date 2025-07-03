@@ -1,41 +1,22 @@
-import { type RevisionPageLink, SiteInsightsLinkPosition } from '@gitbook/api';
+'use client';
+
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { ClientTOCPageLink } from './encodeClientTableOfContents';
 
 import { Link } from '@/components/primitives';
-import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
+import { SiteInsightsLinkPosition } from '@gitbook/api';
 import { TOCPageIcon } from './TOCPageIcon';
 
-export async function PageLinkItem(props: { page: RevisionPageLink; context: GitBookSiteContext }) {
-    const { page, context } = props;
-
-    const resolved = await resolveContentRef(page.target, context);
+export function PageLinkItem(props: { page: ClientTOCPageLink }) {
+    const { page } = props;
 
     return (
         <li className={tcls('flex', 'flex-col')}>
             <Link
-                href={resolved?.href ?? '#'}
-                className={tcls(
-                    'flex',
-                    'justify-start',
-                    'items-center',
-                    'gap-3',
-                    'p-1.5',
-                    'pl-3',
-                    'text-sm',
-                    'transition-colors',
-                    'duration-100',
-                    'text-tint-strong/7',
-                    'rounded-md',
-                    'straight-corners:rounded-none',
-                    'circular-corners:rounded-xl',
-                    'before:content-none',
-                    'font-normal',
-                    'hover:bg-tint',
-                    'hover:text-tint-strong'
-                )}
+                href={page.href ?? '#'}
+                classNames={['PageLinkItemStyles']}
                 insights={{
                     type: 'link_click',
                     link: {

@@ -1,12 +1,12 @@
+import { GITBOOK_INTEGRATIONS_HOST } from '@/lib/env';
 import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockIntegration, RenderIntegrationUI } from '@gitbook/api';
 import { ContentKit, ContentKitOutput } from '@gitbook/react-contentkit';
-import { GITBOOK_INTEGRATIONS_HOST } from '@v2/lib/env';
 
 import type { BlockProps } from '../Block';
 import './contentkit.css';
-import { getDataOrNull } from '@v2/lib/data';
 import { contentKitServerContext } from './contentkit';
+import { fetchSafeIntegrationUI } from './render';
 import { renderIntegrationUi } from './server-actions';
 
 export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegration>) {
@@ -15,8 +15,6 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
     if (!context.contentContext?.space) {
         throw new Error('integration block requires a content.spaceId');
     }
-
-    const { dataFetcher } = context.contentContext;
 
     const initialInput: RenderIntegrationUI = {
         componentId: block.data.block,
@@ -30,17 +28,27 @@ export async function IntegrationBlock(props: BlockProps<DocumentBlockIntegratio
         },
     };
 
-    const initialOutput = await getDataOrNull(
-        dataFetcher.renderIntegrationUi({
-            integrationName: block.data.integration,
-            request: initialInput,
-        }),
+    const initialResponse = await fetchSafeIntegrationUI(context.contentContext, {
+        integrationName: block.data.integration,
+        request: initialInput,
+    });
 
-        // The API can respond with a 400 error if the integration is not installed
-        // and 404 if the integration is not found.
-        [404, 400]
-    );
-    if (!initialOutput || initialOutput.type === 'complete') {
+    if (initialResponse.error) {
+        if (initialResponse.error.code === 404) {
+            return null;
+        }
+
+        return (
+            <div className={tcls(style)}>
+                <pre>
+                    Unexpected error with integration {block.data.integration}:{' '}
+                    {initialResponse.error.message}
+                </pre>
+            </div>
+        );
+    }
+    const initialOutput = initialResponse.data;
+    if (initialOutput.type === 'complete') {
         return null;
     }
 

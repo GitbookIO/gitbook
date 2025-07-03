@@ -1,7 +1,7 @@
 <h1 align="center">GitBook</h1>
 
 <p align="center">
-  <a href="https://gitbook.com/docs/">Docs</a> - <a href="https://github.com/GitbookIO/community">Community</a> - <a href="https://developer.gitbook.com/">Developer Docs</a> - <a href="https://changelog.gitbook.com/">Changelog</a> - <a href="https://github.com/GitbookIO/gitbook/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a> 
+  <a href="https://gitbook.com/docs/">Docs</a> - <a href="https://github.com/GitbookIO/community">Community</a> - <a href="https://developer.gitbook.com/">Developer Docs</a> - <a href="https://changelog.gitbook.com/">Changelog</a> - <a href="https://github.com/GitbookIO/gitbook/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a> - <a href="https://github.com/orgs/GitbookIO/discussions/categories/feature-requests">Feature requests</a> 
 </p>
 
 <p align="center">
@@ -36,9 +36,9 @@ To run a local version of this project, please follow these simple steps.
 ### Prerequisites
 
 -   Node.js (Version: >=20.6)
-  - Use nvm for easy Node management
+    - Use nvm for easy Node management
 -   Bun (Version: >=1.2.1)
-  - We use a text-based lockfile which isn't supported below 1.2.1
+    - We use a text-based lockfile which isn't supported below 1.2.1
 
 ### Set up
 
@@ -59,10 +59,10 @@ bun install
 4. Start your local development server.
 
 ```
-bun dev:v2
+bun dev
 ```
 
-5. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
+6. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/url`.
 
 examples:
 
@@ -70,11 +70,6 @@ examples:
 -   http://localhost:3000/url/open-source.gitbook.io/midjourney
 
 Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
-
-### Other development commands
-
--   `bun format`: format the code
--   `bun lint`: lint the code
 
 ### CI and testing
 

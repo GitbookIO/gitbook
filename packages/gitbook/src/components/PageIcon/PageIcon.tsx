@@ -4,7 +4,10 @@ import { Icon, type IconName } from '@gitbook/icons';
 import { Emoji } from '@/components/primitives';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-export function PageIcon(props: { page: RevisionPage; style?: ClassValue }) {
+export function PageIcon(props: {
+    page: Pick<RevisionPage, 'emoji' | 'icon'>;
+    style?: ClassValue;
+}) {
     const { page, style } = props;
 
     if (page.emoji) {
