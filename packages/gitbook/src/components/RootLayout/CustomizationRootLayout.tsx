@@ -22,8 +22,8 @@ import {
 import { IconStyle, IconsProvider } from '@gitbook/icons';
 import * as ReactDOM from 'react-dom';
 
-import { getFontData } from '@/fonts';
-import { fontNotoColorEmoji, ibmPlexMono } from '@/fonts/default';
+import { type FontData, getFontData } from '@/fonts';
+import { fontNotoColorEmoji } from '@/fonts/default';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -34,6 +34,22 @@ import '@gitbook/icons/style.css';
 import './globals.css';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
 import { AnnouncementDismissedScript } from '../Announcement';
+
+function preloadFont(fontData: FontData) {
+    if (fontData.type === 'custom') {
+        ReactDOM.preconnect(GITBOOK_FONTS_URL);
+        fontData.preloadSources
+            .flatMap((face) => face.sources)
+            .forEach(({ url, format }) => {
+                ReactDOM.preload(url, {
+                    as: 'font',
+                    crossOrigin: 'anonymous',
+                    fetchPriority: 'high',
+                    type: format ? `font/${format}` : undefined,
+                });
+            });
+    }
+}
 
 /**
  * Layout shared between the content and the PDF renderer.
@@ -51,22 +67,12 @@ export async function CustomizationRootLayout(props: {
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
-    const fontData = getFontData(customization.styling.font);
+    const fontData = getFontData(customization.styling.font, 'content');
+    const monospaceFontData = getFontData(customization.styling.monospaceFont, 'mono');
 
     // Preconnect and preload custom fonts if needed
-    if (fontData.type === 'custom') {
-        ReactDOM.preconnect(GITBOOK_FONTS_URL);
-        fontData.preloadSources
-            .flatMap((face) => face.sources)
-            .forEach(({ url, format }) => {
-                ReactDOM.preload(url, {
-                    as: 'font',
-                    crossOrigin: 'anonymous',
-                    fetchPriority: 'high',
-                    type: format ? `font/${format}` : undefined,
-                });
-            });
-    }
+    preloadFont(fontData);
+    preloadFont(monospaceFontData);
 
     return (
         <html
@@ -86,8 +92,8 @@ export async function CustomizationRootLayout(props: {
                 'links' in customization.styling && `links-${customization.styling.links}`,
                 'depth' in customization.styling && `depth-${customization.styling.depth}`,
                 fontNotoColorEmoji.variable,
-                ibmPlexMono.variable,
-                fontData.type === 'default' ? fontData.variable : 'font-custom',
+                monospaceFontData.type === 'default' ? monospaceFontData.variable : null,
+                fontData.type === 'default' ? fontData.variable : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
                 (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
@@ -102,6 +108,9 @@ export async function CustomizationRootLayout(props: {
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
+                {monospaceFontData.type === 'custom' ? (
+                    <style>{monospaceFontData.fontFaceRules}</style>
+                ) : null}
 
                 {/* Inject a script to detect if the announcmeent banner has been dismissed */}
                 {'announcement' in customization && customization.announcement?.enabled ? (
