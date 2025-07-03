@@ -74,6 +74,7 @@ export const de = {
     ai_chat_thinking: 'Denke nach...',
     ai_chat_working: 'Arbeite...',
     ai_chat_context_badge: 'KI',
+    ai_chat_error: 'Etwas ist schief gelaufen.',
     ai_chat_context_title: 'Basierend auf Ihrem Kontext',
     ai_chat_context_description:
         'Der Docs-Assistent verwendet KI und Ihren Kontext, um Antworten zu generieren und Aktionen durchzuführen.',

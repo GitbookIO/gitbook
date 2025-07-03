@@ -49,7 +49,7 @@ export const en = {
     notfound: "The page you are looking for doesn't exist.",
     unexpected_error_title: 'An error occurred',
     unexpected_error: 'Sorry, an unexpected error has occurred. Please try again later.',
-    unexpected_error_retry: 'Retry',
+    unexpected_error_retry: 'Try again',
     pdf_download: 'Export as PDF',
     pdf_goback: 'Go back to content',
     pdf_print: 'Print or Save as PDF',
@@ -72,6 +72,7 @@ export const en = {
     ai_chat_thinking: 'Thinking...',
     ai_chat_working: 'Working...',
     ai_chat_context_badge: 'AI',
+    ai_chat_error: 'Something went wrong.',
     ai_chat_context_title: 'Based on your context',
     ai_chat_context_description:
         'Docs Assistant uses AI and your context to generate answers and perform actions.',

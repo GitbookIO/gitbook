@@ -74,6 +74,7 @@ export const fr: TranslationLanguage = {
     ai_chat_thinking: 'Réfléchit...',
     ai_chat_working: 'Travaille...',
     ai_chat_context_badge: 'IA',
+    ai_chat_error: 'Une erreur est survenue.',
     ai_chat_context_title: 'Basé sur votre contexte',
     ai_chat_context_description:
         "L'Assistant Docs utilise l'IA et votre contexte pour générer des réponses et effectuer des actions.",
