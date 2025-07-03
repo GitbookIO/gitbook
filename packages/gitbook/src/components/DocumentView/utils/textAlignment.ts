@@ -1,11 +1,23 @@
 import type { ClassValue } from '@/lib/tailwind';
 import { nullIfNever } from '@/lib/typescript';
-import { TextAlignment } from '@gitbook/api';
+import { type DocumentBlock, TextAlignment } from '@gitbook/api';
 
 /**
  * Get the tailwind class for a text alignment.
  */
-export function getTextAlignment(textAlignment: TextAlignment | undefined): ClassValue {
+export function getTextAlignment(
+    textAlignment: TextAlignment | undefined,
+    ancestorBlocks: DocumentBlock[]
+): ClassValue {
+    // Text nodes within a table will have their alignment governed by columns instead.)
+    for (let i = ancestorBlocks.length - 1; i >= 0; i--) {
+        const ancestor = ancestorBlocks[i];
+        if (ancestor.type === 'table') {
+            return null;
+        }
+    }
+
+    // If not inside a table, use the normal alignment logic
     switch (textAlignment) {
         case undefined:
         case TextAlignment.Start:

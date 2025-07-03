@@ -9,7 +9,7 @@ import { getBlockTextStyle } from './spacing';
 import { getTextAlignment } from './utils';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
-    const { block, style, context, ...rest } = props;
+    const { block, style, context, ancestorBlocks, ...rest } = props;
 
     const textStyle = getBlockTextStyle(block);
 
@@ -43,7 +43,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'grid-area-1-1',
                     'z-[1]',
                     'justify-self-start',
-                    getTextAlignment(block.data.align),
+                    getTextAlignment(block.data.align, ancestorBlocks),
                     textStyle.lineHeight,
                     textStyle.marginTop
                 )}
