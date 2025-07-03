@@ -5,6 +5,7 @@ import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
+import { CustomizationAIMode } from '@gitbook/api';
 import { AIChatButton } from '../AIChat/AIChatButton';
 import { SearchButton } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
@@ -154,7 +155,10 @@ export function Header(props: {
                                         <span className={tcls('flex-1')}>
                                             {t(
                                                 getSpaceLanguage(customization),
-                                                customization.aiSearch.enabled
+                                                // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
+                                                customization.aiSearch?.enabled ||
+                                                    customization.ai?.mode !==
+                                                        CustomizationAIMode.None
                                                     ? 'search_or_ask'
                                                     : 'search'
                                             )}

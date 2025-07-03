@@ -1,5 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationAIMode, CustomizationHeaderPreset } from '@gitbook/api';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -50,8 +50,9 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
+    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
     const withAIChat =
-        context.customization.aiSearch.enabled &&
+        context.customization.ai?.mode === CustomizationAIMode.Assistant &&
         (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv');
 
     return (
@@ -123,7 +124,11 @@ export function SpaceLayout(props: {
                                                             <span className={tcls('flex-1')}>
                                                                 {t(
                                                                     getSpaceLanguage(customization),
-                                                                    customization.aiSearch.enabled
+                                                                    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
+                                                                    customization.aiSearch
+                                                                        ?.enabled ||
+                                                                        customization.ai?.mode !==
+                                                                            CustomizationAIMode.None
                                                                         ? 'search_or_ask'
                                                                         : 'search'
                                                                 )}
@@ -167,7 +172,11 @@ export function SpaceLayout(props: {
                     <React.Suspense fallback={null}>
                         <SearchModal
                             spaceTitle={siteSpace.title}
-                            withAsk={customization.aiSearch.enabled}
+                            // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
+                            withAsk={
+                                customization.aiSearch?.enabled ||
+                                customization.ai?.mode !== CustomizationAIMode.None
+                            }
                             withAIChat={withAIChat}
                             isMultiVariants={isMultiVariants}
                         />
