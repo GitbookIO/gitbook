@@ -1,8 +1,9 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { InteractiveSection } from './InteractiveSection';
-import { OpenAPIRequestBodyHeader } from './OpenAPIRequestBodyHeader';
+import { OpenAPIRequestBodyHeaderType } from './OpenAPIRequestBodyHeaderType';
 import { OpenAPIRootSchema } from './OpenAPISchemaServer';
 import type { OpenAPIClientContext } from './context';
+import { t } from './translate';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { checkIsReference, createStateKey } from './utils';
 
@@ -25,12 +26,10 @@ export function OpenAPIRequestBody(props: {
     return (
         <InteractiveSection
             header={
-                <OpenAPIRequestBodyHeader
-                    requestBody={requestBody}
-                    context={context}
-                    data={data}
-                    stateKey={stateKey}
-                />
+                <>
+                    <span>{t(context.translation, 'name' in data ? 'payload' : 'body')}</span>
+                    <OpenAPIRequestBodyHeaderType requestBody={requestBody} stateKey={stateKey} />
+                </>
             }
             className="openapi-requestbody"
             stateKey={stateKey}
