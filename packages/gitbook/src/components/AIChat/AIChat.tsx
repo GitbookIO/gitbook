@@ -186,7 +186,7 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                     <AIChatInput
                         value={input}
                         onChange={setInput}
-                        isLoading={chat.loading}
+                        loading={chat.loading}
                         disabled={chat.loading || chat.error}
                         onSubmit={() => {
                             chatController.postMessage({ message: input });
