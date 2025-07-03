@@ -1,8 +1,10 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
+    CustomizationAIMode,
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultFont,
+    CustomizationDefaultMonospaceFont,
     CustomizationDepth,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
@@ -282,6 +284,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             corners: CustomizationCorners.Rounded,
             depth: CustomizationDepth.Subtle,
             font: CustomizationDefaultFont.Inter,
+            monospaceFont: CustomizationDefaultMonospaceFont.IBMPlexMono,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,
@@ -315,8 +318,12 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         feedback: {
             enabled: false,
         },
+        // TODO: remove aiSearch once the cache has been fully updated (after 11/07/2025)
         aiSearch: {
             enabled: true,
+        },
+        ai: {
+            mode: CustomizationAIMode.None,
         },
         externalLinks: {
             target: SiteExternalLinksTarget.Self,
