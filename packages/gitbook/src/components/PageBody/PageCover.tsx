@@ -95,7 +95,7 @@ export async function PageCover(props: {
                     : [
                           'sm:mx-auto',
                           'max-w-3xl ',
-                          'page-full-width:max-w-screen-2xl',
+                          'page-width-wide:max-w-screen-2xl',
                           'sm:rounded-md',
                           'mb-8',
                       ]

@@ -40,8 +40,8 @@ export function PageBody(props: {
               LINK_PREVIEW_MAX_COUNT
           )
         : false;
-    const pageFullWidth = page.layout.width === 'wide';
-    const asFullWidth = pageFullWidth || contentFullWidth;
+    const pageWidthWide = page.layout.width === 'wide';
+    const siteWidthWide = pageWidthWide || contentFullWidth;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
@@ -53,12 +53,12 @@ export function PageBody(props: {
                     'mx-auto max-w-screen-2xl py-8',
                     // Allow words to break if they are too long.
                     'break-anywhere',
-                    pageFullWidth ? 'page-full-width 2xl:px-8' : 'page-default-width',
-                    asFullWidth ? 'site-full-width' : 'site-default-width',
+                    pageWidthWide ? 'page-width-wide 2xl:px-8' : 'page-width-default',
+                    siteWidthWide ? 'site-width-wide' : 'site-width-default',
                     page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'
                 )}
             >
-                <PreservePageLayout asFullWidth={asFullWidth} />
+                <PreservePageLayout siteWidthWide={siteWidthWide} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
