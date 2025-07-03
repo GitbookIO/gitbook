@@ -3,6 +3,10 @@ import type * as api from '@gitbook/api';
 export type DataFetcherErrorData = {
     code: number;
     message: string;
+    cache?: {
+        maxAge?: number;
+        staleWhileRevalidate?: number;
+    };
 };
 
 export type DataFetcherResponse<T> =
