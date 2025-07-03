@@ -27,8 +27,10 @@ export function DropdownMenu(props: {
     className?: ClassValue;
     /** Open the dropdown on hover */
     openOnHover?: boolean;
+    /** Props to pass to the content */
+    contentProps?: RadixDropdownMenu.DropdownMenuContentProps;
 }) {
-    const { button, children, className, openOnHover = false } = props;
+    const { button, children, className, openOnHover = false, contentProps } = props;
     const [hovered, setHovered] = useState(false);
     const [clicked, setClicked] = useState(false);
 
@@ -57,6 +59,7 @@ export function DropdownMenu(props: {
                     onMouseLeave={() => setHovered(false)}
                     align="start"
                     className="z-40 animate-scaleIn pt-2"
+                    {...contentProps}
                 >
                     <div
                         className={tcls(

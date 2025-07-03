@@ -26,13 +26,13 @@ export const variantClasses = {
         'text-contrast-primary-solid',
         'hover:bg-primary-solid-hover',
         'hover:text-contrast-primary-solid-hover',
-        'ring-0',
-        'contrast-more:ring-1',
+        'border-0',
+        'contrast-more:border-1',
     ],
     blank: [
         'bg-transparent',
         'text-tint',
-        'ring-0',
+        'border-0',
         'shadow-none',
         'hover:bg-primary-hover',
         'hover:text-primary',
@@ -115,5 +115,5 @@ export function Button({
         </button>
     );
 
-    return iconOnly ? <Tooltip label={label}>{button}</Tooltip> : button;
+    return iconOnly && label ? <Tooltip label={label}>{button}</Tooltip> : button;
 }

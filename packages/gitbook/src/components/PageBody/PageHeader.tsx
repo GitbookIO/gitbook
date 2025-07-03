@@ -1,11 +1,10 @@
-import type { RevisionPageDocument } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
-import { Fragment } from 'react';
-
+import { AIActionsDropdown } from '@/components/AIActions/AIActionsDropdown';
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-
+import type { RevisionPageDocument } from '@gitbook/api';
+import { Icon } from '@gitbook/icons';
+import { Fragment } from 'react';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
@@ -23,13 +22,15 @@ export async function PageHeader(props: {
 
     return (
         <header
+            id="page-header"
             className={tcls(
                 'max-w-3xl',
                 'page-full-width:max-w-screen-2xl',
                 'mx-auto',
                 'mb-6',
                 'space-y-3',
-                'page-api-block:ml-0'
+                'page-api-block:ml-0',
+                'relative'
             )}
         >
             {ancestors.length > 0 && (
@@ -79,7 +80,16 @@ export async function PageHeader(props: {
                 </nav>
             )}
             {page.layout.title ? (
-                <h1 className={tcls('text-4xl', 'font-bold', 'flex', 'items-center', 'gap-4')}>
+                <h1
+                    className={tcls(
+                        'text-4xl',
+                        'font-bold',
+                        'flex',
+                        'items-center',
+                        'gap-4',
+                        'w-fit'
+                    )}
+                >
                     <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
                     {page.title}
                 </h1>
@@ -87,6 +97,9 @@ export async function PageHeader(props: {
             {page.description && page.layout.description ? (
                 <p className={tcls('text-lg', 'text-tint')}>{page.description}</p>
             ) : null}
+            <div className="!mt-0 absolute top-0 right-0">
+                <AIActionsDropdown />
+            </div>
         </header>
     );
 }
