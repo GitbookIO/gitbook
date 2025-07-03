@@ -5,7 +5,7 @@ import * as zustand from 'zustand';
 import { AIMessageRole } from '@gitbook/api';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
-import { streamAIChatFollowUpResponses, streamAIChatResponse } from './server-actions';
+import { streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
 export type AIChatMessage = {
@@ -90,19 +90,6 @@ export function useAIChatController(): AIChatController {
     const trackEvent = useTrackEvent();
 
     return React.useMemo(() => {
-        /**
-         * Refresh the follow-up suggestions.
-         */
-        const fetchFollowUpSuggestions = async (previousResponseId: string) => {
-            const stream = await streamAIChatFollowUpResponses({
-                previousResponseId,
-            });
-
-            for await (const suggestions of stream) {
-                setState((state) => ({ ...state, followUpSuggestions: suggestions }));
-            }
-        };
-
         return {
             open: () => setState((state) => ({ ...state, opened: true })),
             close: () => setState((state) => ({ ...state, opened: false })),
@@ -147,10 +134,28 @@ export function useAIChatController(): AIChatController {
                     if (!data) continue;
 
                     const event = data.event;
-                    if (event.type === 'response_finish') {
-                        setState((state) => ({ ...state, responseId: event.responseId }));
 
-                        fetchFollowUpSuggestions(event.responseId);
+                    switch (event.type) {
+                        case 'response_finish': {
+                            setState((state) => ({
+                                ...state,
+                                responseId: event.responseId,
+                                // Mark as not loading when the response is finished
+                                // Even if the stream might continue as we receive 'response_followup_suggestion'
+                                loading: false,
+                            }));
+                            break;
+                        }
+                        case 'response_followup_suggestion': {
+                            setState((state) => ({
+                                ...state,
+                                followUpSuggestions: [
+                                    ...state.followUpSuggestions,
+                                    ...event.suggestions,
+                                ],
+                            }));
+                            break;
+                        }
                     }
 
                     setState((state) => ({
