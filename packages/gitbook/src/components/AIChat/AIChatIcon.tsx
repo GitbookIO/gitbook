@@ -6,7 +6,7 @@ interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     state?: 'thinking' | 'default';
 }
 
-const AIChatIcon = ({
+export const AIChatIcon = ({
     className = 'size-4',
     size,
     state = 'default',
@@ -60,5 +60,3 @@ const AIChatIcon = ({
         </svg>
     );
 };
-
-export default AIChatIcon;

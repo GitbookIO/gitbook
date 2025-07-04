@@ -95,6 +95,9 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
                 ? 'dark light'
                 : 'light dark'
             : customization.themes.default,
+        width: 'device-width',
+        initialScale: 1,
+        maximumScale: 1,
     };
 }
 

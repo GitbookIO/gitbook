@@ -16,6 +16,7 @@ export const ja: TranslationLanguage = {
     search_results_count: '${1}件の結果',
     search_scope_space: '${1}',
     search_scope_all: '全てのコンテンツ',
+    ask: '質問する',
     search_ask: '"${1}" を質問する',
     search_ask_description: 'AIで答えを見つける',
     search_ask_sources: '情報源',

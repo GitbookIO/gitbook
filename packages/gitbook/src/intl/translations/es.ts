@@ -16,6 +16,7 @@ export const es: TranslationLanguage = {
     search_results_count: '${1} resultados',
     search_scope_space: '${1}',
     search_scope_all: 'Todo el contenido',
+    ask: 'Preguntar',
     search_ask: 'Preguntar "${1}"',
     search_ask_description: 'Encuentra la respuesta con IA',
     search_ask_sources: 'Fuentes',

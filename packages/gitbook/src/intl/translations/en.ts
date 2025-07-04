@@ -14,6 +14,7 @@ export const en = {
     search_results_count: '${1} results',
     search_scope_space: '${1}',
     search_scope_all: 'All content',
+    ask: 'Ask',
     search_ask: 'Ask "${1}"',
     search_ask_description: 'Find the answer with AI',
     search_ask_sources: 'Sources',

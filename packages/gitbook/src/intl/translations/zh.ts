@@ -16,6 +16,7 @@ export const zh: TranslationLanguage = {
     search_results_count: '${1} 个结果',
     search_scope_space: '${1}',
     search_scope_all: '所有内容',
+    ask: '询问',
     search_ask: '询问"${1}"',
     search_ask_description: '利用人工智能找到答案',
     search_ask_sources: '来源',

@@ -1,6 +1,5 @@
-import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
-
+import { tString, useLanguage } from '@/intl/client';
+import { Button } from '../primitives';
 import { useSearch } from './useSearch';
 
 /**
@@ -20,54 +19,34 @@ export function SearchScopeToggle(props: { spaceTitle: string }) {
         <div
             role="toolbar"
             aria-orientation="horizontal"
-            className={tcls('flex', 'flex-row', 'mr-4')}
+            className="mb-2 flex flex-row flex-wrap gap-1 circular-corners:rounded-3xl rounded-corners:rounded-lg bg-tint-subtle p-1"
         >
-            <ToggleButton
+            <Button
+                variant="blank"
+                size="medium"
+                className="shrink grow justify-center whitespace-normal"
                 active={!state.global}
+                label={tString(language, 'search_scope_space', spaceTitle)}
                 onClick={() => {
                     setSearchState({
                         ...state,
                         global: false,
                     });
                 }}
-            >
-                {t(language, 'search_scope_space', spaceTitle)}
-            </ToggleButton>
-            <ToggleButton
+            />
+            <Button
+                variant="blank"
+                size="medium"
+                className="shrink grow justify-center whitespace-normal"
                 active={state.global}
+                label={tString(language, 'search_scope_all')}
                 onClick={() => {
                     setSearchState({
                         ...state,
                         global: true,
                     });
                 }}
-            >
-                {t(language, 'search_scope_all')}
-            </ToggleButton>
+            />
         </div>
-    );
-}
-
-function ToggleButton(props: { onClick: () => void; children: React.ReactNode; active: boolean }) {
-    const { onClick, children, active } = props;
-    return (
-        <button
-            role="tab"
-            type="button"
-            aria-selected={active}
-            onClick={onClick}
-            className={tcls(
-                'text-sm',
-                'transition-colors',
-                'px-3',
-                'py-2',
-                'border-b-2',
-                'whitespace-pre',
-                '-mb-[1px]',
-                active ? ['text-primary', 'border-primary'] : ['border-transparent']
-            )}
-        >
-            {children}
-        </button>
     );
 }
