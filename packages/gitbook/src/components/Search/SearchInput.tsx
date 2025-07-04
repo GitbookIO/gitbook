@@ -34,13 +34,16 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
 
         useEffect(() => {
             if (isOpen) {
-                inputRef.current?.focus();
+                // Only focus if the input is not already focused to prevent unnecessary scroll
+                if (document.activeElement !== inputRef.current) {
+                    inputRef.current?.focus({ preventScroll: true });
+                }
                 // Place cursor at the end of the input
                 inputRef.current?.setSelectionRange(value.length, value.length);
             } else {
                 inputRef.current?.blur();
             }
-        }, [isOpen]);
+        }, [isOpen, value]);
 
         return (
             <div className="relative flex size-9 grow">
@@ -58,7 +61,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         'has-[input:focus]:-translate-y-px h-9 grow cursor-pointer px-2.5 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
                         'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
-                        'relative z-30 max-md:absolute max-md:right-0',
+                        'relative z-30 justify-start max-md:absolute max-md:right-0',
+                        isOpen ? 'max-md:w-48' : 'max-md:w-9',
                         className
                     )}
                 >
@@ -69,14 +73,14 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-mx-1.5 animate-scaleIn px-1.5 text-base theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
+                            className="-mx-1.5 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
                                 onChange('');
                                 inputRef.current?.focus();
                             }}
                         />
                     ) : (
-                        <Icon icon="magnifying-glass" className="size-4 animate-scaleIn" />
+                        <Icon icon="magnifying-glass" className="size-4 shrink-0 animate-scaleIn" />
                     )}
 
                     <input
@@ -85,11 +89,10 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         onKeyDown={onKeyDown}
                         onChange={(event) => onChange(event.target.value)}
                         value={value}
-                        size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and overrides the min-width in some cases, so we set it to a minimum and control width ourselves. See https://stackoverflow.com/a/29990524
                         placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}
                         className={tcls(
-                            'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                            isOpen ? 'max-md:w-40' : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
+                            'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
+                            isOpen ? '' : 'max-md:opacity-0'
                         )}
                         ref={inputRef}
                     />
