@@ -23,7 +23,7 @@ import { IconStyle, IconsProvider } from '@gitbook/icons';
 import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
-import { fontNotoColorEmoji } from '@/fonts/default';
+import { fontNotoColorEmoji, fonts } from '@/fonts/default';
 import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
@@ -68,7 +68,14 @@ export async function CustomizationRootLayout(props: {
     const sidebarStyles = getSidebarStyles(customization);
     const { infoColor, successColor, warningColor, dangerColor } = getSemanticColors(customization);
     const fontData = getFontData(customization.styling.font, 'content');
-    const monospaceFontData = getFontData(customization.styling.monospaceFont, 'mono');
+    // Temporarily add a if here while the cache is being warmed up.
+    // We can remove the condition after 14-07-2025.
+    const monospaceFontData = customization.styling.monospaceFont
+        ? getFontData(customization.styling.monospaceFont, 'mono')
+        : {
+              type: 'default' as const,
+              variable: fonts.IBMPlexMono.variable,
+          };
 
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);
