@@ -91,9 +91,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}
                         className={tcls(
                             'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                            value !== undefined
-                                ? 'max-md:w-40'
-                                : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
+                            isOpen ? 'max-md:w-40' : 'max-md:-ml-2 max-md:w-0 max-md:opacity-0'
                         )}
                         ref={inputRef}
                     />
