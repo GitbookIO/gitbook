@@ -62,14 +62,14 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         className
                     )}
                 >
-                    {value ? (
+                    {value && isOpen ? (
                         <Button
                             variant="blank"
                             label="Clear"
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-mx-1.5 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
+                            className="-mx-1.5 animate-scaleIn px-1.5 text-base theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
                                 onChange('');
                                 inputRef.current?.focus();
