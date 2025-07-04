@@ -13,7 +13,7 @@ interface SearchButtonProps {
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus: () => void;
     value?: string;
-    withAsk?: boolean;
+    withAI?: boolean;
     isOpen: boolean;
     className?: string;
 }
@@ -23,7 +23,7 @@ interface SearchButtonProps {
  */
 export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
     function SearchInput(props, ref) {
-        const { onChange, onKeyDown, onFocus, value, withAsk = false, isOpen, className } = props;
+        const { onChange, onKeyDown, onFocus, value, withAI = false, isOpen, className } = props;
         const inputRef = useRef<HTMLInputElement>(null);
 
         const language = useLanguage();
@@ -93,7 +93,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
                         onChange={onChange}
                         value={value ?? ''}
                         size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and limits the min-width, so we set it to a sensible minimum and control width ourselves.
-                        placeholder={`${tString(language, withAsk ? 'search_or_ask' : 'search')}...`}
+                        placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}
                         className={tcls(
                             'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             value !== undefined

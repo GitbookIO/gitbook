@@ -7,6 +7,7 @@ import React from 'react';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
+import { CustomizationAIMode } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { useTrackEvent } from '../Insights';
 import { Button, Link, Loading } from '../primitives';
@@ -41,19 +42,18 @@ let cachedRecommendedQuestions: null | ResultType[] = null;
  * Fetch the results of the keyboard navigable elements to display for a query:
  *   - Recommended questions if no query is provided.
  *   - Search results if a query is provided.
- *      - If withAsk is true, add a question result.
+ *      - If withAI is true, add a question result.
  */
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         children?: React.ReactNode;
         query: string;
         global: boolean;
-        withAsk: boolean;
-        withAIChat: boolean;
+        aiMode: CustomizationAIMode;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, withAsk, withAIChat, global } = props;
+    const { children, query, aiMode, global } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -64,9 +64,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
 
+    const withAI =
+        aiMode === CustomizationAIMode.Search || aiMode === CustomizationAIMode.Assistant;
+
     React.useEffect(() => {
         if (!query) {
-            if (!withAsk) {
+            if (!withAI) {
                 setResultsState({ results: [], fetching: false });
                 return;
             }
@@ -77,8 +80,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
             }
 
             let cancelled = false;
-
-            // setResultsState({ results: [], fetching: true });
 
             // We currently have a bug where the same question can be returned multiple times.
             // This is a workaround to avoid that.
@@ -148,14 +149,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, global, withAsk, trackEvent]);
+    }, [query, global, withAI, trackEvent]);
 
     const results: ResultType[] = React.useMemo(() => {
-        if (!withAsk) {
+        if (!withAI) {
             return resultsState.results;
         }
         return withQuestionResult(resultsState.results, query);
-    }, [resultsState.results, query, withAsk]);
+    }, [resultsState.results, query, withAI]);
 
     React.useEffect(() => {
         if (!query) {
@@ -270,7 +271,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             ref={(ref) => {
                                                 refs.current[index] = ref;
                                             }}
-                                            withAIChat={withAIChat}
+                                            withAIChat={aiMode === CustomizationAIMode.Assistant}
                                             key={item.id}
                                             question={query}
                                             active={index === cursor}
@@ -284,7 +285,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                                 refs.current[index] = ref;
                                             }}
                                             key={item.id}
-                                            withAIChat={withAIChat}
+                                            withAIChat={aiMode === CustomizationAIMode.Assistant}
                                             question={item.question}
                                             active={index === cursor}
                                             recommended

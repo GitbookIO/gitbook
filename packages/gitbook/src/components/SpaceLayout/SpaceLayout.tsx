@@ -50,21 +50,24 @@ export function SpaceLayout(props: {
         customization.footer.groups?.length;
 
     // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
-    const withAIChat =
-        context.customization.ai?.mode === CustomizationAIMode.Assistant &&
-        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv');
+    const aiMode =
+        context.customization.ai?.mode ??
+        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv'
+            ? CustomizationAIMode.Assistant
+            : customization.aiSearch.enabled
+              ? CustomizationAIMode.Search
+              : CustomizationAIMode.None);
 
     const searchAndAI = (
         <div className="flex grow items-center gap-2">
             <React.Suspense fallback={null}>
                 <SearchContainer
-                    withAsk={customization.aiSearch.enabled}
-                    withAIChat={withAIChat ?? false}
+                    aiMode={aiMode}
                     isMultiVariants={siteSpaces.length > 1}
                     spaceTitle={siteSpace.title}
                 />
             </React.Suspense>
-            {withAIChat ? <AIChatButton /> : null}
+            {aiMode === CustomizationAIMode.Assistant ? <AIChatButton /> : null}
         </div>
     );
 
@@ -88,7 +91,7 @@ export function SpaceLayout(props: {
                 >
                     <Announcement context={context} />
                     <Header withTopHeader={withTopHeader} context={context} search={searchAndAI} />
-                    {withAIChat ? <AIChat /> : null}
+                    {aiMode === CustomizationAIMode.Assistant ? <AIChat /> : null}
                     <div className="scroll-nojump">
                         <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                             <div

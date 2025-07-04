@@ -1,5 +1,6 @@
 'use client';
 
+import { CustomizationAIMode } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -16,8 +17,7 @@ import { useSearch } from './useSearch';
 interface SearchContainerProps {
     spaceTitle: string;
     isMultiVariants: boolean;
-    withAsk: boolean;
-    withAIChat: boolean;
+    aiMode: CustomizationAIMode;
     className?: string;
 }
 
@@ -25,7 +25,9 @@ interface SearchContainerProps {
  * Client component to render the search modal when the url contains a search query.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { spaceTitle, isMultiVariants, withAsk, withAIChat, className } = props;
+    const { spaceTitle, isMultiVariants, aiMode, className } = props;
+    const withAI =
+        aiMode === CustomizationAIMode.Search || aiMode === CustomizationAIMode.Assistant;
 
     const [state, setSearchState] = useSearch();
     const [open, setOpen] = useState(false);
@@ -124,7 +126,7 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     // Only show content if there's a query or Ask is enabled
-                    state?.query || withAsk ? (
+                    state?.query || withAI ? (
                         <React.Suspense fallback={null}>
                             {isMultiVariants && !state?.ask ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
@@ -134,8 +136,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     ref={resultsRef}
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
-                                    withAsk={withAsk}
-                                    withAIChat={withAIChat}
+                                    aiMode={aiMode}
                                 />
                             ) : null}
                             {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
@@ -176,7 +177,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    withAsk={withAsk}
+                    withAI={withAI}
                     isOpen={open}
                     className={className}
                 />
