@@ -240,7 +240,7 @@ describe('generateFontFacesCSS', () => {
             "url(https://example.com/fonts/opensans-regular.woff2) format('woff2')"
         );
         expect(css).toContain("url(https://example.com/fonts/opensans-bold.woff2) format('woff2')");
-        expect(css).toContain('--font-content-custom: CustomFont_content');
+        expect(css).toContain('--font-content: CustomFont_content');
     });
 
     test('mono type', async () => {
@@ -255,7 +255,7 @@ describe('generateFontFacesCSS', () => {
             "url(https://example.com/fonts/opensans-regular.woff2) format('woff2')"
         );
         expect(css).toContain("url(https://example.com/fonts/opensans-bold.woff2) format('woff2')");
-        expect(css).toContain('--font-mono-custom: CustomFont_mono');
+        expect(css).toContain('--font-mono: CustomFont_mono');
     });
 
     test('multiple font weights', async () => {
