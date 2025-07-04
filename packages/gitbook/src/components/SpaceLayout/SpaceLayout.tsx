@@ -1,5 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationAIMode, CustomizationHeaderPreset } from '@gitbook/api';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -49,7 +49,10 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const withAIChat = context.customization.aiSearch.enabled && context.site.id === 'site_p4Xo4';
+    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
+    const withAIChat =
+        context.customization.ai?.mode === CustomizationAIMode.Assistant &&
+        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv');
 
     const searchAndAI = (
         <div className="flex grow items-center gap-2">

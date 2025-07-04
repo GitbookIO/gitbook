@@ -358,6 +358,11 @@
 
 .openapi-requestbody-header-content {
     /* unstyled */
+    @apply flex flex-row items-center gap-2.5;
+}
+
+.openapi-requestbody-header-type {
+    @apply text-tint select-text text-[0.813rem] font-mono font-normal [word-spacing:-0.25rem];
 }
 
 .openapi-requestbody-description.openapi-markdown {

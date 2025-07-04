@@ -5,7 +5,7 @@ import * as zustand from 'zustand';
 import { AIMessageRole } from '@gitbook/api';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
-import { streamAIChatFollowUpResponses, streamAIChatResponse } from './server-actions';
+import { streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
 export type AIChatMessage = {
@@ -38,6 +38,13 @@ export type AIChatState = {
      * If true, the session is in progress.
      */
     loading: boolean;
+
+    /**
+     * Set to true when an error occurred while communicating with the server. When
+     * this flag is true, the chat input should be read-only and the UI should
+     * display an error alert. Clearing the conversation will reset this flag.
+     */
+    error: boolean;
 };
 
 export type AIChatController = {
@@ -68,6 +75,7 @@ const globalState = zustand.create<{
             messages: [],
             followUpSuggestions: [],
             loading: false,
+            error: false,
         },
         setState: (fn) => set((state) => ({ state: { ...state.state, ...fn(state.state) } })),
     };
@@ -90,19 +98,6 @@ export function useAIChatController(): AIChatController {
     const trackEvent = useTrackEvent();
 
     return React.useMemo(() => {
-        /**
-         * Refresh the follow-up suggestions.
-         */
-        const fetchFollowUpSuggestions = async (previousResponseId: string) => {
-            const stream = await streamAIChatFollowUpResponses({
-                previousResponseId,
-            });
-
-            for await (const suggestions of stream) {
-                setState((state) => ({ ...state, followUpSuggestions: suggestions }));
-            }
-        };
-
         return {
             open: () => setState((state) => ({ ...state, opened: true })),
             close: () => setState((state) => ({ ...state, opened: false })),
@@ -113,6 +108,7 @@ export function useAIChatController(): AIChatController {
                     messages: [],
                     followUpSuggestions: [],
                     responseId: null,
+                    error: false,
                 })),
             postMessage: async (input: { message: string }) => {
                 trackEvent({ type: 'ask_question', query: input.message });
@@ -134,41 +130,70 @@ export function useAIChatController(): AIChatController {
                         ],
                         followUpSuggestions: [],
                         loading: true,
+                        error: false,
                     };
                 });
 
-                const stream = await streamAIChatResponse({
-                    message: input.message,
-                    messageContext: messageContextRef.current,
-                    previousResponseId: globalState.getState().state.responseId ?? undefined,
-                });
+                try {
+                    const stream = await streamAIChatResponse({
+                        message: input.message,
+                        messageContext: messageContextRef.current,
+                        previousResponseId: globalState.getState().state.responseId ?? undefined,
+                    });
 
-                for await (const data of stream) {
-                    if (!data) continue;
+                    for await (const data of stream) {
+                        if (!data) continue;
 
-                    const event = data.event;
-                    if (event.type === 'response_finish') {
-                        setState((state) => ({ ...state, responseId: event.responseId }));
+                        const event = data.event;
 
-                        fetchFollowUpSuggestions(event.responseId);
+                        switch (event.type) {
+                            case 'response_finish': {
+                                setState((state) => ({
+                                    ...state,
+                                    responseId: event.responseId,
+                                    // Mark as not loading when the response is finished
+                                    // Even if the stream might continue as we receive 'response_followup_suggestion'
+                                    loading: false,
+                                    error: false,
+                                }));
+                                break;
+                            }
+                            case 'response_followup_suggestion': {
+                                setState((state) => ({
+                                    ...state,
+                                    followUpSuggestions: [
+                                        ...state.followUpSuggestions,
+                                        ...event.suggestions,
+                                    ],
+                                }));
+                                break;
+                            }
+                        }
+
+                        setState((state) => ({
+                            ...state,
+                            messages: [
+                                ...state.messages.slice(0, -1),
+                                {
+                                    role: AIMessageRole.Assistant,
+                                    content: data.content,
+                                },
+                            ],
+                        }));
                     }
 
                     setState((state) => ({
                         ...state,
-                        messages: [
-                            ...state.messages.slice(0, -1),
-                            {
-                                role: AIMessageRole.Assistant,
-                                content: data.content,
-                            },
-                        ],
+                        loading: false,
+                        error: false,
+                    }));
+                } catch {
+                    setState((state) => ({
+                        ...state,
+                        loading: false,
+                        error: true,
                     }));
                 }
-
-                setState((state) => ({
-                    ...state,
-                    loading: false,
-                }));
             },
         };
     }, [messageContextRef, setState, trackEvent]);

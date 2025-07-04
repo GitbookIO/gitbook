@@ -7,11 +7,15 @@ import { Tooltip } from '../primitives/Tooltip';
 
 export function AIChatInput(props: {
     value: string;
-    disabled: boolean;
+    disabled?: boolean;
+    /**
+     * When true, the input is disabled
+     */
+    loading: boolean;
     onChange: (value: string) => void;
     onSubmit: (value: string) => void;
 }) {
-    const { value, onChange, onSubmit, disabled } = props;
+    const { value, onChange, onSubmit, disabled, loading } = props;
 
     const language = useLanguage();
 
@@ -38,7 +42,8 @@ export function AIChatInput(props: {
         <div className="relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base">
             <textarea
                 ref={inputRef}
-                disabled={disabled}
+                disabled={disabled || loading}
+                data-loading={loading}
                 className={tcls(
                     'resize-none',
                     'focus:outline-none',
@@ -55,7 +60,9 @@ export function AIChatInput(props: {
                     'disabled:bg-tint-subtle',
                     'delay-300',
                     'disabled:delay-0',
-                    'disabled:cursor-progress'
+                    'disabled:cursor-not-allowed',
+                    'data-[loading=true]:cursor-progress',
+                    'data-[loading=true]:opacity-50'
                 )}
                 value={value}
                 rows={1}
@@ -72,7 +79,7 @@ export function AIChatInput(props: {
             <div className="absolute inset-x-0 bottom-0 flex items-center px-2 py-2">
                 <Tooltip
                     label={
-                        <div className="flex flex-col gap-2 p-2">
+                        <div className="flex flex-col gap-3 p-2">
                             <p>{t(language, 'ai_chat_context_description')}</p>
                             <ul className="flex flex-col gap-2">
                                 <li className="flex items-center gap-2">
@@ -88,12 +95,15 @@ export function AIChatInput(props: {
                                     {t(language, 'ai_chat_context_previous_messages')}
                                 </li>
                             </ul>
+                            <p>{t(language, 'ai_chat_context_disclaimer')}</p>
                         </div>
                     }
                     arrow
                 >
                     <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2 py-1 text-tint/7 text-xs transition-all hover:bg-tint">
-                        <Icon icon="glasses-round" className="size-3.5" />{' '}
+                        <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
+                            AI
+                        </span>{' '}
                         <span>{t(language, 'ai_chat_context_title')}</span>
                     </div>
                 </Tooltip>
