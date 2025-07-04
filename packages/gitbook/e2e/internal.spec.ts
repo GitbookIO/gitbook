@@ -1,6 +1,7 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
+    CustomizationDefaultMonospaceFont,
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
@@ -796,6 +797,15 @@ const testCases: TestsCase[] = [
                         toggeable: false,
                     },
                 }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: `With custom monospace font - Theme mode ${themeMode}`,
+                url: `blocks/code${getCustomizationURL({
+                    styling: {
+                        monospaceFont: CustomizationDefaultMonospaceFont.SpaceMono,
+                    },
+                })}`,
                 run: waitForCookiesDialog,
             },
             // New site themes
