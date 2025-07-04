@@ -37,11 +37,13 @@ export function SearchContainer(props: SearchContainerProps) {
     const searchInputRef = useRef<HTMLDivElement>(null);
 
     // Derive open state from search state
-    const open = state !== null;
+    const open = state?.isOpen ?? false;
 
     const onClose = async (to?: string) => {
         if (state?.query === '') {
             await setSearchState(null);
+        } else if (state) {
+            await setSearchState({ ...state, isOpen: false });
         }
 
         if (to) {
@@ -59,15 +61,11 @@ export function SearchContainer(props: SearchContainerProps) {
     );
 
     const onOpen = () => {
-        // Don't re-open if already open to prevent flickering
-        if (open) {
-            return;
-        }
-
         setSearchState((prev) => ({
             ask: prev?.ask ?? false,
             global: prev?.global ?? false,
             query: prev?.query ?? '',
+            isOpen: true,
         }));
 
         trackEvent({
@@ -101,11 +99,12 @@ export function SearchContainer(props: SearchContainerProps) {
         }
     };
 
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (value: string) => {
         setSearchState((prev) => ({
             ask: false, // When typing, we go back to the default search mode
-            query: event.target.value,
+            query: value,
             global: prev?.global ?? false,
+            isOpen: true,
         }));
     };
 
@@ -117,7 +116,7 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     // Only show content if there's a query or Ask is enabled
-                    state?.query || withAI ? (
+                    (state?.query || withAI) && open ? (
                         <React.Suspense fallback={null}>
                             {isMultiVariants && !state?.ask ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />

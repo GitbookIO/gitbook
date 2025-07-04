@@ -9,7 +9,7 @@ import { Button, variantClasses } from '../primitives';
 import { useClassnames } from '../primitives/StyleProvider';
 
 interface SearchInputProps {
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (value: string) => void;
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus: () => void;
     value: string;
@@ -71,10 +71,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             icon="circle-xmark"
                             className="-mx-1.5 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
-                                if (inputRef.current) {
-                                    inputRef.current.value = '';
-                                    inputRef.current.focus();
-                                }
+                                onChange('');
+                                inputRef.current?.focus();
                             }}
                         />
                     ) : (
@@ -85,7 +83,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         type="text"
                         onFocus={onFocus}
                         onKeyDown={onKeyDown}
-                        onChange={onChange}
+                        onChange={(event) => onChange(event.target.value)}
                         value={value}
                         size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and overrides the min-width in some cases, so we set it to a minimum and control width ourselves. See https://stackoverflow.com/a/29990524
                         placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}

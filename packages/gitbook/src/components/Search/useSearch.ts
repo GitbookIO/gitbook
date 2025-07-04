@@ -7,6 +7,7 @@ export interface SearchState {
     query: string;
     ask: boolean;
     global: boolean;
+    isOpen: boolean;
 }
 
 // KeyMap needs to be statically defined to avoid `setRawState` being redefined on every render.
@@ -28,13 +29,24 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
         history: 'replace',
     });
 
+    // Separate local state for isOpen (not synchronized with URL)
+    // Default to true if there's already a query in the URL
+    const [isOpen, setIsOpen] = React.useState(() => {
+        return !!rawState?.q;
+    });
+
     const state = React.useMemo<SearchState | null>(() => {
         if (rawState === null || rawState.q === null) {
             return null;
         }
 
-        return { query: rawState.q, ask: !!rawState.ask, global: !!rawState.global };
-    }, [rawState]);
+        return {
+            query: rawState.q,
+            ask: !!rawState.ask,
+            global: !!rawState.global,
+            isOpen: isOpen,
+        };
+    }, [rawState, isOpen]);
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {
@@ -50,12 +62,17 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
             }
 
             if (update === null) {
+                setIsOpen(false);
                 return setRawState({
                     q: null,
                     ask: null,
                     global: null,
                 });
             }
+
+            // Update the local state
+            setIsOpen(update.isOpen);
+
             return setRawState({
                 q: update.query,
                 ask: update.ask ? true : null,
@@ -89,6 +106,7 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                         query: '',
                         ask: false,
                         global: false,
+                        isOpen: true,
                         ...(prev ?? {}),
                         ...query,
                     }));
