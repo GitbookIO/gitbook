@@ -11,6 +11,7 @@ export function generateFontFacesCSS(
     const { fontFaces } = customFont;
     const fontFamilyName = `CustomFont_${type}`;
     const fontVariableName = `--font-${type}`;
+    const fallbackFont = type === 'content' ? 'sans-serif' : 'monospace';
 
     // Generate font face declarations for all weights
     const fontFaceDeclarations = fontFaces
@@ -43,7 +44,7 @@ export function generateFontFacesCSS(
     return fontFaceDeclarations
         ? `${fontFaceDeclarations}
         :root {
-            ${fontVariableName}: ${fontFamilyName};
+            ${fontVariableName}: ${fontFamilyName}, ${fallbackFont};
         }`
         : '';
 }
