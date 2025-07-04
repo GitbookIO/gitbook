@@ -67,7 +67,7 @@ export async function TableOfContents(props: {
                     'lg:flex',
                     'page-no-toc:lg:hidden',
                     'page-no-toc:xl:flex',
-                    '[body:has(.page-no-toc):not(:has(#site-header:not(.mobile-only)))_&]:lg:flex',
+                    'site-header-none:page-no-toc:lg:flex',
                     'flex-col',
                     'gap-4',
 

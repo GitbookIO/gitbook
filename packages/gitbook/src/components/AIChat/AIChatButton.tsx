@@ -3,7 +3,7 @@ import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
-import AIChatIcon from './AIChatIcon';
+import { AIChatIcon } from './AIChatIcon';
 
 /**
  * Button to open/close the AI chat.

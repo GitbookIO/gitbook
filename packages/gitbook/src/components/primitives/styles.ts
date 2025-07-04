@@ -8,7 +8,6 @@ export const ButtonStyles = [
     'rounded-md',
     'straight-corners:rounded-none',
     'circular-corners:rounded-full',
-    // 'place-self-start',
 
     'ring-1',
     'ring-tint',
@@ -30,8 +29,6 @@ export const ButtonStyles = [
 
     'depth-subtle:hover:-translate-y-px',
     'depth-subtle:focus-visible:-translate-y-px',
-    // 'depth-flat:hover:scale-100',
-    // 'active:scale-100',
     'transition-all',
 
     'grow-0',

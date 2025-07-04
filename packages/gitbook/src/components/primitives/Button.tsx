@@ -1,7 +1,6 @@
 'use client';
 
-import type { ButtonHTMLAttributes, HTMLAttributeAnchorTarget, HTMLAttributes } from 'react';
-import { forwardRef } from 'react';
+import * as React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -22,7 +21,7 @@ type ButtonProps = {
     children?: React.ReactNode;
     active?: boolean;
 } & LinkInsightsProps &
-    HTMLAttributes<HTMLElement>;
+    React.HTMLAttributes<HTMLElement>;
 
 export const variantClasses = {
     primary: [
@@ -81,9 +80,10 @@ const activeClasses = {
     header: 'bg-header-link/3',
 };
 
-export const Button = forwardRef<
+export const Button = React.forwardRef<
     HTMLButtonElement | HTMLAnchorElement,
-    ButtonProps & ButtonHTMLAttributes<HTMLButtonElement> & { target?: HTMLAttributeAnchorTarget }
+    ButtonProps &
+        React.ButtonHTMLAttributes<HTMLButtonElement> & { target?: React.HTMLAttributeAnchorTarget }
 >(
     (
         {

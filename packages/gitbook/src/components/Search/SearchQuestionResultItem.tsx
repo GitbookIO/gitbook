@@ -3,8 +3,8 @@ import React from 'react';
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import { useAIChatController } from '../AI';
-import AIChatIcon from '../AIChat/AIChatIcon';
-import { SearchResultItem } from './SearchResults';
+import { AIChatIcon } from '../AIChat/';
+import { SearchResultItem } from './SearchResultItem';
 import { useSearch, useSearchLink } from './useSearch';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(

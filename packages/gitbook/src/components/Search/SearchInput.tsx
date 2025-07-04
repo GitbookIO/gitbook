@@ -8,20 +8,23 @@ import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
 import { useClassnames } from '../primitives/StyleProvider';
 
-interface SearchButtonProps {
+interface SearchInputProps {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus: () => void;
-    value?: string;
+    value: string;
     withAI?: boolean;
     isOpen: boolean;
     className?: string;
 }
 
+// Size classes for medium size button
+const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'];
+
 /**
  * Input to trigger search.
  */
-export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
+export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
     function SearchInput(props, ref) {
         const { onChange, onKeyDown, onFocus, value, withAI = false, isOpen, className } = props;
         const inputRef = useRef<HTMLInputElement>(null);
@@ -29,16 +32,11 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
         const language = useLanguage();
         const buttonStyles = useClassnames(['ButtonStyles']);
 
-        // Size classes for medium size button
-        const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'];
-
         useEffect(() => {
             if (isOpen) {
                 inputRef.current?.focus();
-                if (value) {
-                    // Place cursor at the end of the input
-                    inputRef.current?.setSelectionRange(value.length, value.length);
-                }
+                // Place cursor at the end of the input
+                inputRef.current?.setSelectionRange(value.length, value.length);
             } else {
                 inputRef.current?.blur();
             }
@@ -46,14 +44,11 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
 
         return (
             <div className="relative flex size-9 grow">
+                {/* biome-ignore lint/a11y/useKeyWithClickEvents: this div needs an onClick to show the input on mobile, where it's normally hidden.
+                Normally you'd also need to add a keyboard trigger to do the same without a pointer, but in this case the input already be focused on its own. */}
                 <div
                     ref={ref}
                     onClick={onFocus}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            onFocus();
-                        }
-                    }}
                     className={tcls(
                         // Apply button styles
                         buttonStyles,
@@ -76,10 +71,10 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
                             icon="circle-xmark"
                             className="-mx-1.5 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
-                                onChange({
-                                    target: { value: '' },
-                                } as React.ChangeEvent<HTMLInputElement>);
-                                inputRef.current?.focus();
+                                if (inputRef.current) {
+                                    inputRef.current.value = '';
+                                    inputRef.current.focus();
+                                }
                             }}
                         />
                     ) : (
@@ -91,8 +86,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
                         onFocus={onFocus}
                         onKeyDown={onKeyDown}
                         onChange={onChange}
-                        value={value ?? ''}
-                        size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and limits the min-width, so we set it to a sensible minimum and control width ourselves.
+                        value={value}
+                        size={1} // Determines the width of the input (in characters). It's inconsistent between browsers and overrides the min-width in some cases, so we set it to a minimum and control width ourselves. See https://stackoverflow.com/a/29990524
                         placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}
                         className={tcls(
                             'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
@@ -109,19 +104,19 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchButtonProps>(
     }
 );
 
+function getOperatingSystem() {
+    const platform = navigator.platform.toLowerCase();
+
+    if (platform.includes('mac')) return 'mac';
+    if (platform.includes('win')) return 'win';
+
+    return 'win';
+}
+
 function Shortcut() {
     const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
 
     useEffect(() => {
-        function getOperatingSystem() {
-            const platform = navigator.platform.toLowerCase();
-
-            if (platform.includes('mac')) return 'mac';
-            if (platform.includes('win')) return 'win';
-
-            return 'win';
-        }
-
         setOperatingSystem(getOperatingSystem());
     }, []);
 

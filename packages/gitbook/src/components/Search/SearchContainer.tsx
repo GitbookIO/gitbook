@@ -2,7 +2,7 @@
 
 import { CustomizationAIMode } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useTrackEvent } from '../Insights';
 import { Popover } from '../primitives';
@@ -22,7 +22,7 @@ interface SearchContainerProps {
 }
 
 /**
- * Client component to render the search modal when the url contains a search query.
+ * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
     const { spaceTitle, isMultiVariants, aiMode, className } = props;
@@ -30,32 +30,24 @@ export function SearchContainer(props: SearchContainerProps) {
         aiMode === CustomizationAIMode.Search || aiMode === CustomizationAIMode.Assistant;
 
     const [state, setSearchState] = useSearch();
-    const [open, setOpen] = useState(false);
     const searchAsk = useSearchAskState();
-    // const [askState] = searchAsk;
     const router = useRouter();
     const trackEvent = useTrackEvent();
     const resultsRef = useRef<SearchResultsRef>(null);
     const searchInputRef = useRef<HTMLDivElement>(null);
 
+    // Derive open state from search state
+    const open = state !== null;
+
     const onClose = async (to?: string) => {
         if (state?.query === '') {
             await setSearchState(null);
         }
-        setOpen(false);
 
         if (to) {
             router.push(to);
         }
     };
-
-    React.useEffect(() => {
-        if (state === null) {
-            setOpen(false);
-        } else {
-            setOpen(true);
-        }
-    }, [state]);
 
     useHotkeys(
         'mod+k',
@@ -77,7 +69,6 @@ export function SearchContainer(props: SearchContainerProps) {
             global: prev?.global ?? false,
             query: prev?.query ?? '',
         }));
-        setOpen(true);
 
         trackEvent({
             type: 'search_open',
@@ -173,7 +164,7 @@ export function SearchContainer(props: SearchContainerProps) {
             >
                 <SearchInput
                     ref={searchInputRef}
-                    value={state?.query}
+                    value={state?.query ?? ''}
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}

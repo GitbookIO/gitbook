@@ -100,11 +100,6 @@ export async function CustomizationRootLayout(props: {
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
 
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-                />
-
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
 
