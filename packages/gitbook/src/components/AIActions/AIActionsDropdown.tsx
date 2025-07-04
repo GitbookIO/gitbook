@@ -21,9 +21,9 @@ type AIAction = {
 
 export function AIActionsDropdown(props: {
     markdown?: string;
-    markdownUrl: string;
+    markdownPageUrl: string;
 }) {
-    const { markdown, markdownUrl } = props;
+    const { markdown, markdownPageUrl } = props;
 
     const chatController = useAIChatController();
     const chat = useAIChatState();
@@ -47,7 +47,7 @@ export function AIActionsDropdown(props: {
             icon: <AIChatIcon />,
             label: 'Ask Docs Assistant',
             description: 'Ask our Docs Assistant about this page',
-            onClick: () => {},
+            onClick: handleOpenAIAssistant,
         },
         ...(markdown
             ? [
@@ -74,7 +74,7 @@ export function AIActionsDropdown(props: {
             description: 'View this page as plain text',
             isExternal: true,
             onClick: () => {
-                window.open(markdownUrl, '_blank');
+                window.open(markdownPageUrl, '_blank');
             },
         },
     ];

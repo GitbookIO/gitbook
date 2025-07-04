@@ -102,7 +102,7 @@ export async function PageHeader(props: {
                 {page.layout.tableOfContents ? (
                     <AIActionsDropdown
                         markdown={markdownResult.data}
-                        markdownUrl={`${context.linker.toPathInSite(page.path)}.md`}
+                        markdownPageUrl={`${context.linker.toPathInSite(page.path)}.md`}
                     />
                 ) : null}
             </div>
