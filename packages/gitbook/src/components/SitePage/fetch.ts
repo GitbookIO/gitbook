@@ -52,7 +52,8 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
     }
 
     // We don't test path that are too long as GitBook doesn't support them and will return a 404 anyway.
-    if (rawPathname.length <= 512) {
+    // API has a limit of less than 512 characters for the source path, so we use the same limit here.
+    if (rawPathname.length < 512) {
         // Duplicated the regex pattern from SiteRedirectSourcePath API type.
         const SITE_REDIRECT_SOURCE_PATH_REGEX =
             /^\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~]|%[0-9A-Fa-f]{2})+)*$/;
