@@ -226,11 +226,13 @@ export function Header(props: {
                                         />
                                     </div>
                                 )}
-                                {sections && sections.list.length > 1 && (
-                                    <SiteSectionTabs
-                                        sections={encodeClientSiteSections(context, sections)}
-                                    />
-                                )}
+                                {sections &&
+                                    (sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
+                                        sections.list.length > 1) && ( // Otherwise, show the tabs if there's more than one section
+                                        <SiteSectionTabs
+                                            sections={encodeClientSiteSections(context, sections)}
+                                        />
+                                    )}
                             </div>
                         </div>
                     </div>
