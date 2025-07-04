@@ -4,7 +4,7 @@ import {
     type DocumentBlockTable,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
+import { Icon, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
 import { Checkbox } from '@/components/primitives';
@@ -98,6 +98,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     <Icon
                                         key={i}
                                         icon="star"
+                                        iconStyle={IconStyle.SharpSolid}
                                         className={tcls('size-[15px]', 'text-primary')}
                                     />
                                 ))}
