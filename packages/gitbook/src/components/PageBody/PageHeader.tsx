@@ -1,5 +1,6 @@
 import { AIActionsDropdown } from '@/components/AIActions/AIActionsDropdown';
 import type { GitBookSiteContext } from '@/lib/context';
+import { getMarkdownForPage } from '@/lib/markdownPage';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import type { RevisionPageDocument } from '@gitbook/api';
@@ -16,13 +17,14 @@ export async function PageHeader(props: {
     const { context, page, ancestors } = props;
     const { revision, linker } = context;
 
+    const markdownResult = await getMarkdownForPage(context, page.path);
+
     if (!page.layout.title && !page.layout.description) {
         return null;
     }
 
     return (
         <header
-            id="page-header"
             className={tcls(
                 'max-w-3xl',
                 'page-full-width:max-w-screen-2xl',
@@ -30,7 +32,8 @@ export async function PageHeader(props: {
                 'mb-6',
                 'space-y-3',
                 'page-api-block:ml-0',
-                'relative'
+                'relative',
+                'page-api-block:max-w-full'
             )}
         >
             {ancestors.length > 0 && (
@@ -79,27 +82,33 @@ export async function PageHeader(props: {
                     </ol>
                 </nav>
             )}
-            {page.layout.title ? (
-                <h1
-                    className={tcls(
-                        'text-4xl',
-                        'font-bold',
-                        'flex',
-                        'items-center',
-                        'gap-4',
-                        'w-fit'
-                    )}
-                >
-                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
-                    {page.title}
-                </h1>
-            ) : null}
+            <div className="flex items-start justify-between gap-4">
+                {page.layout.title ? (
+                    <h1
+                        className={tcls(
+                            'text-4xl',
+                            'font-bold',
+                            'flex',
+                            'items-center',
+                            'gap-4',
+                            'w-fit',
+                            'text-pretty'
+                        )}
+                    >
+                        <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
+                        {page.title}
+                    </h1>
+                ) : null}
+                {page.layout.tableOfContents ? (
+                    <AIActionsDropdown
+                        markdown={markdownResult.data}
+                        markdownUrl={`${context.linker.toPathInSite(page.path)}.md`}
+                    />
+                ) : null}
+            </div>
             {page.description && page.layout.description ? (
                 <p className={tcls('text-lg', 'text-tint')}>{page.description}</p>
             ) : null}
-            <div className="!mt-0 absolute top-0 right-0">
-                <AIActionsDropdown />
-            </div>
         </header>
     );
 }

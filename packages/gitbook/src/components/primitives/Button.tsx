@@ -74,6 +74,19 @@ export function Button({
     const domClassName = tcls(variantClasses[variant], sizeClasses, className);
     const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
+    const content = (
+        <>
+            {icon ? (
+                typeof icon === 'string' ? (
+                    <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                ) : (
+                    icon
+                )
+            ) : null}
+            {iconOnly ? null : label}
+        </>
+    );
+
     if (href) {
         return (
             <Link
@@ -85,14 +98,7 @@ export function Button({
                 target={target}
                 {...rest}
             >
-                {icon ? (
-                    typeof icon === 'string' ? (
-                        <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
-                    ) : (
-                        icon
-                    )
-                ) : null}
-                {iconOnly ? null : label}
+                {content}
             </Link>
         );
     }
@@ -104,14 +110,7 @@ export function Button({
             aria-label={label}
             {...rest}
         >
-            {icon ? (
-                typeof icon === 'string' ? (
-                    <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
-                ) : (
-                    icon
-                )
-            ) : null}
-            {iconOnly ? null : label}
+            {content}
         </button>
     );
 

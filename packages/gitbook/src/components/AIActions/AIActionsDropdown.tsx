@@ -1,13 +1,14 @@
 'use client';
+
 import { useAIChatController, useAIChatState } from '@/components/AI/useAIChat';
 import AIChatIcon from '@/components/AIChat/AIChatIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
-type Action = {
+type AIAction = {
     icon?: IconName | React.ReactNode;
     label: string;
     description?: string;
@@ -18,7 +19,12 @@ type Action = {
     onClick?: () => void;
 };
 
-export function AIActionsDropdown() {
+export function AIActionsDropdown(props: {
+    markdown?: string;
+    markdownUrl: string;
+}) {
+    const { markdown, markdownUrl } = props;
+
     const chatController = useAIChatController();
     const chat = useAIChatState();
     const language = useLanguage();
@@ -36,82 +42,45 @@ export function AIActionsDropdown() {
         });
     };
 
-    const handleCopyPage = async () => {
-        const markdownUrl = `${window.location.href}.md`;
-
-        // Get the page content
-        const markdown = await fetch(markdownUrl).then((res) => res.text());
-
-        // Copy the markdown to the clipboard
-        navigator.clipboard.writeText(markdown);
-    };
-
-    const handleViewAsMarkdown = () => {
-        // Open the page in Markdown format
-        const currentUrl = window.location.href;
-        const markdownUrl = `${currentUrl}.md`;
-        window.open(markdownUrl, '_blank');
-    };
-
-    const actions: Action[] = [
+    const actions: AIAction[] = [
         {
-            icon: 'copy',
-            label: 'Copy page',
-            description: 'Copy the page content',
-            onClick: handleCopyPage,
+            icon: <AIChatIcon />,
+            label: 'Ask Docs Assistant',
+            description: 'Ask our Docs Assistant about this page',
+            onClick: () => {},
         },
+        ...(markdown
+            ? [
+                  {
+                      icon: 'copy',
+                      label: 'Copy for LLMs',
+                      description: 'Copy page as Markdown',
+                      onClick: () => {
+                          if (!markdown) return;
+                          navigator.clipboard.writeText(markdown);
+                      },
+                  },
+              ]
+            : []),
         {
-            icon: 'markdown',
+            icon: (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 471 289.85" className="size-5">
+                    <title>markdown icon</title>
+                    <path d="M437,289.85H34a34,34,0,0,1-34-34V34A34,34,0,0,1,34,0H437a34,34,0,0,1,34,34V255.88A34,34,0,0,1,437,289.85ZM34,22.64A11.34,11.34,0,0,0,22.64,34V255.88A11.34,11.34,0,0,0,34,267.2H437a11.34,11.34,0,0,0,11.33-11.32V34A11.34,11.34,0,0,0,437,22.64Z" />
+                    <path d="M67.93,221.91v-154h45.29l45.29,56.61L203.8,67.93h45.29v154H203.8V133.6l-45.29,56.61L113.22,133.6v88.31Zm283.06,0-67.94-74.72h45.29V67.93h45.29v79.26h45.29Z" />
+                </svg>
+            ),
             label: 'View as Markdown',
-            description: 'Open a Markdown version of this page',
+            description: 'View this page as plain text',
             isExternal: true,
-            onClick: handleViewAsMarkdown,
+            onClick: () => {
+                window.open(markdownUrl, '_blank');
+            },
         },
     ];
 
-    // Get the header width with title and check if there is enough space to show the dropdown
-    useEffect(() => {
-        const getHeaderAvailableSpace = () => {
-            const header = document.getElementById('page-header');
-            const headerTitle = header?.getElementsByTagName('h1')[0];
-
-            return (
-                (header?.getBoundingClientRect().width ?? 0) -
-                (headerTitle?.getBoundingClientRect().width ?? 0)
-            );
-        };
-
-        const dropdownWidth = 202;
-
-        window.addEventListener('resize', () => {
-            const headerAvailableSpace = getHeaderAvailableSpace();
-            if (ref.current) {
-                if (headerAvailableSpace <= dropdownWidth) {
-                    ref.current.classList.add('-mt-3');
-                    ref.current.classList.remove('mt-3');
-                } else {
-                    ref.current.classList.remove('-mt-3');
-                    ref.current.classList.add('mt-3');
-                }
-            }
-        });
-
-        window.addEventListener('load', () => {
-            const headerAvailableSpace = getHeaderAvailableSpace();
-            if (ref.current) {
-                if (headerAvailableSpace <= dropdownWidth) {
-                    ref.current.classList.add('-mt-3');
-                    ref.current.classList.remove('mt-3');
-                } else {
-                    ref.current.classList.remove('-mt-3');
-                    ref.current.classList.add('mt-3');
-                }
-            }
-        });
-    }, []);
-
     return (
-        <div ref={ref} className="hidden items-stretch justify-start md:flex">
+        <div ref={ref} className="hidden h-fit items-stretch justify-start md:flex">
             <Button
                 icon={<AIChatIcon className="size-3.5" />}
                 size="small"
@@ -145,17 +114,19 @@ export function AIActionsDropdown() {
                                 {typeof action.icon === 'string' ? (
                                     <Icon
                                         icon={action.icon as IconName}
-                                        iconStyle={IconStyle.Light}
-                                        className="size-full"
+                                        iconStyle={IconStyle.Regular}
+                                        className="size-full fill-transparent stroke-current"
                                     />
                                 ) : (
                                     action.icon
                                 )}
                             </div>
                         ) : null}
-                        <div className="flex flex-1 flex-col">
-                            <span className="flex items-center gap-1.5 text-tint-strong">
-                                <span className="truncate font-medium">{action.label}</span>
+                        <div className="flex flex-1 flex-col gap-0.5">
+                            <span className="flex items-center gap-2 text-tint-strong">
+                                <span className="truncate font-medium text-[0.9375rem]">
+                                    {action.label}
+                                </span>
                                 {action.isExternal ? (
                                     <Icon icon="arrow-up-right" className="size-3" />
                                 ) : null}
