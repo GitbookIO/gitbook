@@ -47,13 +47,13 @@ export async function getMarkdownForPage(
         return servePageGroup(context, page);
     }
 
-    const { data: markdown } = await context.dataFetcher.getRevisionPageMarkdown({
+    const { data: markdown, error } = await context.dataFetcher.getRevisionPageMarkdown({
         spaceId: context.space.id,
         revisionId: context.revision.id,
         pageId: page.id,
     });
 
-    if (!markdown) {
+    if (error) {
         return {
             error: {
                 message: 'An error occurred while fetching the markdown for this page',
