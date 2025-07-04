@@ -77,6 +77,13 @@ export function getCacheTag(
               site: string;
           }
         /**
+         * All data related to an organization
+         */
+        | {
+              tag: 'organization';
+              organization: string;
+          }
+        /**
          * All data related to an OpenAPI spec
          */
         | {
@@ -112,6 +119,8 @@ export function getCacheTag(
             return `site:${spec.site}`;
         case 'integration':
             return `integration:${spec.integration}`;
+        case 'organization':
+            return `organization:${spec.organization}`;
         case 'openapi':
             return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
         case 'translation':
