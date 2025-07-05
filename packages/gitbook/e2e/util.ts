@@ -229,6 +229,9 @@ export function runTestCases(testCases: TestsCase[]) {
                                     }
                                     await waitForIcons(page);
                                 },
+                                stabilize: {
+                                    roundImageSize: false,
+                                },
                             });
                         }
                     }
