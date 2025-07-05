@@ -119,7 +119,7 @@
         "zustand": "^5.0.3",
       },
       "devDependencies": {
-        "@argos-ci/playwright": "^5.0.3",
+        "@argos-ci/playwright": "^5.0.5",
         "@playwright/test": "^1.51.1",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
@@ -262,11 +262,11 @@
 
     "@argos-ci/api-client": ["@argos-ci/api-client@0.8.1", "", { "dependencies": { "debug": "^4.4.0", "openapi-fetch": "0.13.5" } }, "sha512-3IHv7ANSPNO6OwWgwULlHbP9/tFV9kQDu6+nL9jysfPkGj0GgtrOsyBb+iU931c7wSMo1OD+XNujCnRzDD968w=="],
 
-    "@argos-ci/browser": ["@argos-ci/browser@4.1.1", "", {}, "sha512-UyKdnprGftUjWQkb0jqJ0zGHJmcWBzdko8zRy4y+4efukVX4jjC/Px2HvWW8aqwjoR4aplouMZuzhmOkq2SCsA=="],
+    "@argos-ci/browser": ["@argos-ci/browser@4.1.2", "", {}, "sha512-OljPFzxSNndWSwMBxKGtN3p8lSbt73z+/0CIXbBVTQOPjPMErXWjgtrFL23xqtTq5wdds3uxGv7tjVDWJbgBYg=="],
 
-    "@argos-ci/core": ["@argos-ci/core@3.1.1", "", { "dependencies": { "@argos-ci/api-client": "0.8.1", "@argos-ci/util": "2.3.1", "axios": "^1.8.4", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-7iE3o1XGxlfHC5AF05pzT0OxuO387sryrZt3gKGj/e+6R20DXz7J49yI8++nQ2cuT+wLhcJp8+X0ox+SGMYHmw=="],
+    "@argos-ci/core": ["@argos-ci/core@3.2.0", "", { "dependencies": { "@argos-ci/api-client": "0.8.1", "@argos-ci/util": "2.3.1", "axios": "^1.8.4", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-wraH5RGFpoU7zcKV2BVi4LvY+5bWR/Ds6OVhUtq3jtd7I3qJRFVFq2IX1TfPPvBBA7wX0OqcrqgIWAQwy+vsoA=="],
 
-    "@argos-ci/playwright": ["@argos-ci/playwright@5.0.3", "", { "dependencies": { "@argos-ci/browser": "4.1.1", "@argos-ci/core": "3.1.1", "@argos-ci/util": "2.3.1", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-sqoARsgnDRrwKm1x10L3Z8+OQukk0F9OksVj9v9rvbzNI2WVCw5zbCUMY0qD4Q3Ba7vMFbl1ELUODRc2mfCbNw=="],
+    "@argos-ci/playwright": ["@argos-ci/playwright@5.0.5", "", { "dependencies": { "@argos-ci/browser": "4.1.2", "@argos-ci/core": "3.2.0", "@argos-ci/util": "2.3.1", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-ZqaqptjI8rVUjD2KQzpvI1olFDiiMjgDaIyFOMWo8531cB7CMCwPXDNsFw2psUfsz3a3LP91eH2OrJopmevEkQ=="],
 
     "@argos-ci/util": ["@argos-ci/util@2.3.1", "", {}, "sha512-kE61HU2480fbAnimmA4x9HK45ZJvkoqLdW5GxT5uvwhkclQykVd2S6WfGFUr3JokTXfZ5LZEEfoWgtGA316KSQ=="],
 
