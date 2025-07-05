@@ -223,6 +223,7 @@ export function runTestCases(testCases: TestsCase[]) {
                                 threshold: screenshotOptions?.threshold ?? undefined,
                                 fullPage: testEntry.fullPage ?? false,
                                 beforeScreenshot: async ({ runStabilization }) => {
+                                    await page.reload();
                                     await runStabilization();
                                     if (screenshotOptions?.waitForTOCScrolling !== false) {
                                         await waitForTOCScrolling(page);
