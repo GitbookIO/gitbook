@@ -81,7 +81,7 @@ export function SpaceLayout(props: {
                     />
                     {withAIChat ? <AIChat /> : null}
                     <div className="scroll-nojump">
-                        <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+                        <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                             <div
                                 className={tcls(
                                     'flex',
