@@ -27,10 +27,25 @@ export function DropdownMenu(props: {
     className?: ClassValue;
     /** Open the dropdown on hover */
     openOnHover?: boolean;
-    /** Props to pass to the content */
-    contentProps?: RadixDropdownMenu.DropdownMenuContentProps;
+    /**
+     * Side of the dropdown
+     * @default "bottom"
+     */
+    side?: RadixDropdownMenu.DropdownMenuContentProps['side'];
+    /**
+     * Alignment of the dropdown
+     * @default "start"
+     */
+    align?: RadixDropdownMenu.DropdownMenuContentProps['align'];
 }) {
-    const { button, children, className, openOnHover = false, contentProps } = props;
+    const {
+        button,
+        children,
+        className,
+        openOnHover = false,
+        side = 'bottom',
+        align = 'start',
+    } = props;
     const [hovered, setHovered] = useState(false);
     const [clicked, setClicked] = useState(false);
 
@@ -57,9 +72,9 @@ export function DropdownMenu(props: {
                     collisionPadding={8}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
-                    align="start"
+                    align={align}
+                    side={side}
                     className="z-40 animate-scaleIn pt-2"
-                    {...contentProps}
                 >
                     <div
                         className={tcls(

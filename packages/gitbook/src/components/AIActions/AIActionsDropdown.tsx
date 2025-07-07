@@ -52,9 +52,8 @@ export function AIActionsDropdown(props: {
                 disabled={defaultAction.disabled}
             />
             <DropdownMenu
-                contentProps={{
-                    align: 'end',
-                }}
+                align="end"
+                className="!min-w-60"
                 button={
                     <Button
                         icon="chevron-down"
