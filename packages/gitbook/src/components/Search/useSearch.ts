@@ -32,7 +32,7 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
     // Separate local state for isOpen (not synchronized with URL)
     // Default to true if there's already a query in the URL
     const [isOpen, setIsOpen] = React.useState(() => {
-        return !!rawState?.q;
+        return rawState?.q !== null;
     });
 
     const state = React.useMemo<SearchState | null>(() => {
