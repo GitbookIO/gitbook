@@ -169,7 +169,12 @@ export function getBaseContext(input: {
 
             // For preview requests make sure we include the preview/site as part of the site URL
             const pathname = isPreviewRequest(siteURL)
-                ? joinPaths(`preview/${getPreviewRequestIdentifier(siteURL)}`, urlObject.pathname)
+                ? joinPaths(
+                      `preview/${getPreviewRequestIdentifier(siteURL)}`,
+                      urlObject.pathname.includes(siteURLData.siteBasePath)
+                          ? urlObject.pathname.replace(siteURLData.siteBasePath, '')
+                          : urlObject.pathname
+                  )
                 : `${urlObject.host}${urlObject.pathname}`;
             return `/url/${pathname}${urlObject.search}${urlObject.hash}`;
         };
