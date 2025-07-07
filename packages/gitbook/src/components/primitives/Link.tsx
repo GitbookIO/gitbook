@@ -41,6 +41,26 @@ export const LinkSettingsContext = React.createContext<{
 });
 
 /**
+ * Get the target and rel props for a link based on the provided props and context.
+ */
+function getTargetProps(
+    props: Pick<LinkProps, 'href' | 'rel' | 'target'>,
+    context: {
+        externalLinksTarget: SiteExternalLinksTarget;
+        isExternal: boolean;
+    }
+) {
+    const target =
+        props.target ??
+        (context.isExternal && context.externalLinksTarget === SiteExternalLinksTarget.Blank
+            ? '_blank'
+            : undefined);
+    // Automatically set rel if target is _blank, or use the specified rel.
+    const rel = props.rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined);
+    return { target, rel };
+}
+
+/**
  * Low-level Link component that handles navigation to external urls.
  * It does not contain any styling.
  */
@@ -52,28 +72,33 @@ export const Link = React.forwardRef(function Link(
     const { externalLinksTarget } = React.useContext(LinkSettingsContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
-
-    // Use a real anchor tag for external links,s and a Next.js Link for internal links.
-    // If we use a NextLink for external links, Nextjs won't rerender the top-level layouts.
-    const isExternal = URL.canParse ? URL.canParse(props.href) : props.href.startsWith('http');
+    const isExternal = isExternalLink(href);
+    const { target, rel } = getTargetProps(props, { externalLinksTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        const isExternal = isExternalLink(href, window.location.origin);
+
         if (insights) {
-            trackEvent(insights, undefined, {
-                immediate: isExternal,
-            });
+            trackEvent(insights, undefined, { immediate: isExternal });
         }
 
-        if (
-            isExternalLink(href, window.location.origin) &&
-            // When the page is embedded in an iframe, for security reasons other urls cannot be opened.
-            // In this case, we open the link in a new tab.
-            (window.self !== window.top ||
-                // If the site is configured to open links in a new tab
-                externalLinksTarget === SiteExternalLinksTarget.Blank)
-        ) {
+        const isInIframe = window.self !== window.top;
+
+        // When the page is embedded in an iframe
+        // for security reasons other urls cannot be opened.
+        if (isInIframe && isExternal) {
             event.preventDefault();
-            window.open(href, '_blank');
+            window.open(href, '_blank', 'noopener noreferrer');
+        } else {
+            // The external logic server-side is limited
+            // so we use the client-side logic to determine the real target
+            // by default the target is "_self".
+            const { target = '_self' } = getTargetProps(props, {
+                externalLinksTarget,
+                isExternal,
+            });
+            event.preventDefault();
+            window.open(href, target, rel);
         }
 
         domProps.onClick?.(event);
@@ -81,7 +106,7 @@ export const Link = React.forwardRef(function Link(
 
     // We test if the link is external, without comparing to the origin
     // as this will be rendered on the server and it could result in a mismatch.
-    if (isExternalLink(href)) {
+    if (isExternal) {
         return (
             <a
                 ref={ref}
@@ -89,9 +114,8 @@ export const Link = React.forwardRef(function Link(
                 {...domProps}
                 href={href}
                 onClick={onClick}
-                {...(externalLinksTarget === SiteExternalLinksTarget.Blank && !domProps.target
-                    ? { target: '_blank', rel: 'noopener noreferrer' }
-                    : {})}
+                target={target}
+                rel={rel}
             >
                 {children}
             </a>
