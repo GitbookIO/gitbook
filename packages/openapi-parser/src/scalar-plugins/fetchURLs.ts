@@ -1,10 +1,11 @@
-import { type LoadPlugin, normalize } from '@scalar/openapi-parser';
+import { normalize } from '@scalar/openapi-parser';
+import type { ParsePlugin } from '../parse';
 
 export const fetchUrlsDefaultConfiguration = {
     limit: 40,
 };
 
-export const fetchURLs: (customConfiguration: {
+export const fetchURLs = (customConfiguration: {
     /**
      * Root URL to resolve relative URLs.
      */
@@ -14,7 +15,7 @@ export const fetchURLs: (customConfiguration: {
      * Limit the number of requests. Set to `false` to disable the limit.
      */
     limit?: number | false;
-}) => LoadPlugin = (customConfiguration) => {
+}): ParsePlugin => {
     // State
     let numberOfRequests = 0;
 
@@ -25,7 +26,7 @@ export const fetchURLs: (customConfiguration: {
     };
 
     return {
-        check(value?: any) {
+        validate(value) {
             // Not a string
             if (typeof value !== 'string') {
                 return false;
@@ -42,10 +43,10 @@ export const fetchURLs: (customConfiguration: {
 
             return true;
         },
-        async get(value?: any) {
+        async exec(value) {
             // Limit the number of requests
             if (configuration?.limit !== false && numberOfRequests >= configuration?.limit) {
-                return undefined;
+                return { ok: false };
             }
 
             try {
@@ -53,14 +54,17 @@ export const fetchURLs: (customConfiguration: {
                 const url = getReferenceUrl({ value, rootURL: configuration.rootURL });
                 const response = await fetch(url);
                 if (!response.ok) {
-                    return undefined;
+                    return { ok: false };
                 }
                 const text = await response.text();
                 // Try to normalize the text to be sure it's a valid JSON or YAML.
                 await normalize(text);
-                return text;
-            } catch (_error: any) {
-                return undefined;
+                return {
+                    ok: true,
+                    data: text,
+                };
+            } catch {
+                return { ok: false };
             }
         },
     };
