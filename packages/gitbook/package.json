@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "private": true,
     "dependencies": {
         "@gitbook/api": "catalog:",
@@ -72,7 +72,7 @@
         "direction": "^2.0.1"
     },
     "devDependencies": {
-        "@argos-ci/playwright": "^5.0.3",
+        "@argos-ci/playwright": "^5.0.5",
         "@playwright/test": "^1.51.1",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
