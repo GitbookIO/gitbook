@@ -1,4 +1,5 @@
 import { AIActionsDropdown } from '@/components/AIActions/AIActionsDropdown';
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getMarkdownForPage } from '@/lib/markdownPage';
 import type { AncestorRevisionPage } from '@/lib/pages';
@@ -23,6 +24,8 @@ export async function PageHeader(props: {
         return null;
     }
 
+    const withAIChat = isAIChatEnabled(context);
+
     return (
         <header
             className={tcls(
@@ -32,7 +35,6 @@ export async function PageHeader(props: {
                 'mb-6',
                 'space-y-3',
                 'page-api-block:ml-0',
-                'relative',
                 'page-api-block:max-w-full'
             )}
         >
@@ -102,7 +104,14 @@ export async function PageHeader(props: {
                 {page.layout.tableOfContents ? (
                     <AIActionsDropdown
                         markdown={markdownResult.data}
-                        markdownPageUrl={`${context.linker.toPathInSite(page.path)}.md`}
+                        markdownPageUrl={context.linker.toPathInSite(page.path)}
+                        pageURL={context.linker.toAbsoluteURL(
+                            context.linker.toPathForPage({
+                                pages: context.revision.pages,
+                                page,
+                            })
+                        )}
+                        withAIChat={withAIChat}
                     />
                 ) : null}
             </div>
