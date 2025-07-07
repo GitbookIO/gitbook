@@ -89,7 +89,7 @@ export const Link = React.forwardRef(function Link(
                 {...domProps}
                 href={href}
                 onClick={onClick}
-                {...(externalLinksTarget === SiteExternalLinksTarget.Blank
+                {...(externalLinksTarget === SiteExternalLinksTarget.Blank && !domProps.target
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
             >
