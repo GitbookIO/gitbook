@@ -104,17 +104,6 @@ export function AIActionsDropdown(props: {
     );
 }
 
-function getLLMURL(provider: 'chatgpt' | 'claude', url: string) {
-    const prompt = encodeURIComponent(`Read ${url} and answer questions about the content.`);
-
-    switch (provider) {
-        case 'chatgpt':
-            return `https://chat.openai.com/?q=${prompt}`;
-        case 'claude':
-            return `https://claude.ai/new?q=${prompt}`;
-    }
-}
-
 function useAIActions(props: {
     markdown?: string;
     markdownPageUrl: string;
@@ -200,4 +189,15 @@ function useAIActions(props: {
             onClick: () => window.open(getLLMURL('claude', pageURL), '_blank'),
         },
     ];
+}
+
+function getLLMURL(provider: 'chatgpt' | 'claude', url: string) {
+    const prompt = encodeURIComponent(`Read ${url} and answer questions about the content.`);
+
+    switch (provider) {
+        case 'chatgpt':
+            return `https://chat.openai.com/?q=${prompt}`;
+        case 'claude':
+            return `https://claude.ai/new?q=${prompt}`;
+    }
 }
