@@ -1,5 +1,5 @@
 import { bundle } from '@scalar/openapi-parser';
-import { parseJson, parseYaml } from '@scalar/openapi-parser/plugins';
+import { parseJson, parseYaml } from '@scalar/openapi-parser/plugins-browser';
 import type { ParseOpenAPIInput } from './parse';
 import { fetchURL } from './scalar-plugins/fetchURL';
 import { fetchURLs } from './scalar-plugins/fetchURLs';
