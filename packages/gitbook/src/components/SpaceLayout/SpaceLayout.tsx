@@ -49,14 +49,7 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
-    const aiMode =
-        context.customization.ai?.mode ??
-        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv'
-            ? CustomizationAIMode.Assistant
-            : customization.aiSearch.enabled
-              ? CustomizationAIMode.Search
-              : CustomizationAIMode.None);
+    const aiMode = context.customization.ai?.mode;
 
     const searchAndAI = (
         <div className="flex grow items-center gap-2">

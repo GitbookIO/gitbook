@@ -4,10 +4,13 @@ import React from 'react';
 import type { LinkProps } from '../primitives';
 
 export interface SearchState {
+    // URL-backed state
     query: string;
     ask: boolean;
     global: boolean;
-    isOpen: boolean;
+
+    // Local UI state
+    open: boolean;
 }
 
 // KeyMap needs to be statically defined to avoid `setRawState` being redefined on every render.
@@ -29,9 +32,9 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
         history: 'replace',
     });
 
-    // Separate local state for isOpen (not synchronized with URL)
+    // Separate local state for open (not synchronized with URL)
     // Default to true if there's already a query in the URL
-    const [isOpen, setIsOpen] = React.useState(() => {
+    const [open, setIsOpen] = React.useState(() => {
         return rawState?.q !== null;
     });
 
@@ -44,9 +47,9 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
             query: rawState.q,
             ask: !!rawState.ask,
             global: !!rawState.global,
-            isOpen: isOpen,
+            open: open,
         };
-    }, [rawState, isOpen]);
+    }, [rawState, open]);
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {
@@ -71,7 +74,7 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
             }
 
             // Update the local state
-            setIsOpen(update.isOpen);
+            setIsOpen(update.open);
 
             return setRawState({
                 q: update.query,
@@ -106,7 +109,7 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                         query: '',
                         ask: false,
                         global: false,
-                        isOpen: true,
+                        open: true,
                         ...(prev ?? {}),
                         ...query,
                     }));

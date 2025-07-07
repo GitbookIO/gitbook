@@ -73,7 +73,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-mx-1.5 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
+                            className="-ml-1.5 -mr-1 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
                                 onChange('');
                                 inputRef.current?.focus();

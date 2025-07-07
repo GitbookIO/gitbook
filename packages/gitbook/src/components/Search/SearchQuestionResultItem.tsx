@@ -32,6 +32,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 ? { href: '#' }
                 : getLinkProp({
                       ask: true,
+                      open: true,
                       query: question,
                   }))}
             onClick={() => {

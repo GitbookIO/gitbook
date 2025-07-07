@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useTrackEvent } from '../Insights';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { Popover } from '../primitives';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { useSearchAskState } from './SearchAskContext';
@@ -36,14 +37,16 @@ export function SearchContainer(props: SearchContainerProps) {
     const resultsRef = useRef<SearchResultsRef>(null);
     const searchInputRef = useRef<HTMLDivElement>(null);
 
+    const isMobile = useIsMobile();
+
     // Derive open state from search state
-    const open = state?.isOpen ?? false;
+    const open = state?.open ?? false;
 
     const onClose = async (to?: string) => {
         if (state?.query === '') {
             await setSearchState(null);
         } else if (state) {
-            await setSearchState({ ...state, isOpen: false });
+            await setSearchState({ ...state, open: false });
         }
 
         if (to) {
@@ -65,7 +68,7 @@ export function SearchContainer(props: SearchContainerProps) {
             ask: prev?.ask ?? false,
             global: prev?.global ?? false,
             query: prev?.query ?? '',
-            isOpen: true,
+            open: true,
         }));
 
         trackEvent({
@@ -104,14 +107,12 @@ export function SearchContainer(props: SearchContainerProps) {
             ask: false, // When typing, we go back to the default search mode
             query: value,
             global: prev?.global ?? false,
-            isOpen: true,
+            open: true,
         }));
     };
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
     const normalizedQuery = state?.query.trim() ?? '';
-
-    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 640 : false;
 
     return (
         <SearchAskProvider value={searchAsk}>
