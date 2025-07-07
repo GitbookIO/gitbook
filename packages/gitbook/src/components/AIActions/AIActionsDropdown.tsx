@@ -9,7 +9,7 @@ import { Button } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
-import { useCallback, useMemo, useRef } from 'react';
+import { useRef, useState } from 'react';
 
 type AIAction = {
     icon?: IconName | React.ReactNode;
@@ -34,85 +34,10 @@ export function AIActionsDropdown(props: {
     withAIChat?: boolean;
     pageURL: string;
 }) {
-    const { markdown, markdownPageUrl, withAIChat, pageURL } = props;
-
-    const chatController = useAIChatController();
-    const chat = useAIChatState();
-    const language = useLanguage();
     const ref = useRef<HTMLDivElement>(null);
+    const actions = useAIActions(props);
 
-    const handleDocsAssistant = useCallback(() => {
-        // Open the chat if it's not already open
-        if (!chat.opened) {
-            chatController.open();
-        }
-
-        // Send the "What is this page about?" message
-        chatController.postMessage({
-            message: tString(language, 'ai_chat_suggested_questions_about_this_page'),
-        });
-    }, [chat, chatController, language]);
-
-    const actions: AIAction[] = useMemo(
-        (): AIAction[] => [
-            ...(withAIChat
-                ? [
-                      {
-                          icon: chat.loading ? (
-                              <Icon icon="spinner-third" className="size-4 animate-spin" />
-                          ) : (
-                              <AIChatIcon />
-                          ),
-                          label: 'Ask Docs Assistant',
-                          description: 'Ask our Docs Assistant about this page',
-                          onClick: handleDocsAssistant,
-                          disabled: chat.loading || chat.error,
-                      },
-                  ]
-                : []),
-            ...(markdown
-                ? [
-                      {
-                          icon: 'copy',
-                          label: 'Copy for LLMs',
-                          description: 'Copy page as Markdown',
-                          onClick: () => {
-                              if (!markdown) return;
-                              navigator.clipboard.writeText(markdown);
-                          },
-                      },
-                      {
-                          icon: <MarkdownIcon className="size-5 fill-current text-current" />,
-                          label: 'View as Markdown',
-                          description: 'View this page as plain text',
-                          isExternal: true,
-                          onClick: () => {
-                              window.open(`${markdownPageUrl}.md`, '_blank');
-                          },
-                      },
-                  ]
-                : []),
-            {
-                icon: <ChatGPTIcon className="mt-0.5 fill-current" />,
-                label: 'Open in ChatGPT',
-                description: 'Ask ChatGPT about this page',
-                isExternal: true,
-                onClick: () => {
-                    window.open(getLLMURL('chatgpt', pageURL), '_blank');
-                },
-            },
-            {
-                icon: <ClaudeIcon className="mt-0.5" />,
-                label: 'Open in Claude',
-                description: 'Ask Claude about this page',
-                isExternal: true,
-                onClick: () => window.open(getLLMURL('claude', pageURL), '_blank'),
-            },
-        ],
-        [markdown, markdownPageUrl, pageURL, withAIChat, handleDocsAssistant]
-    );
-
-    // The default action is Ask Docs Assistant if the AI assistant is enabled, otherwise View as Markdown
+    // The default action is "Ask Docs Assistant" if the AI assistant is enabled, otherwise "Copy for LLMs"
     const defaultAction = actions[0];
 
     return (
@@ -188,4 +113,91 @@ function getLLMURL(provider: 'chatgpt' | 'claude', url: string) {
         case 'claude':
             return `https://claude.ai/new?q=${prompt}`;
     }
+}
+
+function useAIActions(props: {
+    markdown?: string;
+    markdownPageUrl: string;
+    pageURL: string;
+    withAIChat?: boolean;
+}): AIAction[] {
+    const { markdown, markdownPageUrl, pageURL, withAIChat } = props;
+
+    const chatController = useAIChatController();
+    const chat = useAIChatState();
+    const language = useLanguage();
+
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        if (!markdown) return;
+        navigator.clipboard.writeText(markdown);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleDocsAssistant = () => {
+        // Open the chat if it's not already open
+        if (!chat.opened) {
+            chatController.open();
+        }
+
+        // Send the "What is this page about?" message
+        chatController.postMessage({
+            message: tString(language, 'ai_chat_suggested_questions_about_this_page'),
+        });
+    };
+
+    return [
+        ...(withAIChat
+            ? [
+                  {
+                      icon: chat.loading ? (
+                          <Icon icon="spinner-third" className="size-4 animate-spin" />
+                      ) : (
+                          <AIChatIcon />
+                      ),
+                      label: 'Ask Docs Assistant',
+                      description: 'Ask our Docs Assistant about this page',
+                      onClick: handleDocsAssistant,
+                      disabled: chat.loading || chat.error,
+                  },
+              ]
+            : []),
+        ...(markdown
+            ? [
+                  {
+                      icon: copied ? 'check' : 'copy',
+                      label: copied ? 'Copied!' : 'Copy for LLMs',
+                      description: 'Copy page as Markdown',
+                      onClick: handleCopy,
+                  },
+                  {
+                      icon: <MarkdownIcon className="size-5 fill-current text-current" />,
+                      label: 'View as Markdown',
+                      description: 'View this page as plain text',
+                      isExternal: true,
+                      onClick: () => {
+                          window.open(`${markdownPageUrl}.md`, '_blank');
+                      },
+                  },
+              ]
+            : []),
+        {
+            icon: <ChatGPTIcon className="mt-0.5 fill-current" />,
+            label: 'Open in ChatGPT',
+            description: 'Ask ChatGPT about this page',
+            isExternal: true,
+            onClick: () => {
+                window.open(getLLMURL('chatgpt', pageURL), '_blank');
+            },
+        },
+        {
+            icon: <ClaudeIcon className="mt-0.5" />,
+            label: 'Open in Claude',
+            description: 'Ask Claude about this page',
+            isExternal: true,
+            onClick: () => window.open(getLLMURL('claude', pageURL), '_blank'),
+        },
+    ];
 }
