@@ -20,6 +20,7 @@ type AIAction = {
      */
     isExternal?: boolean;
     onClick?: () => void;
+    disabled?: boolean;
 };
 
 export function AIActionsDropdown(props: {
@@ -57,10 +58,15 @@ export function AIActionsDropdown(props: {
             ...(withAIChat
                 ? [
                       {
-                          icon: <AIChatIcon />,
+                          icon: chat.loading ? (
+                              <Icon icon="spinner-third" className="size-4 animate-spin" />
+                          ) : (
+                              <AIChatIcon />
+                          ),
                           label: 'Ask Docs Assistant',
                           description: 'Ask our Docs Assistant about this page',
                           onClick: handleDocsAssistant,
+                          disabled: chat.loading || chat.error,
                       },
                   ]
                 : []),
@@ -118,6 +124,7 @@ export function AIActionsDropdown(props: {
                 label={defaultAction.label}
                 className="hover:!scale-100 !shadow-none !rounded-r-none border-r-0 bg-tint-base text-sm"
                 onClick={defaultAction.onClick}
+                disabled={defaultAction.disabled}
             />
             <DropdownMenu
                 contentProps={{
