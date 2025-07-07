@@ -71,7 +71,7 @@ export function AIActionsDropdown(props: {
                         className="flex items-stretch gap-2.5 p-2"
                     >
                         {action.icon ? (
-                            <div className="mt-0.5 flex size-4 items-center text-tint">
+                            <div className="flex size-5 items-center justify-center text-tint">
                                 {typeof action.icon === 'string' ? (
                                     <Icon
                                         icon={action.icon as IconName}
@@ -83,7 +83,7 @@ export function AIActionsDropdown(props: {
                                 )}
                             </div>
                         ) : null}
-                        <div className="flex flex-1 flex-col gap-0.5">
+                        <div className="flex flex-1 flex-col gap-0.5 *:leading-none">
                             <span className="flex items-center gap-2 text-tint-strong">
                                 <span className="truncate font-medium text-sm">{action.label}</span>
                                 {action.isExternal ? (
@@ -161,7 +161,7 @@ function useAIActions(props: {
                       onClick: handleCopy,
                   },
                   {
-                      icon: <MarkdownIcon className="size-5 fill-current text-current" />,
+                      icon: <MarkdownIcon className="size-4 fill-current" />,
                       label: 'View as Markdown',
                       description: 'View this page as plain text',
                       isExternal: true,
@@ -172,7 +172,7 @@ function useAIActions(props: {
               ]
             : []),
         {
-            icon: <ChatGPTIcon className="mt-0.5 fill-current" />,
+            icon: <ChatGPTIcon className="size-3.5 fill-current" />,
             label: 'Open in ChatGPT',
             description: 'Ask ChatGPT about this page',
             isExternal: true,
@@ -181,7 +181,7 @@ function useAIActions(props: {
             },
         },
         {
-            icon: <ClaudeIcon className="mt-0.5" />,
+            icon: <ClaudeIcon className="size-3.5 fill-current" />,
             label: 'Open in Claude',
             description: 'Ask Claude about this page',
             isExternal: true,
