@@ -1,5 +1,7 @@
-import { load } from '@scalar/openapi-parser';
+import { bundle } from '@scalar/openapi-parser';
+import { parseJson, parseYaml } from '@scalar/openapi-parser/plugins';
 import type { ParseOpenAPIInput } from './parse';
+import { fetchURL } from './scalar-plugins/fetchURL';
 import { fetchURLs } from './scalar-plugins/fetchURLs';
 import type { Filesystem } from './types';
 
@@ -12,9 +14,24 @@ export async function createFileSystem(
 ): Promise<Filesystem> {
     const { value, rootURL, options } = input;
 
-    const { filesystem } = await load(value, {
-        plugins: [fetchURLs({ rootURL }), ...(options?.plugins || [])],
+    const result = await bundle(value, {
+        treeShake: false,
+        plugins: [
+            fetchURL(),
+            parseYaml(),
+            parseJson(),
+            fetchURLs({ rootURL }),
+            ...(options?.plugins || []),
+        ],
     });
 
-    return filesystem;
+    return [
+        {
+            dir: '.',
+            isEntrypoint: true,
+            references: [],
+            filename: 'openapi.json',
+            specification: result,
+        },
+    ];
 }
