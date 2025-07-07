@@ -166,7 +166,7 @@ export function linkerWithOtherSpaceBasePath(
     return newLinker;
 }
 
-function joinPaths(prefix: string, path: string): string {
+export function joinPaths(prefix: string, path: string): string {
     const prefixPath = prefix.endsWith('/') ? prefix : `${prefix}/`;
     const suffixPath = path.startsWith('/') ? path.slice(1) : path;
     const pathWithoutTrailingSlash = removeTrailingSlash(prefixPath + suffixPath);

@@ -24,7 +24,8 @@ import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
-import { type GitBookLinker, createLinker } from './links';
+import { type GitBookLinker, createLinker, joinPaths } from './links';
+import { getPreviewRequestIdentifier, isPreviewRequest } from './preview';
 
 /**
  * Data about the site URL. Provided by the middleware.
@@ -165,7 +166,12 @@ export function getBaseContext(input: {
         // Create link in the same format for links to other sites/sections.
         linker.toLinkForContent = (rawURL: string) => {
             const urlObject = new URL(rawURL);
-            return `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
+
+            // For preview requests make sure we include the preview/site as part of the site URL
+            const pathname = isPreviewRequest(siteURL)
+                ? joinPaths(`preview/${getPreviewRequestIdentifier(siteURL)}`, urlObject.pathname)
+                : `${urlObject.host}${urlObject.pathname}`;
+            return `/url/${pathname}${urlObject.search}${urlObject.hash}`;
         };
     }
 

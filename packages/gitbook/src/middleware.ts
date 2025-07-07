@@ -25,6 +25,8 @@ import {
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import type { SiteURLData } from './lib/context';
+import { joinPaths } from './lib/links';
+import { getPreviewRequestIdentifier, isPreviewRequest } from './lib/preview';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -180,10 +182,15 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 // during development and testing in 'url' mode.
                 if (mode === 'url') {
                     const urlObject = new URL(siteURLData.redirect);
-                    contentRedirect = new URL(
-                        `/url/${urlObject.host}${urlObject.pathname}${urlObject.search}`,
-                        request.url
-                    );
+
+                    // For preview requests make sure we include the preview/site as part of the site URL
+                    const pathname = isPreviewRequest(siteRequestURL)
+                        ? joinPaths(
+                              `preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
+                              urlObject.pathname
+                          )
+                        : `${urlObject.host}${urlObject.pathname}`;
+                    contentRedirect = new URL(`/url/${pathname}${urlObject.search}`, request.url);
                 }
 
                 // Keep the same search params as the original request
@@ -332,10 +339,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     };
 
     // For https://preview/<siteURL> requests,
-    if (siteRequestURL.hostname === 'preview') {
+    if (isPreviewRequest(siteRequestURL)) {
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
-            `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
+            `preview/${getPreviewRequestIdentifier(siteRequestURL)}`,
             request,
             withAPIToken
         );
