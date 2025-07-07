@@ -111,6 +111,8 @@ export function SearchContainer(props: SearchContainerProps) {
     // We trim the query to avoid invalidating the search when the user is typing between words.
     const normalizedQuery = state?.query.trim() ?? '';
 
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 640 : false;
+
     return (
         <SearchAskProvider value={searchAsk}>
             <Popover
@@ -135,6 +137,7 @@ export function SearchContainer(props: SearchContainerProps) {
                 }
                 rootProps={{
                     open: open,
+                    modal: isMobile,
                 }}
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),

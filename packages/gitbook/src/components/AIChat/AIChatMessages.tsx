@@ -23,6 +23,7 @@ export function AIChatMessages(props: {
                             message.content ? 'animate-[fadeIn_500ms_both]' : '',
                             'shrink-0',
                             'last:min-h-[calc(100%-5rem)]',
+                            'scroll-mt-36',
                             message.role === AIMessageRole.User
                                 ? 'max-w-[80%] self-end rounded-md bg-tint px-4 py-2'
                                 : ''

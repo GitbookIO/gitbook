@@ -86,7 +86,7 @@ export function AIChatWindow(props: { chat: AIChatState }) {
 
     return (
         <div
-            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96"
+            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96"
             ref={containerRef}
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">

@@ -34,12 +34,12 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
 
         useEffect(() => {
             if (isOpen) {
-                // Only focus if the input is not already focused to prevent unnecessary scroll
                 if (document.activeElement !== inputRef.current) {
+                    // Refocus the input and move the caret to the end – do this only once to avoid scroll jumps on every keystroke
                     inputRef.current?.focus({ preventScroll: true });
+                    // Place cursor at the end of the input
+                    inputRef.current?.setSelectionRange(value.length, value.length);
                 }
-                // Place cursor at the end of the input
-                inputRef.current?.setSelectionRange(value.length, value.length);
             } else {
                 inputRef.current?.blur();
             }
@@ -61,8 +61,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         'has-[input:focus]:-translate-y-px h-9 grow cursor-pointer px-2.5 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
                         'theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/6',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
-                        'relative z-30 justify-start max-md:absolute max-md:right-0',
-                        isOpen ? 'max-md:w-48' : 'max-md:w-9',
+                        'relative z-30 shrink grow justify-start max-md:absolute max-md:right-0',
+                        isOpen ? 'max-md:w-56' : 'max-md:w-9',
                         className
                     )}
                 >
@@ -90,8 +90,9 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         onChange={(event) => onChange(event.target.value)}
                         value={value}
                         placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}
+                        maxLength={512}
                         className={tcls(
-                            'peer z-10 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
+                            'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             isOpen ? '' : 'max-md:opacity-0'
                         )}
                         ref={inputRef}
