@@ -16,8 +16,7 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
     icon: IconName;
 
     /**
-     * Style of the icon to render.
-     * @default 'solid'
+     * Style of the icon to render. Defaults to the current icon style from the context.
      */
     iconStyle?: IconStyle;
 
