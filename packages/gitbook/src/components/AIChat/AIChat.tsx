@@ -16,7 +16,6 @@ import AIChatIcon from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
-import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
 export function AIChat() {
     const chat = useAIChatState();
@@ -169,7 +168,11 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                             ) : null}
                         </div>
                     ) : (
-                        <AIChatMessages chat={chat} lastUserMessageRef={lastUserMessageRef} />
+                        <AIChatMessages
+                            chat={chat}
+                            chatController={chatController}
+                            lastUserMessageRef={lastUserMessageRef}
+                        />
                     )}
                 </div>
                 <div
@@ -177,11 +180,7 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                     className="absolute inset-x-0 bottom-0 mr-2 flex flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
                 >
                     {/* Display an error banner when something went wrong. */}
-                    {chat.error ? (
-                        <AIChatError chatController={chatController} />
-                    ) : (
-                        <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
-                    )}
+                    {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                     <AIChatInput
                         value={input}
