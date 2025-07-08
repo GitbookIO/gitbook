@@ -104,7 +104,7 @@ export async function PageHeader(props: {
                 {page.layout.tableOfContents ? (
                     <AIActionsDropdown
                         markdown={markdownResult.data}
-                        markdownPageUrl={context.linker.toPathInSite(page.path)}
+                        markdownPageUrl={context.linker.toPathInSpace(page.path)}
                         pageURL={context.linker.toAbsoluteURL(
                             context.linker.toPathForPage({
                                 pages: context.revision.pages,
