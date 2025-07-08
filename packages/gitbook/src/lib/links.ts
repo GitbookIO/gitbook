@@ -138,11 +138,6 @@ export function linkerForPublishedURL(linker: GitBookLinker, rawSitePublishedURL
     return {
         ...linker,
         toLinkForContent(rawURL: string): string {
-            const firstPass = linker.toLinkForContent(rawURL);
-            if (firstPass !== rawURL) {
-                return firstPass;
-            }
-
             const url = new URL(rawURL);
 
             // If the link is part of the published site, we rewrite it to be part of the preview site.
@@ -156,7 +151,7 @@ export function linkerForPublishedURL(linker: GitBookLinker, rawSitePublishedURL
                 return linker.toPathInSite(extractedPath) + url.search + url.hash;
             }
 
-            return rawURL;
+            return linker.toLinkForContent(rawURL);
         },
     };
 }
