@@ -76,17 +76,17 @@ export const Link = React.forwardRef(function Link(
     const { target, rel } = getTargetProps(props, { externalLinksTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-        const isExternal = isExternalLink(href, window.location.origin);
+        const isExternalWithOrigin = isExternalLink(href, window.location.origin);
 
         if (insights) {
-            trackEvent(insights, undefined, { immediate: isExternal });
+            trackEvent(insights, undefined, { immediate: isExternalWithOrigin });
         }
 
         const isInIframe = window.self !== window.top;
 
         // When the page is embedded in an iframe
         // for security reasons other urls cannot be opened.
-        if (isInIframe && isExternal) {
+        if (isInIframe && isExternalWithOrigin) {
             event.preventDefault();
             window.open(href, '_blank', 'noopener noreferrer');
         } else {
@@ -95,7 +95,7 @@ export const Link = React.forwardRef(function Link(
             // by default the target is "_self".
             const { target = '_self' } = getTargetProps(props, {
                 externalLinksTarget,
-                isExternal,
+                isExternal: isExternalWithOrigin,
             });
             event.preventDefault();
             window.open(href, target, rel);
