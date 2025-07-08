@@ -1,7 +1,8 @@
 'use client';
-import { tString, useLanguage } from '@/intl/client';
+import { t, useLanguage } from '@/intl/client';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import AIChatIcon from './AIChatIcon';
 
 /**
@@ -20,7 +21,12 @@ export function AIChatButton() {
             size="default"
             variant="secondary"
             className="!px-3 bg-tint-base py-2.5"
-            label={tString(language, 'ai_chat_assistant_name')}
+            label={
+                <div className="flex items-center gap-2">
+                    {t(language, 'ai_chat_assistant_name')}
+                    <KeyboardShortcut keys={['mod', 'j']} className="border-tint-11 text-tint-1" />
+                </div>
+            }
             onClick={() => {
                 if (chat.opened) {
                     chatController.close();

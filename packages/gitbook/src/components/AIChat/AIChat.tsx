@@ -3,6 +3,7 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
     type AIChatState,
@@ -19,19 +20,31 @@ import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
 export function AIChat() {
     const chat = useAIChatState();
+    const chatController = useAIChatController();
+
+    useHotkeys(
+        'mod+j',
+        (e) => {
+            e.preventDefault();
+            chatController.open();
+        },
+        []
+    );
 
     if (!chat.opened) {
         return null;
     }
 
-    return <AIChatWindow chat={chat} />;
+    return <AIChatWindow chatController={chatController} chat={chat} />;
 }
 
-export function AIChatWindow(props: { chat: AIChatState }) {
-    const { chat } = props;
+export function AIChatWindow(props: {
+    chatController: AIChatController;
+    chat: AIChatState;
+}) {
+    const { chatController, chat } = props;
 
     const [input, setInput] = React.useState('');
-    const chatController = useAIChatController();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
