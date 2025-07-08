@@ -64,7 +64,8 @@ export const pt_br = {
     link_tooltip_external_link: 'Link externo para',
     link_tooltip_page_anchor: 'Pular para a seção',
     open_in_new_tab: 'Abrir em uma nova guia',
-    ai_chat_assistant_name: 'Assistente de Docs',
+    ai_chat_assistant_name: 'Assistente do GitBook',
+    ai_chat_assistant_name_unbranded: 'Assistente de IA',
     ai_chat_assistant_description: 'Estou aqui para ajudá-lo com a documentação.',
     ai_chat_assistant_greeting_morning: 'Bom dia',
     ai_chat_assistant_greeting_afternoon: 'Boa tarde',
@@ -77,7 +78,7 @@ export const pt_br = {
     ai_chat_error: 'Algo deu errado.',
     ai_chat_context_title: 'Baseado no seu contexto',
     ai_chat_context_description:
-        'O Assistente de Docs usa IA e seu contexto para gerar respostas e realizar ações.',
+        'O assistente usa IA e seu contexto para gerar respostas e realizar ações.',
     ai_chat_context_pages_youve_read: 'Páginas que você leu',
     ai_chat_context_info_provided_by_the_site: 'Informações fornecidas pelo site',
     ai_chat_context_previous_messages: 'Mensagens anteriores',

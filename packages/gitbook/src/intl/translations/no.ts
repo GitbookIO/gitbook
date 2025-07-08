@@ -64,7 +64,8 @@ export const no: TranslationLanguage = {
     link_tooltip_external_link: 'Ekstern lenke til',
     link_tooltip_page_anchor: 'Hopp til seksjon',
     open_in_new_tab: 'Åpne i ny fane',
-    ai_chat_assistant_name: 'Docs-assistent',
+    ai_chat_assistant_name: 'GitBook-assistent',
+    ai_chat_assistant_name_unbranded: 'AI-assistent',
     ai_chat_assistant_description: 'Jeg er her for å hjelpe deg med docs.',
     ai_chat_assistant_greeting_morning: 'God morgen',
     ai_chat_assistant_greeting_afternoon: 'God ettermiddag',
@@ -77,7 +78,7 @@ export const no: TranslationLanguage = {
     ai_chat_error: 'Noe gikk galt.',
     ai_chat_context_title: 'Basert på din kontekst',
     ai_chat_context_description:
-        'Docs-assistenten bruker AI og din kontekst til å generere svar og utføre handlinger.',
+        'Assistenten bruker AI og din kontekst til å generere svar og utføre handlinger.',
     ai_chat_context_pages_youve_read: 'Sider du har lest',
     ai_chat_context_info_provided_by_the_site: 'Informasjon gitt av nettstedet',
     ai_chat_context_previous_messages: 'Tidligere meldinger',

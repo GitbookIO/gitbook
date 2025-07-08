@@ -79,7 +79,9 @@ export function SpaceLayout(props: {
                         withAIChat={withAIChat}
                         context={context}
                     />
-                    {withAIChat ? <AIChat /> : null}
+                    {withAIChat ? (
+                        <AIChat trademark={context.customization.trademark.enabled} />
+                    ) : null}
                     <div className="scroll-nojump">
                         <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                             <div
