@@ -24,11 +24,11 @@ export function AIActionsDropdown(props: {
     const ref = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={ref} className="hidden h-fit items-stretch justify-start md:flex">
+        <div ref={ref} className="flex h-fit items-stretch justify-start">
             <DefaultAction {...props} />
             <DropdownMenu
                 align="end"
-                className="!min-w-60"
+                className="!min-w-60 max-w-max"
                 button={
                     <Button
                         icon="chevron-down"

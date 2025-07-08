@@ -9,6 +9,7 @@ import AIChatIcon from '@/components/AIChat/AIChatIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
+import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import { useState } from 'react';
 
@@ -24,8 +25,13 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
         <AIActionWrapper
             type={type}
             icon={<AIChatIcon />}
-            label="Ask Docs Assistant"
-            description="Ask our Docs Assistant about this page"
+            label={tString(language, 'ai_chat_ask', tString(language, 'ai_chat_assistant_name'))}
+            shortLabel={tString(language, 'ask')}
+            description={tString(
+                language,
+                'ai_chat_ask_about_page',
+                tString(language, 'ai_chat_assistant_name')
+            )}
             onClick={() => {
                 // Open the chat if it's not already open
                 if (!chat.opened) {
@@ -44,6 +50,7 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
 export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
     const { markdown, type } = props;
     const [copied, setCopied] = useState(false);
+    const language = useLanguage();
 
     // Close the dropdown menu manually after the copy button is clicked
     const closeDropdownMenu = () => {
@@ -61,8 +68,8 @@ export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
         <AIActionWrapper
             type={type}
             icon={copied ? 'check' : 'copy'}
-            label={copied ? 'Copied!' : 'Copy for LLMs'}
-            description="Copy page as Markdown"
+            label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
+            description={tString(language, 'copy_page_markdown')}
             onClick={(e) => {
                 e.preventDefault();
 
@@ -84,13 +91,14 @@ export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
 
 export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionType }) {
     const { markdownPageUrl, type } = props;
+    const language = useLanguage();
 
     return (
         <AIActionWrapper
             type={type}
             icon={<MarkdownIcon className="size-4 fill-current" />}
-            label="View as Markdown"
-            description="View this page as plain text"
+            label={tString(language, 'view_page_markdown')}
+            description={tString(language, 'view_page_plaintext')}
             href={`${markdownPageUrl}.md`}
         />
     );
@@ -102,6 +110,9 @@ export function OpenInLLM(props: {
     type: AIActionType;
 }) {
     const { provider, url, type } = props;
+    const language = useLanguage();
+
+    const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Claude';
 
     return (
         <AIActionWrapper
@@ -113,9 +124,10 @@ export function OpenInLLM(props: {
                     <ClaudeIcon className="size-3.5 fill-current" />
                 )
             }
-            label={provider === 'chatgpt' ? 'Open in ChatGPT' : 'Open in Claude'}
-            description={`Ask ${provider} about this page`}
-            href={getLLMURL(provider, url)}
+            label={tString(language, 'open_in', providerLabel)}
+            shortLabel={providerLabel}
+            description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
+            href={getLLMURL(provider, url, language)}
         />
     );
 }
@@ -124,11 +136,15 @@ function AIActionWrapper(props: {
     type: AIActionType;
     icon: IconName | React.ReactNode;
     label: string;
+    /**
+     * The label to display in the button. If not provided, the `label` will be used.
+     */
+    shortLabel?: string;
     onClick?: (e: React.MouseEvent) => void;
     description?: string;
     href?: string;
 }) {
-    const { type, icon, label, onClick, href, description } = props;
+    const { type, icon, label, shortLabel, onClick, href, description } = props;
 
     if (type === 'button') {
         return (
@@ -136,7 +152,7 @@ function AIActionWrapper(props: {
                 icon={icon}
                 size="small"
                 variant="secondary"
-                label={label}
+                label={shortLabel || label}
                 className="hover:!scale-100 !shadow-none !rounded-r-none border-r-0 bg-tint-base text-sm"
                 onClick={onClick}
                 href={href}
@@ -176,8 +192,8 @@ function AIActionWrapper(props: {
     );
 }
 
-function getLLMURL(provider: 'chatgpt' | 'claude', url: string) {
-    const prompt = encodeURIComponent(`Read ${url} and answer questions about the content.`);
+function getLLMURL(provider: 'chatgpt' | 'claude', url: string, language: TranslationLanguage) {
+    const prompt = encodeURIComponent(tString(language, 'open_in_llms_pre_prompt', url));
 
     switch (provider) {
         case 'chatgpt':
