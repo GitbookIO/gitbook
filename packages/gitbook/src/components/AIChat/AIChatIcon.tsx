@@ -1,18 +1,35 @@
 import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
 import type React from 'react';
 
 interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
     size?: number;
     state?: 'default' | 'intro' | 'thinking' | 'working' | 'done' | 'error';
+    trademark?: boolean;
 }
 
 const AIChatIcon = ({
     className = 'size-4',
     size,
+    trademark = true,
     state = 'default',
     ...props
 }: AIChatIconProps) => {
+    if (!trademark) {
+        return (
+            <Icon
+                icon="sparkle"
+                className={tcls(
+                    className,
+                    state === 'thinking' || state === 'working'
+                        ? 'animate-[spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]'
+                        : ''
+                )}
+            />
+        );
+    }
+
     return (
         <svg
             width="16"

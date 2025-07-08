@@ -91,31 +91,21 @@ export function AIChatWindow(props: { chat: AIChatState; trademark: boolean }) {
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
-                    {trademark ? (
-                        <AIChatIcon
-                            className="size-5 text-tint"
-                            state={
-                                chat.error
-                                    ? 'error'
-                                    : chat.loading
-                                      ? chat.messages[chat.messages.length - 1].content
-                                          ? 'working'
-                                          : 'thinking'
-                                      : chat.messages.length > 0
-                                        ? 'done'
-                                        : 'default'
-                            }
-                        />
-                    ) : (
-                        <Icon
-                            icon="sparkle"
-                            className={`size-5 text-tint ${
-                                chat.loading
-                                    ? 'animate-[spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]'
-                                    : ''
-                            }`}
-                        />
-                    )}
+                    <AIChatIcon
+                        className="size-5 text-tint"
+                        trademark={trademark}
+                        state={
+                            chat.error
+                                ? 'error'
+                                : chat.loading
+                                  ? chat.messages[chat.messages.length - 1].content
+                                      ? 'working'
+                                      : 'thinking'
+                                  : chat.messages.length > 0
+                                    ? 'done'
+                                    : 'default'
+                        }
+                    />
                     <div className="flex flex-col">
                         <div className="font-bold">
                             {trademark
@@ -179,17 +169,11 @@ export function AIChatWindow(props: { chat: AIChatState; trademark: boolean }) {
                     {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center rounded-full bg-tint-subtle">
-                                {trademark ? (
-                                    <AIChatIcon
-                                        state="intro"
-                                        className="size-16 animate-[present_500ms_200ms_both]"
-                                    />
-                                ) : (
-                                    <Icon
-                                        icon="sparkle"
-                                        className="size-16 animate-[present_500ms_200ms_both]"
-                                    />
-                                )}
+                                <AIChatIcon
+                                    state="intro"
+                                    trademark={trademark}
+                                    className="size-16 animate-[present_500ms_200ms_both]"
+                                />
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
                                 <h5 className=" text-center font-bold text-lg text-tint-strong">

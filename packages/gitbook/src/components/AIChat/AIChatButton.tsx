@@ -16,7 +16,7 @@ export function AIChatButton(props: { trademark: boolean }) {
 
     return (
         <Button
-            icon={trademark ? <AIChatIcon /> : 'sparkle'}
+            icon={<AIChatIcon trademark={trademark} />}
             iconOnly
             size="default"
             variant="secondary"
