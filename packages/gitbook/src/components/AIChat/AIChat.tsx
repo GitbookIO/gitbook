@@ -91,8 +91,18 @@ export function AIChatWindow(props: { chat: AIChatState }) {
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <AIChatIcon
-                        className={`size-5 text-tint ${chat.loading ? 'animate-pulse' : ''}`}
-                        state={chat.loading ? 'thinking' : 'default'}
+                        className="size-5 text-tint"
+                        state={
+                            chat.error
+                                ? 'error'
+                                : chat.loading
+                                  ? chat.messages[chat.messages.length - 1].content
+                                      ? 'working'
+                                      : 'thinking'
+                                  : chat.messages.length > 0
+                                    ? 'done'
+                                    : 'default'
+                        }
                     />
                     <div className="flex flex-col">
                         <div className="font-bold">
@@ -155,7 +165,10 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                     {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center rounded-full bg-tint-subtle">
-                                <AIChatIcon className="size-16 animate-[present_500ms_200ms_both]" />
+                                <AIChatIcon
+                                    state="intro"
+                                    className="size-16 animate-[present_500ms_200ms_both]"
+                                />
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
                                 <h5 className=" text-center font-bold text-lg text-tint-strong">
