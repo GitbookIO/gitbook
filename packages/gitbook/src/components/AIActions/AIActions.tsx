@@ -11,7 +11,9 @@ import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+import assertNever from 'assert-never';
 import type React from 'react';
+import { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 
 type AIActionType = 'button' | 'dropdown-menu-item';
@@ -73,6 +75,7 @@ export function CopyMarkdown(props: {
     const { markdown, type, isDefaultAction } = props;
     const language = useLanguage();
     const { copied, setCopied } = useCopiedStore();
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Close the dropdown menu manually after the copy button is clicked
     const closeDropdownMenu = () => {
@@ -86,29 +89,49 @@ export function CopyMarkdown(props: {
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     };
 
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
+    const onClick = (e: React.MouseEvent) => {
+        // Prevent default behavior for non-default actions to avoid closing the dropdown.
+        // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
+        // Default action buttons are excluded from this behavior.
+        if (!isDefaultAction) {
+            e.preventDefault();
+        }
+
+        // Cancel any pending timeout
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        navigator.clipboard.writeText(markdown);
+
+        setCopied(true);
+
+        // Reset the copied state after 2 seconds
+        timeoutRef.current = setTimeout(() => {
+            // Close the dropdown menu if it's a dropdown menu item and not the default action
+            if (type === 'dropdown-menu-item' && !isDefaultAction) {
+                closeDropdownMenu();
+            }
+
+            setCopied(false);
+        }, 2000);
+    };
+
     return (
         <AIActionWrapper
             type={type}
             icon={copied ? 'check' : 'copy'}
             label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
             description={tString(language, 'copy_page_markdown')}
-            onClick={(e) => {
-                if (!isDefaultAction) {
-                    e.preventDefault();
-                }
-
-                if (!markdown) return;
-                navigator.clipboard.writeText(markdown);
-                setCopied(true);
-
-                setTimeout(() => {
-                    if (type === 'dropdown-menu-item' && !isDefaultAction) {
-                        closeDropdownMenu();
-                    }
-
-                    setCopied(false);
-                }, 2000);
-            }}
+            onClick={onClick}
         />
     );
 }
@@ -239,5 +262,7 @@ function getLLMURL(provider: 'chatgpt' | 'claude', url: string, language: Transl
             return `https://chat.openai.com/?q=${prompt}`;
         case 'claude':
             return `https://claude.ai/new?q=${prompt}`;
+        default:
+            assertNever(provider);
     }
 }
