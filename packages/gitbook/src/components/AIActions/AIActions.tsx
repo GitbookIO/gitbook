@@ -45,17 +45,38 @@ export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
     const { markdown, type } = props;
     const [copied, setCopied] = useState(false);
 
+    // Close the dropdown menu manually after the copy button is clicked
+    const closeDropdownMenu = () => {
+        const dropdownMenu = document.querySelector('div[data-radix-popper-content-wrapper]');
+
+        // Cancel if no dropdown menu is open
+        if (!dropdownMenu) return;
+
+        // Dispatch on `document` so that the event is captured by Radix's
+        // dismissable-layer listener regardless of focus location.
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    };
+
     return (
         <AIActionWrapper
             type={type}
             icon={copied ? 'check' : 'copy'}
             label={copied ? 'Copied!' : 'Copy for LLMs'}
             description="Copy page as Markdown"
-            onClick={() => {
+            onClick={(e) => {
+                e.preventDefault();
+
                 if (!markdown) return;
                 navigator.clipboard.writeText(markdown);
                 setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
+
+                setTimeout(() => {
+                    if (type === 'dropdown-menu-item') {
+                        closeDropdownMenu();
+                    }
+
+                    setCopied(false);
+                }, 2000);
             }}
         />
     );
@@ -103,7 +124,7 @@ function AIActionWrapper(props: {
     type: AIActionType;
     icon: IconName | React.ReactNode;
     label: string;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent) => void;
     description?: string;
     href?: string;
 }) {
