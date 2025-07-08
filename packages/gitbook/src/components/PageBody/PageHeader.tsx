@@ -88,8 +88,7 @@ export async function PageHeader(props: {
                 {page.layout.title ? (
                     <h1
                         className={tcls(
-                            'text-3xl',
-                            'md:text-4xl',
+                            'text-4xl',
                             'font-bold',
                             'flex',
                             'items-center',
