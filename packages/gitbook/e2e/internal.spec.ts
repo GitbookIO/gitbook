@@ -427,8 +427,12 @@ const testCases: TestsCase[] = [
                 },
                 screenshot: false,
                 run: async (page) => {
+                    console.log('Current page URL:', await page.url());
+
                     const sectionTabs = page.getByLabel('Sections');
                     await expect(sectionTabs).toBeVisible();
+
+                    console.log('Current page URL:', await page.url());
 
                     const sectionTabLinks = sectionTabs.getByRole('link');
                     for (const link of await sectionTabLinks.all()) {
