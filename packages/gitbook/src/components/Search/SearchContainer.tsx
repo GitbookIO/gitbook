@@ -64,6 +64,9 @@ export function SearchContainer(props: SearchContainerProps) {
     );
 
     const onOpen = () => {
+        if (open) {
+            return;
+        }
         setSearchState((prev) => ({
             ask: prev?.ask ?? false,
             global: prev?.global ?? false,
