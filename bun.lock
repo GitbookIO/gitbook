@@ -37,7 +37,7 @@
     },
     "packages/fonts": {
       "name": "@gitbook/fonts",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@gitbook/api": "catalog:",
       },
@@ -48,7 +48,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.12.0",
+      "version": "0.13.1",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/cache-tags": "workspace:*",
@@ -69,6 +69,7 @@
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tailwindcss/typography": "^0.5.16",
+        "@tusbar/cache-control": "^1.0.2",
         "ai": "^4.2.2",
         "assert-never": "^1.2.1",
         "bun-types": "^1.1.20",
@@ -96,7 +97,6 @@
         "object-identity": "^0.1.2",
         "openapi-types": "^12.1.3",
         "p-map": "^7.0.3",
-        "parse-cache-control": "^1.0.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-hotkeys-hook": "^4.4.1",
@@ -167,7 +167,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "2.1.4",
+      "version": "2.2.0",
       "dependencies": {
         "@scalar/openapi-parser": "^0.18.0",
         "@scalar/openapi-types": "^0.1.9",
@@ -182,7 +182,7 @@
     },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*",
@@ -214,7 +214,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.3.0",
+      "version": "1.3.2",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.3.16",
@@ -1271,6 +1271,8 @@
     "@tsconfig/node20": ["@tsconfig/node20@20.1.4", "", {}, "sha512-sqgsT69YFeLWf5NtJ4Xq/xAF8p4ZQHlmGW74Nu2tD4+g5fAsposc4ZfaaPixVu4y01BEiDCWLRDCvDM5JOsRxg=="],
 
     "@tsconfig/strictest": ["@tsconfig/strictest@2.0.5", "", {}, "sha512-ec4tjL2Rr0pkZ5hww65c+EEPYwxOi4Ryv+0MtjeaSQRJyq322Q27eOQiFbuNgw2hpL4hB1/W/HBGk3VKS43osg=="],
+
+    "@tusbar/cache-control": ["@tusbar/cache-control@1.0.2", "", {}, "sha512-PXfjYTYBVvMPYCLDWj+xIOA9ITFbbhWCHzLcqUCJ5TPGm4JO4cxpGb7x3K8Q1K1ADgNgfBxLsDcTMVRydtZB9A=="],
 
     "@types/debug": ["@types/debug@4.1.12", "", { "dependencies": { "@types/ms": "*" } }, "sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ=="],
 
@@ -2411,8 +2413,6 @@
     "package-manager-detector": ["package-manager-detector@0.2.2", "", {}, "sha512-VgXbyrSNsml4eHWIvxxG/nTL4wgybMTXCV2Un/+yEc3aDKKU6nQBZjbeP3Pl3qm9Qg92X/1ng4ffvCeD/zwHgg=="],
 
     "parent-module": ["parent-module@1.0.1", "", { "dependencies": { "callsites": "^3.0.0" } }, "sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g=="],
-
-    "parse-cache-control": ["parse-cache-control@1.0.1", "", {}, "sha512-60zvsJReQPX5/QP0Kzfd/VrpjScIQ7SHBW6bFCYfEP+fp0Eppr1SHhIO5nd1PjZtvclzSzES9D/p5nFJurwfWg=="],
 
     "parse-json": ["parse-json@5.2.0", "", { "dependencies": { "@babel/code-frame": "^7.0.0", "error-ex": "^1.3.1", "json-parse-even-better-errors": "^2.3.0", "lines-and-columns": "^1.1.6" } }, "sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg=="],
 
