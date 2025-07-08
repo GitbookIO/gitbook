@@ -115,7 +115,7 @@ export function createLinker(
             // If the link points to a content in the same site, we return an absolute path
             // instead of a full URL; it makes it possible to use router navigation
             if (url.hostname === servedOn.host && url.pathname.startsWith(servedOn.siteBasePath)) {
-                return url.pathname;
+                return url.pathname + url.search + url.hash;
             }
 
             return rawURL;
@@ -123,6 +123,37 @@ export function createLinker(
     };
 
     return linker;
+}
+
+/**
+ * Create a new linker that intercepts links that belongs to the published site and rewrite them
+ * relative to the URL being served.
+ *
+ * It is needed for preview of site where the served URL (http://preview/site_abc)
+ * is different from the actual published site URL (https://docs.company.com).
+ */
+export function linkerForPublishedURL(linker: GitBookLinker, rawSitePublishedURL: string) {
+    const sitePublishedURL = new URL(rawSitePublishedURL);
+
+    return {
+        ...linker,
+        toLinkForContent(rawURL: string): string {
+            const url = new URL(rawURL);
+
+            // If the link is part of the published site, we rewrite it to be part of the preview site.
+            if (
+                url.hostname === sitePublishedURL.hostname &&
+                url.pathname.startsWith(sitePublishedURL.pathname)
+            ) {
+                // When detecting that the url has been computed as apart of the published site,
+                // we rewrite it to be part of the preview site.
+                const extractedPath = url.pathname.slice(sitePublishedURL.pathname.length);
+                return linker.toPathInSite(extractedPath) + url.search + url.hash;
+            }
+
+            return linker.toLinkForContent(rawURL);
+        },
+    };
 }
 
 /**
