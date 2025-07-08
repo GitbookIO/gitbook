@@ -49,7 +49,7 @@ export async function getMarkdownForPage(
 
     const { data: markdown, error } = await context.dataFetcher.getRevisionPageMarkdown({
         spaceId: context.space.id,
-        revisionId: context.revision.id,
+        revisionId: context.revisionId,
         pageId: page.id,
     });
 
