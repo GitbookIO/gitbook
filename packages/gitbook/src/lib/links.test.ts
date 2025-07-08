@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'bun:test';
-import { createLinker, linkerWithAbsoluteURLs, linkerWithOtherSpaceBasePath } from './links';
+import {
+    createLinker,
+    linkerForPublishedURL,
+    linkerWithAbsoluteURLs,
+    linkerWithOtherSpaceBasePath,
+} from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
@@ -17,6 +22,12 @@ const siteGitBookIO = createLinker({
     host: 'org.gitbook.io',
     spaceBasePath: '/sitename/variant/',
     siteBasePath: '/sitename/',
+});
+
+const preview = createLinker({
+    host: 'preview',
+    spaceBasePath: '/site_abc/section/space/',
+    siteBasePath: '/site_abc/',
 });
 
 describe('toPathInSpace', () => {
@@ -88,6 +99,12 @@ describe('toLinkForContent', () => {
         );
     });
 
+    it('should preserve the search and hash', () => {
+        expect(root.toLinkForContent('https://docs.company.com/some/path?a=b#c')).toBe(
+            '/some/path?a=b#c'
+        );
+    });
+
     it('should preserve an absolute URL if the site is not the same', () => {
         expect(siteGitBookIO.toLinkForContent('https://org.gitbook.io/anothersite/some/path')).toBe(
             'https://org.gitbook.io/anothersite/some/path'
@@ -136,5 +153,49 @@ describe('linkerWithOtherSpaceBasePath', () => {
             spaceBasePath: '/a/b',
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');
+    });
+});
+
+describe('linkerForPublishedURL', () => {
+    describe('Root custom domain', () => {
+        it('should rewrite links that belongs to the published site to be part of the preview site', () => {
+            const previewLinker = linkerForPublishedURL(preview, 'https://docs.company.com/');
+            expect(previewLinker.toLinkForContent('https://docs.company.com/some/path')).toBe(
+                '/site_abc/some/path'
+            );
+            expect(
+                previewLinker.toLinkForContent('https://docs.company.com/section/variant/some/path')
+            ).toBe('/site_abc/section/variant/some/path');
+            expect(previewLinker.toLinkForContent('https://www.google.com')).toBe(
+                'https://www.google.com'
+            );
+        });
+    });
+
+    describe('gitbook.io domain', () => {
+        it('should rewrite links that belongs to the published site to be part of the preview site', () => {
+            const previewLinker = linkerForPublishedURL(
+                preview,
+                'https://org.gitbook.io/sitename/'
+            );
+            expect(
+                previewLinker.toLinkForContent('https://org.gitbook.io/sitename/some/path')
+            ).toBe('/site_abc/some/path');
+            expect(
+                previewLinker.toLinkForContent(
+                    'https://org.gitbook.io/sitename/section/variant/some/path'
+                )
+            ).toBe('/site_abc/section/variant/some/path');
+            expect(previewLinker.toLinkForContent('https://www.google.com')).toBe(
+                'https://www.google.com'
+            );
+        });
+    });
+
+    it('should should preserve hash and search', () => {
+        const previewLinker = linkerForPublishedURL(preview, 'https://docs.company.com/');
+        expect(previewLinker.toLinkForContent('https://docs.company.com/some/path?a=b#c')).toBe(
+            '/site_abc/some/path?a=b#c'
+        );
     });
 });

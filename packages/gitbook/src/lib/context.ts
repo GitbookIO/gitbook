@@ -24,7 +24,7 @@ import { notFound } from 'next/navigation';
 import { assert } from 'ts-essentials';
 import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
-import { type GitBookLinker, createLinker } from './links';
+import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
 
 /**
  * Data about the site URL. Provided by the middleware.
@@ -301,6 +301,9 @@ export async function fetchSiteContextByIds(
 
     return {
         ...spaceContext,
+        linker: site.urls.published
+            ? linkerForPublishedURL(spaceContext.linker, site.urls.published)
+            : spaceContext.linker,
         organizationId: ids.organization,
         site,
         siteSpaces,
