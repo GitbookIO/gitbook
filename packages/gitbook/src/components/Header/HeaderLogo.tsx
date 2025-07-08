@@ -20,10 +20,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 
     return (
         <Link
-            href={linker.toAbsoluteURL(linker.toPathInSite(''))}
-            // This link should always open in the same tab
-            // so we set the target to _self.
-            target="_self"
+            href={linker.toPathInSite('')}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
