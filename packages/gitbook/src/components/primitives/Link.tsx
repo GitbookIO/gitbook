@@ -89,7 +89,7 @@ export const Link = React.forwardRef(function Link(
         if (isInIframe && isExternalWithOrigin) {
             event.preventDefault();
             window.open(href, '_blank', 'noopener noreferrer');
-        } else {
+        } else if (isExternal) {
             // The external logic server-side is limited
             // so we use the client-side logic to determine the real target
             // by default the target is "_self".
