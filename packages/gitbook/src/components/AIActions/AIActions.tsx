@@ -240,7 +240,7 @@ function AIActionWrapper(props: {
                     )}
                 </div>
             ) : null}
-            <div className="flex flex-1 flex-col gap-0.5 *:leading-none">
+            <div className="flex flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2 text-tint-strong">
                     <span className="truncate font-medium text-sm">{label}</span>
                     {href ? <Icon icon="arrow-up-right" className="size-3" /> : null}
