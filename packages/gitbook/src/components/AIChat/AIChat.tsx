@@ -95,7 +95,9 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                         state={chat.loading ? 'thinking' : 'default'}
                     />
                     <div className="flex flex-col">
-                        <div className="font-bold">Docs Assistant</div>
+                        <div className="font-bold">
+                            {tString(language, 'ai_chat_assistant_name')}
+                        </div>
                         <div
                             className={`text-tint text-xs leading-none transition-all duration-500 ${
                                 chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'

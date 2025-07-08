@@ -64,7 +64,7 @@ export const fr: TranslationLanguage = {
     link_tooltip_external_link: 'Lien externe à',
     link_tooltip_page_anchor: 'Sauter à la section',
     open_in_new_tab: 'Ouvrir dans un nouvel onglet',
-    ai_chat_assistant_name: 'Assistant Docs',
+    ai_chat_assistant_name: 'Assistant GitBook',
     ai_chat_assistant_description: 'Je suis là pour vous aider avec la documentation.',
     ai_chat_assistant_greeting_morning: 'Bonjour',
     ai_chat_assistant_greeting_afternoon: 'Bon après-midi',

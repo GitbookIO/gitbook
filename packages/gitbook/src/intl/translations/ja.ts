@@ -64,7 +64,7 @@ export const ja: TranslationLanguage = {
     link_tooltip_external_link: '外部リンク先',
     link_tooltip_page_anchor: 'ページ内リンク先',
     open_in_new_tab: '新しいタブで開く',
-    ai_chat_assistant_name: 'ドキュメントアシスタント',
+    ai_chat_assistant_name: 'GitBookアシスタント',
     ai_chat_assistant_description: 'ドキュメントについてお手伝いします。',
     ai_chat_assistant_greeting_morning: 'おはようございます',
     ai_chat_assistant_greeting_afternoon: 'こんにちは',

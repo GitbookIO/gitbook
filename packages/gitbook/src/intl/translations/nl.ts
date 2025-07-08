@@ -64,7 +64,7 @@ export const nl: TranslationLanguage = {
     link_tooltip_external_link: 'Externe link naar',
     link_tooltip_page_anchor: 'Spring naar sectie',
     open_in_new_tab: 'Open in nieuw tabblad',
-    ai_chat_assistant_name: 'Docs Assistent',
+    ai_chat_assistant_name: 'GitBook Assistent',
     ai_chat_assistant_description: 'Ik help je met de documentatie.',
     ai_chat_assistant_greeting_morning: 'Goedemorgen',
     ai_chat_assistant_greeting_afternoon: 'Goedemiddag',

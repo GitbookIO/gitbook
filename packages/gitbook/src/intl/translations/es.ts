@@ -66,7 +66,7 @@ export const es: TranslationLanguage = {
     link_tooltip_external_link: 'Enlace externo a',
     link_tooltip_page_anchor: 'Saltar a la sección',
     open_in_new_tab: 'Abrir en una nueva pestaña',
-    ai_chat_assistant_name: 'Asistente de Docs',
+    ai_chat_assistant_name: 'Asistente de GitBook',
     ai_chat_assistant_description: 'Estoy aquí para ayudarte con la documentación.',
     ai_chat_assistant_greeting_morning: 'Buenos días',
     ai_chat_assistant_greeting_afternoon: 'Buenas tardes',

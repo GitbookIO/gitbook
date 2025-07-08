@@ -64,7 +64,7 @@ export const de = {
     link_tooltip_external_link: 'Externe Verlinkung zu',
     link_tooltip_page_anchor: 'Zum Abschnitt springen',
     open_in_new_tab: 'In neuem Tab öffnen',
-    ai_chat_assistant_name: 'Docs-Assistent',
+    ai_chat_assistant_name: 'GitBook-Assistent',
     ai_chat_assistant_description: 'Ich helfe Ihnen bei der Dokumentation.',
     ai_chat_assistant_greeting_morning: 'Guten Morgen',
     ai_chat_assistant_greeting_afternoon: 'Guten Tag',

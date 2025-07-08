@@ -62,7 +62,7 @@ export const zh: TranslationLanguage = {
     link_tooltip_external_link: '外部链接到',
     link_tooltip_page_anchor: '跳转到页面',
     open_in_new_tab: '在新标签页中打开',
-    ai_chat_assistant_name: '文档助手',
+    ai_chat_assistant_name: 'GitBook 助手',
     ai_chat_assistant_description: '我在这里帮助您了解文档。',
     ai_chat_assistant_greeting_morning: '早上好',
     ai_chat_assistant_greeting_afternoon: '下午好',

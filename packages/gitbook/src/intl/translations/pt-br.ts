@@ -64,7 +64,7 @@ export const pt_br = {
     link_tooltip_external_link: 'Link externo para',
     link_tooltip_page_anchor: 'Pular para a seção',
     open_in_new_tab: 'Abrir em uma nova guia',
-    ai_chat_assistant_name: 'Assistente de Docs',
+    ai_chat_assistant_name: 'Assistente do GitBook',
     ai_chat_assistant_description: 'Estou aqui para ajudá-lo com a documentação.',
     ai_chat_assistant_greeting_morning: 'Bom dia',
     ai_chat_assistant_greeting_afternoon: 'Boa tarde',

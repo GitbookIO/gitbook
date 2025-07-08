@@ -64,7 +64,7 @@ export const no: TranslationLanguage = {
     link_tooltip_external_link: 'Ekstern lenke til',
     link_tooltip_page_anchor: 'Hopp til seksjon',
     open_in_new_tab: 'Åpne i ny fane',
-    ai_chat_assistant_name: 'Docs-assistent',
+    ai_chat_assistant_name: 'GitBook-assistent',
     ai_chat_assistant_description: 'Jeg er her for å hjelpe deg med docs.',
     ai_chat_assistant_greeting_morning: 'God morgen',
     ai_chat_assistant_greeting_afternoon: 'God ettermiddag',
