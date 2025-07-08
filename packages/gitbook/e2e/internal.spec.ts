@@ -433,7 +433,7 @@ const testCases: TestsCase[] = [
                     const sectionTabLinks = sectionTabs.getByRole('link');
                     for (const link of await sectionTabLinks.all()) {
                         const href = await link.getAttribute('href');
-                        expect(href).toMatch(/^url\/preview\/site_p4Xo4\/?/);
+                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
                     }
                 },
             },
