@@ -35,7 +35,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
     const markdown = await throwIfDataError(
         context.dataFetcher.getRevisionPageMarkdown({
             spaceId: context.space.id,
-            revisionId: context.revision.id,
+            revisionId: context.revisionId,
             pageId: page.id,
         })
     );
