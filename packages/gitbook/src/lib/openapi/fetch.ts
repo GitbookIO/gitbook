@@ -53,15 +53,29 @@ const fetchFilesystem = async (url: string) => {
     try {
         return await fetchFilesystemUncached(url);
     } catch (error) {
+        // To avoid hammering the file with requests, we cache the error for around a minute.
+        cacheLife('minutes');
         // Throwing an error inside a "use cache" function obfuscates the error,
         // so we need to handle it here and recreates the error outside the cache function.
         if (error instanceof OpenAPIParseError) {
-            cacheLife('seconds');
             return { error: { code: error.code, message: error.message } };
         }
-        throw error;
+        if (error instanceof OpenAPIFetchError) {
+            return { error: { code: 'invalid' as const, message: 'Failed to fetch OpenAPI file' } };
+        }
+        // If the error is not an OpenAPIParseError or OpenAPIFetchError,
+        // we assume it's an unknown error and return a generic error.
+        console.error('Unknown error while fetching OpenAPI file:', error);
+        return { error: { code: 'invalid' as const, message: 'Unknown error' } };
     }
 };
+
+class OpenAPIFetchError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'OpenAPIFetchError';
+    }
+}
 
 async function fetchFilesystemUncached(
     url: string,
@@ -78,7 +92,9 @@ async function fetchFilesystemUncached(
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`);
+        throw new OpenAPIFetchError(
+            `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`
+        );
     }
 
     const text = await response.text();
