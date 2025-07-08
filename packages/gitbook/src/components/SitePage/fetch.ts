@@ -71,14 +71,17 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
                 redirectPathname,
             ]);
             for (const source of redirectSources) {
-                const resolvedSiteRedirect = await getDataOrNull(
-                    context.dataFetcher.getSiteRedirectBySource({
-                        organizationId,
-                        siteId: site.id,
-                        source,
-                        siteShareKey: shareKey,
-                    })
-                );
+                // We try to resolve the site redirect
+                const resolvedSiteRedirect =
+                    source.length < 512 &&
+                    (await getDataOrNull(
+                        context.dataFetcher.getSiteRedirectBySource({
+                            organizationId,
+                            siteId: site.id,
+                            source,
+                            siteShareKey: shareKey,
+                        })
+                    ));
                 if (resolvedSiteRedirect) {
                     return redirect(linker.toLinkForContent(resolvedSiteRedirect.target));
                 }
