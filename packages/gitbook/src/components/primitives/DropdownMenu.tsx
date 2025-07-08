@@ -27,8 +27,25 @@ export function DropdownMenu(props: {
     className?: ClassValue;
     /** Open the dropdown on hover */
     openOnHover?: boolean;
+    /**
+     * Side of the dropdown
+     * @default "bottom"
+     */
+    side?: RadixDropdownMenu.DropdownMenuContentProps['side'];
+    /**
+     * Alignment of the dropdown
+     * @default "start"
+     */
+    align?: RadixDropdownMenu.DropdownMenuContentProps['align'];
 }) {
-    const { button, children, className, openOnHover = false } = props;
+    const {
+        button,
+        children,
+        className,
+        openOnHover = false,
+        side = 'bottom',
+        align = 'start',
+    } = props;
     const [hovered, setHovered] = useState(false);
     const [clicked, setClicked] = useState(false);
 
@@ -55,12 +72,13 @@ export function DropdownMenu(props: {
                     collisionPadding={8}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
-                    align="start"
-                    className="z-40 animate-scaleIn pt-2"
+                    align={align}
+                    side={side}
+                    className="z-40 animate-scaleIn border-tint pt-2"
                 >
                     <div
                         className={tcls(
-                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
+                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
                             className
                         )}
                     >
@@ -116,16 +134,17 @@ export function DropdownButton(props: {
 export function DropdownMenuItem(
     props: {
         href?: string;
+        target?: React.HTMLAttributeAnchorTarget;
         active?: boolean;
         className?: ClassValue;
         children: React.ReactNode;
     } & LinkInsightsProps &
         RadixDropdownMenu.DropdownMenuItemProps
 ) {
-    const { children, active = false, href, className, insights, ...rest } = props;
+    const { children, active = false, href, className, insights, target, ...rest } = props;
 
     const itemClassName = tcls(
-        'rounded straight-corners:rounded-sm px-3 py-1 text-sm flex gap-2 items-center',
+        'rounded straight-corners:rounded-sm circular-corners:rounded-lg px-3 py-1 text-sm flex gap-2 items-center',
         active
             ? 'bg-primary text-primary-strong data-[highlighted]:bg-primary-hover'
             : 'data-[highlighted]:bg-tint-hover',
@@ -137,7 +156,7 @@ export function DropdownMenuItem(
     if (href) {
         return (
             <RadixDropdownMenu.Item {...rest} asChild>
-                <Link href={href} insights={insights} className={itemClassName}>
+                <Link href={href} insights={insights} className={itemClassName} target={target}>
                     {children}
                 </Link>
             </RadixDropdownMenu.Item>

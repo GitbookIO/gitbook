@@ -11,6 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
 import { AIChat } from '../AIChat';
@@ -50,10 +51,7 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
-    const withAIChat =
-        context.customization.ai?.mode === CustomizationAIMode.Assistant &&
-        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv');
+    const withAIChat = isAIChatEnabled(context);
 
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
