@@ -24,7 +24,13 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
     return (
         <AIActionWrapper
             type={type}
-            icon={<AIChatIcon />}
+            icon={
+                chat.loading ? (
+                    <Icon icon="spinner-third" className="size-3.5 animate-spin" />
+                ) : (
+                    <AIChatIcon />
+                )
+            }
             label={tString(language, 'ai_chat_ask', tString(language, 'ai_chat_assistant_name'))}
             shortLabel={tString(language, 'ask')}
             description={tString(
@@ -32,6 +38,7 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
                 'ai_chat_ask_about_page',
                 tString(language, 'ai_chat_assistant_name')
             )}
+            disabled={chat.loading}
             onClick={() => {
                 // Open the chat if it's not already open
                 if (!chat.opened) {
@@ -143,8 +150,9 @@ function AIActionWrapper(props: {
     onClick?: (e: React.MouseEvent) => void;
     description?: string;
     href?: string;
+    disabled?: boolean;
 }) {
-    const { type, icon, label, shortLabel, onClick, href, description } = props;
+    const { type, icon, label, shortLabel, onClick, href, description, disabled } = props;
 
     if (type === 'button') {
         return (
@@ -157,6 +165,7 @@ function AIActionWrapper(props: {
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
+                disabled={disabled}
             />
         );
     }
@@ -167,6 +176,7 @@ function AIActionWrapper(props: {
             href={href}
             target="_blank"
             onClick={onClick}
+            disabled={disabled}
         >
             {icon ? (
                 <div className="flex size-5 items-center justify-center text-tint">

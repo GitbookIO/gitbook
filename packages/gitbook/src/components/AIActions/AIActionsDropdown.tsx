@@ -24,7 +24,7 @@ export function AIActionsDropdown(props: {
     const ref = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={ref} className="flex h-fit items-stretch justify-start">
+        <div ref={ref} className="hidden h-fit items-stretch justify-start sm:flex">
             <DefaultAction {...props} />
             <DropdownMenu
                 align="end"
