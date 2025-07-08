@@ -31,6 +31,16 @@ export function AIChat() {
         []
     );
 
+    useHotkeys(
+        'esc',
+        () => {
+            if (chat.opened) {
+                chatController.close();
+            }
+        },
+        []
+    );
+
     if (!chat.opened) {
         return null;
     }

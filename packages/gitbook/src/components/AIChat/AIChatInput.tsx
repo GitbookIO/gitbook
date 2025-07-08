@@ -33,12 +33,10 @@ export function AIChatInput(props: {
     };
 
     useEffect(() => {
-        if (!disabled) {
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 300);
+        if (!disabled && !loading) {
+            inputRef.current?.focus();
         }
-    }, [disabled]);
+    }, [disabled, loading]);
 
     useHotkeys(
         'mod+j',
@@ -81,6 +79,12 @@ export function AIChatInput(props: {
                 placeholder={tString(language, 'ai_chat_input_placeholder')}
                 onChange={handleInput}
                 onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        event.currentTarget.blur();
+                        return;
+                    }
+
                     if (event.key === 'Enter' && !event.shiftKey && value.trim()) {
                         event.preventDefault();
                         event.currentTarget.style.height = 'auto';
