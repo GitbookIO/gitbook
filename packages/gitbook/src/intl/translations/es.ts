@@ -67,6 +67,7 @@ export const es: TranslationLanguage = {
     link_tooltip_page_anchor: 'Saltar a la sección',
     open_in_new_tab: 'Abrir en una nueva pestaña',
     ai_chat_assistant_name: 'Asistente de GitBook',
+    ai_chat_assistant_name_unbranded: 'Asistente de IA',
     ai_chat_assistant_description: 'Estoy aquí para ayudarte con la documentación.',
     ai_chat_assistant_greeting_morning: 'Buenos días',
     ai_chat_assistant_greeting_afternoon: 'Buenas tardes',
@@ -79,7 +80,7 @@ export const es: TranslationLanguage = {
     ai_chat_error: 'Algo salió mal.',
     ai_chat_context_title: 'Basado en tu contexto',
     ai_chat_context_description:
-        'El Asistente de Docs usa IA y tu contexto para generar respuestas y realizar acciones.',
+        'El asistente usa IA y tu contexto para generar respuestas y realizar acciones.',
     ai_chat_context_pages_youve_read: 'Páginas que has leído',
     ai_chat_context_info_provided_by_the_site: 'Información proporcionada por el sitio',
     ai_chat_context_previous_messages: 'Mensajes anteriores',

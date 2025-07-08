@@ -65,6 +65,7 @@ export const nl: TranslationLanguage = {
     link_tooltip_page_anchor: 'Spring naar sectie',
     open_in_new_tab: 'Open in nieuw tabblad',
     ai_chat_assistant_name: 'GitBook Assistent',
+    ai_chat_assistant_name_unbranded: 'AI Assistent',
     ai_chat_assistant_description: 'Ik help je met de documentatie.',
     ai_chat_assistant_greeting_morning: 'Goedemorgen',
     ai_chat_assistant_greeting_afternoon: 'Goedemiddag',
@@ -77,7 +78,7 @@ export const nl: TranslationLanguage = {
     ai_chat_error: 'Er is iets misgegaan.',
     ai_chat_context_title: 'Gebaseerd op je context',
     ai_chat_context_description:
-        'De Docs Assistent gebruikt AI en je context om antwoorden te genereren en acties uit te voeren.',
+        'De assistent gebruikt AI en je context om antwoorden te genereren en acties uit te voeren.',
     ai_chat_context_pages_youve_read: "Pagina's die je hebt gelezen",
     ai_chat_context_info_provided_by_the_site: 'Informatie verstrekt door de site',
     ai_chat_context_previous_messages: 'Vorige berichten',

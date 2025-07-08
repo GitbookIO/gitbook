@@ -65,6 +65,7 @@ export const de = {
     link_tooltip_page_anchor: 'Zum Abschnitt springen',
     open_in_new_tab: 'In neuem Tab öffnen',
     ai_chat_assistant_name: 'GitBook-Assistent',
+    ai_chat_assistant_name_unbranded: 'KI-Assistent',
     ai_chat_assistant_description: 'Ich helfe Ihnen bei der Dokumentation.',
     ai_chat_assistant_greeting_morning: 'Guten Morgen',
     ai_chat_assistant_greeting_afternoon: 'Guten Tag',
@@ -77,7 +78,7 @@ export const de = {
     ai_chat_error: 'Etwas ist schief gelaufen.',
     ai_chat_context_title: 'Basierend auf Ihrem Kontext',
     ai_chat_context_description:
-        'Der Docs-Assistent verwendet KI und Ihren Kontext, um Antworten zu generieren und Aktionen durchzuführen.',
+        'Der Assistent verwendet KI und Ihren Kontext, um Antworten zu generieren und Aktionen durchzuführen.',
     ai_chat_context_pages_youve_read: 'Seiten, die Sie gelesen haben',
     ai_chat_context_info_provided_by_the_site: 'Von der Website bereitgestellte Informationen',
     ai_chat_context_previous_messages: 'Vorherige Nachrichten',

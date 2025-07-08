@@ -65,6 +65,7 @@ export const ja: TranslationLanguage = {
     link_tooltip_page_anchor: 'ページ内リンク先',
     open_in_new_tab: '新しいタブで開く',
     ai_chat_assistant_name: 'GitBookアシスタント',
+    ai_chat_assistant_name_unbranded: 'AIアシスタント',
     ai_chat_assistant_description: 'ドキュメントについてお手伝いします。',
     ai_chat_assistant_greeting_morning: 'おはようございます',
     ai_chat_assistant_greeting_afternoon: 'こんにちは',
@@ -77,7 +78,7 @@ export const ja: TranslationLanguage = {
     ai_chat_error: '何らかのエラーが発生しました。',
     ai_chat_context_title: 'あなたのコンテキストに基づいて',
     ai_chat_context_description:
-        'ドキュメントアシスタントはAIとあなたのコンテキストを使用して回答を生成し、アクションを実行します。',
+        'アシスタントはAIとあなたのコンテキストを使用して回答を生成し、アクションを実行します。',
     ai_chat_context_pages_youve_read: '読んだページ',
     ai_chat_context_info_provided_by_the_site: 'サイトから提供された情報',
     ai_chat_context_previous_messages: '以前のメッセージ',

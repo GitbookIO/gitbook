@@ -65,6 +65,7 @@ export const fr: TranslationLanguage = {
     link_tooltip_page_anchor: 'Sauter à la section',
     open_in_new_tab: 'Ouvrir dans un nouvel onglet',
     ai_chat_assistant_name: 'Assistant GitBook',
+    ai_chat_assistant_name_unbranded: 'Assistant IA',
     ai_chat_assistant_description: 'Je suis là pour vous aider avec la documentation.',
     ai_chat_assistant_greeting_morning: 'Bonjour',
     ai_chat_assistant_greeting_afternoon: 'Bon après-midi',
@@ -77,7 +78,7 @@ export const fr: TranslationLanguage = {
     ai_chat_error: 'Une erreur est survenue.',
     ai_chat_context_title: 'Basé sur votre contexte',
     ai_chat_context_description:
-        "L'Assistant Docs utilise l'IA et votre contexte pour générer des réponses et effectuer des actions.",
+        "L'assistant utilise l'IA et votre contexte pour générer des réponses et effectuer des actions.",
     ai_chat_context_pages_youve_read: 'Pages que vous avez lues',
     ai_chat_context_info_provided_by_the_site: 'Informations fournies par le site',
     ai_chat_context_previous_messages: 'Messages précédents',

@@ -63,6 +63,7 @@ export const en = {
     link_tooltip_page_anchor: 'Jump to section',
     open_in_new_tab: 'Open in new tab',
     ai_chat_assistant_name: 'GitBook Assistant',
+    ai_chat_assistant_name_unbranded: 'AI Assistant',
     ai_chat_assistant_description: "I'm here to help you with the docs.",
     ai_chat_assistant_greeting_morning: 'Good morning',
     ai_chat_assistant_greeting_afternoon: 'Good afternoon',
@@ -75,7 +76,7 @@ export const en = {
     ai_chat_error: 'Something went wrong.',
     ai_chat_context_title: 'Based on your context',
     ai_chat_context_description:
-        'GitBook Assistant uses AI and your context to generate answers and perform actions.',
+        'The assistant uses AI and your context to generate answers and perform actions.',
     ai_chat_context_pages_youve_read: "Pages you've read",
     ai_chat_context_info_provided_by_the_site: 'Info provided by the site',
     ai_chat_context_previous_messages: 'Previous messages',
