@@ -1,6 +1,11 @@
-import { OpenAPIParseError, parseOpenAPI } from '@gitbook/openapi-parser';
+import {
+    type Filesystem,
+    OpenAPIParseError,
+    type OpenAPIParseErrorCode,
+    parseOpenAPI,
+} from '@gitbook/openapi-parser';
 
-import { noCacheFetchOptions } from '@/lib/data';
+import { DataFetcherError, noCacheFetchOptions } from '@/lib/data';
 import { resolveContentRef } from '@/lib/references';
 import { unstable_cacheLife as cacheLife } from 'next/cache';
 import { assert } from 'ts-essentials';
@@ -48,7 +53,17 @@ export async function fetchOpenAPIFilesystem(
     };
 }
 
-const fetchFilesystem = async (url: string) => {
+const fetchFilesystem = async (
+    url: string
+): Promise<
+    | Filesystem
+    | {
+          error: {
+              code: OpenAPIParseErrorCode;
+              message: string;
+          };
+      }
+> => {
     'use cache';
     try {
         return await fetchFilesystemUncached(url);
@@ -60,22 +75,15 @@ const fetchFilesystem = async (url: string) => {
         if (error instanceof OpenAPIParseError) {
             return { error: { code: error.code, message: error.message } };
         }
-        if (error instanceof OpenAPIFetchError) {
+        if (error instanceof DataFetcherError) {
             return { error: { code: 'invalid' as const, message: 'Failed to fetch OpenAPI file' } };
         }
-        // If the error is not an OpenAPIParseError or OpenAPIFetchError,
+        // If the error is not an OpenAPIParseError or DataFetcherError,
         // we assume it's an unknown error and return a generic error.
         console.error('Unknown error while fetching OpenAPI file:', error);
         return { error: { code: 'invalid' as const, message: 'Unknown error' } };
     }
 };
-
-class OpenAPIFetchError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'OpenAPIFetchError';
-    }
-}
 
 async function fetchFilesystemUncached(
     url: string,
@@ -92,9 +100,7 @@ async function fetchFilesystemUncached(
     });
 
     if (!response.ok) {
-        throw new OpenAPIFetchError(
-            `Failed to fetch OpenAPI file: ${response.status} ${response.statusText}`
-        );
+        throw new DataFetcherError('Failed to fetch OpenAPI file', response.status);
     }
 
     const text = await response.text();
