@@ -423,6 +423,10 @@ const testCases: TestsCase[] = [
                     const searchParams = new URLSearchParams();
                     searchParams.set('token', data.apiToken);
 
+                    console.log(
+                        'preview test URL',
+                        `url/preview/${data.site}/?${searchParams.toString()}`
+                    );
                     return `url/preview/${data.site}/?${searchParams.toString()}`;
                 },
                 screenshot: false,
