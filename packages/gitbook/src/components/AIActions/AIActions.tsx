@@ -11,10 +11,14 @@ import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
-import { useState } from 'react';
+import type React from 'react';
+import { create } from 'zustand';
 
 type AIActionType = 'button' | 'dropdown-menu-item';
 
+/**
+ * Opens our AI Docs Assistant.
+ */
 export function OpenDocsAssistant(props: { type: AIActionType }) {
     const { type } = props;
     const chatController = useAIChatController();
@@ -24,13 +28,7 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
     return (
         <AIActionWrapper
             type={type}
-            icon={
-                chat.loading ? (
-                    <Icon icon="spinner-third" className="size-3.5 animate-spin" />
-                ) : (
-                    <AIChatIcon />
-                )
-            }
+            icon={<AIChatIcon state={chat.loading ? 'thinking' : 'default'} />}
             label={tString(language, 'ai_chat_ask', tString(language, 'ai_chat_assistant_name'))}
             shortLabel={tString(language, 'ask')}
             description={tString(
@@ -54,10 +52,27 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
     );
 }
 
-export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
-    const { markdown, type } = props;
-    const [copied, setCopied] = useState(false);
+// We need to store the copied state in a store to share the state between the
+// copy button and the dropdown menu item.
+const useCopiedStore = create<{
+    copied: boolean;
+    setCopied: (copied: boolean) => void;
+}>((set) => ({
+    copied: false,
+    setCopied: (copied: boolean) => set({ copied }),
+}));
+
+/**
+ * Copies the markdown version of the page to the clipboard.
+ */
+export function CopyMarkdown(props: {
+    markdown: string;
+    type: AIActionType;
+    isDefaultAction?: boolean;
+}) {
+    const { markdown, type, isDefaultAction } = props;
     const language = useLanguage();
+    const { copied, setCopied } = useCopiedStore();
 
     // Close the dropdown menu manually after the copy button is clicked
     const closeDropdownMenu = () => {
@@ -78,14 +93,16 @@ export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
             label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
             description={tString(language, 'copy_page_markdown')}
             onClick={(e) => {
-                e.preventDefault();
+                if (!isDefaultAction) {
+                    e.preventDefault();
+                }
 
                 if (!markdown) return;
                 navigator.clipboard.writeText(markdown);
                 setCopied(true);
 
                 setTimeout(() => {
-                    if (type === 'dropdown-menu-item') {
+                    if (type === 'dropdown-menu-item' && !isDefaultAction) {
                         closeDropdownMenu();
                     }
 
@@ -96,6 +113,9 @@ export function CopyMarkdown(props: { markdown: string; type: AIActionType }) {
     );
 }
 
+/**
+ * Redirects to the markdown version of the page.
+ */
 export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionType }) {
     const { markdownPageUrl, type } = props;
     const language = useLanguage();
@@ -111,6 +131,9 @@ export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionT
     );
 }
 
+/**
+ * Open the page in a LLM with a pre-filled prompt. Either ChatGPT or Claude.
+ */
 export function OpenInLLM(props: {
     provider: 'chatgpt' | 'claude';
     url: string;
@@ -139,6 +162,9 @@ export function OpenInLLM(props: {
     );
 }
 
+/**
+ * Wraps an action in a button (for the default action) or dropdown menu item.
+ */
 function AIActionWrapper(props: {
     type: AIActionType;
     icon: IconName | React.ReactNode;
@@ -202,6 +228,9 @@ function AIActionWrapper(props: {
     );
 }
 
+/**
+ * Returns the URL to open the page in a LLM with a pre-filled prompt.
+ */
 function getLLMURL(provider: 'chatgpt' | 'claude', url: string, language: TranslationLanguage) {
     const prompt = encodeURIComponent(tString(language, 'open_in_llms_pre_prompt', url));
 

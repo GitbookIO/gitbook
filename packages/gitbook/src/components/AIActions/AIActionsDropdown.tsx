@@ -10,13 +10,14 @@ import { Button } from '@/components/primitives/Button';
 import { DropdownMenu } from '@/components/primitives/DropdownMenu';
 import { useRef } from 'react';
 
+/**
+ * Dropdown menu for the AI Actions (Ask Docs Assistant, Copy page, View as Markdown, Open in LLM).
+ */
 export function AIActionsDropdown(props: {
     markdown?: string;
     markdownPageUrl: string;
     /**
-     * Whether to include the "Ask Docs Assistant" entry in the dropdown menu. This **does not**
-     * affect the standalone assistant button rendered next to the dropdown.
-     * Defaults to `false` to avoid duplicating the action unless explicitly requested.
+     * Whether to include the "Ask Docs Assistant" entry in the dropdown menu.
      */
     withAIChat?: boolean;
     pageURL: string;
@@ -39,13 +40,16 @@ export function AIActionsDropdown(props: {
                     />
                 }
             >
-                <DropdownMenuContent {...props} />
+                <AIActionsDropdownMenuContent {...props} />
             </DropdownMenu>
         </div>
     );
 }
 
-function DropdownMenuContent(props: {
+/**
+ * The content of the dropdown menu.
+ */
+function AIActionsDropdownMenuContent(props: {
     markdown?: string;
     markdownPageUrl: string;
     withAIChat?: boolean;
@@ -58,7 +62,11 @@ function DropdownMenuContent(props: {
             {withAIChat ? <OpenDocsAssistant type="dropdown-menu-item" /> : null}
             {markdown ? (
                 <>
-                    <CopyMarkdown markdown={markdown} type="dropdown-menu-item" />
+                    <CopyMarkdown
+                        markdown={markdown}
+                        isDefaultAction={!withAIChat}
+                        type="dropdown-menu-item"
+                    />
                     <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="dropdown-menu-item" />
                 </>
             ) : null}
@@ -68,18 +76,27 @@ function DropdownMenuContent(props: {
     );
 }
 
+/**
+ * A default action shown as a quick-access button beside the dropdown menu
+ */
 function DefaultAction(props: {
     markdown?: string;
     withAIChat?: boolean;
     pageURL: string;
+    markdownPageUrl: string;
 }) {
-    const { markdown, withAIChat, pageURL } = props;
+    const { markdown, withAIChat, pageURL, markdownPageUrl } = props;
 
     if (withAIChat) {
         return <OpenDocsAssistant type="button" />;
     }
+
     if (markdown) {
-        return <CopyMarkdown markdown={markdown} type="button" />;
+        return <CopyMarkdown isDefaultAction={!withAIChat} markdown={markdown} type="button" />;
+    }
+
+    if (markdownPageUrl) {
+        return <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="button" />;
     }
 
     return <OpenInLLM provider="chatgpt" url={pageURL} type="button" />;
