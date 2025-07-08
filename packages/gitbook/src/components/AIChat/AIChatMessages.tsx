@@ -1,17 +1,20 @@
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type React from 'react';
-import type { AIChatState } from '../AI/useAIChat';
+import type { AIChatController, AIChatState } from '../AI/useAIChat';
+import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
 export function AIChatMessages(props: {
     chat: AIChatState;
+    chatController: AIChatController;
     lastUserMessageRef?: React.RefObject<HTMLDivElement>;
 }) {
-    const { chat, lastUserMessageRef } = props;
+    const { chat, chatController, lastUserMessageRef } = props;
 
     return (
         <>
             {chat.messages.map((message, index) => {
+                const isLastMessage = index === chat.messages.length - 1;
                 const isLastUserMessage =
                     message.role === AIMessageRole.User &&
                     index === chat.messages.map((m) => m.role).lastIndexOf(AIMessageRole.User);
@@ -24,8 +27,9 @@ export function AIChatMessages(props: {
                             'shrink-0',
                             'last:min-h-[calc(100%-5rem)]',
                             'scroll-mt-36',
+                            'flex flex-col gap-6',
                             message.role === AIMessageRole.User
-                                ? 'max-w-[80%] self-end rounded-md bg-tint px-4 py-2'
+                                ? 'max-w-[80%] self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
                                 : ''
                         )}
                         style={{
@@ -48,6 +52,12 @@ export function AIChatMessages(props: {
                                     />
                                 ))}
                             </div>
+                        ) : null}
+                        {isLastMessage ? (
+                            <AIChatFollowupSuggestions
+                                chat={chat}
+                                chatController={chatController}
+                            />
                         ) : null}
                     </div>
                 );

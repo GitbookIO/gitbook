@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.2.0
+
+### Minor Changes
+
+- bd553bc: Expose `isJson` and `isYaml` in OpenAPI parser
+
 ## 2.1.5
 
 ### Patch Changes

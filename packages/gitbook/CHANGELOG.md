@@ -1,5 +1,15 @@
 # gitbook
 
+## 0.13.1
+
+### Patch Changes
+
+- f5894bc: Fix incorrect revision ID in Markdown fetch logic
+- 1b59e7c: Styling improvements to AI Chat Followup questions
+- Updated dependencies [bd553bc]
+  - @gitbook/openapi-parser@2.2.0
+  - @gitbook/react-openapi@1.3.2
+
 ## 0.13.0
 
 ### Minor Changes

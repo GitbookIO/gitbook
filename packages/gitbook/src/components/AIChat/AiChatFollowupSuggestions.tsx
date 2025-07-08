@@ -15,7 +15,7 @@ export function AIChatFollowupSuggestions(props: {
     }
 
     return (
-        <div className="flex flex-row flex-wrap justify-end gap-2 pt-8">
+        <div className="mt-auto flex flex-row flex-wrap justify-end gap-2">
             {chat.followUpSuggestions.map((suggestion, index) => (
                 <Button
                     key={index}
@@ -23,9 +23,9 @@ export function AIChatFollowupSuggestions(props: {
                         chatController.postMessage({ message: suggestion });
                     }}
                     label={suggestion}
-                    className="max-w-full animate-[present_500ms_both] whitespace-normal text-right"
-                    size="small"
-                    variant="secondary"
+                    className="max-w-[80%] animate-[present_500ms_both] whitespace-normal text-left ring-1 ring-tint-subtle"
+                    size="medium"
+                    variant="blank"
                     style={{
                         animationDelay: `${250 + Math.min(index * 50, 150)}ms`,
                     }}
