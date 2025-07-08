@@ -35,8 +35,12 @@ export function KeyboardShortcut(props: { keys: string[]; className?: ClassValue
                 <kbd
                     key={key}
                     className={tcls(
-                        'flex size-5 items-center justify-center rounded-md border border-tint-subtle',
-                        key === 'mod' ? (operatingSystem === 'mac' ? 'text-sm' : '') : 'uppercase',
+                        'flex h-5 min-w-5 items-center justify-center rounded-md border border-tint-subtle px-1',
+                        key === 'mod'
+                            ? operatingSystem === 'mac'
+                                ? 'text-sm'
+                                : 'text-xs'
+                            : 'uppercase',
                         className
                     )}
                 >
