@@ -74,11 +74,11 @@ export function DropdownMenu(props: {
                     onMouseLeave={() => setHovered(false)}
                     align={align}
                     side={side}
-                    className="z-40 animate-scaleIn pt-2"
+                    className="z-40 animate-scaleIn border-tint pt-2"
                 >
                     <div
                         className={tcls(
-                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80',
+                            'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
                             className
                         )}
                     >
@@ -144,7 +144,7 @@ export function DropdownMenuItem(
     const { children, active = false, href, className, insights, target, ...rest } = props;
 
     const itemClassName = tcls(
-        'rounded straight-corners:rounded-sm px-3 py-1 text-sm flex gap-2 items-center',
+        'rounded straight-corners:rounded-sm circular-corners:rounded-lg px-3 py-1 text-sm flex gap-2 items-center',
         active
             ? 'bg-primary text-primary-strong data-[highlighted]:bg-primary-hover'
             : 'data-[highlighted]:bg-tint-hover',
