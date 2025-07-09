@@ -10,7 +10,7 @@ import { Button } from '@/components/primitives/Button';
 import { DropdownMenu } from '@/components/primitives/DropdownMenu';
 
 import { Icon } from '@gitbook/icons';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 
 /**
  * Dropdown menu for the AI Actions (Ask Docs Assistant, Copy page, View as Markdown, Open in LLM).
@@ -25,33 +25,10 @@ export function AIActionsDropdown(props: {
     trademark: boolean;
 }) {
     const ref = useRef<HTMLDivElement>(null);
-    const { markdownPageUrl } = props;
-
-    const [markdown, setMarkdown] = useState<string>();
-
-    // Fetch the markdown page when the URL changes
-    useEffect(() => {
-        if (!markdownPageUrl) {
-            return;
-        }
-
-        const fetchMarkdown = async () => {
-            const markdown = await fetch(markdownPageUrl);
-
-            if (!markdown.ok) {
-                return;
-            }
-
-            const markdownText = await markdown.text();
-            setMarkdown(markdownText);
-        };
-
-        fetchMarkdown();
-    }, [markdownPageUrl]);
 
     return (
         <div ref={ref} className="flex h-fit items-stretch justify-start">
-            <DefaultAction markdown={markdown} {...props} />
+            <DefaultAction {...props} />
             <DropdownMenu
                 align="end"
                 className="!min-w-60 max-w-max"
@@ -70,7 +47,7 @@ export function AIActionsDropdown(props: {
                     />
                 }
             >
-                <AIActionsDropdownMenuContent markdown={markdown} {...props} />
+                <AIActionsDropdownMenuContent {...props} />
             </DropdownMenu>
         </div>
     );
@@ -80,13 +57,12 @@ export function AIActionsDropdown(props: {
  * The content of the dropdown menu.
  */
 function AIActionsDropdownMenuContent(props: {
-    markdown?: string;
     markdownPageUrl: string;
     withAIChat?: boolean;
     pageURL: string;
     trademark: boolean;
 }) {
-    const { markdown, markdownPageUrl, withAIChat, pageURL, trademark } = props;
+    const { markdownPageUrl, withAIChat, pageURL, trademark } = props;
 
     return (
         <>
@@ -95,8 +71,8 @@ function AIActionsDropdownMenuContent(props: {
             ) : null}
 
             <CopyMarkdown
-                markdown={markdown}
                 isDefaultAction={!withAIChat}
+                markdownPageUrl={markdownPageUrl}
                 type="dropdown-menu-item"
             />
             <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="dropdown-menu-item" />
@@ -110,12 +86,22 @@ function AIActionsDropdownMenuContent(props: {
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function DefaultAction(props: { markdown?: string; withAIChat?: boolean; trademark: boolean }) {
-    const { markdown, withAIChat, trademark } = props;
+function DefaultAction(props: {
+    markdownPageUrl: string;
+    withAIChat?: boolean;
+    trademark: boolean;
+}) {
+    const { markdownPageUrl, withAIChat, trademark } = props;
 
     if (withAIChat) {
         return <OpenDocsAssistant trademark={trademark} type="button" />;
     }
 
-    return <CopyMarkdown isDefaultAction={!withAIChat} markdown={markdown} type="button" />;
+    return (
+        <CopyMarkdown
+            isDefaultAction={!withAIChat}
+            markdownPageUrl={markdownPageUrl}
+            type="button"
+        />
+    );
 }

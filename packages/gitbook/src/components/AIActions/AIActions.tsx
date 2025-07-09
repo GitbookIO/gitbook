@@ -5,6 +5,7 @@ import { useAIChatState } from '@/components/AI/useAIChat';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
+import { useCopyMarkdown } from '@/components/AIActions/assets/useCopyMarkdown';
 import { getAIChatName } from '@/components/AIChat';
 import AIChatIcon from '@/components/AIChat/AIChatIcon';
 import { Button } from '@/components/primitives/Button';
@@ -67,14 +68,15 @@ const useCopiedStore = create<{
  * Copies the markdown version of the page to the clipboard.
  */
 export function CopyMarkdown(props: {
-    markdown: string | undefined;
+    markdownPageUrl: string;
     type: AIActionType;
     isDefaultAction?: boolean;
 }) {
-    const { markdown, type, isDefaultAction } = props;
+    const { markdownPageUrl, type, isDefaultAction } = props;
     const language = useLanguage();
     const { copied, setCopied } = useCopiedStore();
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const { fetchMarkdown, copyMarkdown, isLoading } = useCopyMarkdown(markdownPageUrl);
 
     // Close the dropdown menu manually after the copy button is clicked
     const closeDropdownMenu = () => {
@@ -97,10 +99,6 @@ export function CopyMarkdown(props: {
     }, []);
 
     const onClick = (e: React.MouseEvent) => {
-        if (!markdown) {
-            return;
-        }
-
         // Prevent default behavior for non-default actions to avoid closing the dropdown.
         // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
         // Default action buttons are excluded from this behavior.
@@ -113,7 +111,8 @@ export function CopyMarkdown(props: {
             clearTimeout(timeoutRef.current);
         }
 
-        navigator.clipboard.writeText(markdown);
+        // Copy the markdown to the clipboard
+        copyMarkdown();
 
         setCopied(true);
 
@@ -136,7 +135,8 @@ export function CopyMarkdown(props: {
             shortLabel={copied ? tString(language, 'code_copied') : tString(language, 'code_copy')}
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
-            disabled={!markdown}
+            onMouseEnter={fetchMarkdown}
+            isLoading={isLoading}
         />
     );
 }
@@ -202,16 +202,31 @@ function AIActionWrapper(props: {
      */
     shortLabel?: string;
     onClick?: (e: React.MouseEvent) => void;
+    onMouseEnter?: () => void;
     description?: string;
     href?: string;
     disabled?: boolean;
+    isLoading?: boolean;
 }) {
-    const { type, icon, label, shortLabel, onClick, href, description, disabled } = props;
+    const {
+        type,
+        icon,
+        label,
+        shortLabel,
+        onClick,
+        onMouseEnter,
+        href,
+        description,
+        disabled,
+        isLoading,
+    } = props;
 
     if (type === 'button') {
         return (
             <Button
-                icon={icon}
+                icon={
+                    isLoading ? <Icon icon="spinner-third" className="size-4 animate-spin" /> : icon
+                }
                 size="xsmall"
                 variant="secondary"
                 label={shortLabel || label}
@@ -219,7 +234,8 @@ function AIActionWrapper(props: {
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
-                disabled={disabled}
+                disabled={disabled || isLoading}
+                onMouseEnter={onMouseEnter}
             />
         );
     }
@@ -231,6 +247,7 @@ function AIActionWrapper(props: {
             target="_blank"
             onClick={onClick}
             disabled={disabled}
+            onMouseEnter={onMouseEnter}
         >
             {icon ? (
                 <div className="flex size-5 items-center justify-center text-tint">
