@@ -5,6 +5,7 @@ import { useAIChatState } from '@/components/AI/useAIChat';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
+import { getAIChatName } from '@/components/AIChat';
 import AIChatIcon from '@/components/AIChat/AIChatIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
@@ -21,7 +22,7 @@ type AIActionType = 'button' | 'dropdown-menu-item';
 /**
  * Opens our AI Docs Assistant.
  */
-export function OpenDocsAssistant(props: { type: AIActionType; trademark?: boolean }) {
+export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolean }) {
     const { type, trademark } = props;
     const chatController = useAIChatController();
     const chat = useAIChatState();
@@ -33,21 +34,9 @@ export function OpenDocsAssistant(props: { type: AIActionType; trademark?: boole
             icon={
                 <AIChatIcon state={chat.loading ? 'thinking' : 'default'} trademark={trademark} />
             }
-            label={tString(
-                language,
-                'ai_chat_ask',
-                trademark
-                    ? tString(language, 'ai_chat_assistant_name')
-                    : tString(language, 'ai_chat_assistant_name_unbranded')
-            )}
+            label={tString(language, 'ai_chat_ask', getAIChatName(trademark))}
             shortLabel={tString(language, 'ask')}
-            description={tString(
-                language,
-                'ai_chat_ask_about_page',
-                trademark
-                    ? tString(language, 'ai_chat_assistant_name')
-                    : tString(language, 'ai_chat_assistant_name_unbranded')
-            )}
+            description={tString(language, 'ai_chat_ask_about_page', getAIChatName(trademark))}
             disabled={chat.loading}
             onClick={() => {
                 // Open the chat if it's not already open

@@ -129,11 +129,7 @@ export function AIChatWindow(props: {
                         }
                     />
                     <div className="flex flex-col">
-                        <div className="font-bold">
-                            {trademark
-                                ? tString(language, 'ai_chat_assistant_name')
-                                : tString(language, 'ai_chat_assistant_name_unbranded')}
-                        </div>
+                        <div className="font-bold">{getAIChatName(trademark)}</div>
                         <div
                             className={`text-tint text-xs leading-none transition-all duration-500 ${
                                 chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'
@@ -264,4 +260,12 @@ function AIChatError(props: { chatController: AIChatController }) {
             </div>
         </div>
     );
+}
+
+export function getAIChatName(trademark: boolean) {
+    const language = useLanguage();
+
+    return trademark
+        ? tString(language, 'ai_chat_assistant_name')
+        : tString(language, 'ai_chat_assistant_name_unbranded');
 }
