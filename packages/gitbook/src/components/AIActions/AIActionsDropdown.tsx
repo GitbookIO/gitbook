@@ -22,7 +22,7 @@ export function AIActionsDropdown(props: {
      */
     withAIChat?: boolean;
     pageURL: string;
-    trademark?: boolean;
+    trademark: boolean;
 }) {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -61,7 +61,7 @@ function AIActionsDropdownMenuContent(props: {
     markdownPageUrl: string;
     withAIChat?: boolean;
     pageURL: string;
-    trademark?: boolean;
+    trademark: boolean;
 }) {
     const { markdown, markdownPageUrl, withAIChat, pageURL, trademark } = props;
 
@@ -94,7 +94,7 @@ function DefaultAction(props: {
     withAIChat?: boolean;
     pageURL: string;
     markdownPageUrl: string;
-    trademark?: boolean;
+    trademark: boolean;
 }) {
     const { markdown, withAIChat, pageURL, markdownPageUrl, trademark } = props;
 
