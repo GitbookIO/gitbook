@@ -55,8 +55,8 @@ export function PageAside(props: {
                 'chat-open:xl:max-3xl:max-w-0',
                 'chat-open:xl:max-3xl:ml-0',
 
-                'xl:transition-all xl:duration-300',
-                '[transition-behavior:allow-discrete]',
+                'motion-safe:xl:transition-all motion-safe:xl:duration-300',
+                'motion-safe:[transition-behavior:allow-discrete]',
 
                 'flex-col',
                 'basis-56',

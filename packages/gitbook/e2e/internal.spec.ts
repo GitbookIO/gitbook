@@ -1,6 +1,7 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
+    CustomizationDefaultMonospaceFont,
     CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
@@ -414,6 +415,28 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
                 },
             },
+            {
+                name: 'With sections',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    const sectionTabs = page.getByLabel('Sections');
+                    await expect(sectionTabs).toBeVisible();
+
+                    const sectionTabLinks = sectionTabs.getByRole('link');
+                    for (const link of await sectionTabLinks.all()) {
+                        const href = await link.getAttribute('href');
+                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
+                    }
+                },
+            },
         ],
     },
     {
@@ -796,6 +819,15 @@ const testCases: TestsCase[] = [
                         toggeable: false,
                     },
                 }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: `With custom monospace font - Theme mode ${themeMode}`,
+                url: `blocks/code${getCustomizationURL({
+                    styling: {
+                        monospaceFont: CustomizationDefaultMonospaceFont.SpaceMono,
+                    },
+                })}`,
                 run: waitForCookiesDialog,
             },
             // New site themes

@@ -229,7 +229,7 @@ async function isCSSValid(css: string): Promise<boolean> {
 
 describe('generateFontFacesCSS', () => {
     test('basic case with regular and bold weights', async () => {
-        const css = generateFontFacesCSS(TEST_FONTS.basic);
+        const css = generateFontFacesCSS(TEST_FONTS.basic, 'content');
 
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
@@ -240,11 +240,26 @@ describe('generateFontFacesCSS', () => {
             "url(https://example.com/fonts/opensans-regular.woff2) format('woff2')"
         );
         expect(css).toContain("url(https://example.com/fonts/opensans-bold.woff2) format('woff2')");
-        expect(css).toContain('--font-custom: CustomFont');
+        expect(css).toContain('--font-content: CustomFont_content');
+    });
+
+    test('mono type', async () => {
+        const css = generateFontFacesCSS(TEST_FONTS.basic, 'mono');
+
+        const isValid = await isCSSValid(css);
+        expect(isValid).toBe(true);
+
+        expect(css).toContain('font-weight: 400');
+        expect(css).toContain('font-weight: 700');
+        expect(css).toContain(
+            "url(https://example.com/fonts/opensans-regular.woff2) format('woff2')"
+        );
+        expect(css).toContain("url(https://example.com/fonts/opensans-bold.woff2) format('woff2')");
+        expect(css).toContain('--font-mono: CustomFont_mono');
     });
 
     test('multiple font weights', async () => {
-        const css = generateFontFacesCSS(TEST_FONTS.multiWeight);
+        const css = generateFontFacesCSS(TEST_FONTS.multiWeight, 'content');
 
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
@@ -255,7 +270,7 @@ describe('generateFontFacesCSS', () => {
     });
 
     test('multiple sources for a single weight', async () => {
-        const css = generateFontFacesCSS(TEST_FONTS.multiSource);
+        const css = generateFontFacesCSS(TEST_FONTS.multiSource, 'content');
 
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
@@ -266,7 +281,7 @@ describe('generateFontFacesCSS', () => {
     });
 
     test('missing format property', async () => {
-        const css = generateFontFacesCSS(TEST_FONTS.missingFormat);
+        const css = generateFontFacesCSS(TEST_FONTS.missingFormat, 'content');
 
         const isValid = await isCSSValid(css);
         expect(isValid).toBe(true);
@@ -277,13 +292,13 @@ describe('generateFontFacesCSS', () => {
     });
 
     test('empty font faces array', async () => {
-        const css = generateFontFacesCSS(TEST_FONTS.empty);
+        const css = generateFontFacesCSS(TEST_FONTS.empty, 'content');
 
         expect(css).toBe('');
     });
 
     test('font with special characters in name', async () => {
-        const css = generateFontFacesCSS(TEST_FONTS.specialChars);
+        const css = generateFontFacesCSS(TEST_FONTS.specialChars, 'content');
 
         // Validate CSS syntax
         const isValid = await isCSSValid(css);

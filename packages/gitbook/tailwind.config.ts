@@ -80,7 +80,6 @@ const config: Config = {
                     'var(--font-noto-color-emoji)',
                     'sans-serif',
                 ],
-                custom: ['var(--font-custom)'],
                 var: ['var(--font-family)'],
             },
             colors: {
@@ -376,20 +375,36 @@ const config: Config = {
                     },
                 },
                 pathLoading: {
+                    '0%,10%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                    '50%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '-100',
+                        opacity: '0',
+                    },
+                    '51%': {
+                        strokeDasharray: '0 100',
+                        strokeDashoffset: '0',
+                        opacity: '0',
+                    },
+                    '90%,100%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                },
+                pathEnter: {
                     '0%': {
                         strokeDasharray: '0 100',
                         strokeDashoffset: '0',
                         opacity: '0',
                     },
-                    '40%, 60%': {
-                        strokeDasharray: '100 100',
-                        strokeDashoffset: '0',
-                        opacity: '1',
-                    },
                     '100%': {
                         strokeDasharray: '100 100',
-                        strokeDashoffset: '-100',
-                        opacity: '0',
+                        strokeDashoffset: '0',
                     },
                 },
                 stroke: {
@@ -407,6 +422,14 @@ const config: Config = {
                         strokeDasharray: '100 100',
                         strokeDashoffset: '-100',
                         opacity: '0',
+                    },
+                },
+                bob: {
+                    '0%, 100%': {
+                        transform: 'translateY(0)',
+                    },
+                    '50%': {
+                        transform: 'translateY(-10%)',
                     },
                 },
                 enterFromRight: {

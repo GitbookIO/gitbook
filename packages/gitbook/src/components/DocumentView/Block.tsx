@@ -105,6 +105,9 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Stepper {...props} block={block} />;
             case 'stepper-step':
                 return <StepperStep {...props} block={block} />;
+            case 'if':
+                // If block should be processed by the API.
+                return null;
             case 'image':
             case 'code-line':
             case 'tabs-item':
@@ -142,6 +145,7 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'hint':
         case 'tabs':
         case 'stepper-step':
+        case 'if':
             return <SkeletonParagraph id={id} style={style} />;
         case 'expandable':
         case 'table':

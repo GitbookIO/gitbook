@@ -3,7 +3,13 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
-import { type AIChatState, useAIChatController, useAIChatState } from '../AI/useAIChat';
+import { useHotkeys } from 'react-hotkeys-hook';
+import {
+    type AIChatController,
+    type AIChatState,
+    useAIChatController,
+    useAIChatState,
+} from '../AI/useAIChat';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
@@ -11,23 +17,44 @@ import AIChatIcon from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
-import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
-export function AIChat() {
+export function AIChat(props: { trademark: boolean }) {
+    const { trademark } = props;
     const chat = useAIChatState();
+    const chatController = useAIChatController();
+
+    useHotkeys(
+        'mod+j',
+        (e) => {
+            e.preventDefault();
+            chatController.open();
+        },
+        []
+    );
+
+    useHotkeys(
+        'esc',
+        () => {
+            chatController.close();
+        },
+        []
+    );
 
     if (!chat.opened) {
         return null;
     }
 
-    return <AIChatWindow chat={chat} />;
+    return <AIChatWindow trademark={trademark} chatController={chatController} chat={chat} />;
 }
 
-export function AIChatWindow(props: { chat: AIChatState }) {
-    const { chat } = props;
+export function AIChatWindow(props: {
+    chatController: AIChatController;
+    chat: AIChatState;
+    trademark: boolean;
+}) {
+    const { chatController, chat, trademark } = props;
 
     const [input, setInput] = React.useState('');
-    const chatController = useAIChatController();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -87,11 +114,26 @@ export function AIChatWindow(props: { chat: AIChatState }) {
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <AIChatIcon
-                        className={`size-5 text-tint ${chat.loading ? 'animate-pulse' : ''}`}
-                        state={chat.loading ? 'thinking' : 'default'}
+                        className="size-5 text-tint"
+                        trademark={trademark}
+                        state={
+                            chat.error
+                                ? 'error'
+                                : chat.loading
+                                  ? chat.messages[chat.messages.length - 1].content
+                                      ? 'working'
+                                      : 'thinking'
+                                  : chat.messages.length > 0
+                                    ? 'done'
+                                    : 'default'
+                        }
                     />
                     <div className="flex flex-col">
-                        <div className="font-bold">Docs Assistant</div>
+                        <div className="font-bold">
+                            {trademark
+                                ? tString(language, 'ai_chat_assistant_name')
+                                : tString(language, 'ai_chat_assistant_name_unbranded')}
+                        </div>
                         <div
                             className={`text-tint text-xs leading-none transition-all duration-500 ${
                                 chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'
@@ -149,7 +191,11 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                     {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center rounded-full bg-tint-subtle">
-                                <AIChatIcon className="size-16 animate-[present_500ms_200ms_both]" />
+                                <AIChatIcon
+                                    state="intro"
+                                    trademark={trademark}
+                                    className="size-16 animate-[present_500ms_200ms_both]"
+                                />
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
                                 <h5 className=" text-center font-bold text-lg text-tint-strong">
@@ -159,27 +205,62 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                                     {t(language, 'ai_chat_assistant_description')}
                                 </p>
                             </div>
-                            <AIChatSuggestedQuestions chatController={chatController} />
+                            {!chat.error ? (
+                                <AIChatSuggestedQuestions chatController={chatController} />
+                            ) : null}
                         </div>
                     ) : (
-                        <AIChatMessages chat={chat} lastUserMessageRef={lastUserMessageRef} />
+                        <AIChatMessages
+                            chat={chat}
+                            chatController={chatController}
+                            lastUserMessageRef={lastUserMessageRef}
+                        />
                     )}
                 </div>
                 <div
                     ref={inputRef}
                     className="absolute inset-x-0 bottom-0 mr-2 flex flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
                 >
-                    <AIChatFollowupSuggestions chat={chat} chatController={chatController} />
+                    {/* Display an error banner when something went wrong. */}
+                    {chat.error ? <AIChatError chatController={chatController} /> : null}
+
                     <AIChatInput
                         value={input}
                         onChange={setInput}
-                        disabled={chat.loading}
+                        loading={chat.loading}
+                        disabled={chat.loading || chat.error}
                         onSubmit={() => {
                             chatController.postMessage({ message: input });
                             setInput('');
                         }}
                     />
                 </div>
+            </div>
+        </div>
+    );
+}
+
+function AIChatError(props: { chatController: AIChatController }) {
+    const language = useLanguage();
+    const { chatController } = props;
+
+    return (
+        <div className="flex flex-wrap justify-between gap-2 rounded-md bg-danger p-3 text-danger text-sm ring-1 ring-danger">
+            <div className="flex items-center gap-2">
+                <Icon icon="exclamation-triangle" className="size-3.5" />
+                <span className="flex items-center gap-1">{t(language, 'ai_chat_error')}</span>
+            </div>
+            <div className="flex justify-end">
+                <Button
+                    variant="blank"
+                    size="small"
+                    icon="refresh"
+                    label={tString(language, 'unexpected_error_retry')}
+                    onClick={() => {
+                        chatController.clear();
+                    }}
+                    className="!text-danger hover:bg-danger-5"
+                />
             </div>
         </div>
     );

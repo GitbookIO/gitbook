@@ -2,16 +2,22 @@ import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { Button } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { Tooltip } from '../primitives/Tooltip';
 
 export function AIChatInput(props: {
     value: string;
-    disabled: boolean;
+    disabled?: boolean;
+    /**
+     * When true, the input is disabled
+     */
+    loading: boolean;
     onChange: (value: string) => void;
     onSubmit: (value: string) => void;
 }) {
-    const { value, onChange, onSubmit, disabled } = props;
+    const { value, onChange, onSubmit, disabled, loading } = props;
 
     const language = useLanguage();
 
@@ -27,18 +33,26 @@ export function AIChatInput(props: {
     };
 
     useEffect(() => {
-        if (!disabled) {
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 300);
+        if (!disabled && !loading) {
+            inputRef.current?.focus();
         }
-    }, [disabled]);
+    }, [disabled, loading]);
+
+    useHotkeys(
+        'mod+j',
+        (e) => {
+            e.preventDefault();
+            inputRef.current?.focus();
+        },
+        []
+    );
 
     return (
         <div className="relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base">
             <textarea
                 ref={inputRef}
-                disabled={disabled}
+                disabled={disabled || loading}
+                data-loading={loading}
                 className={tcls(
                     'resize-none',
                     'focus:outline-none',
@@ -49,19 +63,28 @@ export function AIChatInput(props: {
                     'pb-12',
                     'h-auto',
                     'bg-transparent',
+                    'peer',
                     'max-h-64',
                     'placeholder:text-tint/8',
                     'transition-colors',
                     'disabled:bg-tint-subtle',
                     'delay-300',
                     'disabled:delay-0',
-                    'disabled:cursor-progress'
+                    'disabled:cursor-not-allowed',
+                    'data-[loading=true]:cursor-progress',
+                    'data-[loading=true]:opacity-50'
                 )}
                 value={value}
                 rows={1}
                 placeholder={tString(language, 'ai_chat_input_placeholder')}
                 onChange={handleInput}
                 onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        event.currentTarget.blur();
+                        return;
+                    }
+
                     if (event.key === 'Enter' && !event.shiftKey && value.trim()) {
                         event.preventDefault();
                         event.currentTarget.style.height = 'auto';
@@ -69,6 +92,9 @@ export function AIChatInput(props: {
                     }
                 }}
             />
+            <div className="absolute top-2.5 right-4 animate-[fadeIn_0.2s_0.5s_ease-in-out_both] peer-focus:hidden">
+                <KeyboardShortcut keys={['mod', 'j']} />
+            </div>
             <div className="absolute inset-x-0 bottom-0 flex items-center px-2 py-2">
                 <Tooltip
                     label={

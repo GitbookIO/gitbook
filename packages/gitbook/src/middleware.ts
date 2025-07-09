@@ -82,6 +82,24 @@ async function validateServerActionRequest(request: NextRequest) {
 }
 
 /**
+ * Filter malicious requests.
+ * @param requestURL The URL of the request to filter.
+ * @returns True if the request is malicious, false otherwise.
+ */
+function shouldFilterMaliciousRequests(requestURL: URL): boolean {
+    // We want to filter hostnames that contains a port here as this is likely a malicious request.
+    if (requestURL.host.includes(':')) {
+        return true;
+    }
+    // These requests will be rejected by the API anyway, we might as well do it right away.
+    if (requestURL.pathname.endsWith(';.jsp')) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Handle request that are targetting the site routes group.
  */
 async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
@@ -108,7 +126,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     }
 
     // We want to filter hostnames that contains a port here as this is likely a malicious request.
-    if (siteRequestURL.host.includes(':')) {
+    if (shouldFilterMaliciousRequests(siteRequestURL)) {
         return new Response('Invalid request', {
             status: 400,
             headers: { 'content-type': 'text/plain' },

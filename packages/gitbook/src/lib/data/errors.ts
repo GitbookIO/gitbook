@@ -1,4 +1,5 @@
 import { GitBookAPIError } from '@gitbook/api';
+import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { unstable_cacheLife as cacheLife } from 'next/cache';
 import type { DataFetcherErrorData, DataFetcherResponse } from './types';
 
@@ -98,10 +99,22 @@ export async function wrapCacheDataFetcherError<T>(
     fn: () => Promise<T>
 ): Promise<DataFetcherResponse<T>> {
     const result = await wrapDataFetcherError(fn);
-    if (result.error && result.error.code >= 500) {
-        // We don't want to cache errors for too long.
-        // as the API might
-        cacheLife('minutes');
+    if (result.error) {
+        const cacheValue = result.error.cache;
+        // We only want to cache 404 errors for "long", because that's an "expected" error.
+        if (result.error.code === 404) {
+            cacheLife({
+                stale: 60,
+                revalidate: cacheValue?.maxAge ?? 60 * 60, // 1 hour
+                expire: cacheValue?.staleWhileRevalidate ?? 60 * 60 * 24, // 1 day
+            });
+        } else {
+            cacheLife({
+                stale: 60, // This one is only for the client
+                revalidate: cacheValue?.maxAge ?? 30, // we don't want to cache it for too long, but at least 30 seconds to avoid hammering the API
+                expire: cacheValue?.staleWhileRevalidate ?? 90, // we want to revalidate this error after 90 seconds for sure
+            });
+        }
     }
     return result;
 }
@@ -135,6 +148,35 @@ export function ignoreDataFetcherErrors<T>(
 }
 
 /**
+ * Extract cache control information from a GitBookAPIError.
+ * If the error does not have a response or no cache-control, it returns undefined.
+ */
+export function extractCacheControl(error: GitBookAPIError) {
+    try {
+        if (!error.response) {
+            return undefined;
+        }
+
+        const cacheControl = error.response.headers.get('cache-control');
+        if (!cacheControl) {
+            return undefined;
+        }
+        const parsed = parseCacheControl(cacheControl);
+
+        const maxAge = parsed?.maxAge ?? parsed?.sharedMaxAge ?? 0;
+        const staleWhileRevalidate = parsed.staleWhileRevalidate ?? undefined;
+
+        return {
+            // If maxAge is 0, we want to apply the default, not 0
+            maxAge: maxAge === 0 ? undefined : maxAge,
+            staleWhileRevalidate,
+        };
+    } catch {
+        return undefined;
+    }
+}
+
+/**
  * Get a data fetcher exposable error from a JS error.
  */
 export function getExposableError(error: Error): DataFetcherErrorData {
@@ -142,10 +184,12 @@ export function getExposableError(error: Error): DataFetcherErrorData {
         if (error.code >= 500) {
             throw error;
         }
+        const cache = extractCacheControl(error);
 
         return {
             code: error.code,
             message: error.errorMessage,
+            cache,
         };
     }
 

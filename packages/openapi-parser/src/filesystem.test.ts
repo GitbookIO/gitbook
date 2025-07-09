@@ -39,11 +39,8 @@ describe('#createFileSystem', () => {
             value: url,
             rootURL: url,
         });
-        expect(filesystem).toHaveLength(4);
+        expect(filesystem).toHaveLength(1);
         expect(filesystem[0]?.isEntrypoint).toBe(true);
-        expect(filesystem[1]?.isEntrypoint).toBe(false);
-        expect(filesystem[1]?.filename).toBe('user.yaml');
-        expect(filesystem[2]?.filename).toBe('../tag.yaml');
-        expect(filesystem[3]?.filename).toBe('http://localhost:3020/root/pet.yaml');
+        expect(filesystem[0]?.filename).toBe('openapi.json');
     });
 });

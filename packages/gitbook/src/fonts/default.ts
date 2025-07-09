@@ -1,9 +1,13 @@
-import { CustomizationDefaultFont } from '@gitbook/api';
+import { CustomizationDefaultFont, CustomizationDefaultMonospaceFont } from '@gitbook/api';
 import {
+    DM_Mono,
+    Fira_Code,
     Fira_Sans_Extra_Condensed,
     IBM_Plex_Mono,
     IBM_Plex_Serif,
+    Inconsolata,
     Inter,
+    JetBrains_Mono,
     Lato,
     Merriweather,
     Noto_Color_Emoji,
@@ -13,8 +17,11 @@ import {
     Poppins,
     Raleway,
     Roboto,
+    Roboto_Mono,
     Roboto_Slab,
+    Source_Code_Pro,
     Source_Sans_3,
+    Space_Mono,
     Ubuntu,
 } from 'next/font/google';
 import localFont from 'next/font/local';
@@ -39,16 +46,6 @@ const inter = Inter({
     preload: false,
     display: 'swap',
     fallback: ['system-ui', 'arial'],
-});
-
-export const ibmPlexMono = IBM_Plex_Mono({
-    weight: ['400', '500', '600', '700'],
-    variable: '--font-mono',
-    style: 'normal',
-    display: 'swap',
-    preload: false,
-    fallback: ['monospace'],
-    adjustFontFallback: false,
 });
 
 const firaSans = Fira_Sans_Extra_Condensed({
@@ -185,10 +182,94 @@ const abcFavorit = localFont({
     declarations: [{ prop: 'ascent-override', value: '100%' }],
 });
 
+const ibmPlexMono = IBM_Plex_Mono({
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const dmMono = DM_Mono({
+    weight: ['400', '500'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const firaCode = Fira_Code({
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const inconsolata = Inconsolata({
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const jetBrainsMono = JetBrains_Mono({
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const robotoMono = Roboto_Mono({
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const sourceCodePro = Source_Code_Pro({
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
+const spaceMono = Space_Mono({
+    weight: ['400', '700'],
+    variable: '--font-mono',
+    style: 'normal',
+    display: 'swap',
+    preload: false,
+    fallback: ['monospace'],
+    adjustFontFallback: false,
+});
+
 /**
  * Font definitions.
  */
-export const fonts: { [fontName in CustomizationDefaultFont]: { variable: string } } = {
+export const fonts: {
+    [fontName in CustomizationDefaultFont | CustomizationDefaultMonospaceFont]: {
+        variable: string;
+    };
+} = {
     [CustomizationDefaultFont.Inter]: inter,
     [CustomizationDefaultFont.FiraSans]: firaSans,
     [CustomizationDefaultFont.IBMPlexSerif]: ibmPlexSerif,
@@ -204,4 +285,12 @@ export const fonts: { [fontName in CustomizationDefaultFont]: { variable: string
     [CustomizationDefaultFont.SourceSansPro]: sourceSansPro,
     [CustomizationDefaultFont.Ubuntu]: ubuntu,
     [CustomizationDefaultFont.ABCFavorit]: abcFavorit,
+    [CustomizationDefaultMonospaceFont.IBMPlexMono]: ibmPlexMono,
+    [CustomizationDefaultMonospaceFont.DMMono]: dmMono,
+    [CustomizationDefaultMonospaceFont.FiraCode]: firaCode,
+    [CustomizationDefaultMonospaceFont.Inconsolata]: inconsolata,
+    [CustomizationDefaultMonospaceFont.JetBrainsMono]: jetBrainsMono,
+    [CustomizationDefaultMonospaceFont.RobotoMono]: robotoMono,
+    [CustomizationDefaultMonospaceFont.SourceCodePro]: sourceCodePro,
+    [CustomizationDefaultMonospaceFont.SpaceMono]: spaceMono,
 };

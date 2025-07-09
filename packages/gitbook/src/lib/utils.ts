@@ -14,6 +14,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             successColor: { light: '#00C950', dark: '#00C950' },
             corners: api.CustomizationCorners.Rounded,
             font: api.CustomizationDefaultFont.Inter,
+            monospaceFont: api.CustomizationDefaultMonospaceFont.IBMPlexMono,
             background: api.CustomizationBackground.Plain,
             icons: api.CustomizationIconsStyle.Regular,
             links: api.CustomizationLinksStyle.Default,
@@ -48,8 +49,12 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         feedback: {
             enabled: false,
         },
+        // TODO: remove aiSearch once the cache has been fully updated (after 11/07/2025)
         aiSearch: {
             enabled: true,
+        },
+        ai: {
+            mode: api.CustomizationAIMode.None,
         },
         externalLinks: {
             target: api.SiteExternalLinksTarget.Self,

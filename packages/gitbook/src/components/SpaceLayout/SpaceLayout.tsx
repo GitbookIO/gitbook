@@ -1,5 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationAIMode, CustomizationHeaderPreset } from '@gitbook/api';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -11,6 +11,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
+import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
 import { AIChat } from '../AIChat';
@@ -50,9 +51,7 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const withAIChat =
-        context.customization.aiSearch.enabled &&
-        (context.site.id === 'site_p4Xo4' || context.site.id === 'site_JOVzv');
+    const withAIChat = isAIChatEnabled(context);
 
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
@@ -78,9 +77,11 @@ export function SpaceLayout(props: {
                         withAIChat={withAIChat}
                         context={context}
                     />
-                    {withAIChat ? <AIChat /> : null}
+                    {withAIChat ? (
+                        <AIChat trademark={context.customization.trademark.enabled} />
+                    ) : null}
                     <div className="scroll-nojump">
-                        <div className="transition-all duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+                        <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                             <div
                                 className={tcls(
                                     'flex',
@@ -123,7 +124,11 @@ export function SpaceLayout(props: {
                                                             <span className={tcls('flex-1')}>
                                                                 {t(
                                                                     getSpaceLanguage(customization),
-                                                                    customization.aiSearch.enabled
+                                                                    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
+                                                                    customization.aiSearch
+                                                                        ?.enabled ||
+                                                                        customization.ai?.mode !==
+                                                                            CustomizationAIMode.None
                                                                         ? 'search_or_ask'
                                                                         : 'search'
                                                                 )}
@@ -167,7 +172,11 @@ export function SpaceLayout(props: {
                     <React.Suspense fallback={null}>
                         <SearchModal
                             spaceTitle={siteSpace.title}
-                            withAsk={customization.aiSearch.enabled}
+                            // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
+                            withAsk={
+                                customization.aiSearch?.enabled ||
+                                customization.ai?.mode !== CustomizationAIMode.None
+                            }
                             withAIChat={withAIChat}
                             isMultiVariants={isMultiVariants}
                         />
