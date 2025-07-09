@@ -1,5 +1,5 @@
+import { getLogger } from '@/lib/logger';
 import type { Queue } from '@opennextjs/aws/types/overrides.js';
-import { getLogger } from '@v2/lib/logger';
 
 export default {
     name: 'GitbookISRQueue',

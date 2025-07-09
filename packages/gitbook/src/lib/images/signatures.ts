@@ -35,9 +35,12 @@ export async function verifyImageSignature(
     const generated = await generator(input);
 
     const logger = getLogger().subLogger('image-signature');
-    logger.log(
-        `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
-    );
+    if (generated !== signature) {
+        // We only log if the signature does not match, to avoid logging useless information
+        logger.log(
+            `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
+        );
+    }
     return generated === signature;
 }
 
