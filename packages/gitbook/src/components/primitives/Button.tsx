@@ -14,7 +14,7 @@ type ButtonProps = {
     variant?: 'primary' | 'secondary' | 'blank';
     icon?: IconName | React.ReactNode;
     iconOnly?: boolean;
-    size?: 'default' | 'medium' | 'small';
+    size?: 'default' | 'medium' | 'small' | 'xsmall';
     className?: ClassValue;
     label?: string | React.ReactNode;
 } & LinkInsightsProps &
@@ -67,6 +67,7 @@ export function Button({
         default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
         medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
         small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
+        xsmall: ['text-xs', 'py-1', iconOnly ? 'px-1.5' : 'px-2'],
     };
 
     const sizeClasses = sizes[size] || sizes.default;

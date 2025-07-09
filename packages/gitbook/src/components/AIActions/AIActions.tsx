@@ -5,6 +5,7 @@ import { useAIChatState } from '@/components/AI/useAIChat';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
+import { getAIChatName } from '@/components/AIChat';
 import AIChatIcon from '@/components/AIChat/AIChatIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
@@ -21,8 +22,8 @@ type AIActionType = 'button' | 'dropdown-menu-item';
 /**
  * Opens our AI Docs Assistant.
  */
-export function OpenDocsAssistant(props: { type: AIActionType }) {
-    const { type } = props;
+export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolean }) {
+    const { type, trademark } = props;
     const chatController = useAIChatController();
     const chat = useAIChatState();
     const language = useLanguage();
@@ -30,14 +31,12 @@ export function OpenDocsAssistant(props: { type: AIActionType }) {
     return (
         <AIActionWrapper
             type={type}
-            icon={<AIChatIcon state={chat.loading ? 'thinking' : 'default'} />}
-            label={tString(language, 'ai_chat_ask', tString(language, 'ai_chat_assistant_name'))}
+            icon={
+                <AIChatIcon state={chat.loading ? 'thinking' : 'default'} trademark={trademark} />
+            }
+            label={tString(language, 'ai_chat_ask', getAIChatName(trademark))}
             shortLabel={tString(language, 'ask')}
-            description={tString(
-                language,
-                'ai_chat_ask_about_page',
-                tString(language, 'ai_chat_assistant_name')
-            )}
+            description={tString(language, 'ai_chat_ask_about_page', getAIChatName(trademark))}
             disabled={chat.loading}
             onClick={() => {
                 // Open the chat if it's not already open
@@ -130,6 +129,7 @@ export function CopyMarkdown(props: {
             type={type}
             icon={copied ? 'check' : 'copy'}
             label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
+            shortLabel={copied ? tString(language, 'code_copied') : tString(language, 'code_copy')}
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
         />
@@ -207,7 +207,7 @@ function AIActionWrapper(props: {
         return (
             <Button
                 icon={icon}
-                size="small"
+                size="xsmall"
                 variant="secondary"
                 label={shortLabel || label}
                 className="hover:!scale-100 !shadow-none !rounded-r-none border-r-0 bg-tint-base text-sm"

@@ -38,6 +38,27 @@ export async function PageHeader(props: {
                 'page-api-block:max-w-full'
             )}
         >
+            {page.layout.tableOfContents ? (
+                <div
+                    className={tcls(
+                        'float-right mb-2 ml-4',
+                        ancestors.length > 0 ? '-mt-2' : 'xs:mt-2'
+                    )}
+                >
+                    <AIActionsDropdown
+                        markdown={markdownResult.data}
+                        markdownPageUrl={context.linker.toPathInSpace(page.path)}
+                        pageURL={context.linker.toAbsoluteURL(
+                            context.linker.toPathForPage({
+                                pages: context.revision.pages,
+                                page,
+                            })
+                        )}
+                        withAIChat={withAIChat}
+                        trademark={context.customization.trademark.enabled}
+                    />
+                </div>
+            ) : null}
             {ancestors.length > 0 && (
                 <nav>
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
@@ -84,39 +105,26 @@ export async function PageHeader(props: {
                     </ol>
                 </nav>
             )}
-            <div className="flex items-start justify-between gap-4">
-                {page.layout.title ? (
-                    <h1
-                        className={tcls(
-                            'text-4xl',
-                            'font-bold',
-                            'flex',
-                            'items-center',
-                            'gap-4',
-                            'w-fit',
-                            'text-pretty'
-                        )}
-                    >
-                        <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
-                        {page.title}
-                    </h1>
-                ) : null}
-                {page.layout.tableOfContents ? (
-                    <AIActionsDropdown
-                        markdown={markdownResult.data}
-                        markdownPageUrl={context.linker.toPathInSpace(page.path)}
-                        pageURL={context.linker.toAbsoluteURL(
-                            context.linker.toPathForPage({
-                                pages: context.revision.pages,
-                                page,
-                            })
-                        )}
-                        withAIChat={withAIChat}
-                    />
-                ) : null}
-            </div>
+            {page.layout.title ? (
+                <h1
+                    className={tcls(
+                        'text-4xl',
+                        'font-bold',
+                        'flex',
+                        'items-center',
+                        'gap-4',
+                        'grow',
+                        'text-pretty',
+                        'clear-right',
+                        'xs:clear-none'
+                    )}
+                >
+                    <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
+                    {page.title}
+                </h1>
+            ) : null}
             {page.description && page.layout.description ? (
-                <p className={tcls('text-lg', 'text-tint')}>{page.description}</p>
+                <p className={tcls('text-lg', 'text-tint', 'clear-both')}>{page.description}</p>
             ) : null}
         </header>
     );
