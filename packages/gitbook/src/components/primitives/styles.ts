@@ -2,6 +2,7 @@ import type { ClassValue } from '@/lib/tailwind';
 
 export const ButtonStyles = [
     'button',
+    'group/button',
     'inline-flex',
     'items-center',
     'gap-2',

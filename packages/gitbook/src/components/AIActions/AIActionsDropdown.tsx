@@ -8,6 +8,7 @@ import {
 } from '@/components/AIActions/AIActions';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenu } from '@/components/primitives/DropdownMenu';
+import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
 
 /**
@@ -21,20 +22,26 @@ export function AIActionsDropdown(props: {
      */
     withAIChat?: boolean;
     pageURL: string;
+    trademark?: boolean;
 }) {
     const ref = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={ref} className="hidden h-fit items-stretch justify-start sm:flex">
+        <div ref={ref} className="flex h-fit items-stretch justify-start">
             <DefaultAction {...props} />
             <DropdownMenu
                 align="end"
                 className="!min-w-60 max-w-max"
                 button={
                     <Button
-                        icon="chevron-down"
+                        icon={
+                            <Icon
+                                icon="chevron-down"
+                                className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
+                            />
+                        }
                         iconOnly
-                        size="small"
+                        size="xsmall"
                         variant="secondary"
                         className="hover:!scale-100 !shadow-none !rounded-l-none bg-tint-base text-sm"
                     />
@@ -54,12 +61,15 @@ function AIActionsDropdownMenuContent(props: {
     markdownPageUrl: string;
     withAIChat?: boolean;
     pageURL: string;
+    trademark?: boolean;
 }) {
-    const { markdown, markdownPageUrl, withAIChat, pageURL } = props;
+    const { markdown, markdownPageUrl, withAIChat, pageURL, trademark } = props;
 
     return (
         <>
-            {withAIChat ? <OpenDocsAssistant type="dropdown-menu-item" /> : null}
+            {withAIChat ? (
+                <OpenDocsAssistant trademark={trademark} type="dropdown-menu-item" />
+            ) : null}
             {markdown ? (
                 <>
                     <CopyMarkdown
@@ -84,11 +94,12 @@ function DefaultAction(props: {
     withAIChat?: boolean;
     pageURL: string;
     markdownPageUrl: string;
+    trademark?: boolean;
 }) {
-    const { markdown, withAIChat, pageURL, markdownPageUrl } = props;
+    const { markdown, withAIChat, pageURL, markdownPageUrl, trademark } = props;
 
     if (withAIChat) {
-        return <OpenDocsAssistant type="button" />;
+        return <OpenDocsAssistant trademark={trademark} type="button" />;
     }
 
     if (markdown) {
