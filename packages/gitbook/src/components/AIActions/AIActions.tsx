@@ -112,9 +112,7 @@ export function CopyMarkdown(props: {
         }
 
         // Copy the markdown to the clipboard
-        copyMarkdown();
-
-        setCopied(true);
+        copyMarkdown().then(() => setCopied(true));
 
         // Reset the copied state after 2 seconds
         timeoutRef.current = setTimeout(() => {
