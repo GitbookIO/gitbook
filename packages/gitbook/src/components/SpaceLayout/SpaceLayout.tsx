@@ -49,7 +49,7 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const aiMode = context.customization.ai?.mode;
+    const aiMode = customization.ai?.mode;
 
     const searchAndAI = (
         <div className="flex grow items-center gap-2">
@@ -60,7 +60,9 @@ export function SpaceLayout(props: {
                     spaceTitle={siteSpace.title}
                 />
             </React.Suspense>
-            {aiMode === CustomizationAIMode.Assistant ? <AIChatButton /> : null}
+            {aiMode === CustomizationAIMode.Assistant ? (
+                <AIChatButton trademark={customization.trademark.enabled} />
+            ) : null}
         </div>
     );
 
@@ -80,11 +82,13 @@ export function SpaceLayout(props: {
                     enabled={withTracking}
                     appURL={GITBOOK_APP_URL}
                     apiHost={GITBOOK_API_PUBLIC_URL}
-                    visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
+                    visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
                     <Header withTopHeader={withTopHeader} context={context} search={searchAndAI} />
-                    {aiMode === CustomizationAIMode.Assistant ? <AIChat /> : null}
+                    {aiMode === CustomizationAIMode.Assistant ? (
+                        <AIChat trademark={customization.trademark.enabled} />
+                    ) : null}
                     <div className="scroll-nojump">
                         <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                             <div

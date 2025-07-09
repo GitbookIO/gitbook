@@ -2,6 +2,7 @@ import type { ClassValue } from '@/lib/tailwind';
 
 export const ButtonStyles = [
     'button',
+    'group/button',
     'inline-flex',
     'items-center',
     'gap-2',
@@ -9,12 +10,9 @@ export const ButtonStyles = [
     'straight-corners:rounded-none',
     'circular-corners:rounded-full',
 
-    'ring-1',
-    'ring-tint',
-    'hover:ring-tint-hover',
-    'focus-visible:ring-2',
-    'focus-visible:ring-primary-hover',
-    'outline-none',
+    'border',
+    'border-tint',
+    'hover:border-tint-hover',
 
     'depth-subtle:shadow-sm',
     'depth-subtle:hover:shadow-md',
@@ -23,9 +21,9 @@ export const ButtonStyles = [
     'shadow-tint',
     'dark:shadow-tint-1',
 
-    'contrast-more:ring-tint-12',
-    'contrast-more:hover:ring-2',
-    'contrast-more:hover:ring-tint-12',
+    'contrast-more:border-tint-12',
+    'contrast-more:hover:border-2',
+    'contrast-more:hover:border-tint-12',
 
     'depth-subtle:hover:-translate-y-px',
     'depth-subtle:focus-visible:-translate-y-px',

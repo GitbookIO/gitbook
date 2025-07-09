@@ -3,6 +3,7 @@
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
     type AIChatState,
@@ -17,21 +18,43 @@ import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
-export function AIChat() {
+export function AIChat(props: { trademark: boolean }) {
+    const { trademark } = props;
     const chat = useAIChatState();
+    const chatController = useAIChatController();
+
+    useHotkeys(
+        'mod+j',
+        (e) => {
+            e.preventDefault();
+            chatController.open();
+        },
+        []
+    );
+
+    useHotkeys(
+        'esc',
+        () => {
+            chatController.close();
+        },
+        []
+    );
 
     if (!chat.opened) {
         return null;
     }
 
-    return <AIChatWindow chat={chat} />;
+    return <AIChatWindow trademark={trademark} chatController={chatController} chat={chat} />;
 }
 
-export function AIChatWindow(props: { chat: AIChatState }) {
-    const { chat } = props;
+export function AIChatWindow(props: {
+    chatController: AIChatController;
+    chat: AIChatState;
+    trademark: boolean;
+}) {
+    const { chatController, chat, trademark } = props;
 
     const [input, setInput] = React.useState('');
-    const chatController = useAIChatController();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -91,11 +114,22 @@ export function AIChatWindow(props: { chat: AIChatState }) {
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <AIChatIcon
-                        className={`size-5 text-tint ${chat.loading ? 'animate-pulse' : ''}`}
-                        state={chat.loading ? 'thinking' : 'default'}
+                        className="size-5 text-tint"
+                        trademark={trademark}
+                        state={
+                            chat.error
+                                ? 'error'
+                                : chat.loading
+                                  ? chat.messages[chat.messages.length - 1].content
+                                      ? 'working'
+                                      : 'thinking'
+                                  : chat.messages.length > 0
+                                    ? 'done'
+                                    : 'default'
+                        }
                     />
                     <div className="flex flex-col">
-                        <div className="font-bold">Docs Assistant</div>
+                        <div className="font-bold">{getAIChatName(trademark)}</div>
                         <div
                             className={`text-tint text-xs leading-none transition-all duration-500 ${
                                 chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'
@@ -153,7 +187,11 @@ export function AIChatWindow(props: { chat: AIChatState }) {
                     {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
                             <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center rounded-full bg-tint-subtle">
-                                <AIChatIcon className="size-16 animate-[present_500ms_200ms_both]" />
+                                <AIChatIcon
+                                    state="intro"
+                                    trademark={trademark}
+                                    className="size-16 animate-[present_500ms_200ms_both]"
+                                />
                             </div>
                             <div className="animate-[fadeIn_500ms_400ms_both]">
                                 <h5 className=" text-center font-bold text-lg text-tint-strong">
@@ -222,4 +260,12 @@ function AIChatError(props: { chatController: AIChatController }) {
             </div>
         </div>
     );
+}
+
+export function getAIChatName(trademark: boolean) {
+    const language = useLanguage();
+
+    return trademark
+        ? tString(language, 'ai_chat_assistant_name')
+        : tString(language, 'ai_chat_assistant_name_unbranded');
 }

@@ -14,9 +14,9 @@ type ButtonProps = {
     variant?: 'primary' | 'secondary' | 'blank' | 'header';
     icon?: IconName | React.ReactNode;
     iconOnly?: boolean;
-    size?: 'default' | 'medium' | 'small';
+    size?: 'default' | 'medium' | 'small' | 'xsmall';
     className?: ClassValue;
-    label?: string;
+    label?: string | React.ReactNode;
     trailing?: React.ReactNode;
     children?: React.ReactNode;
     active?: boolean;
@@ -29,14 +29,14 @@ export const variantClasses = {
         'text-contrast-primary-solid',
         'hover:bg-primary-solid-hover',
         'hover:text-contrast-primary-solid-hover',
-        'ring-0',
-        'contrast-more:ring-1',
+        'border-0',
+        'contrast-more:border-1',
     ],
     blank: [
         'bg-transparent',
         'text-tint',
-        'ring-0',
-        '!shadow-none',
+        'border-0',
+        'shadow-none',
         'hover:bg-primary-hover',
         'hover:text-primary-strong',
         'hover:scale-1',
@@ -107,6 +107,7 @@ export const Button = React.forwardRef<
             default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
             medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
             small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
+            xsmall: ['text-xs', 'py-1', iconOnly ? 'px-1.5' : 'px-2'],
         };
 
         const sizeClasses = sizes[size] || sizes.default;
@@ -119,50 +120,47 @@ export const Button = React.forwardRef<
         );
         const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
-        if (href) {
-            return (
-                <Link
-                    ref={ref as React.Ref<HTMLAnchorElement>}
-                    href={href}
-                    className={domClassName}
-                    classNames={['ButtonStyles']}
-                    insights={insights}
-                    aria-label={label}
-                    target={target}
-                    {...rest}
-                >
-                    {icon ? (
-                        typeof icon === 'string' ? (
-                            <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
-                        ) : (
-                            icon
-                        )
-                    ) : null}
-                    {iconOnly ? null : label}
-                </Link>
-            );
-        }
+    const content = (
+        <>
+            {icon ? (
+                typeof icon === 'string' ? (
+                    <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                ) : (
+                    icon
+                )
+            ) : null}
+            {iconOnly ? null : label}
+        </>
+    );
 
-        const button = (
-            <button
-                ref={ref as React.Ref<HTMLButtonElement>}
-                type="button"
-                className={tcls(buttonOnlyClassNames, domClassName)}
-                aria-label={label}
+    if (href) {
+        return (
+            <Link
+                ref={ref as React.Ref<HTMLAnchorElement>}
+                href={href}
+                className={domClassName}
+                classNames={['ButtonStyles']}
+                insights={insights}
+                aria-label={label?.toString()}
+                target={target}
                 {...rest}
             >
-                {icon ? (
-                    typeof icon === 'string' ? (
-                        <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
-                    ) : (
-                        icon
-                    )
-                ) : null}
-                {iconOnly ? null : (children ?? label)}
-                {trailing}
-            </button>
+                {content}
+            </Link>
         );
-
-        return iconOnly ? <Tooltip label={label}>{button}</Tooltip> : button;
     }
-);
+
+    const button = (
+        <button
+        ref={ref as React.Ref<HTMLButtonElement>}
+            type="button"
+            className={tcls(buttonOnlyClassNames, domClassName)}
+            aria-label={label?.toString()}
+            {...rest}
+        >
+            {content}
+        </button>
+    );
+
+    return iconOnly && label ? <Tooltip label={label}>{button}</Tooltip> : button;
+}
