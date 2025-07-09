@@ -16,7 +16,7 @@ type ButtonProps = {
     iconOnly?: boolean;
     size?: 'default' | 'medium' | 'small';
     className?: ClassValue;
-    label?: string;
+    label?: string | React.ReactNode;
 } & LinkInsightsProps &
     HTMLAttributes<HTMLElement>;
 
@@ -94,7 +94,7 @@ export function Button({
                 className={domClassName}
                 classNames={['ButtonStyles']}
                 insights={insights}
-                aria-label={label}
+                aria-label={label?.toString()}
                 target={target}
                 {...rest}
             >
@@ -107,7 +107,7 @@ export function Button({
         <button
             type="button"
             className={tcls(buttonOnlyClassNames, domClassName)}
-            aria-label={label}
+            aria-label={label?.toString()}
             {...rest}
         >
             {content}

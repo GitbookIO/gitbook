@@ -22,9 +22,9 @@ const AIChatIcon = ({
                 icon="sparkle"
                 className={tcls(
                     className,
-                    state === 'thinking' || state === 'working'
-                        ? 'animate-[spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]'
-                        : ''
+                    (state === 'thinking' || state === 'working') &&
+                        'animate-[spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]',
+                    state === 'intro' && 'animate-[spin_2s_forwards_cubic-bezier(0.16,1,0.3,1)]'
                 )}
             />
         );
@@ -65,7 +65,10 @@ const AIChatIcon = ({
             {/* Error */}
             <g
                 clipPath="url(#clip0_153_2034)"
-                className={tcls(state === 'error' ? 'animate-[fadeIn_.5s_.3s_both]' : 'hidden')}
+                className={tcls(
+                    'text-danger-subtle',
+                    state === 'error' ? 'animate-[fadeIn_.5s_.3s_both]' : 'hidden'
+                )}
             >
                 <path
                     d="M13.0312 1.42059L13.0312 3.95184"
@@ -91,7 +94,8 @@ const AIChatIcon = ({
                 className={tcls(
                     state === 'done'
                         ? 'animate-[fadeIn_.5s_.3s_both]'
-                        : 'animate-[fadeOut_.5s_both]'
+                        : 'animate-[fadeOut_.5s_both]',
+                    state === 'intro' && 'hidden'
                 )}
             />
 
@@ -135,8 +139,8 @@ const AIChatIcon = ({
                     strokeLinejoin="round"
                     className={tcls(
                         (state === 'thinking' || state === 'working') &&
-                            'animate-[pathLoading_2s_infinite_forwards]',
-                        state === 'intro' && 'animate-[pathEnter_2s_forwards]',
+                            'animate-[pathLoading_2s_infinite_both]',
+                        state === 'intro' && 'animate-[pathEnter_2s_both]',
                         state === 'done' && 'animate-[pathEnter_1s_forwards_ease]'
                     )}
                 />
