@@ -136,6 +136,7 @@ export function CopyMarkdown(props: {
             shortLabel={copied ? tString(language, 'code_copied') : tString(language, 'code_copy')}
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
+            disabled={!markdown}
         />
     );
 }
