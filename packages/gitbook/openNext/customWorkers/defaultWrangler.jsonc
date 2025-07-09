@@ -16,7 +16,8 @@
     "env": {
         "dev": {
             "vars": {
-                "STAGE": "dev"
+                "STAGE": "dev",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
             },
             "r2_buckets": [
                 {
@@ -84,6 +85,9 @@
             }
         },
         "staging": {
+            "vars": {
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
+            },
             "r2_buckets": [
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
@@ -126,7 +130,7 @@
                 // This is a bit misleading, but it means that we can have 500 concurrent revalidations
                 // This means that we'll have up to 100 durable objects instance running at the same time
                 "MAX_REVALIDATE_CONCURRENCY": "100",
-                "OPEN_NEXT_REQUEST_ID_HEADER": true
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
             },
             "r2_buckets": [
                 {
