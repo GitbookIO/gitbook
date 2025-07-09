@@ -10,9 +10,9 @@ export const ButtonStyles = [
     'circular-corners:rounded-full',
     // 'place-self-start',
 
-    'ring-1',
-    'ring-tint',
-    'hover:ring-tint-hover',
+    'border',
+    'border-tint',
+    'hover:border-tint-hover',
 
     'shadow-sm',
     'shadow-tint',
@@ -21,9 +21,9 @@ export const ButtonStyles = [
     'active:shadow-none',
     'depth-flat:shadow-none',
 
-    'contrast-more:ring-tint-12',
-    'contrast-more:hover:ring-2',
-    'contrast-more:hover:ring-tint-12',
+    'contrast-more:border-tint-12',
+    'contrast-more:hover:border-2',
+    'contrast-more:hover:border-tint-12',
 
     'hover:scale-104',
     'depth-flat:hover:scale-100',

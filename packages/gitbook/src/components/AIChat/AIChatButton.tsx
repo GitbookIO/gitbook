@@ -8,7 +8,8 @@ import AIChatIcon from './AIChatIcon';
 /**
  * Button to open/close the AI chat.
  */
-export function AIChatButton() {
+export function AIChatButton(props: { trademark: boolean }) {
+    const { trademark } = props;
     const chatController = useAIChatController();
     const chat = useAIChatState();
 
@@ -16,14 +17,16 @@ export function AIChatButton() {
 
     return (
         <Button
-            icon={<AIChatIcon />}
+            icon={<AIChatIcon trademark={trademark} />}
             iconOnly
             size="default"
             variant="secondary"
             className="!px-3 bg-tint-base py-2.5"
             label={
                 <div className="flex items-center gap-2">
-                    {t(language, 'ai_chat_assistant_name')}
+                    {trademark
+                        ? t(language, 'ai_chat_assistant_name')
+                        : t(language, 'ai_chat_assistant_name_unbranded')}
                     <KeyboardShortcut keys={['mod', 'j']} className="border-tint-11 text-tint-1" />
                 </div>
             }
