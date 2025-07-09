@@ -67,7 +67,7 @@ const useCopiedStore = create<{
  * Copies the markdown version of the page to the clipboard.
  */
 export function CopyMarkdown(props: {
-    markdown: string;
+    markdown: string | undefined;
     type: AIActionType;
     isDefaultAction?: boolean;
 }) {
@@ -97,6 +97,10 @@ export function CopyMarkdown(props: {
     }, []);
 
     const onClick = (e: React.MouseEvent) => {
+        if (!markdown) {
+            return;
+        }
+
         // Prevent default behavior for non-default actions to avoid closing the dropdown.
         // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
         // Default action buttons are excluded from this behavior.
@@ -149,7 +153,7 @@ export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionT
             icon={<MarkdownIcon className="size-4 fill-current" />}
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={`${markdownPageUrl}.md`}
+            href={markdownPageUrl}
         />
     );
 }
