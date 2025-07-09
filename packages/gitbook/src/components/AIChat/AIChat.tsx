@@ -44,14 +44,15 @@ export function AIChat(props: { trademark: boolean }) {
         return null;
     }
 
-    return <AIChatWindow chatController={chatController} chat={chat} />;
+    return <AIChatWindow trademark={trademark} chatController={chatController} chat={chat} />;
 }
 
 export function AIChatWindow(props: {
     chatController: AIChatController;
     chat: AIChatState;
+    trademark: boolean;
 }) {
-    const { chatController, chat } = props;
+    const { chatController, chat, trademark } = props;
 
     const [input, setInput] = React.useState('');
 
