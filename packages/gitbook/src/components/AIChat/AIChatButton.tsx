@@ -4,7 +4,7 @@ import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { getAIChatName } from './AIChat';
-import AIChatIcon from './AIChatIcon';
+import { AIChatIcon } from './AIChatIcon';
 
 /**
  * Button to open/close the AI chat.

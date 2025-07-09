@@ -6,7 +6,7 @@ import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
 import { getAIChatName } from '@/components/AIChat';
-import AIChatIcon from '@/components/AIChat/AIChatIcon';
+import { AIChatIcon } from '@/components/AIChat';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
