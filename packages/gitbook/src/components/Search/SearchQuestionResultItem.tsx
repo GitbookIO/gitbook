@@ -28,6 +28,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             action={tString(language, 'ask', '')}
             ref={ref}
             data-testid="search-result-item"
+            scroll={false}
             {...(withAIChat
                 ? { href: '#' }
                 : getLinkProp({
