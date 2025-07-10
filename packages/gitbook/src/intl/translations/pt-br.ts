@@ -103,5 +103,4 @@ export const pt_br = {
     view_page_plaintext: 'Ver esta página em texto simples',
     open_in: 'Abrir no ${1}',
     open_in_llms_pre_prompt: 'Leia ${1} e responda perguntas sobre o conteúdo.',
-    ask: 'Perguntar',
 };

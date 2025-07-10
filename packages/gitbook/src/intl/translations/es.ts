@@ -105,5 +105,4 @@ export const es: TranslationLanguage = {
     view_page_plaintext: 'Ver esta página como texto plano',
     open_in: 'Abrir en ${1}',
     open_in_llms_pre_prompt: 'Lee ${1} y responde preguntas sobre el contenido.',
-    ask: 'Preguntar',
 };

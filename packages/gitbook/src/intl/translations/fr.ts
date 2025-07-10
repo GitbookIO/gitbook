@@ -103,5 +103,4 @@ export const fr: TranslationLanguage = {
     view_page_plaintext: 'Voir cette page en texte brut',
     open_in: 'Ouvrir dans ${1}',
     open_in_llms_pre_prompt: 'Lis ${1} et réponds aux questions sur le contenu.',
-    ask: 'Demander',
 };

@@ -103,5 +103,4 @@ export const no: TranslationLanguage = {
     view_page_plaintext: 'Vis denne siden som ren tekst',
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
-    ask: 'Spør',
 };

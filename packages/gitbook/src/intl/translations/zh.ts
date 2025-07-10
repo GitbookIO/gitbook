@@ -100,5 +100,4 @@ export const zh: TranslationLanguage = {
     view_page_plaintext: '以纯文本查看此页面',
     open_in: '在 ${1} 中打开',
     open_in_llms_pre_prompt: '阅读 ${1} 并回答内容相关的问题。',
-    ask: '提问',
 };
