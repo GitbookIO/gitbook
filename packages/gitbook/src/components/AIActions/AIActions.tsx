@@ -58,22 +58,26 @@ export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolea
 const useCopiedStore = create<{
     copied: boolean;
     setCopied: (copied: boolean) => void;
+    loading: boolean;
+    setLoading: (loading: boolean) => void;
 }>((set) => ({
     copied: false,
     setCopied: (copied: boolean) => set({ copied }),
+    loading: false,
+    setLoading: (loading: boolean) => set({ loading }),
 }));
 
 /**
  * Copies the markdown version of the page to the clipboard.
  */
 export function CopyMarkdown(props: {
-    markdown: string;
+    markdownPageUrl: string;
     type: AIActionType;
     isDefaultAction?: boolean;
 }) {
-    const { markdown, type, isDefaultAction } = props;
+    const { markdownPageUrl, type, isDefaultAction } = props;
     const language = useLanguage();
-    const { copied, setCopied } = useCopiedStore();
+    const { copied, setCopied, loading, setLoading } = useCopiedStore();
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Close the dropdown menu manually after the copy button is clicked
@@ -88,6 +92,16 @@ export function CopyMarkdown(props: {
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     };
 
+    // Fetch the markdown from the page
+    const fetchMarkdown = async () => {
+        setLoading(true);
+
+        return fetch(markdownPageUrl)
+            .then((res) => res.text())
+            .finally(() => setLoading(false));
+    };
+
+    // Reset the copied state when the component unmounts
     useEffect(() => {
         return () => {
             if (timeoutRef.current) {
@@ -96,7 +110,7 @@ export function CopyMarkdown(props: {
         };
     }, []);
 
-    const onClick = (e: React.MouseEvent) => {
+    const onClick = async (e: React.MouseEvent) => {
         // Prevent default behavior for non-default actions to avoid closing the dropdown.
         // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
         // Default action buttons are excluded from this behavior.
@@ -104,13 +118,9 @@ export function CopyMarkdown(props: {
             e.preventDefault();
         }
 
-        // Cancel any pending timeout
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
+        const markdown = await fetchMarkdown();
 
         navigator.clipboard.writeText(markdown);
-
         setCopied(true);
 
         // Reset the copied state after 2 seconds
@@ -132,6 +142,7 @@ export function CopyMarkdown(props: {
             shortLabel={copied ? tString(language, 'code_copied') : tString(language, 'code_copy')}
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
+            loading={loading}
         />
     );
 }
@@ -149,7 +160,7 @@ export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionT
             icon={<MarkdownIcon className="size-4 fill-current" />}
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={`${markdownPageUrl}.md`}
+            href={markdownPageUrl}
         />
     );
 }
@@ -200,13 +211,16 @@ function AIActionWrapper(props: {
     description?: string;
     href?: string;
     disabled?: boolean;
+    loading?: boolean;
 }) {
-    const { type, icon, label, shortLabel, onClick, href, description, disabled } = props;
+    const { type, icon, label, shortLabel, onClick, href, description, disabled, loading } = props;
 
     if (type === 'button') {
         return (
             <Button
-                icon={icon}
+                icon={
+                    loading ? <Icon icon="spinner-third" className="size-4 animate-spin" /> : icon
+                }
                 size="xsmall"
                 variant="secondary"
                 label={shortLabel || label}
@@ -214,7 +228,7 @@ function AIActionWrapper(props: {
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
-                disabled={disabled}
+                disabled={disabled || loading}
             />
         );
     }

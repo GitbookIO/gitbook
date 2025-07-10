@@ -1,7 +1,6 @@
 import { AIActionsDropdown } from '@/components/AIActions/AIActionsDropdown';
 import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
-import { getMarkdownForPage } from '@/lib/markdownPage';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import type { RevisionPageDocument } from '@gitbook/api';
@@ -17,8 +16,6 @@ export async function PageHeader(props: {
 }) {
     const { context, page, ancestors } = props;
     const { revision, linker } = context;
-
-    const markdownResult = await getMarkdownForPage(context, page.path);
 
     if (!page.layout.title && !page.layout.description) {
         return null;
@@ -46,8 +43,7 @@ export async function PageHeader(props: {
                     )}
                 >
                     <AIActionsDropdown
-                        markdown={markdownResult.data}
-                        markdownPageUrl={context.linker.toPathInSpace(page.path)}
+                        markdownPageUrl={`${context.linker.toPathInSpace(page.path)}.md`}
                         pageURL={context.linker.toAbsoluteURL(
                             context.linker.toPathForPage({
                                 pages: context.revision.pages,
