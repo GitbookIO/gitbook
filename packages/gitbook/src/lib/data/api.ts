@@ -7,6 +7,7 @@ import {
     type RenderIntegrationUI,
 } from '@gitbook/api';
 import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-tags';
+import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { cache } from '../cache';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
@@ -144,6 +145,43 @@ export function createDataFetcher(
             return getUserById(input, { userId });
         },
     };
+}
+
+/**
+ * Infer the cache life from the api response headers.
+ * @param response The response from the API call.
+ * @param defaultCacheLife The default cache life to use if not specified in the response.
+ * @returns nothing
+ */
+function cacheLifeFromResponse(
+    response: HttpResponse<unknown, unknown>,
+    defaultCacheLife: 'days' | 'max' | 'hours' | 'minutes' | 'seconds'
+) {
+    const cacheControlHeader = response.headers.get('x-gitbook-cache-control');
+    const parsed = parseCacheControl(cacheControlHeader || '');
+    const maxAge = parsed?.maxAge ?? parsed?.sharedMaxAge;
+    if (maxAge) {
+        return cacheLife({
+            stale: 60 * 5, // This one is only for the client,
+            revalidate: maxAge, // revalidate and expire are the same, we don't want stale data here
+            expire: maxAge,
+        });
+    }
+    // Typings in Next is "wrong" and does not allow us just use it as `cacheLife(defaultCacheLife)`
+    switch (defaultCacheLife) {
+        case 'days':
+            return cacheLife('days');
+        case 'max':
+            return cacheLife('max');
+        case 'hours':
+            return cacheLife('hours');
+        case 'minutes':
+            return cacheLife('minutes');
+        case 'seconds':
+            return cacheLife('seconds');
+        default:
+            throw new Error(`Unknown default cache life: ${defaultCacheLife}`);
+    }
 }
 
 const getUserById = cache(async (input: DataFetcherInput, params: { userId: string }) => {
@@ -307,7 +345,7 @@ const getRevisionPageDocument = cache(
                     );
 
                     cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
+                    cacheLifeFromResponse(res, 'max');
 
                     return res.data;
                 }
@@ -361,7 +399,7 @@ const getDocument = cache(
                     }
                 );
                 cacheTag(...getCacheTagsFromResponse(res));
-                cacheLife('max');
+                cacheLifeFromResponse(res, 'max');
                 return res.data;
             });
         });
@@ -406,7 +444,7 @@ const getComputedDocument = cache(
                         }
                     );
                     cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('max');
+                    cacheLifeFromResponse(res, 'max');
                     return res.data;
                 }
             );
