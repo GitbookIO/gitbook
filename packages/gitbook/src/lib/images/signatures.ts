@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { getLogger } from '@/lib/logger';
 import fnv1a from '@sindresorhus/fnv1a';
 import type { MaybePromise } from 'p-map';
 import { assert } from 'ts-essentials';
@@ -33,10 +34,13 @@ export async function verifyImageSignature(
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);
 
-    // biome-ignore lint/suspicious/noConsole: we want to log the signature comparison
-    console.log(
-        `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
-    );
+    const logger = getLogger().subLogger('imageResizing');
+    if (generated !== signature) {
+        // We only log if the signature does not match, to avoid logging useless information
+        logger.log(
+            `comparing image signature for "${input.url}" on identifier "${input.imagesContextId}": "${generated}" (expected) === "${signature}" (actual)`
+        );
+    }
     return generated === signature;
 }
 
