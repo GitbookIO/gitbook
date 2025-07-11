@@ -16,6 +16,7 @@ export const zh: TranslationLanguage = {
     search_results_count: '${1} 个结果',
     search_scope_space: '${1}',
     search_scope_all: '所有内容',
+    ask: '询问',
     search_ask: '询问"${1}"',
     search_ask_description: '利用人工智能找到答案',
     search_ask_sources: '来源',
@@ -99,5 +100,4 @@ export const zh: TranslationLanguage = {
     view_page_plaintext: '以纯文本查看此页面',
     open_in: '在 ${1} 中打开',
     open_in_llms_pre_prompt: '阅读 ${1} 并回答内容相关的问题。',
-    ask: '提问',
 };

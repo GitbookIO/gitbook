@@ -16,6 +16,7 @@ export const no: TranslationLanguage = {
     search_results_count: '${1} resultater',
     search_scope_space: '${1}',
     search_scope_all: 'Alt innhold',
+    ask: 'Spør',
     search_ask: 'Spør "${1}"',
     search_ask_description: 'Finn svaret med AI',
     search_ask_sources: 'Kilder',
@@ -102,5 +103,4 @@ export const no: TranslationLanguage = {
     view_page_plaintext: 'Vis denne siden som ren tekst',
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
-    ask: 'Spør',
 };

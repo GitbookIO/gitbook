@@ -4,20 +4,18 @@ import React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
-import { SearchButton, SearchModal } from '@/components/Search';
 import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { getSpaceLanguage } from '@/intl/server';
-import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
-import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
 import { AIChat } from '../AIChat';
+import { AIChatButton } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
+import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
@@ -51,7 +49,22 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const withAIChat = isAIChatEnabled(context);
+    const aiMode = customization.ai?.mode;
+
+    const searchAndAI = (
+        <div className="flex grow items-center gap-2">
+            <React.Suspense fallback={null}>
+                <SearchContainer
+                    aiMode={aiMode}
+                    isMultiVariants={siteSpaces.length > 1}
+                    spaceTitle={siteSpace.title}
+                />
+            </React.Suspense>
+            {aiMode === CustomizationAIMode.Assistant ? (
+                <AIChatButton trademark={customization.trademark.enabled} />
+            ) : null}
+        </div>
+    );
 
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
@@ -69,16 +82,12 @@ export function SpaceLayout(props: {
                     enabled={withTracking}
                     appURL={GITBOOK_APP_URL}
                     apiHost={GITBOOK_API_PUBLIC_URL}
-                    visitorCookieTrackingEnabled={context.customization.insights?.trackingCookie}
+                    visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
-                    <Header
-                        withTopHeader={withTopHeader}
-                        withAIChat={withAIChat}
-                        context={context}
-                    />
-                    {withAIChat ? (
-                        <AIChat trademark={context.customization.trademark.enabled} />
+                    <Header withTopHeader={withTopHeader} context={context} search={searchAndAI} />
+                    {aiMode === CustomizationAIMode.Assistant ? (
+                        <AIChat trademark={customization.trademark.enabled} />
                     ) : null}
                     <div className="scroll-nojump">
                         <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
@@ -103,7 +112,7 @@ export function SpaceLayout(props: {
                                                 className={tcls(
                                                     'hidden',
                                                     'pr-4',
-                                                    'lg:flex',
+                                                    'md:flex',
                                                     'grow-0',
                                                     'flex-wrap',
                                                     'dark:shadow-light/1',
@@ -117,27 +126,7 @@ export function SpaceLayout(props: {
                                     innerHeader={
                                         // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                                         <>
-                                            {!withTopHeader && (
-                                                <div className={tcls('hidden', 'lg:block')}>
-                                                    <React.Suspense fallback={null}>
-                                                        <SearchButton>
-                                                            <span className={tcls('flex-1')}>
-                                                                {t(
-                                                                    getSpaceLanguage(customization),
-                                                                    // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
-                                                                    customization.aiSearch
-                                                                        ?.enabled ||
-                                                                        customization.ai?.mode !==
-                                                                            CustomizationAIMode.None
-                                                                        ? 'search_or_ask'
-                                                                        : 'search'
-                                                                )}
-                                                                ...
-                                                            </span>
-                                                        </SearchButton>
-                                                    </React.Suspense>
-                                                </div>
-                                            )}
+                                            {!withTopHeader && searchAndAI}
                                             {!withTopHeader && withSections && sections && (
                                                 <SiteSectionList
                                                     className={tcls('hidden', 'lg:block')}
@@ -168,19 +157,6 @@ export function SpaceLayout(props: {
                     </div>
 
                     {withFooter ? <Footer context={context} /> : null}
-
-                    <React.Suspense fallback={null}>
-                        <SearchModal
-                            spaceTitle={siteSpace.title}
-                            // TODO: remove aiSearch and optional chain once the cache has been fully updated (after 11/07/2025)
-                            withAsk={
-                                customization.aiSearch?.enabled ||
-                                customization.ai?.mode !== CustomizationAIMode.None
-                            }
-                            withAIChat={withAIChat}
-                            isMultiVariants={isMultiVariants}
-                        />
-                    </React.Suspense>
                 </InsightsProvider>
             </CurrentContentProvider>
         </SpaceLayoutContextProvider>

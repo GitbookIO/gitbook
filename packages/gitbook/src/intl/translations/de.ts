@@ -14,6 +14,7 @@ export const de = {
     search_results_count: '${1} Ergebnisse',
     search_scope_space: '${1}',
     search_scope_all: 'Alle Inhalte',
+    ask: 'Fragen',
     search_ask: 'Fragen "${1}"',
     search_ask_description: 'Finden Sie die Antwort mit AI',
     search_ask_sources: 'Quellen',
@@ -102,5 +103,4 @@ export const de = {
     view_page_plaintext: 'Diese Seite als Klartext anzeigen',
     open_in: 'Öffnen in ${1}',
     open_in_llms_pre_prompt: 'Lies ${1} und beantworte Fragen zum Inhalt.',
-    ask: 'Fragen',
 };

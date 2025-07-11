@@ -16,6 +16,7 @@ export const fr: TranslationLanguage = {
     search_results_count: '${1} résultats',
     search_scope_space: '${1}',
     search_scope_all: 'Tout le contenu',
+    ask: 'Demander',
     search_ask: 'Demander "${1}"',
     search_ask_description: "Trouvez la réponse avec l'IA",
     search_ask_sources: 'Sources',
@@ -102,5 +103,4 @@ export const fr: TranslationLanguage = {
     view_page_plaintext: 'Voir cette page en texte brut',
     open_in: 'Ouvrir dans ${1}',
     open_in_llms_pre_prompt: 'Lis ${1} et réponds aux questions sur le contenu.',
-    ask: 'Demander',
 };

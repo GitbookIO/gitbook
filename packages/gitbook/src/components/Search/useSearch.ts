@@ -4,9 +4,13 @@ import React from 'react';
 import type { LinkProps } from '../primitives';
 
 export interface SearchState {
+    // URL-backed state
     query: string;
     ask: boolean;
     global: boolean;
+
+    // Local UI state
+    open: boolean;
 }
 
 // KeyMap needs to be statically defined to avoid `setRawState` being redefined on every render.
@@ -28,13 +32,24 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
         history: 'replace',
     });
 
+    // Separate local state for open (not synchronized with URL)
+    // Default to true if there's already a query in the URL
+    const [open, setIsOpen] = React.useState(() => {
+        return rawState?.q !== null;
+    });
+
     const state = React.useMemo<SearchState | null>(() => {
         if (rawState === null || rawState.q === null) {
             return null;
         }
 
-        return { query: rawState.q, ask: !!rawState.ask, global: !!rawState.global };
-    }, [rawState]);
+        return {
+            query: rawState.q,
+            ask: !!rawState.ask,
+            global: !!rawState.global,
+            open: open,
+        };
+    }, [rawState, open]);
 
     const stateRef = React.useRef(state);
     React.useLayoutEffect(() => {
@@ -50,12 +65,17 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
             }
 
             if (update === null) {
+                setIsOpen(false);
                 return setRawState({
                     q: null,
                     ask: null,
                     global: null,
                 });
             }
+
+            // Update the local state
+            setIsOpen(update.open);
+
             return setRawState({
                 q: update.query,
                 ask: update.ask ? true : null,
@@ -78,8 +98,8 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
         (query) => {
             const searchParams = new URLSearchParams();
             searchParams.set('q', query.query ?? '');
-            query.ask ? searchParams.set('ask', 'on') : searchParams.delete('ask');
-            query.global ? searchParams.set('global', 'on') : searchParams.delete('global');
+            query.ask ? searchParams.set('ask', 'true') : searchParams.delete('ask');
+            query.global ? searchParams.set('global', 'true') : searchParams.delete('global');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -89,6 +109,7 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                         query: '',
                         ask: false,
                         global: false,
+                        open: true,
                         ...(prev ?? {}),
                         ...query,
                     }));

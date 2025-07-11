@@ -9,26 +9,24 @@ export const ButtonStyles = [
     'rounded-md',
     'straight-corners:rounded-none',
     'circular-corners:rounded-full',
-    // 'place-self-start',
 
     'border',
     'border-tint',
     'hover:border-tint-hover',
 
-    'shadow-sm',
+    'depth-subtle:shadow-sm',
+    'depth-subtle:hover:shadow-md',
+    'depth-subtle:focus-visible:shadow-md',
+    'active:shadow-none',
     'shadow-tint',
     'dark:shadow-tint-1',
-    'hover:shadow-md',
-    'active:shadow-none',
-    'depth-flat:shadow-none',
 
     'contrast-more:border-tint-12',
     'contrast-more:hover:border-2',
     'contrast-more:hover:border-tint-12',
 
-    'hover:scale-104',
-    'depth-flat:hover:scale-100',
-    'active:scale-100',
+    'depth-subtle:hover:-translate-y-px',
+    'depth-subtle:focus-visible:-translate-y-px',
     'transition-all',
 
     'grow-0',
