@@ -13,8 +13,9 @@ import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
+import { usePathname } from 'next/navigation';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { create } from 'zustand';
 
 type AIActionType = 'button' | 'dropdown-menu-item';
@@ -53,19 +54,47 @@ export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolea
     );
 }
 
-// We need to store the copied state in a store to share the state between the
-// copy button and the dropdown menu item.
-const useCopiedStore = create<{
+type CopiedStore = {
+    markdown: string | null;
     copied: boolean;
-    setCopied: (copied: boolean) => void;
     loading: boolean;
-    setLoading: (loading: boolean) => void;
-}>((set) => ({
-    copied: false,
-    setCopied: (copied: boolean) => set({ copied }),
-    loading: false,
-    setLoading: (loading: boolean) => set({ loading }),
-}));
+    pathname: string;
+};
+
+// We need to store everything in a store to share the state between every instance of the component.
+const useCopiedStore = create<
+    CopiedStore & {
+        setState: (partial: Partial<CopiedStore>) => void;
+        copyWithTimeout: (markdown: string) => void;
+    }
+>((set) => {
+    let timeoutRef: ReturnType<typeof setTimeout> | null = null;
+
+    return {
+        markdown: null,
+        copied: false,
+        loading: false,
+        pathname: '',
+        setState: (partial: Partial<CopiedStore>) => set((state) => ({ ...state, ...partial })),
+        copyWithTimeout: async (markdown: string) => {
+            // Clear any existing timeout
+            if (timeoutRef) {
+                clearTimeout(timeoutRef);
+            }
+
+            await navigator.clipboard.writeText(markdown);
+
+            // Set copied to true
+            set({ copied: true, markdown });
+
+            // Set timeout to reset copied state
+            timeoutRef = setTimeout(() => {
+                set({ copied: false });
+                timeoutRef = null;
+            }, 1500);
+        },
+    };
+});
 
 /**
  * Copies the markdown version of the page to the clipboard.
@@ -77,61 +106,50 @@ export function CopyMarkdown(props: {
 }) {
     const { markdownPageUrl, type, isDefaultAction } = props;
     const language = useLanguage();
-    const { copied, setCopied, loading, setLoading } = useCopiedStore();
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const basePathname = usePathname();
+    const { copied, loading, markdown, pathname, setState, copyWithTimeout } = useCopiedStore();
 
-    // Close the dropdown menu manually after the copy button is clicked
-    const closeDropdownMenu = () => {
-        const dropdownMenu = document.querySelector('div[data-radix-popper-content-wrapper]');
-
-        // Cancel if no dropdown menu is open
-        if (!dropdownMenu) return;
-
-        // Dispatch on `document` so that the event is captured by Radix's
-        // dismissable-layer listener regardless of focus location.
-        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-    };
+    // Clear cached markdown when navigating to a new page
+    useEffect(() => {
+        if (basePathname && pathname !== basePathname) {
+            setState({ markdown: null, pathname: basePathname });
+        }
+    }, [basePathname, pathname, setState]);
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
-        setLoading(true);
+        setState({ loading: true });
 
         return fetch(markdownPageUrl)
             .then((res) => res.text())
-            .finally(() => setLoading(false));
+            .finally(() => setState({ loading: false }));
     };
-
-    // Reset the copied state when the component unmounts
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
 
     const onClick = async (e: React.MouseEvent) => {
         // Prevent default behavior for non-default actions to avoid closing the dropdown.
         // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
-        // Default action buttons are excluded from this behavior.
         if (!isDefaultAction) {
             e.preventDefault();
         }
 
-        const markdown = await fetchMarkdown();
+        // Copy the markdown to the clipboard
+        copyWithTimeout(markdown || (await fetchMarkdown()));
 
-        navigator.clipboard.writeText(markdown);
-        setCopied(true);
+        // Close dropdown after a short delay to allow the copied state to show
+        if (type === 'dropdown-menu-item' && !isDefaultAction) {
+            setTimeout(() => {
+                const dropdownMenu = document.querySelector(
+                    'div[data-radix-popper-content-wrapper]'
+                );
+                if (!dropdownMenu) return;
 
-        // Reset the copied state after 2 seconds
-        timeoutRef.current = setTimeout(() => {
-            // Close the dropdown menu if it's a dropdown menu item and not the default action
-            if (type === 'dropdown-menu-item' && !isDefaultAction) {
-                closeDropdownMenu();
-            }
-
-            setCopied(false);
-        }, 2000);
+                // Dispatch on `document` so that the event is captured by Radix's
+                // dismissable-layer listener regardless of focus location.
+                document.dispatchEvent(
+                    new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+                );
+            }, 1500);
+        }
     };
 
     return (
@@ -239,11 +257,13 @@ function AIActionWrapper(props: {
             href={href}
             target="_blank"
             onClick={onClick}
-            disabled={disabled}
+            disabled={disabled || loading}
         >
-            {icon ? (
-                <div className="flex size-5 items-center justify-center text-tint">
-                    {typeof icon === 'string' ? (
+            <div className="flex size-5 items-center justify-center text-tint">
+                {loading ? (
+                    <Icon icon="spinner-third" className="size-4 animate-spin" />
+                ) : icon ? (
+                    typeof icon === 'string' ? (
                         <Icon
                             icon={icon as IconName}
                             iconStyle={IconStyle.Regular}
@@ -251,9 +271,10 @@ function AIActionWrapper(props: {
                         />
                     ) : (
                         icon
-                    )}
-                </div>
-            ) : null}
+                    )
+                ) : null}
+            </div>
+
             <div className="flex flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2 text-tint-strong">
                     <span className="truncate font-medium text-sm">{label}</span>
