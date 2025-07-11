@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { getDataOrNull } from '@/lib/data';
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
-import { withLeadingSlash } from '@/lib/paths';
+import { withLeadingSlash, withTrailingSlash } from '@/lib/paths';
 
 export interface PagePathParams {
     pathname?: string | string[];
@@ -91,15 +91,18 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         // If page still can't be found, we try with the API, in case we have a redirect at space level.
         // We use the raw pathname to handle special/malformed redirects setup by users in the GitSync.
         // The page rendering will take care of redirecting to a normalized pathname.
-        const resolved = await getDataOrNull(
-            context.dataFetcher.getRevisionPageByPath({
-                spaceId: space.id,
-                revisionId: revisionId,
-                path: rawPathname,
-            })
-        );
-        if (resolved) {
-            return resolvePageId(revision.pages, resolved.id);
+        // We also try with the pathname with a trailing slash, as some redirects might be set up that way.
+        for (const pathname of [rawPathname, withTrailingSlash(rawPathname)]) {
+            const resolved = await getDataOrNull(
+                context.dataFetcher.getRevisionPageByPath({
+                    spaceId: space.id,
+                    revisionId: revisionId,
+                    path: pathname,
+                })
+            );
+            if (resolved) {
+                return resolvePageId(revision.pages, resolved.id);
+            }
         }
     }
 
