@@ -14,7 +14,7 @@ export async function resizeImageWithCFFetch(
 ): Promise<Response> {
     const { signal, ...resizeOptions } = options;
 
-    const logger = getLogger().subLogger('resize-image-cf-fetch');
+    const logger = getLogger().subLogger('imageResizing');
     logger.log(`resize image using cf-fetch: ${input}`);
 
     return copyImageResponse(

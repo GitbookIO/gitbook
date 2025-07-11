@@ -25,7 +25,7 @@ export async function resizeImageWithCDNCgi(
         resizeOptions
     )}/${encodeURIComponent(input)}`;
 
-    const logger = getLogger().subLogger('resize-image-cdn-cgi');
+    const logger = getLogger().subLogger('imageResizing');
     logger.log(`resize image using cdn-cgi: ${resizeURL}`);
 
     return copyImageResponse(

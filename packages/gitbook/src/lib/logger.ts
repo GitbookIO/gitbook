@@ -12,6 +12,7 @@ export type LoggerOptions = SubLoggerOptions & {
 
 const formatPrefix = (name: string, options: LoggerOptions) => {
     const { labels } = options;
+    // The tail worker used for extracting the labels expect this format.
     return `%${JSON.stringify(labels ?? {})}%[${name}]`;
 };
 

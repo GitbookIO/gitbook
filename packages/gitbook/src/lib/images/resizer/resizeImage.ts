@@ -35,7 +35,7 @@ export async function getImageSize(
             height: json.original.height,
         };
     } catch (error) {
-        const logger = getLogger().subLogger('get-image-size');
+        const logger = getLogger().subLogger('imageResizing');
         logger.warn(`Error getting image size for ${input}:`, error);
         return null;
     }

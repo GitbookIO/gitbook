@@ -34,7 +34,7 @@ export async function verifyImageSignature(
     const generator = IMAGE_SIGNATURE_FUNCTIONS[version];
     const generated = await generator(input);
 
-    const logger = getLogger().subLogger('image-signature');
+    const logger = getLogger().subLogger('imageResizing');
     if (generated !== signature) {
         // We only log if the signature does not match, to avoid logging useless information
         logger.log(
