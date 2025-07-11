@@ -50,124 +50,98 @@ export function createDataFetcher(
         // API that are tied to the token
         //
         getPublishedContentSite(params) {
-            return trace('getPublishedContentSite', () =>
-                getPublishedContentSite(input, {
-                    organizationId: params.organizationId,
-                    siteId: params.siteId,
-                    siteShareKey: params.siteShareKey,
-                })
-            );
+            return getPublishedContentSite(input, {
+                organizationId: params.organizationId,
+                siteId: params.siteId,
+                siteShareKey: params.siteShareKey,
+            });
         },
         getSiteRedirectBySource(params) {
-            return trace('getSiteRedirectBySource', () =>
-                getSiteRedirectBySource(input, {
-                    organizationId: params.organizationId,
-                    siteId: params.siteId,
-                    siteShareKey: params.siteShareKey,
-                    source: params.source,
-                })
-            );
+            return getSiteRedirectBySource(input, {
+                organizationId: params.organizationId,
+                siteId: params.siteId,
+                siteShareKey: params.siteShareKey,
+                source: params.source,
+            });
         },
         getRevision(params) {
-            return trace('getRevision', () =>
-                getRevision(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                })
-            );
+            return getRevision(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+            });
         },
         getRevisionPageByPath(params) {
-            return trace('getRevisionPageByPath', () =>
-                getRevisionPageByPath(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    path: params.path,
-                })
-            );
+            return getRevisionPageByPath(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                path: params.path,
+            });
         },
         getRevisionPageMarkdown(params) {
-            return trace('getRevisionPageMarkdown', () =>
-                getRevisionPageMarkdown(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
-                })
-            );
+            return getRevisionPageMarkdown(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                pageId: params.pageId,
+            });
         },
         getRevisionPageDocument(params) {
-            return trace('getRevisionPageDocument', () =>
-                getRevisionPageDocument(input, {
-                    spaceId: params.spaceId,
-                    revisionId: params.revisionId,
-                    pageId: params.pageId,
-                })
-            );
+            return getRevisionPageDocument(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                pageId: params.pageId,
+            });
         },
         getLatestOpenAPISpecVersionContent(params) {
-            return trace('getLatestOpenAPISpecVersionContent', () =>
-                getLatestOpenAPISpecVersionContent(input, {
-                    organizationId: params.organizationId,
-                    slug: params.slug,
-                })
-            );
+            return getLatestOpenAPISpecVersionContent(input, {
+                organizationId: params.organizationId,
+                slug: params.slug,
+            });
         },
         getSpace(params) {
-            return trace('getSpace', () =>
-                getSpace(input, {
-                    spaceId: params.spaceId,
-                    shareKey: params.shareKey,
-                })
-            );
+            return getSpace(input, {
+                spaceId: params.spaceId,
+                shareKey: params.shareKey,
+            });
         },
         getChangeRequest(params) {
-            return trace('getChangeRequest', () =>
-                getChangeRequest(input, {
-                    spaceId: params.spaceId,
-                    changeRequestId: params.changeRequestId,
-                })
-            );
+            return getChangeRequest(input, {
+                spaceId: params.spaceId,
+                changeRequestId: params.changeRequestId,
+            });
         },
         getDocument(params) {
-            return trace('getDocument', () =>
-                getDocument(input, {
-                    spaceId: params.spaceId,
-                    documentId: params.documentId,
-                })
-            );
+            return getDocument(input, {
+                spaceId: params.spaceId,
+                documentId: params.documentId,
+            });
         },
         getComputedDocument(params) {
-            return trace('getComputedDocument', () =>
-                getComputedDocument(input, {
-                    organizationId: params.organizationId,
-                    spaceId: params.spaceId,
-                    source: params.source,
-                    seed: params.seed,
-                })
-            );
+            return getComputedDocument(input, {
+                organizationId: params.organizationId,
+                spaceId: params.spaceId,
+                source: params.source,
+                seed: params.seed,
+            });
         },
         getEmbedByUrl(params) {
-            return trace('getEmbedByUrl', () =>
-                getEmbedByUrl(input, {
-                    url: params.url,
-                    spaceId: params.spaceId,
-                })
-            );
+            return getEmbedByUrl(input, {
+                url: params.url,
+                spaceId: params.spaceId,
+            });
         },
         searchSiteContent(params) {
-            return trace('searchSiteContent', () => searchSiteContent(input, params));
+            return searchSiteContent(input, params);
         },
 
         renderIntegrationUi(params) {
-            return trace('renderIntegrationUi', () =>
-                renderIntegrationUi(input, {
-                    integrationName: params.integrationName,
-                    request: params.request,
-                })
-            );
+            return renderIntegrationUi(input, {
+                integrationName: params.integrationName,
+                request: params.request,
+            });
         },
 
         getUserById(userId) {
-            return trace('getUserById', () => getUserById(input, { userId }));
+            return getUserById(input, { userId });
         },
     };
 }
