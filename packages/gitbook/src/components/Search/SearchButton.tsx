@@ -1,11 +1,11 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { useEffect, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import { useTrackEvent } from '../Insights';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { useSearch } from './useSearch';
 
 /**
@@ -100,45 +100,10 @@ export function SearchButton(props: { children?: React.ReactNode; style?: ClassV
                 className={tcls('text-tint-subtle', 'shrink-0', 'size-4')}
             />
             <div className={tcls('w-full', 'hidden', 'md:block', 'text-left')}>{children}</div>
-            <Shortcut />
+            <KeyboardShortcut
+                keys={['mod', 'k']}
+                className="theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background"
+            />
         </button>
-    );
-}
-
-function Shortcut() {
-    const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
-
-    useEffect(() => {
-        function getOperatingSystem() {
-            const platform = navigator.platform.toLowerCase();
-
-            if (platform.includes('mac')) return 'mac';
-            if (platform.includes('win')) return 'win';
-
-            return 'win';
-        }
-
-        setOperatingSystem(getOperatingSystem());
-    }, []);
-
-    return (
-        <div
-            aria-busy={operatingSystem === null ? 'true' : undefined}
-            className={tcls(
-                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
-                operatingSystem
-                    ? 'motion-safe:animate-fadeIn motion-reduce:opacity-100'
-                    : 'opacity-0'
-            )}
-        >
-            <kbd
-                className={`flex h-5 min-w-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
-            >
-                {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
-            </kbd>
-            <kbd className="flex size-5 items-center justify-center rounded border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background">
-                K
-            </kbd>
-        </div>
     );
 }

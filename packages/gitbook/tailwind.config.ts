@@ -375,20 +375,36 @@ const config: Config = {
                     },
                 },
                 pathLoading: {
+                    '0%,10%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                    '50%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '-100',
+                        opacity: '0',
+                    },
+                    '51%': {
+                        strokeDasharray: '0 100',
+                        strokeDashoffset: '0',
+                        opacity: '0',
+                    },
+                    '90%,100%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                },
+                pathEnter: {
                     '0%': {
                         strokeDasharray: '0 100',
                         strokeDashoffset: '0',
                         opacity: '0',
                     },
-                    '40%, 60%': {
-                        strokeDasharray: '100 100',
-                        strokeDashoffset: '0',
-                        opacity: '1',
-                    },
                     '100%': {
                         strokeDasharray: '100 100',
-                        strokeDashoffset: '-100',
-                        opacity: '0',
+                        strokeDashoffset: '0',
                     },
                 },
                 stroke: {
@@ -406,6 +422,14 @@ const config: Config = {
                         strokeDasharray: '100 100',
                         strokeDashoffset: '-100',
                         opacity: '0',
+                    },
+                },
+                bob: {
+                    '0%, 100%': {
+                        transform: 'translateY(0)',
+                    },
+                    '50%': {
+                        transform: 'translateY(-10%)',
                     },
                 },
                 enterFromRight: {
@@ -450,6 +474,7 @@ const config: Config = {
         },
         opacity: opacity(),
         screens: {
+            xs: '480px',
             sm: '640px',
             md: '768px',
             lg: '1024px',

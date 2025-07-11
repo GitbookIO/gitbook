@@ -1,4 +1,5 @@
 import { GITBOOK_IMAGE_RESIZE_URL } from '@/lib/env';
+import { getLogger } from '@/lib/logger';
 import type { CloudflareImageOptions } from './types';
 import { copyImageResponse } from './utils';
 
@@ -24,8 +25,8 @@ export async function resizeImageWithCDNCgi(
         resizeOptions
     )}/${encodeURIComponent(input)}`;
 
-    // biome-ignore lint/suspicious/noConsole: this log is useful for debugging
-    console.log(`resize image using cdn-cgi: ${resizeURL}`);
+    const logger = getLogger().subLogger('imageResizing');
+    logger.log(`resize image using cdn-cgi: ${resizeURL}`);
 
     return copyImageResponse(
         await fetch(resizeURL, {

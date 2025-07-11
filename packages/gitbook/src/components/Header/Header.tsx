@@ -166,7 +166,11 @@ export function Header(props: {
                                         </span>
                                     </SearchButton>
                                 </Suspense>
-                                {withAIChat && <AIChatButton />}
+                                {withAIChat && (
+                                    <AIChatButton
+                                        trademark={context.customization.trademark.enabled}
+                                    />
+                                )}
                             </div>
 
                             {customization.header.links.length > 0 && (

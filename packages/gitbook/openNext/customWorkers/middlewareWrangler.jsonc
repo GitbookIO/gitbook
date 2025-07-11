@@ -21,7 +21,8 @@
         "dev": {
             "vars": {
                 "STAGE": "dev",
-                "NEXT_PRIVATE_DEBUG_CACHE": "true"
+                "NEXT_PRIVATE_DEBUG_CACHE": "true",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
             },
             "r2_buckets": [
                 {
@@ -85,7 +86,8 @@
         "staging": {
             "vars": {
                 "STAGE": "staging",
-                "WORKER_VERSION_ID": "TO_REPLACE"
+                "WORKER_VERSION_ID": "TO_REPLACE",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
             },
             "routes": [
                 {
@@ -153,7 +155,8 @@
                 // TODO: remove this once the issue is fixed
                 "DEBUG_CLOUDFLARE": "true",
                 "WORKER_VERSION_ID": "TO_REPLACE",
-                "STAGE": "production"
+                "STAGE": "production",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
             },
             "routes": [
                 {
