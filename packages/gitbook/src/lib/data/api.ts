@@ -153,10 +153,10 @@ export function createDataFetcher(
  * @param defaultCacheLife The default cache life to use if not specified in the response.
  * @returns nothing
  */
-const cacheLifeFromResponse = (
+function cacheLifeFromResponse(
     response: HttpResponse<unknown, unknown>,
     defaultCacheLife: 'days' | 'max' | 'hours' | 'minutes' | 'seconds'
-) => {
+) {
     const cacheControlHeader = response.headers.get('x-gitbook-cache-control');
     const parsed = parseCacheControl(cacheControlHeader || '');
     const maxAge = parsed?.maxAge ?? parsed?.sharedMaxAge;
@@ -182,7 +182,7 @@ const cacheLifeFromResponse = (
         default:
             throw new Error(`Unknown default cache life: ${defaultCacheLife}`);
     }
-};
+}
 
 const getUserById = cache(async (input: DataFetcherInput, params: { userId: string }) => {
     'use cache';
