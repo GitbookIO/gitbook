@@ -12,18 +12,20 @@ import { DropdownMenu } from '@/components/primitives/DropdownMenu';
 import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
 
+interface AIActionsDropdownProps {
+    markdownPageUrl: string;
+    withAIChat?: boolean;
+    trademark: boolean;
+    /**
+     * Whether to include the "Open in LLM" entries in the dropdown menu.
+     */
+    withLLMActions?: boolean;
+}
+
 /**
  * Dropdown menu for the AI Actions (Ask Docs Assistant, Copy page, View as Markdown, Open in LLM).
  */
-export function AIActionsDropdown(props: {
-    markdownPageUrl: string;
-    /**
-     * Whether to include the "Ask Docs Assistant" entry in the dropdown menu.
-     */
-    withAIChat?: boolean;
-    pageURL: string;
-    trademark: boolean;
-}) {
+export function AIActionsDropdown(props: AIActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
 
     return (
@@ -56,13 +58,8 @@ export function AIActionsDropdown(props: {
 /**
  * The content of the dropdown menu.
  */
-function AIActionsDropdownMenuContent(props: {
-    markdownPageUrl: string;
-    withAIChat?: boolean;
-    pageURL: string;
-    trademark: boolean;
-}) {
-    const { markdownPageUrl, withAIChat, pageURL, trademark } = props;
+function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
+    const { markdownPageUrl, withAIChat, trademark, withLLMActions } = props;
 
     return (
         <>
@@ -77,8 +74,12 @@ function AIActionsDropdownMenuContent(props: {
             />
             <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="dropdown-menu-item" />
 
-            <OpenInLLM provider="chatgpt" url={pageURL} type="dropdown-menu-item" />
-            <OpenInLLM provider="claude" url={pageURL} type="dropdown-menu-item" />
+            {withLLMActions ? (
+                <>
+                    <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="dropdown-menu-item" />
+                    <OpenInLLM provider="claude" url={markdownPageUrl} type="dropdown-menu-item" />
+                </>
+            ) : null}
         </>
     );
 }
@@ -86,11 +87,7 @@ function AIActionsDropdownMenuContent(props: {
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function DefaultAction(props: {
-    markdownPageUrl: string;
-    withAIChat?: boolean;
-    trademark: boolean;
-}) {
+function DefaultAction(props: AIActionsDropdownProps) {
     const { markdownPageUrl, withAIChat, trademark } = props;
 
     if (withAIChat) {
