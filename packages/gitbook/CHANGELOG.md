@@ -1,5 +1,20 @@
 # gitbook
 
+## 0.14.0
+
+### Minor Changes
+
+- 0003030: Implement AI actions dropdown
+- acb9f53: New search layout
+
+### Patch Changes
+
+- 52ab368: Reposition AI Actions dropdown
+- 7212345: Fix AI Actions dropdown and LLM integration
+- 8daede5: Ensure all content links are resolved relatively to preview.
+- ed684c1: Move AI Actions markdown fetching to client-side
+- 9cc5a78: Generalise keyboard shortcuts, add Cmd+J to AI Chat
+
 ## 0.13.1
 
 ### Patch Changes
