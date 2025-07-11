@@ -9,7 +9,7 @@ interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     trademark?: boolean;
 }
 
-const AIChatIcon = ({
+export const AIChatIcon = ({
     className = 'size-4',
     size,
     trademark = true,
@@ -148,5 +148,3 @@ const AIChatIcon = ({
         </svg>
     );
 };
-
-export default AIChatIcon;

@@ -14,6 +14,7 @@ export const pt_br = {
     search_results_count: '${1} resultados',
     search_scope_space: '${1}',
     search_scope_all: 'Todo o conteúdo',
+    ask: 'Perguntar',
     search_ask: 'Perguntar "${1}"',
     search_ask_description: 'Encontre a resposta com IA',
     search_ask_sources: 'Fontes',
@@ -102,5 +103,4 @@ export const pt_br = {
     view_page_plaintext: 'Ver esta página em texto simples',
     open_in: 'Abrir no ${1}',
     open_in_llms_pre_prompt: 'Leia ${1} e responda perguntas sobre o conteúdo.',
-    ask: 'Perguntar',
 };

@@ -16,6 +16,7 @@ export const nl: TranslationLanguage = {
     search_results_count: '${1} resultaten',
     search_scope_space: '${1}',
     search_scope_all: 'Alle inhoud',
+    ask: 'Vragen',
     search_ask: 'Vraag "${1}"',
     search_ask_description: 'Vind het antwoord met AI',
     search_ask_sources: 'Bronnen',
@@ -102,5 +103,4 @@ export const nl: TranslationLanguage = {
     view_page_plaintext: 'Bekijk deze pagina als platte tekst',
     open_in: 'Open in ${1}',
     open_in_llms_pre_prompt: 'Lees ${1} en beantwoord vragen over de inhoud.',
-    ask: 'Vraag',
 };

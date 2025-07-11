@@ -1,5 +1,4 @@
 import {
-    CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -86,11 +85,6 @@ export async function CustomizationRootLayout(props: {
             suppressHydrationWarning
             lang={customization.internationalization.locale}
             className={tcls(
-                /* This offset is used when scrolling to elements on the page, like #anchors and (on mobile) the latest AI chat message.
-                 * It is set to the maximum height of the header (64px) + sections (44px) + offset (40px) */
-                customization.header.preset === CustomizationHeaderPreset.None
-                    ? null
-                    : 'scroll-pt-[148px]',
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
