@@ -36,7 +36,7 @@ export const variantClasses = {
         'bg-transparent',
         'text-tint',
         'border-0',
-        'shadow-none',
+        '!shadow-none',
         'hover:bg-primary-hover',
         'hover:text-primary-strong',
         'hover:scale-1',
