@@ -39,7 +39,7 @@ export function AIChatInput(props: {
             const timeout = setTimeout(() => {
                 inputRef.current?.focus();
             }, 50);
-            
+
             return () => clearTimeout(timeout);
         }
     }, [disabled, loading]);
