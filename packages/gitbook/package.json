@@ -110,5 +110,8 @@
         "e2e-customers": "playwright test e2e/customers.spec.ts",
         "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
         "typecheck": "tsc --noEmit"
-    }
+    },
+    "browserslist": [
+        ">0.3%, chrome >= 64, edge >= 79, firefox >= 67, opera >= 51, safari >= 12 and not dead"
+    ]
 }
