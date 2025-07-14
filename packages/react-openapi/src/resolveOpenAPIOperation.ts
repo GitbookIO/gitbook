@@ -40,8 +40,11 @@ export async function resolveOpenAPIOperation(
     }
 
     const servers = 'servers' in schema ? (schema.servers ?? []) : [];
+    const schemaSecurity = Array.isArray(schema.security ?? [])
+        ? schema.security
+        : [schema.security];
     const security: OpenAPIV3_1.SecurityRequirementObject[] =
-        operation.security ?? schema.security ?? [];
+        operation.security ?? schemaSecurity ?? [];
 
     // If security includes an empty object, it means that the security is optional
     const isOptionalSecurity = security.some((entry) => Object.keys(entry).length === 0);
