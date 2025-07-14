@@ -36,9 +36,11 @@ export function AIChatInput(props: {
         if (!disabled && !loading) {
             // Add a small delay to ensure the input is rendered before focusing
             // This fixes inconsistent focus behaviour across browsers
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 inputRef.current?.focus();
             }, 50);
+            
+            return () => clearTimeout(timeout);
         }
     }, [disabled, loading]);
 
