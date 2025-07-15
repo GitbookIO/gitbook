@@ -19,7 +19,7 @@ interface SearchInputProps {
 }
 
 // Size classes for medium size button
-const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'];
+const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'md:circular-corners:px-4'];
 
 /**
  * Input to trigger search.
