@@ -1,5 +1,29 @@
 # gitbook
 
+## 0.14.0
+
+### Minor Changes
+
+- 0003030: Implement AI actions dropdown
+- acb9f53: New search layout
+
+### Patch Changes
+
+- 334cfdd: Fix responsive class for SearchInput button
+- 6816f0f: add browserlists and fix old browser css-masks
+- 9ee9082: Refactor icon loading state in AIAction components
+- 52ab368: Reposition AI Actions dropdown
+- 7212345: Fix AI Actions dropdown and LLM integration
+- 8daede5: Ensure all content links are resolved relatively to preview.
+- ed684c1: Move AI Actions markdown fetching to client-side
+- 9cc5a78: Generalise keyboard shortcuts, add Cmd+J to AI Chat
+- Updated dependencies [6816f0f]
+- Updated dependencies [1738677]
+  - @gitbook/icons@0.2.1
+  - @gitbook/openapi-parser@2.2.1
+  - @gitbook/react-contentkit@0.7.2
+  - @gitbook/react-openapi@1.3.3
+
 ## 0.13.1
 
 ### Patch Changes

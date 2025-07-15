@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.13.1",
+    "version": "0.14.0",
     "private": true,
     "dependencies": {
         "@gitbook/api": "catalog:",

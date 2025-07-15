@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.2.1
+
+### Patch Changes
+
+- 1738677: Stricter validation
+
 ## 2.2.0
 
 ### Minor Changes
