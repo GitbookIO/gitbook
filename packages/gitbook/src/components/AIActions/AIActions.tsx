@@ -61,7 +61,7 @@ type CopiedStore = {
 // We need to store everything in a store to share the state between every instance of the component.
 const useCopiedStore = create<
     CopiedStore & {
-        setState: (partial: Partial<CopiedStore>) => void;
+        setLoading: (loading: boolean) => void;
         copyWithTimeout: (props: { markdown: string }, opts?: { onSuccess?: () => void }) => void;
     }
 >((set) => {
@@ -70,7 +70,7 @@ const useCopiedStore = create<
     return {
         copied: false,
         loading: false,
-        setState: (partial: Partial<CopiedStore>) => set((state) => ({ ...state, ...partial })),
+        setLoading: (loading: boolean) => set({ loading }),
         copyWithTimeout: async (props, opts) => {
             const { markdown } = props;
             const { onSuccess } = opts || {};
@@ -112,16 +112,16 @@ export function CopyMarkdown(props: {
 
     const closeDropdown = useDropdownMenuClose();
 
-    const { copied, loading, setState, copyWithTimeout } = useCopiedStore();
+    const { copied, loading, setLoading, copyWithTimeout } = useCopiedStore();
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
-        setState({ loading: true });
+        setLoading(true);
 
         const result = await fetch(markdownPageUrl).then((res) => res.text());
         markdownCache.set(markdownPageUrl, result);
 
-        setState({ loading: false });
+        setLoading(false);
 
         return result;
     };
