@@ -62,7 +62,7 @@ type CopiedStore = {
 const useCopiedStore = create<
     CopiedStore & {
         setLoading: (loading: boolean) => void;
-        copy: (props: { markdown: string }, opts?: { onSuccess?: () => void }) => void;
+        copy: (data: string, opts?: { onSuccess?: () => void }) => void;
     }
 >((set) => {
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
@@ -71,15 +71,14 @@ const useCopiedStore = create<
         copied: false,
         loading: false,
         setLoading: (loading: boolean) => set({ loading }),
-        copy: async (props, opts) => {
-            const { markdown } = props;
+        copy: async (data, opts) => {
             const { onSuccess } = opts || {};
 
             if (timeoutRef) {
                 clearTimeout(timeoutRef);
             }
 
-            await navigator.clipboard.writeText(markdown);
+            await navigator.clipboard.writeText(data);
 
             set({ copied: true });
 
@@ -133,19 +132,14 @@ export function CopyMarkdown(props: {
             e.preventDefault();
         }
 
-        copy(
-            {
-                markdown: markdownCache.get(markdownPageUrl) || (await fetchMarkdown()),
+        copy(markdownCache.get(markdownPageUrl) || (await fetchMarkdown()), {
+            onSuccess: () => {
+                // We close the dropdown menu if the action is a dropdown menu item and not the default action.
+                if (type === 'dropdown-menu-item' && !isDefaultAction) {
+                    closeDropdown();
+                }
             },
-            {
-                onSuccess: () => {
-                    // We close the dropdown menu if the action is a dropdown menu item and not the default action.
-                    if (type === 'dropdown-menu-item' && !isDefaultAction) {
-                        closeDropdown();
-                    }
-                },
-            }
-        );
+        });
     };
 
     return (
