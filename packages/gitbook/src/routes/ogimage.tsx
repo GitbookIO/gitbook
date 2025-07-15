@@ -366,19 +366,25 @@ const SUPPORTED_IMAGE_TYPES = [
 async function fetchImage(url: string, options?: ResizeImageOptions) {
     // Skip early some images to avoid fetching them
     const parsedURL = new URL(url);
-    if (UNSUPPORTED_IMAGE_EXTENSIONS.includes(getExtension(parsedURL.pathname).toLowerCase())) {
-        return null;
-    }
 
-    // We use the image resizer to normalize the image format to PNG.
-    // as @vercel/og can sometimes fail on some JPEG images.
-    const response =
-        checkIsSizableImageURL(url) !== SizableImageAction.Resize
-            ? await fetch(url)
-            : await resizeImage(url, {
-                  ...options,
-                  format: 'png',
-              });
+    let response: Response;
+    if (
+        UNSUPPORTED_IMAGE_EXTENSIONS.includes(getExtension(parsedURL.pathname).toLowerCase()) ||
+        checkIsSizableImageURL(url) === SizableImageAction.Resize
+    ) {
+        // We use the image resizer to normalize the image format to PNG.
+        // as @vercel/og can sometimes fail on some JPEG images, and will fail on avif and webp images.
+        response = await resizeImage(
+            url,
+            {
+                ...options,
+                format: 'png',
+            },
+            true
+        ); // Bypass the skip check
+    } else {
+        response = await fetch(url);
+    }
 
     // Filter out unsupported image types
     const contentType = response.headers.get('content-type');

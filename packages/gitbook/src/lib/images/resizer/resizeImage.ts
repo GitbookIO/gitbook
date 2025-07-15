@@ -48,10 +48,11 @@ export async function resizeImage(
     input: string,
     options: CloudflareImageOptions & {
         signal?: AbortSignal;
-    }
+    },
+    bypassSkipCheck = false
 ): Promise<Response> {
     const action = checkIsSizableImageURL(input);
-    if (action === SizableImageAction.Skip) {
+    if (action === SizableImageAction.Skip && !bypassSkipCheck) {
         throw new Error(
             'Cannot resize this image, this function should have never been called on this url'
         );
