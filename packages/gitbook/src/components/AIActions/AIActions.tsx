@@ -13,9 +13,8 @@ import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
-import { usePathname } from 'next/navigation';
+import QuickLRU from 'quick-lru';
 import type React from 'react';
-import { useEffect } from 'react';
 import { create } from 'zustand';
 
 type AIActionType = 'button' | 'dropdown-menu-item';
@@ -55,10 +54,8 @@ export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolea
 }
 
 type CopiedStore = {
-    markdown: string | null;
     copied: boolean;
     loading: boolean;
-    pathname: string;
 };
 
 // We need to store everything in a store to share the state between every instance of the component.
@@ -71,10 +68,8 @@ const useCopiedStore = create<
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
 
     return {
-        markdown: null,
         copied: false,
         loading: false,
-        pathname: '',
         setState: (partial: Partial<CopiedStore>) => set((state) => ({ ...state, ...partial })),
         copyWithTimeout: async (props) => {
             const { markdown, shouldCloseDropdown } = props;
@@ -85,7 +80,7 @@ const useCopiedStore = create<
 
             await navigator.clipboard.writeText(markdown);
 
-            set({ copied: true, markdown, loading: false });
+            set({ copied: true, loading: false });
 
             timeoutRef = setTimeout(() => {
                 set({ copied: false });
@@ -98,6 +93,11 @@ const useCopiedStore = create<
         },
     };
 });
+
+/**
+ * Cache for the markdown versbion of the page.
+ */
+const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
 /**
  * Function to manually close the dropdown
@@ -121,23 +121,19 @@ export function CopyMarkdown(props: {
 }) {
     const { markdownPageUrl, type, isDefaultAction } = props;
     const language = useLanguage();
-    const basePathname = usePathname();
-    const { copied, loading, markdown, pathname, setState, copyWithTimeout } = useCopiedStore();
 
-    // Clear cached markdown when navigating to a new page
-    useEffect(() => {
-        if (basePathname && pathname !== basePathname) {
-            setState({ markdown: null, pathname: basePathname });
-        }
-    }, [basePathname, pathname, setState]);
+    const { copied, loading, setState, copyWithTimeout } = useCopiedStore();
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
         setState({ loading: true });
 
-        return fetch(markdownPageUrl)
-            .then((res) => res.text())
-            .finally(() => setState({ loading: false }));
+        const result = await fetch(markdownPageUrl).then((res) => res.text());
+        markdownCache.set(markdownPageUrl, result);
+
+        setState({ loading: false });
+
+        return result;
     };
 
     const onClick = async (e: React.MouseEvent) => {
@@ -148,7 +144,7 @@ export function CopyMarkdown(props: {
         }
 
         copyWithTimeout({
-            markdown: markdown || (await fetchMarkdown()),
+            markdown: markdownCache.get(markdownPageUrl) || (await fetchMarkdown()),
             shouldCloseDropdown: type === 'dropdown-menu-item' && !isDefaultAction,
         });
     };
