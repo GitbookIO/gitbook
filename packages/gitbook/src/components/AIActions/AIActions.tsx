@@ -65,7 +65,7 @@ type CopiedStore = {
 const useCopiedStore = create<
     CopiedStore & {
         setState: (partial: Partial<CopiedStore>) => void;
-        copyWithTimeout: (markdown: string) => void;
+        copyWithTimeout: (props: { markdown: string; shouldCloseDropdown: boolean }) => void;
     }
 >((set) => {
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
@@ -76,25 +76,40 @@ const useCopiedStore = create<
         loading: false,
         pathname: '',
         setState: (partial: Partial<CopiedStore>) => set((state) => ({ ...state, ...partial })),
-        copyWithTimeout: async (markdown: string) => {
-            // Clear any existing timeout
+        copyWithTimeout: async (props) => {
+            const { markdown, shouldCloseDropdown } = props;
+
             if (timeoutRef) {
                 clearTimeout(timeoutRef);
             }
 
             await navigator.clipboard.writeText(markdown);
 
-            // Set copied to true
-            set({ copied: true, markdown });
+            set({ copied: true, markdown, loading: false });
 
-            // Set timeout to reset copied state
             timeoutRef = setTimeout(() => {
                 set({ copied: false });
                 timeoutRef = null;
+
+                if (shouldCloseDropdown) {
+                    closeDropdown();
+                }
             }, 1500);
         },
     };
 });
+
+/**
+ * Function to manually close the dropdown
+ */
+function closeDropdown() {
+    const dropdownMenu = document.querySelector('div[data-radix-popper-content-wrapper]');
+    if (!dropdownMenu) return;
+
+    // Dispatch on `document` so that the event is captured by Radix's
+    // dismissable-layer listener regardless of focus location.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+}
 
 /**
  * Copies the markdown version of the page to the clipboard.
@@ -132,24 +147,10 @@ export function CopyMarkdown(props: {
             e.preventDefault();
         }
 
-        // Copy the markdown to the clipboard
-        copyWithTimeout(markdown || (await fetchMarkdown()));
-
-        // Close dropdown after a short delay to allow the copied state to show
-        if (type === 'dropdown-menu-item' && !isDefaultAction) {
-            setTimeout(() => {
-                const dropdownMenu = document.querySelector(
-                    'div[data-radix-popper-content-wrapper]'
-                );
-                if (!dropdownMenu) return;
-
-                // Dispatch on `document` so that the event is captured by Radix's
-                // dismissable-layer listener regardless of focus location.
-                document.dispatchEvent(
-                    new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
-                );
-            }, 1500);
-        }
+        copyWithTimeout({
+            markdown: markdown || (await fetchMarkdown()),
+            shouldCloseDropdown: type === 'dropdown-menu-item' && !isDefaultAction,
+        });
     };
 
     return (
