@@ -252,6 +252,8 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             height: 630,
             fonts: fonts.length ? fonts : undefined,
             headers: {
+                // We don't want to cache the image for too long in the browser
+                'cache-control': 'public, max-age=300, s-maxage=31536000',
                 'cache-tag': [
                     getCacheTag({
                         tag: 'site',
