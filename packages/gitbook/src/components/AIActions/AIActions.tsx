@@ -8,7 +8,7 @@ import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
 import { getAIChatName } from '@/components/AIChat';
 import { AIChatIcon } from '@/components/AIChat';
 import { Button } from '@/components/primitives/Button';
-import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
+import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
@@ -62,7 +62,7 @@ type CopiedStore = {
 const useCopiedStore = create<
     CopiedStore & {
         setState: (partial: Partial<CopiedStore>) => void;
-        copyWithTimeout: (props: { markdown: string; shouldCloseDropdown: boolean }) => void;
+        copyWithTimeout: (props: { markdown: string }, opts?: { onSuccess?: () => void }) => void;
     }
 >((set) => {
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
@@ -71,8 +71,9 @@ const useCopiedStore = create<
         copied: false,
         loading: false,
         setState: (partial: Partial<CopiedStore>) => set((state) => ({ ...state, ...partial })),
-        copyWithTimeout: async (props) => {
-            const { markdown, shouldCloseDropdown } = props;
+        copyWithTimeout: async (props, opts) => {
+            const { markdown } = props;
+            const { onSuccess } = opts || {};
 
             if (timeoutRef) {
                 clearTimeout(timeoutRef);
@@ -80,15 +81,14 @@ const useCopiedStore = create<
 
             await navigator.clipboard.writeText(markdown);
 
-            set({ copied: true, loading: false });
+            set({ copied: true });
 
             timeoutRef = setTimeout(() => {
                 set({ copied: false });
-                timeoutRef = null;
+                onSuccess?.();
 
-                if (shouldCloseDropdown) {
-                    closeDropdown();
-                }
+                // Reset the timeout ref to avoid multiple timeouts
+                timeoutRef = null;
             }, 1500);
         },
     };
@@ -100,18 +100,6 @@ const useCopiedStore = create<
 const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
 /**
- * Function to manually close the dropdown
- */
-function closeDropdown() {
-    const dropdownMenu = document.querySelector('div[data-radix-popper-content-wrapper]');
-    if (!dropdownMenu) return;
-
-    // Dispatch on `document` so that the event is captured by Radix's
-    // dismissable-layer listener regardless of focus location.
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-}
-
-/**
  * Copies the markdown version of the page to the clipboard.
  */
 export function CopyMarkdown(props: {
@@ -121,6 +109,8 @@ export function CopyMarkdown(props: {
 }) {
     const { markdownPageUrl, type, isDefaultAction } = props;
     const language = useLanguage();
+
+    const closeDropdown = useDropdownMenuClose();
 
     const { copied, loading, setState, copyWithTimeout } = useCopiedStore();
 
@@ -143,10 +133,19 @@ export function CopyMarkdown(props: {
             e.preventDefault();
         }
 
-        copyWithTimeout({
-            markdown: markdownCache.get(markdownPageUrl) || (await fetchMarkdown()),
-            shouldCloseDropdown: type === 'dropdown-menu-item' && !isDefaultAction,
-        });
+        copyWithTimeout(
+            {
+                markdown: markdownCache.get(markdownPageUrl) || (await fetchMarkdown()),
+            },
+            {
+                onSuccess: () => {
+                    // We close the dropdown menu if the action is a dropdown menu item and not the default action.
+                    if (type === 'dropdown-menu-item' && !isDefaultAction) {
+                        closeDropdown();
+                    }
+                },
+            }
+        );
     };
 
     return (
