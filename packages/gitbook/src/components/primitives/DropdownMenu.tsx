@@ -2,7 +2,7 @@
 
 import { Icon } from '@gitbook/icons';
 import type { DetailedHTMLProps, HTMLAttributes } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
@@ -209,5 +209,5 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
 export function useDropdownMenuClose() {
     const context = useContext(DropdownMenuContext);
     assert(context, 'DropdownMenuContext not found');
-    return () => context.setOpen(false);
+    return useCallback(() => context.setOpen(false), [context]);
 }
