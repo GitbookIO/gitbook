@@ -62,7 +62,7 @@ type CopiedStore = {
 const useCopiedStore = create<
     CopiedStore & {
         setLoading: (loading: boolean) => void;
-        copyWithTimeout: (props: { markdown: string }, opts?: { onSuccess?: () => void }) => void;
+        copy: (props: { markdown: string }, opts?: { onSuccess?: () => void }) => void;
     }
 >((set) => {
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
@@ -71,7 +71,7 @@ const useCopiedStore = create<
         copied: false,
         loading: false,
         setLoading: (loading: boolean) => set({ loading }),
-        copyWithTimeout: async (props, opts) => {
+        copy: async (props, opts) => {
             const { markdown } = props;
             const { onSuccess } = opts || {};
 
@@ -112,7 +112,7 @@ export function CopyMarkdown(props: {
 
     const closeDropdown = useDropdownMenuClose();
 
-    const { copied, loading, setLoading, copyWithTimeout } = useCopiedStore();
+    const { copied, loading, setLoading, copy } = useCopiedStore();
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
@@ -133,7 +133,7 @@ export function CopyMarkdown(props: {
             e.preventDefault();
         }
 
-        copyWithTimeout(
+        copy(
             {
                 markdown: markdownCache.get(markdownPageUrl) || (await fetchMarkdown()),
             },
