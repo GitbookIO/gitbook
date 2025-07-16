@@ -24,16 +24,18 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             className={tcls(
                 textStyle.textSize,
                 'heading',
-                'grid',
+                'flex',
+                'items-baseline',
                 'scroll-m-12',
                 hashLinkButtonWrapperStyles,
-                style
+                style,
+                textStyle.marginTop
             )}
         >
             <HashLinkButton
                 id={id}
                 block={block}
-                className={tcls('-ml-6', textStyle.anchorButtonMarginTop)}
+                className={tcls('-ml-6', 'pr-2')}
                 iconClassName={tcls('size-4')}
                 label="Direct link to heading"
             />
@@ -44,8 +46,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                     'z-[1]',
                     'justify-self-start',
                     getTextAlignment(block.data.align),
-                    textStyle.lineHeight,
-                    textStyle.marginTop
+                    textStyle.lineHeight
                 )}
             >
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />
