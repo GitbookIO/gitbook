@@ -54,10 +54,9 @@
     }
 
     .flip-heading-hash {
-        @apply [&:is(h1,h2,h3,h4)]:content-start;
-        @apply [&:is(h1,h2,h3,h4)]:[grid-auto-columns:auto_1fr];
-        @apply [&:is(h1,h2,h3,h4)>div:first-child]:[grid-area:1/2];
-        @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-1;
+        @apply [&:is(h1,h2,h3,h4)]:flex-row-reverse;
+        @apply [&:is(h1,h2,h3,h4)]:[justify-content:start];
+        @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-2;
     }
 }
 

@@ -42,7 +42,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
 
             <div
                 className={tcls(
-                    'grid-area-1-1',
+                    'flex-1',
                     'z-[1]',
                     'justify-self-start',
                     getTextAlignment(block.data.align),
