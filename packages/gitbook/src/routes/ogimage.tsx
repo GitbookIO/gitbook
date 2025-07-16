@@ -376,14 +376,11 @@ async function fetchImage(url: string, options?: ResizeImageOptions) {
     ) {
         // We use the image resizer to normalize the image format to PNG.
         // as @vercel/og can sometimes fail on some JPEG images, and will fail on avif and webp images.
-        response = await resizeImage(
-            url,
-            {
-                ...options,
-                format: 'png',
-            },
-            true
-        ); // Bypass the skip check
+        response = await resizeImage(url, {
+            ...options,
+            format: 'png',
+            bypassSkipCheck: true, // Bypass the check to see if the image can be resized
+        });
     } else {
         response = await fetch(url);
     }
