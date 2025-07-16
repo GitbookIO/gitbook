@@ -516,6 +516,9 @@ const config: Config = {
                 'html:not(.announcement-hidden):has(#announcement-banner) &'
             );
 
+            // Variant to target first-of-type in a column
+            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
+
             const customisationVariants = {
                 // Sidebar styles
                 sidebar: ['sidebar-default', 'sidebar-filled'],

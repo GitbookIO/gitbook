@@ -35,9 +35,9 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
                 // flip heading hash icon if list item is a heading
                 'flip-heading-hash',
                 // remove margin-top for the first heading in a list
-                '[&:is(h2)>div]:mt-0',
-                '[&:is(h3)>div]:mt-0',
-                '[&:is(h4)>div]:mt-0',
+                '[&:is(h2)]:pt-0',
+                '[&:is(h3)]:pt-0',
+                '[&:is(h4)]:pt-0',
                 // Override the "mx-auto" class from UnwrappedBlocks
                 'mx-0'
             )}

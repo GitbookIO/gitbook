@@ -10,8 +10,6 @@ export function getBlockTextStyle(block: DocumentBlock): {
     lineHeight: string;
     /** Tailwind class for the margin top (mt-*) */
     marginTop?: string;
-    /** Tailwind class for the margin top to apply on the anchor link button */
-    anchorButtonMarginTop?: string;
 } {
     switch (block.type) {
         case 'paragraph':
@@ -23,22 +21,19 @@ export function getBlockTextStyle(block: DocumentBlock): {
             return {
                 textSize: 'text-3xl font-semibold',
                 lineHeight: 'leading-tight',
-                marginTop: 'mt-[1em]',
-                anchorButtonMarginTop: 'mt-[1.05em]',
+                marginTop: 'column-first-of-type:pt-0 pt-[1em]',
             };
         case 'heading-2':
             return {
                 textSize: 'text-2xl font-semibold',
                 lineHeight: 'leading-snug',
-                marginTop: 'mt-[0.75em]',
-                anchorButtonMarginTop: 'mt-[0.9em]',
+                marginTop: 'column-first-of-type:pt-0 pt-[0.75em]',
             };
         case 'heading-3':
             return {
                 textSize: 'text-xl font-semibold',
                 lineHeight: 'leading-snug',
-                marginTop: 'mt-[0.5em]',
-                anchorButtonMarginTop: 'mt-[0.65em]',
+                marginTop: 'column-first-of-type:pt-0 pt-[0.5em]',
             };
         case 'divider':
             return {

@@ -61,7 +61,7 @@ export function getOpenAPIContext(args: {
                 style={tcls([
                     headingProps.deprecated ? 'line-through' : undefined,
                     headingProps.deprecated || !!headingProps.stability
-                        ? '[&>div]:mt-0'
+                        ? '[&>div]:pt-0'
                         : undefined,
                 ])}
                 block={{
