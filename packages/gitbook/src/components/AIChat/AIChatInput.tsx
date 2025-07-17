@@ -64,7 +64,7 @@ export function AIChatInput(props: {
                     'focus:outline-none',
                     'focus:ring-0',
                     'w-full',
-                    'px-4',
+                    'px-3',
                     'py-3',
                     'pb-12',
                     'h-auto',
@@ -98,7 +98,7 @@ export function AIChatInput(props: {
                     }
                 }}
             />
-            <div className="absolute top-2.5 right-4 animate-[fadeIn_0.2s_0.5s_ease-in-out_both] peer-focus:hidden">
+            <div className="absolute top-2.5 right-3 animate-[fadeIn_0.2s_0.5s_ease-in-out_both] peer-focus:hidden">
                 <KeyboardShortcut keys={['mod', 'j']} />
             </div>
             <div className="absolute inset-x-0 bottom-0 flex items-center px-2 py-2">
