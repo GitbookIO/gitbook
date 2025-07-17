@@ -29,19 +29,20 @@ export function AIChatMessages(props: {
                             'scroll-mt-36',
                             'lg:scroll-mt-0',
                             'flex flex-col gap-6',
+                            'group/message',
                             message.role === AIMessageRole.User
                                 ? 'max-w-[80%] self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'
-                                : ''
+                                : 'text-tint-strong'
                         )}
                         style={{
                             animationDelay: `${Math.min(index * 0.05, 0.5)}s`,
                         }}
                         key={index}
                     >
-                        {message.content ? (
-                            message.content
-                        ) : chat.loading ? (
-                            <div className="flex w-full animate-[fadeIn_500ms_both] flex-wrap gap-2">
+                        {message.content ? message.content : null}
+
+                        {isLastMessage && chat.loading ? (
+                            <div className="flex w-full animate-[fadeIn_500ms_both] flex-wrap gap-2 group-has-[.has-content]/message:hidden">
                                 {Array.from({ length: 7 }).map((_, index) => (
                                     <div
                                         key={index}
@@ -54,6 +55,7 @@ export function AIChatMessages(props: {
                                 ))}
                             </div>
                         ) : null}
+
                         {isLastMessage ? (
                             <AIChatFollowupSuggestions
                                 chat={chat}

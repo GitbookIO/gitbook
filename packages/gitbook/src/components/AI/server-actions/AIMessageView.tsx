@@ -1,4 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
+import { tcls } from '@/lib/tailwind';
 import type { AIMessage } from '@gitbook/api';
 import { DocumentView } from '../../DocumentView';
 import { AIToolCallsSummary } from './AIToolCallsSummary';
@@ -19,7 +20,13 @@ export function AIMessageView(
         <div className="flex flex-col gap-2">
             {message.steps.map((step, index) => {
                 return (
-                    <div key={index} className="flex animate-[fadeIn_500ms_both] flex-col gap-2">
+                    <div
+                        key={index}
+                        className={tcls(
+                            'flex animate-[fadeIn_500ms_both] flex-col gap-2',
+                            step.content.nodes.length > 0 ? 'has-content' : ''
+                        )}
+                    >
                         <DocumentView
                             document={step.content}
                             context={{
@@ -28,8 +35,9 @@ export function AIMessageView(
                                 wrapBlocksInSuspense: false,
                                 shouldRenderLinkPreviews: true,
                             }}
-                            style={['space-y-4']}
+                            style="mt-2 space-y-4 empty:hidden"
                         />
+
                         {renderToolCalls && step.toolCalls && step.toolCalls.length > 0 ? (
                             <AIToolCallsSummary toolCalls={step.toolCalls} context={context} />
                         ) : null}

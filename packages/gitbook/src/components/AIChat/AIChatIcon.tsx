@@ -54,7 +54,7 @@ export const AIChatIcon = ({
                     state === 'intro' &&
                         'animate-[fadeIn_.5s_.7s_both,spin_2s_1s_forwards_cubic-bezier(.43,1.54,.64,1)]',
                     (state === 'working' || state === 'thinking') &&
-                        'animate-[fadeIn_.5s_.3s_both,spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]',
+                        'animate-[fadeIn_.5s_.3s_both,spin_2s_1s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]',
                     state === 'done' && 'animate-[fadeOut_.5s_both]',
                     state === 'default' && 'animate-[fadeIn_0s_both]',
                     state === 'error' && 'hidden'

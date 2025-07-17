@@ -241,7 +241,7 @@ function AIChatError(props: { chatController: AIChatController }) {
     const { chatController } = props;
 
     return (
-        <div className="flex flex-wrap justify-between gap-2 rounded-md bg-danger p-3 text-danger text-sm ring-1 ring-danger">
+        <div className="flex animate-scaleIn flex-wrap justify-between gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md bg-danger px-3 py-2 text-danger text-sm ring-1 ring-danger">
             <div className="flex items-center gap-2">
                 <Icon icon="exclamation-triangle" className="size-3.5" />
                 <span className="flex items-center gap-1">{t(language, 'ai_chat_error')}</span>
