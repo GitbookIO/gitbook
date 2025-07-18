@@ -94,6 +94,8 @@ export const no: TranslationLanguage = {
     ai_chat_tools_listed_pages: 'Bladde gjennom docs',
     ai_chat_tools_read_page: 'Leste side ${1}',
     ai_chat_tools_mcp_tool: 'Kallte ${1}',
+    ai_chat_feedback_positive: 'Godt svar',
+    ai_chat_feedback_negative: 'Dårlig svar',
     ai_chat_ask: 'Spør ${1}',
     ai_chat_ask_about_page: 'Spør ${1} om denne siden',
     copy_for_llms: 'Kopier for LLMs',

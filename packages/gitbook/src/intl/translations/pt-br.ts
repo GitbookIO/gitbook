@@ -94,6 +94,8 @@ export const pt_br = {
     ai_chat_tools_listed_pages: 'Navegou pelos docs',
     ai_chat_tools_read_page: 'Leu a página ${1}',
     ai_chat_tools_mcp_tool: 'Chamou ${1}',
+    ai_chat_feedback_positive: 'Boa resposta',
+    ai_chat_feedback_negative: 'Má resposta',
     ai_chat_ask: 'Perguntar a ${1}',
     ai_chat_ask_about_page: 'Perguntar a ${1} sobre esta página',
     copy_for_llms: 'Copiar para LLMs',

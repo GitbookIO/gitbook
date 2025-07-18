@@ -94,6 +94,8 @@ export const fr: TranslationLanguage = {
     ai_chat_tools_listed_pages: 'Parcouru les docs',
     ai_chat_tools_read_page: 'Lu la page ${1}',
     ai_chat_tools_mcp_tool: 'Appelé ${1}',
+    ai_chat_feedback_positive: 'Bonne réponse',
+    ai_chat_feedback_negative: 'Mauvaise réponse',
     ai_chat_ask: 'Demander à ${1}',
     ai_chat_ask_about_page: 'Demander à ${1} au sujet de cette page',
     copy_for_llms: 'Copier pour les LLMs',

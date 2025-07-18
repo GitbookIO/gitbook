@@ -94,6 +94,8 @@ export const ja: TranslationLanguage = {
     ai_chat_tools_listed_pages: 'ドキュメントを閲覧',
     ai_chat_tools_read_page: 'ページ ${1} を読みました',
     ai_chat_tools_mcp_tool: '${1} を呼び出しました',
+    ai_chat_feedback_positive: '良い回答',
+    ai_chat_feedback_negative: '悪い回答',
     ai_chat_ask: '${1} に質問する',
     ai_chat_ask_about_page: 'このページについて ${1} に質問する',
     copy_for_llms: 'LLM 用にコピー',

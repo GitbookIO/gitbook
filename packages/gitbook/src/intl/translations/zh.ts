@@ -91,6 +91,8 @@ export const zh: TranslationLanguage = {
     ai_chat_tools_listed_pages: '浏览了文档',
     ai_chat_tools_read_page: '已读取页面 ${1}',
     ai_chat_tools_mcp_tool: '调用了 ${1}',
+    ai_chat_feedback_positive: '好的回答',
+    ai_chat_feedback_negative: '不好的回答',
     ai_chat_ask: '向 ${1} 提问',
     ai_chat_ask_about_page: '向 ${1} 提问有关此页面',
     copy_for_llms: '为 LLMs 复制',

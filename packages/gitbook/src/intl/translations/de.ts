@@ -94,6 +94,8 @@ export const de = {
     ai_chat_tools_listed_pages: 'Docs durchsucht',
     ai_chat_tools_read_page: 'Seite ${1} gelesen',
     ai_chat_tools_mcp_tool: 'Aufgerufen ${1}',
+    ai_chat_feedback_positive: 'Gute Antwort',
+    ai_chat_feedback_negative: 'Schlechte Antwort',
     ai_chat_ask: 'Frage ${1}',
     ai_chat_ask_about_page: 'Frage ${1} zu dieser Seite',
     copy_for_llms: 'Für LLMs kopieren',

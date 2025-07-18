@@ -92,6 +92,8 @@ export const en = {
     ai_chat_tools_listed_pages: 'Browsed the docs',
     ai_chat_tools_read_page: 'Read page ${1}',
     ai_chat_tools_mcp_tool: 'Called ${1}',
+    ai_chat_feedback_positive: 'Good response',
+    ai_chat_feedback_negative: 'Bad response',
     ai_chat_ask: 'Ask ${1}',
     ai_chat_ask_about_page: 'Ask ${1} about this page',
     copy_for_llms: 'Copy for LLMs',

@@ -96,6 +96,8 @@ export const es: TranslationLanguage = {
     ai_chat_tools_listed_pages: 'Exploró los docs',
     ai_chat_tools_read_page: 'Leyó la página ${1}',
     ai_chat_tools_mcp_tool: 'Llamó a ${1}',
+    ai_chat_feedback_positive: 'Buena respuesta',
+    ai_chat_feedback_negative: 'Mala respuesta',
     ai_chat_ask: 'Preguntar ${1}',
     ai_chat_ask_about_page: 'Preguntar a ${1} sobre esta página',
     copy_for_llms: 'Copiar para LLMs',

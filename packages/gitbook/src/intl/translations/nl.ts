@@ -94,6 +94,8 @@ export const nl: TranslationLanguage = {
     ai_chat_tools_listed_pages: 'Docs doorzocht',
     ai_chat_tools_read_page: 'Pagina ${1} gelezen',
     ai_chat_tools_mcp_tool: '${1} aangeroepen',
+    ai_chat_feedback_positive: 'Goed antwoord',
+    ai_chat_feedback_negative: 'Slecht antwoord',
     ai_chat_ask: 'Vraag ${1}',
     ai_chat_ask_about_page: 'Vraag ${1} over deze pagina',
     copy_for_llms: 'Kopiëren voor LLMs',
