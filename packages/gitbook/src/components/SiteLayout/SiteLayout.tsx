@@ -12,6 +12,7 @@ import { SpaceLayout } from '@/components/SpaceLayout';
 import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
+import { hash } from 'node:crypto';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
@@ -46,10 +47,17 @@ export async function SiteLayout(props: {
         });
     });
 
+    // Set the adaptive content hash to the current version of the content.
+    const adaptiveContentHash =
+        Object.keys(visitorAuthClaims).length > 0
+            ? hash('sha256', JSON.stringify(visitorAuthClaims))
+            : undefined;
+
     return (
         <NuqsAdapter>
             <ClientContexts
                 nonce={nonce}
+                adaptiveContentHash={adaptiveContentHash}
                 forcedTheme={
                     forcedTheme ??
                     (customization.themes.toggeable ? undefined : customization.themes.default)

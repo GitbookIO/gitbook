@@ -9,9 +9,10 @@ export function ClientContexts(props: {
     nonce?: string;
     forcedTheme: CustomizationThemeMode | undefined;
     externalLinksTarget: SiteExternalLinksTarget;
+    adaptiveContentHash?: string;
     children: React.ReactNode;
 }) {
-    const { children, forcedTheme, externalLinksTarget } = props;
+    const { children, forcedTheme, externalLinksTarget, adaptiveContentHash } = props;
 
     /**
      * A bug in ThemeProvider is causing the nonce to be included incorrectly
@@ -24,7 +25,7 @@ export function ClientContexts(props: {
 
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
-            <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
+            <LinkSettingsContext.Provider value={{ externalLinksTarget, adaptiveContentHash }}>
                 {children}
             </LinkSettingsContext.Provider>
         </ThemeProvider>

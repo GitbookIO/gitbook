@@ -37,6 +37,10 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
  */
 export const LinkSettingsContext = React.createContext<{
     externalLinksTarget: SiteExternalLinksTarget;
+    /**
+     * Adaptive content hash used to determine the version of the content that should be displayed.
+     */
+    adaptiveContentHash?: string;
 }>({
     externalLinksTarget: SiteExternalLinksTarget.Self,
 });
@@ -70,7 +74,7 @@ export const Link = React.forwardRef(function Link(
     ref: React.Ref<HTMLAnchorElement>
 ) {
     const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
-    const { externalLinksTarget } = React.useContext(LinkSettingsContext);
+    const { externalLinksTarget, adaptiveContentHash } = React.useContext(LinkSettingsContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalLink(href);
@@ -123,10 +127,14 @@ export const Link = React.forwardRef(function Link(
         );
     }
 
+    const newHref = adaptiveContentHash
+        ? `${href}${href.includes('?') ? '&' : '?'}ach=${adaptiveContentHash}`
+        : href;
+
     return (
         <NextLink
             ref={ref}
-            href={href}
+            href={newHref}
             prefetch={prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
