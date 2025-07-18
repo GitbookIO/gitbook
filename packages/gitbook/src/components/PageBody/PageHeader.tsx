@@ -32,7 +32,7 @@ export async function PageHeader(props: {
         <header
             className={tcls(
                 'max-w-3xl',
-                'page-full-width:max-w-screen-2xl',
+                'page-width-wide:max-w-screen-2xl',
                 'mx-auto',
                 'mb-6',
                 'space-y-3',
