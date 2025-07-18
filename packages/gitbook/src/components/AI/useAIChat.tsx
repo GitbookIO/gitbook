@@ -11,6 +11,7 @@ import { useAIMessageContextRef } from './useAIMessageContext';
 export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
+    query?: string;
 };
 
 export type AIChatState = {
@@ -23,6 +24,11 @@ export type AIChatState = {
      * ID of the latest AI response.
      */
     responseId: string | null;
+
+    /**
+     * The latest query sent to the AI.
+     */
+    query: string | null;
 
     /**
      * Messages in the session.
@@ -73,6 +79,7 @@ const globalState = zustand.create<{
             opened: false,
             responseId: null,
             messages: [],
+            query: null,
             followUpSuggestions: [],
             loading: false,
             error: false,
@@ -106,6 +113,7 @@ export function useAIChatController(): AIChatController {
                     opened: state.opened,
                     loading: false,
                     messages: [],
+                    query: null,
                     followUpSuggestions: [],
                     responseId: null,
                     error: false,
@@ -128,6 +136,7 @@ export function useAIChatController(): AIChatController {
                                 content: null,
                             },
                         ],
+                        query: input.message,
                         followUpSuggestions: [],
                         loading: true,
                         error: false,
