@@ -22,16 +22,18 @@ export async function PageHeader(props: {
 
     const withAIChat = isAIChatEnabled(context);
 
+    const pageActions = context.customization.pageActions
+        ? { ...context.customization.pageActions }
+        : {
+              // TODO: After 25/07/2025, we can remove this default values as the cache will be updated
+              markdown: true,
+              externalAI: true,
+          };
+
     if (context.site.visibility !== SiteVisibility.Public) {
         // @TODO: remove once we handle this default-for-private-sites in the API
-        context.customization.pageActions.externalAI = false;
+        pageActions.externalAI = false;
     }
-
-    const pageActions = context.customization.pageActions ?? {
-        // TODO: After 25/07/2025, we can remove this default values as the cache will be updated
-        markdown: true,
-        externalAI: true,
-    };
 
     return (
         <header
