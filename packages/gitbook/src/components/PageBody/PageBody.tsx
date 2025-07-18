@@ -93,19 +93,28 @@ export function PageBody(props: {
                     <PageFooterNavigation context={context} page={page} />
                 ) : null}
 
-                <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
-                    {updatedAt ? (
-                        <p className="mr-auto text-sm">
-                            {t(language, 'page_last_modified', <DateRelative value={updatedAt} />)}
-                        </p>
-                    ) : null}
-                    {withPageFeedback ? (
-                        <PageFeedbackForm
-                            className={page.layout.outline ? 'xl:hidden' : ''}
-                            pageId={page.id}
-                        />
-                    ) : null}
-                </div>
+                {
+                    // TODO: after 25/07/2025, we can chage it to a true check as the cache will be updated
+                    page.layout.metadata !== false ? (
+                        <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
+                            {updatedAt ? (
+                                <p className="mr-auto text-sm ">
+                                    {t(
+                                        language,
+                                        'page_last_modified',
+                                        <DateRelative value={updatedAt} />
+                                    )}
+                                </p>
+                            ) : null}
+                            {withPageFeedback ? (
+                                <PageFeedbackForm
+                                    className={page.layout.outline ? 'xl:hidden' : ''}
+                                    pageId={page.id}
+                                />
+                            ) : null}
+                        </div>
+                    ) : null
+                }
             </main>
 
             <TrackPageViewEvent />
