@@ -27,6 +27,12 @@ export async function PageHeader(props: {
         context.customization.pageActions.externalAI = false;
     }
 
+    const pageActions = context.customization.pageActions ?? {
+        // TODO: After 25/07/2025, we can remove this default values as the cache will be updated
+        markdown: true,
+        externalAI: true,
+    };
+
     return (
         <header
             className={tcls(
@@ -41,9 +47,7 @@ export async function PageHeader(props: {
         >
             {page.layout.tableOfContents &&
             // Show page actions if *any* of the actions are enabled
-            (withAIChat ||
-                context.customization.pageActions.markdown ||
-                context.customization.pageActions.externalAI) ? (
+            (withAIChat || pageActions.markdown || pageActions.externalAI) ? (
                 <div
                     className={tcls(
                         'float-right mb-2 ml-4',
@@ -54,13 +58,7 @@ export async function PageHeader(props: {
                         markdownPageUrl={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
                         withAIChat={withAIChat}
                         trademark={context.customization.trademark.enabled}
-                        actions={
-                            context.customization.pageActions ?? {
-                                // TODO: After 25/07/2025, we can remove this default values as the cache will be updated
-                                markdown: true,
-                                externalAI: true,
-                            }
-                        }
+                        actions={pageActions}
                     />
                 </div>
             ) : null}
