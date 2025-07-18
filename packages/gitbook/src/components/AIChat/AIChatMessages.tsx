@@ -59,10 +59,10 @@ export function AIChatMessages(props: {
 
                         {isLastMessage ? (
                             <>
-                                {!chat.loading && !chat.error && chat.responseId && (
+                                {!chat.loading && !chat.error && chat.query && chat.responseId && (
                                     <AIResponseFeedback
                                         responseId={chat.responseId}
-                                        query={chat.messages[0].content?.toString() ?? ''} // Use the first (user) message as the query for the chat
+                                        query={chat.query}
                                         className="-ml-1 -mt-4"
                                     />
                                 )}
