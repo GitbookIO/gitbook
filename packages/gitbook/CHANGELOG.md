@@ -1,5 +1,12 @@
 # gitbook
 
+## 0.14.1
+
+### Patch Changes
+
+- eb1bd3a: AI response feedback buttons
+- 611e286: Remove padding on first Heading in Columns
+
 ## 0.14.0
 
 ### Minor Changes
