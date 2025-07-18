@@ -77,19 +77,21 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
             if (typeof window !== 'undefined') {
                 setHighlighting(true);
-                highlightCodeBlock(block, inlines).then((lines) => {
-                    if (cancelled) {
-                        return;
-                    }
+                highlightCodeBlock(block, inlines)
+                    .then((lines) => {
+                        if (cancelled) {
+                            return;
+                        }
 
-                    setLines(lines);
-                    setHighlighting(false);
-                }).catch((error) => {
-                    console.error('Failed to highlight code block:', error);
-                    if (!cancelled) {
+                        setLines(lines);
                         setHighlighting(false);
-                    }
-                });
+                    })
+                    .catch((error) => {
+                        console.error('Failed to highlight code block:', error);
+                        if (!cancelled) {
+                            setHighlighting(false);
+                        }
+                    });
             }
 
             return () => {
