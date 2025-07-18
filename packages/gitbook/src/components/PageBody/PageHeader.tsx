@@ -54,7 +54,13 @@ export async function PageHeader(props: {
                         markdownPageUrl={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
                         withAIChat={withAIChat}
                         trademark={context.customization.trademark.enabled}
-                        actions={context.customization.pageActions}
+                        actions={
+                            context.customization.pageActions ?? {
+                                // TODO: After 25/07/2025, we can remove this default values as the cache will be updated
+                                markdown: true,
+                                externalAI: true,
+                            }
+                        }
                     />
                 </div>
             ) : null}
