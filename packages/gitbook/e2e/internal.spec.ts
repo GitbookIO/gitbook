@@ -933,6 +933,22 @@ const testCases: TestsCase[] = [
         ]),
     },
     {
+        name: 'Page actions',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Without page actions',
+                url: getCustomizationURL({
+                    pageActions: {
+                        markdown: false,
+                        externalAI: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
         name: 'Ads',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
