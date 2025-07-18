@@ -9,7 +9,7 @@ import { Button } from '../primitives';
 
 export function AIResponseFeedback(props: {
     className?: ClassValue;
-    responseId?: string;
+    responseId: string;
     query: string;
 }) {
     const { className, responseId, query } = props;
@@ -28,7 +28,7 @@ export function AIResponseFeedback(props: {
             <Button
                 icon="thumbs-up"
                 iconOnly
-                label={tString(language, 'ai_chat_feedback_positive')}
+                label={tString(language, 'was_this_helpful_positive_label')}
                 variant="blank"
                 className={tcls(
                     'animate-fadeIn overflow-hidden text-tint-subtle transition-all',
@@ -44,7 +44,7 @@ export function AIResponseFeedback(props: {
             <Button
                 icon="thumbs-down"
                 iconOnly
-                label={tString(language, 'ai_chat_feedback_negative')}
+                label={tString(language, 'was_this_helpful_negative_label')}
                 variant="blank"
                 className={tcls(
                     'animate-fadeIn overflow-hidden text-tint-subtle transition-all',

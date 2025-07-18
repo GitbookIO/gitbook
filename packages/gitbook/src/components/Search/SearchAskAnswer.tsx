@@ -152,7 +152,8 @@ function AnswerBody(props: { query: string; answer: AskAnswerResult }) {
             <div data-testid="search-ask-answer" className="text-tint-strong">
                 {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.sources.length > 0 ? (
-                    <AIResponseFeedback query={query} className="-ml-1 mt-2" />
+                    // @TODO: Add responseId once search uses new AI endpoint
+                    <AIResponseFeedback query={query} className="-ml-1 mt-2" responseId="" />
                 ) : null}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
