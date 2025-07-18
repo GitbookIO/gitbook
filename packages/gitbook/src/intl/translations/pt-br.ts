@@ -32,6 +32,8 @@ export const pt_br = {
     was_this_helpful_negative: 'Não',
     was_this_helpful_thank_you: 'Obrigado!',
     was_this_helpful_comment: 'Gostaria de adicionar algo?',
+    was_this_helpful_positive_label: 'Útil',
+    was_this_helpful_negative_label: 'Não útil',
     submit: 'Enviar',
     annotation_button_label: 'Abrir anotação',
     code_copied: 'Copiado!',

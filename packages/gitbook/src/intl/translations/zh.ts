@@ -33,6 +33,8 @@ export const zh: TranslationLanguage = {
     was_this_helpful_negative: '不',
     was_this_helpful_thank_you: '谢谢！',
     was_this_helpful_comment: '您有什么想补充的吗?',
+    was_this_helpful_positive_label: '有帮助',
+    was_this_helpful_negative_label: '没有帮助',
     submit: '提交',
     annotation_button_label: '打开批注',
     code_copied: '已复制！',

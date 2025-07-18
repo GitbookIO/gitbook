@@ -31,6 +31,8 @@ export const variantClasses = {
         'hover:text-contrast-primary-solid-hover',
         'border-0',
         'contrast-more:border-1',
+        'disabled:bg-tint',
+        'disabled:text-tint/8',
     ],
     blank: [
         'bg-transparent',
@@ -42,6 +44,8 @@ export const variantClasses = {
         'hover:scale-1',
         'contrast-more:bg-tint-subtle',
         'depth-subtle:hover:translate-y-0',
+        'disabled:text-tint/8',
+        'disabled:bg-transparent',
     ],
     secondary: [
         'bg-tint',
@@ -51,6 +55,8 @@ export const variantClasses = {
         'depth-flat:hover:bg-tint-hover',
         'hover:text-primary',
         'contrast-more:bg-tint-subtle',
+        'disabled:bg-transparent',
+        'disabled:text-tint/8',
     ],
     header: [
         'bg-tint-base text-tint',
@@ -75,7 +81,7 @@ export const variantClasses = {
 
 const activeClasses = {
     primary: 'bg-primary-solid-hover',
-    blank: 'bg-primary-active text-primary-strong font-medium hover:text-primary-strong hover:bg-primary-active',
+    blank: 'bg-primary-active disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active',
     secondary: 'bg-tint-active',
     header: 'bg-header-link/3',
 };
@@ -99,13 +105,14 @@ export const Button = React.forwardRef<
             children,
             active,
             trailing,
+            disabled,
             ...rest
         },
         ref
     ) => {
         const sizes = {
             default: ['text-base', 'font-semibold', 'px-5', 'py-2', 'circular-corners:px-6'],
-            medium: ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
+            medium: ['text-sm', iconOnly ? 'px-2' : 'px-3.5', 'py-1.5', 'circular-corners:px-4'],
             small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
             xsmall: ['text-xs', 'py-1', iconOnly ? 'px-1.5' : 'px-2'],
         };
@@ -142,6 +149,7 @@ export const Button = React.forwardRef<
                     classNames={['ButtonStyles']}
                     insights={insights}
                     aria-label={label?.toString()}
+                    aria-pressed={active === undefined ? undefined : active}
                     target={target}
                     {...rest}
                 >
@@ -156,12 +164,24 @@ export const Button = React.forwardRef<
                 type="button"
                 className={tcls(buttonOnlyClassNames, domClassName)}
                 aria-label={label?.toString()}
+                aria-pressed={active === undefined ? undefined : active}
+                disabled={disabled}
                 {...rest}
             >
                 {content}
             </button>
         );
 
-        return iconOnly && label ? <Tooltip label={label}>{button}</Tooltip> : button;
+        return iconOnly && label ? (
+            <Tooltip
+                rootProps={{ open: disabled === true ? false : undefined }}
+                label={label}
+                triggerProps={{ disabled }}
+            >
+                {button}
+            </Tooltip>
+        ) : (
+            button
+        );
     }
 );

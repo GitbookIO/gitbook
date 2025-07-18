@@ -318,10 +318,6 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         feedback: {
             enabled: false,
         },
-        // TODO: remove aiSearch once the cache has been fully updated (after 11/07/2025)
-        aiSearch: {
-            enabled: true,
-        },
         ai: {
             mode: CustomizationAIMode.None,
         },
@@ -336,6 +332,10 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         },
         pagination: {
             enabled: true,
+        },
+        pageActions: {
+            externalAI: true,
+            markdown: true,
         },
         trademark: {
             enabled: true,

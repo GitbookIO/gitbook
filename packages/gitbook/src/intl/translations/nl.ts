@@ -34,6 +34,8 @@ export const nl: TranslationLanguage = {
     was_this_helpful_negative: 'Nee',
     was_this_helpful_thank_you: 'Bedankt!',
     was_this_helpful_comment: 'Nog iets toe te voegen?',
+    was_this_helpful_positive_label: 'Nuttig',
+    was_this_helpful_negative_label: 'Niet nuttig',
     submit: 'Versturen',
     annotation_button_label: 'Open annotatie',
     code_copied: 'Gekopieerd!',

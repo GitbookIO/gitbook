@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import type { RevisionPage } from '@gitbook/api';
+import {
+    type RevisionPage,
+    RevisionPageLayoutOptionsCoverSize,
+    RevisionPageLayoutOptionsWidth,
+} from '@gitbook/api';
 
 import { resolveFirstDocument, resolvePagePath, resolvePagePathDocumentOrGroup } from './pages';
 
@@ -28,11 +32,14 @@ describe('resolveFirstDocument', () => {
                         pages: [],
                         layout: {
                             cover: true,
+                            coverSize: RevisionPageLayoutOptionsCoverSize.Full,
                             title: true,
                             description: true,
                             tableOfContents: true,
                             outline: true,
                             pagination: true,
+                            width: RevisionPageLayoutOptionsWidth.Default,
+                            metadata: true,
                         },
                     },
                 ],
@@ -75,11 +82,14 @@ describe('resolveFirstDocument', () => {
                 pages: [],
                 layout: {
                     cover: true,
+                    coverSize: RevisionPageLayoutOptionsCoverSize.Full,
                     title: true,
                     description: true,
                     tableOfContents: true,
                     outline: true,
                     pagination: true,
+                    width: RevisionPageLayoutOptionsWidth.Default,
+                    metadata: true,
                 },
             },
         ];
@@ -115,11 +125,14 @@ describe('resolvePagePath', () => {
                 pages: [],
                 layout: {
                     cover: true,
+                    coverSize: RevisionPageLayoutOptionsCoverSize.Full,
                     title: true,
                     description: true,
                     tableOfContents: true,
                     outline: true,
                     pagination: true,
+                    width: RevisionPageLayoutOptionsWidth.Default,
+                    metadata: true,
                 },
             },
         ];
@@ -185,11 +198,14 @@ describe('resolvePagePath', () => {
                         pages: [],
                         layout: {
                             cover: true,
+                            coverSize: RevisionPageLayoutOptionsCoverSize.Full,
                             title: true,
                             description: true,
                             tableOfContents: true,
                             outline: true,
                             pagination: true,
+                            width: RevisionPageLayoutOptionsWidth.Default,
+                            metadata: true,
                         },
                     },
                 ],
