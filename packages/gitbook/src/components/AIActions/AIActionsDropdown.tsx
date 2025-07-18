@@ -8,6 +8,7 @@ import {
 } from '@/components/AIActions/AIActions';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenu } from '@/components/primitives/DropdownMenu';
+import type { SiteCustomizationSettings } from '@gitbook/api';
 
 import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
@@ -16,10 +17,7 @@ interface AIActionsDropdownProps {
     markdownPageUrl: string;
     withAIChat?: boolean;
     trademark: boolean;
-    /**
-     * Whether to include the "Open in LLM" entries in the dropdown menu.
-     */
-    withLLMActions?: boolean;
+    actions: SiteCustomizationSettings['pageActions'];
 }
 
 /**
@@ -59,7 +57,7 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
  * The content of the dropdown menu.
  */
 function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
-    const { markdownPageUrl, withAIChat, trademark, withLLMActions } = props;
+    const { markdownPageUrl, withAIChat, trademark, actions } = props;
 
     return (
         <>
@@ -67,14 +65,18 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
                 <OpenDocsAssistant trademark={trademark} type="dropdown-menu-item" />
             ) : null}
 
-            <CopyMarkdown
-                isDefaultAction={!withAIChat}
-                markdownPageUrl={markdownPageUrl}
-                type="dropdown-menu-item"
-            />
-            <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="dropdown-menu-item" />
+            {actions.markdown ? (
+                <>
+                    <CopyMarkdown
+                        isDefaultAction={!withAIChat}
+                        markdownPageUrl={markdownPageUrl}
+                        type="dropdown-menu-item"
+                    />
+                    <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="dropdown-menu-item" />
+                </>
+            ) : null}
 
-            {withLLMActions ? (
+            {actions.externalAI ? (
                 <>
                     <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="dropdown-menu-item" />
                     <OpenInLLM provider="claude" url={markdownPageUrl} type="dropdown-menu-item" />
@@ -88,17 +90,27 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
  * A default action shown as a quick-access button beside the dropdown menu
  */
 function DefaultAction(props: AIActionsDropdownProps) {
-    const { markdownPageUrl, withAIChat, trademark } = props;
+    const { markdownPageUrl, withAIChat, trademark, actions } = props;
 
     if (withAIChat) {
         return <OpenDocsAssistant trademark={trademark} type="button" />;
     }
 
-    return (
-        <CopyMarkdown
-            isDefaultAction={!withAIChat}
-            markdownPageUrl={markdownPageUrl}
-            type="button"
-        />
-    );
+    if (actions.markdown) {
+        return (
+            <CopyMarkdown
+                isDefaultAction={!withAIChat}
+                markdownPageUrl={markdownPageUrl}
+                type="button"
+            />
+        );
+    }
+
+    if (actions.externalAI) {
+        return (
+            <>
+                <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="button" />
+            </>
+        );
+    }
 }
