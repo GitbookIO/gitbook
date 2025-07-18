@@ -10,6 +10,7 @@ import type { BlockProps } from '../Block';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
 import type { HighlightLine, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
+import { highlightCodeBlock } from './server-actions';
 
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
@@ -28,10 +29,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const [lines, setLines] = useState<null | HighlightLine[]>(null);
     const [highlighting, setHighlighting] = useState(false);
 
-    // Preload the highlighter when the block is mounted.
-    useEffect(() => {
-        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block));
-    }, [block]);
+    // Note: Preloading is not needed since we're using server actions for highlighting
 
     // When user scrolls, we need to wait for the scroll to finish before running the highlight
     const isScrollingRef = useRef(false);
@@ -79,16 +77,21 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
             if (typeof window !== 'undefined') {
                 setHighlighting(true);
-                import('./highlight').then(({ highlight }) => {
-                    highlight(block, inlines).then((lines) => {
+                highlightCodeBlock(block, inlines)
+                    .then((lines) => {
                         if (cancelled) {
                             return;
                         }
 
                         setLines(lines);
                         setHighlighting(false);
+                    })
+                    .catch((error) => {
+                        console.error('Failed to highlight code block:', error);
+                        if (!cancelled) {
+                            setHighlighting(false);
+                        }
                     });
-                });
             }
 
             return () => {
