@@ -3,7 +3,7 @@ import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import type { RevisionPageDocument } from '@gitbook/api';
+import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
@@ -21,6 +21,11 @@ export async function PageHeader(props: {
     }
 
     const withAIChat = isAIChatEnabled(context);
+
+    if (context.site.visibility !== SiteVisibility.Public) {
+        // @TODO: remove once we handle this default-for-private-sites in the API
+        context.customization.pageActions.externalAI = false;
+    }
 
     return (
         <header
