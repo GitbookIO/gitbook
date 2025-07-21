@@ -7,6 +7,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { useContentKitClientContext } from './context';
 import type { ContentKitClientElementProps } from './types';
+import { ElementModal } from './ElementModal';
 
 export function ElementButton(
     props: ContentKitClientElementProps<ContentKitButton> & {
@@ -18,12 +19,12 @@ export function ElementButton(
     const clientContext = useContentKitClientContext();
 
     const [loading, setLoading] = React.useState(false);
-
-    // TODO:
-    // - confirm dialog
+    const [confirm, setConfirm] = React.useState<boolean>(false);
 
     return (
+        <>
         <button
+            type="button"
             title={element.tooltip}
             className={classNames(
                 'contentkit-button',
@@ -35,6 +36,12 @@ export function ElementButton(
                 }
 
                 event.stopPropagation();
+                event.preventDefault();
+                
+                if (element.confirm && !confirm) {
+                    setConfirm(true);
+                    return;
+                }
 
                 setLoading(true);
                 clientContext.dispatchAction(element.onPress).finally(() => {
@@ -54,5 +61,44 @@ export function ElementButton(
                 </>
             )}
         </button>
+        {element.confirm && confirm ? <Confirm open={confirm} {...element.confirm} onConfirm={() => {
+            setConfirm(false)
+            setLoading(true);
+            clientContext.dispatchAction(element.onPress).finally(() => {
+               setLoading(false);
+            });
+        }} onCancel={() => setConfirm(false)} /> : null}
+        </>
     );
+}
+
+function Confirm({ open, onCancel, onConfirm, style, title, text, confirm }: any) {
+   return <div className='contentkit-modal-backdrop' onClick={onCancel}>
+        <div
+            className={classNames(
+                'contentkit-modal contentkit-modal-confirm',
+                open ? 'contentkit-modal-opened' : null
+            )}
+            onClick={(event) => {
+                event.stopPropagation();
+            }}
+        >
+            <div className='contentkit-modal-header'>
+                {title ? (
+                    <h1 className='contentkit-modal-title'>{title}</h1>
+                ) : null}
+                {text ? <div className="contentkit-modal-subtitle">{text}</div> : null}
+               
+            </div>
+            <div className='contentkit-modal-footer'>
+                 <button type="button" className='contentkit-button contentkit-button-confirm contentkit-button-style-secondary' onClick={onCancel}>
+                     Cancel
+                </button>
+                 <button type="button" className={classNames('contentkit-button contentkit-button-confirm',
+                `contentkit-button-style-${style ?? 'primary'}`)} onClick={onConfirm}>
+                    {confirm ?? 'OK'}
+                </button>
+            </div>
+        </div>
+    </div>
 }
