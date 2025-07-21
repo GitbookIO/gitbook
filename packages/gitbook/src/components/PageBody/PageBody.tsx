@@ -40,8 +40,8 @@ export function PageBody(props: {
               LINK_PREVIEW_MAX_COUNT
           )
         : false;
-    const pageFullWidth = page.id === 'wtthNFMqmEQmnt5LKR0q';
-    const asFullWidth = pageFullWidth || contentFullWidth;
+    const pageWidthWide = page.layout.width === 'wide';
+    const siteWidthWide = pageWidthWide || contentFullWidth;
     const language = getSpaceLanguage(customization);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
@@ -53,12 +53,12 @@ export function PageBody(props: {
                     'mx-auto max-w-screen-2xl py-8',
                     // Allow words to break if they are too long.
                     'break-anywhere',
-                    pageFullWidth ? 'page-full-width 2xl:px-8' : 'page-default-width',
-                    asFullWidth ? 'site-full-width' : 'site-default-width',
+                    pageWidthWide ? 'page-width-wide 2xl:px-8' : 'page-width-default',
+                    siteWidthWide ? 'site-width-wide' : 'site-width-default',
                     page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'
                 )}
             >
-                <PreservePageLayout asFullWidth={asFullWidth} />
+                <PreservePageLayout siteWidthWide={siteWidthWide} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
@@ -93,19 +93,28 @@ export function PageBody(props: {
                     <PageFooterNavigation context={context} page={page} />
                 ) : null}
 
-                <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
-                    {updatedAt ? (
-                        <p className="mr-auto text-sm">
-                            {t(language, 'page_last_modified', <DateRelative value={updatedAt} />)}
-                        </p>
-                    ) : null}
-                    {withPageFeedback ? (
-                        <PageFeedbackForm
-                            className={page.layout.outline ? 'xl:hidden' : ''}
-                            pageId={page.id}
-                        />
-                    ) : null}
-                </div>
+                {
+                    // TODO: after 25/07/2025, we can chage it to a true check as the cache will be updated
+                    page.layout.metadata !== false ? (
+                        <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
+                            {updatedAt ? (
+                                <p className="mr-auto text-sm ">
+                                    {t(
+                                        language,
+                                        'page_last_modified',
+                                        <DateRelative value={updatedAt} />
+                                    )}
+                                </p>
+                            ) : null}
+                            {withPageFeedback ? (
+                                <PageFeedbackForm
+                                    className={page.layout.outline ? 'xl:hidden' : ''}
+                                    pageId={page.id}
+                                />
+                            ) : null}
+                        </div>
+                    ) : null
+                }
             </main>
 
             <TrackPageViewEvent />

@@ -71,11 +71,13 @@ export async function PageBodyBlankslate(props: {
             className={tcls(
                 'grid',
                 'max-w-3xl',
+                'page-width-wide:max-w-screen-2xl',
                 'w-full',
                 'mx-auto',
                 'gap-4',
                 'grid-cols-1',
-                'sm:grid-cols-2'
+                'sm:grid-cols-2',
+                'page-width-wide:md:grid-cols-3'
             )}
         >
             {pageElements}
