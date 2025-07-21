@@ -131,11 +131,15 @@ export const Link = React.forwardRef(function Link(
         ? `${href}${href.includes('?') ? '&' : '?'}ach=${adaptiveContentHash}`
         : href;
 
+    // Not sure why yet, but it seems necessary to force prefetch to true
+    // default behavior doesn't seem to properly use the client router cache.
+    const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
+
     return (
         <NextLink
             ref={ref}
             href={newHref}
-            prefetch={prefetch}
+            prefetch={_prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
             onClick={onClick}
