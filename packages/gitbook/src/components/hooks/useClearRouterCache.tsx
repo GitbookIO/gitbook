@@ -1,37 +1,34 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { LinkSettingsContext } from '../primitives';
+
+// We cannot use a ref here because the contextId gets reset on navigation
+// Probably because of this bug https://github.com/vercel/next.js/issues/67542
+let previousContextId: string | undefined;
 
 /**
  * A custom hook that clears the router cache on contextId change.
  * This is useful for ensuring that the router does not cache stale data for adaptive content.
  */
 export function useClearRouterCache() {
-    const { adaptiveContentHash } = useContext(LinkSettingsContext);
-    const previousAdaptiveContentHash = usePrevious(adaptiveContentHash);
-    const router = useRouter();
-
+    const { contextId } = useContext(LinkSettingsContext);
     useEffect(() => {
-        if (adaptiveContentHash !== previousAdaptiveContentHash) {
-            router.refresh(); // This will clear the router cache
+        if (previousContextId === undefined) {
+            // On the first run, we set the previousContextId to the current contextId
+            previousContextId = contextId;
+            return; // Skip the first run to avoid unnecessary reload
         }
-    }, [adaptiveContentHash, previousAdaptiveContentHash, router]);
+        // Initially, previousContextId will be undefined, so we only clear the cache
+        // if contextId has changed from a defined value to a new value.
+        // This prevents unnecessary cache clearing on the first render.
+        if (contextId !== previousContextId && previousContextId !== undefined) {
+            previousContextId = contextId;
+            window.location.reload(); // We want to trigger a full reload to clear the in memory cache
+        }
+    }, [contextId]);
 }
 
-export function usePrevious<T>(value: T): T | null {
-    const [current, setCurrent] = useState(value);
-    const [previous, setPrevious] = useState<T | null>(null);
-
-    if (value !== current) {
-        setPrevious(current);
-        setCurrent(value);
-    }
-
-    return previous;
-}
-
-export function RouterCacheClearer() {
+export const RouterCacheClearer = () => {
     useClearRouterCache();
     return null; // This component does not render anything, it just runs the hook
-}
+};
