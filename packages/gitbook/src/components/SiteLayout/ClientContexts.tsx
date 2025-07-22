@@ -3,6 +3,7 @@
 import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
 import { ThemeProvider } from 'next-themes';
 import type React from 'react';
+import { RouterCacheClearer } from '../hooks/useClearRouterCache';
 import { LinkSettingsContext } from '../primitives';
 
 export function ClientContexts(props: {
@@ -26,6 +27,7 @@ export function ClientContexts(props: {
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
             <LinkSettingsContext.Provider value={{ externalLinksTarget, adaptiveContentHash }}>
+                <RouterCacheClearer />
                 {children}
             </LinkSettingsContext.Provider>
         </ThemeProvider>

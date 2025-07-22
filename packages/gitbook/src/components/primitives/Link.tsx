@@ -74,7 +74,7 @@ export const Link = React.forwardRef(function Link(
     ref: React.Ref<HTMLAnchorElement>
 ) {
     const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
-    const { externalLinksTarget, adaptiveContentHash } = React.useContext(LinkSettingsContext);
+    const { externalLinksTarget } = React.useContext(LinkSettingsContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalLink(href);
@@ -127,10 +127,6 @@ export const Link = React.forwardRef(function Link(
         );
     }
 
-    const newHref = adaptiveContentHash
-        ? `${href}${href.includes('?') ? '&' : '?'}ach=${adaptiveContentHash}`
-        : href;
-
     // Not sure why yet, but it seems necessary to force prefetch to true
     // default behavior doesn't seem to properly use the client router cache.
     const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
@@ -138,7 +134,7 @@ export const Link = React.forwardRef(function Link(
     return (
         <NextLink
             ref={ref}
-            href={newHref}
+            href={href}
             prefetch={_prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
