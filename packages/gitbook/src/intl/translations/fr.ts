@@ -88,6 +88,7 @@ export const fr: TranslationLanguage = {
     ai_chat_context_disclaimer: "Les réponses de l'IA peuvent contenir des erreurs.",
     ai_chat_input_placeholder: 'Demander, rechercher ou effectuer une action...',
     send: 'Envoyer',
+    actions: 'Actions',
     ai_chat_suggested_questions_title: 'Questions suggérées',
     ai_chat_suggested_questions_about_this_page: 'De quoi parle cette page ?',
     ai_chat_suggested_questions_read_next: 'Que devrais-je lire ensuite ?',

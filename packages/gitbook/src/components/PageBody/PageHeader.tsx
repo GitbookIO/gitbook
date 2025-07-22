@@ -45,7 +45,7 @@ export async function PageHeader(props: {
             (withAIChat || pageActions.markdown || pageActions.externalAI) ? (
                 <div
                     className={tcls(
-                        'float-right mb-2 ml-4',
+                        'float-right mb-2 ml-4 page-api-block:xl:max-2xl:mr-[14.5rem]',
                         ancestors.length > 0 ? '-mt-2' : 'xs:mt-2'
                     )}
                 >

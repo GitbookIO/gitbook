@@ -88,6 +88,7 @@ export const de = {
     ai_chat_context_disclaimer: 'KI-Antworten können Fehler enthalten.',
     ai_chat_input_placeholder: 'Fragen, suchen oder Aktion ausführen...',
     send: 'Senden',
+    actions: 'Aktionen',
     ai_chat_suggested_questions_title: 'Vorgeschlagene Fragen',
     ai_chat_suggested_questions_about_this_page: 'Worum geht es auf dieser Seite?',
     ai_chat_suggested_questions_read_next: 'Was sollte ich als nächstes lesen?',

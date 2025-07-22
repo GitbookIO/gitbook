@@ -23,7 +23,7 @@ export function AIChatFollowupSuggestions(props: {
                         chatController.postMessage({ message: suggestion });
                     }}
                     label={suggestion}
-                    className="max-w-[80%] animate-[present_500ms_both] whitespace-normal text-left ring-1 ring-tint-subtle"
+                    className="animate-[present_500ms_both] whitespace-normal text-left ring-1 ring-tint-subtle"
                     size="medium"
                     variant="blank"
                     style={{

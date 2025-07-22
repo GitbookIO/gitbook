@@ -88,6 +88,7 @@ export const nl: TranslationLanguage = {
     ai_chat_context_disclaimer: 'AI-antwoorden kunnen fouten bevatten.',
     ai_chat_input_placeholder: 'Vraag, zoek of voer een actie uit...',
     send: 'Versturen',
+    actions: 'Acties',
     ai_chat_suggested_questions_title: 'Voorgestelde vragen',
     ai_chat_suggested_questions_about_this_page: 'Waar gaat deze pagina over?',
     ai_chat_suggested_questions_read_next: 'Wat moet ik hierna lezen?',

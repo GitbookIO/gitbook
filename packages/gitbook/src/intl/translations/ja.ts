@@ -88,6 +88,7 @@ export const ja: TranslationLanguage = {
     ai_chat_context_disclaimer: 'AIの回答には誤りが含まれる場合があります。',
     ai_chat_input_placeholder: '質問、検索、またはアクションを実行...',
     send: '送信',
+    actions: 'アクション',
     ai_chat_suggested_questions_title: 'おすすめの質問',
     ai_chat_suggested_questions_about_this_page: 'このページは何について説明していますか？',
     ai_chat_suggested_questions_read_next: '次に何を読むべきですか？',

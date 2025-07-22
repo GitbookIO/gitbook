@@ -88,6 +88,7 @@ export const pt_br = {
     ai_chat_context_disclaimer: 'Respostas de IA podem conter erros.',
     ai_chat_input_placeholder: 'Pergunte, pesquise ou execute uma ação...',
     send: 'Enviar',
+    actions: 'Ações',
     ai_chat_suggested_questions_title: 'Perguntas sugeridas',
     ai_chat_suggested_questions_about_this_page: 'Sobre o que é esta página?',
     ai_chat_suggested_questions_read_next: 'O que devo ler em seguida?',
