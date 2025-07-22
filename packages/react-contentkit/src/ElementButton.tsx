@@ -20,7 +20,7 @@ export function ElementButton(
     const [loading, setLoading] = React.useState(false);
     const [confirm, setConfirm] = React.useState<boolean>(false);
 
-    const wrapLoading = React.useCallback(async function<T>(fn: Promise<T> | (() => Promise<T>)) {
+    const wrapLoading = React.useCallback(async <T,>(fn: Promise<T> | (() => Promise<T>)) => {
         setLoading(true);
         try {
             return fn instanceof Promise ? await fn : await fn();
@@ -28,7 +28,7 @@ export function ElementButton(
             setLoading(false);
         }
     }, []);
-    
+
     return (
         <>
             <button
@@ -67,12 +67,14 @@ export function ElementButton(
                 )}
             </button>
             {element.confirm && confirm ? (
-                <Confirm
+                <ConfirmDialog
                     open={confirm}
                     {...element.confirm}
                     onConfirm={() => {
                         setConfirm(false);
-                        wrapLoading(async () => await clientContext.dispatchAction(element.onPress));
+                        wrapLoading(
+                            async () => await clientContext.dispatchAction(element.onPress)
+                        );
                     }}
                     onCancel={() => setConfirm(false)}
                 />
@@ -81,7 +83,7 @@ export function ElementButton(
     );
 }
 
-function Confirm({ open, onCancel, onConfirm, style, title, text, confirm }: any) {
+function ConfirmDialog({ open, onCancel, onConfirm, style, title, text, confirm }: any) {
     return (
         <div className="contentkit-modal-backdrop" onClick={onCancel}>
             <div
