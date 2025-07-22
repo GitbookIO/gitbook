@@ -24,11 +24,16 @@ export function ClientContexts(props: {
      */
     const nonce = typeof window === 'undefined' || !props.nonce ? props.nonce : '';
 
+    //TODO: Don't forget to remove these Links
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
             <LinkSettingsContext.Provider value={{ externalLinksTarget, contextId }}>
-                <Link href="?visitor.isDeveloper=true">Is dev true</Link>
-                <Link href="?visitor.isDeveloper=false">Is dev false</Link>
+                <Link prefetch={false} href="?visitor.isDeveloper=true">
+                    Is dev true
+                </Link>
+                <Link prefetch={false} href="?visitor.isDeveloper=false">
+                    Is dev false
+                </Link>
                 <RouterCacheClearer />
                 {children}
             </LinkSettingsContext.Provider>
