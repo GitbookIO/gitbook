@@ -298,10 +298,16 @@ const config: Config = {
             },
             animation: {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+                'present-slow': 'present 500ms cubic-bezier(0.25, 1, 0.5, 1) both',
                 scaleIn: 'scaleIn 200ms ease both',
+                'scaleIn-slow': 'scaleIn 500ms ease both',
                 scaleOut: 'scaleOut 200ms ease both',
+                'scaleOut-slow': 'scaleOut 500ms ease both',
                 fadeIn: 'fadeIn 200ms ease both',
+                'fadeIn-slow': 'fadeIn 500ms ease both',
                 fadeOut: 'fadeOut 200ms ease both',
+                'fadeOut-slow': 'fadeOut 500ms ease both',
+
                 enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',

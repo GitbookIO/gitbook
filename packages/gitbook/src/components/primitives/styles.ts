@@ -8,7 +8,7 @@ export const ButtonStyles = [
     'gap-2',
     'rounded-md',
     'straight-corners:rounded-none',
-    'circular-corners:rounded-full',
+    'circular-corners:rounded-3xl',
 
     'border',
     'border-tint',

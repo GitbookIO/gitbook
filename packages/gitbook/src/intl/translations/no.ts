@@ -88,6 +88,7 @@ export const no: TranslationLanguage = {
     ai_chat_context_disclaimer: 'AI-svar kan inneholde feil.',
     ai_chat_input_placeholder: 'Spør, søk eller utfør en handling...',
     send: 'Send',
+    actions: 'Handlinger',
     ai_chat_suggested_questions_title: 'Foreslåtte spørsmål',
     ai_chat_suggested_questions_about_this_page: 'Hva handler denne siden om?',
     ai_chat_suggested_questions_read_next: 'Hva bør jeg lese neste?',

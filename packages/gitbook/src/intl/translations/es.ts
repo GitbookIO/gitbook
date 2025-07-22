@@ -90,6 +90,7 @@ export const es: TranslationLanguage = {
     ai_chat_context_disclaimer: 'Las respuestas de IA pueden contener errores.',
     ai_chat_input_placeholder: 'Pregunta, busca o realiza una acción...',
     send: 'Enviar',
+    actions: 'Acciones',
     ai_chat_suggested_questions_title: 'Preguntas sugeridas',
     ai_chat_suggested_questions_about_this_page: '¿De qué trata esta página?',
     ai_chat_suggested_questions_read_next: '¿Qué debería leer después?',

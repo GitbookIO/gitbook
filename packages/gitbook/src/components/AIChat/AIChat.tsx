@@ -112,7 +112,7 @@ export function AIChatWindow(props: {
             ref={containerRef}
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
-                <div className="flex items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
+                <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <AIChatIcon
                         className="size-5 text-tint"
                         trademark={trademark}
@@ -149,7 +149,7 @@ export function AIChatWindow(props: {
                                     onClick={() => {}}
                                     iconOnly
                                     icon="ellipsis"
-                                    label={tString(language, 'more')}
+                                    label={tString(language, 'actions')}
                                     className="!px-2"
                                     variant="blank"
                                     size="default"
@@ -162,7 +162,10 @@ export function AIChatWindow(props: {
                                 }}
                                 disabled={isEmpty}
                             >
-                                <Icon icon="broom-wide" className="size-3 text-tint-subtle" />
+                                <Icon
+                                    icon="broom-wide"
+                                    className="size-3 shrink-0 text-tint-subtle"
+                                />
                                 {t(language, 'ai_chat_clear_conversation')}
                             </DropdownMenuItem>
                         </DropdownMenu>
@@ -186,7 +189,7 @@ export function AIChatWindow(props: {
                 >
                     {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
-                            <div className="flex size-32 animate-[fadeIn_500ms_both] items-center justify-center rounded-full bg-tint-subtle">
+                            <div className="flex size-32 animate-fadeIn-slow items-center justify-center rounded-full bg-tint-subtle">
                                 <AIChatIcon
                                     state="intro"
                                     trademark={trademark}
@@ -215,7 +218,7 @@ export function AIChatWindow(props: {
                 </div>
                 <div
                     ref={inputRef}
-                    className="absolute inset-x-0 bottom-0 mr-2 flex flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
+                    className="absolute inset-x-0 bottom-0 mr-2 flex select-none flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
                 >
                     {/* Display an error banner when something went wrong. */}
                     {chat.error ? <AIChatError chatController={chatController} /> : null}

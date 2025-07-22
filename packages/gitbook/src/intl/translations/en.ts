@@ -86,6 +86,7 @@ export const en = {
     ai_chat_context_disclaimer: 'AI responses may contain mistakes.',
     ai_chat_input_placeholder: 'Ask, search, or take action...',
     send: 'Send',
+    actions: 'Actions',
     ai_chat_suggested_questions_title: 'Suggested questions',
     ai_chat_suggested_questions_about_this_page: 'What is this page about?',
     ai_chat_suggested_questions_read_next: 'What should I read next?',

@@ -85,6 +85,7 @@ export const zh: TranslationLanguage = {
     ai_chat_context_disclaimer: '人工智能的回答可能包含错误。',
     ai_chat_input_placeholder: '询问、搜索或执行操作...',
     send: '发送',
+    actions: '操作',
     ai_chat_suggested_questions_title: '建议的问题',
     ai_chat_suggested_questions_about_this_page: '这个页面讲的是什么？',
     ai_chat_suggested_questions_read_next: '我接下来应该读什么？',

@@ -24,7 +24,7 @@ export function AIChatMessages(props: {
                     <div
                         ref={isLastUserMessage ? lastUserMessageRef : undefined}
                         className={tcls(
-                            message.content ? 'animate-[fadeIn_500ms_both]' : '',
+                            message.content ? 'animate-fadeIn-slow' : '',
                             'shrink-0',
                             'last:min-h-[calc(100%-5rem)]',
                             'scroll-mt-36',
@@ -43,11 +43,11 @@ export function AIChatMessages(props: {
                         {message.content ? message.content : null}
 
                         {isLastMessage && chat.loading ? (
-                            <div className="flex w-full animate-[fadeIn_500ms_both] flex-wrap gap-2 group-has-[.has-content]/message:hidden">
+                            <div className="flex w-full animate-fadeIn-slow flex-wrap gap-2 group-has-[.has-content]/message:hidden">
                                 {Array.from({ length: 7 }).map((_, index) => (
                                     <div
                                         key={index}
-                                        className="h-4 animate-[fadeIn_0.5s_ease_both,pulse_1.5s_infinite] rounded-md bg-tint-4"
+                                        className="h-4 animate-[fadeIn_500ms_ease_both,pulse_1.5s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-4"
                                         style={{
                                             width: `calc(${(index % 4) * 20 + 10}% - 4px)`,
                                             animationDelay: `${index * 0.1}s`,

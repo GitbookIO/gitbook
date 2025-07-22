@@ -59,8 +59,8 @@ export function AIResponseFeedback(props: {
             />
             {rating !== null ? (
                 <span
-                    className="ml-2 animate-fadeIn text-tint-subtle"
-                    style={{ animationDelay: '.3s', animationDuration: '.5s' }}
+                    className="ml-2 animate-fadeIn-slow text-tint-subtle"
+                    style={{ animationDelay: '.3s' }}
                 >
                     {t(language, 'was_this_helpful_thank_you')}
                 </span>
