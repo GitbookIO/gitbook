@@ -4,7 +4,7 @@ import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/a
 import { ThemeProvider } from 'next-themes';
 import type React from 'react';
 import { RouterCacheClearer } from '../hooks/useClearRouterCache';
-import { Link, LinkSettingsContext } from '../primitives';
+import { LinkSettingsContext } from '../primitives';
 
 export function ClientContexts(props: {
     nonce?: string;
@@ -24,16 +24,9 @@ export function ClientContexts(props: {
      */
     const nonce = typeof window === 'undefined' || !props.nonce ? props.nonce : '';
 
-    //TODO: Don't forget to remove these Links
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
             <LinkSettingsContext.Provider value={{ externalLinksTarget, contextId }}>
-                <Link prefetch={false} href="?visitor.isDeveloper=true">
-                    Is dev true
-                </Link>
-                <Link prefetch={false} href="?visitor.isDeveloper=false">
-                    Is dev false
-                </Link>
                 <RouterCacheClearer />
                 {children}
             </LinkSettingsContext.Provider>
