@@ -8,13 +8,13 @@ import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
 import { getAIChatName } from '@/components/AIChat';
 import { AIChatIcon } from '@/components/AIChat';
 import { Button } from '@/components/primitives/Button';
-import { DropdownMenuItem } from '@/components/primitives/DropdownMenu';
+import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
+import QuickLRU from 'quick-lru';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 
 type AIActionType = 'button' | 'dropdown-menu-item';
@@ -53,19 +53,50 @@ export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolea
     );
 }
 
-// We need to store the copied state in a store to share the state between the
-// copy button and the dropdown menu item.
-const useCopiedStore = create<{
+type CopiedStore = {
     copied: boolean;
-    setCopied: (copied: boolean) => void;
     loading: boolean;
-    setLoading: (loading: boolean) => void;
-}>((set) => ({
-    copied: false,
-    setCopied: (copied: boolean) => set({ copied }),
-    loading: false,
-    setLoading: (loading: boolean) => set({ loading }),
-}));
+};
+
+// We need to store everything in a store to share the state between every instance of the component.
+const useCopiedStore = create<
+    CopiedStore & {
+        setLoading: (loading: boolean) => void;
+        copy: (data: string, opts?: { onSuccess?: () => void }) => void;
+    }
+>((set) => {
+    let timeoutRef: ReturnType<typeof setTimeout> | null = null;
+
+    return {
+        copied: false,
+        loading: false,
+        setLoading: (loading: boolean) => set({ loading }),
+        copy: async (data, opts) => {
+            const { onSuccess } = opts || {};
+
+            if (timeoutRef) {
+                clearTimeout(timeoutRef);
+            }
+
+            await navigator.clipboard.writeText(data);
+
+            set({ copied: true });
+
+            timeoutRef = setTimeout(() => {
+                set({ copied: false });
+                onSuccess?.();
+
+                // Reset the timeout ref to avoid multiple timeouts
+                timeoutRef = null;
+            }, 1500);
+        },
+    };
+});
+
+/**
+ * Cache for the markdown versbion of the page.
+ */
+const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
 /**
  * Copies the markdown version of the page to the clipboard.
@@ -77,61 +108,38 @@ export function CopyMarkdown(props: {
 }) {
     const { markdownPageUrl, type, isDefaultAction } = props;
     const language = useLanguage();
-    const { copied, setCopied, loading, setLoading } = useCopiedStore();
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Close the dropdown menu manually after the copy button is clicked
-    const closeDropdownMenu = () => {
-        const dropdownMenu = document.querySelector('div[data-radix-popper-content-wrapper]');
+    const closeDropdown = useDropdownMenuClose();
 
-        // Cancel if no dropdown menu is open
-        if (!dropdownMenu) return;
-
-        // Dispatch on `document` so that the event is captured by Radix's
-        // dismissable-layer listener regardless of focus location.
-        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-    };
+    const { copied, loading, setLoading, copy } = useCopiedStore();
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        return fetch(markdownPageUrl)
-            .then((res) => res.text())
-            .finally(() => setLoading(false));
-    };
+        const result = await fetch(markdownPageUrl).then((res) => res.text());
+        markdownCache.set(markdownPageUrl, result);
 
-    // Reset the copied state when the component unmounts
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
+        setLoading(false);
+
+        return result;
+    };
 
     const onClick = async (e: React.MouseEvent) => {
         // Prevent default behavior for non-default actions to avoid closing the dropdown.
         // This allows showing transient UI (e.g., a "copied" state) inside the menu item.
-        // Default action buttons are excluded from this behavior.
         if (!isDefaultAction) {
             e.preventDefault();
         }
 
-        const markdown = await fetchMarkdown();
-
-        navigator.clipboard.writeText(markdown);
-        setCopied(true);
-
-        // Reset the copied state after 2 seconds
-        timeoutRef.current = setTimeout(() => {
-            // Close the dropdown menu if it's a dropdown menu item and not the default action
-            if (type === 'dropdown-menu-item' && !isDefaultAction) {
-                closeDropdownMenu();
-            }
-
-            setCopied(false);
-        }, 2000);
+        copy(markdownCache.get(markdownPageUrl) || (await fetchMarkdown()), {
+            onSuccess: () => {
+                // We close the dropdown menu if the action is a dropdown menu item and not the default action.
+                if (type === 'dropdown-menu-item' && !isDefaultAction) {
+                    closeDropdown();
+                }
+            },
+        });
     };
 
     return (
@@ -224,7 +232,7 @@ function AIActionWrapper(props: {
                 size="xsmall"
                 variant="secondary"
                 label={shortLabel || label}
-                className="hover:!scale-100 !shadow-none !rounded-r-none border-r-0 bg-tint-base text-sm"
+                className="hover:!scale-100 !shadow-none !rounded-r-none hover:!translate-y-0 border-r-0 bg-tint-base text-sm"
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
@@ -239,11 +247,13 @@ function AIActionWrapper(props: {
             href={href}
             target="_blank"
             onClick={onClick}
-            disabled={disabled}
+            disabled={disabled || loading}
         >
-            {icon ? (
-                <div className="flex size-5 items-center justify-center text-tint">
-                    {typeof icon === 'string' ? (
+            <div className="flex size-5 items-center justify-center text-tint">
+                {loading ? (
+                    <Icon icon="spinner-third" className="size-4 animate-spin" />
+                ) : icon ? (
+                    typeof icon === 'string' ? (
                         <Icon
                             icon={icon as IconName}
                             iconStyle={IconStyle.Regular}
@@ -251,9 +261,10 @@ function AIActionWrapper(props: {
                         />
                     ) : (
                         icon
-                    )}
-                </div>
-            ) : null}
+                    )
+                ) : null}
+            </div>
+
             <div className="flex flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2 text-tint-strong">
                     <span className="truncate font-medium text-sm">{label}</span>

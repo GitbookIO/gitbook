@@ -195,3 +195,18 @@
 .contentkit-hstack > .contentkit-divider-large {
     @apply mx-4;
 }
+
+/** Confirmation modal */
+
+.contentkit-modal-confirm {
+    @apply p-4;
+}
+.contentkit-modal-confirm .contentkit-modal-footer {
+    @apply flex gap-2 justify-end;
+}
+.contentkit-button-confirm {
+    @apply w-auto flex-grow-0 flex-shrink-0;
+}
+.contentkit-button-style-danger {
+    @apply bg-danger text-danger hover:bg-danger-hover hover:text-danger-strong contrast-more:bg-tint-subtle;
+}

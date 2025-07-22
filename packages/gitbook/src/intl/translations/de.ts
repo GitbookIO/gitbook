@@ -32,6 +32,8 @@ export const de = {
     was_this_helpful_negative: 'Nein',
     was_this_helpful_thank_you: 'Danke!',
     was_this_helpful_comment: 'Möchten Sie etwas hinzufügen?',
+    was_this_helpful_positive_label: 'Hilfreich',
+    was_this_helpful_negative_label: 'Nicht hilfreich',
     submit: 'Absenden',
     annotation_button_label: 'Kommentar öffnen',
     code_copied: 'Kopiert!',

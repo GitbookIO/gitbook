@@ -36,7 +36,7 @@ async function untrustedValidate(input: ValidateOpenAPIV3Input) {
     const result = await validate(value);
 
     // Spec is invalid, we stop here.
-    if (!result.specification) {
+    if (!result.valid) {
         throw new OpenAPIParseError('Invalid OpenAPI document', {
             code: 'invalid',
             rootURL,

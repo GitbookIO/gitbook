@@ -48,10 +48,15 @@ export async function resizeImage(
     input: string,
     options: CloudflareImageOptions & {
         signal?: AbortSignal;
+        /**
+         * Bypass the check to see if the image can be resized.
+         * This is useful for some format that are not supported by @next/og and need to be transformed
+         */
+        bypassSkipCheck?: boolean;
     }
 ): Promise<Response> {
     const action = checkIsSizableImageURL(input);
-    if (action === SizableImageAction.Skip) {
+    if (action === SizableImageAction.Skip && !options.bypassSkipCheck) {
         throw new Error(
             'Cannot resize this image, this function should have never been called on this url'
         );

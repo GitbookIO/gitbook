@@ -58,7 +58,7 @@ export async function RecordCard(
                 '[&_.heading>div:first-child]:hidden',
                 '[&_.heading>div]:text-[.8em]',
                 'md:[&_.heading>div]:text-[1em]',
-                '[&_.blocks:first-child_.heading:first-child_div]:mt-0', // Remove margin on first heading in card
+                '[&_.blocks:first-child_.heading]:pt-0', // Remove padding-top on first heading in card
 
                 // On mobile, check if we can display the cover responsively or not:
                 // - If the file has a landscape aspect ratio, we display it normally

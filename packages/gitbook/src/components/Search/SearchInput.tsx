@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+import { CustomizationAIMode } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
 import { useClassnames } from '../primitives/StyleProvider';
@@ -13,20 +14,20 @@ interface SearchInputProps {
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus: () => void;
     value: string;
-    withAI?: boolean;
+    aiMode: CustomizationAIMode;
     isOpen: boolean;
     className?: string;
 }
 
 // Size classes for medium size button
-const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'circular-corners:px-4'];
+const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'md:circular-corners:px-4'];
 
 /**
  * Input to trigger search.
  */
 export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
     function SearchInput(props, ref) {
-        const { onChange, onKeyDown, onFocus, value, withAI = false, isOpen, className } = props;
+        const { onChange, onKeyDown, onFocus, value, aiMode, isOpen, className } = props;
         const inputRef = useRef<HTMLInputElement>(null);
 
         const language = useLanguage();
@@ -59,7 +60,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         sizeClasses,
                         // Additional custom styles
                         'has-[input:focus]:-translate-y-px h-9 grow cursor-pointer px-2.5 has-[input:focus]:bg-tint-base depth-subtle:has-[input:focus]:shadow-lg depth-subtle:has-[input:focus]:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
-                        'theme-bold:has-[input:focus-visible]:border-header-link/6 theme-bold:has-[input:focus-visible]:bg-header-link/3',
+                        'theme-bold:border-header-link/3 theme-bold:has-[input:focus-visible]:border-header-link/5 theme-bold:has-[input:focus-visible]:bg-header-link/3 theme-bold:has-[input:focus-visible]:ring-header-link/5',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
                         'relative z-30 shrink grow justify-start max-md:absolute max-md:right-0',
                         isOpen ? 'max-md:w-56' : 'max-md:w-[38px]',
@@ -73,7 +74,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-ml-1.5 -mr-1 animate-scaleIn px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
+                            className="-ml-1.5 -mr-1 animate-scaleIn px-1.5"
                             onClick={() => {
                                 onChange('');
                                 inputRef.current?.focus();
@@ -89,15 +90,17 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         onKeyDown={onKeyDown}
                         onChange={(event) => onChange(event.target.value)}
                         value={value}
-                        placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}...`}
+                        // We only show "search or ask" if the search input actually handles both search and ask.
+                        placeholder={`${tString(language, aiMode === CustomizationAIMode.Search ? 'search_or_ask' : 'search')}...`}
                         maxLength={512}
+                        size={10}
                         className={tcls(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-none transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             isOpen ? '' : 'max-md:opacity-0'
                         )}
                         ref={inputRef}
                     />
-                    <Shortcut />
+                    {!isOpen ? <Shortcut /> : null}
                 </div>
             </div>
         );
@@ -124,7 +127,7 @@ function Shortcut() {
         <div
             aria-busy={operatingSystem === null ? 'true' : undefined}
             className={tcls(
-                `shortcut -mr-1 hidden justify-end gap-0.5 whitespace-nowrap text-xs [font-feature-settings:"calt",_"case"] contrast-more:text-tint-strong md:flex`,
+                `shortcut -mr-1 relative z-10 hidden justify-end gap-0.5 whitespace-nowrap text-xs [font-feature-settings:"calt",_"case"] after:absolute after:right-full after:z-20 after:h-full after:w-8 after:bg-gradient-to-r after:from-transparent after:to-tint-base theme-bold:after:to-transparent after:content-[''] contrast-more:text-tint-strong md:flex`,
                 operatingSystem
                     ? 'motion-safe:animate-fadeIn motion-reduce:opacity-11'
                     : 'opacity-0'

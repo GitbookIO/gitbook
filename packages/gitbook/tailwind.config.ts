@@ -516,6 +516,9 @@ const config: Config = {
                 'html:not(.announcement-hidden):has(#announcement-banner) &'
             );
 
+            // Variant to target first-of-type in a column
+            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
+
             const customisationVariants = {
                 // Sidebar styles
                 sidebar: ['sidebar-default', 'sidebar-filled'],
@@ -561,9 +564,9 @@ const config: Config = {
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.
              */
-            addVariant('site-full-width', 'body:has(.site-full-width) &');
-            addVariant('site-default-width', 'body:has(.site-default-width) &');
-            addVariant('page-full-width', 'body:has(.page-full-width) &');
+            addVariant('site-width-wide', 'body:has(.site-width-wide) &');
+            addVariant('site-width-default', 'body:has(.site-width-default) &');
+            addVariant('page-width-wide', 'body:has(.page-width-wide) &');
 
             /**
              * Variant when the page is configured to hide the table of content.

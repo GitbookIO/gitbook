@@ -32,6 +32,8 @@ export const en = {
     was_this_helpful_negative: 'No',
     was_this_helpful_thank_you: 'Thank you!',
     was_this_helpful_comment: "Anything you'd like to add?",
+    was_this_helpful_positive_label: 'Helpful',
+    was_this_helpful_negative_label: 'Not helpful',
     submit: 'Submit',
     annotation_button_label: 'Open annotation',
     code_copied: 'Copied!',
