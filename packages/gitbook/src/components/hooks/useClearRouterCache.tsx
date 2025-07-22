@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
 import { LinkSettingsContext } from '../primitives';
 
@@ -12,6 +13,7 @@ let previousContextId: string | undefined;
  */
 export function useClearRouterCache() {
     const { contextId } = useContext(LinkSettingsContext);
+    const router = useRouter();
     useEffect(() => {
         if (previousContextId === undefined) {
             // On the first run, we set the previousContextId to the current contextId
@@ -23,9 +25,10 @@ export function useClearRouterCache() {
         // This prevents unnecessary cache clearing on the first render.
         if (contextId !== previousContextId && previousContextId !== undefined) {
             previousContextId = contextId;
-            window.location.reload(); // We want to trigger a full reload to clear the in memory cache
+            // Trigger a full reload to clear the in-memory cache
+            router.refresh(); // This will clear the cache and re-fetch the data
         }
-    }, [contextId]);
+    }, [contextId, router]);
 }
 
 export const RouterCacheClearer = () => {

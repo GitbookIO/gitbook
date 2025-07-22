@@ -249,6 +249,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             shareKey: siteURLData.shareKey,
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
+            contextId: siteURLData.contextId,
         };
 
         const requestHeaders = new Headers(request.headers);
