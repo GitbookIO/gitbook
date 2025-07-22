@@ -7,7 +7,8 @@ import {
 
 import { DataFetcherError, noCacheFetchOptions } from '@/lib/data';
 import { resolveContentRef } from '@/lib/references';
-import { unstable_cacheLife as cacheLife } from 'next/cache';
+import { getCacheTag } from '@gitbook/cache-tags';
+import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { assert } from 'ts-essentials';
 import { enrichFilesystem } from './enrich';
 import type {
@@ -40,7 +41,7 @@ export async function fetchOpenAPIFilesystem(
             assert(resolved.openAPIFilesystem);
             return resolved.openAPIFilesystem;
         }
-        return fetchFilesystem(resolved.href);
+        return fetchFilesystem(resolved.href, context.space.id);
     })();
 
     if ('error' in filesystem) {
@@ -54,7 +55,8 @@ export async function fetchOpenAPIFilesystem(
 }
 
 const fetchFilesystem = async (
-    url: string
+    url: string,
+    spaceId: string
 ): Promise<
     | Filesystem
     | {
@@ -66,6 +68,7 @@ const fetchFilesystem = async (
 > => {
     'use cache';
     try {
+        cacheTag(getCacheTag({ tag: 'space', space: spaceId }));
         return await fetchFilesystemUncached(url);
     } catch (error) {
         // To avoid hammering the file with requests, we cache the error for around a minute.
@@ -96,6 +99,7 @@ async function fetchFilesystemUncached(
     // https://github.com/cloudflare/workerd/issues/1957
     const response = await fetch(new URL(url), {
         ...noCacheFetchOptions,
+        cache: 'no-store',
         signal: options?.signal,
     });
 
