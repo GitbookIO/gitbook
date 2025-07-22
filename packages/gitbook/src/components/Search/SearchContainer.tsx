@@ -27,8 +27,6 @@ interface SearchContainerProps {
  */
 export function SearchContainer(props: SearchContainerProps) {
     const { spaceTitle, isMultiVariants, aiMode, className } = props;
-    const withAI =
-        aiMode === CustomizationAIMode.Search || aiMode === CustomizationAIMode.Assistant;
 
     const [state, setSearchState] = useSearch();
     const searchAsk = useSearchAskState();
@@ -122,7 +120,7 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     // Only show content if there's a query or Ask is enabled
-                    (state?.query || withAI) && open ? (
+                    (state?.query || aiMode !== CustomizationAIMode.None) && open ? (
                         <React.Suspense fallback={null}>
                             {isMultiVariants && !state?.ask ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
@@ -174,7 +172,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    withAI={withAI}
+                    aiMode={aiMode}
                     isOpen={open}
                     className={className}
                 />
