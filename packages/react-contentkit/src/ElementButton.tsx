@@ -20,6 +20,15 @@ export function ElementButton(
     const [loading, setLoading] = React.useState(false);
     const [confirm, setConfirm] = React.useState<boolean>(false);
 
+    const wrapLoading = React.useCallback(async function<T>(fn: Promise<T> | (() => Promise<T>)) {
+        setLoading(true);
+        try {
+            return fn instanceof Promise ? await fn : await fn();
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+    
     return (
         <>
             <button
@@ -42,10 +51,7 @@ export function ElementButton(
                         return;
                     }
 
-                    setLoading(true);
-                    clientContext.dispatchAction(element.onPress).finally(() => {
-                        setLoading(false);
-                    });
+                    wrapLoading(async () => await clientContext.dispatchAction(element.onPress));
                 }}
             >
                 {loading ? (
@@ -66,10 +72,7 @@ export function ElementButton(
                     {...element.confirm}
                     onConfirm={() => {
                         setConfirm(false);
-                        setLoading(true);
-                        clientContext.dispatchAction(element.onPress).finally(() => {
-                            setLoading(false);
-                        });
+                        wrapLoading(async () => await clientContext.dispatchAction(element.onPress));
                     }}
                     onCancel={() => setConfirm(false)}
                 />
