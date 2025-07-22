@@ -1,4 +1,6 @@
 'use client';
+import { useLanguage } from '@/intl/client';
+import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { useAIChatController, useAIChatState } from '../AI/useAIChat';
 import { Button } from '../primitives';
@@ -13,6 +15,7 @@ export function AIChatButton(props: { trademark: boolean }) {
     const { trademark } = props;
     const chatController = useAIChatController();
     const chat = useAIChatState();
+    const language = useLanguage();
 
     return (
         <Button
@@ -23,7 +26,7 @@ export function AIChatButton(props: { trademark: boolean }) {
             className={tcls('h-9 px-2.5')}
             label={
                 <div className="flex items-center gap-2">
-                    {getAIChatName(trademark)}
+                    {t(language, 'ai_chat_ask', getAIChatName(trademark))}
                     <KeyboardShortcut keys={['mod', 'j']} className="border-tint-11 text-tint-1" />
                 </div>
             }
