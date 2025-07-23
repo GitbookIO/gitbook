@@ -87,7 +87,7 @@ export function AnnouncementBanner(props: {
                         </Tag>
                         {closeable ? (
                             <button
-                                className={`absolute top-0 right-4 mt-2 mr-2 rounded-sm circular-corners:rounded-lg straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
+                                className={`absolute top-0 right-4 mt-2 mr-2 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
                                 type="button"
                                 onClick={dismissAnnouncement}
                                 title={tString(language, 'close')}

@@ -43,7 +43,7 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
                         iconOnly
                         size="xsmall"
                         variant="secondary"
-                        className="hover:scale-100! hover:translate-y-0! shadow-none! rounded-l-none! bg-tint-base text-sm"
+                        className="rounded-l-none! bg-tint-base text-sm shadow-none! hover:translate-y-0! hover:scale-100!"
                     />
                 }
             >

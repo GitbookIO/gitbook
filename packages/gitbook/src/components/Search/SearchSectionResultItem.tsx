@@ -49,7 +49,7 @@ function highlightQueryInBody(body: string, query: string) {
 
     // Ensure the query to be highlighted is visible in the body.
     return (
-        <p className="relative line-clamp-3 text-sm wrap-anywhere">
+        <p className="wrap-anywhere relative line-clamp-3 text-sm">
             <HighlightQuery query={query} text={idx < 20 ? body : `...${body.slice(idx - 10)}`} />
         </p>
     );
