@@ -297,6 +297,7 @@ const config: Config = {
                 primary: generateVarShades('primary', [ColorCategory.borders]),
                 tint: generateVarShades('tint', [ColorCategory.borders]),
                 neutral: generateVarShades('neutral', [ColorCategory.borders]),
+
                 ...Object.fromEntries(
                     semanticColors.map((color) => [
                         color,
@@ -534,7 +535,7 @@ const config: Config = {
             );
 
             // Variant to target first-of-type in a column
-            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
+            addVariant('column-first-of-type', '.group\\/column > &:first-of-type'); // optional for group-based variants
 
             const customisationVariants = {
                 // Sidebar styles
