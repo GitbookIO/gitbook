@@ -52,8 +52,10 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'flip-heading-hash items-start px-4 py-4! pl-3 text-[1em] *:flex-none',
-                        hasHeading ? hintStyle.header : null
+                        'w-full items-start py-4! pl-3 text-[1em] *:flex-none',
+                        // Heading hash styles
+                        'flip-heading-hash pr-8',
+                        hintStyle.header
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}
                     {...contextProps}
