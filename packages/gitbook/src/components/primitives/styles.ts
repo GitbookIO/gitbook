@@ -18,7 +18,7 @@ export const ButtonStyles = [
     'hover:depth-subtle:shadow-md',
     'focus-visible:depth-subtle:shadow-md',
     'active:shadow-none',
-    'shadow-tint/7',
+    'shadow-tint/6',
     'dark:shadow-tint-1',
 
     'contrast-more:border-tint-12',
