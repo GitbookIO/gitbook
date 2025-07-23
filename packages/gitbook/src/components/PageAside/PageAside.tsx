@@ -166,7 +166,7 @@ export function PageAside(props: {
                                 'border-t',
                                 'first:border-none',
                                 'border-tint-subtle',
-                                'py-4',
+                                'py-6',
                                 'first:pt-0',
                                 'xl:max-2xl:page-api-block:px-3',
                                 'empty:hidden'
@@ -174,7 +174,7 @@ export function PageAside(props: {
                         >
                             {withPageFeedback ? (
                                 <React.Suspense fallback={null}>
-                                    <PageFeedbackForm pageId={page.id} className={tcls('mt-2')} />
+                                    <PageFeedbackForm pageId={page.id} />
                                 </React.Suspense>
                             ) : null}
                             {customization.git.showEditLink && space.gitSync?.url && page.git ? (
