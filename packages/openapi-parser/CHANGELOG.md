@@ -1,5 +1,30 @@
 # @gitbook/openapi-parser
 
+## 2.2.1
+
+### Patch Changes
+
+- 1738677: Stricter validation
+
+## 2.2.0
+
+### Minor Changes
+
+- bd553bc: Expose `isJson` and `isYaml` in OpenAPI parser
+
+## 2.1.5
+
+### Patch Changes
+
+- 1e013cd: Optional label in OpenAPI x-codeSamples
+- 4f5cbfe: Upgrade Scalar parser
+
+## 2.1.4
+
+### Patch Changes
+
+- d00dc8c: Pass scalar's errors through OpenAPIParseError
+
 ## 2.1.3
 
 ### Patch Changes

@@ -1,37 +1,7 @@
-import type { ExecutionContext, IncomingRequestCfProperties } from '@cloudflare/workers-types';
+import { getCloudflareContext as getCloudflareContextV2 } from '@/lib/data/cloudflare';
+import { GITBOOK_RUNTIME } from '@/lib/env';
 
 let pendings: Array<Promise<unknown>> = [];
-
-/**
- * Get a global context object for the current execution.
- * This object can be used to store data that should be shared between the middleware and the handler
- * and re-used for all requests.
- */
-export async function getGlobalContext(): Promise<ExecutionContext | object> {
-    if (process.env.NODE_ENV === 'test') {
-        // Do not try loading the next-on-pages package in tests as it'll fail
-        return globalThis;
-    }
-
-    // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
-    const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
-    return getOptionalRequestContext()?.ctx ?? globalThis;
-}
-
-/**
- * Get a global context object for the current request.
- * This object can be used as a key to store request-specific data in a WeakMap.
- */
-export async function getRequestContext(): Promise<IncomingRequestCfProperties | object> {
-    if (process.env.NODE_ENV === 'test') {
-        // Do not try loading the next-on-pages package in tests as it'll fail
-        return globalThis;
-    }
-
-    // We lazy-load the next-on-pages package to avoid errors when running tests because of 'server-only'.
-    const { getOptionalRequestContext } = await import('@cloudflare/next-on-pages');
-    return getOptionalRequestContext()?.cf ?? globalThis;
-}
 
 /**
  * Extend the lifetime of the event handler until the promise is resolved.
@@ -47,12 +17,17 @@ export async function waitUntil(promise: Promise<unknown>) {
         return;
     }
 
-    const cloudflareContext = await getGlobalContext();
-    if ('waitUntil' in cloudflareContext) {
-        cloudflareContext.waitUntil(promise);
-    } else {
-        await promise;
+    if (GITBOOK_RUNTIME === 'cloudflare') {
+        const context = getCloudflareContextV2();
+        if (context) {
+            context.ctx.waitUntil(promise);
+            return;
+        }
     }
+
+    await promise.catch((error) => {
+        console.error('Ignored error in waitUntil', error);
+    });
 }
 
 /**

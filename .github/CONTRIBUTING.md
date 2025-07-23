@@ -53,19 +53,42 @@ After forking this repository, you'll want to [create a branch](https://docs.git
 
 #### 3. Install dependencies and run the project locally
 
-GitBook uses [Bun](https://bun.sh/) to run the project. Make sure you're using the specified version of `node` before running any of the development commands to ensure a smooth development experience.
+##### Prerequisites:
+- Node.js (Version: >=20.6)
+  - Use `nvm` for easy Node management
+- [Bun](https://bun.sh/) (Version: >=1.2.15)
+  - We use a text-based lockfile which isn't supported below 1.2.15
 
-You can easily do this by running the command `nvm use`.
+##### Setup steps:
 
-To start your local version of GitBook, run the command `bun dev`.
+1. Ensure you are using the project's version of Node:
+```bash
+nvm use
+```
+
+2. Install dependencies using Bun:
+```bash
+bun install
+```
+
+3. Start the development server:
+```bash
+bun dev
+```
+
+Additional development commands:
+- `bun format`: Format the code using Biome
+- `bun typecheck`: Run TypeScript type checking
+- `bun unit`: Run unit tests
+- `bun e2e`: Run end-to-end tests
 
 #### 4. Preview your changes
 
-When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/`.
+When running the development server, published GitBook sites can be rendered through your local version at `http://localhost:3000/url`.
 
-For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/docs.gitbook.com` after running the development server.
+For example, our published docs can be viewed using the local version by visiting `http://localhost:3000/url/gitbook.com/docs` after running the development server.
 
-You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://docs.gitbook.com/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
+You can visit any published GitBook site behind your development server. Please make sure your site is [published publicly](https://gitbook.com/docs/published-documentation/publish-your-content-as-a-docs-site) to ensure you can view the site correctly in your development version.
 
 ### Commit your update
 

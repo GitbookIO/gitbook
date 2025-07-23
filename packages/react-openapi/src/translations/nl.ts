@@ -35,6 +35,7 @@ export const nl = {
     show: 'Toon ${1}',
     hide: 'Verberg ${1}',
     available_items: 'Beschikbare items',
+    available_scopes: 'Beschikbare scopes',
     properties: 'Eigenschappen',
     or: 'of',
     and: 'en',

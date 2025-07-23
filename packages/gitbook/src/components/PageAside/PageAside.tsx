@@ -1,3 +1,4 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type JSONDocument,
     type RevisionPageDocument,
@@ -6,7 +7,6 @@ import {
     type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import React from 'react';
 import urlJoin from 'url-join';
 
@@ -48,11 +48,19 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
-                // 'lg:page-no-toc:flex',
+                'chat-open:xl:max-3xl:hidden',
+                'chat-open:xl:max-3xl:opacity-0',
+                'max-w-56',
+                'chat-open:xl:max-3xl:*:w-56',
+                'chat-open:xl:max-3xl:max-w-0',
+                'chat-open:xl:max-3xl:ml-0',
+
+                'motion-safe:xl:transition-all motion-safe:xl:duration-300',
+                'motion-safe:[transition-behavior:allow-discrete]',
+
                 'flex-col',
                 'basis-56',
-                // 'page-no-toc:basis-40',
-                // 'xl:page-no-toc:basis-56',
+                'xl:ml-12',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
@@ -87,8 +95,9 @@ export function PageAside(props: {
                 'xl:max-2xl:dark:hover:page-api-block:shadow-tint-1/1',
                 'xl:max-2xl:page-api-block:rounded-md',
                 'xl:max-2xl:page-api-block:h-auto',
-                'xl:max-2xl:page-api-block:my-8',
-                'page-api-block:p-2'
+                'xl:max-2xl:page-api-block:my-9',
+                'page-api-block:px-2',
+                'page-api-block:py-1.5'
             )}
         >
             {page.layout.outline ? (

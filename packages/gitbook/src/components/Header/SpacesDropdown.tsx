@@ -1,10 +1,10 @@
 import type { SiteSpace } from '@gitbook/api';
 
+import type { GitBookSiteContext } from '@/lib/context';
+import { getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { DropdownChevron, DropdownMenu } from './DropdownMenu';
-import { SpacesDropdownMenuItem } from './SpacesDropdownMenuItem';
+import { DropdownChevron, DropdownMenu } from '../primitives/DropdownMenu';
+import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
 
 export function SpacesDropdown(props: {
     context: GitBookSiteContext;
@@ -13,7 +13,6 @@ export function SpacesDropdown(props: {
     className?: string;
 }) {
     const { context, siteSpace, siteSpaces, className } = props;
-    const { linker } = context;
 
     return (
         <DropdownMenu
@@ -61,24 +60,20 @@ export function SpacesDropdown(props: {
                         className
                     )}
                 >
-                    <span className={tcls('line-clamp-1', 'grow')}>{siteSpace.title}</span>
+                    <span className={tcls('truncate', 'grow')}>{siteSpace.title}</span>
                     <DropdownChevron />
                 </div>
             }
         >
-            {siteSpaces.map((otherSiteSpace, index) => (
-                <SpacesDropdownMenuItem
-                    key={`${otherSiteSpace.id}-${index}`}
-                    variantSpace={{
-                        id: otherSiteSpace.id,
-                        title: otherSiteSpace.title,
-                        url: otherSiteSpace.urls.published
-                            ? linker.toLinkForContent(otherSiteSpace.urls.published)
-                            : otherSiteSpace.space.urls.app,
-                    }}
-                    active={otherSiteSpace.id === siteSpace.id}
-                />
-            ))}
+            <SpacesDropdownMenuItems
+                slimSpaces={siteSpaces.map((space) => ({
+                    id: space.id,
+                    title: space.title,
+                    url: getSiteSpaceURL(context, space),
+                    isActive: space.id === siteSpace.id,
+                }))}
+                curPath={siteSpace.path}
+            />
         </DropdownMenu>
     );
 }

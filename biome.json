@@ -21,7 +21,7 @@
             "packages/openapi-parser/src/fixtures/**/*",
             "packages/emoji-codepoints/index.ts",
             "packages/icons/src/data/*.json",
-            "packages/cache-do/worker-configuration.d.ts"
+            "packages/gitbook/worker-configuration.d.ts"
         ]
     },
     "formatter": {
@@ -127,7 +127,6 @@
         {
             "include": [
                 "packages/gitbook/**/*",
-                "packages/gitbook-v2/**/*",
                 "packages/react-openapi/**/*",
                 "packages/react-math/**/*",
                 "packages/react-contentkit/**/*",

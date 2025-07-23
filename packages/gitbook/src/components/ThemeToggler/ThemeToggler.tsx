@@ -69,6 +69,7 @@ function ThemeButton(props: {
                 'p-2',
                 'rounded-sm',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-full',
                 'transition-all',
                 'text-tint',
                 'contrast-more:text-tint-strong',

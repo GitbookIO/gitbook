@@ -1,0 +1,156 @@
+{
+    "main": ".open-next/worker.js",
+    "name": "gitbook-open-v2",
+    "compatibility_date": "2025-04-14",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public"
+    ],
+    "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS"
+    },
+    "observability": {
+        "enabled": true
+    },
+    "vars": {
+        "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+        "IS_PREVIEW": "false"
+    },
+    "env": {
+        "preview": {
+            "vars": {
+                "IS_PREVIEW": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-preview"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-prod-api-cache"
+                }
+            ]
+            // No durable objects on preview, as they block the generation of preview URLs
+            // and we don't need tags invalidation on preview
+        },
+        "staging": {
+            "routes": [
+                {
+                    "pattern": "open-2c.gitbook-staging.com/*",
+                    "zone_name": "gitbook-staging.com"
+                },
+                {
+                    "pattern": "static-2c.gitbook-staging.com/*",
+                    "zone_name": "gitbook-staging.com"
+                }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-staging"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-staging-api-cache"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
+                }
+            ]
+        },
+        "production": {
+            "vars": {
+                // This is a bit misleading, but it means that we can have 500 concurrent revalidations
+                // This means that we'll have up to 100 durable objects instance running at the same time
+                "MAX_REVALIDATE_CONCURRENCY": "100",
+                // Temporary variable to find the issue once deployed
+                // TODO: remove this once the issue is fixed
+                "DEBUG_CLOUDFLARE": "true"
+            },
+            "routes": [
+                {
+                    "pattern": "open-2c.gitbook.com/*",
+                    "zone_name": "gitbook.com"
+                },
+                {
+                    "pattern": "static-2c.gitbook.com/*",
+                    "zone_name": "gitbook.com"
+                }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-production"
+                },
+                {
+                    "binding": "GITBOOK_API",
+                    "service": "gitbook-x-prod-api-cache"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"]
+                }
+            ]
+        }
+    }
+}

@@ -4,13 +4,14 @@ import {
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 
-import { Link } from '@/components/primitives';
+import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { resolveContentRef } from '@/lib/references';
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
+import { RecordCardStyles } from './styles';
 import { getRecordValue } from './utils';
 
 export async function RecordCard(
@@ -23,18 +24,18 @@ export async function RecordCard(
     const coverFile = view.coverDefinition
         ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
         : null;
-    const cover =
-        coverFile && context.contentContext
-            ? await resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
-            : null;
-
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
-    const target =
+
+    const [cover, target] = await Promise.all([
+        coverFile && context.contentContext
+            ? resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
+            : null,
         targetRef && context.contentContext
-            ? await resolveContentRef(targetRef, context.contentContext)
-            : null;
+            ? resolveContentRef(targetRef, context.contentContext)
+            : null,
+    ]);
 
     const coverIsSquareOrPortrait =
         cover?.file?.dimensions &&
@@ -44,20 +45,20 @@ export async function RecordCard(
         <div
             className={tcls(
                 'grid-area-1-1',
-                'z-0',
                 'relative',
                 'grid',
                 'bg-tint-base',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
                 'inset-[-1px]',
-                'rounded-[7px]',
+                'rounded',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-xl',
                 'overflow-hidden',
                 '[&_.heading>div:first-child]:hidden',
                 '[&_.heading>div]:text-[.8em]',
                 'md:[&_.heading>div]:text-[1em]',
-                '[&_.blocks:first-child_.heading:first-child_div]:mt-0', // Remove margin on first heading in card
+                '[&_.blocks:first-child_.heading]:pt-0', // Remove padding-top on first heading in card
 
                 // On mobile, check if we can display the cover responsively or not:
                 // - If the file has a landscape aspect ratio, we display it normally
@@ -143,45 +144,26 @@ export async function RecordCard(
         </div>
     );
 
-    const style = [
-        'group',
-        'grid',
-        'shadow-1xs',
-        'shadow-tint-9/1',
-        'rounded-md',
-        'straight-corners:rounded-none',
-        'dark:shadow-transparent',
-        'z-0',
-
-        'before:pointer-events-none',
-        'before:grid-area-1-1',
-        'before:transition-shadow',
-        'before:w-full',
-        'before:h-full',
-        'before:rounded-[inherit]',
-        'before:ring-1',
-        'before:ring-tint-12/2',
-        'before:z-10',
-        'before:relative',
-    ] as ClassValue;
-
     if (target && targetRef) {
         return (
-            <Link
-                href={target.href}
-                className={tcls(style, 'hover:before:ring-tint-12/5')}
-                insights={{
-                    type: 'link_click',
-                    link: {
-                        target: targetRef,
-                        position: SiteInsightsLinkPosition.Content,
-                    },
-                }}
-            >
+            // We don't use `Link` directly here because we could end up in a situation where
+            // a link is rendered inside a link, which is not allowed in HTML.
+            // It causes an hydration error in React.
+            <LinkBox href={target.href} classNames={['RecordCardStyles']}>
+                <LinkOverlay
+                    href={target.href}
+                    insights={{
+                        type: 'link_click',
+                        link: {
+                            target: targetRef,
+                            position: SiteInsightsLinkPosition.Content,
+                        },
+                    }}
+                />
                 {body}
-            </Link>
+            </LinkBox>
         );
     }
 
-    return <div className={tcls(style)}>{body}</div>;
+    return <div className={tcls(RecordCardStyles)}>{body}</div>;
 }

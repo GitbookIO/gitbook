@@ -6,8 +6,8 @@ import { OpenAPIResponseExampleContent } from './OpenAPIResponseExampleContent';
 import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import type { OpenAPIOperationData, OpenAPIWebhookData } from './types';
 import { getExampleFromReference, getExamples } from './util/example';
-import { createStateKey, getStatusCodeDefaultLabel } from './utils';
-import { checkIsReference, resolveDescription } from './utils';
+import { createStateKey, getStatusCodeDefaultLabel, resolveDescription } from './utils';
+import { checkIsReference } from './utils';
 
 /**
  * Display an example of the response content.
@@ -41,45 +41,47 @@ export function OpenAPIResponseExample(props: {
         return Number(a) - Number(b);
     });
 
-    const tabs = responses.map(([key, responseObject]) => {
-        const description = resolveDescription(responseObject);
-        const label = description ? (
-            <Markdown source={description} />
-        ) : (
-            getStatusCodeDefaultLabel(key, context)
-        );
+    const tabs = responses
+        .filter(([_, responseObject]) => responseObject && typeof responseObject === 'object')
+        .map(([key, responseObject]) => {
+            const description = resolveDescription(responseObject);
+            const label = description ? (
+                <Markdown source={description} />
+            ) : (
+                getStatusCodeDefaultLabel(key, context)
+            );
 
-        if (checkIsReference(responseObject)) {
+            if (checkIsReference(responseObject)) {
+                return {
+                    key: key,
+                    label,
+                    statusCode: key,
+                    body: (
+                        <OpenAPIExample
+                            example={getExampleFromReference(responseObject, context)}
+                            context={context}
+                            syntax="json"
+                        />
+                    ),
+                };
+            }
+
+            if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
+                return {
+                    key: key,
+                    label,
+                    statusCode: key,
+                    body: <OpenAPIEmptyExample context={context} />,
+                };
+            }
+
             return {
                 key: key,
                 label,
                 statusCode: key,
-                body: (
-                    <OpenAPIExample
-                        example={getExampleFromReference(responseObject, context)}
-                        context={context}
-                        syntax="json"
-                    />
-                ),
+                body: <OpenAPIResponse context={context} content={responseObject.content} />,
             };
-        }
-
-        if (!responseObject.content || Object.keys(responseObject.content).length === 0) {
-            return {
-                key: key,
-                label,
-                statusCode: key,
-                body: <OpenAPIEmptyExample context={context} />,
-            };
-        }
-
-        return {
-            key: key,
-            label,
-            statusCode: key,
-            body: <OpenAPIResponse context={context} content={responseObject.content} />,
-        };
-    });
+        });
 
     if (tabs.length === 0) {
         return null;
@@ -97,7 +99,7 @@ export function OpenAPIResponseExample(props: {
 function OpenAPIResponse(props: {
     context: OpenAPIContext;
     content: {
-        [media: string]: OpenAPIV3.MediaTypeObject;
+        [media: string]: OpenAPIV3.MediaTypeObject | null;
     };
 }) {
     const { context, content } = props;
@@ -111,6 +113,15 @@ function OpenAPIResponse(props: {
 
     const tabs = entries.map((entry) => {
         const [mediaType, mediaTypeObject] = entry;
+
+        if (!mediaTypeObject) {
+            return {
+                key: mediaType,
+                label: mediaType,
+                body: <OpenAPIEmptyExample context={context} />,
+            };
+        }
+
         return {
             key: mediaType,
             label: mediaType,

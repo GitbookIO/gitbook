@@ -1,0 +1,31 @@
+{
+    "name": "@gitbook/fonts",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "version": "0.1.0",
+    "dependencies": {
+        "@gitbook/api": "catalog:"
+    },
+    "devDependencies": {
+        "google-font-metadata": "^6.0.3",
+        "typescript": "^5.5.3"
+    },
+    "scripts": {
+        "generate": "bun ./bin/generate.js",
+        "build": "tsc --project tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "dev": "tsc -w",
+        "clean": "rm -rf ./dist && rm -rf ./src/data",
+        "unit": "bun test"
+    },
+    "files": ["dist", "src", "bin", "README.md", "CHANGELOG.md"],
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

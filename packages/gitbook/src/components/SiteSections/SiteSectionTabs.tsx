@@ -83,6 +83,12 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                                                     )
                                                 }
                                                 asChild
+                                                onClick={(e) => {
+                                                    if (value) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }
+                                                }}
                                             >
                                                 <SectionGroupTab
                                                     isActive={isActive}
@@ -127,7 +133,7 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                 }}
             >
                 <NavigationMenu.Viewport
-                    className="relative mt-3 h-(--radix-navigation-menu-viewport-height) w-[calc(100vw-2rem)] origin-[top_center] overflow-hidden rounded-lg straight-corners:rounded-xs bg-tint-base shadow-lg shadow-tint-10/6 ring-1 ring-tint-subtle duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,height,transform] motion-safe:data-[state=closed]:animate-scaleOut motion-safe:data-[state=open]:animate-scaleIn md:mx-0 md:w-(--radix-navigation-menu-viewport-width) dark:shadow-tint-1/6"
+                    className="relative mt-3 h-(--radix-navigation-menu-viewport-height) w-[calc(100vw-2rem)] origin-[top_center] overflow-hidden rounded-lg straight-corners:rounded-xs bg-tint-base depth-flat:shadow-none shadow-lg shadow-tint-10/6 ring-1 ring-tint-subtle duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,height,transform] motion-safe:data-[state=closed]:animate-scaleOut motion-safe:data-[state=open]:animate-scaleIn md:mx-0 md:w-(--radix-navigation-menu-viewport-width) dark:shadow-tint-1/6"
                     style={{
                         translate:
                             undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,
@@ -151,7 +157,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             ref={ref}
             {...rest}
             className={tcls(
-                'group relative my-2 flex select-none items-center justify-between rounded-sm straight-corners:rounded-none px-3 py-1',
+                'group relative my-2 flex select-none items-center justify-between circular-corners:rounded-full rounded-corners:rounded-sm px-3 py-1',
                 isActive
                     ? 'text-primary-subtle'
                     : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
@@ -180,7 +186,7 @@ const SectionGroupTab = React.forwardRef(function SectionGroupTab(
             ref={ref}
             {...rest}
             className={tcls(
-                'group relative my-2 flex select-none items-center justify-between rounded-sm straight-corners:rounded-none px-3 py-1 transition-colors',
+                'group relative my-2 flex select-none items-center justify-between circular-corners:rounded-full rounded-sm straight-corners:rounded-none px-3 py-1 transition-colors hover:cursor-default',
                 isActive
                     ? 'text-primary-subtle'
                     : 'text-tint hover:bg-tint-hover hover:text-tint-strong'

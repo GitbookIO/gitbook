@@ -1,9 +1,10 @@
+import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
+import { throwIfDataError } from '@/lib/data';
+import type { GitBookLinker } from '@/lib/links';
 import { joinPath } from '@/lib/paths';
-import { getIndexablePages } from '@/lib/sitemap';
+import { type FlatPageEntry, getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import type { SiteSection, SiteSpace } from '@gitbook/api';
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
-import { throwIfDataError } from '@v2/lib/data';
 import assertNever from 'assert-never';
 import type { ListItem, Paragraph, Root, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
@@ -46,7 +47,7 @@ export async function serveLLMsTxt(
         }),
         {
             headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
+                'Content-Type': 'text/markdown; charset=utf-8',
             },
         }
     );
@@ -133,40 +134,17 @@ async function getNodesFromSiteSpaces(
             if (!siteSpaceUrl) {
                 return [];
             }
-            const rootPages = await throwIfDataError(
-                dataFetcher.getRevisionPages({
+            const revision = await throwIfDataError(
+                dataFetcher.getRevision({
                     spaceId: siteSpace.space.id,
                     revisionId: siteSpace.space.revision,
-                    metadata: false,
                 })
             );
-            const pages = getIndexablePages(rootPages);
-            const listChildren = await Promise.all(
-                pages.map(async ({ page }): Promise<ListItem> => {
-                    const pageURL = new URL(siteSpaceUrl);
-                    pageURL.pathname = joinPath(pageURL.pathname, page.path);
-                    if (options.withMarkdownPages) {
-                        pageURL.pathname = `${pageURL.pathname}.md`;
-                    }
+            const pages = getIndexablePages(revision.pages);
 
-                    const url = linker.toLinkForContent(pageURL.toString());
-                    const children: Paragraph['children'] = [
-                        {
-                            type: 'link',
-                            url,
-                            children: [{ type: 'text', value: page.title }],
-                        },
-                    ];
-                    if (page.description) {
-                        children.push({ type: 'text', value: `: ${page.description}` });
-                    }
-                    return {
-                        type: 'listItem',
-                        children: [{ type: 'paragraph', children }],
-                    };
-                })
-            );
             const nodes: RootContent[] = [];
+
+            // Add the space title as a heading
             if (options.heading) {
                 nodes.push({
                     type: 'heading',
@@ -174,13 +152,65 @@ async function getNodesFromSiteSpaces(
                     children: [{ type: 'text', value: siteSpace.title }],
                 });
             }
-            nodes.push({
-                type: 'list',
-                spread: false,
-                children: listChildren,
-            });
+
+            // Add the pages as a list
+            nodes.push(
+                ...(await getMarkdownForPagesTree(pages, {
+                    siteSpaceUrl,
+                    linker,
+                    withMarkdownPages: options.withMarkdownPages,
+                }))
+            );
+
             return nodes;
         })
     );
     return all.flat();
+}
+
+/**
+ * Returns a list of markdown nodes for a pages tree.
+ */
+export async function getMarkdownForPagesTree(
+    pages: FlatPageEntry[],
+    options: {
+        siteSpaceUrl: string;
+        linker: GitBookLinker;
+        withMarkdownPages?: boolean;
+    }
+): Promise<RootContent[]> {
+    const { siteSpaceUrl, linker } = options;
+
+    const listChildren = await Promise.all(
+        pages.map(async ({ page }): Promise<ListItem> => {
+            const pageURL = new URL(siteSpaceUrl);
+            pageURL.pathname = joinPath(pageURL.pathname, page.path);
+            if (options.withMarkdownPages) {
+                pageURL.pathname = `${pageURL.pathname}.md`;
+            }
+
+            const url = linker.toLinkForContent(pageURL.toString());
+            const children: Paragraph['children'] = [
+                {
+                    type: 'link',
+                    url,
+                    children: [{ type: 'text', value: page.title }],
+                },
+            ];
+            if (page.description) {
+                children.push({ type: 'text', value: `: ${page.description}` });
+            }
+            return {
+                type: 'listItem',
+                children: [{ type: 'paragraph', children }],
+            };
+        })
+    );
+    const nodes: RootContent[] = [];
+    nodes.push({
+        type: 'list',
+        spread: false,
+        children: listChildren,
+    });
+    return nodes;
 }

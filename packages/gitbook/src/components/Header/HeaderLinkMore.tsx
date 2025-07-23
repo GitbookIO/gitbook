@@ -1,16 +1,21 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type CustomizationContentLink,
     type CustomizationHeaderItem,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type React from 'react';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { DropdownChevron, DropdownMenu, DropdownMenuItem, DropdownSubMenu } from './DropdownMenu';
+import {
+    DropdownChevron,
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownSubMenu,
+} from '../primitives/DropdownMenu';
 import styles from './headerLinks.module.css';
 
 /**
@@ -77,7 +82,7 @@ async function MoreMenuLink(props: {
         </DropdownSubMenu>
     ) : (
         <DropdownMenuItem
-            href={target?.href ?? null}
+            href={target?.href}
             insights={
                 link.to
                     ? {

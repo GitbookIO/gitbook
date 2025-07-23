@@ -2,12 +2,13 @@ import {
     CURRENT_SIGNATURE_VERSION,
     type CloudflareImageOptions,
     type SignatureVersion,
+    SizableImageAction,
     checkIsSizableImageURL,
     isSignatureVersion,
     parseImageAPIURL,
     resizeImage,
     verifyImageSignature,
-} from '@v2/lib/images';
+} from '@/lib/images';
 import { NextResponse } from 'next/server';
 
 /**
@@ -40,7 +41,7 @@ export async function serveResizedImage(
     // Check again if the image can be sized, even though we checked when rendering the Image component
     // Otherwise, it's possible to pass just any link to this endpoint and trigger HTML injection on the domain
     // Also prevent infinite redirects.
-    if (!checkIsSizableImageURL(url)) {
+    if (checkIsSizableImageURL(url) === SizableImageAction.Skip) {
         return new Response('Invalid url parameter', { status: 400 });
     }
 

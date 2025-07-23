@@ -1,3 +1,4 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import {
     type ContentRef,
     type CustomizationContentLink,
@@ -5,7 +6,6 @@ import {
     type CustomizationHeaderPreset,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import assertNever from 'assert-never';
 
 import { resolveContentRef } from '@/lib/references';
@@ -17,7 +17,7 @@ import {
     DropdownChevron,
     DropdownMenu,
     DropdownMenuItem,
-} from './DropdownMenu';
+} from '../primitives/DropdownMenu';
 
 export async function HeaderLink(props: {
     context: GitBookSiteContext;
@@ -104,7 +104,7 @@ function HeaderItemButton(
     const variant = (() => {
         switch (linkStyle) {
             case 'button-secondary':
-                return 'secondary';
+                return 'header';
             case 'button-primary':
                 return 'primary';
             default:
@@ -119,10 +119,8 @@ function HeaderItemButton(
             className={tcls(
                 {
                     'button-primary':
-                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none hover:theme-bold:bg-header-link hover:theme-bold:text-header-background hover:theme-bold:shadow-none',
-                    'button-secondary': tcls(
-                        'theme-bold:bg-header-link/2 theme-gradient:bg-tint-base theme-muted:bg-tint-base theme-bold:text-header-link theme-bold:shadow-none theme-bold:ring-header-link/4 hover:theme-bold:bg-header-link/3 hover:theme-bold:text-header-link hover:theme-bold:shadow-none hover:theme-bold:ring-header-link/5 contrast-more:theme-bold:bg-header-background contrast-more:theme-bold:text-header-link contrast-more:theme-bold:ring-header-link contrast-more:hover:theme-bold:ring-header-link'
-                    ),
+                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none theme-bold:hover:bg-header-link theme-bold:hover:text-header-background theme-bold:hover:shadow-none',
+                    'button-secondary': '',
                 }[linkStyle]
             )}
             insights={{
@@ -159,7 +157,7 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
         'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
-        'hover:theme-bold:text-header-link'
+        'theme-bold:hover:!text-header-link/7'
     );
 }
 

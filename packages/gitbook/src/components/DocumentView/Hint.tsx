@@ -23,6 +23,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'rounded-md',
                 hasHeading ? 'rounded-l' : null,
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-xl',
                 'overflow-hidden',
                 hasHeading ? ['border-l-2', hintStyle.containerWithHeader] : hintStyle.container,
 
@@ -51,7 +52,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'flip-heading-hash p-4 pl-3 text-[1em] *:mt-0',
+                        'flip-heading-hash !py-4 items-start px-4 pl-3 text-[1em] *:flex-none',
                         hasHeading ? hintStyle.header : null
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}

@@ -1,9 +1,7 @@
 import type { DocumentBlockReusableContent } from '@gitbook/api';
 
+import { getDataOrNull } from '@/lib/data';
 import { resolveContentRef } from '@/lib/references';
-
-import type { GitBookSpaceContext } from '@v2/lib/context';
-import { getDataOrNull } from '@v2/lib/data';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
 
@@ -23,37 +21,25 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         dataFetcher,
     });
 
-    if (!resolved?.reusableContent) {
+    if (!resolved) {
         return null;
     }
 
-    const reusableContent = resolved.reusableContent.revisionReusableContent;
-    if (!reusableContent.document) {
+    const { reusableContent } = resolved;
+    if (!reusableContent || !reusableContent.revisionReusableContent.document) {
         return null;
     }
 
     const document = await getDataOrNull(
         dataFetcher.getDocument({
-            spaceId: resolved.reusableContent.space.id,
-            documentId: reusableContent.document,
+            spaceId: reusableContent.context.space.id,
+            documentId: reusableContent.revisionReusableContent.document,
         })
     );
 
     if (!document) {
         return null;
     }
-
-    // Create a new context for reusable content block, including
-    // the data fetcher with the token from the block meta and the correct
-    // space and revision pointers.
-    const reusableContentContext: GitBookSpaceContext = {
-        ...context.contentContext,
-        dataFetcher,
-        space: resolved.reusableContent.space,
-        revisionId: resolved.reusableContent.revision,
-        pages: [],
-        shareKey: undefined,
-    };
 
     return (
         <UnwrappedBlocks
@@ -62,7 +48,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
             ancestorBlocks={[...ancestorBlocks, block]}
             context={{
                 ...context,
-                contentContext: reusableContentContext,
+                contentContext: reusableContent.context,
             }}
         />
     );

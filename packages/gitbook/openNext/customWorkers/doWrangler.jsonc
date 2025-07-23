@@ -1,0 +1,149 @@
+{
+    "main": "do.js",
+    "name": "gitbook-open-v2-do",
+    "compatibility_date": "2025-04-14",
+    "compatibility_flags": [
+        "nodejs_compat",
+        "allow_importable_env",
+        "global_fetch_strictly_public"
+    ],
+    "observability": {
+        "enabled": true
+    },
+    "env": {
+        "preview": {
+            "vars": {
+                "STAGE": "preview",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-preview"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-preview"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        },
+        "staging": {
+            "vars": {
+                "STAGE": "staging",
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-staging"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-staging-tail"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-staging"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        },
+        "production": {
+            "vars": {
+                // R2 is strongly consistent, so we can disable SQLite
+                "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
+                // We don't want to pollute the memory with broken cache entries
+                // Most of the time, those are fake requests.
+                "NEXT_CACHE_DO_QUEUE_MAX_RETRIES": "1",
+                "STAGE": "production"
+            },
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "gitbook-open-v2-cache-production"
+                }
+            ],
+            "tail_consumers": [
+                {
+                    "service": "gitbook-x-prod-tail"
+                }
+            ],
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "gitbook-open-v2-production"
+                }
+            ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
+                    },
+                    {
+                        "name": "WRITE_BUFFER",
+                        "class_name": "R2WriteBuffer"
+                    }
+                ]
+            },
+            "migrations": [
+                {
+                    "tag": "v1",
+                    "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "R2WriteBuffer"]
+                }
+            ]
+        }
+    }
+}

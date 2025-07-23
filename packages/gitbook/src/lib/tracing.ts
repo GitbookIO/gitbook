@@ -1,3 +1,5 @@
+import { getLogger } from '@/lib/logger';
+
 export interface TraceSpan {
     setAttribute: (label: string, value: boolean | string | number) => void;
 }
@@ -28,19 +30,19 @@ export async function trace<T>(
     };
 
     const start = now();
-    let failed = false;
+    let traceError: null | Error = null;
     try {
         return await fn(span);
     } catch (error) {
         span.setAttribute('error', true);
-        failed = true;
+        traceError = error as Error;
         throw error;
     } finally {
         if (process.env.SILENT !== 'true' && process.env.NODE_ENV !== 'development') {
             const end = now();
-            // biome-ignore lint/suspicious/noConsole: we want to log performance data
-            console.log(
-                `trace ${completeName} ${failed ? 'failed' : 'succeeded'} in ${end - start}ms`,
+            const logger = getLogger().subLogger(operation);
+            logger.log(
+                `trace ${completeName} ${traceError ? `failed with ${traceError.message}` : 'succeeded'} in ${end - start}ms`,
                 attributes
             );
         }

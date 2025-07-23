@@ -9,9 +9,6 @@ import type { BlockProps } from '../Block';
 import { CopyCodeButton } from './CopyCodeButton';
 import type { HighlightLine, HighlightToken } from './highlight';
 
-import './theme.css';
-import './CodeBlockRenderer.css';
-
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     lines: HighlightLine[];
     'aria-busy'?: boolean;
@@ -50,7 +47,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             />
             <pre
                 className={tcls(
-                    'hide-scroll relative overflow-auto border border-tint-subtle bg-tint-subtle theme-muted:bg-tint-base [grid-area:2/1] contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base',
+                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-muted:bg-tint-base p-2 [grid-area:2/1] contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base',
                     'rounded-md straight-corners:rounded-xs shadow-xs',
                     title && 'rounded-ss-none'
                 )}
@@ -58,7 +55,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 <code
                     id={id}
                     className={tcls(
-                        'inline-grid min-w-full grid-cols-[auto_1fr] p-2 [count-reset:line]',
+                        'inline-grid min-w-full grid-cols-[auto_1fr] [count-reset:line] print:whitespace-pre-wrap',
                         withWrap && 'whitespace-pre-wrap'
                     )}
                 >

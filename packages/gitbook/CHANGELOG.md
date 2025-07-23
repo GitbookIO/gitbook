@@ -1,5 +1,187 @@
 # gitbook
 
+## 0.14.0
+
+### Minor Changes
+
+- 0003030: Implement AI actions dropdown
+- acb9f53: New search layout
+
+### Patch Changes
+
+- 334cfdd: Fix responsive class for SearchInput button
+- 6816f0f: add browserlists and fix old browser css-masks
+- 9ee9082: Refactor icon loading state in AIAction components
+- 52ab368: Reposition AI Actions dropdown
+- 7212345: Fix AI Actions dropdown and LLM integration
+- 8daede5: Ensure all content links are resolved relatively to preview.
+- ed684c1: Move AI Actions markdown fetching to client-side
+- 9cc5a78: Generalise keyboard shortcuts, add Cmd+J to AI Chat
+- Updated dependencies [6816f0f]
+- Updated dependencies [1738677]
+  - @gitbook/icons@0.2.1
+  - @gitbook/openapi-parser@2.2.1
+  - @gitbook/react-contentkit@0.7.2
+  - @gitbook/react-openapi@1.3.3
+
+## 0.13.1
+
+### Patch Changes
+
+- f5894bc: Fix incorrect revision ID in Markdown fetch logic
+- 1b59e7c: Styling improvements to AI Chat Followup questions
+- Updated dependencies [bd553bc]
+  - @gitbook/openapi-parser@2.2.0
+  - @gitbook/react-openapi@1.3.2
+
+## 0.13.0
+
+### Minor Changes
+
+- af98402: Add support for inline icons.
+- 7d3fe23: Add circular corners and depth styling
+- f3affc3: Display MCP tool calls in AI chat.
+- fa12f9e: Support dark-mode specific page cover image
+- df848ef: Add support for icons in buttons.
+- b7a0db3: Fix rendering of ogimage with SVG logos.
+- c3b620e: Best effort at preserving current variant when navigating between sections by matching the pathname against site spaces in the new section.
+- 4fb2a4a: Rework full-width layout, add support for full-width page option
+- df848ef: Add support for text alignment for headings and paragraphs.
+- f033734: Add support for site customization option to change how external links open.
+- 7b38f89: Enable AI chat when AI mode is configured to assistant
+- 8d65983: Add AI chat
+
+### Patch Changes
+
+- 42d88da: Fix UX issue about highlighting the search term in search result sections
+- 6aa3ff9: Fix three small visual issues
+
+  - Fix sidebar showing on `no-toc` pages in the gradient theme
+  - Fix variant selector truncating incorrectly in header when sections are present
+  - Fix page cover alignment on `lg` screens without TOC
+
+- 015615d: Respect fullWidth and defaultWidth for images
+- e8fb84d: Fix hash with align in columns
+- 4721403: Hide scrollbar on sections
+- d410381: Add docs.testgitbook.com to ADAPTIVE_CONTENT_HOSTS list
+- 7d5a6d2: fix nested a tag causing hydration error
+- bc1eca8: Error handling for AI Chat
+- b3a7ad6: fix href being empty in TOC
+- dc4268d: Fix navigation between sections/variants when previewing a site in v2
+- 58d7f3c: Fix revision id for computed content
+- 11a6511: Fix crash when integration script fails to render block.
+- 7a00880: Improve support for OAuth2 security type
+- c0ee60e: Adds Columns layout block to GBO
+- 9316ccd: Update Models page styling
+- 42d43e0: Show scrollbars
+- 72cd0e5: Optimize performances by using a smarter per-request cache arround data cached functions
+- af66ff7: add a force-revalidate api route to force bust the cache in case of errors
+- e2afc07: Fix resolution of page by resolving site redirects before space redirects
+- 88a35ed: Fix crash when integration is triggering invalid requests.
+- 711cf38: Optimize the fetch of revision files by using only the getRevision cache.
+- f58b904: encode customization header
+- 4f5fec7: Fix CodeBlock layout
+- 3bfe347: Show tabs when there is a single section group present
+- a7a713b: Scroll to active TOC when clicking a link
+- ba0094a: fix ISR on preview env
+- 521052d: Fix concurrent execution in Vercel causing pages to not be attached to the proper tags.
+- 33726c8: Generate a llms-full.txt version of the docs site
+- 500c8cb: Don't crash ogimage generation on RTL text, as a workaround until we can support it.
+- 6859f7d: Fix rendering of ogimage when logo or icon are AVIF images.
+- a28a997: Add margin to adjacent buttons
+- 67998b6: Fix ogimage generation failing with some JPEG images.
+- 8c0a53a: Fix page group not expanded by default
+- dfa8a37: Don't cache unexpected API errors for more than a few minutes.
+- 73e0cbb: Fix an issue where PDF export URLs were not keeping their query params.
+- e5bac69: Fix markdown page generation for groups
+- 6294bbb: add a global error boundary
+- b60039b: Fix links to other spaces within a section.
+- 59da30f: Add support for cover repositioning
+- b403962: Handle nullish OpenAPI mediaTypeObject
+- c730845: Fix missing title on button to close the announcement banner.
+- 231167d: Make icons for page groups more contrasting
+- d99da6a: Ignore case while highlighting search results.
+- dae019c: Consistently show variant selector in section bar if site has sections
+- dd65987: Include page group children under the .md route
+- 57bb146: Make TOC height dynamic based on visible header and footer elements
+- 4f7c0ee: Clicking an active TOC item toggles its descendants
+- ca3b9ac: Improve AI Chat context popup
+- 5726999: Fix viewing a page from a revision
+- 392f594: Fix InlineLinkTooltip having a negative impact on performance, especially on larger pages.
+- c9373ef: Fix bold header links hover color
+- fa3eb07: cache fonts and static image used in OGImage in memory
+- e7a591d: Fix border being added to cards
+- 427f748: Add metadata for adding site to Apple devices home
+- a3a944d: Fix crash during rendering of ogimage for VA sites with default icon.
+- 4b67fe5: Add `urlObject.hash` to `linker.toLinkForContent` to pass through URL fragment identifiers, used in search
+- caaa692: Allow to zoom images on mobile if relevant
+- 902c3c6: apply customization for dynamic context
+- b6b5975: Reverse order of feedback smileys
+- fbfcca5: Fix ogimage using incorrect Google Font depending on language.
+- 2932077: remove trailing slash from linker
+- 2350baa: Support for OpenAPI Array request body
+- Updated dependencies [957afd9]
+- Updated dependencies [7a00880]
+- Updated dependencies [11a6511]
+- Updated dependencies [fbfcca5]
+- Updated dependencies [a0c06a7]
+- Updated dependencies [b403962]
+- Updated dependencies [1e013cd]
+- Updated dependencies [4f5cbfe]
+- Updated dependencies [4c9a9d0]
+- Updated dependencies [40df91a]
+- Updated dependencies [2350baa]
+  - @gitbook/react-openapi@1.3.1
+  - @gitbook/react-contentkit@0.7.1
+  - @gitbook/fonts@0.1.0
+  - @gitbook/openapi-parser@2.1.5
+
+## 0.12.0
+
+### Minor Changes
+
+- 8339e91: Fix images in reusable content across spaces.
+- 326e28e: Design tweaks to code blocks and OpenAPI pages
+- 3119066: Add support for reusable content across spaces.
+- 7d7806d: Pass SVG images through image resizing without resizing them to serve them from optimal host.
+
+### Patch Changes
+
+- c4ebb3f: Fix openapi-select hover in responses
+- aed79fd: Decrease rounding of header logo
+- 42ca7e1: Fix openapi CR preview
+- e6ddc0f: Fix URL in sitemap
+- 5e975ab: Fix code highlighting for HTTP
+- 5d504ff: Fix resolution of links in reusable contents
+- 95a1f65: Better print layouts: wrap code blocks & force table column auto-sizing
+- 0499966: Fix invalid sitemap.xml generated with relative URLs instead of absolute ones
+- 2a805cc: Change OpenAPI schema-optional from `info` to `tint` color
+- 580101d: Fix schemas disclosure label causing client error
+- 12a455d: Fix OpenAPI layout issues
+- 97b7c79: Increase logging around caching behaviour causing page crashes.
+- 373f18f: Prevent section group popovers from opening on click
+- 3f29206: Update the regex for validating site redirect
+- 0c973a3: Always link main logo to the root of the site
+- ae5f1ab: Change `Dropdown`s to use Radix's `DropdownMenu`
+- 0e201d5: Add border to filled sidebar on gradient theme
+- dd043df: Revert investigation work around URL caches.
+- 89a5816: Fix OpenAPI disclosure label ("Show properties") misalignment on mobile
+- Updated dependencies [c3f6b8c]
+- Updated dependencies [d00dc8c]
+- Updated dependencies [42ca7e1]
+- Updated dependencies [326e28e]
+- Updated dependencies [5e975ab]
+- Updated dependencies [f7a3470]
+- Updated dependencies [580101d]
+- Updated dependencies [20ebecb]
+- Updated dependencies [80cb52a]
+- Updated dependencies [cb5598d]
+- Updated dependencies [c6637b0]
+- Updated dependencies [a3ec264]
+  - @gitbook/colors@0.3.3
+  - @gitbook/openapi-parser@2.1.4
+  - @gitbook/react-openapi@1.3.0
+
 ## 0.11.1
 
 ### Patch Changes
@@ -564,7 +746,7 @@
 - 4cbcc5b: Rollback of scalar modal while fixing perf issue
 - 3996110: Optimize images rendered in community ads
 - 133c3e7: Update design of Checkbox to be more consistent and readable
-- 5096f7f: Disable KV cache for docs.gitbook.com as a test, also disable it for change-request to improve consistency
+- 5096f7f: Disable KV cache for gitbook.com/docs as a test, also disable it for change-request to improve consistency
 - 0f1565c: Add optional env `GITBOOK_INTEGRATIONS_HOST` to configure the host serving the integrations
 - 2ff7ed1: Fix table of contents being visible on mobile when disabled at the page level
 - b075f0f: Fix accessibility of the table of contents by using `aria-current` instead of `aria-selected`

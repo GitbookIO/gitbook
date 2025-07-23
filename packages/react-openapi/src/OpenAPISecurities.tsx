@@ -1,5 +1,7 @@
+import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
+import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
@@ -105,13 +107,7 @@ function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPI
                 />
             );
         case 'oauth2':
-            return (
-                <OpenAPISchemaName
-                    context={context}
-                    propertyName="OAuth2"
-                    required={security.required}
-                />
-            );
+            return <OpenAPISchemaOAuth2Flows context={context} security={security} />;
         case 'openIdConnect':
             return (
                 <OpenAPISchemaName
@@ -124,4 +120,112 @@ function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPI
             // @ts-ignore
             return security.type;
     }
+}
+
+function OpenAPISchemaOAuth2Flows(props: {
+    context: OpenAPIClientContext;
+    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean };
+}) {
+    const { context, security } = props;
+
+    const flows = Object.entries(security.flows ?? {});
+
+    return (
+        <div className="openapi-securities-oauth-flows">
+            {flows.map(([name, flow], index) => (
+                <OpenAPISchemaOAuth2Item
+                    key={index}
+                    flow={flow}
+                    name={name}
+                    context={context}
+                    security={security}
+                />
+            ))}
+        </div>
+    );
+}
+
+function OpenAPISchemaOAuth2Item(props: {
+    flow: NonNullable<OpenAPIV3.OAuth2SecurityScheme['flows']>[keyof NonNullable<
+        OpenAPIV3.OAuth2SecurityScheme['flows']
+    >];
+    name: string;
+    context: OpenAPIClientContext;
+    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean };
+}) {
+    const { flow, context, security, name } = props;
+
+    if (!flow) {
+        return null;
+    }
+
+    const scopes = Object.entries(flow?.scopes ?? {});
+
+    return (
+        <div>
+            <OpenAPISchemaName
+                context={context}
+                propertyName="OAuth2"
+                type={name}
+                required={security.required}
+            />
+            <div className="openapi-securities-oauth-content openapi-markdown">
+                {security.description ? <Markdown source={security.description} /> : null}
+                {'authorizationUrl' in flow && flow.authorizationUrl ? (
+                    <span>
+                        Authorization URL:{' '}
+                        <OpenAPICopyButton
+                            value={flow.authorizationUrl}
+                            context={context}
+                            className="openapi-securities-url"
+                            withTooltip
+                        >
+                            {flow.authorizationUrl}
+                        </OpenAPICopyButton>
+                    </span>
+                ) : null}
+                {'tokenUrl' in flow && flow.tokenUrl ? (
+                    <span>
+                        Token URL:{' '}
+                        <OpenAPICopyButton
+                            value={flow.tokenUrl}
+                            context={context}
+                            className="openapi-securities-url"
+                            withTooltip
+                        >
+                            {flow.tokenUrl}
+                        </OpenAPICopyButton>
+                    </span>
+                ) : null}
+                {'refreshUrl' in flow && flow.refreshUrl ? (
+                    <span>
+                        Refresh URL:{' '}
+                        <OpenAPICopyButton
+                            value={flow.refreshUrl}
+                            context={context}
+                            className="openapi-securities-url"
+                            withTooltip
+                        >
+                            {flow.refreshUrl}
+                        </OpenAPICopyButton>
+                    </span>
+                ) : null}
+                {scopes.length ? (
+                    <div>
+                        {t(context.translation, 'available_scopes')}:{' '}
+                        <ul>
+                            {scopes.map(([key, value]) => (
+                                <li key={key}>
+                                    <OpenAPICopyButton value={key} context={context} withTooltip>
+                                        <code>{key}</code>
+                                    </OpenAPICopyButton>
+                                    : {value}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : null}
+            </div>
+        </div>
+    );
 }

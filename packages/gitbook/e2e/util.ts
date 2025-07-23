@@ -1,8 +1,11 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
+    CustomizationAIMode,
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultFont,
+    CustomizationDefaultMonospaceFont,
+    CustomizationDepth,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
@@ -15,6 +18,7 @@ import {
     CustomizationThemeMode,
     type CustomizationThemedColor,
     type SiteCustomizationSettings,
+    SiteExternalLinksTarget,
 } from '@gitbook/api';
 import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
 import deepMerge from 'deepmerge';
@@ -168,6 +172,7 @@ export function runTestCases(testCases: TestsCase[]) {
                               new URL(testEntryPathname, testCase.contentBaseURL).toString()
                           )
                         : getTestURL(testEntryPathname);
+
                     if (testEntry.cookies) {
                         await context.addCookies(
                             testEntry.cookies.map((cookie) => ({
@@ -277,7 +282,9 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             dangerColor: { light: '#FB2C36', dark: '#FB2C36' },
             successColor: { light: '#00C950', dark: '#00C950' },
             corners: CustomizationCorners.Rounded,
+            depth: CustomizationDepth.Subtle,
             font: CustomizationDefaultFont.Inter,
+            monospaceFont: CustomizationDefaultMonospaceFont.IBMPlexMono,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,
@@ -311,8 +318,11 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         feedback: {
             enabled: false,
         },
-        aiSearch: {
-            enabled: true,
+        ai: {
+            mode: CustomizationAIMode.None,
+        },
+        externalLinks: {
+            target: SiteExternalLinksTarget.Self,
         },
         advancedCustomization: {
             enabled: true,
@@ -322,6 +332,10 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         },
         pagination: {
             enabled: true,
+        },
+        pageActions: {
+            externalAI: true,
+            markdown: true,
         },
         trademark: {
             enabled: true,
@@ -343,21 +357,32 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
 /**
  * Wait for all icons present on the page to be loaded.
  */
-async function waitForIcons(page: Page) {
+export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
-        const urlStates: Record<string, 'pending' | 'loaded'> =
-            (window as any).__ICONS_STATES__ || {};
+        const urlStates: Record<
+            string,
+            { state: 'pending'; uri: null } | { state: 'loaded'; uri: string }
+        > = (window as any).__ICONS_STATES__ || {};
         (window as any).__ICONS_STATES__ = urlStates;
+
+        const fetchSvgAsDataUri = async (url: string): Promise<string> => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch SVG: ${response.status}`);
+            }
+
+            const svgText = await response.text();
+            const encoded = encodeURIComponent(svgText).replace(/'/g, '%27').replace(/"/g, '%22');
+
+            return `data:image/svg+xml;charset=utf-8,${encoded}`;
+        };
 
         const loadUrl = (url: string) => {
             // Mark the URL as pending.
-            urlStates[url] = 'pending';
-
-            const img = new Image();
-            img.onload = () => {
-                urlStates[url] = 'loaded';
-            };
-            img.src = url;
+            urlStates[url] = { state: 'pending', uri: null };
+            fetchSvgAsDataUri(url).then((uri) => {
+                urlStates[url] = { state: 'loaded', uri };
+            });
         };
 
         const icons = Array.from(document.querySelectorAll('svg.gb-icon'));
@@ -393,18 +418,11 @@ async function waitForIcons(page: Page) {
 
             // If the URL is already queued for loading, we return the state.
             if (urlStates[url]) {
-                if (urlStates[url] === 'loaded') {
+                if (urlStates[url].state === 'loaded') {
                     icon.setAttribute('data-argos-state', 'pending');
-                    const bckMaskImage = icon.style.maskImage;
-                    const bckDisplay = icon.style.display;
-                    icon.style.maskImage = '';
-                    icon.style.display = 'none';
+                    icon.style.maskImage = `url("${urlStates[url].uri}")`;
                     requestAnimationFrame(() => {
-                        icon.style.maskImage = bckMaskImage;
-                        icon.style.display = bckDisplay;
-                        requestAnimationFrame(() => {
-                            icon.setAttribute('data-argos-state', 'loaded');
-                        });
+                        icon.setAttribute('data-argos-state', 'loaded');
                     });
                     return false;
                 }

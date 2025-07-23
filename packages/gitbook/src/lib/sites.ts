@@ -1,4 +1,6 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
+import { joinPath } from './paths';
 
 /**
  * Get all sections from a site structure.
@@ -46,36 +48,111 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
 /**
  * Find a site space by its spaceId in a site structure.
  */
-export function findSiteSpaceById(siteStructure: SiteStructure, spaceId: string): SiteSpace | null {
+export function findSiteSpaceBy(
+    siteStructure: SiteStructure,
+    predicate: (siteSpace: SiteSpace) => boolean
+): {
+    siteSpace: SiteSpace;
+    siteSection: SiteSection | null;
+    siteSectionGroup: SiteSectionGroup | null;
+} | null {
     if (siteStructure.type === 'siteSpaces') {
-        return siteStructure.structure.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+        const siteSpace = siteStructure.structure.find(predicate) ?? null;
+        if (siteSpace) {
+            return {
+                siteSpace,
+                siteSection: null,
+                siteSectionGroup: null,
+            };
+        }
+
+        return null;
     }
 
-    for (const section of siteStructure.structure) {
-        const siteSpace =
-            section.object === 'site-section'
-                ? findSiteSpaceByIdInSiteSpaces(section.siteSpaces, spaceId)
-                : findSiteSpaceByIdInSections(section.sections, spaceId);
-        if (siteSpace) {
-            return siteSpace;
+    for (const sectionOrGroup of siteStructure.structure) {
+        if (sectionOrGroup.object === 'site-section') {
+            const siteSpace = findSiteSpaceByIdInSiteSpaces(sectionOrGroup.siteSpaces, predicate);
+            if (siteSpace) {
+                return {
+                    siteSpace,
+                    siteSection: sectionOrGroup,
+                    siteSectionGroup: null,
+                };
+            }
+        } else {
+            const found = findSiteSpaceByIdInSections(sectionOrGroup.sections, predicate);
+            if (found) {
+                return {
+                    siteSpace: found.siteSpace,
+                    siteSection: found.siteSection,
+                    siteSectionGroup: sectionOrGroup,
+                };
+            }
         }
     }
 
     return null;
 }
 
-function findSiteSpaceByIdInSections(sections: SiteSection[], spaceId: string): SiteSpace | null {
-    for (const section of sections) {
-        const siteSpace =
-            section.siteSpaces.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+/**
+ * Get the URL to navigate to for a section.
+ * When the site is not published yet, `urls.published` is not available.
+ * To ensure navigation works in preview, we compute a relative URL from the siteSection path.
+ */
+export function getSectionURL(context: GitBookSiteContext, section: SiteSection) {
+    const { linker } = context;
+    return section.urls.published
+        ? linker.toLinkForContent(section.urls.published)
+        : linker.toPathInSite(section.path);
+}
+
+/**
+ * Get the URL to navigate to for a site space.
+ * When the site is not published yet, `urls.published` is not available.
+ * To ensure navigation works in preview, we compute a relative URL from the siteSpace path.
+ */
+export function getSiteSpaceURL(context: GitBookSiteContext, siteSpace: SiteSpace) {
+    const { linker } = context;
+    if (siteSpace.urls.published) {
+        return linker.toLinkForContent(siteSpace.urls.published);
+    }
+
+    return linker.toPathInSite(getFallbackSiteSpacePath(context, siteSpace));
+}
+
+/**
+ * Get the path of a site space in the current site.
+ */
+export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace: SiteSpace) {
+    const found = findSiteSpaceBy(context.structure, (entry) => entry.id === siteSpace.id);
+    // don't include the path for the default site space
+    const siteSpacePath = siteSpace.default ? '' : siteSpace.path;
+
+    // for non-default site sections, include the section path.
+    if (found?.siteSection && !found?.siteSection.default) {
+        return joinPath(found.siteSection.path, siteSpacePath);
+    }
+
+    return siteSpacePath;
+}
+
+function findSiteSpaceByIdInSections(
+    sections: SiteSection[],
+    predicate: (siteSpace: SiteSpace) => boolean
+): { siteSpace: SiteSpace; siteSection: SiteSection } | null {
+    for (const siteSection of sections) {
+        const siteSpace = siteSection.siteSpaces.find(predicate) ?? null;
         if (siteSpace) {
-            return siteSpace;
+            return { siteSpace, siteSection };
         }
     }
 
     return null;
 }
 
-function findSiteSpaceByIdInSiteSpaces(siteSpaces: SiteSpace[], spaceId: string): SiteSpace | null {
-    return siteSpaces.find((siteSpace) => siteSpace.space.id === spaceId) ?? null;
+function findSiteSpaceByIdInSiteSpaces(
+    siteSpaces: SiteSpace[],
+    predicate: (siteSpace: SiteSpace) => boolean
+): SiteSpace | null {
+    return siteSpaces.find(predicate) ?? null;
 }

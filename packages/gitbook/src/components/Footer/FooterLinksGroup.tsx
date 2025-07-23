@@ -1,9 +1,9 @@
+import type { GitBookAnyContext } from '@/lib/context';
 import {
     type CustomizationContentLink,
     type CustomizationFooterGroup,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import type { GitBookAnyContext } from '@v2/lib/context';
 
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';

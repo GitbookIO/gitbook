@@ -1,5 +1,5 @@
+import type { GitBookSiteContext } from '@/lib/context';
 import { CustomizationThemeMode } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 import type { Metadata, Viewport } from 'next';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import React from 'react';
@@ -13,8 +13,8 @@ import { buildVersion } from '@/lib/build';
 import { isSiteIndexable } from '@/lib/seo';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@v2/lib/env';
-import { getResizedImageURL } from '@v2/lib/images';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
+import { getResizedImageURL } from '@/lib/images';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
@@ -54,6 +54,7 @@ export async function SiteLayout(props: {
                     forcedTheme ??
                     (customization.themes.toggeable ? undefined : customization.themes.default)
                 }
+                externalLinksTarget={customization.externalLinks.target}
             >
                 <SpaceLayout
                     context={context}
@@ -94,6 +95,9 @@ export async function generateSiteLayoutViewport(context: GitBookSiteContext): P
                 ? 'dark light'
                 : 'light dark'
             : customization.themes.default,
+        width: 'device-width',
+        initialScale: 1,
+        maximumScale: 1,
     };
 }
 
@@ -102,30 +106,37 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     const faviconSize = 48;
-    const icons = [
-        {
-            url: customIcon?.light
-                ? await getResizedImageURL(imageResizer, customIcon.light, {
-                      width: faviconSize,
-                      height: faviconSize,
-                  })
-                : linker.toAbsoluteURL(
-                      linker.toPathInSpace('~gitbook/icon?size=small&theme=light')
-                  ),
-            type: 'image/png',
-            media: '(prefers-color-scheme: light)',
-        },
-        {
-            url: customIcon?.dark
-                ? await getResizedImageURL(imageResizer, customIcon.dark, {
-                      width: faviconSize,
-                      height: faviconSize,
-                  })
-                : linker.toAbsoluteURL(linker.toPathInSpace('~gitbook/icon?size=small&theme=dark')),
-            type: 'image/png',
-            media: '(prefers-color-scheme: dark)',
-        },
-    ];
+    const icons = await Promise.all(
+        [
+            {
+                url: customIcon?.light
+                    ? getResizedImageURL(imageResizer, customIcon.light, {
+                          width: faviconSize,
+                          height: faviconSize,
+                      })
+                    : linker.toAbsoluteURL(
+                          linker.toPathInSpace('~gitbook/icon?size=small&theme=light')
+                      ),
+                type: 'image/png',
+                media: '(prefers-color-scheme: light)',
+            },
+            {
+                url: customIcon?.dark
+                    ? getResizedImageURL(imageResizer, customIcon.dark, {
+                          width: faviconSize,
+                          height: faviconSize,
+                      })
+                    : linker.toAbsoluteURL(
+                          linker.toPathInSpace('~gitbook/icon?size=small&theme=dark')
+                      ),
+                type: 'image/png',
+                media: '(prefers-color-scheme: dark)',
+            },
+        ].map(async (icon) => ({
+            ...icon,
+            url: await icon.url,
+        }))
+    );
 
     return {
         title: site.title,
@@ -133,6 +144,12 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
         icons: {
             icon: icons,
             apple: icons,
+        },
+        appleWebApp: {
+            capable: true,
+            title: site.title,
+            statusBarStyle:
+                customization.themes.default === CustomizationThemeMode.Dark ? 'black' : 'default',
         },
         robots: (await isSiteIndexable(context)) ? 'index, follow' : 'noindex, nofollow',
     };

@@ -19,7 +19,7 @@ export function SitePageSkeleton() {
                 'lg:items-start'
             )}
         >
-            <div className={tcls('flex-1', 'max-w-3xl', 'mx-auto', 'page-full-width:mx-0')}>
+            <div className={tcls('flex-1', 'max-w-3xl', 'mx-auto', 'site-width-wide:mx-0')}>
                 <SkeletonHeading style={tcls('mb-8')} />
                 <SkeletonParagraph style={tcls('mb-4')} />
             </div>

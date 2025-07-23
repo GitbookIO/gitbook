@@ -2,11 +2,11 @@ import type { SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 import jsontoxml from 'jsontoxml';
 
+import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
 import { filterOutNullable } from '@/lib/typescript';
-import { type GitBookSiteContext, checkIsRootSiteContext } from '@v2/lib/context';
 
 /**
  * Generate a root sitemap that point to all sitemap-pages.xml.
@@ -51,7 +51,7 @@ export function serveRootSitemap(context: GitBookSiteContext) {
  */
 export function servePagesSitemap(context: GitBookSiteContext) {
     const { linker } = context;
-    const pages = getIndexablePages(context.pages);
+    const pages = getIndexablePages(context.revision.pages);
 
     const urls = pages.map(({ page, depth }) => {
         // Decay priority with depth
@@ -64,7 +64,7 @@ export function servePagesSitemap(context: GitBookSiteContext) {
             priority: normalizedPriority,
             loc: linker.toAbsoluteURL(
                 linker.toPathForPage({
-                    pages: context.pages,
+                    pages: context.revision.pages,
                     page,
                 })
             ),
@@ -141,7 +141,7 @@ function getUrlsFromSiteSpaces(context: GitBookSiteContext, siteSpaces: SiteSpac
         }
         const url = new URL(siteSpace.urls.published);
         url.pathname = joinPath(url.pathname, 'sitemap-pages.xml');
-        return context.linker.toLinkForContent(url.toString());
+        return context.linker.toAbsoluteURL(context.linker.toLinkForContent(url.toString()));
     }, []);
     return urls.filter(filterOutNullable);
 }

@@ -1,7 +1,7 @@
 <h1 align="center">GitBook</h1>
 
 <p align="center">
-  <a href="https://docs.gitbook.com/">Docs</a> - <a href="https://github.com/GitbookIO/community">Community</a> - <a href="https://developer.gitbook.com/">Developer Docs</a> - <a href="https://changelog.gitbook.com/">Changelog</a> - <a href="https://github.com/GitbookIO/gitbook/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a> 
+  <a href="https://gitbook.com/docs/">Docs</a> - <a href="https://github.com/GitbookIO/community">Community</a> - <a href="https://developer.gitbook.com/">Developer Docs</a> - <a href="https://changelog.gitbook.com/">Changelog</a> - <a href="https://github.com/GitbookIO/gitbook/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a> - <a href="https://github.com/orgs/GitbookIO/discussions/categories/feature-requests">Feature requests</a> 
 </p>
 
 <p align="center">
@@ -35,10 +35,10 @@ To run a local version of this project, please follow these simple steps.
 
 ### Prerequisites
 
--   Node.js (Version: >=20.6)
-  - Use nvm for easy Node management
--   Bun (Version: >=1.2.1)
-  - We use a text-based lockfile which isn't supported below 1.2.1
+- Node.js (Version: >=20.6)
+    - Use nvm for easy Node management
+- [Bun](https://bun.sh/) (Version: >=1.2.15)
+  - We use a text-based lockfile which isn't supported below 1.2.15
 
 ### Set up
 
@@ -59,22 +59,17 @@ bun install
 4. Start your local development server.
 
 ```
-bun dev:v2
+bun dev
 ```
 
-5. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/`.
+6. Open a published GitBook space in your web browser, prefixing it with `http://localhost:3000/url`.
 
 examples:
 
--   http://localhost:3000/url/docs.gitbook.com
+-   http://localhost:3000/url/gitbook.com/docs
 -   http://localhost:3000/url/open-source.gitbook.io/midjourney
 
 Any published GitBook site can be accessed through your local development instance, and any updates you make to the codebase will be reflected in your browser.
-
-### Other development commands
-
--   `bun format`: format the code
--   `bun lint`: lint the code
 
 ### CI and testing
 
@@ -150,11 +145,11 @@ See `LICENSE` for more information.
 </p>
 
 ```md
-[![GitBook](https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1)](https://gitbook.com/)
+[![GitBook](https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1)](https://www.gitbook.com/preview?utm_source=gitbook_readme_badge&utm_medium=organic&utm_campaign=preview_documentation&utm_content=link)
 ```
 
 ```html
-<a href="https://gitbook.com">
+<a href="https://www.gitbook.com/preview?utm_source=gitbook_readme_badge&utm_medium=organic&utm_campaign=preview_documentation&utm_content=link">
     <img
         src="https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1"
     />

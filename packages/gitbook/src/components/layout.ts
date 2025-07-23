@@ -14,7 +14,6 @@ export const CONTAINER_STYLE: ClassValue = [
     'md:px-8',
     'max-w-(--breakpoint-2xl)',
     'mx-auto',
-    'page-full-width:max-w-full',
 ];
 
 /**

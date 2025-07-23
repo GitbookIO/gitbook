@@ -38,10 +38,18 @@ export function ContentKit<RenderContext>(props: {
     render: (input: {
         renderContext: RenderContext;
         request: RequestRenderIntegrationUI;
-    }) => Promise<{
-        children: React.ReactNode;
-        output: ContentKitRenderOutput;
-    }>;
+    }) => Promise<
+        | {
+              error?: undefined;
+              children: React.ReactNode;
+              output: ContentKitRenderOutput;
+          }
+        | {
+              error: string;
+              children?: undefined;
+              output?: undefined;
+          }
+    >;
     /** Callback when an action is triggered */
     onAction?: (action: ContentKitAction) => void;
     /** Callback when the flow is completed */
@@ -98,17 +106,18 @@ export function ContentKit<RenderContext>(props: {
                 request: newInput,
             });
             const output = result.output;
+            if (output) {
+                if (output.type === 'complete') {
+                    return onComplete?.(output.returnValue);
+                }
 
-            if (output.type === 'complete') {
-                return onComplete?.(output.returnValue);
+                setCurrent((prev) => ({
+                    input: newInput,
+                    children: result.children,
+                    output: output,
+                    state: prev.state,
+                }));
             }
-
-            setCurrent((prev) => ({
-                input: newInput,
-                children: result.children,
-                output: output,
-                state: prev.state,
-            }));
         },
         [setCurrent, current, render, onComplete]
     );
@@ -147,8 +156,10 @@ export function ContentKit<RenderContext>(props: {
                             renderContext,
                             request: modalInput,
                         });
-
-                        if (result.output.type === 'element' || !result.output.type) {
+                        if (
+                            result.output &&
+                            (result.output.type === 'element' || !result.output.type)
+                        ) {
                             setSubView({
                                 mode: 'modal',
                                 initialInput: modalInput,

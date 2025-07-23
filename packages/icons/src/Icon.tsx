@@ -16,8 +16,7 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
     icon: IconName;
 
     /**
-     * Style of the icon to render.
-     * @default 'solid'
+     * Style of the icon to render. Defaults to the current icon style from the context.
      */
     iconStyle?: IconStyle;
 
@@ -59,8 +58,11 @@ export const Icon = React.forwardRef(function Icon(
             {...rest}
             style={{
                 maskImage: `url(${url})`,
+                WebkitMaskImage: `url(${url})`,
                 maskRepeat: 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
                 maskPosition: 'center',
+                WebkitMaskPosition: 'center',
                 ...(size ? { width: size, height: size } : {}),
                 ...rest.style,
             }}

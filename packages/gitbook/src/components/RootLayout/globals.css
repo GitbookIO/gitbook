@@ -190,6 +190,89 @@
     }
 }
 
+@layer utilities {
+    .linear-mask-gradient {
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
+    }
+    .linear-mask-util {
+        mask-image: linear-gradient(to bottom, white, white);
+    }
+    .grid-area-1-1 {
+        grid-area: 1 / 1;
+    }
+    .gutter-stable {
+        scrollbar-gutter: stable;
+    }
+
+    .triangle {
+        position: relative;
+        background-color: orange;
+        text-align: left;
+        transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+    }
+    .triangle:before,
+    .triangle:after {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    .triangle,
+    .triangle:before,
+    .triangle:after {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+
+    .triangle:before {
+        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+    }
+    .triangle:after {
+        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+    }
+
+    .break-anywhere {
+        word-break: break-word;
+    }
+    @supports (overflow-wrap: anywhere) {
+        .break-anywhere {
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .bg-gradient-primary {
+        @apply bg-gradient-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+    }
+    .bg-gradient-tint {
+        @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+    }
+
+    /**
+     * Utility to prevent horizontal jumps when the vertical scrollbar appears
+     * It should be used on main containers of the layout, while preserving horizontal delimiters.
+     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
+     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
+     */
+    .scroll-nojump {
+        width: 100%;
+    }
+    @media screen and (min-width: 1536px) {
+        .scroll-nojump {
+            margin-left: var(--scrollbar-width);
+            margin-right: 0;
+            width: calc(100% - var(--scrollbar-width));
+        }
+    }
+
+    .elevate-link {
+        & a[href]:not(.link-overlay) {
+            position: relative;
+            z-index: 20;
+        }
+    }
+}
+
 html {
     color-scheme: light;
 
@@ -201,6 +284,114 @@ html.dark {
     color-scheme: dark light;
 }
 
-html.announcement-hidden .announcement-banner {
+html.announcement-hidden #announcement-banner {
     @apply hidden;
+}
+
+/* Shiki theme */
+:root {
+    --shiki-color-text: theme("colors.tint.11");
+    --shiki-token-punctuation: theme("colors.tint.11");
+    --shiki-token-comment: theme("colors.neutral.9/.7");
+    --shiki-token-link: theme("colors.primary.10");
+
+    --shiki-token-constant: theme("colors.warning.10");
+    --shiki-token-string: theme("colors.warning.10");
+    --shiki-token-string-expression: theme("colors.success.10");
+    --shiki-token-keyword: theme("colors.danger.10");
+    --shiki-token-parameter: theme("colors.warning.10");
+    --shiki-token-function: theme("colors.primary.10");
+
+    --shiki-token-inserted: theme("colors.success.10");
+    --shiki-token-deleted: theme("colors.danger.10");
+    --shiki-token-changed: theme("colors.tint.12");
+}
+
+@media (prefers-contrast: more) {
+    :root {
+        --shiki-color-text: theme("colors.tint.12");
+        --shiki-token-punctuation: theme("colors.tint.12");
+        --shiki-token-comment: theme("colors.neutral.11");
+        --shiki-token-link: theme("colors.primary.11");
+
+        --shiki-token-constant: theme("colors.warning.11");
+        --shiki-token-string: theme("colors.warning.11");
+        --shiki-token-string-expression: theme("colors.success.11");
+        --shiki-token-keyword: theme("colors.danger.11");
+        --shiki-token-parameter: theme("colors.warning.11");
+        --shiki-token-function: theme("colors.primary.11");
+
+        --shiki-token-inserted: theme("colors.success.11");
+        --shiki-token-deleted: theme("colors.danger.11");
+        --shiki-token-changed: theme("colors.tint.12");
+    }
+}
+
+html.dark {
+    /* Override select colors to have more contrast */
+    --shiki-token-comment: theme("colors.neutral.9");
+
+    --shiki-token-constant: theme("colors.warning.11");
+    --shiki-token-string: theme("colors.warning.11");
+    --shiki-token-string-expression: theme("colors.success.11");
+    --shiki-token-keyword: theme("colors.danger.11");
+    --shiki-token-parameter: theme("colors.warning.11");
+    --shiki-token-function: theme("colors.primary.11");
+}
+
+.code-monochrome {
+    --shiki-token-constant: theme("colors.tint.11");
+    --shiki-token-string: theme("colors.tint.12");
+    --shiki-token-string-expression: theme("colors.tint.12");
+    --shiki-token-keyword: theme("colors.primary.10");
+    --shiki-token-parameter: theme("colors.tint.9");
+    --shiki-token-function: theme("colors.primary.9");
+}
+
+html.dark.code-monochrome {
+    --shiki-token-constant: theme("colors.tint.11");
+    --shiki-token-string: theme("colors.tint.12");
+    --shiki-token-string-expression: theme("colors.tint.12");
+    --shiki-token-keyword: theme("colors.primary.11");
+    --shiki-token-parameter: theme("colors.tint.10");
+    --shiki-token-function: theme("colors.primary.10");
+}
+
+/* Code blocks */
+.highlight-line {
+    @apply grid [grid-template-columns:subgrid] col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-[1] rounded;
+    @apply only:hover:ring-transparent;
+    @apply [counter-increment:line];
+
+    &.highlighted {
+        @apply bg-tint-active;
+        @apply first:rounded-t-md *:first:mt-1;
+        @apply last:rounded-b-md *:last:mb-1;
+        @apply rounded-none;
+    }
+
+    &:not(.highlighted) + .highlighted {
+        @apply rounded-t-md *:mt-1;
+    }
+
+    &.highlighted:has(+ :not(.highlighted)) {
+        @apply rounded-b-md *:mb-1;
+    }
+
+    &:not(.highlighted) + .highlighted:has(+ :not(.highlighted)) {
+        @apply rounded-md;
+    }
+}
+
+.highlight-line-number {
+    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-tint-subtle contrast-more:from-tint-base theme-muted:from-tint-base [html.theme-bold.sidebar-filled_&]:from-tint-base to-transparent;
+    @apply before:text-tint before:content-[counter(line)];
+
+    .highlight-line.highlighted > & {
+        @apply before:text-tint bg-gradient-to-r from-80% from-tint-active to-transparent;
+    }
+}
+
+.highlight-line-content {
+    @apply ml-3 block text-sm;
 }

@@ -1,9 +1,12 @@
 import {
     CustomizationBackground,
     CustomizationCorners,
+    CustomizationDefaultMonospaceFont,
+    CustomizationDepth,
     CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
+    CustomizationThemeMode,
 } from '@gitbook/api';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
@@ -12,7 +15,7 @@ import {
     VISITOR_TOKEN_COOKIE,
     getVisitorAuthCookieName,
     getVisitorAuthCookieValue,
-} from '@/lib/visitor-token';
+} from '@/lib/visitors';
 
 import { getSiteAPIToken } from '../tests/utils';
 import {
@@ -269,7 +272,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'GitBook',
-        contentBaseURL: 'https://docs.gitbook.com',
+        contentBaseURL: 'https://gitbook.com/docs/',
         tests: [
             {
                 name: 'Home',
@@ -412,6 +415,28 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="table-of-contents"]')).toBeVisible();
                 },
             },
+            {
+                name: 'With sections',
+                url: async () => {
+                    const data = await getSiteAPIToken('https://gitbook.com/docs');
+
+                    const searchParams = new URLSearchParams();
+                    searchParams.set('token', data.apiToken);
+
+                    return `url/preview/${data.site}/?${searchParams.toString()}`;
+                },
+                screenshot: false,
+                run: async (page) => {
+                    const sectionTabs = page.getByLabel('Sections');
+                    await expect(sectionTabs).toBeVisible();
+
+                    const sectionTabLinks = sectionTabs.getByRole('link');
+                    for (const link of await sectionTabLinks.all()) {
+                        const href = await link.getAttribute('href');
+                        expect(href).toMatch(/^\/url\/preview\/site_p4Xo4\/?/);
+                    }
+                },
+            },
         ],
     },
     {
@@ -422,6 +447,54 @@ const testCases: TestsCase[] = [
             {
                 name: 'Text page',
                 url: 'text-page.md',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
+        name: 'llms.txt',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'llms.txt',
+                url: 'llms.txt',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
+        name: 'llms-full.txt',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'llms-full.txt',
+                url: 'llms-full.txt',
+                screenshot: false,
+                run: async (_page, response) => {
+                    expect(response?.status()).toBe(200);
+                    expect(response?.headers()['content-type']).toContain('text/markdown');
+                },
+            },
+        ],
+    },
+    {
+        name: '[page].md',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'blocks.md',
+                url: 'blocks.md',
                 screenshot: false,
                 run: async (_page, response) => {
                     expect(response?.status()).toBe(200);
@@ -570,8 +643,18 @@ const testCases: TestsCase[] = [
                 run: waitForCookiesDialog,
             },
             {
+                name: 'Icons',
+                url: 'blocks/icons',
+                run: waitForCookiesDialog,
+            },
+            {
                 name: 'Links',
                 url: 'blocks/links',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'Buttons',
+                url: 'blocks/buttons',
                 run: waitForCookiesDialog,
             },
             {
@@ -632,6 +715,7 @@ const testCases: TestsCase[] = [
                 name: 'Stepper',
                 url: 'blocks/stepper',
             },
+            { name: 'Columns', url: 'blocks/columns' },
         ],
     },
     {
@@ -646,6 +730,16 @@ const testCases: TestsCase[] = [
             {
                 name: 'With cover',
                 url: 'page-options/page-with-cover',
+                run: waitForCookiesDialog,
+            },
+            {
+                name: 'With cover for dark mode',
+                url: `page-options/page-with-dark-cover${getCustomizationURL({
+                    themes: {
+                        default: CustomizationThemeMode.Dark,
+                        toggeable: false,
+                    },
+                })}`,
                 run: waitForCookiesDialog,
             },
             {
@@ -725,6 +819,15 @@ const testCases: TestsCase[] = [
                         toggeable: false,
                     },
                 }),
+                run: waitForCookiesDialog,
+            },
+            {
+                name: `With custom monospace font - Theme mode ${themeMode}`,
+                url: `blocks/code${getCustomizationURL({
+                    styling: {
+                        monospaceFont: CustomizationDefaultMonospaceFont.SpaceMono,
+                    },
+                })}`,
                 run: waitForCookiesDialog,
             },
             // New site themes
@@ -817,7 +920,33 @@ const testCases: TestsCase[] = [
                 }),
                 run: waitForCookiesDialog,
             },
+            {
+                name: `With flat and circular corners - Theme mode ${themeMode}`,
+                url: getCustomizationURL({
+                    styling: {
+                        depth: CustomizationDepth.Flat,
+                        corners: CustomizationCorners.Circular,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
         ]),
+    },
+    {
+        name: 'Page actions',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'Without page actions',
+                url: getCustomizationURL({
+                    pageActions: {
+                        markdown: false,
+                        externalAI: false,
+                    },
+                }),
+                run: waitForCookiesDialog,
+            },
+        ],
     },
     {
         name: 'Ads',
@@ -845,7 +974,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-uno')).toBeTruthy(); // same uno site
-                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },
@@ -865,7 +994,7 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                     const url = page.url();
                     expect(url.includes('shared-space-dos')).toBeTruthy(); // same dos site
-                    expect(url.endsWith('/shared')).toBeTruthy(); // correct page
+                    expect(url.endsWith('/shared/')).toBeTruthy(); // correct page
                 },
                 screenshot: false,
             },

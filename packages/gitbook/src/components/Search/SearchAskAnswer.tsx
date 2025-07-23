@@ -10,6 +10,7 @@ import { t } from '@/intl/translate';
 import type { TranslationLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
 
+import { AIResponseFeedback } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
@@ -88,20 +89,26 @@ export function SearchAskAnswer(props: { query: string }) {
     }, [setAskState]);
 
     const loading = (
-        <div className={tcls('w-full', 'flex', 'items-center', 'justify-center')}>
-            <Loading className={tcls('w-6', 'py-8', 'text-primary-subtle')} />
+        <div className="flex grow items-center justify-center">
+            <Loading className={tcls('size-6', 'text-tint/6')} />
         </div>
     );
 
     return (
-        <div className={tcls('max-h-[60vh]', 'overflow-y-auto')}>
+        <div className="flex min-h-full p-4">
             {askState?.type === 'answer' ? (
                 <React.Suspense fallback={loading}>
-                    <TransitionAnswerBody answer={askState.answer} placeholder={loading} />
+                    <TransitionAnswerBody
+                        answer={askState.answer}
+                        placeholder={loading}
+                        query={query}
+                    />
                 </React.Suspense>
             ) : null}
             {askState?.type === 'error' ? (
-                <div className={tcls('p-4')}>{t(language, 'search_ask_error')}</div>
+                <div className={tcls('grow p-4 text-center')}>
+                    {t(language, 'search_ask_error')}
+                </div>
             ) : null}
             {askState?.type === 'loading' ? loading : null}
         </div>
@@ -112,8 +119,12 @@ export function SearchAskAnswer(props: { query: string }) {
  * Since the answer can be an async component that could suspend rendering,
  * we need to wrap it in a transition to avoid flickering.
  */
-function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: React.ReactNode }) {
-    const { answer, placeholder } = props;
+function TransitionAnswerBody(props: {
+    query: string;
+    answer: AskAnswerResult;
+    placeholder: React.ReactNode;
+}) {
+    const { query, answer, placeholder } = props;
     const [display, setDisplay] = React.useState<AskAnswerResult | null>(null);
     const [_isPending, startTransition] = React.useTransition();
 
@@ -125,24 +136,25 @@ function TransitionAnswerBody(props: { answer: AskAnswerResult; placeholder: Rea
 
     return display ? (
         <div className={tcls('w-full')}>
-            <AnswerBody answer={display} />
+            <AnswerBody query={query} answer={display} />
         </div>
     ) : (
         <>{placeholder}</>
     );
 }
 
-function AnswerBody(props: { answer: AskAnswerResult }) {
-    const { answer } = props;
+function AnswerBody(props: { query: string; answer: AskAnswerResult }) {
+    const { query, answer } = props;
     const language = useLanguage();
 
     return (
         <>
-            <div
-                data-testid="search-ask-answer"
-                className={tcls('my-4', 'sm:mt-6', 'px-4', 'sm:px-12', 'text-tint-strong')}
-            >
+            <div data-testid="search-ask-answer" className="text-tint-strong">
                 {answer.body ?? t(language, 'search_ask_no_answer')}
+                {answer.sources.length > 0 ? (
+                    // @TODO: Add responseId once search uses new AI endpoint
+                    <AIResponseFeedback query={query} className="-ml-1 mt-2" responseId="" />
+                ) : null}
                 {answer.followupQuestions.length > 0 ? (
                     <AnswerFollowupQuestions followupQuestions={answer.followupQuestions} />
                 ) : null}
@@ -163,7 +175,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
     const getSearchLinkProps = useSearchLink();
 
     return (
-        <div className={tcls('flex', 'flex-col', 'flex-wrap', 'mt-4', 'sm:mt-6')}>
+        <div className={tcls('flex', 'flex-col', 'flex-wrap', 'mt-4')}>
             {followupQuestions.map((question) => (
                 <Link
                     key={question}
@@ -176,6 +188,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'py-2',
                         'rounded-sm',
                         'straight-corners:rounded-none',
+                        'circular-corners:rounded-full',
                         'text-tint',
                         'hover:bg-tint-hover',
                         'focus-within:bg-tint-hover'
@@ -211,8 +224,7 @@ function AnswerSources(props: {
                 'gap-2',
                 'mt-4',
                 'sm:mt-6',
-                'py-4',
-                'px-4',
+                'pt-4',
                 'border-t',
                 'border-subtle'
             )}

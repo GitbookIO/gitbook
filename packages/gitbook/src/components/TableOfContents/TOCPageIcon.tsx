@@ -7,13 +7,13 @@ import { PageIcon } from '../PageIcon';
 /**
  * Styled page icon for the table of contents.
  */
-export function TOCPageIcon({ page }: { page: RevisionPage }) {
+export function TOCPageIcon({ page }: { page: Pick<RevisionPage, 'emoji' | 'icon'> }) {
     return (
         <PageIcon
             page={page}
             style={tcls(
                 'text-base',
-                'text-tint-strong/6',
+                '[.toclink_&]:text-tint-strong/6',
                 'group-aria-current-page/toclink:text-primary-subtle',
                 'contrast-more:group-aria-current-page/toclink:text-primary',
 

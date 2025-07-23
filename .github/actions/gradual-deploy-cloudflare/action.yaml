@@ -1,0 +1,83 @@
+name: Gradual Deploy to Cloudflare
+description: Use gradual deployment to deploy to Cloudflare. This action will upload the middleware and server versions to Cloudflare and kept them bound together
+inputs:
+  apiToken:
+    description: 'Cloudflare API token'
+    required: true
+  accountId:
+    description: 'Cloudflare account ID'
+    required: true
+  environment:
+    description: 'Cloudflare environment to deploy to (staging, production, preview)'
+    required: true
+  middlewareVersionId:
+    description: 'Middleware version ID to deploy'
+    required: true
+  serverVersionId:
+    description: 'Server version ID to deploy'
+    required: true
+outputs:
+  deployment-url: 
+    description: "Deployment URL"
+    value: ${{ steps.deploy_middleware.outputs.deployment-url }}
+runs:
+  using: 'composite'
+  steps:
+      - id: wrangler_status
+        name: Check wrangler deployment status
+        uses: cloudflare/wrangler-action@v3.14.0
+        with:
+            apiToken: ${{ inputs.apiToken }}
+            accountId: ${{ inputs.accountId }}
+            workingDirectory: ./
+            wranglerVersion: '4.10.0'
+            environment: ${{ inputs.environment }}
+            command: deployments status --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
+
+      # This step is used to get the version ID that is currently deployed to Cloudflare.
+      - id: extract_current_version
+        name: Extract current version
+        shell: bash
+        run: |
+          version_id=$(echo "${{ steps.wrangler_status.outputs.command-output }}" | grep -A 3 "(100%)" | grep -oP '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+          echo "version_id=$version_id" >> $GITHUB_OUTPUT
+
+      - id: deploy_server
+        name: Deploy server to Cloudflare at 0%
+        uses: cloudflare/wrangler-action@v3.14.0
+        with:
+            apiToken: ${{ inputs.apiToken }}
+            accountId: ${{ inputs.accountId }}
+            workingDirectory: ./
+            wranglerVersion: '4.10.0'
+            environment: ${{ inputs.environment }}
+            command: versions deploy ${{ steps.extract_current_version.outputs.version_id }}@100% ${{ inputs.serverVersionId }}@0% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
+
+      # Since we use version overrides headers, we can directly deploy the middleware to 100%.
+      - id: deploy_middleware
+        name: Deploy middleware to Cloudflare at 100%
+        uses: cloudflare/wrangler-action@v3.14.0
+        with:
+            apiToken: ${{ inputs.apiToken }}
+            accountId: ${{ inputs.accountId }}
+            workingDirectory: ./
+            wranglerVersion: '4.10.0'
+            environment: ${{ inputs.environment }}
+            command: versions deploy ${{ inputs.middlewareVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/middlewareWrangler.jsonc
+
+      - name: Deploy server to Cloudflare at 100%
+        uses: cloudflare/wrangler-action@v3.14.0
+        with:
+            apiToken: ${{ inputs.apiToken }}
+            accountId: ${{ inputs.accountId }}
+            workingDirectory: ./
+            wranglerVersion: '4.10.0'
+            environment: ${{ inputs.environment }}
+            command: versions deploy ${{ inputs.serverVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
+
+      - name: Outputs
+        shell: bash
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy_middleware.outputs.deployment-url }}
+        run: |
+            echo "URL: ${{ steps.deploy_middleware.outputs.deployment-url }}"

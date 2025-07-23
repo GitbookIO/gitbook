@@ -122,7 +122,25 @@ function Color(props: MarkedLeafProps<DocumentMarkColor>) {
     );
 }
 
-const textColorToStyle: { [color in DocumentMarkColor['data']['text']]: ClassValue } = {
+/**
+ * @TODO replace by DocumentMarkColor['data']['text'] and DocumentMarkColor['data']['background']
+ * once the API is updated.
+ */
+type DocumentMarkColorValue =
+    | 'default'
+    | 'green'
+    | 'blue'
+    | 'red'
+    | 'orange'
+    | 'yellow'
+    | 'purple'
+    | '$primary'
+    | '$info'
+    | '$success'
+    | '$warning'
+    | '$danger';
+
+const textColorToStyle: { [color in DocumentMarkColorValue]: ClassValue } = {
     default: [],
     blue: ['text-blue-500'],
     red: ['text-red-500'],
@@ -130,9 +148,14 @@ const textColorToStyle: { [color in DocumentMarkColor['data']['text']]: ClassVal
     yellow: ['text-yellow-600'],
     purple: ['text-purple-500'],
     orange: ['text-orange-500'],
+    $primary: ['text-primary'],
+    $info: ['text-info'],
+    $success: ['text-success'],
+    $warning: ['text-warning'],
+    $danger: ['text-danger'],
 };
 
-const backgroundColorToStyle: { [color in DocumentMarkColor['data']['background']]: ClassValue } = {
+const backgroundColorToStyle: { [color in DocumentMarkColorValue]: ClassValue } = {
     default: [],
     blue: ['bg-mark-blue'],
     red: ['bg-mark-red'],
@@ -140,4 +163,9 @@ const backgroundColorToStyle: { [color in DocumentMarkColor['data']['background'
     yellow: ['bg-mark-yellow'],
     purple: ['bg-mark-purple'],
     orange: ['bg-mark-orange'],
+    $primary: ['bg-primary'],
+    $info: ['bg-info'],
+    $success: ['bg-success'],
+    $warning: ['bg-warning'],
+    $danger: ['bg-danger'],
 };

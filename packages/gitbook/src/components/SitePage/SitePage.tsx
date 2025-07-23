@@ -1,6 +1,6 @@
+import type { GitBookSiteContext } from '@/lib/context';
+import { getPageDocument } from '@/lib/data';
 import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { getPageDocument } from '@v2/lib/data';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
@@ -10,7 +10,7 @@ import { PageBody, PageCover } from '@/components/PageBody';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
-import { getResizedImageURL } from '@v2/lib/images';
+import { getResizedImageURL } from '@/lib/images';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
@@ -39,10 +39,10 @@ export async function SitePage(props: SitePageProps) {
         } else {
             notFound();
         }
-    } else if (getPagePath(context.pages, pageTarget.page) !== rawPathname) {
+    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
         redirect(
             context.linker.toPathForPage({
-                pages: context.pages,
+                pages: context.revision.pages,
                 page: pageTarget.page,
             })
         );
@@ -62,7 +62,7 @@ export async function SitePage(props: SitePageProps) {
     const withSections = Boolean(sections && sections.list.length > 0);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
-    const document = await getPageDocument(context.dataFetcher, context.space, page);
+    const document = await getPageDocument(context, page);
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
@@ -117,7 +117,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, pages, linker, imageResizer } = context;
+    const { site, customization, revision, linker, imageResizer } = context;
 
     return {
         title: [page.title, site.title].filter(Boolean).join(' | '),
@@ -125,7 +125,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior
             canonical: linker
-                .toAbsoluteURL(linker.toPathForPage({ pages, page }))
+                .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
                 .replace(/\/+$/, ''),
         },
         openGraph: {

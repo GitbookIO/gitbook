@@ -13,10 +13,10 @@ import { getColumnAlignment } from './utils';
      3. Auto-size is turned off without setting a width, we then default to a fixed width of 100px
 */
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
-    const { block, view, records, style } = props;
+    const { block, view, records, style, context } = props;
 
     /* Calculate how many columns are auto-sized vs fixed width */
-    const columnWidths = view.columnWidths;
+    const columnWidths = context.mode === 'print' ? undefined : view.columnWidths;
     const autoSizedColumns = view.columns.filter((column) => !columnWidths?.[column]);
     const fixedColumns = view.columns.filter((column) => columnWidths?.[column]);
 
@@ -38,7 +38,8 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         className={tcls(
                             tableWidth,
                             styles.rowGroup,
-                            'straight-corners:rounded-none'
+                            'straight-corners:rounded-none',
+                            'circular-corners:rounded-xl'
                         )}
                     >
                         <div role="row" className={tcls('flex', 'w-full')}>

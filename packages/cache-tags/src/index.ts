@@ -90,7 +90,7 @@ export function getCacheTag(
         | {
               tag: 'translation';
               organization: string;
-              translationSettings: string;
+              translation: string;
           }
 ): string {
     switch (spec.tag) {
@@ -115,7 +115,7 @@ export function getCacheTag(
         case 'openapi':
             return `organization:${spec.organization}:openapi:${spec.openAPISpec}`;
         case 'translation':
-            return `organization:${spec.organization}:translation:${spec.translationSettings}`;
+            return `organization:${spec.organization}:translation:${spec.translation}`;
         default:
             assertNever(spec);
     }
@@ -144,6 +144,10 @@ export function getComputedContentSourceCacheTags(
 ) {
     const tags: string[] = [];
 
+    if (!('dependencies' in source)) {
+        return tags;
+    }
+
     // We add the dependencies as tags, to ensure that the computed content is invalidated
     // when the dependencies are updated.
     const dependencies = Object.values(source.dependencies ?? {});
@@ -167,12 +171,12 @@ export function getComputedContentSourceCacheTags(
                         })
                     );
                     break;
-                case 'translation-language':
+                case 'translation':
                     tags.push(
                         getCacheTag({
                             tag: 'translation',
                             organization: inContext.organizationId,
-                            translationSettings: dependency.ref.translationSettings,
+                            translation: dependency.ref.translation,
                         })
                     );
                     break;

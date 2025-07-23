@@ -1,4 +1,4 @@
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 
 import { Image } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';
@@ -20,7 +20,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
 
     return (
         <Link
-            href={linker.toAbsoluteURL(linker.toPathInSpace(''))}
+            href={linker.toPathInSite('')}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
@@ -48,8 +48,6 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                     ]}
                     priority="high"
                     style={tcls(
-                        'rounded-sm',
-                        'straight-corners:rounded-xs',
                         'overflow-hidden',
                         'shrink',
                         'min-w-0',

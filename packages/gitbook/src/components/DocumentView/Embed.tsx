@@ -5,7 +5,8 @@ import ReactDOM from 'react-dom';
 import { Card } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 
-import { getDataOrNull } from '@v2/lib/data';
+import { getDataOrNull } from '@/lib/data';
+import { Image } from '../utils';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { IntegrationBlock } from './Integration';
@@ -52,7 +53,14 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                 <Card
                     leadingIcon={
                         embed.icon ? (
-                            <img src={embed.icon} className={tcls('w-5', 'h-5')} alt="Logo" />
+                            <Image
+                                src={embed.icon}
+                                className={tcls('w-5', 'h-5')}
+                                alt="Logo"
+                                sources={{ light: { src: embed.icon } }}
+                                sizes={[{ width: 20 }]}
+                                resize={context.contentContext.imageResizer}
+                            />
                         ) : null
                     }
                     href={block.data.url}

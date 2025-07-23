@@ -64,10 +64,10 @@ export function PageFeedbackForm(props: {
                 <div className="rounded-full border border-tint-subtle bg-tint-base contrast-more:border-tint-12">
                     <div className="flex">
                         <RatingButton
-                            rating={PageFeedbackRating.Bad}
-                            label={tString(languages, 'was_this_helpful_negative')}
-                            onClick={() => onSubmitRating(PageFeedbackRating.Bad)}
-                            active={rating === PageFeedbackRating.Bad}
+                            rating={PageFeedbackRating.Good}
+                            label={tString(languages, 'was_this_helpful_positive')}
+                            onClick={() => onSubmitRating(PageFeedbackRating.Good)}
+                            active={rating === PageFeedbackRating.Good}
                             disabled={rating !== undefined}
                         />
                         <RatingButton
@@ -78,10 +78,10 @@ export function PageFeedbackForm(props: {
                             disabled={rating !== undefined}
                         />
                         <RatingButton
-                            rating={PageFeedbackRating.Good}
-                            label={tString(languages, 'was_this_helpful_positive')}
-                            onClick={() => onSubmitRating(PageFeedbackRating.Good)}
-                            active={rating === PageFeedbackRating.Good}
+                            rating={PageFeedbackRating.Bad}
+                            label={tString(languages, 'was_this_helpful_negative')}
+                            onClick={() => onSubmitRating(PageFeedbackRating.Bad)}
+                            active={rating === PageFeedbackRating.Bad}
                             disabled={rating !== undefined}
                         />
                     </div>

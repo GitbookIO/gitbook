@@ -40,6 +40,10 @@ export function Trademark(props: {
                 '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
 
+                'rounded-lg',
+                'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
+
                 'before:hidden',
                 'lg:before:block',
                 'before:content-[""]',
@@ -102,6 +106,7 @@ export function TrademarkLink(props: {
 
                 'rounded-lg',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
 
                 'hover:bg-tint',
                 'hover:text-tint-strong',

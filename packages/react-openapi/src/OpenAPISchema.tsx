@@ -16,7 +16,7 @@ import { retrocycle } from './decycle';
 import { getDisclosureLabel } from './getDisclosureLabel';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import { checkIsReference, resolveDescription, resolveFirstExample } from './utils';
+import { checkIsReference, getSchemaTitle, resolveDescription, resolveFirstExample } from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -80,11 +80,10 @@ function OpenAPISchemaProperty(
                                 context={context}
                             />
                             {index < alternatives.length - 1 ? (
-                                <span className="openapi-schema-alternative-separator">
-                                    {(schema.anyOf || schema.oneOf) &&
-                                        tString(context.translation, 'or')}
-                                    {schema.allOf && tString(context.translation, 'and')}
-                                </span>
+                                <OpenAPISchemaAlternativeSeparator
+                                    schema={schema}
+                                    context={context}
+                                />
                             ) : null}
                         </div>
                     ))}
@@ -253,6 +252,28 @@ function OpenAPISchemaAlternative(props: {
             circularRefs={circularRefs}
             context={context}
         />
+    );
+}
+
+function OpenAPISchemaAlternativeSeparator(props: {
+    schema: OpenAPIV3.SchemaObject;
+    context: OpenAPIClientContext;
+}) {
+    const { schema, context } = props;
+
+    const anyOf = schema.anyOf || schema.items?.anyOf;
+    const oneOf = schema.oneOf || schema.items?.oneOf;
+    const allOf = schema.allOf || schema.items?.allOf;
+
+    if (!anyOf && !oneOf && !allOf) {
+        return null;
+    }
+
+    return (
+        <span className="openapi-schema-alternative-separator">
+            {(anyOf || oneOf) && tString(context.translation, 'or')}
+            {allOf && tString(context.translation, 'and')}
+        </span>
     );
 }
 
@@ -457,6 +478,14 @@ export function getSchemaAlternatives(
     schema: OpenAPIV3.SchemaObject,
     ancestors: Set<OpenAPIV3.SchemaObject> = new Set()
 ): OpenAPIV3.SchemaObject[] | null {
+    // Search for alternatives in the items property if it exists
+    if (
+        schema.items &&
+        ('oneOf' in schema.items || 'allOf' in schema.items || 'anyOf' in schema.items)
+    ) {
+        return getSchemaAlternatives(schema.items, ancestors);
+    }
+
     const alternatives:
         | [AlternativeType, (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[]]
         | null = (() => {
@@ -572,6 +601,9 @@ function flattenAlternatives(
     schemasOrRefs: (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
     ancestors: Set<OpenAPIV3.SchemaObject>
 ): OpenAPIV3.SchemaObject[] {
+    // Get the parent schema's required fields from the most recent ancestor
+    const latestAncestor = Array.from(ancestors).pop();
+
     return schemasOrRefs.reduce<OpenAPIV3.SchemaObject[]>((acc, schemaOrRef) => {
         if (checkIsReference(schemaOrRef)) {
             return acc;
@@ -580,49 +612,43 @@ function flattenAlternatives(
         if (schemaOrRef[alternativeType] && !ancestors.has(schemaOrRef)) {
             const schemas = getSchemaAlternatives(schemaOrRef, ancestors);
             if (schemas) {
-                acc.push(...schemas);
+                acc.push(
+                    ...schemas.map((schema) => ({
+                        ...schema,
+                        required: mergeRequiredFields(schema, latestAncestor),
+                    }))
+                );
             }
             return acc;
         }
 
-        acc.push(schemaOrRef);
+        // For direct schemas, handle required fields
+        const schema = {
+            ...schemaOrRef,
+            required: mergeRequiredFields(schemaOrRef, latestAncestor),
+        };
+
+        acc.push(schema);
         return acc;
     }, []);
 }
 
-function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
-    // Otherwise try to infer a nice title
-    let type = 'any';
-
-    if (schema.enum || schema['x-enumDescriptions'] || schema['x-gitbook-enum']) {
-        type = `${schema.type} · enum`;
-        // check array AND schema.items as this is sometimes null despite what the type indicates
-    } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(schema.items)}[]`;
-    } else if (Array.isArray(schema.type)) {
-        type = schema.type.join(' | ');
-    } else if (schema.type || schema.properties) {
-        type = schema.type ?? 'object';
-
-        if (schema.format) {
-            type += ` · ${schema.format}`;
-        }
-
-        // Only add the title if it's an object (no need for the title of a string, number, etc.)
-        if (type === 'object' && schema.title) {
-            type += ` · ${schema.title.replaceAll(' ', '')}`;
-        }
+/**
+ * Merge the required fields of a schema with the required fields of its latest ancestor.
+ */
+function mergeRequiredFields(
+    schemaOrRef: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
+    latestAncestor: OpenAPIV3.SchemaObject | undefined
+) {
+    if (!schemaOrRef.required && !latestAncestor?.required) {
+        return undefined;
     }
 
-    if ('anyOf' in schema) {
-        type = 'any of';
-    } else if ('oneOf' in schema) {
-        type = 'one of';
-    } else if ('allOf' in schema) {
-        type = 'all of';
-    } else if ('not' in schema) {
-        type = 'not';
+    if (checkIsReference(schemaOrRef)) {
+        return latestAncestor?.required;
     }
 
-    return type;
+    return Array.from(
+        new Set([...(latestAncestor?.required || []), ...(schemaOrRef.required || [])])
+    );
 }

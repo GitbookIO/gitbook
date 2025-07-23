@@ -47,9 +47,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'bg-tint-base',
                 'rounded-sm',
                 'straight-corners:rounded-none',
+                'circular-corners:rounded-2xl',
                 'ring-1',
                 'ring-tint-subtle',
                 'shadow-1xs',
+                'depth-flat:shadow-none',
                 'p-4',
                 'pr-8',
                 'bottom-4',
@@ -57,7 +59,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'left-16',
                 'max-w-md',
                 'text-balance',
-                'sm:left-auto'
+                'sm:left-auto',
+                'lg:chat-open:mr-80',
+                'xl:chat-open:mr-[25rem]',
+                'transition-all',
+                'duration-300'
             )}
         >
             <p id={describedById} className={tcls('text-sm')}>
@@ -72,7 +78,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             <button
                 type="button"
                 onClick={() => setShow(false)}
-                aria-label={tString(language, 'cookies_close')}
+                aria-label={tString(language, 'close')}
                 className={tcls(
                     'absolute',
                     'top-3',
@@ -83,9 +89,10 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'justify-center',
                     'items-center',
                     'rounded-xs',
+                    'circular-corners:rounded-full',
                     'hover:bg-tint-hover'
                 )}
-                title={tString(language, 'cookies_close')}
+                title={tString(language, 'close')}
             >
                 <Icon icon="xmark" className={tcls('size-4')} />
             </button>

@@ -167,7 +167,7 @@ const getExampleFromSchema = (
     const makeUpRandomData = !!options?.emptyString;
 
     // If the property is deprecated we don't show it in examples.
-    if (schema.deprecated) {
+    if (schema.deprecated || (schema.type === 'array' && schema.items?.deprecated)) {
         return undefined;
     }
 
@@ -202,6 +202,14 @@ const getExampleFromSchema = (
     // Use an example, if there’s one
     if (schema.example !== undefined) {
         return cache(schema, schema.example);
+    }
+
+    // Use a default value, if there’s one and it’s a string or number
+    if (
+        schema.default !== undefined &&
+        ['string', 'number', 'boolean'].includes(typeof schema.default)
+    ) {
+        return cache(schema, schema.default);
     }
 
     // enum: [ 'available', 'pending', 'sold' ]

@@ -35,6 +35,7 @@ export const no = {
     show: 'Vis ${1}',
     hide: 'Skjul ${1}',
     available_items: 'Tilgjengelige elementer',
+    available_scopes: 'Tilgjengelige scopes',
     properties: 'Egenskaper',
     or: 'eller',
     and: 'og',
