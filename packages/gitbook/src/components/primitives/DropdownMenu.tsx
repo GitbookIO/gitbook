@@ -203,6 +203,12 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
     );
 }
 
+export function DropdownMenuSeparator() {
+    return (
+        <RadixDropdownMenu.Separator className="h-px w-full border-tint border-t first:hidden" />
+    );
+}
+
 /**
  * Hook to close the dropdown menu.
  */

@@ -6,8 +6,8 @@ import {
     OpenInLLM,
     ViewAsMarkdown,
 } from '@/components/AIActions/AIActions';
-import { Button } from '@/components/primitives/Button';
-import { DropdownMenu } from '@/components/primitives/DropdownMenu';
+import { Button, ButtonGroup } from '@/components/primitives/Button';
+import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import type { SiteCustomizationSettings } from '@gitbook/api';
 
 import { Icon } from '@gitbook/icons';
@@ -27,29 +27,31 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={ref} className="flex h-fit items-stretch justify-start">
+        <ButtonGroup ref={ref}>
             <DefaultAction {...props} />
-            <DropdownMenu
-                align="end"
-                className="!min-w-60 max-w-max"
-                button={
-                    <Button
-                        icon={
-                            <Icon
-                                icon="chevron-down"
-                                className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
-                            />
-                        }
-                        iconOnly
-                        size="xsmall"
-                        variant="secondary"
-                        className="hover:!scale-100 hover:!translate-y-0 !shadow-none !rounded-l-none bg-tint-base text-sm"
-                    />
-                }
-            >
-                <AIActionsDropdownMenuContent {...props} />
-            </DropdownMenu>
-        </div>
+            {props.actions.markdown || props.actions.externalAI ? (
+                <DropdownMenu
+                    align="end"
+                    className="!min-w-60 max-w-max"
+                    button={
+                        <Button
+                            icon={
+                                <Icon
+                                    icon="chevron-down"
+                                    className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
+                                />
+                            }
+                            iconOnly
+                            size="xsmall"
+                            variant="secondary"
+                            className="bg-tint-base text-sm"
+                        />
+                    }
+                >
+                    <AIActionsDropdownMenuContent {...props} />
+                </DropdownMenu>
+            ) : null}
+        </ButtonGroup>
     );
 }
 
@@ -67,6 +69,7 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
 
             {actions.markdown ? (
                 <>
+                    <DropdownMenuSeparator />
                     <CopyMarkdown
                         isDefaultAction={!withAIChat}
                         markdownPageUrl={markdownPageUrl}
@@ -78,6 +81,7 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
 
             {actions.externalAI ? (
                 <>
+                    <DropdownMenuSeparator />
                     <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="dropdown-menu-item" />
                     <OpenInLLM provider="claude" url={markdownPageUrl} type="dropdown-menu-item" />
                 </>

@@ -232,7 +232,7 @@ function AIActionWrapper(props: {
                 size="xsmall"
                 variant="secondary"
                 label={shortLabel || label}
-                className="hover:!scale-100 !shadow-none !rounded-r-none hover:!translate-y-0 border-r-0 bg-tint-base text-sm"
+                className="bg-tint-base text-sm"
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
