@@ -290,71 +290,71 @@ html.announcement-hidden #announcement-banner {
 
 /* Shiki theme */
 :root {
-    --shiki-color-text: var(--color-tint-11);
-    --shiki-token-punctuation: var(--color-tint-11);
-    --shiki-token-comment: theme("colors.neutral.9/.7");
-    --shiki-token-link: var(--color-primary-10);
+    --shiki-color-text: rgb(var(--tint-11));
+    --shiki-token-punctuation: rgb(var(--tint-11));
+    --shiki-token-comment: rgb(var(--neutral-9));
+    --shiki-token-link: rgb(var(--primary-10));
 
-    --shiki-token-constant: var(--color-warning-10);
-    --shiki-token-string: var(--color-warning-10);
-    --shiki-token-string-expression: var(--color-success-10);
-    --shiki-token-keyword: var(--color-danger-10);
-    --shiki-token-parameter: var(--color-warning-10);
-    --shiki-token-function: var(--color-primary-10);
+    --shiki-token-constant: rgb(var(--warning-10));
+    --shiki-token-string: rgb(var(--warning-10));
+    --shiki-token-string-expression: rgb(var(--success-10));
+    --shiki-token-keyword: rgb(var(--danger-10));
+    --shiki-token-parameter: rgb(var(--warning-10));
+    --shiki-token-function: rgb(var(--primary-10));
 
-    --shiki-token-inserted: var(--color-success-10);
-    --shiki-token-deleted: var(--color-danger-10);
-    --shiki-token-changed: var(--color-tint-12);
+    --shiki-token-inserted: rgb(var(--success-10));
+    --shiki-token-deleted: rgb(var(--danger-10));
+    --shiki-token-changed: rgb(var(--tint-12));
 }
 
 @media (prefers-contrast: more) {
     :root {
-        --shiki-color-text: var(--color-tint-12);
-        --shiki-token-punctuation: var(--color-tint-12);
-        --shiki-token-comment: var(--color-neutral-11);
-        --shiki-token-link: var(--color-primary-11);
+        --shiki-color-text: rgb(var(--tint-12));
+        --shiki-token-punctuation: rgb(var(--tint-12));
+        --shiki-token-comment: rgb(var(--neutral-11));
+        --shiki-token-link: rgb(var(--primary-11));
 
-        --shiki-token-constant: var(--color-warning-11);
-        --shiki-token-string: var(--color-warning-11);
-        --shiki-token-string-expression: var(--color-success-11);
-        --shiki-token-keyword: var(--color-danger-11);
-        --shiki-token-parameter: var(--color-warning-11);
-        --shiki-token-function: var(--color-primary-11);
+        --shiki-token-constant: rgb(var(--warning-11));
+        --shiki-token-string: rgb(var(--warning-11));
+        --shiki-token-string-expression: rgb(var(--success-11));
+        --shiki-token-keyword: rgb(var(--danger-11));
+        --shiki-token-parameter: rgb(var(--warning-11));
+        --shiki-token-function: rgb(var(--primary-11));
 
-        --shiki-token-inserted: var(--color-success-11);
-        --shiki-token-deleted: var(--color-danger-11);
-        --shiki-token-changed: var(--color-tint-12);
+        --shiki-token-inserted: rgb(var(--success-11));
+        --shiki-token-deleted: rgb(var(--danger-11));
+        --shiki-token-changed: rgb(var(--tint-12));
     }
 }
 
 html.dark {
     /* Override select colors to have more contrast */
-    --shiki-token-comment: var(--color-neutral-9);
+    --shiki-token-comment: rgb(var(--neutral-9));
 
-    --shiki-token-constant: var(--color-warning-11);
-    --shiki-token-string: var(--color-warning-11);
-    --shiki-token-string-expression: var(--color-success-11);
-    --shiki-token-keyword: var(--color-danger-11);
-    --shiki-token-parameter: var(--color-warning-11);
-    --shiki-token-function: var(--color-primary-11);
+    --shiki-token-constant: rgb(var(--warning-11));
+    --shiki-token-string: rgb(var(--warning-11));
+    --shiki-token-string-expression: rgb(var(--success-11));
+    --shiki-token-keyword: rgb(var(--danger-11));
+    --shiki-token-parameter: rgb(var(--warning-11));
+    --shiki-token-function: rgb(var(--primary-11));
 }
 
 .code-monochrome {
-    --shiki-token-constant: var(--color-tint-11);
-    --shiki-token-string: var(--color-tint-12);
-    --shiki-token-string-expression: var(--color-tint-12);
-    --shiki-token-keyword: var(--color-primary-10);
-    --shiki-token-parameter: var(--color-tint-9);
-    --shiki-token-function: var(--color-primary-9);
+    --shiki-token-constant: rgb(var(--tint-11));
+    --shiki-token-string: rgb(var(--tint-12));
+    --shiki-token-string-expression: rgb(var(--tint-12));
+    --shiki-token-keyword: rgb(var(--primary-10));
+    --shiki-token-parameter: rgb(var(--tint-9));
+    --shiki-token-function: rgb(var(--primary-9));
 }
 
 html.dark.code-monochrome {
-    --shiki-token-constant: var(--color-tint-11);
-    --shiki-token-string: var(--color-tint-12);
-    --shiki-token-string-expression: var(--color-tint-12);
-    --shiki-token-keyword: var(--color-primary-11);
-    --shiki-token-parameter: var(--color-tint-10);
-    --shiki-token-function: var(--color-primary-10);
+    --shiki-token-constant: rgb(var(--tint-11));
+    --shiki-token-string: rgb(var(--tint-12));
+    --shiki-token-string-expression: rgb(var(--tint-12));
+    --shiki-token-keyword: rgb(var(--primary-11));
+    --shiki-token-parameter: rgb(var(--tint-10));
+    --shiki-token-function: rgb(var(--primary-10));
 }
 
 /* Code blocks */
