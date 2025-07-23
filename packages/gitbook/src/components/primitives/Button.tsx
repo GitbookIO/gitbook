@@ -110,7 +110,7 @@ export const Button = React.forwardRef<
         ref
     ) => {
         const sizes = {
-            default: ['text-base', 'font-semibold', 'px-5', 'py-2'],
+            default: ['text-base', 'font-semibold', iconOnly ? 'px-2' : 'px-5', 'py-2'],
             medium: ['text-sm', iconOnly ? 'px-2' : 'px-3.5', 'py-1.5'],
             small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
             xsmall: ['text-xs', 'py-1', iconOnly ? 'px-1.5' : 'px-2'],

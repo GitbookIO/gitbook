@@ -150,7 +150,6 @@ export function AIChatWindow(props: {
                                     iconOnly
                                     icon="ellipsis"
                                     label={tString(language, 'actions')}
-                                    className="px-2!"
                                     variant="blank"
                                     size="default"
                                 />
@@ -174,7 +173,6 @@ export function AIChatWindow(props: {
                             iconOnly
                             icon="close"
                             label={tString(language, 'close')}
-                            className="px-2!"
                             variant="blank"
                             size="default"
                         />

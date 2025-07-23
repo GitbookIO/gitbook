@@ -81,7 +81,10 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             }}
                         />
                     ) : (
-                        <Icon icon="magnifying-glass" className="size-4 shrink-0 animate-scale-in" />
+                        <Icon
+                            icon="magnifying-glass"
+                            className="size-4 shrink-0 animate-scale-in"
+                        />
                     )}
 
                     <input
