@@ -21,7 +21,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
                 'hint',
                 'transition-colors',
                 'rounded-md',
-                hasHeading ? 'rounded-l' : null,
+                hasHeading ? 'rounded-l-sm' : null,
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-xl',
                 'overflow-hidden',
@@ -52,7 +52,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'flip-heading-hash !py-4 items-start px-4 pl-3 text-[1em] *:flex-none',
+                        'flip-heading-hash py-4! items-start px-4 pl-3 text-[1em] *:flex-none',
                         hasHeading ? hintStyle.header : null
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}
@@ -114,10 +114,10 @@ const HINT_STYLES: {
         header: 'bg-warning-active',
         body: [
             'text-neutral-strong',
-            '[&_a]:links-default:text-warning',
-            '[&_a:hover]:links-default:text-warning-strong',
-            '[&_a]:links-default:decoration-warning/6',
-            '[&_a]:links-accent:decoration-warning',
+            'links-default:[&_a]:text-warning',
+            'links-default:[&_a:hover]:text-warning-strong',
+            'links-default:[&_a]:decoration-warning/6',
+            'links-accent:[&_a]:decoration-warning',
             'decoration-warning/6',
             '[&_.can-override-bg]:bg-warning-active',
             '[&_.can-override-text]:text-warning-strong',
@@ -131,10 +131,10 @@ const HINT_STYLES: {
         header: 'bg-danger-active',
         body: [
             'text-neutral-strong',
-            '[&_a]:links-default:text-danger',
-            '[&_a:hover]:links-default:text-danger-strong',
-            '[&_a]:links-default:decoration-danger/6',
-            '[&_a]:links-accent:decoration-danger',
+            'links-default:[&_a]:text-danger',
+            'links-default:[&_a:hover]:text-danger-strong',
+            'links-default:[&_a]:decoration-danger/6',
+            'links-accent:[&_a]:decoration-danger',
             'decoration-danger/6',
             '[&_.can-override-bg]:bg-danger-active',
             '[&_.can-override-text]:text-danger-strong',
@@ -148,10 +148,10 @@ const HINT_STYLES: {
         header: 'bg-success-active',
         body: [
             'text-neutral-strong',
-            '[&_a]:links-default:text-success',
-            '[&_a:hover]:links-default:text-success-strong',
-            '[&_a]:links-default:decoration-success/6',
-            '[&_a]:links-accent:decoration-success',
+            'links-default:[&_a]:text-success',
+            'links-default:[&_a:hover]:text-success-strong',
+            'links-default:[&_a]:decoration-success/6',
+            'links-accent:[&_a]:decoration-success',
             'decoration-success/6',
             '[&_.can-override-bg]:bg-success-active',
             '[&_.can-override-text]:text-success-strong',

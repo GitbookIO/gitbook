@@ -43,20 +43,20 @@ export async function TableOfContents(props: {
                     // Server-side static positioning
                     'lg:top-0',
                     'lg:h-screen',
-                    'announcement:lg:h-[calc(100vh-4.25rem)]',
+                    'lg:announcement:h-[calc(100vh-4.25rem)]',
 
                     // With header
                     'lg:site-header:top-16',
                     'lg:site-header:h-[calc(100vh-4rem)]',
-                    'lg:site-header:announcement:h-[calc(100vh-4rem-4.25rem)]',
+                    'lg:announcement:site-header:h-[calc(100vh-4rem-4.25rem)]',
 
-                    'lg:site-header-sections:top-[6.75rem]',
+                    'lg:site-header-sections:top-27',
                     'lg:site-header-sections:h-[calc(100vh-6.75rem)]',
-                    'lg:announcement:site-header-sections:h-[calc(100vh-6.75rem-4.25rem)]',
+                    'lg:site-header-sections:announcement:h-[calc(100vh-6.75rem-4.25rem)]',
 
                     // Client-side dynamic positioning (CSS vars applied by script)
-                    'lg:[html[style*="--toc-top-offset"]_&]:!top-[var(--toc-top-offset)]',
-                    'lg:[html[style*="--toc-height"]_&]:!h-[var(--toc-height)]',
+                    'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
+                    'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
 
                     'pt-6',
                     'pb-4',
@@ -68,7 +68,7 @@ export async function TableOfContents(props: {
                     'lg:flex',
                     'lg:page-no-toc:hidden',
                     'xl:page-no-toc:flex',
-                    'lg:page-no-toc:site-header-none:flex',
+                    'lg:site-header-none:page-no-toc:flex',
                     'flex-col',
                     'gap-4',
 
@@ -89,24 +89,24 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
                         'page-no-toc:bg-transparent!',
-                        'page-no-toc:!border-none',
+                        'page-no-toc:border-none!',
 
                         'sidebar-filled:rounded-xl',
                         'straight-corners:rounded-none',
-                        '[html.sidebar-filled.circular-corners_&]:page-has-toc:rounded-3xl'
+                        'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-3xl'
                     )}
                 >
                     {innerHeader && <div className="px-5 *:my-4">{innerHeader}</div>}
                     <TOCScrollContainer // The scrollview inside the sidebar
                         className={tcls(
-                            'flex flex-grow flex-col p-2',
+                            'flex grow flex-col p-2',
                             customization.trademark.enabled && 'lg:pb-20',
                             'lg:gutter-stable overflow-y-auto',
                             '[&::-webkit-scrollbar]:bg-transparent',
                             '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                            'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
-                            'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
-                            'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8'
+                            '[&::-webkit-scrollbar]:group-hover:bg-tint-subtle',
+                            '[&::-webkit-scrollbar-thumb]:group-hover:bg-tint-7',
+                            '[&::-webkit-scrollbar-thumb:hover]:group-hover:bg-tint-8'
                         )}
                     >
                         <PagesList

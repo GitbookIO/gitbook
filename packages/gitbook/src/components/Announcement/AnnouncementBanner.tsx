@@ -87,7 +87,7 @@ export function AnnouncementBanner(props: {
                         </Tag>
                         {closeable ? (
                             <button
-                                className={`absolute top-0 right-4 mt-2 mr-2 rounded circular-corners:rounded-lg straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
+                                className={`absolute top-0 right-4 mt-2 mr-2 rounded-sm circular-corners:rounded-lg straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
                                 type="button"
                                 onClick={dismissAnnouncement}
                                 title={tString(language, 'close')}
@@ -130,7 +130,7 @@ const BANNER_STYLES = {
         icon: 'circle-exclamation',
         iconColor: 'text-warning-subtle',
         close: 'hover:bg-tint-base hover:ring-warning-subtle',
-        link: 'links-default:text-warning links-default:hover:text-warning-strong links-default:decoration-warning/6 links-accent:decoration-warning',
+        link: 'links-default:text-warning hover:links-default:text-warning-strong links-default:decoration-warning/6 links-accent:decoration-warning',
     },
     danger: {
         container: 'bg-danger decoration-danger/6 ring-danger-subtle',
@@ -138,7 +138,7 @@ const BANNER_STYLES = {
         icon: 'triangle-exclamation',
         iconColor: 'text-danger-subtle',
         close: 'hover:bg-tint-base hover:ring-danger-subtle',
-        link: 'links-default:text-danger links-default:hover:text-danger-strong links-default:decoration-danger/6 links-accent:decoration-danger',
+        link: 'links-default:text-danger hover:links-default:text-danger-strong links-default:decoration-danger/6 links-accent:decoration-danger',
     },
     success: {
         container: 'bg-success decoration-success/6 ring-success-subtle',
@@ -146,6 +146,6 @@ const BANNER_STYLES = {
         icon: 'circle-check',
         iconColor: 'text-success-subtle',
         close: 'hover:bg-tint-base hover:ring-success-subtle',
-        link: 'links-default:text-success links-default:hover:text-success-strong links-default:decoration-success/6 links-accent:decoration-success',
+        link: 'links-default:text-success hover:links-default:text-success-strong links-default:decoration-success/6 links-accent:decoration-success',
     },
 };

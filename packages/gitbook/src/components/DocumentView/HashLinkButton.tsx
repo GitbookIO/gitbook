@@ -30,8 +30,8 @@ export function HashLinkButton(props: {
                 'opacity-0',
                 'group-hover/hash:opacity-[0]',
                 'group-focus/hash:opacity-[0]',
-                'md:group-hover/hash:md:opacity-[1]',
-                'md:group-focus/hash:md:opacity-[1]',
+                'md:group-hover/hash:opacity-[1]',
+                'md:group-focus/hash:opacity-[1]',
                 className
             )}
         >

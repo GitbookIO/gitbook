@@ -66,7 +66,7 @@ export function InlineLinkTooltipImpl(props: {
                                         <div
                                             className={tcls(
                                                 'flex gap-2 leading-snug',
-                                                isExternal && 'text-sm [overflow-wrap:anywhere]'
+                                                isExternal && 'text-sm wrap-anywhere'
                                             )}
                                         >
                                             {target.icon ? (

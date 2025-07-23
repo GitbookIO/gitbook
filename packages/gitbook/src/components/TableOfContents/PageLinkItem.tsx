@@ -39,7 +39,7 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
                         'transition-colors',
                         '[&>path]:transition-opacity',
                         '[&>path]:opacity-[0.4]',
-                        '[&>path]:group-hover:opacity-11'
+                        'group-hover:[&>path]:opacity-11'
                     )}
                 />
             </Link>

@@ -14,8 +14,8 @@ export function SkeletonParagraph(props: { id?: string; style?: ClassValue }) {
             <LoadingPane
                 style={[
                     'rounded-md',
-                    '[height:calc(15rem-1px)]',
-                    '[max-width:calc(48rem-1px)]',
+                    'h-[calc(15rem-1px)]',
+                    'max-w-[calc(48rem-1px)]',
                     style,
                 ]}
             />
@@ -32,7 +32,7 @@ export function SkeletonHeading(props: { id?: string; style?: ClassValue }) {
         <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={12}
-                style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]']}
+                style={['rounded-md', 'h-[47px]', 'max-w-[calc(48rem-1px)]']}
             />
         </div>
     );
@@ -47,7 +47,7 @@ export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
         <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={96}
-                style={['rounded-md', 'h-full', 'aspect-video', '[max-width:calc(48rem-1px)]']}
+                style={['rounded-md', 'h-full', 'aspect-video', 'max-w-[calc(48rem-1px)]']}
             />
         </div>
     );
@@ -76,7 +76,7 @@ export function SkeletonSmall(props: { id?: string; style?: ClassValue }) {
         <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={12}
-                style={['rounded-md', 'h-[35px]', '[max-width:calc(48rem-1px)]']}
+                style={['rounded-md', 'h-[35px]', 'max-w-[calc(48rem-1px)]']}
             />
         </div>
     );

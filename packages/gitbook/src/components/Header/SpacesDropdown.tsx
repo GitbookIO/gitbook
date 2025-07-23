@@ -18,7 +18,7 @@ export function SpacesDropdown(props: {
         <DropdownMenu
             className={tcls(
                 'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
-                'group-hover/dropdown:group-focus-within/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
+                'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
             )}
             button={
                 <div

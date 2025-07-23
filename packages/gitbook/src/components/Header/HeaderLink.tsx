@@ -119,7 +119,7 @@ function HeaderItemButton(
             className={tcls(
                 {
                     'button-primary':
-                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none theme-bold:hover:bg-header-link theme-bold:hover:text-header-background theme-bold:hover:shadow-none',
+                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none hover:theme-bold:bg-header-link hover:theme-bold:text-header-background hover:theme-bold:shadow-none',
                     'button-secondary': '',
                 }[linkStyle]
             )}
@@ -144,20 +144,20 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
         'truncate',
 
         'text-tint',
-        'hover:links-default:text-primary',
-        'data-[state=open]:links-default:text-primary',
-        'hover:tint:links-default:text-tint-strong',
-        'data-[state=open]:tint:links-default:text-tint-strong',
+        'links-default:hover:text-primary',
+        'links-default:data-[state=open]:text-primary',
+        'links-default:tint:hover:text-tint-strong',
+        'links-default:tint:data-[state=open]:text-tint-strong',
         'underline-offset-2',
-        'hover:links-accent:underline',
-        'data-[state=open]:links-accent:underline',
+        'links-accent:hover:underline',
+        'links-accent:data-[state=open]:underline',
         'links-accent:underline-offset-4',
         'links-accent:decoration-primary-subtle',
         'links-accent:decoration-[3px]',
         'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
-        'theme-bold:hover:!text-header-link/7'
+        'hover:theme-bold:text-header-link/7!'
     );
 }
 

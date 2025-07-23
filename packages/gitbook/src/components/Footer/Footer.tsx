@@ -36,16 +36,16 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 <div className={tcls(CONTAINER_STYLE, 'px-4', 'py-8', 'lg:py-12', 'mx-auto')}>
                     <div
                         className={tcls(
-                            'lg:!max-w-none mx-auto grid max-w-3xl site-width-wide:max-w-screen-2xl justify-between gap-12',
+                            'mx-auto grid max-w-3xl site-width-wide:max-w-screen-2xl justify-between gap-12 lg:max-w-none!',
                             'grid-cols-[auto_auto]',
                             'lg:grid-cols-[18rem_minmax(auto,48rem)_auto]',
                             'xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
-                            'site-width-wide:lg:grid-cols-[18rem_minmax(auto,80rem)_auto]',
-                            'site-width-wide:xl:grid-cols-[18rem_minmax(auto,80rem)_14rem]',
-                            'page-no-toc:lg:grid-cols-[minmax(auto,48rem)_auto]',
-                            'page-no-toc:xl:grid-cols-[14rem_minmax(auto,48rem)_14rem]',
-                            '[body:has(.site-width-wide,.page-no-toc)_&]:lg:grid-cols-[minmax(auto,90rem)_auto]',
-                            '[body:has(.site-width-wide,.page-no-toc)_&]:xl:grid-cols-[14rem_minmax(auto,90rem)_14rem]'
+                            'lg:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_auto]',
+                            'xl:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_14rem]',
+                            'lg:page-no-toc:grid-cols-[minmax(auto,48rem)_auto]',
+                            'xl:page-no-toc:grid-cols-[14rem_minmax(auto,48rem)_14rem]',
+                            'lg:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[minmax(auto,90rem)_auto]',
+                            'xl:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[14rem_minmax(auto,90rem)_14rem]'
                         )}
                     >
                         {

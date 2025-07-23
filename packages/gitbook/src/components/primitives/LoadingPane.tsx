@@ -78,8 +78,8 @@ export const LoadingPane = (props: {
                             ? 'animate-[pulseAlt_6s_cubic-bezier(.44,.12,.29,.94)_infinite]'
                             : 'animate-[rotateLoop_2s_linear_infinite]',
                         pulse
-                            ? '[background-image:radial-gradient(circle_closest-side,var(--tw-gradient-stops)_0,var(--tw-gradient-stops)_33%,var(--tw-gradient-stops)_66%)]'
-                            : '[background-image:conic-gradient(from_-90deg_at_50%_50%,var(--tw-gradient-stops)_0deg,var(--tw-gradient-stops)_90deg,var(--tw-gradient-stops)_280deg)]',
+                            ? 'bg-[radial-gradient(circle_closest-side,var(--tw-gradient-stops)_0,var(--tw-gradient-stops)_33%,var(--tw-gradient-stops)_66%)]'
+                            : 'bg-[conic-gradient(from_-90deg_at_50%_50%,var(--tw-gradient-stops)_0deg,var(--tw-gradient-stops)_90deg,var(--tw-gradient-stops)_280deg)]',
                         delayStyle,
                         gridStyle
                     )}

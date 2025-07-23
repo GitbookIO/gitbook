@@ -32,7 +32,7 @@ export function Trademark(props: {
                 'pointer-events-none',
                 'sidebar-filled:pl-2',
                 'sidebar-filled:pb-2',
-                'page-no-toc:sidebar-filled:p-0',
+                'sidebar-filled:page-no-toc:p-0',
 
                 'bg-tint-base',
                 'sidebar-filled:bg-tint-subtle',
@@ -102,7 +102,7 @@ export function TrademarkLink(props: {
                 'py-4',
 
                 'sidebar-filled:px-3',
-                'lg:page-no-toc:sidebar-filled:px-5',
+                'lg:sidebar-filled:page-no-toc:px-5',
 
                 'rounded-lg',
                 'straight-corners:rounded-none',

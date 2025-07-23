@@ -193,7 +193,7 @@ export function DynamicTabs(
                             'after:border-tint',
                             'after:top-[15%]',
                             'after:h-[70%]',
-                            'after:w-[1px]',
+                            'after:w-px',
 
                             'px-3.5',
                             'py-2',
@@ -232,7 +232,7 @@ export function DynamicTabs(
                                 'inline-block',
                                 'text-sm',
                                 'transition-[color]',
-                                'font-[500]',
+                                'font-medium',
                                 'relative',
                                 'max-w-full',
                                 'truncate'

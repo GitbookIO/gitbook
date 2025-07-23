@@ -205,7 +205,7 @@ export function SiteSectionGroupItem(props: {
                             'shrink-0',
                             'size-3',
                             'm-1',
-                            'transition-[opacity]',
+                            'transition-opacity',
                             'text-current',
                             'transition-transform',
                             'opacity-6',

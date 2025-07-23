@@ -36,7 +36,7 @@ export function HeaderLinkMore(props: {
                 'hover:text-primary',
                 'dark:hover:text-primary',
                 'theme-bold:text-header-link',
-                'hover:theme-bold:text-header-link/8',
+                'theme-bold:hover:text-header-link/8',
                 'flex',
                 'gap-1',
                 'items-center'

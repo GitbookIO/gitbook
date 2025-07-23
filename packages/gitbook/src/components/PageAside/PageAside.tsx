@@ -48,15 +48,15 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'xl:flex',
-                'chat-open:xl:max-3xl:hidden',
-                'chat-open:xl:max-3xl:opacity-0',
+                'xl:max-3xl:chat-open:hidden',
+                'xl:max-3xl:chat-open:opacity-0',
                 'max-w-56',
-                'chat-open:xl:max-3xl:*:w-56',
-                'chat-open:xl:max-3xl:max-w-0',
-                'chat-open:xl:max-3xl:ml-0',
+                'xl:max-3xl:*:chat-open:w-56',
+                'xl:max-3xl:chat-open:max-w-0',
+                'xl:max-3xl:chat-open:ml-0',
 
                 'motion-safe:xl:transition-all motion-safe:xl:duration-300',
-                'motion-safe:[transition-behavior:allow-discrete]',
+                'motion-safe:transition-discrete',
 
                 'flex-col',
                 'basis-56',
@@ -77,7 +77,7 @@ export function PageAside(props: {
                 'lg:site-header:max-h-[calc(100vh-4rem)]',
 
                 // With header & sections
-                'lg:site-header-sections:top-[6.75rem]',
+                'lg:site-header-sections:top-27',
                 'lg:site-header-sections:max-h-[calc(100vh-6.75rem)]',
 
                 // When in api page mode, we display it as an overlay on non-large resolutions
@@ -90,9 +90,9 @@ export function PageAside(props: {
                 'xl:max-2xl:page-api-block:backdrop-blur-lg',
                 'xl:max-2xl:page-api-block:border',
                 'xl:max-2xl:page-api-block:border-tint',
-                'xl:max-2xl:hover:page-api-block:shadow-lg',
-                'xl:max-2xl:hover:page-api-block:shadow-tint-12/1',
-                'xl:max-2xl:dark:hover:page-api-block:shadow-tint-1/1',
+                'xl:max-2xl:page-api-block:hover:shadow-lg',
+                'xl:max-2xl:page-api-block:hover:shadow-tint-12/1',
+                'xl:max-2xl:dark:page-api-block:hover:shadow-tint-1/1',
                 'xl:max-2xl:page-api-block:rounded-md',
                 'xl:max-2xl:page-api-block:h-auto',
                 'xl:max-2xl:page-api-block:my-9',
@@ -124,7 +124,7 @@ export function PageAside(props: {
                                 'size-3',
                                 'opacity-6',
                                 'ml-auto',
-                                'xl:max-2xl:group-hover/aside:page-api-block:hidden'
+                                'xl:max-2xl:page-api-block:group-hover/aside:hidden'
                             )}
                         />
                     </div>
@@ -141,7 +141,7 @@ export function PageAside(props: {
                             'sticky',
                             'lg:top:0',
                             'lg:site-header:top-16',
-                            'lg:site-header-sections:top-[6.75rem]',
+                            'lg:site-header-sections:top-27',
 
                             'gap-6',
                             'pt-8',
@@ -149,7 +149,7 @@ export function PageAside(props: {
                             'xl:max-2xl:page-api-block:py-0',
                             // Hide it for api page, until hovered
                             'xl:max-2xl:page-api-block:hidden',
-                            'xl:max-2xl:group-hover/aside:page-api-block:flex'
+                            'xl:max-2xl:page-api-block:group-hover/aside:flex'
                         )}
                     >
                         {document ? (
@@ -187,10 +187,10 @@ export function PageAside(props: {
                                             'items-center',
                                             'text-sm',
                                             'hover:text-tint-strong',
-                                            'hover:links-accent:underline',
-                                            'hover:links-accent:underline-offset-4',
-                                            'hover:links-accent:decoration-[3px]',
-                                            'hover:links-accent:decoration-primary-subtle',
+                                            'links-accent:hover:underline',
+                                            'links-accent:hover:underline-offset-4',
+                                            'links-accent:hover:decoration-[3px]',
+                                            'links-accent:hover:decoration-primary-subtle',
                                             'py-2'
                                         )}
                                     >
@@ -216,10 +216,10 @@ export function PageAside(props: {
                                             'items-center',
                                             'text-sm',
                                             'hover:text-tint-strong',
-                                            'hover:links-accent:underline',
-                                            'hover:links-accent:underline-offset-4',
-                                            'hover:links-accent:decoration-[3px]',
-                                            'hover:links-accent:decoration-primary-subtle',
+                                            'links-accent:hover:underline',
+                                            'links-accent:hover:underline-offset-4',
+                                            'links-accent:hover:decoration-[3px]',
+                                            'links-accent:hover:decoration-primary-subtle',
                                             'py-2'
                                         )}
                                     >
@@ -237,7 +237,7 @@ export function PageAside(props: {
             ) : null}
             <div
                 className={tcls(
-                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 xl:max-2xl:page-api-block:hidden xl:max-2xl:page-api-block:pb-0 xl:max-2xl:group-hover/aside:page-api-block:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 xl:max-2xl:page-api-block:hidden xl:max-2xl:page-api-block:pb-0 xl:max-2xl:page-api-block:group-hover/aside:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     'xl:max-2xl:page-api-block:bg-transparent'
                 )}
             >

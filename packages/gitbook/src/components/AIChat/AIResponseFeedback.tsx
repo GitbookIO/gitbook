@@ -31,7 +31,7 @@ export function AIResponseFeedback(props: {
                 label={tString(language, 'was_this_helpful_positive_label')}
                 variant="blank"
                 className={tcls(
-                    'animate-fadeIn overflow-hidden text-tint-subtle transition-all',
+                    'animate-fade-in overflow-hidden text-tint-subtle transition-all',
                     rating !== null && rating !== 1 && 'px-0 text-[0] opacity-0'
                 )}
                 size="medium"
@@ -47,7 +47,7 @@ export function AIResponseFeedback(props: {
                 label={tString(language, 'was_this_helpful_negative_label')}
                 variant="blank"
                 className={tcls(
-                    'animate-fadeIn overflow-hidden text-tint-subtle transition-all',
+                    'animate-fade-in overflow-hidden text-tint-subtle transition-all',
                     rating !== null && rating !== -1 && 'px-0 text-[0] opacity-0'
                 )}
                 size="medium"
@@ -59,7 +59,7 @@ export function AIResponseFeedback(props: {
             />
             {rating !== null ? (
                 <span
-                    className="ml-2 animate-fadeIn-slow text-tint-subtle"
+                    className="ml-2 animate-fade-in-slow text-tint-subtle"
                     style={{ animationDelay: '.3s' }}
                 >
                     {t(language, 'was_this_helpful_thank_you')}

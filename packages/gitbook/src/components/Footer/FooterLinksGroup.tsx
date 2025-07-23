@@ -46,14 +46,14 @@ async function FooterLink(props: { link: CustomizationContentLink; context: GitB
             className={tcls(
                 'font-normal',
                 'text-tint',
-                'hover:links-default:text-primary',
-                'hover:tint:links-default:text-tint-strong',
+                'links-default:hover:text-primary',
+                'links-default:tint:hover:text-tint-strong',
 
                 'contrast-more:underline',
                 'contrast-more:text-tint-strong',
                 'underline-offset-2',
 
-                'hover:links-accent:underline',
+                'links-accent:hover:underline',
                 'links-accent:underline-offset-4',
                 'links-accent:decoration-primary-subtle',
                 'links-accent:decoration-[3px]'

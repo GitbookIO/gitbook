@@ -71,7 +71,7 @@ function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
 }
 
 function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
-    return <kbd className="rounded-sm border border-b-2 px-1 font-mono">{props.children}</kbd>;
+    return <kbd className="rounded-xs border border-b-2 px-1 font-mono">{props.children}</kbd>;
 }
 
 function Superscript(props: MarkedLeafProps<DocumentMarkSuperscript>) {
@@ -86,9 +86,9 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
     return (
         <code
             className={tcls(
-                'py-[1px]',
+                'py-px',
                 'px-1.5',
-                'min-w-[1.625rem]',
+                'min-w-6.5',
                 'justify-center',
                 'items-center',
                 'leading-normal',
