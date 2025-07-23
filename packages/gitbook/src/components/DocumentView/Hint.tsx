@@ -52,7 +52,7 @@ export function Hint(props: BlockProps<DocumentBlockHint>) {
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        '!py-4 items-start pl-3 text-[1em] *:flex-none',
+                        '!py-4 w-full items-start pl-3 text-[1em] *:flex-none',
                         // Heading hash styles
                         'flip-heading-hash pr-8',
                         hintStyle.header
