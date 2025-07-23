@@ -32,7 +32,7 @@ export function AIResponseFeedback(props: {
                 variant="blank"
                 className={tcls(
                     'animate-fade-in overflow-hidden text-tint-subtle transition-all',
-                    rating !== null && rating !== 1 && 'px-0 text-[0] opacity-0'
+                    rating !== null && rating !== 1 && 'px-0 text-[0rem] opacity-0'
                 )}
                 size="medium"
                 style={{ animationDuration: '.5s' }}
@@ -48,7 +48,7 @@ export function AIResponseFeedback(props: {
                 variant="blank"
                 className={tcls(
                     'animate-fade-in overflow-hidden text-tint-subtle transition-all',
-                    rating !== null && rating !== -1 && 'px-0 text-[0] opacity-0'
+                    rating !== null && rating !== -1 && 'px-0 text-[0rem] opacity-0'
                 )}
                 size="medium"
                 style={{ animationDelay: '.2s', animationDuration: '.5s' }}
