@@ -108,7 +108,7 @@ export function TableOfContents(props: {
                         iconOnly
                         size="medium"
                         autoFocus={false}
-                        className="absolute top-2 right-2 z-50 aspect-square bg-transparent text-tint opacity-8 shadow-none ring-transparent lg:hidden"
+                        className="absolute top-2 right-2 z-50 aspect-square size-[calc(2.25rem+1px)] justify-center bg-transparent text-tint opacity-8 shadow-none ring-transparent lg:hidden"
                         onClick={() => setOpen(false)}
                     >
                         <span className="sr-only">Close</span>

@@ -149,6 +149,7 @@ export function SpaceLayout(props: {
                                                                 'page-no-toc:hidden',
                                                                 'site-header-none:page-no-toc:flex'
                                                             )}
+                                                            withPortal={false}
                                                         />
                                                     )}
                                                 </>
