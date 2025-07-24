@@ -330,6 +330,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
         // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
+        // Vercel already set this header, this is needed in OpenNext.
         if (siteURLData.contextId) {
             response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
         }

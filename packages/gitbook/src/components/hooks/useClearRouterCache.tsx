@@ -1,7 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect } from 'react';
-import { LinkSettingsContext } from '../primitives';
+import { useEffect } from 'react';
 
 // We cannot use a ref here because the contextId gets reset on navigation
 // Probably because of this bug https://github.com/vercel/next.js/issues/67542
@@ -11,8 +10,7 @@ let previousContextId: string | undefined;
  * A custom hook that clears the router cache on contextId change.
  * This is useful for ensuring that the router does not cache stale data for adaptive content.
  */
-export function useClearRouterCache() {
-    const { contextId } = useContext(LinkSettingsContext);
+export function useClearRouterCache(contextId: string | undefined) {
     const router = useRouter();
     useEffect(() => {
         if (previousContextId === undefined) {
@@ -30,8 +28,3 @@ export function useClearRouterCache() {
         }
     }, [contextId, router]);
 }
-
-export const RouterCacheClearer = () => {
-    useClearRouterCache();
-    return null; // This component does not render anything, it just runs the hook
-};

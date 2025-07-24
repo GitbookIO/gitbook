@@ -125,7 +125,7 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** Scripts to load for the site. */
     scripts: SiteIntegrationScript[];
 
-    /** Context ID used by adaptive content. It is used to clear the router cache */
+    /** Context ID used by adaptive content. It represents an unique identifier for the authentication context */
     contextId?: string;
 };
 

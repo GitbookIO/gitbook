@@ -37,10 +37,6 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
  */
 export const LinkSettingsContext = React.createContext<{
     externalLinksTarget: SiteExternalLinksTarget;
-    /**
-     * Context ID used by adaptive content. It is used to clear the router cache.
-     */
-    contextId?: string;
 }>({
     externalLinksTarget: SiteExternalLinksTarget.Self,
 });

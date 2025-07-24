@@ -3,17 +3,19 @@
 import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
 import { ThemeProvider } from 'next-themes';
 import type React from 'react';
-import { RouterCacheClearer } from '../hooks/useClearRouterCache';
+import { useClearRouterCache } from '../hooks/useClearRouterCache';
 import { LinkSettingsContext } from '../primitives';
 
 export function ClientContexts(props: {
     nonce?: string;
     forcedTheme: CustomizationThemeMode | undefined;
     externalLinksTarget: SiteExternalLinksTarget;
-    contextId?: string;
+    contextId: string | undefined;
     children: React.ReactNode;
 }) {
     const { children, forcedTheme, externalLinksTarget, contextId } = props;
+
+    useClearRouterCache(contextId);
 
     /**
      * A bug in ThemeProvider is causing the nonce to be included incorrectly
@@ -26,8 +28,7 @@ export function ClientContexts(props: {
 
     return (
         <ThemeProvider nonce={nonce} attribute="class" enableSystem forcedTheme={forcedTheme}>
-            <LinkSettingsContext.Provider value={{ externalLinksTarget, contextId }}>
-                <RouterCacheClearer />
+            <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
                 {children}
             </LinkSettingsContext.Provider>
         </ThemeProvider>
