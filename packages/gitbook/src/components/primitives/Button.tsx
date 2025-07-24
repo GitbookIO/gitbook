@@ -185,3 +185,17 @@ export const Button = React.forwardRef<
         );
     }
 );
+
+export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonProps>(({ children }, ref) => {
+    return (
+        <div
+            ref={ref}
+            className={tcls(
+                '*:!transform-none *:!shadow-none flex h-fit items-stretch justify-start',
+                '[&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+            )}
+        >
+            {children}
+        </div>
+    );
+});
