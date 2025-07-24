@@ -126,7 +126,9 @@ export function SpaceLayout(props: {
                                     <TOCScrollContent
                                         context={context}
                                         innerHeader={
-                                            !withTopHeader || isMultiVariants ? (
+                                            (!withTopHeader && !!searchAndAI) ||
+                                            (!withTopHeader && withSections && !!sections) ||
+                                            (isMultiVariants && !sections) ? (
                                                 // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                                                 <>
                                                     {!withTopHeader && searchAndAI}

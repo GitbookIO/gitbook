@@ -103,7 +103,7 @@ export function TableOfContents(props: {
 
                 {open ? (
                     <Button
-                        variant="secondary"
+                        variant="blank"
                         icon="close"
                         iconOnly
                         size="medium"
