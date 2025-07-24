@@ -1,5 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 
+import { HeaderMobileMenuButton } from '@/components/Header/HeaderMobileMenuButton';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
@@ -8,7 +9,6 @@ import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
-import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { SpacesDropdown } from './SpacesDropdown';
 
 /**
@@ -78,7 +78,7 @@ export function Header(props: {
                                     'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                                 )}
                             >
-                                <HeaderMobileMenu
+                                <HeaderMobileMenuButton
                                     className={tcls(
                                         'lg:hidden',
                                         '-ml-2',
