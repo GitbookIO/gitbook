@@ -6,7 +6,7 @@ import { getSpaceLanguage, t } from '@/intl/server';
 import { resolvePrevNextPages } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 
-import type { GitBookSiteContext } from '@v2/lib/context';
+import type { GitBookSiteContext } from '@/lib/context';
 import { Link, type LinkInsightsProps } from '../primitives';
 
 /**
@@ -17,11 +17,13 @@ export async function PageFooterNavigation(props: {
     page: RevisionPageDocument;
 }) {
     const { context, page } = props;
-    const { customization, pages, linker } = context;
-    const { previous, next } = resolvePrevNextPages(pages, page);
+    const { customization, revision, linker } = context;
+    const { previous, next } = resolvePrevNextPages(revision.pages, page);
     const language = getSpaceLanguage(customization);
-    const previousHref = previous ? linker.toPathForPage({ pages, page: previous }) : '';
-    const nextHref = next ? linker.toPathForPage({ pages, page: next }) : '';
+    const previousHref = previous
+        ? linker.toPathForPage({ pages: revision.pages, page: previous })
+        : '';
+    const nextHref = next ? linker.toPathForPage({ pages: revision.pages, page: next }) : '';
 
     return (
         <div
@@ -32,7 +34,7 @@ export async function PageFooterNavigation(props: {
                 'mt-6',
                 'gap-2',
                 'max-w-3xl',
-                'page-full-width:max-w-screen-2xl',
+                'page-width-wide:max-w-screen-2xl',
                 'mx-auto',
                 'text-tint'
             )}

@@ -1,8 +1,10 @@
 import { argosScreenshot } from '@argos-ci/playwright';
 import {
+    CustomizationAIMode,
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultFont,
+    CustomizationDefaultMonospaceFont,
     CustomizationDepth,
     type CustomizationHeaderItem,
     CustomizationHeaderPreset,
@@ -16,6 +18,7 @@ import {
     CustomizationThemeMode,
     type CustomizationThemedColor,
     type SiteCustomizationSettings,
+    SiteExternalLinksTarget,
 } from '@gitbook/api';
 import { type BrowserContext, type Page, type Response, expect, test } from '@playwright/test';
 import deepMerge from 'deepmerge';
@@ -290,6 +293,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             corners: CustomizationCorners.Rounded,
             depth: CustomizationDepth.Subtle,
             font: CustomizationDefaultFont.Inter,
+            monospaceFont: CustomizationDefaultMonospaceFont.IBMPlexMono,
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,
@@ -323,8 +327,11 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         feedback: {
             enabled: false,
         },
-        aiSearch: {
-            enabled: true,
+        ai: {
+            mode: CustomizationAIMode.None,
+        },
+        externalLinks: {
+            target: SiteExternalLinksTarget.Self,
         },
         advancedCustomization: {
             enabled: true,
@@ -334,6 +341,10 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         },
         pagination: {
             enabled: true,
+        },
+        pageActions: {
+            externalAI: true,
+            markdown: true,
         },
         trademark: {
             enabled: true,
@@ -355,7 +366,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
 /**
  * Wait for all icons present on the page to be loaded.
  */
-async function waitForIcons(page: Page) {
+export async function waitForIcons(page: Page) {
     await page.waitForFunction(() => {
         const urlStates: Record<
             string,

@@ -1,13 +1,15 @@
-import type { AnyApiDefinitionFormat, LoadPlugin } from '@scalar/openapi-parser';
+import type { AnyObject, bundle } from '@scalar/openapi-parser';
 import { OpenAPIParseError } from './error';
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';
 import { parseOpenAPIV3 } from './v3';
+
+export type ParsePlugin = Parameters<typeof bundle>[1]['plugins'][number];
 
 export interface ParseOpenAPIInput {
     /**
      * The API definition to parse.
      */
-    value: AnyApiDefinitionFormat;
+    value: string | AnyObject;
     /**
      * The root URL of the specified OpenAPI document.
      */
@@ -20,7 +22,7 @@ export interface ParseOpenAPIInput {
      * Options for the parser.
      */
     options?: {
-        plugins?: LoadPlugin[];
+        plugins?: ParsePlugin[];
     };
 }
 

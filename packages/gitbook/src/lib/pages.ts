@@ -8,17 +8,63 @@ import {
 
 export type AncestorRevisionPage = RevisionPageDocument | RevisionPageGroup;
 
+type ResolvedPagePath<Page extends RevisionPageDocument | RevisionPageGroup> = {
+    page: Page;
+    ancestors: AncestorRevisionPage[];
+};
+
 /**
  * Resolve a page path to a page document.
  */
 export function resolvePagePath(
     rootPages: Revision['pages'],
     pagePath: string
-): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
+): ResolvedPagePath<RevisionPageDocument> | undefined {
+    const result = findPageByPath(rootPages, pagePath);
+
+    if (!result) {
+        return undefined;
+    }
+
+    return resolvePageDocument(result.page, result.ancestors);
+}
+
+/**
+ * Resolve a page path to a page document or group.
+ * Similar to resolvePagePath but returns both documents and groups.
+ */
+export function resolvePagePathDocumentOrGroup(
+    rootPages: Revision['pages'],
+    pagePath: string
+): ResolvedPagePath<RevisionPageDocument | RevisionPageGroup> | undefined {
+    const result = findPageByPath(rootPages, pagePath);
+
+    if (!result) {
+        return undefined;
+    }
+
+    return { page: result.page, ancestors: result.ancestors };
+}
+
+/**
+ * Helper function to find a page by path, handling empty paths and page iteration.
+ */
+function findPageByPath(
+    rootPages: Revision['pages'],
+    pagePath: string
+): ResolvedPagePath<RevisionPageDocument | RevisionPageGroup> | undefined {
+    if (!pagePath) {
+        const firstPage = resolveFirstDocument(rootPages, []);
+        if (!firstPage) {
+            return undefined;
+        }
+        return { page: firstPage.page, ancestors: firstPage.ancestors };
+    }
+
     const iteratePages = (
         pages: RevisionPage[],
         ancestors: AncestorRevisionPage[]
-    ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined => {
+    ): ResolvedPagePath<RevisionPageDocument | RevisionPageGroup> | undefined => {
         for (const page of pages) {
             if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
                 continue;
@@ -34,18 +80,9 @@ export function resolvePagePath(
                 continue;
             }
 
-            return resolvePageDocument(page, ancestors);
+            return { page, ancestors };
         }
     };
-
-    if (!pagePath) {
-        const firstPage = resolveFirstDocument(rootPages, []);
-        if (!firstPage) {
-            return undefined;
-        }
-
-        return firstPage;
-    }
 
     return iteratePages(rootPages, []);
 }
@@ -118,6 +155,20 @@ export function getPagePath(
     }
 
     return page.path;
+}
+
+/**
+ * Get all possible paths for a page.
+ */
+export function getPagePaths(
+    rootPages: Revision['pages'],
+    page: RevisionPageDocument | RevisionPageGroup
+): string[] {
+    const path = getPagePath(rootPages, page);
+    if (path === page.path) {
+        return [path];
+    }
+    return [path, page.path];
 }
 
 /**

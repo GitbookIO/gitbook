@@ -1,34 +1,35 @@
-import { resolvePagePath } from '@/lib/pages';
-import { RevisionPageType } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { throwIfDataError } from '@v2/lib/data';
+import type { GitBookSiteContext } from '@/lib/context';
+import { getDataOrNull } from '@/lib/data';
+import { getMarkdownForPage } from '@/lib/markdownPage';
 
 /**
- * Generate a markdown version of a page.
+ * Serve a markdown version of a page.
+ * Returns a 404 if the page is not found.
  */
 export async function servePageMarkdown(context: GitBookSiteContext, pagePath: string) {
-    const pageLookup = resolvePagePath(context.pages, pagePath);
-    if (!pageLookup) {
-        return new Response(`Page "${pagePath}" not found`, { status: 404 });
+    try {
+        const result = await getDataOrNull(getMarkdownForPage(context, pagePath));
+        if (!result) {
+            return new Response('Page not found', {
+                status: 404,
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf-8',
+                },
+            });
+        }
+
+        return new Response(result, {
+            headers: {
+                'Content-Type': 'text/markdown; charset=utf-8',
+            },
+        });
+    } catch (error) {
+        console.error('Error serving markdown page:', error);
+        return new Response('Internal Server Error', {
+            status: 500,
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+            },
+        });
     }
-
-    const { page } = pageLookup;
-
-    if (page.type !== RevisionPageType.Document) {
-        return new Response(`Page "${pagePath}" is not a document`, { status: 404 });
-    }
-
-    const markdown = await throwIfDataError(
-        context.dataFetcher.getRevisionPageMarkdown({
-            spaceId: context.space.id,
-            revisionId: context.revisionId,
-            pageId: page.id,
-        })
-    );
-
-    return new Response(markdown, {
-        headers: {
-            'Content-Type': 'text/markdown; charset=utf-8',
-        },
-    });
 }

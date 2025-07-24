@@ -1,11 +1,11 @@
 import { notFound, redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
+import type { GitBookSiteContext } from '@/lib/context';
 import { getEmojiForCode } from '@/lib/emojis';
+import { getResizedImageURL } from '@/lib/images';
 import { tcls } from '@/lib/tailwind';
 import { getCacheTag } from '@gitbook/cache-tags';
-import type { GitBookSiteContext } from '@v2/lib/context';
-import { getResizedImageURL } from '@v2/lib/images';
 
 const SIZES = {
     /** Size for a favicon */
@@ -24,6 +24,11 @@ const SIZES = {
     },
 };
 
+type RenderIconOptions = {
+    size: keyof typeof SIZES;
+    theme: 'light' | 'dark';
+};
+
 /**
  * Generate an icon for a site content.
  */
@@ -31,7 +36,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
     const options = getOptions(req.url);
     const size = SIZES[options.size];
 
-    const { site, customization } = context;
+    const { customization } = context;
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     // If the site has a custom icon, redirect to it
@@ -45,17 +50,45 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
         );
     }
 
+    return new ImageResponse(<SiteDefaultIcon context={context} options={options} />, {
+        width: size.width,
+        height: size.height,
+        headers: {
+            'cache-tag': [
+                getCacheTag({
+                    tag: 'site',
+                    site: context.site.id,
+                }),
+            ].join(','),
+        },
+    });
+}
+
+/**
+ * Render the icon as a React node.
+ */
+export function SiteDefaultIcon(props: {
+    context: GitBookSiteContext;
+    options: RenderIconOptions;
+    style?: React.CSSProperties;
+    tw?: string;
+}) {
+    const { context, options, style, tw } = props;
+    const size = SIZES[options.size];
+
+    const { site, customization } = context;
     const contentTitle = site.title;
 
-    return new ImageResponse(
+    return (
         <div
-            tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle)}
+            tw={tcls(options.theme === 'light' ? 'bg-white' : 'bg-black', size.boxStyle, tw)}
             style={{
                 width: '100%',
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                ...style,
             }}
         >
             <h2
@@ -70,19 +103,7 @@ export async function serveIcon(context: GitBookSiteContext, req: Request) {
                     ? getEmojiForCode(customization.favicon.emoji)
                     : contentTitle.slice(0, 1).toUpperCase()}
             </h2>
-        </div>,
-        {
-            width: size.width,
-            height: size.height,
-            headers: {
-                'cache-tag': [
-                    getCacheTag({
-                        tag: 'site',
-                        site: context.site.id,
-                    }),
-                ].join(','),
-            },
-        }
+        </div>
     );
 }
 

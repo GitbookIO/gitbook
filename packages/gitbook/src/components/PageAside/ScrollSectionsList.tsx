@@ -6,6 +6,7 @@ import { useScrollActiveId } from '@/components/hooks';
 import type { DocumentSection } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
+import { useBodyLoaded } from '@/components/primitives';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
 import { AsideSectionHighlight } from './AsideSectionHighlight';
 
@@ -30,9 +31,12 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
         });
     }, [sections]);
 
+    const enabled = useBodyLoaded();
+
     const activeId = useScrollActiveId(ids, {
         rootMargin: `-${HEADER_HEIGHT_DESKTOP}px 0px -40% 0px`,
         threshold: SECTION_INTERSECTING_THRESHOLD,
+        enabled,
     });
 
     return (

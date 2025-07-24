@@ -35,19 +35,19 @@ async function untrustedValidate(input: ValidateOpenAPIV3Input) {
     const { value, rootURL } = input;
     const result = await validate(value);
 
-    // Spec is invalid, we stop here.
-    if (!result.specification) {
-        throw new OpenAPIParseError('Invalid OpenAPI document', {
-            code: 'invalid',
-            rootURL,
-            errors: result.errors,
-        });
-    }
-
     if (result.version === '2.0') {
         throw new OpenAPIParseError('Only OpenAPI v3 is supported', {
             code: 'parse-v2-in-v3',
             rootURL,
+        });
+    }
+
+    // Spec is invalid, we stop here.
+    if (!result.valid) {
+        throw new OpenAPIParseError('Invalid OpenAPI document', {
+            code: 'invalid',
+            rootURL,
+            errors: result.errors,
         });
     }
 

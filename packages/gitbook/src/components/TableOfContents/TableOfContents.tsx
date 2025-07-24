@@ -1,12 +1,14 @@
 'use client';
 
 import { MobileMenuScript, useMobileMenuSheet } from '@/components/MobileMenu';
+import { TableOfContentsScript } from '@/components/TableOfContents/TableOfContentsScript';
 import { Button } from '@/components/primitives';
+import type { GitBookSiteContext } from '@/lib/context';
 import { tcls } from '@/lib/tailwind';
 import type React from 'react';
-import { TableOfContentsScript } from './TableOfContentsScript';
 
 export function TableOfContents(props: {
+    context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     children: React.ReactNode;
 }) {

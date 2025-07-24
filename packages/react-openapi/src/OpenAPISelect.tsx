@@ -33,7 +33,7 @@ interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectPro
     icon?: React.ReactNode;
 }
 
-export function useSelectState(stateKey = 'select-state', initialKey?: Key) {
+export function useSelectState(stateKey = 'select-state', initialKey: Key = 'default') {
     const store = useStore(getOrCreateStoreByKey(stateKey, initialKey));
     return {
         key: store.key,

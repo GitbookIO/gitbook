@@ -11,7 +11,7 @@ import { useScrollPage } from '@/components/hooks';
 export function PageClientLayout(props: { withSections?: boolean }) {
     // We use this hook in the page layout to ensure the elements for the blocks
     // are rendered before we scroll to a hash or to the top of the page
-    useScrollPage({ scrollMarginTop: props.withSections ? 48 : undefined });
+    useScrollPage({ scrollMarginTop: props.withSections ? 108 : 64 });
 
     useStripFallbackQueryParam();
     return null;
@@ -31,7 +31,7 @@ function useStripFallbackQueryParam() {
     const searchParams = useSearchParams();
 
     React.useEffect(() => {
-        if (searchParams.has('fallback')) {
+        if (searchParams?.has('fallback')) {
             const params = new URLSearchParams(searchParams.toString());
             params.delete('fallback');
             router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);

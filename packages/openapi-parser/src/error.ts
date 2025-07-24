@@ -1,6 +1,6 @@
 import type { ErrorObject } from '@scalar/openapi-parser';
 
-type OpenAPIParseErrorCode =
+export type OpenAPIParseErrorCode =
     | 'invalid'
     | 'parse-v2-in-v3'
     | 'v2-conversion'

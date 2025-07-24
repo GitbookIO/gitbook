@@ -80,7 +80,6 @@ const config: Config = {
                     'var(--font-noto-color-emoji)',
                     'sans-serif',
                 ],
-                custom: ['var(--font-custom)'],
                 var: ['var(--font-family)'],
             },
             colors: {
@@ -294,16 +293,25 @@ const config: Config = {
                     ])
                 ),
             },
+            transitionTimingFunction: {
+                quint: 'cubic-bezier(0.83, 0, 0.17, 1)',
+            },
             animation: {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
-                scaleIn: 'scaleIn 200ms ease',
-                scaleOut: 'scaleOut 200ms ease',
-                fadeIn: 'fadeIn 200ms ease forwards',
-                fadeOut: 'fadeOut 200ms ease forwards',
-                enterFromLeft: 'enterFromLeft 250ms ease',
-                enterFromRight: 'enterFromRight 250ms ease',
-                exitToLeft: 'exitToLeft 250ms ease',
-                exitToRight: 'exitToRight 250ms ease',
+                'present-slow': 'present 500ms cubic-bezier(0.25, 1, 0.5, 1) both',
+                scaleIn: 'scaleIn 200ms ease both',
+                'scaleIn-slow': 'scaleIn 500ms ease both',
+                scaleOut: 'scaleOut 200ms ease both',
+                'scaleOut-slow': 'scaleOut 500ms ease both',
+                fadeIn: 'fadeIn 200ms ease both',
+                'fadeIn-slow': 'fadeIn 500ms ease both',
+                fadeOut: 'fadeOut 200ms ease both',
+                'fadeOut-slow': 'fadeOut 500ms ease both',
+
+                enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
             },
             keyframes: {
                 pulseAlt: {
@@ -373,20 +381,36 @@ const config: Config = {
                     },
                 },
                 pathLoading: {
+                    '0%,10%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                    '50%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '-100',
+                        opacity: '0',
+                    },
+                    '51%': {
+                        strokeDasharray: '0 100',
+                        strokeDashoffset: '0',
+                        opacity: '0',
+                    },
+                    '90%,100%': {
+                        strokeDasharray: '100 100',
+                        strokeDashoffset: '0',
+                        opacity: '1',
+                    },
+                },
+                pathEnter: {
                     '0%': {
                         strokeDasharray: '0 100',
                         strokeDashoffset: '0',
                         opacity: '0',
                     },
-                    '40%, 60%': {
-                        strokeDasharray: '100 100',
-                        strokeDashoffset: '0',
-                        opacity: '1',
-                    },
                     '100%': {
                         strokeDasharray: '100 100',
-                        strokeDashoffset: '-100',
-                        opacity: '0',
+                        strokeDashoffset: '0',
                     },
                 },
                 stroke: {
@@ -406,21 +430,29 @@ const config: Config = {
                         opacity: '0',
                     },
                 },
+                bob: {
+                    '0%, 100%': {
+                        transform: 'translateY(0)',
+                    },
+                    '50%': {
+                        transform: 'translateY(-10%)',
+                    },
+                },
                 enterFromRight: {
-                    from: { opacity: '0', transform: 'translateX(200px)' },
-                    to: { opacity: '1', transform: 'translateX(0)' },
+                    from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
                 },
                 enterFromLeft: {
-                    from: { opacity: '0', transform: 'translateX(-200px)' },
-                    to: { opacity: '1', transform: 'translateX(0)' },
+                    from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)' },
-                    to: { opacity: '0', transform: 'translateX(200px)' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)' },
-                    to: { opacity: '0', transform: 'translateX(-200px)' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
                     from: { opacity: '0', transform: 'rotateX(-10deg) scale(0.9)' },
@@ -448,19 +480,33 @@ const config: Config = {
         },
         opacity: opacity(),
         screens: {
+            xs: '480px',
             sm: '640px',
             md: '768px',
             lg: '1024px',
             xl: '1280px',
             '2xl': '1536px',
+            '3xl': '1920px',
         },
     },
     plugins: [
+        plugin(({ addUtilities }) => {
+            addUtilities({
+                '.no-scrollbar': {
+                    'scrollbar-width': 'none',
+                    '-ms-overflow-style': 'none',
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                },
+            });
+        }),
         plugin(({ addVariant }) => {
             /**
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
+            addVariant('chat-open', 'body:has(.ai-chat) &');
 
             /**
              * Variant when a header is displayed.
@@ -475,6 +521,9 @@ const config: Config = {
                 'announcement',
                 'html:not(.announcement-hidden):has(#announcement-banner) &'
             );
+
+            // Variant to target first-of-type in a column
+            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
 
             const customisationVariants = {
                 // Sidebar styles
@@ -521,9 +570,9 @@ const config: Config = {
             /**
              * Variant when the page contains a block that will be rendered in full-width mode.
              */
-            addVariant('site-full-width', 'body:has(.site-full-width) &');
-            addVariant('site-default-width', 'body:has(.site-default-width) &');
-            addVariant('page-full-width', 'body:has(.page-full-width) &');
+            addVariant('site-width-wide', 'body:has(.site-width-wide) &');
+            addVariant('site-width-default', 'body:has(.site-width-default) &');
+            addVariant('page-width-wide', 'body:has(.page-width-wide) &');
 
             /**
              * Variant when the page is configured to hide the table of content.

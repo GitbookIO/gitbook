@@ -1,13 +1,14 @@
 'use client';
 
 import { tString, useLanguage } from '@/intl/client';
-import * as storage from '@/lib/local-storage';
+import { setLocalStorageItem } from '@/lib/browser';
 import type { ResolvedContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import { CONTAINER_STYLE } from '../layout';
-import { Link, linkStyles } from '../primitives';
+import { Link } from '../primitives';
+import { LinkStyles } from '../primitives/styles';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 
 /**
@@ -28,67 +29,73 @@ export function AnnouncementBanner(props: {
     const style = BANNER_STYLES[announcement.style];
 
     return (
-        <div id="announcement-banner" className="theme-bold:bg-header-background pt-4 pb-2">
+        <div
+            id="announcement-banner"
+            className="theme-bold:bg-header-background pt-4 pb-2"
+            data-nosnippet=""
+        >
             <div className="scroll-nojump">
-                <div className={tcls('relative', CONTAINER_STYLE)}>
-                    <Tag
-                        href={contentRef?.href ?? ''}
-                        className={tcls(
-                            'flex w-full items-start justify-center overflow-hidden circular-corners:rounded-xl rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
-                            style.container,
-                            closeable && 'pr-12',
-                            hasLink && style.hover
-                        )}
-                        insights={
-                            announcement.link
-                                ? {
-                                      type: 'link_click',
-                                      link: {
-                                          target: announcement.link.to,
-                                          position: SiteInsightsLinkPosition.Announcement,
-                                      },
-                                  }
-                                : undefined
-                        }
-                    >
-                        <Icon
-                            icon={style.icon as IconName}
-                            className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
-                        />
-                        <div>
-                            {announcement.message}
-                            {hasLink ? (
-                                <div className={tcls(linkStyles, style.link, 'ml-1 inline')}>
-                                    {contentRef?.icon ? (
-                                        <span className="mr-1 ml-2 *:inline">
-                                            {contentRef?.icon}
-                                        </span>
-                                    ) : null}
-                                    {announcement.link?.title && (
-                                        <span className="mr-1">{announcement.link?.title}</span>
-                                    )}
-                                    <Icon
-                                        icon={
-                                            announcement.link?.to.kind === 'url'
-                                                ? 'arrow-up-right'
-                                                : 'chevron-right'
-                                        }
-                                        className={tcls('mb-0.5 inline size-3')}
-                                    />
-                                </div>
-                            ) : null}
-                        </div>
-                    </Tag>
-                    {closeable ? (
-                        <button
-                            className={`absolute top-0 right-4 mt-2 mr-2 rounded circular-corners:rounded-lg straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
-                            type="button"
-                            onClick={dismissAnnouncement}
-                            title={tString(language, 'close')}
+                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <div className={tcls('relative', CONTAINER_STYLE)}>
+                        <Tag
+                            href={contentRef?.href ?? ''}
+                            className={tcls(
+                                'flex w-full items-start justify-center overflow-hidden circular-corners:rounded-xl rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
+                                style.container,
+                                closeable && 'pr-12',
+                                hasLink && style.hover
+                            )}
+                            insights={
+                                announcement.link
+                                    ? {
+                                          type: 'link_click',
+                                          link: {
+                                              target: announcement.link.to,
+                                              position: SiteInsightsLinkPosition.Announcement,
+                                          },
+                                      }
+                                    : undefined
+                            }
                         >
-                            <Icon icon="close" className="size-4" />
-                        </button>
-                    ) : null}
+                            <Icon
+                                icon={style.icon as IconName}
+                                className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
+                            />
+                            <div>
+                                {announcement.message}
+                                {hasLink ? (
+                                    <div className={tcls(LinkStyles, style.link, 'ml-1 inline')}>
+                                        {contentRef?.icon ? (
+                                            <span className="mr-1 ml-2 *:inline">
+                                                {contentRef?.icon}
+                                            </span>
+                                        ) : null}
+                                        {announcement.link?.title && (
+                                            <span className="mr-1">{announcement.link?.title}</span>
+                                        )}
+                                        <Icon
+                                            icon={
+                                                announcement.link?.to.kind === 'url'
+                                                    ? 'arrow-up-right'
+                                                    : 'chevron-right'
+                                            }
+                                            className={tcls('mb-0.5 inline size-3')}
+                                        />
+                                    </div>
+                                ) : null}
+                            </div>
+                        </Tag>
+                        {closeable ? (
+                            <button
+                                className={`absolute top-0 right-4 mt-2 mr-2 rounded circular-corners:rounded-lg straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
+                                type="button"
+                                onClick={dismissAnnouncement}
+                                title={tString(language, 'close')}
+                            >
+                                <Icon icon="close" className="size-4" />
+                            </button>
+                        ) : null}
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,7 +107,7 @@ export function AnnouncementBanner(props: {
  * @see AnnouncementScript
  */
 function dismissAnnouncement() {
-    storage.setItem(ANNOUNCEMENT_STORAGE_KEY, {
+    setLocalStorageItem(ANNOUNCEMENT_STORAGE_KEY, {
         visible: false,
         at: Date.now(),
     });

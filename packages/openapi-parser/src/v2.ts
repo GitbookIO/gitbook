@@ -28,5 +28,5 @@ export async function convertOpenAPIV2ToOpenAPIV3(
         }
     })();
 
-    return parseOpenAPIV3({ ...input, rootURL, value: upgradeResult.specification });
+    return parseOpenAPIV3({ ...input, rootURL, value: upgradeResult.specification, trust: true });
 }

@@ -1,6 +1,7 @@
+import type { GitBookSiteContext, SiteSections } from '@/lib/context';
 import { getSectionURL, getSiteSpaceURL } from '@/lib/sites';
 import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
-import type { GitBookSiteContext, SiteSections } from '@v2/lib/context';
+import assertNever from 'assert-never';
 
 export type ClientSiteSections = {
     list: (ClientSiteSection | ClientSiteSectionGroup)[];
@@ -27,20 +28,32 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
     const clientSections: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
 
     for (const item of list) {
-        if (item.object === 'site-section-group') {
-            clientSections.push({
-                id: item.id,
-                title: item.title,
-                icon: item.icon,
-                object: item.object,
-                sections: item.sections
+        switch (item.object) {
+            case 'site-section-group': {
+                const sections = item.sections
                     .filter((section) => shouldIncludeSection(context, section))
-                    .map((section) => encodeSection(context, section)),
-            });
-        } else {
-            if (shouldIncludeSection(context, item)) {
-                clientSections.push(encodeSection(context, item));
+                    .map((section) => encodeSection(context, section));
+
+                // Skip empty groups
+                if (sections.length === 0) {
+                    continue;
+                }
+
+                clientSections.push({
+                    id: item.id,
+                    title: item.title,
+                    icon: item.icon,
+                    object: item.object,
+                    sections,
+                });
+                continue;
             }
+            case 'site-section': {
+                clientSections.push(encodeSection(context, item));
+                continue;
+            }
+            default:
+                assertNever(item, 'Unknown site section object type');
         }
     }
 

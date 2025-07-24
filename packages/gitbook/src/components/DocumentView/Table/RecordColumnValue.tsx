@@ -4,7 +4,7 @@ import {
     type DocumentBlockTable,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
+import { Icon, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
 import { Checkbox } from '@/components/primitives';
@@ -21,6 +21,12 @@ import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
 import type { TableRecordKV } from './Table';
 import { type VerticalAlignment, getColumnAlignment } from './utils';
+
+const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
+    'text-left': '[&_*]:text-left text-left',
+    'text-center': '[&_*]:text-center text-center',
+    'text-right': '[&_*]:text-right text-right',
+};
 
 /**
  * Render the value for a column in a record.
@@ -92,6 +98,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     <Icon
                                         key={i}
                                         icon="star"
+                                        iconStyle={IconStyle.SharpSolid}
                                         className={tcls('size-[15px]', 'text-primary')}
                                     />
                                 ))}
@@ -116,7 +123,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
 
             const horizontalAlignment = getColumnAlignment(definition);
-            const childrenHorizontalAlignment = `[&_*]:${horizontalAlignment}`;
+            const horizontalClasses = alignmentMap[horizontalAlignment];
 
             return (
                 <Blocks
@@ -131,8 +138,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         'lg:space-y-3',
                         'leading-normal',
                         verticalAlignment,
-                        horizontalAlignment,
-                        childrenHorizontalAlignment,
+                        horizontalClasses,
                     ]}
                     context={context}
                     blockStyle={['w-full', 'max-w-[unset]']}

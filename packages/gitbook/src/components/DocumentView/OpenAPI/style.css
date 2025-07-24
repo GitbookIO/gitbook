@@ -358,6 +358,11 @@
 
 .openapi-requestbody-header-content {
     /* unstyled */
+    @apply flex flex-row items-center gap-2.5;
+}
+
+.openapi-requestbody-header-type {
+    @apply text-tint select-text text-[0.813rem] font-mono font-normal [word-spacing:-0.25rem];
 }
 
 .openapi-requestbody-description.openapi-markdown {
@@ -680,9 +685,7 @@ body:has(.openapi-select-popover) {
 /* Tabs */
 .openapi-panel-header,
 .openapi-tabs-list {
-    @apply flex flex-row gap-1.5 py-1.5 px-2.5 w-full overflow-x-scroll;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    @apply flex flex-row gap-1.5 py-1.5 px-2.5 w-full overflow-x-auto no-scrollbar;
 }
 
 .openapi-tabs-tab {

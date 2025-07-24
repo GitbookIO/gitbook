@@ -6,6 +6,7 @@ import type { BlockProps } from './Block';
 import { HashLinkButton, hashLinkButtonWrapperStyles } from './HashLinkButton';
 import { Inlines } from './Inlines';
 import { getBlockTextStyle } from './spacing';
+import { getTextAlignment } from './utils';
 
 export function Heading(props: BlockProps<DocumentBlockHeading>) {
     const { block, style, context, ...rest } = props;
@@ -23,28 +24,32 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             className={tcls(
                 textStyle.textSize,
                 'heading',
-                'grid',
+                'flex',
+                'items-baseline',
                 'scroll-m-12',
+                getTextAlignment(block.data.align),
                 hashLinkButtonWrapperStyles,
-                style
+                style,
+                textStyle.marginTop
             )}
         >
             <HashLinkButton
                 id={id}
                 block={block}
-                className={tcls('-ml-6', textStyle.anchorButtonMarginTop)}
+                className={tcls('-ml-6', 'pr-2')}
                 iconClassName={tcls('size-4')}
                 label="Direct link to heading"
             />
 
             <div
                 className={tcls(
-                    'grid-area-1-1',
+                    'flex-1',
                     'z-[1]',
                     'justify-self-start',
-                    'text-left',
-                    textStyle.lineHeight,
-                    textStyle.marginTop
+                    'max-w-full',
+                    'break-words',
+                    getTextAlignment(block.data.align),
+                    textStyle.lineHeight
                 )}
             >
                 <Inlines {...rest} context={context} nodes={block.nodes} ancestorInlines={[]} />

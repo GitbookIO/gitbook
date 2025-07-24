@@ -79,7 +79,7 @@ export type OpenAPIStability = 'experimental' | 'alpha' | 'beta';
  */
 export interface OpenAPICustomCodeSample {
     lang: string;
-    label: string;
+    label?: string;
     source: string;
 }
 

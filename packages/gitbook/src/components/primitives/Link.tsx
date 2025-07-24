@@ -4,7 +4,10 @@ import NextLink, { type LinkProps as NextLinkProps } from 'next/link';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { SiteExternalLinksTarget } from '@gitbook/api';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
+import { isExternalLink } from '../utils/link';
+import { type DesignTokenName, useClassnames } from './StyleProvider';
 
 // Props from Next, which includes NextLinkProps and all the things anchor elements support.
 type BaseLinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof NextLinkProps> &
@@ -25,7 +28,38 @@ export type LinkProps = Omit<BaseLinkProps, 'href'> &
     LinkInsightsProps & {
         /** Enforce href is passed as a string (not a URL). */
         href: string;
+        /** This is a temporary solution designed to reduce the number of tailwind class passed to the client */
+        classNames?: DesignTokenName[];
     };
+
+/**
+ * Context to configure the default behavior of links.
+ */
+export const LinkSettingsContext = React.createContext<{
+    externalLinksTarget: SiteExternalLinksTarget;
+}>({
+    externalLinksTarget: SiteExternalLinksTarget.Self,
+});
+
+/**
+ * Get the target and rel props for a link based on the provided props and context.
+ */
+function getTargetProps(
+    props: Pick<LinkProps, 'href' | 'rel' | 'target'>,
+    context: {
+        externalLinksTarget: SiteExternalLinksTarget;
+        isExternal: boolean;
+    }
+) {
+    const target =
+        props.target ??
+        (context.isExternal && context.externalLinksTarget === SiteExternalLinksTarget.Blank
+            ? '_blank'
+            : undefined);
+    // Automatically set rel if target is _blank, or use the specified rel.
+    const rel = props.rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined);
+    return { target, rel };
+}
 
 /**
  * Low-level Link component that handles navigation to external urls.
@@ -35,25 +69,37 @@ export const Link = React.forwardRef(function Link(
     props: LinkProps,
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { href, prefetch, children, insights, ...domProps } = props;
+    const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
+    const { externalLinksTarget } = React.useContext(LinkSettingsContext);
     const trackEvent = useTrackEvent();
-
-    // Use a real anchor tag for external links,s and a Next.js Link for internal links.
-    // If we use a NextLink for external links, Nextjs won't rerender the top-level layouts.
-    const isExternal = URL.canParse ? URL.canParse(props.href) : props.href.startsWith('http');
+    const forwardedClassNames = useClassnames(classNames || []);
+    const isExternal = isExternalLink(href);
+    const { target, rel } = getTargetProps(props, { externalLinksTarget, isExternal });
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        const isExternalWithOrigin = isExternalLink(href, window.location.origin);
+
         if (insights) {
-            trackEvent(insights, undefined, {
-                immediate: isExternal,
-            });
+            trackEvent(insights, undefined, { immediate: isExternalWithOrigin });
         }
 
-        // When the page is embedded in an iframe, for security reasons other urls cannot be opened.
-        // In this case, we open the link in a new tab.
-        if (window.self !== window.top && isExternalLink(href, window.location.origin)) {
+        const isInIframe = window.self !== window.top;
+
+        // When the page is embedded in an iframe
+        // for security reasons other urls cannot be opened.
+        if (isInIframe && isExternalWithOrigin) {
             event.preventDefault();
-            window.open(href, '_blank');
+            window.open(href, '_blank', 'noopener noreferrer');
+        } else if (isExternal && !event.ctrlKey && !event.metaKey) {
+            // The external logic server-side is limited
+            // so we use the client-side logic to determine the real target
+            // by default the target is "_self".
+            const { target = '_self' } = getTargetProps(props, {
+                externalLinksTarget,
+                isExternal: isExternalWithOrigin,
+            });
+            event.preventDefault();
+            window.open(href, target, rel);
         }
 
         domProps.onClick?.(event);
@@ -61,16 +107,35 @@ export const Link = React.forwardRef(function Link(
 
     // We test if the link is external, without comparing to the origin
     // as this will be rendered on the server and it could result in a mismatch.
-    if (isExternalLink(href)) {
+    if (isExternal) {
         return (
-            <a ref={ref} {...domProps} href={href} onClick={onClick}>
+            <a
+                ref={ref}
+                className={tcls(...forwardedClassNames, className)}
+                {...domProps}
+                href={href}
+                onClick={onClick}
+                target={target}
+                rel={rel}
+            >
                 {children}
             </a>
         );
     }
 
+    // Not sure why yet, but it seems necessary to force prefetch to true
+    // default behavior doesn't seem to properly use the client router cache.
+    const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
+
     return (
-        <NextLink ref={ref} href={href} prefetch={prefetch} {...domProps} onClick={onClick}>
+        <NextLink
+            ref={ref}
+            href={href}
+            prefetch={_prefetch}
+            className={tcls(...forwardedClassNames, className)}
+            {...domProps}
+            onClick={onClick}
+        >
             {children}
         </NextLink>
     );
@@ -81,12 +146,17 @@ export const Link = React.forwardRef(function Link(
  * It is used to create a clickable area that can contain other elements.
  */
 export const LinkBox = React.forwardRef(function LinkBox(
-    props: React.BaseHTMLAttributes<HTMLDivElement>,
+    props: React.BaseHTMLAttributes<HTMLDivElement> & { classNames?: DesignTokenName[] },
     ref: React.Ref<HTMLDivElement>
 ) {
-    const { children, className, ...domProps } = props;
+    const { children, className, classNames, ...domProps } = props;
+    const forwardedClassNames = useClassnames(classNames || []);
     return (
-        <div ref={ref} {...domProps} className={tcls('elevate-link relative', className)}>
+        <div
+            ref={ref}
+            {...domProps}
+            className={tcls('elevate-link relative', className, forwardedClassNames)}
+        >
             {children}
         </div>
     );
@@ -112,27 +182,3 @@ export const LinkOverlay = React.forwardRef(function LinkOverlay(
         </Link>
     );
 });
-
-/**
- * Check if a link is external, compared to an origin.
- */
-function isExternalLink(href: string, origin: string | null = null) {
-    if (!URL.canParse) {
-        // If URL.canParse is not available, we quickly check if it looks like a URL
-        return href.startsWith('http');
-    }
-
-    if (!URL.canParse(href)) {
-        // If we can't parse the href, we consider it a relative path
-        return false;
-    }
-
-    if (!origin) {
-        // If origin is not provided, we consider the link external
-        return true;
-    }
-
-    // If the url points to the same origin, we consider it internal
-    const parsed = new URL(href);
-    return parsed.origin !== origin;
-}
