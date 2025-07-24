@@ -104,7 +104,7 @@ export function AIChatWindow(props: {
             observer.observe(inputRef.current);
         }
         return () => observer.disconnect();
-    }, [chat.opened]);
+    }, []);
 
     return (
         <div

@@ -2,10 +2,9 @@ import React from 'react';
 
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
-import { useAIChatController } from '../AI';
 import { AIChatIcon } from '../AIChat/';
 import { SearchResultItem } from './SearchResultItem';
-import { useSearch, useSearchLink } from './useSearch';
+import { useSearchLink } from './useSearch';
 
 export const SearchQuestionResultItem = React.forwardRef(function SearchQuestionResultItem(
     props: {
@@ -19,8 +18,6 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
     const { question, recommended = false, active, withAIChat } = props;
     const language = useLanguage();
     const getLinkProp = useSearchLink();
-    const chatController = useAIChatController();
-    const [, setSearchState] = useSearch();
 
     return (
         <SearchResultItem
@@ -29,21 +26,11 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             ref={ref}
             data-testid="search-result-item"
             scroll={false}
-            {...(withAIChat
-                ? { href: '#' }
-                : getLinkProp({
-                      ask: true,
-                      open: true,
-                      query: question,
-                  }))}
-            onClick={() => {
-                if (withAIChat) {
-                    // If AI Chat is enabled, hijack to open the chat and post the question
-                    chatController.open();
-                    chatController.postMessage({ message: question });
-                    setSearchState(null); // Close the search modal
-                }
-            }}
+            {...getLinkProp({
+                ask: question,
+                open: false,
+                query: null,
+            })}
             active={active}
             leadingIcon={
                 recommended ? (
