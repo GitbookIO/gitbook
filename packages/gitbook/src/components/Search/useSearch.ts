@@ -42,7 +42,7 @@ export function useSearch(withAIChat = false): [SearchState | null, UpdateSearch
                 global: rawState.global,
             });
         }
-    }, [rawState?.ask, rawState?.q, setRawState]);
+    }, [rawState, setRawState]);
 
     // Separate local state for open (not synchronized with URL)
     // Default to true if there's already a query in the URL
