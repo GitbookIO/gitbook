@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 2.2.2
+
+### Patch Changes
+
+- b5ad0ce: Fix OpenAPI v2 parsing
+
 ## 2.2.1
 
 ### Patch Changes
