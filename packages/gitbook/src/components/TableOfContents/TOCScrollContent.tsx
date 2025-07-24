@@ -1,16 +1,19 @@
 import { PagesList } from '@/components/TableOfContents';
 import { Trademark } from '@/components/TableOfContents';
 import { TOCScrollContainer } from '@/components/TableOfContents/TOCScroller';
+import { encodeClientTableOfContents } from '@/components/TableOfContents/encodeClientTableOfContents';
+import type { GitBookSiteContext } from '@/lib/context';
 import { tcls } from '@/lib/tailwind';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
-import type { GitBookSiteContext } from '@v2/lib/context';
 
-export function TOCScrollContent(props: {
+export async function TOCScrollContent(props: {
     context: GitBookSiteContext;
     innerHeader?: React.ReactNode;
 }) {
     const { context, innerHeader } = props;
-    const { customization } = context;
+    const { customization, revision } = context;
+
+    const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
 
     return (
         <div // The actual sidebar, either shown with a filled bg or transparent.
@@ -51,9 +54,7 @@ export function TOCScrollContent(props: {
                 )}
             >
                 <PagesList
-                    rootPages={context.pages}
-                    pages={context.pages}
-                    context={context}
+                    pages={pages}
                     style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                 />
                 {customization.trademark.enabled ? (

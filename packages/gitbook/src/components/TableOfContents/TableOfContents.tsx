@@ -3,12 +3,10 @@
 import { MobileMenuScript, useMobileMenuSheet } from '@/components/MobileMenu';
 import { TableOfContentsScript } from '@/components/TableOfContents/TableOfContentsScript';
 import { Button } from '@/components/primitives';
-import type { GitBookSiteContext } from '@/lib/context';
 import { tcls } from '@/lib/tailwind';
 import type React from 'react';
 
 export function TableOfContents(props: {
-    context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     children: React.ReactNode;
 }) {
@@ -108,8 +106,9 @@ export function TableOfContents(props: {
                         variant="secondary"
                         icon="close"
                         iconOnly
+                        size="medium"
                         autoFocus={false}
-                        className="absolute top-2 right-2 z-50 bg-transparent text-tint opacity-8 shadow-none ring-transparent lg:hidden"
+                        className="absolute top-2 right-2 z-50 aspect-square bg-transparent text-tint opacity-8 shadow-none ring-transparent lg:hidden"
                         onClick={() => setOpen(false)}
                     >
                         <span className="sr-only">Close</span>

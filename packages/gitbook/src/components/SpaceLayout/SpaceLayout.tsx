@@ -105,7 +105,6 @@ export function SpaceLayout(props: {
                                 )}
                             >
                                 <TableOfContents
-                                    context={context}
                                     header={
                                         withTopHeader ? null : (
                                             <div
