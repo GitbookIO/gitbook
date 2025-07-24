@@ -126,31 +126,33 @@ export function SpaceLayout(props: {
                                     <TOCScrollContent
                                         context={context}
                                         innerHeader={
-                                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                                            <>
-                                                {!withTopHeader && searchAndAI}
-                                                {!withTopHeader && withSections && sections && (
-                                                    <SiteSectionList
-                                                        className={tcls('hidden', 'lg:block')}
-                                                        sections={encodeClientSiteSections(
-                                                            context,
-                                                            sections
-                                                        )}
-                                                    />
-                                                )}
-                                                {isMultiVariants && !sections && (
-                                                    <SpacesDropdown
-                                                        context={context}
-                                                        siteSpace={siteSpace}
-                                                        siteSpaces={siteSpaces}
-                                                        className={tcls(
-                                                            'w-full',
-                                                            'page-no-toc:hidden',
-                                                            'site-header-none:page-no-toc:flex'
-                                                        )}
-                                                    />
-                                                )}
-                                            </>
+                                            !withTopHeader || isMultiVariants ? (
+                                                // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                                                <>
+                                                    {!withTopHeader && searchAndAI}
+                                                    {!withTopHeader && withSections && sections && (
+                                                        <SiteSectionList
+                                                            className={tcls('hidden', 'lg:block')}
+                                                            sections={encodeClientSiteSections(
+                                                                context,
+                                                                sections
+                                                            )}
+                                                        />
+                                                    )}
+                                                    {isMultiVariants && !sections && (
+                                                        <SpacesDropdown
+                                                            context={context}
+                                                            siteSpace={siteSpace}
+                                                            siteSpaces={siteSpaces}
+                                                            className={tcls(
+                                                                'w-full',
+                                                                'page-no-toc:hidden',
+                                                                'site-header-none:page-no-toc:flex'
+                                                            )}
+                                                        />
+                                                    )}
+                                                </>
+                                            ) : null
                                         }
                                     />
                                 </TableOfContents>
