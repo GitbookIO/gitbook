@@ -86,7 +86,7 @@ export function DropdownMenu(props: {
                     >
                         <div
                             className={tcls(
-                                'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
+                                'flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
                                 className
                             )}
                         >
@@ -194,7 +194,7 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
                     collisionPadding={8}
                     className="z-40 animate-present"
                 >
-                    <div className="flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
+                    <div className="flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
                         {children}
                     </div>
                 </RadixDropdownMenu.SubContent>
@@ -203,9 +203,12 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
     );
 }
 
-export function DropdownMenuSeparator() {
+export function DropdownMenuSeparator(props: { className?: ClassValue }) {
+    const { className } = props;
     return (
-        <RadixDropdownMenu.Separator className="h-px w-full border-tint border-t first:hidden" />
+        <RadixDropdownMenu.Separator
+            className={tcls('my-1 h-px w-full border-tint-subtle border-t', className)}
+        />
     );
 }
 

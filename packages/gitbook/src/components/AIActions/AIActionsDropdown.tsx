@@ -69,7 +69,7 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
 
             {actions.markdown ? (
                 <>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="first:hidden" />
                     <CopyMarkdown
                         isDefaultAction={!withAIChat}
                         markdownPageUrl={markdownPageUrl}
@@ -81,7 +81,7 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
 
             {actions.externalAI ? (
                 <>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="first:hidden" />
                     <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="dropdown-menu-item" />
                     <OpenInLLM provider="claude" url={markdownPageUrl} type="dropdown-menu-item" />
                 </>
