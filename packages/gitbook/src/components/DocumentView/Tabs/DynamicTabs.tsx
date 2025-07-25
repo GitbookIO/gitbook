@@ -84,9 +84,13 @@ export function DynamicTabs(
         );
     }, [id, tabs, tabsState]);
 
+    const orientation: string = 'horizontal'; // TODO: Get orientation from tab block options
+    const position: string = 'start'; // TODO: Get position from tab block options
+    const description = null; // TODO: Get description from tabs
+
     // To avoid issue with hydration, we only use the state from localStorage
     // once the component has been mounted.
-    // Otherwise because of  the streaming/suspense approach, tabs can be first-rendered at different time
+    // Otherwise because of the streaming/suspense approach, tabs can be first-rendered at different time
     // and get stuck into an inconsistent state.
     const mounted = useIsMounted();
     const active = mounted ? activeState : tabs[0];
@@ -143,14 +147,15 @@ export function DynamicTabs(
     return (
         <div
             className={tcls(
-                'rounded-lg',
-                'straight-corners:rounded-sm',
-                'ring-1',
-                'ring-inset',
-                'ring-tint-subtle',
                 'flex',
                 'flex-col',
                 'overflow-hidden',
+                'pb-1',
+
+                orientation === 'horizontal' && position === 'start' && 'flex-col',
+                orientation === 'vertical' && position === 'start' && 'md:flex-row',
+                orientation === 'vertical' && position === 'end' && 'md:flex-row-reverse',
+
                 style
             )}
         >
@@ -158,70 +163,37 @@ export function DynamicTabs(
                 role="tablist"
                 className={tcls(
                     'group/tabs',
-                    'inline-flex',
+                    'flex',
+                    tabs.length > 3 ? 'md:flex-wrap' : '',
+                    'overflow-x-auto',
+                    'md:overflow-hidden',
+                    'gap-x-1',
                     'flex-row',
-                    'self-stretch',
-                    'after:flex-[1]',
-                    'after:bg-tint-12/1',
-                    // if last tab is selected, apply rounded to :after element
-                    '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
+                    orientation === 'vertical' && 'gap-1.5 md:max-w-[40%] md:flex-col',
+                    'snap-x',
+                    'snap-mandatory',
+                    '-mb-px',
+                    'peer',
+                    orientation === 'vertical' && position === 'start' && 'md:-mr-px md:mb-0',
+                    orientation === 'vertical' && position === 'end' && 'md:-ml-px md:mb-0'
                 )}
             >
                 {tabs.map((tab) => (
                     <div
                         key={tab.id}
                         className={tcls(
-                            hashLinkButtonWrapperStyles,
-                            'flex',
-                            'items-center',
-                            'gap-3.5',
-
-                            //prev from active-tab
-                            '[&:has(+_.active-tab)]:rounded-br-md',
-
-                            //next from active-tab
-                            '[.active-tab_+_&]:rounded-bl-md',
-
-                            //next from active-tab
-                            '[.active-tab_+_:after]:rounded-br-md',
-
-                            'after:transition-colors',
-                            'after:border-r',
-                            'after:absolute',
-                            'after:left-[unset]',
-                            'after:right-0',
-                            'after:border-tint',
-                            'after:top-[15%]',
-                            'after:h-[70%]',
-                            'after:w-[1px]',
-
-                            'px-3.5',
-                            'py-2',
-
-                            'last:after:border-transparent',
-
-                            'text-tint',
-                            'bg-tint-12/1',
-                            'hover:text-tint-strong',
-                            'max-w-full',
-                            'truncate',
-
-                            active.id === tab.id
-                                ? [
-                                      'shrink-0',
-                                      'active-tab',
-                                      'text-tint-strong',
-                                      'bg-transparent',
-                                      'after:[&.active-tab]:border-transparent',
-                                      'after:[:has(+_&.active-tab)]:border-transparent',
-                                      'after:[:has(&_+)]:border-transparent',
-                                  ]
-                                : null
+                            'tab -mx-4 flex overflow-hidden px-4 max-md:shrink-0 max-md:last:pr-0 [&:first-child>button]:before:hidden',
+                            active.id === tab.id && 'active-tab z-20',
+                            description && [
+                                'min-w-56 max-md:max-w-[calc(33.33%+1.75rem)]',
+                                orientation === 'horizontal' && 'md:max-w-[calc(33.33%+1.75rem)]',
+                            ]
                         )}
                     >
                         <button
                             type="button"
                             role="tab"
+                            aria-orientation={orientation as 'horizontal' | 'vertical'}
                             aria-selected={active.id === tab.id}
                             aria-controls={getTabPanelId(tab.id)}
                             id={getTabButtonId(tab.id)}
@@ -229,23 +201,107 @@ export function DynamicTabs(
                                 onSelectTab(tab);
                             }}
                             className={tcls(
-                                'inline-block',
-                                'text-sm',
-                                'transition-[color]',
-                                'font-[500]',
+                                hashLinkButtonWrapperStyles,
+                                description ? 'p-4' : 'px-4 py-1.5',
+                                'grow',
+                                'transition-colors',
+                                'text-left',
+                                'flex',
+                                'flex-col',
+                                'gap-1',
+                                'rounded-md',
+                                'straight-corners:rounded-none',
+                                'circular-corners:rounded-2xl',
+                                'focus:outline-none',
+                                'focus-visible:ring-2',
+                                'ring-inset',
+                                'border',
                                 'relative',
-                                'max-w-full',
-                                'truncate'
+
+                                // Flared corners
+                                'before:absolute before:size-4 before:transition-all before:content-[""] focus-visible:before:hidden',
+                                'before:end-full',
+                                'before:bottom-0',
+                                'before:rounded-ee-md',
+                                'circular-corners:before:rounded-ee-2xl',
+                                'before:border-e before:border-b',
+                                'before:shadow-[4px_4px_0_1px_var(--tw-shadow-color)]',
+
+                                'after:absolute after:size-4 after:transition-all after:content-[""] focus-visible:after:hidden',
+                                'after:start-full',
+                                'after:bottom-0',
+                                'after:rounded-es-md',
+                                'circular-corners:after:rounded-es-2xl',
+                                'after:border-s after:border-b',
+                                'after:shadow-[-4px_4px_0_1px_var(--tw-shadow-color)]',
+
+                                active.id === tab.id
+                                    ? [
+                                          'before:border-tint-subtle after:border-tint-subtle',
+                                          'before:shadow-tint-1 after:shadow-tint-1',
+                                      ]
+                                    : [
+                                          'before:border-tint-subtle after:border-tint-subtle',
+                                          'before:shadow-tint-2 after:shadow-tint-2',
+                                          'hover:after:shadow-tint-4 hover:before:shadow-tint-4',
+                                      ],
+                                orientation === 'vertical' && 'md:after:hidden md:before:hidden',
+                                'straight-corners:before:hidden straight-corners:after:hidden',
+
+                                'max-md:!rounded-b-none max-md:border-b-0',
+
+                                // Position-specific adjustments
+                                orientation === 'horizontal' &&
+                                    position === 'start' &&
+                                    'md:!rounded-b-none md:border-b-0',
+                                orientation === 'vertical' &&
+                                    position === 'start' &&
+                                    'md:!rounded-r-none md:border-r-0',
+                                orientation === 'vertical' &&
+                                    position === 'end' &&
+                                    'md:!rounded-l-none md:border-l-0',
+
+                                'text-tint',
+                                'snap-start',
+                                active.id === tab.id
+                                    ? ['border-tint-subtle bg-tint-base text-tint-strong']
+                                    : [
+                                          'border-tint-subtle bg-tint-subtle',
+                                          'hover:z-10 hover:border-tint-subtle hover:bg-tint-hover hover:text-tint-strong',
+                                          'focus-visible:z-10 focus-visible:bg-tint-hover focus-visible:text-tint-strong',
+                                      ]
                             )}
                         >
-                            {tab.title}
+                            <div
+                                className={tcls(
+                                    'flex flex-row items-center gap-1',
+                                    description ? 'font-semibold text-base' : 'font-medium text-sm'
+                                )}
+                            >
+                                <div
+                                    className={tcls(
+                                        'line-clamp-2',
+                                        active.id === tab.id && 'text-primary-subtle'
+                                    )}
+                                >
+                                    {tab.title}
+                                </div>
+                                <HashLinkButton
+                                    id={getTabButtonId(tab.id)}
+                                    block={block}
+                                    label="Direct link to tab"
+                                    className={tcls(
+                                        '-mt-px ml-auto',
+                                        orientation === 'vertical' || description
+                                            ? 'max-md:-mr-3'
+                                            : '-mr-3'
+                                    )}
+                                />
+                            </div>
+                            {description ? (
+                                <p className="line-clamp-5 text-sm">{description}</p>
+                            ) : null}
                         </button>
-
-                        <HashLinkButton
-                            id={getTabButtonId(tab.id)}
-                            block={block}
-                            label="Direct link to tab"
-                        />
                     </div>
                 ))}
             </div>
@@ -255,7 +311,23 @@ export function DynamicTabs(
                     role="tabpanel"
                     id={getTabPanelId(tab.id)}
                     aria-labelledby={getTabButtonId(tab.id)}
-                    className={tcls('p-4', tab.id !== active.id ? 'hidden' : null)}
+                    className={tcls(
+                        'p-4',
+                        'rounded-md',
+                        'straight-corners:rounded-none',
+                        'circular-corners:rounded-2xl',
+                        'z-10',
+                        'bg-tint-base',
+                        position === 'start' && '!rounded-tl-none',
+                        position === 'end' && '!rounded-tr-none',
+                        'transition-all',
+                        'ring-1',
+                        'ring-inset',
+                        'ring-tint-subtle',
+                        'grow',
+                        'depth-subtle:shadow-sm',
+                        tab.id !== active.id ? 'hidden' : null
+                    )}
                 >
                     {tabsBody[index]}
                 </div>
@@ -300,7 +372,6 @@ function getTabByTitle(input: TabsInput, state: TabsState): TabsItem | null {
                 };
             })
             .filter(({ score }) => score >= 0)
-            // .sortBy(({ score }) => -score)
             .sort(({ score: a }, { score: b }) => b - a)
             .map(({ item }) => item)[0] ?? null
     );
