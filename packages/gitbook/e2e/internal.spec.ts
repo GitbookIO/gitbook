@@ -84,7 +84,6 @@ const testCases: TestsCase[] = [
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'AI Assistant',
@@ -98,7 +97,6 @@ const testCases: TestsCase[] = [
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'Not found',
@@ -328,7 +326,6 @@ const testCases: TestsCase[] = [
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'AI Assistant',
@@ -342,7 +339,6 @@ const testCases: TestsCase[] = [
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'Not found',
