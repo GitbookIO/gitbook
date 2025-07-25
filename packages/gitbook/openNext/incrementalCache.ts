@@ -36,6 +36,11 @@ class GitbookIncrementalCache implements IncrementalCache {
         const r2 = getCloudflareContext().env[BINDING_NAME];
         const localCache = await this.getCacheInstance();
         if (!r2) throw new Error('No R2 bucket');
+        if (process.env.SHOULD_BYPASS_CACHE === 'true') {
+            // We are in a local middleware environment, we should bypass the cache
+            // and go directly to the server.
+            return null;
+        }
         try {
             // Check local cache first if available
             const localCacheEntry = await localCache.match(this.getCacheUrlKey(cacheKey));
