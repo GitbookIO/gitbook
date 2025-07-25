@@ -108,6 +108,7 @@ export function AIChatWindow(props: {
 
     return (
         <div
+            data-testid="ai-chat"
             className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96"
             ref={containerRef}
         >
