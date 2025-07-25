@@ -144,7 +144,7 @@ export function PageAside(props: {
                             'lg:site-header-sections:top-27',
 
                             'gap-6',
-                            'pt-10',
+                            'pt-8',
 
                             'xl:max-2xl:page-api-block:py-0',
                             // Hide it for api page, until hovered
