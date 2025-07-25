@@ -139,19 +139,27 @@ class GitbookIncrementalCache implements IncrementalCache {
     }
 
     async writeToR2(key: string, value: string): Promise<void> {
-        const env = getCloudflareContext().env as {
-            WRITE_BUFFER: DurableObjectNamespace<
-                Rpc.DurableObjectBranded & {
-                    write: (key: string, value: string) => Promise<void>;
-                }
-            >;
-        };
-        const id = env.WRITE_BUFFER.idFromName(key);
+        try {
+            const env = getCloudflareContext().env as {
+                WRITE_BUFFER: DurableObjectNamespace<
+                    Rpc.DurableObjectBranded & {
+                        write: (key: string, value: string) => Promise<void>;
+                    }
+                >;
+            };
+            const id = env.WRITE_BUFFER.idFromName(key);
 
-        // A stub is a client used to invoke methods on the Durable Object
-        const stub = env.WRITE_BUFFER.get(id);
+            // A stub is a client used to invoke methods on the Durable Object
+            const stub = env.WRITE_BUFFER.get(id);
 
-        await stub.write(key, value);
+            await stub.write(key, value);
+        } catch {
+            // We fallback to writing directly to R2
+            // it can fail locally because the limit is 1Mb per args
+            // It is 32Mb in production, so we should be fine
+            const r2 = getCloudflareContext().env[BINDING_NAME];
+            r2?.put(key, value);
+        }
     }
 
     async getCacheInstance(): Promise<Cache> {
