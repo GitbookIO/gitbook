@@ -36,13 +36,17 @@
                     {
                         "name": "WRITE_BUFFER",
                         "class_name": "R2WriteBuffer"
+                    },
+                    {
+                        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+                        "class_name": "DOShardedTagCache"
                     }
                 ]
             },
             "migrations": [
                 {
                     "tag": "v1",
-                    "new_sqlite_classes": ["R2WriteBuffer"]
+                    "new_sqlite_classes": ["R2WriteBuffer", "DOShardedTagCache"]
                 }
             ]
         },
