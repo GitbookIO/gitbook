@@ -46,7 +46,7 @@ export async function PageHeader(props: {
                 <div
                     className={tcls(
                         '-mt-3 xs:-mt-2 float-right mb-2 ml-4 xl:max-2xl:page-api-block:mr-58',
-                        ancestors.length > 0 ? '' : 'xs:mt-1'
+                        ancestors.length > 0 ? '' : 'xs:mt-2'
                     )}
                 >
                     <AIActionsDropdown
