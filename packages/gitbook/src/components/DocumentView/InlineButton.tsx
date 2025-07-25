@@ -19,7 +19,7 @@ export async function InlineButton(props: InlineProps<api.DocumentInlineButton>)
 
     return (
         // Set the leading to have some vertical space between adjacent buttons
-        <span className="inline-button leading-[3rem] [&:has(+.inline-button)]:mr-2">
+        <span className="inline-button leading-12 [&:has(+.inline-button)]:mr-2">
             <Button
                 href={resolved.href}
                 label={inline.data.label}

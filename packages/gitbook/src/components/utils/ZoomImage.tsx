@@ -242,7 +242,7 @@ function ZoomImageModal(props: {
                     'bg-tint',
                     'border',
                     'border-tint',
-                    'shadow-sm',
+                    'shadow-xs',
                     'hover:shadow-md'
                 )}
                 onClick={onClose}

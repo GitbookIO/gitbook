@@ -1,3 +1,5 @@
+@reference "../../RootLayout/globals.css";
+
 /* Detect whether a scrollbar exists on the table */
 @keyframes detect-scroll {
     from,

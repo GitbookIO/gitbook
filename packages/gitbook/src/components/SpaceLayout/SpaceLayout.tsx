@@ -144,7 +144,7 @@ export function SpaceLayout(props: {
                                                     className={tcls(
                                                         'w-full',
                                                         'page-no-toc:hidden',
-                                                        'site-header-none:page-no-toc:flex'
+                                                        'page-no-toc:site-header-none:flex'
                                                     )}
                                                 />
                                             )}

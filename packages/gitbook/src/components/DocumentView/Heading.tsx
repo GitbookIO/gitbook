@@ -44,7 +44,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <div
                 className={tcls(
                     'flex-1',
-                    'z-[1]',
+                    'z-1',
                     'justify-self-start',
                     'max-w-full',
                     'break-words',

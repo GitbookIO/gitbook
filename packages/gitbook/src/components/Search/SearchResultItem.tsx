@@ -56,13 +56,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
             <div className="size-4 shrink-0 text-tint-subtle">{leadingIcon}</div>
             <div className="grow">{children}</div>
             {active ? (
-                <Button
-                    label={action}
-                    iconOnly
-                    variant="primary"
-                    className="p-2"
-                    icon="arrow-turn-down-left"
-                />
+                <Button label={action} iconOnly variant="primary" icon="arrow-turn-down-left" />
             ) : (
                 <div className="flex size-8 shrink-0 items-center justify-center text-tint-subtle">
                     <Icon icon="chevron-right" className="size-3" />

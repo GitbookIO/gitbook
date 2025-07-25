@@ -45,7 +45,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'fixed',
                 'z-10',
                 'bg-tint-base',
-                'rounded',
+                'rounded-sm',
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-2xl',
                 'ring-1',
@@ -61,7 +61,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'text-balance',
                 'sm:left-auto',
                 'lg:chat-open:mr-80',
-                'xl:chat-open:mr-[25rem]',
+                'xl:chat-open:mr-100',
                 'transition-all',
                 'duration-300'
             )}
@@ -88,7 +88,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     'flex',
                     'justify-center',
                     'items-center',
-                    'rounded-sm',
+                    'rounded-xs',
                     'circular-corners:rounded-full',
                     'hover:bg-tint-hover'
                 )}

@@ -40,7 +40,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
                 >
                     {index + 1}
                 </div>
-                <div className="can-override-bg absolute top-9 bottom-2 left-[0.875rem] w-px bg-primary-7 theme-muted:bg-primary-subtle" />
+                <div className="can-override-bg absolute top-9 bottom-2 left-3.5 w-px bg-primary-7 theme-muted:bg-primary-subtle" />
             </div>
             <Blocks
                 {...contextProps}

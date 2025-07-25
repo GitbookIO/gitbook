@@ -16,28 +16,28 @@ export const LoadingPane = (props: {
             case 0:
                 return 'delay-0';
             case 1:
-                return '[animation-delay:_200ms]';
+                return '[animation-delay:200ms]';
             case 2:
-                return '[animation-delay:_400ms]';
+                return '[animation-delay:400ms]';
             case 3:
-                return '[animation-delay:_600ms]';
+                return '[animation-delay:600ms]';
             case 4:
-                return '[animation-delay:_800ms]';
+                return '[animation-delay:800ms]';
         }
     })();
 
     const tileStyle = (() => {
         switch (tile) {
             case 12:
-                return '[mask:conic-gradient(from_90deg_at_1px_1px,_#0000_90deg,_#0003_0)_calc(50%+1px)_calc(0%+47px)_/_12px_12px]';
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/12px_12px]';
             case 24:
-                return '[mask:conic-gradient(from_90deg_at_1px_1px,_#0000_90deg,_#0003_0)_calc(50%+1px)_calc(0%+47px)_/_24px_24px]';
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/24px_24px]';
             case 48:
-                return '[mask:conic-gradient(from_90deg_at_1px_1px,_#0000_90deg,_#0003_0)_calc(50%+1px)_calc(0%+47px)_/_48px_48px]';
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/48px_48px]';
             case 96:
-                return '[mask:conic-gradient(from_90deg_at_1px_1px,_#0000_90deg,_#0003_0)_calc(50%+1px)_calc(0%+47px)_/_96px_96px]';
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/96px_96px]';
             default:
-                return '[mask:conic-gradient(from_90deg_at_1px_1px,_#0000_90deg,_#0003_0)_calc(50%+1px)_calc(0%+47px)_/_48px_48px]';
+                return '[mask:conic-gradient(from_90deg_at_1px_1px,#0000_90deg,#0003_0)_calc(50%+1px)_calc(0%+47px)/48px_48px]';
         }
     })();
 
@@ -78,8 +78,8 @@ export const LoadingPane = (props: {
                             ? 'animate-[pulseAlt_6s_cubic-bezier(.44,.12,.29,.94)_infinite]'
                             : 'animate-[rotateLoop_2s_linear_infinite]',
                         pulse
-                            ? '[background-image:radial-gradient(circle_closest-side,_var(--tw-gradient-stops)_0,_var(--tw-gradient-stops)_33%,_var(--tw-gradient-stops)_66%)]'
-                            : '[background-image:conic-gradient(from_-90deg_at_50%_50%,_var(--tw-gradient-stops)_0deg,_var(--tw-gradient-stops)_90deg,_var(--tw-gradient-stops)_280deg)]',
+                            ? 'bg-[radial-gradient(circle_closest-side,var(--tw-gradient-stops)_0,var(--tw-gradient-stops)_33%,var(--tw-gradient-stops)_66%)]'
+                            : 'bg-[conic-gradient(from_-90deg_at_50%_50%,var(--tw-gradient-stops)_0deg,var(--tw-gradient-stops)_90deg,var(--tw-gradient-stops)_280deg)]',
                         delayStyle,
                         gridStyle
                     )}

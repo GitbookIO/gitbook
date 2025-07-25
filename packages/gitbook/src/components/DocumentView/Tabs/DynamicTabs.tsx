@@ -144,7 +144,7 @@ export function DynamicTabs(
         <div
             className={tcls(
                 'rounded-lg',
-                'straight-corners:rounded-sm',
+                'straight-corners:rounded-xs',
                 'ring-1',
                 'ring-inset',
                 'ring-tint-subtle',
@@ -161,7 +161,7 @@ export function DynamicTabs(
                     'inline-flex',
                     'flex-row',
                     'self-stretch',
-                    'after:flex-[1]',
+                    'after:flex-1',
                     'after:bg-tint-12/1',
                     // if last tab is selected, apply rounded to :after element
                     '[&:has(button.active-tab:last-of-type):after]:rounded-bl-md'
@@ -180,7 +180,7 @@ export function DynamicTabs(
                             '[&:has(+_.active-tab)]:rounded-br-md',
 
                             //next from active-tab
-                            '[.active-tab_+_&]:rounded-bl-md',
+                            '[.active-tab+&]:rounded-bl-md',
 
                             //next from active-tab
                             '[.active-tab_+_:after]:rounded-br-md',
@@ -193,7 +193,7 @@ export function DynamicTabs(
                             'after:border-tint',
                             'after:top-[15%]',
                             'after:h-[70%]',
-                            'after:w-[1px]',
+                            'after:w-px',
 
                             'px-3.5',
                             'py-2',
@@ -212,9 +212,9 @@ export function DynamicTabs(
                                       'active-tab',
                                       'text-tint-strong',
                                       'bg-transparent',
-                                      'after:[&.active-tab]:border-transparent',
-                                      'after:[:has(+_&.active-tab)]:border-transparent',
-                                      'after:[:has(&_+)]:border-transparent',
+                                      '[&.active-tab]:after:border-transparent',
+                                      '[:has(+_&.active-tab)]:after:border-transparent',
+                                      '[:has(&_+)]:after:border-transparent',
                                   ]
                                 : null
                         )}
@@ -232,7 +232,7 @@ export function DynamicTabs(
                                 'inline-block',
                                 'text-sm',
                                 'transition-[color]',
-                                'font-[500]',
+                                'font-medium',
                                 'relative',
                                 'max-w-full',
                                 'truncate'

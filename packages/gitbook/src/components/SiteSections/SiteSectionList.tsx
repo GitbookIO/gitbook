@@ -32,7 +32,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
             <nav
                 aria-label="Sections"
                 className={tcls(
-                    '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-gradient-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base',
+                    '-mx-5 before:contents[] relative border-tint-subtle border-b from-transparent sidebar-filled:to-tint-subtle theme-muted:to-tint-subtle to-tint-base text-sm text-tint before:pointer-events-none before:absolute before:right-2 before:bottom-0 before:left-0 before:h-12 before:bg-linear-to-b [html.sidebar-filled.theme-bold.tint_&]:to-tint-base [html.sidebar-filled.theme-bold.tint_&]:to-tint-subtle [html.sidebar-filled.theme-muted_&]:to-tint-base',
                     className
                 )}
             >
@@ -108,7 +108,7 @@ export function SiteSectionListItem(props: {
         >
             <div
                 className={tcls(
-                    'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-sm shadow-tint ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
+                    'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
                     isActive
                         ? 'bg-primary tint:bg-primary-solid text-primary-subtle tint:text-contrast-primary-solid shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary contrast-more:ring-2 contrast-more:ring-primary'
                         : null
@@ -162,7 +162,7 @@ export function SiteSectionGroupItem(props: {
             >
                 <div
                     className={tcls(
-                        'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-sm shadow-tint ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
+                        'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
                         isActiveGroup
                             ? 'bg-primary tint:bg-primary-solid text-primary tint:text-contrast-primary-solid shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary-strong contrast-more:ring-2 contrast-more:ring-primary'
                             : null
@@ -183,7 +183,7 @@ export function SiteSectionGroupItem(props: {
                         'group',
                         'relative',
                         'rounded-full',
-                        'straight-corners:rounded-sm',
+                        'straight-corners:rounded-xs',
                         'w-5',
                         'h-5',
                         'after:grid-area-1-1',
@@ -202,10 +202,10 @@ export function SiteSectionGroupItem(props: {
                         icon="chevron-right"
                         className={tcls(
                             'grid',
-                            'flex-shrink-0',
+                            'shrink-0',
                             'size-3',
                             'm-1',
-                            'transition-[opacity]',
+                            'transition-opacity',
                             'text-current',
                             'transition-transform',
                             'opacity-6',

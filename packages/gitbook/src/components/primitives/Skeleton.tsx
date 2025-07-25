@@ -12,12 +12,7 @@ export function SkeletonParagraph(props: { id?: string; style?: ClassValue }) {
     return (
         <div id={id} role="status" aria-busy className="skeleton-paragraph">
             <LoadingPane
-                style={[
-                    'rounded-md',
-                    '[height:calc(15rem-1px)]',
-                    '[max-width:calc(48rem-1px)]',
-                    style,
-                ]}
+                style={['rounded-md', 'h-[calc(15rem-1px)]', 'max-w-[calc(48rem-1px)]', style]}
             />
         </div>
     );
@@ -30,10 +25,7 @@ export function SkeletonHeading(props: { id?: string; style?: ClassValue }) {
     const { id, style } = props;
     return (
         <div id={id} role="status" aria-busy className={tcls(style)}>
-            <LoadingPane
-                tile={12}
-                style={['rounded-md', 'h-[47px]', '[max-width:calc(48rem-1px)]']}
-            />
+            <LoadingPane tile={12} style={['rounded-md', 'h-[47px]', 'max-w-[calc(48rem-1px)]']} />
         </div>
     );
 }
@@ -47,7 +39,7 @@ export function SkeletonImage(props: { id?: string; style?: ClassValue }) {
         <div id={id} role="status" aria-busy className={tcls(style)}>
             <LoadingPane
                 tile={96}
-                style={['rounded-md', 'h-full', 'aspect-video', '[max-width:calc(48rem-1px)]']}
+                style={['rounded-md', 'h-full', 'aspect-video', 'max-w-[calc(48rem-1px)]']}
             />
         </div>
     );
@@ -74,10 +66,7 @@ export function SkeletonSmall(props: { id?: string; style?: ClassValue }) {
     const { id, style } = props;
     return (
         <div id={id} role="status" aria-busy className={tcls(style)}>
-            <LoadingPane
-                tile={12}
-                style={['rounded-md', 'h-[35px]', '[max-width:calc(48rem-1px)]']}
-            />
+            <LoadingPane tile={12} style={['rounded-md', 'h-[35px]', 'max-w-[calc(48rem-1px)]']} />
         </div>
     );
 }
