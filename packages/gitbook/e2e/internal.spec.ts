@@ -1,4 +1,5 @@
 import {
+    CustomizationAIMode,
     CustomizationBackground,
     CustomizationCorners,
     CustomizationDefaultMonospaceFont,
@@ -73,9 +74,27 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'AI Search',
-                url: '?q=What+is+GitBook%3F&ask=true',
+                url: `${getCustomizationURL({
+                    ai: {
+                        mode: CustomizationAIMode.Search,
+                    },
+                })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
                     await expect(page.getByTestId('search-ask-answer')).toBeVisible({
+                        timeout: 15_000,
+                    });
+                },
+                screenshot: false,
+            },
+            {
+                name: 'AI Assistant',
+                url: `${getCustomizationURL({
+                    ai: {
+                        mode: CustomizationAIMode.Assistant,
+                    },
+                })}&ask=What+is+GitBook%3F`,
+                run: async (page) => {
+                    await expect(page.getByTestId('ai-chat')).toBeVisible({
                         timeout: 15_000,
                     });
                 },
@@ -299,9 +318,27 @@ const testCases: TestsCase[] = [
             },
             {
                 name: 'AI Search',
-                url: '?q=What+is+GitBook%3F&ask=true',
+                url: `${getCustomizationURL({
+                    ai: {
+                        mode: CustomizationAIMode.Search,
+                    },
+                })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
                     await expect(page.getByTestId('search-ask-answer')).toBeVisible({
+                        timeout: 15_000,
+                    });
+                },
+                screenshot: false,
+            },
+            {
+                name: 'AI Assistant',
+                url: `${getCustomizationURL({
+                    ai: {
+                        mode: CustomizationAIMode.Assistant,
+                    },
+                })}&ask=What+is+GitBook%3F`,
+                run: async (page) => {
+                    await expect(page.getByTestId('ai-chat')).toBeVisible({
                         timeout: 15_000,
                     });
                 },
