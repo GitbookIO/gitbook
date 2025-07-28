@@ -259,11 +259,12 @@ export function useAIChatController(): AIChatController {
 
     // Auto-trigger AI chat when ?ask= parameter appears in URL
     React.useEffect(() => {
-        const hasAsk = searchState?.ask !== undefined;
+        const hasNoAsk = searchState?.ask === undefined || searchState?.ask === null;
         const hasQuery = searchState?.query !== null;
 
         // Don't trigger if we have a regular search query active
-        if (!hasAsk || hasQuery) return;
+        if (hasNoAsk) return;
+        if (hasQuery && searchState.open === false) return;
 
         // Open the chat when ask parameter appears
         onOpen();
@@ -279,7 +280,7 @@ export function useAIChatController(): AIChatController {
                 onPostMessage({ message: searchState.ask.trim() });
             }
         }
-    }, [searchState?.ask, searchState?.query, onOpen, onPostMessage]);
+    }, [searchState?.ask, searchState?.query, searchState?.open, onOpen, onPostMessage]);
 
     return React.useMemo(() => {
         return {
