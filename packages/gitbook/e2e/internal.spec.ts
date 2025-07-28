@@ -80,7 +80,7 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
-                    await page.route('**/ai/response', async (route) => {
+                    await page.route('**/ai/response*', async (route) => {
                         const response = await route.fetch();
                         // Add a prefix to the title.
                         let body = await response.text();
@@ -110,7 +110,7 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
-                    await page.route('**/ai/response', async (route) => {
+                    await page.route('**/ai/response*', async (route) => {
                         const response = await route.fetch();
                         // Add a prefix to the title.
                         let body = await response.text();
@@ -356,7 +356,7 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
-                    await page.route('**/ai/response', async (route) => {
+                    await page.route('**/ai/response*', async (route) => {
                         const response = await route.fetch();
                         // Add a prefix to the title.
                         let body = await response.text();
@@ -386,7 +386,7 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
-                    await page.route('**/ai/response', async (route) => {
+                    await page.route('**/ai/response*', async (route) => {
                         const response = await route.fetch();
                         // Add a prefix to the title.
                         let body = await response.text();
