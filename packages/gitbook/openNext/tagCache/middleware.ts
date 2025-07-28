@@ -27,6 +27,11 @@ function getCacheKey(tag: string) {
     return `http://regional.cache/${tag}`;
 }
 
+/**
+ * Fetches the last revalidated timestamp for each tag from the regional cache.
+ * @param tags The tags to fetch from the cache.
+ * @returns A promise that resolves to an array of tuples containing the tag and its last revalidated timestamp.
+ */
 async function getFromRegionalCache(tags: string[]): Promise<(readonly [string, number])[]> {
     try {
         const cache = await caches.open('tag');
@@ -49,11 +54,13 @@ async function getFromRegionalCache(tags: string[]): Promise<(readonly [string, 
 
         return Promise.all(result);
     } catch {
-        //If we have an error here, we just fallback to the original tag cache
         return [];
     }
 }
 
+/**
+ * It will populate the regional cache with the last revalidated timestamp for each tag.
+ */
 async function updateRegionalCache(tags: string[]) {
     const regionalCache = await caches.open('tag');
     for (const tag of tags) {
@@ -151,7 +158,10 @@ export default {
         // Write only the filtered tags
         await originalTagCache.writeTags(deduplicatedTags);
 
-        // delete from regional cache
+        /**
+         * Delete from the regional cache.
+         * We don't update it with new value so that we keep the DO as the single source of truth.
+         */
         await deleteFromRegionalCache(deduplicatedTags);
     },
 } satisfies NextModeTagCache;
