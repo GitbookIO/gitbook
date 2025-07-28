@@ -3,24 +3,25 @@ import {
     type ContentRefUser,
     type DocumentBlockTable,
     SiteInsightsLinkPosition,
+    type TableRecordValueImage,
 } from '@gitbook/api';
 import { Icon, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 
+import type { DocumentContext } from '@/components/DocumentView/DocumentView';
 import { Checkbox } from '@/components/primitives';
 import { StyledLink } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { getNodeFragmentByName } from '@/lib/document';
 import { getSimplifiedContentType } from '@/lib/files';
-import { resolveContentRef } from '@/lib/references';
+import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
-
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
 import type { TableRecordKV } from './Table';
-import { type VerticalAlignment, getColumnAlignment } from './utils';
+import { type VerticalAlignment, getColumnAlignment, resolveTableImageValue } from './utils';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
     'text-left': '[&_*]:text-left text-left',
@@ -166,57 +167,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             return (
                 <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
                     {files.filter(filterOutNullable).map((ref, index) => {
-                        const contentType = ref.file
-                            ? getSimplifiedContentType(ref.file.contentType)
-                            : null;
-
-                        return (
-                            <StyledLink
-                                key={index}
-                                href={ref.href}
-                                target="_blank"
-                                className="flex flex-row items-center gap-2"
-                                insights={
-                                    ref.file
-                                        ? {
-                                              type: 'link_click',
-                                              link: {
-                                                  target: {
-                                                      kind: 'file',
-                                                      file: ref.file.id,
-                                                  },
-                                                  position: SiteInsightsLinkPosition.Content,
-                                              },
-                                          }
-                                        : undefined
-                                }
-                            >
-                                {contentType === 'image' ? (
-                                    <Image
-                                        style={['max-h-[1lh]', 'h-[1lh]']}
-                                        alt={ref.text}
-                                        sizes={[{ width: 24 }]}
-                                        resize={context.contentContext?.imageResizer}
-                                        sources={{
-                                            light: {
-                                                src: ref.href,
-                                                size: {
-                                                    width: 24,
-                                                    height: 24,
-                                                },
-                                            },
-                                        }}
-                                        priority="lazy"
-                                    />
-                                ) : (
-                                    <FileIcon
-                                        contentType={contentType}
-                                        className={tcls('size-4')}
-                                    />
-                                )}
-                                {ref.text}
-                            </StyledLink>
-                        );
+                        return <FileItem key={index} resolvedRef={ref} context={context} />;
                     })}
                 </Tag>
             );
@@ -329,7 +280,152 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 </Tag>
             );
         }
+        case 'image': {
+            const resolved = await resolveTableImageValue({
+                value: value as TableRecordValueImage,
+                context,
+            });
+
+            if (!resolved) {
+                return null;
+            }
+
+            return (
+                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
+                    {resolved.light.file ? (
+                        <>
+                            <FileItem
+                                resolvedRef={resolved.light}
+                                context={context}
+                                className={tcls('block', resolved.dark ? 'dark:hidden' : '')}
+                            />
+                            {resolved.dark ? (
+                                <FileItem
+                                    resolvedRef={resolved.dark}
+                                    context={context}
+                                    className={tcls('hidden', 'dark:block')}
+                                />
+                            ) : null}
+                        </>
+                    ) : (
+                        <StyledLink
+                            href={resolved.light.href}
+                            target="_blank"
+                            className={tcls(
+                                'flex',
+                                'flex-row',
+                                'items-center',
+                                'gap-2',
+                                'truncate',
+                                'text-sm'
+                            )}
+                        >
+                            <Image
+                                style={['max-h-[1lh]', 'h-[1lh]', 'aspect-auto', 'object-cover']}
+                                alt={resolved.light.href}
+                                sizes={[{ width: 24 }]}
+                                resize={context.contentContext?.imageResizer}
+                                sources={{
+                                    light: {
+                                        src: resolved.light.href,
+                                        size: { width: 24, height: 24 },
+                                    },
+                                    ...(resolved.dark
+                                        ? {
+                                              dark: {
+                                                  src: resolved.dark.href,
+                                                  size: { width: 24, height: 24 },
+                                              },
+                                          }
+                                        : {}),
+                                }}
+                            />
+
+                            <span className="truncate">
+                                <span
+                                    className={tcls(
+                                        'contents truncate',
+                                        resolved.dark ? 'dark:hidden' : ''
+                                    )}
+                                >
+                                    {resolved.light.href}
+                                </span>
+                                {resolved.dark ? (
+                                    <span className={tcls('hidden truncate', 'dark:contents')}>
+                                        {resolved.dark?.href}
+                                    </span>
+                                ) : null}
+                            </span>
+                        </StyledLink>
+                    )}
+                </Tag>
+            );
+        }
         default:
             assertNever(definition);
     }
+}
+
+function FileItem(props: {
+    resolvedRef: ResolvedContentRef;
+    context: DocumentContext;
+    className?: string;
+}) {
+    const { resolvedRef, context, className } = props;
+
+    const contentType = resolvedRef.file
+        ? getSimplifiedContentType(resolvedRef.file.contentType)
+        : null;
+
+    return (
+        <StyledLink
+            href={resolvedRef.href}
+            target="_blank"
+            className={tcls(
+                'flex',
+                'flex-row',
+                'text-sm',
+                'items-center',
+                'gap-2',
+                'truncate',
+                className
+            )}
+            insights={
+                resolvedRef.file
+                    ? {
+                          type: 'link_click',
+                          link: {
+                              target: {
+                                  kind: 'file',
+                                  file: resolvedRef.file.id,
+                              },
+                              position: SiteInsightsLinkPosition.Content,
+                          },
+                      }
+                    : undefined
+            }
+        >
+            {contentType === 'image' ? (
+                <Image
+                    style={['max-h-[1lh]', 'h-[1lh]', 'aspect-auto', 'object-cover']}
+                    alt={resolvedRef.text}
+                    sizes={[{ width: 24 }]}
+                    resize={context.contentContext?.imageResizer}
+                    sources={{
+                        light: {
+                            src: resolvedRef.href,
+                            size: {
+                                width: 24,
+                                height: 24,
+                            },
+                        },
+                    }}
+                    priority="lazy"
+                />
+            ) : (
+                <FileIcon contentType={contentType} className={tcls('size-4', 'object-cover')} />
+            )}
+            <span className="truncate">{resolvedRef.text}</span>
+        </StyledLink>
+    );
 }
