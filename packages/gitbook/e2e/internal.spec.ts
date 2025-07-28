@@ -80,11 +80,27 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
+                    await page.route('**/ai/response', async (route) => {
+                        const response = await route.fetch();
+                        // Add a prefix to the title.
+                        let body = await response.text();
+                        body = 'Successful AI response (intercepted) ✓';
+                        await route.fulfill({
+                            // Pass all fields from the response.
+                            response,
+                            // Override response body.
+                            body,
+                            // Force content type to be html.
+                            headers: {
+                                ...response.headers(),
+                                'content-type': 'text/html',
+                            },
+                        });
+                    });
                     await expect(page.getByTestId('search-ask-answer')).toBeVisible({
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'AI Assistant',
@@ -94,11 +110,27 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
+                    await page.route('**/ai/response', async (route) => {
+                        const response = await route.fetch();
+                        // Add a prefix to the title.
+                        let body = await response.text();
+                        body = 'Successful AI response (intercepted) ✓';
+                        await route.fulfill({
+                            // Pass all fields from the response.
+                            response,
+                            // Override response body.
+                            body,
+                            // Force content type to be html.
+                            headers: {
+                                ...response.headers(),
+                                'content-type': 'text/html',
+                            },
+                        });
+                    });
                     await expect(page.getByTestId('ai-chat')).toBeVisible({
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'Not found',
@@ -324,11 +356,27 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
+                    await page.route('**/ai/response', async (route) => {
+                        const response = await route.fetch();
+                        // Add a prefix to the title.
+                        let body = await response.text();
+                        body = 'Successful AI response (intercepted) ✓';
+                        await route.fulfill({
+                            // Pass all fields from the response.
+                            response,
+                            // Override response body.
+                            body,
+                            // Force content type to be html.
+                            headers: {
+                                ...response.headers(),
+                                'content-type': 'text/html',
+                            },
+                        });
+                    });
                     await expect(page.getByTestId('search-ask-answer')).toBeVisible({
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'AI Assistant',
@@ -338,11 +386,27 @@ const testCases: TestsCase[] = [
                     },
                 })}&ask=What+is+GitBook%3F`,
                 run: async (page) => {
+                    await page.route('**/ai/response', async (route) => {
+                        const response = await route.fetch();
+                        // Add a prefix to the title.
+                        let body = await response.text();
+                        body = 'Successful AI response (intercepted) ✓';
+                        await route.fulfill({
+                            // Pass all fields from the response.
+                            response,
+                            // Override response body.
+                            body,
+                            // Force content type to be html.
+                            headers: {
+                                ...response.headers(),
+                                'content-type': 'text/html',
+                            },
+                        });
+                    });
                     await expect(page.getByTestId('ai-chat')).toBeVisible({
                         timeout: 15_000,
                     });
                 },
-                screenshot: false,
             },
             {
                 name: 'Not found',
