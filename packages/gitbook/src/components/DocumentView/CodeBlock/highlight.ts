@@ -71,9 +71,9 @@ export async function highlight(
     if (!langName || (isSafari && ['powershell', 'cpp'].includes(langName))) {
         // Fallback to plain highlighting if
         // - language is not found
-        // - TEMP - RND-7772: language is `powershell` and browser is Safari:
-        //   PowerShell commands can trigger complex regex that Safari
-        //   JS engine doesn't support, causing the highlighter to crash.
+        // - TEMP : language is PowerShell or C++ and browser is Safari:
+        //   RegExp#[Symbol.search] throws TypeError when `lastIndex` isn’t writable
+        //   Fixed in upcoming Safari 18.6, remove when it'll be released - RND-7772
         return plainHighlight(block, inlines);
     }
 
