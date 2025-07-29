@@ -5,6 +5,7 @@ import * as zustand from 'zustand';
 import { AIMessageRole } from '@gitbook/api';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
+import { useSearch } from '../Search';
 import { streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
@@ -56,20 +57,15 @@ export type AIChatState = {
 export type AIChatController = {
     /** Open the dialog */
     open: () => void;
-
     /** Close the dialog */
     close: () => void;
-
     /** Post a message to the session */
-    postMessage: (input: {
-        /** The message to post to the session. it can be markdown formatted. */
-        message: string;
-    }) => void;
-
+    postMessage: (input: { message: string }) => void;
     /** Clear the conversation */
     clear: () => void;
 };
 
+// Global state store for AI chat
 const globalState = zustand.create<{
     state: AIChatState;
     setState: (fn: (state: AIChatState) => Partial<AIChatState>) => void;
@@ -98,112 +94,200 @@ export function useAIChatState(): AIChatState {
 
 /**
  * Get the controller to interact with the AI chat.
+ * Integrates with search state to synchronize ?ask= parameter.
  */
 export function useAIChatController(): AIChatController {
     const messageContextRef = useAIMessageContextRef();
     const setState = zustand.useStore(globalState, (state) => state.setState);
     const trackEvent = useTrackEvent();
+    const [searchState, setSearchState] = useSearch(true);
+
+    // Open AI chat and sync with search state
+    const onOpen = React.useCallback(() => {
+        const { messages } = globalState.getState().state;
+        setState((state) => ({ ...state, opened: true }));
+
+        // Update search state to show ask mode with first message or current ask value
+        setSearchState((prev) => ({
+            ask: prev?.ask ?? messages[0]?.query ?? '',
+            query: prev?.query ?? null,
+            global: prev?.global ?? false,
+            open: false, // Close search popover when opening chat
+        }));
+    }, [setState, setSearchState]);
+
+    // Close AI chat and clear ask parameter
+    const onClose = React.useCallback(() => {
+        setState((state) => ({ ...state, opened: false }));
+
+        // Clear ask parameter but keep other search state
+        setSearchState((prev) => ({
+            ask: null,
+            query: prev?.query ?? null,
+            global: prev?.global ?? false,
+            open: false,
+        }));
+    }, [setState, setSearchState]);
+
+    // Post a message to the AI chat
+    const onPostMessage = React.useCallback(
+        async (input: { message: string }) => {
+            const { messages } = globalState.getState().state;
+
+            // For first message, update the ask parameter in URL
+            if (messages.length === 0) {
+                setSearchState((prev) => ({
+                    ask: input.message,
+                    query: prev?.query ?? null,
+                    global: prev?.global ?? false,
+                    open: false,
+                }));
+            }
+
+            trackEvent({ type: 'ask_question', query: input.message });
+
+            // Add user message and placeholder for AI response
+            setState((state) => {
+                return {
+                    ...state,
+                    messages: [
+                        ...state.messages,
+                        {
+                            role: AIMessageRole.User,
+                            content: input.message,
+                            query: input.message,
+                        },
+                        {
+                            role: AIMessageRole.Assistant,
+                            content: null, // Placeholder for streaming response
+                        },
+                    ],
+                    query: input.message,
+                    responseId: null,
+                    followUpSuggestions: [],
+                    loading: true,
+                    error: false,
+                };
+            });
+
+            try {
+                const stream = await streamAIChatResponse({
+                    message: input.message,
+                    messageContext: messageContextRef.current,
+                    previousResponseId: globalState.getState().state.responseId ?? undefined,
+                });
+
+                // Process streaming response
+                for await (const data of stream) {
+                    if (!data) continue;
+
+                    const event = data.event;
+
+                    switch (event.type) {
+                        case 'response_finish': {
+                            setState((state) => ({
+                                ...state,
+                                responseId: event.responseId,
+                                // Mark as not loading when the response is finished
+                                // Even if the stream might continue as we receive 'response_followup_suggestion'
+                                loading: false,
+                                error: false,
+                            }));
+                            break;
+                        }
+                        case 'response_followup_suggestion': {
+                            setState((state) => ({
+                                ...state,
+                                followUpSuggestions: [
+                                    ...state.followUpSuggestions,
+                                    ...event.suggestions,
+                                ],
+                            }));
+                            break;
+                        }
+                    }
+
+                    // Update the assistant message with streamed content
+                    setState((state) => ({
+                        ...state,
+                        messages: [
+                            ...state.messages.slice(0, -1),
+                            {
+                                role: AIMessageRole.Assistant,
+                                content: data.content,
+                            },
+                        ],
+                    }));
+                }
+
+                setState((state) => ({
+                    ...state,
+                    loading: false,
+                    error: false,
+                }));
+            } catch {
+                setState((state) => ({
+                    ...state,
+                    loading: false,
+                    error: true,
+                }));
+            }
+        },
+        [messageContextRef.current, setState, setSearchState, trackEvent]
+    );
+
+    // Clear the conversation and reset ask parameter
+    const onClear = React.useCallback(() => {
+        setState((state) => ({
+            opened: state.opened,
+            loading: false,
+            messages: [],
+            query: null,
+            followUpSuggestions: [],
+            responseId: null,
+            error: false,
+        }));
+
+        // Reset ask parameter to empty string (keeps chat open but clears content)
+        setSearchState((prev) => ({
+            ask: '',
+            query: prev?.query ?? null,
+            global: prev?.global ?? false,
+            open: false,
+        }));
+    }, [setState, setSearchState]);
+
+    // Auto-trigger AI chat when ?ask= parameter appears in URL
+    React.useEffect(() => {
+        const hasNoAsk = searchState?.ask === undefined || searchState?.ask === null;
+        const hasQuery = searchState?.query !== null;
+
+        // Don't trigger if we have a regular search query active
+        if (hasNoAsk) return;
+        if (hasQuery && searchState.open === false) return;
+
+        // Open the chat when ask parameter appears
+        onOpen();
+
+        // Auto-post the first message if ask has content and no messages exist yet
+        if (searchState?.ask?.trim()) {
+            const { messages } = globalState.getState().state;
+            if (
+                // Post new message if it's different from the last user message
+                messages.filter((m) => m.role === AIMessageRole.User).at(-1)?.query !==
+                searchState?.ask?.trim()
+            ) {
+                onPostMessage({ message: searchState.ask.trim() });
+            }
+        }
+    }, [searchState?.ask, searchState?.query, searchState?.open, onOpen, onPostMessage]);
 
     return React.useMemo(() => {
         return {
-            open: () => setState((state) => ({ ...state, opened: true })),
-            close: () => setState((state) => ({ ...state, opened: false })),
-            clear: () =>
-                setState((state) => ({
-                    opened: state.opened,
-                    loading: false,
-                    messages: [],
-                    query: null,
-                    followUpSuggestions: [],
-                    responseId: null,
-                    error: false,
-                })),
-            postMessage: async (input: { message: string }) => {
-                trackEvent({ type: 'ask_question', query: input.message });
-                setState((state) => {
-                    return {
-                        ...state,
-                        messages: [
-                            ...state.messages,
-                            {
-                                // TODO: how to handle markdown here?
-                                // to avoid rendering as plain text
-                                role: AIMessageRole.User,
-                                content: input.message,
-                            },
-                            {
-                                role: AIMessageRole.Assistant,
-                                content: null,
-                            },
-                        ],
-                        query: input.message,
-                        followUpSuggestions: [],
-                        loading: true,
-                        error: false,
-                    };
-                });
-
-                try {
-                    const stream = await streamAIChatResponse({
-                        message: input.message,
-                        messageContext: messageContextRef.current,
-                        previousResponseId: globalState.getState().state.responseId ?? undefined,
-                    });
-
-                    for await (const data of stream) {
-                        if (!data) continue;
-
-                        const event = data.event;
-
-                        switch (event.type) {
-                            case 'response_finish': {
-                                setState((state) => ({
-                                    ...state,
-                                    responseId: event.responseId,
-                                    // Mark as not loading when the response is finished
-                                    // Even if the stream might continue as we receive 'response_followup_suggestion'
-                                    loading: false,
-                                    error: false,
-                                }));
-                                break;
-                            }
-                            case 'response_followup_suggestion': {
-                                setState((state) => ({
-                                    ...state,
-                                    followUpSuggestions: [
-                                        ...state.followUpSuggestions,
-                                        ...event.suggestions,
-                                    ],
-                                }));
-                                break;
-                            }
-                        }
-
-                        setState((state) => ({
-                            ...state,
-                            messages: [
-                                ...state.messages.slice(0, -1),
-                                {
-                                    role: AIMessageRole.Assistant,
-                                    content: data.content,
-                                },
-                            ],
-                        }));
-                    }
-
-                    setState((state) => ({
-                        ...state,
-                        loading: false,
-                        error: false,
-                    }));
-                } catch {
-                    setState((state) => ({
-                        ...state,
-                        loading: false,
-                        error: true,
-                    }));
-                }
-            },
+            open: onOpen,
+            close: onClose,
+            clear: onClear,
+            postMessage: onPostMessage,
         };
-    }, [messageContextRef, setState, trackEvent]);
+    }, [onOpen, onClose, onClear, onPostMessage]);
 }
