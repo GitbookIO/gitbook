@@ -67,7 +67,7 @@ export async function highlight(
     inlines: RenderedInline[]
 ): Promise<HighlightLine[]> {
     const langName = getBlockLang(block);
-    console.log('CLAIRE langName: ', langName);
+
     if (!langName || (isSafari && ['powershell', 'cpp'].includes(langName))) {
         // Fallback to plain highlighting if
         // - language is not found
