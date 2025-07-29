@@ -24,7 +24,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             size={recommended ? 'small' : 'medium'}
             action={tString(language, 'ask', '')}
             ref={ref}
-            data-testid="search-result-item"
+            data-testid={recommended ? 'search-recommended-question' : 'search-ask-question'}
             scroll={false}
             {...getLinkProp({
                 ask: question,

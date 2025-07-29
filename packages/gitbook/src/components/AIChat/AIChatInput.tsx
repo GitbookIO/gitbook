@@ -59,6 +59,7 @@ export function AIChatInput(props: {
                 ref={inputRef}
                 disabled={disabled || loading}
                 data-loading={loading}
+                data-testid="ai-chat-input"
                 className={tcls(
                     'resize-none',
                     'focus:outline-none',

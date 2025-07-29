@@ -20,6 +20,7 @@ export function AIChatButton(props: { trademark: boolean }) {
     return (
         <Button
             icon={<AIChatIcon trademark={trademark} />}
+            data-testid="ai-chat-button"
             iconOnly
             size="default"
             variant="header"
