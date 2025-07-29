@@ -41,10 +41,13 @@ export function SearchContainer(props: SearchContainerProps) {
     // Derive open state from search state
     const open = state?.open ?? false;
 
-    // Close the pop-over when we switch to “ask” mode
     React.useEffect(() => {
         if (state?.ask && aiMode === CustomizationAIMode.Assistant) {
+            // Close the pop-over when we switch to “ask” mode
             setSearchState((prev) => (prev ? { ...prev, open: !state.ask } : prev));
+        } else if (state?.ask && aiMode === CustomizationAIMode.None) {
+            // Rewrite ask to query when the site doesn't support AI
+            setSearchState((prev) => (prev ? { ...prev, query: prev.ask, ask: null } : prev));
         }
     }, [state?.ask, setSearchState, aiMode]);
 
