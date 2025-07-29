@@ -77,7 +77,7 @@ export function SearchContainer(props: SearchContainerProps) {
             return;
         }
         setSearchState((prev) => ({
-            ask: null,
+            ask: aiMode === CustomizationAIMode.Assistant && prev ? prev.ask : null,
             global: prev?.global ?? false,
             query: (!withAIChat ? prev?.ask : null) ?? prev?.query ?? '',
             open: true,
@@ -116,7 +116,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onChange = (value: string) => {
         setSearchState((prev) => ({
-            ask: null, // When typing, we go back to the default search mode
+            ask: aiMode === CustomizationAIMode.Assistant && prev ? prev.ask : null, // When typing, we go back to the default search mode
             query: value,
             global: prev?.global ?? false,
             open: true,
