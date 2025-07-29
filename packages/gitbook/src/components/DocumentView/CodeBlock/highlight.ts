@@ -34,6 +34,8 @@ export type RenderedInline = {
     body: React.ReactNode;
 };
 
+const isSafari =
+    typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const theme = createCssVariablesTheme();
 
 const { getSingletonHighlighter } = createSingletonShorthands(
@@ -65,8 +67,12 @@ export async function highlight(
     inlines: RenderedInline[]
 ): Promise<HighlightLine[]> {
     const langName = getBlockLang(block);
-    if (!langName) {
-        // Language not found, fallback to plain highlighting
+    if (!langName || (isSafari && langName === 'powershell')) {
+        // Fallback to plain highlighting if
+        // - language is not found
+        // - TEMP - RND-7772: language is `powershell` and browser is Safari:
+        //   PowerShell commands can trigger complex regex that Safari
+        //   JS engine doesn't support, causing the highlighter to crash.
         return plainHighlight(block, inlines);
     }
 
