@@ -338,7 +338,7 @@ async function transformAnswer(
                     document={answer.answer.document}
                     context={{
                         mode: 'default',
-                        contentContext: undefined,
+                        contentContext: context,
                         wrapBlocksInSuspense: false,
                         shouldRenderLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
