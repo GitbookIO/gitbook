@@ -43,10 +43,10 @@ export function SearchContainer(props: SearchContainerProps) {
 
     // Close the pop-over when we switch to “ask” mode
     React.useEffect(() => {
-        if (state?.ask && open && aiMode === CustomizationAIMode.Assistant) {
-            setSearchState((prev) => (prev ? { ...prev, open: false } : prev));
+        if (state?.ask && aiMode === CustomizationAIMode.Assistant) {
+            setSearchState((prev) => (prev ? { ...prev, open: !state.ask } : prev));
         }
-    }, [state?.ask, open, setSearchState, aiMode]);
+    }, [state?.ask, setSearchState, aiMode]);
 
     const onClose = React.useCallback(
         async (to?: string) => {

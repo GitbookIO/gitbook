@@ -5,7 +5,7 @@ import * as zustand from 'zustand';
 import { AIMessageRole } from '@gitbook/api';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
-import { useSearch } from '../Search/useSearch';
+import { useSearch } from '../Search';
 import { streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
