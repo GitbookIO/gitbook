@@ -148,7 +148,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     aiMode={aiMode}
                                 />
                             ) : null}
-                            {state?.ask ? <SearchAskAnswer query={normalizedAsk} /> : null}
+                            {normalizedAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }
