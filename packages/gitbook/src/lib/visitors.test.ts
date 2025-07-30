@@ -297,7 +297,7 @@ describe('getVisitorUnsignedClaims', () => {
     });
 });
 
-describe('normalizeVisitorAuthURL', () => {
+describe('normalizeVisitorParamsURL', () => {
     it('should strip the jwt_token param when present in the URL', () => {
         const url = new URL('https://docs.example.com/?jwt_token=fake-token');
         expect(normalizeVisitorParamsURL(url).toString()).toBe('https://docs.example.com/');
