@@ -7,7 +7,7 @@ import {
     getVisitorAuthCookieValue,
     getVisitorToken,
     getVisitorUnsignedClaims,
-    normalizeVisitorParamsURL,
+    normalizeVisitorParamsURL as normalizeVisitorURL,
 } from './visitors';
 
 describe('getVisitorAuthToken', () => {
@@ -297,34 +297,32 @@ describe('getVisitorUnsignedClaims', () => {
     });
 });
 
-describe('normalizeVisitorParamsURL', () => {
+describe('normalizeVisitorURL', () => {
     it('should strip the jwt_token param when present in the URL', () => {
         const url = new URL('https://docs.example.com/?jwt_token=fake-token');
-        expect(normalizeVisitorParamsURL(url).toString()).toBe('https://docs.example.com/');
+        expect(normalizeVisitorURL(url).toString()).toBe('https://docs.example.com/');
     });
 
     it('should strip the visitor.* params when present in the URL', () => {
         const url = new URL(
             'https://docs.example.com/?visitor.isBetaUser=true&visitor.language=fr'
         );
-        expect(normalizeVisitorParamsURL(url).toString()).toBe('https://docs.example.com/');
+        expect(normalizeVisitorURL(url).toString()).toBe('https://docs.example.com/');
     });
 
     it('should strip both jwt_token and visitor.* params when present in the URL', () => {
         const url = new URL(
             'https://docs.example.com/?jwt_token=fake-token&visitor.isBetaUser=true&visitor.language=fr'
         );
-        expect(normalizeVisitorParamsURL(url).toString()).toBe('https://docs.example.com/');
+        expect(normalizeVisitorURL(url).toString()).toBe('https://docs.example.com/');
     });
 
     it('should leave other params like q or ask untouched', () => {
         const url1 = new URL('https://docs.example.com/?q=search');
-        expect(normalizeVisitorParamsURL(url1).toString()).toBe(
-            'https://docs.example.com/?q=search'
-        );
+        expect(normalizeVisitorURL(url1).toString()).toBe('https://docs.example.com/?q=search');
 
         const url2 = new URL('https://docs.example.com/?ask=this+is+a+question');
-        expect(normalizeVisitorParamsURL(url2).toString()).toBe(
+        expect(normalizeVisitorURL(url2).toString()).toBe(
             'https://docs.example.com/?ask=this+is+a+question'
         );
     });

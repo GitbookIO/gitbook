@@ -226,10 +226,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
         //
-        const incomingURLWithoutToken = normalizeVisitorParamsURL(incomingURL);
-        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
+        const normalizedVisitorURL = normalizeVisitorParamsURL(incomingURL);
+        if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(incomingURLWithoutToken.toString()),
+                NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
             );
         }

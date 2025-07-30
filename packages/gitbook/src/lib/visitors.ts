@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
+const VISITOR_PARAM_PREFIX = 'visitor.';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
 
@@ -163,8 +164,8 @@ export function getVisitorUnsignedClaims(args: {
     }
 
     for (const [key, value] of url.searchParams.entries()) {
-        if (key.startsWith('visitor.')) {
-            const claimPath = key.substring('visitor.'.length);
+        if (key.startsWith(VISITOR_PARAM_PREFIX)) {
+            const claimPath = key.substring(VISITOR_PARAM_PREFIX.length);
             const claimValue = parseVisitorQueryParamValue(value);
 
             setVisitorClaimByPath(claims, claimPath, claimValue);
@@ -335,7 +336,7 @@ export function normalizeVisitorParamsURL(url: URL): URL {
     }
 
     for (const [urlParam] of url.searchParams.entries()) {
-        if (urlParam.startsWith('visitor.')) {
+        if (urlParam.startsWith(VISITOR_PARAM_PREFIX)) {
             withVisitorParamsURL.searchParams.delete(urlParam);
         }
     }
