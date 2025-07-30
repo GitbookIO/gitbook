@@ -21,7 +21,7 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
-    normalizeVisitorAuthURL,
+    normalizeVisitorURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
@@ -221,13 +221,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             incomingURL.search = requestURL.search;
         }
         //
-        // Make sure the URL is clean of any va token after a successful lookup
-        // The token is stored in a cookie that is set on the redirect response
+        // Make sure the URL is clean of any va token after a successful lookup,
+        // and of any visitor.* params that may have been passed to the URL.
         //
-        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
-        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
+        // The token and the visitor.* params value are stored in cookies that are set
+        // on the redirect response.
+        //
+        const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
+        if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(incomingURLWithoutToken.toString()),
+                NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
             );
         }
