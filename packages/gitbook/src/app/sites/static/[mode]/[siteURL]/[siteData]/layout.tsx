@@ -5,7 +5,7 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
-import { GITBOOK_DISABLE_TRACKING } from '@/lib/env';
+import { shouldTrackEvents } from '@/lib/tracking';
 
 interface SiteStaticLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -16,12 +16,13 @@ export default async function SiteStaticLayout({
     children,
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
     const { context, visitorAuthClaims } = await getStaticSiteContext(await params);
+    const withTracking = shouldTrackEvents();
 
     return (
         <CustomizationRootLayout customization={context.customization}>
             <SiteLayout
                 context={context}
-                withTracking={!GITBOOK_DISABLE_TRACKING}
+                withTracking={withTracking}
                 visitorAuthClaims={visitorAuthClaims}
             >
                 {children}

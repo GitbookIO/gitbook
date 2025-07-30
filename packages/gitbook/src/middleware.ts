@@ -141,6 +141,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         url: siteRequestURL,
     });
 
+    //
+    // Strip the tracking header to prevent users providing it themselves.
+    //
+    request.headers.delete('x-gitbook-disable-tracking');
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
@@ -340,6 +345,9 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {
+        // Do not track page views for preview requests
+        request.headers.set('x-gitbook-disable-tracking', 'true');
+
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
             `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,

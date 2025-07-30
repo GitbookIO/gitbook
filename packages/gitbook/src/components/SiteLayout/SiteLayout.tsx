@@ -30,7 +30,9 @@ export async function SiteLayout(props: {
 }) {
     const { context, nonce, forcedTheme, withTracking, visitorAuthClaims, children } = props;
 
-    const { scripts, customization } = context;
+    const { customization } = context;
+    // Scripts are disabled when tracking is disabled
+    const scripts = withTracking ? context.scripts : [];
 
     ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
     ReactDOM.preconnect(GITBOOK_ICONS_URL);
