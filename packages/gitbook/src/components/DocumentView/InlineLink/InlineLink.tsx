@@ -5,7 +5,7 @@ import { languages } from '@/intl/translations';
 import type { GitBookAnyContext } from '@/lib/context';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { Icon } from '@gitbook/icons';
-import { StyledLink } from '../../primitives';
+import { HoverCard, HoverCardRoot, HoverCardTrigger, StyledLink } from '../../primitives';
 import type { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
 import { InlineLinkTooltip } from './InlineLinkTooltip';
@@ -22,14 +22,27 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
 
     if (!context.contentContext || !resolved) {
         return (
-            <span title="Broken link" className="underline">
-                <Inlines
-                    context={context}
-                    document={document}
-                    nodes={inline.nodes}
-                    ancestorInlines={[...ancestorInlines, inline]}
-                />
-            </span>
+            <HoverCardRoot>
+                <HoverCardTrigger>
+                    <span className="cursor-not-allowed underline">
+                        <Inlines
+                            context={context}
+                            document={document}
+                            nodes={inline.nodes}
+                            ancestorInlines={[...ancestorInlines, inline]}
+                        />
+                    </span>
+                </HoverCardTrigger>
+                <HoverCard className="flex flex-col gap-1 p-4">
+                    <div className="flex items-center gap-2">
+                        <Icon icon="ban" className="size-4 text-tint-subtle" />
+                        <h5 className="font-semibold">Page not found</h5>
+                    </div>
+                    <p className="text-sm text-tint">
+                        This link points to a page that has been removed or no longer exists.
+                    </p>
+                </HoverCard>
+            </HoverCardRoot>
         );
     }
     const isExternal = inline.data.ref.kind === 'url';
