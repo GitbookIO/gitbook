@@ -196,7 +196,10 @@ export async function streamRecommendedQuestions() {
         const apiClient = await context.dataFetcher.api();
         const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
             siteURLData.organization,
-            siteURLData.site
+            siteURLData.site,
+            {
+                spaceId: siteURLData.space,
+            }
         );
 
         for await (const chunk of apiStream) {
