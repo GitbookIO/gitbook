@@ -329,13 +329,18 @@ export function getVisitorAuthCookieValue(basePath: string, token: string): stri
  * Normalize the URL by removing the visitor JWT token and visitor.* param from the query parameters (if present).
  */
 export function normalizeVisitorParamsURL(url: URL): URL {
+    const withVisitorParamsURL = new URL(url);
     if (url.searchParams.has(VISITOR_AUTH_PARAM)) {
-        const withoutVAParam = new URL(url);
-        withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
-        return withoutVAParam;
+        withVisitorParamsURL.searchParams.delete(VISITOR_AUTH_PARAM);
     }
 
-    return url;
+    for (const [urlParam] of url.searchParams.entries()) {
+        if (urlParam.startsWith('visitor.')) {
+            withVisitorParamsURL.searchParams.delete(urlParam);
+        }
+    }
+
+    return withVisitorParamsURL;
 }
 
 /**
