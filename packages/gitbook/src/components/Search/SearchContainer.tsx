@@ -128,6 +128,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
     const normalizedQuery = state?.query?.trim() ?? '';
+    const normalizedAsk = state?.ask?.trim() ?? '';
 
     return (
         <SearchAskProvider value={searchAsk}>
@@ -147,7 +148,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     aiMode={aiMode}
                                 />
                             ) : null}
-                            {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
+                            {state?.ask ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }
