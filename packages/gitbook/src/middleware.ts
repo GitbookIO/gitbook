@@ -143,6 +143,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     const withAPIToken = async (
         apiToken: string | null,
+
+        /**
+         * Optionally pass headers that will be included in the response.
+         */
         responseHeaders?: Record<string, string>
     ) => {
         const siteURLData = await throwIfDataError(
