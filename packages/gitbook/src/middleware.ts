@@ -24,6 +24,7 @@ import {
     normalizeVisitorURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
+import { cookies } from 'next/headers';
 import type { SiteURLData } from './lib/context';
 export const config = {
     matcher: [
@@ -548,9 +549,16 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
 /**
  * Write the cookies to a response.
  */
-function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
-    cookies.forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value, cookie.options);
+async function writeResponseCookies<R extends NextResponse>(
+    response: R,
+    cookiesToSet: ResponseCookies
+): Promise<R> {
+    const cookiesFn = await cookies();
+    cookiesToSet.forEach((cookie) => {
+        // response.cookies.set(cookie.name, cookie.value, cookie.options);
+        // For some reason we have to use the cookies function instead of response.cookies.set
+        // Without it, it breaks the ai assistant server actions (it thinks it is a static route).
+        cookiesFn.set(cookie.name, cookie.value, cookie.options);
     });
 
     return response;
