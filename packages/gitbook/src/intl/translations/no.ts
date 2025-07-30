@@ -51,6 +51,8 @@ export const no: TranslationLanguage = {
     view: 'Vis',
     edit_on_git: 'Rediger på ${1}',
     notfound_title: 'Siden ble ikke funnet',
+    notfound_link:
+        'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
     notfound: 'Siden du leter etter eksisterer ikke.',
     unexpected_error_title: 'En feil oppstod',
     unexpected_error: 'Beklager, en uventet feil har oppstått. Vennligst prøv igjen senere.',

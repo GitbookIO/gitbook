@@ -51,6 +51,7 @@ export const nl: TranslationLanguage = {
     view: 'Bekijken',
     edit_on_git: 'Bewerk op ${1}',
     notfound_title: 'Pagina niet gevonden',
+    notfound_link: 'Deze link verwijst naar een pagina die is verwijderd of niet meer bestaat.',
     notfound: 'De pagina die je zoekt, bestaat niet.',
     unexpected_error_title: 'Er is een fout opgetreden',
     unexpected_error: 'Sorry, er is een onverwachte fout opgetreden. Probeer het later opnieuw.',

@@ -51,6 +51,7 @@ export const ja: TranslationLanguage = {
     view: '表示',
     edit_on_git: '${1}で編集',
     notfound_title: 'ページが見つかりません',
+    notfound_link: 'このリンクは、削除されたか、もはや存在しないページを指しています。',
     notfound: 'お探しのページは存在しません。',
     unexpected_error_title: 'エラーが発生しました',
     unexpected_error: '申し訳ありません、予期せぬエラーが発生しました。もう一度お試しください。',
