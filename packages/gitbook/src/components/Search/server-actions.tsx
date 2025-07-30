@@ -185,8 +185,9 @@ export async function streamAskQuestion({
 
 /**
  * Stream a list of suggested questions for the site.
+ * Optionally scoped to a specific space.
  */
-export async function streamRecommendedQuestions() {
+export async function streamRecommendedQuestions(spaceId?: string) {
     const siteURLData = await getSiteURLDataFromMiddleware();
     const context = await getServerActionBaseContext();
 
@@ -196,7 +197,10 @@ export async function streamRecommendedQuestions() {
         const apiClient = await context.dataFetcher.api();
         const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
             siteURLData.organization,
-            siteURLData.site
+            siteURLData.site,
+            {
+                spaceId,
+            }
         );
 
         for await (const chunk of apiStream) {

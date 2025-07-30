@@ -26,7 +26,11 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     }
 
     const { reusableContent } = resolved;
-    if (!reusableContent || !reusableContent.revisionReusableContent.document) {
+    if (
+        !reusableContent ||
+        !('document' in reusableContent.revisionReusableContent) ||
+        !reusableContent.revisionReusableContent.document
+    ) {
         return null;
     }
 

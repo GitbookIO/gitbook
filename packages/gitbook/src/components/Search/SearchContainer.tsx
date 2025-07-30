@@ -16,6 +16,7 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 
 interface SearchContainerProps {
+    spaceId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
     aiMode: CustomizationAIMode;
@@ -26,7 +27,7 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { spaceTitle, isMultiVariants, aiMode, className } = props;
+    const { spaceId, spaceTitle, isMultiVariants, aiMode, className } = props;
 
     const withAIChat = aiMode === CustomizationAIMode.Assistant;
     const [state, setSearchState] = useSearch(withAIChat);
@@ -146,6 +147,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
                                     aiMode={aiMode}
+                                    spaceId={spaceId}
                                 />
                             ) : null}
                             {normalizedAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}

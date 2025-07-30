@@ -58,6 +58,7 @@ export function SpaceLayout(props: {
                     aiMode={aiMode}
                     isMultiVariants={siteSpaces.length > 1}
                     spaceTitle={siteSpace.title}
+                    spaceId={siteSpace.space.id}
                 />
             </React.Suspense>
             {aiMode === CustomizationAIMode.Assistant ? (
