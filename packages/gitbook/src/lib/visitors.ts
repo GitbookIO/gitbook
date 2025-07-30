@@ -329,7 +329,7 @@ export function getVisitorAuthCookieValue(basePath: string, token: string): stri
 /**
  * Normalize the URL by removing the visitor JWT token and visitor.* param from the query parameters (if present).
  */
-export function normalizeVisitorParamsURL(url: URL): URL {
+export function normalizeVisitorURL(url: URL): URL {
     const withVisitorParamsURL = new URL(url);
     if (url.searchParams.has(VISITOR_AUTH_PARAM)) {
         withVisitorParamsURL.searchParams.delete(VISITOR_AUTH_PARAM);

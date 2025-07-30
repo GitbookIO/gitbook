@@ -21,7 +21,7 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
-    normalizeVisitorParamsURL,
+    normalizeVisitorURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import type { SiteURLData } from './lib/context';
@@ -226,7 +226,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // The token and the visitor.* params value are stored in cookies that are set
         // on the redirect response.
         //
-        const normalizedVisitorURL = normalizeVisitorParamsURL(incomingURL);
+        const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
         if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
                 NextResponse.redirect(normalizedVisitorURL.toString()),

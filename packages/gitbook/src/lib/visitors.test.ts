@@ -7,7 +7,7 @@ import {
     getVisitorAuthCookieValue,
     getVisitorToken,
     getVisitorUnsignedClaims,
-    normalizeVisitorParamsURL as normalizeVisitorURL,
+    normalizeVisitorURL,
 } from './visitors';
 
 describe('getVisitorAuthToken', () => {
