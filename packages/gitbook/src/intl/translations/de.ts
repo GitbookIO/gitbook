@@ -49,6 +49,8 @@ export const de = {
     view: 'Anzeigen',
     edit_on_git: 'Bearbeiten auf ${1}',
     notfound_title: 'Seite nicht gefunden',
+    notfound_link:
+        'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',
     notfound: 'Die gesuchte Seite existiert nicht.',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error:

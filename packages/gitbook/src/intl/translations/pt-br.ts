@@ -49,6 +49,7 @@ export const pt_br = {
     view: 'Ver',
     edit_on_git: 'Editar no ${1}',
     notfound_title: 'Página não encontrada',
+    notfound_link: 'Este link aponta para uma página que foi removida ou não existe mais.',
     notfound: 'A página que você está procurando não existe.',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:

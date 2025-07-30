@@ -1,11 +1,10 @@
 import { type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSpaceLanguage, tString } from '@/intl/server';
-import { languages } from '@/intl/translations';
-import type { GitBookAnyContext } from '@/lib/context';
+import { type TranslationLanguage, languages } from '@/intl/translations';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { Icon } from '@gitbook/icons';
-import { StyledLink } from '../../primitives';
+import { HoverCard, HoverCardRoot, HoverCardTrigger, StyledLink } from '../../primitives';
 import type { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
 import { InlineLinkTooltip } from './InlineLinkTooltip';
@@ -19,17 +18,34 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
               resolveAnchorText: false,
           })
         : null;
+    const { contentContext } = context;
 
-    if (!context.contentContext || !resolved) {
+    const language =
+        contentContext && 'customization' in contentContext
+            ? getSpaceLanguage(contentContext.customization)
+            : languages.en;
+
+    if (!contentContext || !resolved) {
         return (
-            <span title="Broken link" className="underline">
-                <Inlines
-                    context={context}
-                    document={document}
-                    nodes={inline.nodes}
-                    ancestorInlines={[...ancestorInlines, inline]}
-                />
-            </span>
+            <HoverCardRoot>
+                <HoverCardTrigger>
+                    <span className="cursor-not-allowed underline">
+                        <Inlines
+                            context={context}
+                            document={document}
+                            nodes={inline.nodes}
+                            ancestorInlines={[...ancestorInlines, inline]}
+                        />
+                    </span>
+                </HoverCardTrigger>
+                <HoverCard className="flex flex-col gap-1 p-4">
+                    <div className="flex items-center gap-2">
+                        <Icon icon="ban" className="size-4 text-tint-subtle" />
+                        <h5 className="font-semibold">{tString(language, 'notfound_title')}</h5>
+                    </div>
+                    <p className="text-sm text-tint">{tString(language, 'notfound_link')}</p>
+                </HoverCard>
+            </HoverCardRoot>
         );
     }
     const isExternal = inline.data.ref.kind === 'url';
@@ -61,11 +77,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
 
     if (context.shouldRenderLinkPreviews) {
         return (
-            <InlineLinkTooltipWrapper
-                inline={inline}
-                context={context.contentContext}
-                resolved={resolved}
-            >
+            <InlineLinkTooltipWrapper inline={inline} language={language} resolved={resolved}>
                 {content}
             </InlineLinkTooltipWrapper>
         );
@@ -80,15 +92,13 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
  */
 function InlineLinkTooltipWrapper(props: {
     inline: DocumentInlineLink;
-    context: GitBookAnyContext;
     children: React.ReactNode;
     resolved: ResolvedContentRef;
+    language: TranslationLanguage;
 }) {
-    const { inline, context, resolved, children } = props;
+    const { inline, language, resolved, children } = props;
 
     let breadcrumbs = resolved.ancestors ?? [];
-    const language =
-        'customization' in context ? getSpaceLanguage(context.customization) : languages.en;
     const isExternal = inline.data.ref.kind === 'url';
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
     if (isExternal) {

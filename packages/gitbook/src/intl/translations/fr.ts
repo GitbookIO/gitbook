@@ -48,6 +48,7 @@ export const fr = {
     view: 'Voir',
     edit_on_git: 'Modifier sur ${1}',
     notfound_title: 'Page introuvable',
+    notfound_link: "Ce lien pointe vers une page qui a été supprimée ou n'existe plus.",
     notfound: 'La page que vous cherchez n’existe pas.',
     unexpected_error_title: 'Erreur inattendue',
     unexpected_error: 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
