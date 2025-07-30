@@ -102,6 +102,9 @@ export function useAIChatController(): AIChatController {
     const trackEvent = useTrackEvent();
     const [searchState, setSearchState] = useSearch(true);
 
+    // Track if we've initialized from the URL ask parameter
+    const hasInitializedFromUrlRef = React.useRef<boolean>(false);
+
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
         const { messages } = globalState.getState().state;
@@ -248,6 +251,9 @@ export function useAIChatController(): AIChatController {
             error: false,
         }));
 
+        // Reset initialization flag so URL ask can be processed again
+        hasInitializedFromUrlRef.current = false;
+
         // Reset ask parameter to empty string (keeps chat open but clears content)
         setSearchState((prev) => ({
             ask: '',
@@ -257,7 +263,7 @@ export function useAIChatController(): AIChatController {
         }));
     }, [setState, setSearchState]);
 
-    // Auto-trigger AI chat when ?ask= parameter appears in URL
+    // Auto-trigger AI chat when ?ask= parameter appears in URL (only once)
     React.useEffect(() => {
         const hasNoAsk = searchState?.ask === undefined || searchState?.ask === null;
         const hasQuery = searchState?.query !== null;
@@ -269,18 +275,29 @@ export function useAIChatController(): AIChatController {
         // Open the chat when ask parameter appears
         onOpen();
 
-        // Auto-post the first message if ask has content and no messages exist yet
+        // Auto-post the message if ask has content
         if (searchState?.ask?.trim()) {
-            const { messages } = globalState.getState().state;
-            if (
-                // Post new message if it's different from the last user message
-                messages.filter((m) => m.role === AIMessageRole.User).at(-1)?.query !==
-                searchState?.ask?.trim()
-            ) {
-                onPostMessage({ message: searchState.ask.trim() });
-            }
+            // Don't trigger if we're already posting a message
+            const loading = globalState.getState().state.loading;
+            if (loading) return;
+
+            // Only initialize once from URL
+            if (hasInitializedFromUrlRef.current) return;
+
+            // Wait for messageContextRef to be defined before proceeding
+            if (!messageContextRef.current?.location) return;
+
+            hasInitializedFromUrlRef.current = true;
+            onPostMessage({ message: searchState.ask.trim() });
         }
-    }, [searchState?.ask, searchState?.query, searchState?.open, onOpen, onPostMessage]);
+    }, [
+        searchState?.ask,
+        searchState?.query,
+        searchState?.open,
+        messageContextRef,
+        onOpen,
+        onPostMessage,
+    ]);
 
     return React.useMemo(() => {
         return {
