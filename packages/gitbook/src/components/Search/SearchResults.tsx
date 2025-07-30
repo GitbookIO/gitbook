@@ -36,6 +36,7 @@ type ResultType =
  * We cache the recommended questions globally to avoid calling the API multiple times
  * when re-opening the search modal. The cache is per space, so that we can
  * have different recommended questions for different spaces of the same site.
+ * It should not be used outside of an useEffect.
  */
 const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
 
