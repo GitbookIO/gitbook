@@ -21,7 +21,7 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
-    normalizeVisitorAuthURL,
+    normalizeVisitorParamsURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import type { SiteURLData } from './lib/context';
@@ -223,7 +223,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Make sure the URL is clean of any va token after a successful lookup
         // The token is stored in a cookie that is set on the redirect response
         //
-        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
+        const incomingURLWithoutToken = normalizeVisitorParamsURL(incomingURL);
         if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
                 NextResponse.redirect(incomingURLWithoutToken.toString()),
