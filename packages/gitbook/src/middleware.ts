@@ -220,8 +220,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             incomingURL.search = requestURL.search;
         }
         //
-        // Make sure the URL is clean of any va token after a successful lookup
-        // The token is stored in a cookie that is set on the redirect response
+        // Make sure the URL is clean of any va token after a successful lookup,
+        // and of any visitor.* params that may have been passed to the URL.
+        //
+        // The token and the visitor.* params value are stored in cookies that are set
+        // on the redirect response.
         //
         const incomingURLWithoutToken = normalizeVisitorParamsURL(incomingURL);
         if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
