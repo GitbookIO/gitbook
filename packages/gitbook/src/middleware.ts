@@ -141,14 +141,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         url: siteRequestURL,
     });
 
-    const withAPIToken = async (
-        apiToken: string | null,
+    //
+    // Strip the tracking header to prevent users providing it themselves.
+    //
+    request.headers.delete('x-gitbook-disable-tracking');
 
-        /**
-         * Optionally pass headers that will be included in the response.
-         */
-        responseHeaders?: Record<string, string>
-    ) => {
+    const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
                 url: siteRequestURL.toString(),
@@ -326,10 +324,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             },
         });
 
-        Object.entries(responseHeaders ?? {}).forEach(([key, value]) => {
-            response.headers.set(key, value);
-        });
-
         // Add Content Security Policy header
         response.headers.set('content-security-policy', getContentSecurityPolicy());
         // Basic security headers
@@ -351,15 +345,14 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {
+        // Do not track page views for preview requests
+        request.headers.set('x-gitbook-disable-tracking', 'true');
+
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
             `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
             request,
-            (apiToken) =>
-                withAPIToken(apiToken, {
-                    // Do not track page views for preview requests
-                    'x-gitbook-disable-tracking': 'true',
-                })
+            withAPIToken
         );
     }
 
