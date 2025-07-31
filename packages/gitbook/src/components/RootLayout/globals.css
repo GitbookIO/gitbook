@@ -4,8 +4,11 @@
 
 @layer base {
     :root {
-        --scrollbar-width: calc(100vw - 100%);
         @apply leading-relaxed;
+    }
+    * {
+        scrollbar-color: theme("colors.tint.7") theme("colors.tint.2");
+        scrollbar-width: thin;
     }
     body {
         @apply text-tint-strong antialiased;
@@ -35,22 +38,6 @@
     pre {
         /* Don't apply antialiased to `code` and `pre` elements */
         @apply subpixel-antialiased;
-    }
-
-    /*  Light mode */
-    ::-webkit-scrollbar {
-        @apply bg-tint-subtle;
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        @apply bg-tint-7;
-        border-radius: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        @apply bg-tint-8;
     }
 
     .flip-heading-hash {
@@ -116,23 +103,6 @@
     }
     .bg-gradient-tint {
         @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
-    }
-
-    /**
-     * Utility to prevent horizontal jumps when the vertical scrollbar appears
-     * It should be used on main containers of the layout, while preserving horizontal delimiters.
-     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
-     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
-     */
-    .scroll-nojump {
-        width: 100%;
-    }
-    @media screen and (min-width: 1536px) {
-        .scroll-nojump {
-            margin-left: var(--scrollbar-width);
-            margin-right: 0;
-            width: calc(100% - var(--scrollbar-width));
-        }
     }
 
     .elevate-link {
