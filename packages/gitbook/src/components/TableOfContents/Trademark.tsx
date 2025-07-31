@@ -21,13 +21,13 @@ export function Trademark(props: {
     return (
         <div
             className={tcls(
-                'relative',
                 'z-[2]',
-                'lg:absolute',
+                'absolute',
 
-                'left-0',
+                'left-2',
                 'right-2',
                 'bottom-0',
+                'lg:left-0',
 
                 'pointer-events-none',
                 'sidebar-filled:pl-2',
@@ -44,8 +44,7 @@ export function Trademark(props: {
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-2xl',
 
-                'before:hidden',
-                'lg:before:block',
+                'before:block',
                 'before:content-[""]',
                 'before:absolute',
                 'before:inset-x-0',
@@ -111,8 +110,7 @@ export function TrademarkLink(props: {
                 'hover:bg-tint',
                 'hover:text-tint-strong',
 
-                'ring-2',
-                'lg:ring-1',
+                'ring-1',
                 'ring-inset',
                 'ring-tint-subtle',
 

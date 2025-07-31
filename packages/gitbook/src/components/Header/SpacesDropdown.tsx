@@ -11,8 +11,9 @@ export function SpacesDropdown(props: {
     siteSpace: SiteSpace;
     siteSpaces: SiteSpace[];
     className?: string;
+    withPortal?: boolean;
 }) {
-    const { context, siteSpace, siteSpaces, className } = props;
+    const { context, siteSpace, siteSpaces, className, withPortal } = props;
 
     return (
         <DropdownMenu
@@ -20,6 +21,7 @@ export function SpacesDropdown(props: {
                 'group-hover/dropdown:invisible', // Prevent hover from opening the dropdown, as it's annoying in this context
                 'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
             )}
+            withPortal={withPortal}
             button={
                 <div
                     data-testid="space-dropdown-button"

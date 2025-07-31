@@ -7,6 +7,7 @@ import { createContext, useCallback, useContext, useState } from 'react';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Slot } from '@radix-ui/react-slot';
 
 import { assert } from 'ts-essentials';
 import { Link, type LinkInsightsProps } from '.';
@@ -34,8 +35,14 @@ export function DropdownMenu(props: {
     children: React.ReactNode;
     /** Custom styles */
     className?: ClassValue;
-    /** Open the dropdown on hover */
+    /** Open the dropdown on hover
+     * @default false
+     */
     openOnHover?: boolean;
+    /** Whether to render the dropdown menu in a portal
+     * @default true
+     */
+    withPortal?: boolean;
     /**
      * Side of the dropdown
      * @default "bottom"
@@ -54,11 +61,14 @@ export function DropdownMenu(props: {
         openOnHover = false,
         side = 'bottom',
         align = 'start',
+        withPortal = true,
     } = props;
     const [hovered, setHovered] = useState(false);
     const [open, setOpen] = useState(false);
 
     const isOpen = openOnHover ? open || hovered : open;
+
+    const Portal = withPortal ? RadixDropdownMenu.Portal : Slot;
 
     return (
         <DropdownMenuContext.Provider value={{ open: isOpen, setOpen }}>
@@ -73,7 +83,7 @@ export function DropdownMenu(props: {
                     {button}
                 </RadixDropdownMenu.Trigger>
 
-                <RadixDropdownMenu.Portal>
+                <Portal>
                     <RadixDropdownMenu.Content
                         data-testid="dropdown-menu"
                         hideWhenDetached
@@ -93,7 +103,7 @@ export function DropdownMenu(props: {
                             {children}
                         </div>
                     </RadixDropdownMenu.Content>
-                </RadixDropdownMenu.Portal>
+                </Portal>
             </RadixDropdownMenu.Root>
         </DropdownMenuContext.Provider>
     );

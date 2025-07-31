@@ -25,6 +25,7 @@
         "@tusbar/cache-control": "^1.0.2",
         "ai": "^4.2.2",
         "assert-never": "^1.2.1",
+        "react-aria": "^3.37.0",
         "bun-types": "^1.1.20",
         "classnames": "^2.5.1",
         "direction": "^2.0.1",

@@ -1887,6 +1887,57 @@ const testCases: TestsCase[] = [
             ]),
         ],
     },
+    {
+        name: 'Mobile menu',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/',
+        tests: [
+            {
+                name: 'Mobile menu open',
+                viewports: ['iphone-x'],
+                url: '',
+                run: async (page) => {
+                    // Set mobile viewport size to ensure mobile menu is visible
+                    await page.setViewportSize({ width: 375, height: 812 }); // iPhone X dimensions
+
+                    await page.locator('[data-testid="mobile-menu-button"]').click();
+
+                    // Wait for table of contents to appear
+                    const tableOfContents = page.locator('[data-testid="table-of-contents"]');
+                    await tableOfContents.waitFor({ state: 'visible', timeout: 5000 });
+                    await expect(tableOfContents).toBeVisible();
+                },
+            },
+            {
+                name: 'Mobile menu with dropdown menu',
+                viewports: ['iphone-x'],
+                url: 'multi-variants/',
+                run: async (page) => {
+                    // Set mobile viewport size to ensure mobile menu is visible
+                    await page.setViewportSize({ width: 375, height: 812 }); // iPhone X dimensions
+
+                    await page.locator('[data-testid="mobile-menu-button"]').click();
+
+                    // Wait for table of contents to appear
+                    const tableOfContents = page.locator('[data-testid="table-of-contents"]');
+                    await tableOfContents.waitFor({ state: 'visible', timeout: 5000 });
+                    await expect(tableOfContents).toBeVisible();
+
+                    // Wait for space dropdown button to be visible
+                    const spaceDropdownButton = tableOfContents.locator(
+                        '[data-testid="space-dropdown-button"]'
+                    );
+                    await spaceDropdownButton.waitFor({ state: 'visible', timeout: 5000 });
+                    await expect(spaceDropdownButton).toBeVisible();
+                    await spaceDropdownButton.click();
+
+                    // Wait for space dropdown to appear
+                    const spaceDropdown = page.locator('[data-testid="dropdown-menu"]');
+                    await spaceDropdown.waitFor({ state: 'visible', timeout: 5000 });
+                    await expect(spaceDropdown).toBeVisible();
+                },
+            },
+        ],
+    },
 ];
 
 runTestCases(testCases);

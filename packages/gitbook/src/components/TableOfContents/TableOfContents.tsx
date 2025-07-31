@@ -1,43 +1,75 @@
-import type { GitBookSiteContext } from '@/lib/context';
-import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
+'use client';
+
+import { MobileMenuScript, useMobileMenuSheet } from '@/components/MobileMenu';
+import { TableOfContentsScript } from '@/components/TableOfContents/TableOfContentsScript';
+import { Button } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
 import type React from 'react';
 
-import { tcls } from '@/lib/tailwind';
-
-import { PagesList } from './PagesList';
-import { TOCScrollContainer } from './TOCScroller';
-import { TableOfContentsScript } from './TableOfContentsScript';
-import { Trademark } from './Trademark';
-import { encodeClientTableOfContents } from './encodeClientTableOfContents';
-
-export async function TableOfContents(props: {
-    context: GitBookSiteContext;
+export function TableOfContents(props: {
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
-    innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
+    children: React.ReactNode;
 }) {
-    const { innerHeader, context, header } = props;
-    const { space, customization, revision } = context;
-
-    const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
+    const { header, children } = props;
+    const { open, setOpen } = useMobileMenuSheet();
 
     return (
         <>
+            <div
+                className="fixed inset-0 z-40 bg-tint-12/4 backdrop-blur-lg data-[state=closed]:pointer-events-none data-[state=closed]:invisible data-[state=closed]:animate-fadeOut data-[state=open]:animate-fadeIn lg:hidden dark:bg-tint-1/6"
+                data-state={open ? 'open' : 'closed'}
+                onClick={() => setOpen(false)}
+            />
             <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
                 data-testid="table-of-contents"
                 id="table-of-contents"
+                data-state={open ? 'open' : 'closed'}
                 className={tcls(
                     'group',
+
+                    'flex',
+                    'flex-col',
+                    'gap-4',
+
+                    'border-tint-subtle',
+
+                    'fixed',
+                    'z-50',
+
+                    'max-lg:transition',
+                    'max-lg:ease-in-out',
+                    'max-lg:duration-500',
+
+                    'max-lg:rounded-xl',
+                    'max-lg:circular-corners:rounded-2xl',
+                    'max-lg:straight-corners:rounded-none',
+                    'max-lg:bg-tint-base',
+                    'max-lg:sidebar-filled:bg-tint-subtle',
+                    'max-lg:theme-muted:bg-tint-subtle',
+                    'max-lg:[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                    'max-lg:[html.sidebar-filled.theme-muted_&]:bg-tint-base',
+                    'max-lg:[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+
+                    'max-lg:pb-2',
+                    'max-lg:w-10/12',
+                    'max-lg:shadow-lg',
+                    'max-lg:depth-flat:shadow-none',
+                    'max-lg:inset-1.5',
+                    'max-lg:transition-all',
+                    'max-lg:duration-300',
+                    'max-lg:max-w-sm',
+                    'max-lg:data-[state=open]:left-1.5',
+                    'max-lg:data-[state=closed]:-left-full',
+
                     'text-sm',
 
                     'grow-0',
                     'shrink-0',
-                    'basis-full',
                     'lg:basis-72',
                     'page-no-toc:lg:basis-56',
 
-                    'relative',
-                    'z-[1]',
                     'lg:sticky',
+                    'lg:z-[1]',
                     'lg:mr-12',
 
                     // Server-side static positioning
@@ -57,72 +89,36 @@ export async function TableOfContents(props: {
                     '[html[style*="--toc-top-offset"]_&]:lg:!top-[var(--toc-top-offset)]',
                     '[html[style*="--toc-height"]_&]:lg:!h-[var(--toc-height)]',
 
-                    'pt-6',
-                    'pb-4',
+                    'lg:pt-6',
+                    'lg:pb-4',
                     'sidebar-filled:lg:pr-6',
                     'page-no-toc:lg:pr-0',
 
-                    'hidden',
-                    'navigation-open:!flex',
-                    'lg:flex',
                     'page-no-toc:lg:hidden',
                     'page-no-toc:xl:flex',
-                    'site-header-none:page-no-toc:lg:flex',
-                    'flex-col',
-                    'gap-4',
-
-                    'navigation-open:border-b',
-                    'border-tint-subtle'
+                    'site-header-none:page-no-toc:lg:flex'
                 )}
             >
                 {header && header}
-                <div // The actual sidebar, either shown with a filled bg or transparent.
-                    className={tcls(
-                        'lg:-ms-5',
-                        'relative flex flex-grow flex-col overflow-hidden border-tint-subtle',
 
-                        'sidebar-filled:bg-tint-subtle',
-                        'theme-muted:bg-tint-subtle',
-                        '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                        '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                        '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                        '[html.sidebar-filled.theme-gradient_&]:border',
-                        'page-no-toc:!bg-transparent',
-                        'page-no-toc:!border-none',
-
-                        'sidebar-filled:rounded-xl',
-                        'straight-corners:rounded-none',
-                        '[html.sidebar-filled.circular-corners_&]:page-has-toc:rounded-3xl'
-                    )}
-                >
-                    {innerHeader && <div className="px-5 *:my-4">{innerHeader}</div>}
-                    <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls(
-                            'flex flex-grow flex-col p-2',
-                            customization.trademark.enabled && 'lg:pb-20',
-                            'lg:gutter-stable overflow-y-auto',
-                            '[&::-webkit-scrollbar]:bg-transparent',
-                            '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                            'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
-                            'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
-                            'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8'
-                        )}
+                {open ? (
+                    <Button
+                        variant="blank"
+                        icon="close"
+                        iconOnly
+                        size="medium"
+                        autoFocus={false}
+                        className="absolute top-2 right-2 z-50 aspect-square size-[calc(2.25rem+1px)] justify-center bg-transparent text-tint opacity-8 shadow-none ring-transparent lg:hidden"
+                        onClick={() => setOpen(false)}
                     >
-                        <PagesList
-                            pages={pages}
-                            style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
-                        />
-                        {customization.trademark.enabled ? (
-                            <Trademark
-                                space={space}
-                                customization={customization}
-                                placement={SiteInsightsTrademarkPlacement.Sidebar}
-                            />
-                        ) : null}
-                    </TOCScrollContainer>
-                </div>
+                        <span className="sr-only">Close</span>
+                    </Button>
+                ) : null}
+
+                {children}
             </aside>
             <TableOfContentsScript />
+            <MobileMenuScript />
         </>
     );
 }

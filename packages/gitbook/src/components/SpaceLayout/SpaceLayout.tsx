@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
-import { TableOfContents } from '@/components/TableOfContents';
+import { TOCScrollContent, TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
@@ -106,7 +106,6 @@ export function SpaceLayout(props: {
                                 )}
                             >
                                 <TableOfContents
-                                    context={context}
                                     header={
                                         withTopHeader ? null : (
                                             <div
@@ -124,34 +123,43 @@ export function SpaceLayout(props: {
                                             </div>
                                         )
                                     }
-                                    innerHeader={
-                                        // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
-                                        <>
-                                            {!withTopHeader && searchAndAI}
-                                            {!withTopHeader && withSections && sections && (
-                                                <SiteSectionList
-                                                    className={tcls('hidden', 'lg:block')}
-                                                    sections={encodeClientSiteSections(
-                                                        context,
-                                                        sections
+                                >
+                                    <TOCScrollContent
+                                        context={context}
+                                        innerHeader={
+                                            (!withTopHeader && !!searchAndAI) ||
+                                            (!withTopHeader && withSections && !!sections) ||
+                                            (isMultiVariants && !sections) ? (
+                                                // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
+                                                <>
+                                                    {!withTopHeader && searchAndAI}
+                                                    {!withTopHeader && withSections && sections && (
+                                                        <SiteSectionList
+                                                            className={tcls('hidden', 'lg:block')}
+                                                            sections={encodeClientSiteSections(
+                                                                context,
+                                                                sections
+                                                            )}
+                                                        />
                                                     )}
-                                                />
-                                            )}
-                                            {isMultiVariants && !sections && (
-                                                <SpacesDropdown
-                                                    context={context}
-                                                    siteSpace={siteSpace}
-                                                    siteSpaces={siteSpaces}
-                                                    className={tcls(
-                                                        'w-full',
-                                                        'page-no-toc:hidden',
-                                                        'site-header-none:page-no-toc:flex'
+                                                    {isMultiVariants && !sections && (
+                                                        <SpacesDropdown
+                                                            context={context}
+                                                            siteSpace={siteSpace}
+                                                            siteSpaces={siteSpaces}
+                                                            className={tcls(
+                                                                'w-full',
+                                                                'page-no-toc:hidden',
+                                                                'site-header-none:page-no-toc:flex'
+                                                            )}
+                                                            withPortal={false}
+                                                        />
                                                     )}
-                                                />
-                                            )}
-                                        </>
-                                    }
-                                />
+                                                </>
+                                            ) : null
+                                        }
+                                    />
+                                </TableOfContents>
                                 <div className="flex min-w-0 flex-1 flex-col">{children}</div>
                             </div>
                         </div>
