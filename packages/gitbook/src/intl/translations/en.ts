@@ -85,7 +85,7 @@ export const en = {
     ai_chat_context_info_provided_by_the_site: 'Info provided by the site',
     ai_chat_context_previous_messages: 'Previous messages',
     ai_chat_context_disclaimer: 'AI responses may contain mistakes.',
-    ai_chat_input_placeholder: 'Ask, search, or take action...',
+    ai_chat_input_placeholder: 'Ask, search, or explain...',
     send: 'Send',
     actions: 'Actions',
     ai_chat_suggested_questions_title: 'Suggested questions',
