@@ -32,6 +32,11 @@ export type AIChatState = {
     query: string | null;
 
     /**
+     * The first query sent to the AI. This is appended to the URL when the AI chat is opened.
+     */
+    initialQuery: string | null;
+
+    /**
      * Messages in the session.
      */
     messages: AIChatMessage[];
@@ -79,6 +84,7 @@ const globalState = zustand.create<{
             followUpSuggestions: [],
             loading: false,
             error: false,
+            initialQuery: null,
         },
         setState: (fn) => set((state) => ({ state: { ...state.state, ...fn(state.state) } })),
     };
@@ -102,17 +108,14 @@ export function useAIChatController(): AIChatController {
     const trackEvent = useTrackEvent();
     const [searchState, setSearchState] = useSearch(true);
 
-    // Track if we've initialized from the URL ask parameter
-    const hasInitializedFromUrlRef = React.useRef<boolean>(false);
-
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
-        const { messages } = globalState.getState().state;
+        const { initialQuery } = globalState.getState().state;
         setState((state) => ({ ...state, opened: true }));
 
         // Update search state to show ask mode with first message or current ask value
         setSearchState((prev) => ({
-            ask: prev?.ask ?? messages[0]?.query ?? '',
+            ask: prev?.ask ?? initialQuery ?? '',
             query: prev?.query ?? null,
             global: prev?.global ?? false,
             open: false, // Close search popover when opening chat
@@ -249,10 +252,8 @@ export function useAIChatController(): AIChatController {
             followUpSuggestions: [],
             responseId: null,
             error: false,
+            initialQuery: null,
         }));
-
-        // Reset initialization flag so URL ask can be processed again
-        hasInitializedFromUrlRef.current = false;
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
         setSearchState((prev) => ({
@@ -277,18 +278,21 @@ export function useAIChatController(): AIChatController {
 
         // Auto-post the message if ask has content
         if (searchState?.ask?.trim()) {
+            const trimmedAsk = searchState.ask.trim();
+            const { loading, initialQuery } = globalState.getState().state;
+
             // Don't trigger if we're already posting a message
-            const loading = globalState.getState().state.loading;
             if (loading) return;
 
-            // Only initialize once from URL
-            if (hasInitializedFromUrlRef.current) return;
+            // Only initialize once per URL ask value
+            if (initialQuery === trimmedAsk) return;
 
             // Wait for messageContextRef to be defined before proceeding
             if (!messageContextRef.current?.location) return;
 
-            hasInitializedFromUrlRef.current = true;
-            onPostMessage({ message: searchState.ask.trim() });
+            // Mark this ask value as processed
+            setState((state) => ({ ...state, initialQuery: trimmedAsk }));
+            onPostMessage({ message: trimmedAsk });
         }
     }, [
         searchState?.ask,
@@ -296,6 +300,7 @@ export function useAIChatController(): AIChatController {
         searchState?.open,
         messageContextRef,
         onOpen,
+        setState,
         onPostMessage,
     ]);
 

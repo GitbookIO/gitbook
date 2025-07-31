@@ -54,10 +54,12 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            if (state?.query === '') {
-                await setSearchState(null);
-            } else if (state) {
-                await setSearchState({ ...state, open: false });
+            if (state) {
+                await setSearchState({
+                    ...state,
+                    open: false,
+                    query: state.query === '' ? null : state.query,
+                });
             }
 
             if (to) {
@@ -131,6 +133,8 @@ export function SearchContainer(props: SearchContainerProps) {
     const normalizedQuery = state?.query?.trim() ?? '';
     const normalizedAsk = state?.ask?.trim() ?? '';
 
+    const showAsk = aiMode === CustomizationAIMode.Search && normalizedAsk;
+
     return (
         <SearchAskProvider value={searchAsk}>
             <Popover
@@ -138,10 +142,10 @@ export function SearchContainer(props: SearchContainerProps) {
                     // Only show content if there's a query or Ask is enabled
                     (state?.query || aiMode !== CustomizationAIMode.None) && open ? (
                         <React.Suspense fallback={null}>
-                            {isMultiVariants && !state?.ask ? (
+                            {isMultiVariants && !showAsk ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
                             ) : null}
-                            {state !== null && !state.ask ? (
+                            {state !== null && !showAsk ? (
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
@@ -150,7 +154,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     spaceId={spaceId}
                                 />
                             ) : null}
-                            {normalizedAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
+                            {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }

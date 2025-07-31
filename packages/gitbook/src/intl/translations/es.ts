@@ -89,7 +89,7 @@ export const es: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site: 'Información proporcionada por el sitio',
     ai_chat_context_previous_messages: 'Mensajes anteriores',
     ai_chat_context_disclaimer: 'Las respuestas de IA pueden contener errores.',
-    ai_chat_input_placeholder: 'Pregunta, busca o realiza una acción...',
+    ai_chat_input_placeholder: 'Pregunta, busca o explica...',
     send: 'Enviar',
     actions: 'Acciones',
     ai_chat_suggested_questions_title: 'Preguntas sugeridas',

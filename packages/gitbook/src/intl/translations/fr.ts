@@ -84,7 +84,7 @@ export const fr = {
     ai_chat_context_info_provided_by_the_site: 'Informations fournies par le site',
     ai_chat_context_previous_messages: 'Messages précédents',
     ai_chat_context_disclaimer: 'Les réponses générées peuvent contenir des erreurs.',
-    ai_chat_input_placeholder: 'Rechercher…',
+    ai_chat_input_placeholder: 'Demander, rechercher ou expliquer...',
     send: 'Envoyer',
     actions: 'Actions',
     ai_chat_suggested_questions_title: 'Suggestions de questions',

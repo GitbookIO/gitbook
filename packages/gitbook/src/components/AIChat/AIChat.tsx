@@ -93,6 +93,15 @@ export function AIChatWindow(props: {
             block: 'start',
         });
 
+        const timeout = setTimeout(() => {
+            if (lastUserMessageRef.current) {
+                lastUserMessageRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        }, 100);
+
         // We want the chat messages to scroll underneath the input, but they should scroll past the input when scrolling all the way down.
         // The best way to do this is to observe the input height and adjust the padding bottom of the scroll container accordingly.
         const observer = new ResizeObserver((entries) => {
@@ -103,7 +112,10 @@ export function AIChatWindow(props: {
         if (inputRef.current) {
             observer.observe(inputRef.current);
         }
-        return () => observer.disconnect();
+        return () => {
+            observer.disconnect();
+            clearTimeout(timeout);
+        };
     }, []);
 
     return (
