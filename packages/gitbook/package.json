@@ -100,7 +100,7 @@
         "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math && wrangler types",
         "copy:icons": "gitbook-icons ./public/~gitbook/static/icons",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math",
-        "dev": "env-cmd --silent -f ../../.env.local next --turbopack",
+        "dev": "env-cmd --silent -f ../../.env.local next",
         "build": "next build",
         "start": "next start",
         "build:cloudflare": "opennextjs-cloudflare build",
