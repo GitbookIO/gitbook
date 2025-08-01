@@ -34,7 +34,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                         'bg-tint',
                         'ring-1',
                         'ring-tint',
-                        'rounded',
+                        'rounded-sm',
                         'shadow-1xs',
                         'shadow-tint-12/1',
                         'dark:shadow-tint-1/2',
@@ -53,7 +53,7 @@ export function AnnotationPopover(props: { children: React.ReactNode; body: Reac
                             viewBox="0 0 8 5"
                             className={tcls(
                                 'relative',
-                                'z-[2]',
+                                'z-2',
                                 'fill-tint-3', // Same as bg-tint
                                 'stroke-tint-7', // Same as ring-tint
                                 '[paint-order:stroke_fill]'

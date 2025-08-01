@@ -67,7 +67,7 @@ function ThemeButton(props: {
             aria-checked={active}
             className={tcls(
                 'p-2',
-                'rounded',
+                'rounded-sm',
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-full',
                 'transition-all',

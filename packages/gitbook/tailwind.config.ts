@@ -293,6 +293,18 @@ const config: Config = {
                     ])
                 ),
             },
+            divideColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders]),
+                    ])
+                ),
+            },
             transitionTimingFunction: {
                 quint: 'cubic-bezier(0.83, 0, 0.17, 1)',
             },
@@ -523,7 +535,7 @@ const config: Config = {
             );
 
             // Variant to target first-of-type in a column
-            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
+            addVariant('column-first-of-type', '.group\\/column > &:first-of-type'); // optional for group-based variants
 
             const customisationVariants = {
                 // Sidebar styles

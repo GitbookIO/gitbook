@@ -71,11 +71,7 @@ function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
 }
 
 function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {
-    return (
-        <kbd className="rounded border px-1 font-mono shadow-[0_1px_0_0_theme(borderColor.DEFAULT)]">
-            {props.children}
-        </kbd>
-    );
+    return <kbd className="rounded-xs border border-b-2 px-1 font-mono">{props.children}</kbd>;
 }
 
 function Superscript(props: MarkedLeafProps<DocumentMarkSuperscript>) {
@@ -90,9 +86,9 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
     return (
         <code
             className={tcls(
-                'py-[1px]',
+                'py-px',
                 'px-1.5',
-                'min-w-[1.625rem]',
+                'min-w-6.5',
                 'justify-center',
                 'items-center',
                 'leading-normal',
@@ -100,7 +96,7 @@ function Code(props: MarkedLeafProps<DocumentMarkCode>) {
                 'ring-inset',
                 'ring-tint',
                 'bg-tint',
-                'rounded',
+                'rounded-sm',
                 // Text size is proportional to the font-size of the parent element
                 'text-[.875em]',
                 // We ensure that the code is not making the parent bigger, especially in headings

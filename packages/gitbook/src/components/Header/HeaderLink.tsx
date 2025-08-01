@@ -119,7 +119,7 @@ function HeaderItemButton(
             className={tcls(
                 {
                     'button-primary':
-                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none theme-bold:hover:bg-header-link theme-bold:hover:text-header-background theme-bold:hover:shadow-none',
+                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none hover:theme-bold:bg-header-link hover:theme-bold:text-header-background hover:theme-bold:shadow-none',
                     'button-secondary': '',
                 }[linkStyle]
             )}
@@ -157,7 +157,7 @@ function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPrese
         'links-accent:py-0.5', // Prevent underline from being cut off at the bottom
 
         'theme-bold:text-header-link',
-        'theme-bold:hover:!text-header-link/7'
+        'hover:theme-bold:text-header-link/7!'
     );
 }
 

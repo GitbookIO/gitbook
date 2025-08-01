@@ -23,7 +23,7 @@ export const Checkbox = React.forwardRef<
         className={tcls(
             'peer',
             'shrink-0',
-            'rounded-sm',
+            'rounded-xs',
             'straight-corners:rounded-none',
             'ring-1',
             'ring-tint-12/4',
