@@ -8,6 +8,7 @@ import { ja } from './ja';
 import { nl } from './nl';
 import { no } from './no';
 import { pt_br } from './pt-br';
+import { ru } from './ru';
 import type { TranslationLanguage } from './types';
 import { zh } from './zh';
 
@@ -26,5 +27,6 @@ export const languages: {
     ja,
     nl,
     no,
+    ru,
     'pt-br': pt_br,
 };
