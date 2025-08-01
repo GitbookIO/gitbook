@@ -49,6 +49,7 @@ export const pt_br = {
     view: 'Ver',
     edit_on_git: 'Editar no ${1}',
     notfound_title: 'Página não encontrada',
+    notfound_link: 'Este link aponta para uma página que foi removida ou não existe mais.',
     notfound: 'A página que você está procurando não existe.',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:
@@ -86,7 +87,7 @@ export const pt_br = {
     ai_chat_context_info_provided_by_the_site: 'Informações fornecidas pelo site',
     ai_chat_context_previous_messages: 'Mensagens anteriores',
     ai_chat_context_disclaimer: 'Respostas de IA podem conter erros.',
-    ai_chat_input_placeholder: 'Pergunte, pesquise ou execute uma ação...',
+    ai_chat_input_placeholder: 'Pergunte, pesquise ou explique...',
     send: 'Enviar',
     actions: 'Ações',
     ai_chat_suggested_questions_title: 'Perguntas sugeridas',

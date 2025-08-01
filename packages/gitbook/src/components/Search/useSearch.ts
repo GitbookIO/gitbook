@@ -5,8 +5,8 @@ import type { LinkProps } from '../primitives';
 
 export interface SearchState {
     // URL-backed state
-    query: string;
-    ask: boolean;
+    query: string | null;
+    ask: string | null;
     global: boolean;
 
     // Local UI state
@@ -16,7 +16,7 @@ export interface SearchState {
 // KeyMap needs to be statically defined to avoid `setRawState` being redefined on every render.
 const keyMap = {
     q: parseAsString,
-    ask: parseAsBoolean,
+    ask: parseAsString,
     global: parseAsBoolean,
 };
 
@@ -27,25 +27,37 @@ export type UpdateSearchState = (
 /**
  * Hook to access the current search query and update it.
  */
-export function useSearch(): [SearchState | null, UpdateSearchState] {
+export function useSearch(withAIChat = false): [SearchState | null, UpdateSearchState] {
     const [rawState, setRawState] = useQueryStates(keyMap, {
         history: 'replace',
     });
 
+    // Handle legacy ask=true format by converting it to the new format
+    React.useEffect(() => {
+        if (rawState?.ask === 'true' && rawState?.q) {
+            // Convert legacy format: q=query&ask=true -> ask=query&q=null
+            setRawState({
+                q: null,
+                ask: rawState.q,
+                global: rawState.global,
+            });
+        }
+    }, [rawState, setRawState]);
+
     // Separate local state for open (not synchronized with URL)
     // Default to true if there's already a query in the URL
     const [open, setIsOpen] = React.useState(() => {
-        return rawState?.q !== null;
+        return rawState?.q !== null || (!withAIChat && rawState?.ask !== null);
     });
 
     const state = React.useMemo<SearchState | null>(() => {
-        if (rawState === null || rawState.q === null) {
+        if (rawState === null || (rawState.q === null && rawState.ask === null)) {
             return null;
         }
 
         return {
             query: rawState.q,
-            ask: !!rawState.ask,
+            ask: rawState.ask,
             global: !!rawState.global,
             open: open,
         };
@@ -78,7 +90,7 @@ export function useSearch(): [SearchState | null, UpdateSearchState] {
 
             return setRawState({
                 q: update.query,
-                ask: update.ask ? true : null,
+                ask: update.ask,
                 global: update.global ? true : null,
             });
         },
@@ -97,8 +109,8 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
     return React.useCallback(
         (query) => {
             const searchParams = new URLSearchParams();
-            searchParams.set('q', query.query ?? '');
-            query.ask ? searchParams.set('ask', 'true') : searchParams.delete('ask');
+            query.query ? searchParams.set('q', query.query) : searchParams.delete('q');
+            query.ask ? searchParams.set('ask', query.ask) : searchParams.delete('ask');
             query.global ? searchParams.set('global', 'true') : searchParams.delete('global');
             return {
                 href: `?${searchParams.toString()}`,
@@ -106,10 +118,10 @@ export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
                 onClick: (event) => {
                     event.preventDefault();
                     setSearch((prev) => ({
-                        query: '',
-                        ask: false,
+                        query: null,
+                        ask: null,
                         global: false,
-                        open: true,
+                        open: query.open ?? prev?.open ?? false,
                         ...(prev ?? {}),
                         ...query,
                     }));

@@ -16,6 +16,7 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 
 interface SearchContainerProps {
+    spaceId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
     aiMode: CustomizationAIMode;
@@ -26,9 +27,10 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { spaceTitle, isMultiVariants, aiMode, className } = props;
+    const { spaceId, spaceTitle, isMultiVariants, aiMode, className } = props;
 
-    const [state, setSearchState] = useSearch();
+    const withAIChat = aiMode === CustomizationAIMode.Assistant;
+    const [state, setSearchState] = useSearch(withAIChat);
     const searchAsk = useSearchAskState();
     const router = useRouter();
     const trackEvent = useTrackEvent();
@@ -40,17 +42,32 @@ export function SearchContainer(props: SearchContainerProps) {
     // Derive open state from search state
     const open = state?.open ?? false;
 
-    const onClose = async (to?: string) => {
-        if (state?.query === '') {
-            await setSearchState(null);
-        } else if (state) {
-            await setSearchState({ ...state, open: false });
+    React.useEffect(() => {
+        if (state?.ask && aiMode === CustomizationAIMode.Assistant) {
+            // Close the pop-over when we switch to “ask” mode
+            setSearchState((prev) => (prev ? { ...prev, open: !state.ask } : prev));
+        } else if (state?.ask && aiMode === CustomizationAIMode.None) {
+            // Rewrite ask to query when the site doesn't support AI
+            setSearchState((prev) => (prev ? { ...prev, query: prev.ask, ask: null } : prev));
         }
+    }, [state?.ask, setSearchState, aiMode]);
 
-        if (to) {
-            router.push(to);
-        }
-    };
+    const onClose = React.useCallback(
+        async (to?: string) => {
+            if (state) {
+                await setSearchState({
+                    ...state,
+                    open: false,
+                    query: state.query === '' ? null : state.query,
+                });
+            }
+
+            if (to) {
+                router.push(to);
+            }
+        },
+        [state, setSearchState, router]
+    );
 
     useHotkeys(
         'mod+k',
@@ -61,21 +78,21 @@ export function SearchContainer(props: SearchContainerProps) {
         []
     );
 
-    const onOpen = () => {
+    const onOpen = React.useCallback(() => {
         if (open) {
             return;
         }
         setSearchState((prev) => ({
-            ask: prev?.ask ?? false,
+            ask: aiMode === CustomizationAIMode.Assistant && prev ? prev.ask : null,
             global: prev?.global ?? false,
-            query: prev?.query ?? '',
+            query: (!withAIChat ? prev?.ask : null) ?? prev?.query ?? '',
             open: true,
         }));
 
         trackEvent({
             type: 'search_open',
         });
-    };
+    }, [open, setSearchState, trackEvent, withAIChat]);
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -105,7 +122,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onChange = (value: string) => {
         setSearchState((prev) => ({
-            ask: false, // When typing, we go back to the default search mode
+            ask: aiMode === CustomizationAIMode.Assistant && prev ? prev.ask : null, // When typing, we go back to the default search mode
             query: value,
             global: prev?.global ?? false,
             open: true,
@@ -113,7 +130,10 @@ export function SearchContainer(props: SearchContainerProps) {
     };
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
-    const normalizedQuery = state?.query.trim() ?? '';
+    const normalizedQuery = state?.query?.trim() ?? '';
+    const normalizedAsk = state?.ask?.trim() ?? '';
+
+    const showAsk = aiMode === CustomizationAIMode.Search && normalizedAsk;
 
     return (
         <SearchAskProvider value={searchAsk}>
@@ -122,18 +142,19 @@ export function SearchContainer(props: SearchContainerProps) {
                     // Only show content if there's a query or Ask is enabled
                     (state?.query || aiMode !== CustomizationAIMode.None) && open ? (
                         <React.Suspense fallback={null}>
-                            {isMultiVariants && !state?.ask ? (
+                            {isMultiVariants && !showAsk ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
                             ) : null}
-                            {state !== null && !state.ask ? (
+                            {state !== null && !showAsk ? (
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
                                     aiMode={aiMode}
+                                    spaceId={spaceId}
                                 />
                             ) : null}
-                            {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
+                            {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }
@@ -168,7 +189,7 @@ export function SearchContainer(props: SearchContainerProps) {
             >
                 <SearchInput
                     ref={searchInputRef}
-                    value={state?.query ?? ''}
+                    value={(!withAIChat ? state?.ask : null) ?? state?.query ?? ''}
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}

@@ -94,9 +94,10 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         onChange={(event) => onChange(event.target.value)}
                         value={value}
                         // We only show "search or ask" if the search input actually handles both search and ask.
-                        placeholder={`${tString(language, aiMode === CustomizationAIMode.Search ? 'search_or_ask' : 'search')}...`}
+                        placeholder={`${tString(language, aiMode === CustomizationAIMode.Search ? 'search_or_ask' : 'search')}…`}
                         maxLength={512}
                         size={10}
+                        data-testid="search-input"
                         className={tcls(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-hidden transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             isOpen ? '' : 'max-md:opacity-0'

@@ -23,6 +23,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
             size="small"
             active={active}
             action={tString(language, 'view')}
+            data-testid="search-page-section-result"
             insights={{
                 type: 'search_open_result',
                 query,

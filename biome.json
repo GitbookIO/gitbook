@@ -21,7 +21,8 @@
             "packages/openapi-parser/src/fixtures/**/*",
             "packages/emoji-codepoints/index.ts",
             "packages/icons/src/data/*.json",
-            "packages/gitbook/worker-configuration.d.ts"
+            "packages/gitbook/worker-configuration.d.ts",
+            "**/*.css"
         ]
     },
     "formatter": {

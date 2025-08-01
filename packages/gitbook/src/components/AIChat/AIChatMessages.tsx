@@ -23,6 +23,7 @@ export function AIChatMessages(props: {
                 return (
                     <div
                         ref={isLastUserMessage ? lastUserMessageRef : undefined}
+                        data-testid="ai-chat-message"
                         className={tcls(
                             message.content ? 'animate-fade-in-slow' : '',
                             'shrink-0',

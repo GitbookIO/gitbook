@@ -4,6 +4,7 @@ import type React from 'react';
 
 import { TranslateContext } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { LoadingStateProvider } from '../primitives/LoadingStateProvider';
 
 export function ClientContexts(props: {
@@ -14,7 +15,9 @@ export function ClientContexts(props: {
 
     return (
         <TranslateContext.Provider value={language}>
-            <LoadingStateProvider>{children}</LoadingStateProvider>
+            <TooltipProvider delayDuration={200}>
+                <LoadingStateProvider>{children}</LoadingStateProvider>
+            </TooltipProvider>
         </TranslateContext.Provider>
     );
 }

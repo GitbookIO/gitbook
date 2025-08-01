@@ -38,7 +38,7 @@ export function AIChatInput(props: {
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
                 inputRef.current?.focus();
-            }, 50);
+            }, 150);
 
             return () => clearTimeout(timeout);
         }
@@ -59,6 +59,7 @@ export function AIChatInput(props: {
                 ref={inputRef}
                 disabled={disabled || loading}
                 data-loading={loading}
+                data-testid="ai-chat-input"
                 className={tcls(
                     'resize-none',
                     'focus:outline-hidden',
