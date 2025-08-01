@@ -38,7 +38,7 @@ export function AIChatInput(props: {
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
                 inputRef.current?.focus();
-            }, 50);
+            }, 150);
 
             return () => clearTimeout(timeout);
         }
@@ -62,7 +62,7 @@ export function AIChatInput(props: {
                 data-testid="ai-chat-input"
                 className={tcls(
                     'resize-none',
-                    'focus:outline-none',
+                    'focus:outline-hidden',
                     'focus:ring-0',
                     'w-full',
                     'px-3',
@@ -127,7 +127,7 @@ export function AIChatInput(props: {
                     arrow
                 >
                     <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2 py-1 text-tint/7 text-xs transition-all hover:bg-tint">
-                        <span className="-ml-1 rounded-corners:rounded circular-corners:rounded-2xl bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
+                        <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
                             {t(language, 'ai_chat_context_badge')}
                         </span>{' '}
                         <span>{t(language, 'ai_chat_context_title')}</span>

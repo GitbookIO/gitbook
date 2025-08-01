@@ -50,7 +50,7 @@ export function PageBody(props: {
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
-                    'mx-auto max-w-screen-2xl py-8',
+                    'mx-auto max-w-screen-2xl py-11',
                     // Allow words to break if they are too long.
                     'break-anywhere',
                     pageWidthWide ? 'page-width-wide 2xl:px-8' : 'page-width-default',

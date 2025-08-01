@@ -16,6 +16,7 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 
 interface SearchContainerProps {
+    spaceId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
     aiMode: CustomizationAIMode;
@@ -26,7 +27,7 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { spaceTitle, isMultiVariants, aiMode, className } = props;
+    const { spaceId, spaceTitle, isMultiVariants, aiMode, className } = props;
 
     const withAIChat = aiMode === CustomizationAIMode.Assistant;
     const [state, setSearchState] = useSearch(withAIChat);
@@ -53,10 +54,12 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            if (state?.query === '') {
-                await setSearchState(null);
-            } else if (state) {
-                await setSearchState({ ...state, open: false });
+            if (state) {
+                await setSearchState({
+                    ...state,
+                    open: false,
+                    query: state.query === '' ? null : state.query,
+                });
             }
 
             if (to) {
@@ -128,6 +131,9 @@ export function SearchContainer(props: SearchContainerProps) {
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
     const normalizedQuery = state?.query?.trim() ?? '';
+    const normalizedAsk = state?.ask?.trim() ?? '';
+
+    const showAsk = aiMode === CustomizationAIMode.Search && normalizedAsk;
 
     return (
         <SearchAskProvider value={searchAsk}>
@@ -136,18 +142,19 @@ export function SearchContainer(props: SearchContainerProps) {
                     // Only show content if there's a query or Ask is enabled
                     (state?.query || aiMode !== CustomizationAIMode.None) && open ? (
                         <React.Suspense fallback={null}>
-                            {isMultiVariants && !state?.ask ? (
+                            {isMultiVariants && !showAsk ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
                             ) : null}
-                            {state !== null && !state.ask ? (
+                            {state !== null && !showAsk ? (
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
                                     aiMode={aiMode}
+                                    spaceId={spaceId}
                                 />
                             ) : null}
-                            {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
+                            {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }
@@ -159,7 +166,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base has-[.empty]:hidden scroll-py-2 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        'bg-tint-base has-[.empty]:hidden scroll-py-2 w-128 p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: (event) => {
                         // Don't close if clicking on the search input itself
                         if (searchInputRef.current?.contains(event.target as Node)) {

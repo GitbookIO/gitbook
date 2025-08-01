@@ -51,6 +51,8 @@ export const no: TranslationLanguage = {
     view: 'Vis',
     edit_on_git: 'Rediger på ${1}',
     notfound_title: 'Siden ble ikke funnet',
+    notfound_link:
+        'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
     notfound: 'Siden du leter etter eksisterer ikke.',
     unexpected_error_title: 'En feil oppstod',
     unexpected_error: 'Beklager, en uventet feil har oppstått. Vennligst prøv igjen senere.',
@@ -86,7 +88,7 @@ export const no: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site: 'Informasjon gitt av nettstedet',
     ai_chat_context_previous_messages: 'Tidligere meldinger',
     ai_chat_context_disclaimer: 'AI-svar kan inneholde feil.',
-    ai_chat_input_placeholder: 'Spør, søk eller utfør en handling...',
+    ai_chat_input_placeholder: 'Spør, søk eller forklar...',
     send: 'Send',
     actions: 'Handlinger',
     ai_chat_suggested_questions_title: 'Foreslåtte spørsmål',

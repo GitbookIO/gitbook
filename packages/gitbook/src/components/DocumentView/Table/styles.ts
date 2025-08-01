@@ -6,7 +6,7 @@ export const RecordCardStyles = [
     'shadow-1xs',
     'shadow-tint-9/1',
     'depth-flat:shadow-none',
-    'rounded',
+    'rounded-sm',
     'straight-corners:rounded-none',
     'circular-corners:rounded-xl',
     'dark:shadow-transparent',

@@ -58,6 +58,7 @@ export function SpaceLayout(props: {
                     aiMode={aiMode}
                     isMultiVariants={siteSpaces.length > 1}
                     spaceTitle={siteSpace.title}
+                    spaceId={siteSpace.space.id}
                 />
             </React.Suspense>
             {aiMode === CustomizationAIMode.Assistant ? (
@@ -144,7 +145,7 @@ export function SpaceLayout(props: {
                                                     className={tcls(
                                                         'w-full',
                                                         'page-no-toc:hidden',
-                                                        'site-header-none:page-no-toc:flex'
+                                                        'page-no-toc:site-header-none:flex'
                                                     )}
                                                 />
                                             )}

@@ -94,7 +94,7 @@ export function PageFeedbackForm(props: {
                             <textarea
                                 ref={inputRef}
                                 name="comment"
-                                className="max-h-40 min-h-16 grow rounded straight-corners:rounded-none bg-tint-base p-2 ring-1 ring-tint ring-inset placeholder:text-sm placeholder:text-tint contrast-more:ring-tint-12 contrast-more:placeholder:text-tint-strong"
+                                className="max-h-40 min-h-16 grow rounded-sm straight-corners:rounded-none bg-tint-base p-2 ring-1 ring-tint ring-inset placeholder:text-sm placeholder:text-tint contrast-more:ring-tint-12 contrast-more:placeholder:text-tint-strong"
                                 placeholder={tString(languages, 'was_this_helpful_comment')}
                                 aria-label={tString(languages, 'was_this_helpful_comment')}
                                 onChange={(e) => setComment(e.target.value)}
@@ -151,11 +151,11 @@ function RatingButton(
         <button
             className={tcls(
                 'p-2 first:rounded-l-full first:pl-2.5 last:rounded-r-full last:pr-2.5 hover:bg-primary-hover hover:text-primary-strong',
-                'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit disabled:dark:hover:text-inherit',
+                'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit dark:disabled:hover:text-inherit',
                 'ring-tint contrast-more:hover:ring-1',
                 active
                     ? 'bg-primary-active text-primary-strong disabled:hover:bg-primary-active disabled:hover:text-primary-strong contrast-more:ring-2 contrast-more:hover:ring-2'
-                    : 'disabled:opacity-7 disabled:contrast-more:ring-0'
+                    : 'disabled:opacity-7 contrast-more:disabled:ring-0'
             )}
             type="button"
             {...attr}

@@ -35,7 +35,7 @@
     "workspaces": {
         "packages": ["packages/*"],
         "catalog": {
-            "@gitbook/api": "^0.129.0"
+            "@gitbook/api": "^0.130.0"
         }
     },
     "patchedDependencies": {

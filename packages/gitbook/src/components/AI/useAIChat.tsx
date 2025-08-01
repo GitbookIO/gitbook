@@ -32,6 +32,11 @@ export type AIChatState = {
     query: string | null;
 
     /**
+     * The first query sent to the AI. This is appended to the URL when the AI chat is opened.
+     */
+    initialQuery: string | null;
+
+    /**
      * Messages in the session.
      */
     messages: AIChatMessage[];
@@ -79,6 +84,7 @@ const globalState = zustand.create<{
             followUpSuggestions: [],
             loading: false,
             error: false,
+            initialQuery: null,
         },
         setState: (fn) => set((state) => ({ state: { ...state.state, ...fn(state.state) } })),
     };
@@ -104,12 +110,12 @@ export function useAIChatController(): AIChatController {
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
-        const { messages } = globalState.getState().state;
+        const { initialQuery } = globalState.getState().state;
         setState((state) => ({ ...state, opened: true }));
 
         // Update search state to show ask mode with first message or current ask value
         setSearchState((prev) => ({
-            ask: prev?.ask ?? messages[0]?.query ?? '',
+            ask: prev?.ask ?? initialQuery ?? '',
             query: prev?.query ?? null,
             global: prev?.global ?? false,
             open: false, // Close search popover when opening chat
@@ -246,6 +252,7 @@ export function useAIChatController(): AIChatController {
             followUpSuggestions: [],
             responseId: null,
             error: false,
+            initialQuery: null,
         }));
 
         // Reset ask parameter to empty string (keeps chat open but clears content)
@@ -257,7 +264,7 @@ export function useAIChatController(): AIChatController {
         }));
     }, [setState, setSearchState]);
 
-    // Auto-trigger AI chat when ?ask= parameter appears in URL
+    // Auto-trigger AI chat when ?ask= parameter appears in URL (only once)
     React.useEffect(() => {
         const hasNoAsk = searchState?.ask === undefined || searchState?.ask === null;
         const hasQuery = searchState?.query !== null;
@@ -269,18 +276,33 @@ export function useAIChatController(): AIChatController {
         // Open the chat when ask parameter appears
         onOpen();
 
-        // Auto-post the first message if ask has content and no messages exist yet
+        // Auto-post the message if ask has content
         if (searchState?.ask?.trim()) {
-            const { messages } = globalState.getState().state;
-            if (
-                // Post new message if it's different from the last user message
-                messages.filter((m) => m.role === AIMessageRole.User).at(-1)?.query !==
-                searchState?.ask?.trim()
-            ) {
-                onPostMessage({ message: searchState.ask.trim() });
-            }
+            const trimmedAsk = searchState.ask.trim();
+            const { loading, initialQuery } = globalState.getState().state;
+
+            // Don't trigger if we're already posting a message
+            if (loading) return;
+
+            // Only initialize once per URL ask value
+            if (initialQuery === trimmedAsk) return;
+
+            // Wait for messageContextRef to be defined before proceeding
+            if (!messageContextRef.current?.location) return;
+
+            // Mark this ask value as processed
+            setState((state) => ({ ...state, initialQuery: trimmedAsk }));
+            onPostMessage({ message: trimmedAsk });
         }
-    }, [searchState?.ask, searchState?.query, searchState?.open, onOpen, onPostMessage]);
+    }, [
+        searchState?.ask,
+        searchState?.query,
+        searchState?.open,
+        messageContextRef,
+        onOpen,
+        setState,
+        onPostMessage,
+    ]);
 
     return React.useMemo(() => {
         return {

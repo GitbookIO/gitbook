@@ -99,7 +99,7 @@ export function PageControlButtons(props: {
                             'bg-yellow-100',
                             'border-yellow-400',
                             'text-yellow-800',
-                            'shadow-sm',
+                            'shadow-xs',
                             'border',
                             'rounded-md',
                             'p-4',
@@ -140,7 +140,7 @@ export function PageControlButtons(props: {
                         'py-2',
                         'bg-slate-100',
                         'rounded-full',
-                        'shadow-sm',
+                        'shadow-xs',
                         'border-slate-300',
                         'border'
                     )}

@@ -23,9 +23,9 @@ import type { TableRecordKV } from './Table';
 import { type VerticalAlignment, getColumnAlignment } from './utils';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
-    'text-left': '[&_*]:text-left text-left',
-    'text-center': '[&_*]:text-center text-center',
-    'text-right': '[&_*]:text-right text-right',
+    'text-left': '**:text-left text-left',
+    'text-center': '**:text-center text-center',
+    'text-right': '**:text-right text-right',
 };
 
 /**
@@ -193,7 +193,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             >
                                 {contentType === 'image' ? (
                                     <Image
-                                        style={['max-h-[1lh]', 'h-[1lh]']}
+                                        style={['max-h-lh', 'h-lh']}
                                         alt={ref.text}
                                         sizes={[{ width: 24 }]}
                                         resize={context.contentContext?.imageResizer}
@@ -314,7 +314,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     className={tcls(
                                         'text-sm',
                                         'whitespace-pre',
-                                        'rounded',
+                                        'rounded-sm',
                                         'py-1',
                                         'px-2',
                                         'bg-primary',

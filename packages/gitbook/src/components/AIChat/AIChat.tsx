@@ -93,6 +93,15 @@ export function AIChatWindow(props: {
             block: 'start',
         });
 
+        const timeout = setTimeout(() => {
+            if (lastUserMessageRef.current) {
+                lastUserMessageRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        }, 100);
+
         // We want the chat messages to scroll underneath the input, but they should scroll past the input when scrolling all the way down.
         // The best way to do this is to observe the input height and adjust the padding bottom of the scroll container accordingly.
         const observer = new ResizeObserver((entries) => {
@@ -103,13 +112,16 @@ export function AIChatWindow(props: {
         if (inputRef.current) {
             observer.observe(inputRef.current);
         }
-        return () => observer.disconnect();
+        return () => {
+            observer.disconnect();
+            clearTimeout(timeout);
+        };
     }, []);
 
     return (
         <div
             data-testid="ai-chat"
-            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enterFromRight lg:pr-4 lg:pl-0 xl:w-96"
+            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
             ref={containerRef}
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
@@ -151,7 +163,6 @@ export function AIChatWindow(props: {
                                     iconOnly
                                     icon="ellipsis"
                                     label={tString(language, 'actions')}
-                                    className="!px-2"
                                     variant="blank"
                                     size="default"
                                 />
@@ -175,7 +186,6 @@ export function AIChatWindow(props: {
                             iconOnly
                             icon="close"
                             label={tString(language, 'close')}
-                            className="!px-2"
                             variant="blank"
                             size="default"
                         />
@@ -190,7 +200,7 @@ export function AIChatWindow(props: {
                 >
                     {isEmpty ? (
                         <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
-                            <div className="flex size-32 animate-fadeIn-slow items-center justify-center rounded-full bg-tint-subtle">
+                            <div className="flex size-32 animate-fade-in-slow items-center justify-center rounded-full bg-tint-subtle">
                                 <AIChatIcon
                                     state="intro"
                                     trademark={trademark}
@@ -219,7 +229,7 @@ export function AIChatWindow(props: {
                 </div>
                 <div
                     ref={inputRef}
-                    className="absolute inset-x-0 bottom-0 mr-2 flex select-none flex-col gap-4 bg-gradient-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
+                    className="absolute inset-x-0 bottom-0 mr-2 flex select-none flex-col gap-4 bg-linear-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
                 >
                     {/* Display an error banner when something went wrong. */}
                     {chat.error ? <AIChatError chatController={chatController} /> : null}
@@ -245,7 +255,7 @@ function AIChatError(props: { chatController: AIChatController }) {
     const { chatController } = props;
 
     return (
-        <div className="flex animate-scaleIn flex-wrap justify-between gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md bg-danger px-3 py-2 text-danger text-sm ring-1 ring-danger">
+        <div className="flex animate-scale-in flex-wrap justify-between gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md bg-danger px-3 py-2 text-danger text-sm ring-1 ring-danger">
             <div className="flex items-center gap-2">
                 <Icon icon="exclamation-triangle" className="size-3.5" />
                 <span className="flex items-center gap-1">{t(language, 'ai_chat_error')}</span>
@@ -259,7 +269,7 @@ function AIChatError(props: { chatController: AIChatController }) {
                     onClick={() => {
                         chatController.clear();
                     }}
-                    className="!text-danger hover:bg-danger-5"
+                    className="text-danger! hover:bg-danger-5"
                 />
             </div>
         </div>

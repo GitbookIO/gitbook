@@ -13,14 +13,14 @@ export function TOCPageIcon({ page }: { page: Pick<RevisionPage, 'emoji' | 'icon
             page={page}
             style={tcls(
                 'text-base',
-                '[.toclink_&]:text-tint-strong/6',
+                'in-[.toclink]:text-tint-strong/6',
                 'group-aria-current-page/toclink:text-primary-subtle',
                 'contrast-more:group-aria-current-page/toclink:text-primary',
 
                 !page.emoji
                     ? [
-                          'theme-gradient:bg-gradient-to-b',
-                          'theme-bold:bg-gradient-to-b',
+                          'theme-gradient:bg-linear-to-b',
+                          'theme-bold:bg-linear-to-b',
                           'theme-gradient:bg-fixed',
                           'theme-bold:bg-fixed',
 
@@ -29,7 +29,7 @@ export function TOCPageIcon({ page }: { page: Pick<RevisionPage, 'emoji' | 'icon
                           'tint:from-tint-7',
                           'tint:to-tint-10',
 
-                          'group-aria-current-page/toclink:bg-none',
+                          'group-aria-current-page/toclink:bg-none!',
                       ]
                     : '',
 

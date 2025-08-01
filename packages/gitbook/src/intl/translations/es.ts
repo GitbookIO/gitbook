@@ -51,6 +51,7 @@ export const es: TranslationLanguage = {
     view: 'Ver',
     edit_on_git: 'Editar en ${1}',
     notfound_title: 'Página no encontrada',
+    notfound_link: 'Este enlace apunta a una página que ha sido eliminada o ya no existe.',
     notfound: 'La página que buscas no existe.',
     unexpected_error_title: 'Ocurrió un error',
     unexpected_error:
@@ -88,7 +89,7 @@ export const es: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site: 'Información proporcionada por el sitio',
     ai_chat_context_previous_messages: 'Mensajes anteriores',
     ai_chat_context_disclaimer: 'Las respuestas de IA pueden contener errores.',
-    ai_chat_input_placeholder: 'Pregunta, busca o realiza una acción...',
+    ai_chat_input_placeholder: 'Pregunta, busca o explica...',
     send: 'Enviar',
     actions: 'Acciones',
     ai_chat_suggested_questions_title: 'Preguntas sugeridas',

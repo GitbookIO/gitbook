@@ -62,9 +62,9 @@ function opacity() {
 const config: Config = {
     darkMode: 'class',
     content: [
-        './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-        './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-        './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/pages/**/*.{js,ts,jsx,tsx,mdx,css}',
+        './src/components/**/*.{js,ts,jsx,tsx,mdx,css}',
+        './src/app/**/*.{js,ts,jsx,tsx,mdx,css}',
     ],
     theme: {
         extend: {
@@ -290,6 +290,18 @@ const config: Config = {
                                 ColorCategory.accents,
                             ]),
                         ],
+                    ])
+                ),
+            },
+            divideColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders]),
                     ])
                 ),
             },
@@ -523,7 +535,7 @@ const config: Config = {
             );
 
             // Variant to target first-of-type in a column
-            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
+            addVariant('column-first-of-type', '.group\\/column > &:first-of-type'); // optional for group-based variants
 
             const customisationVariants = {
                 // Sidebar styles
