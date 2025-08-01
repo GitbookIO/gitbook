@@ -118,8 +118,8 @@
         "zustand": "^5.0.3",
       },
       "devDependencies": {
-        "@argos-ci/playwright": "^5.0.5",
-        "@playwright/test": "^1.51.1",
+        "@argos-ci/playwright": "^5.0.9",
+        "@playwright/test": "^1.54.2",
         "@tailwindcss/postcss": "^4.1.11",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
@@ -263,13 +263,13 @@
 
     "@argos-ci/api-client": ["@argos-ci/api-client@0.8.1", "", { "dependencies": { "debug": "^4.4.0", "openapi-fetch": "0.13.5" } }, "sha512-3IHv7ANSPNO6OwWgwULlHbP9/tFV9kQDu6+nL9jysfPkGj0GgtrOsyBb+iU931c7wSMo1OD+XNujCnRzDD968w=="],
 
-    "@argos-ci/browser": ["@argos-ci/browser@4.1.2", "", {}, "sha512-OljPFzxSNndWSwMBxKGtN3p8lSbt73z+/0CIXbBVTQOPjPMErXWjgtrFL23xqtTq5wdds3uxGv7tjVDWJbgBYg=="],
+    "@argos-ci/browser": ["@argos-ci/browser@4.2.0", "", {}, "sha512-xztv7hMNJyAYw2FXZDm4OCtw+jotJv0BPp5/9dljKrJ0us/2dDEEYKAvVcxzdzRpSe7VOtXSdsoFf0XCCPmxtQ=="],
 
-    "@argos-ci/core": ["@argos-ci/core@3.2.0", "", { "dependencies": { "@argos-ci/api-client": "0.8.1", "@argos-ci/util": "2.3.1", "axios": "^1.8.4", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-wraH5RGFpoU7zcKV2BVi4LvY+5bWR/Ds6OVhUtq3jtd7I3qJRFVFq2IX1TfPPvBBA7wX0OqcrqgIWAQwy+vsoA=="],
+    "@argos-ci/core": ["@argos-ci/core@3.2.1", "", { "dependencies": { "@argos-ci/api-client": "0.8.1", "@argos-ci/util": "2.3.2", "axios": "^1.8.4", "convict": "^6.2.4", "debug": "^4.4.0", "fast-glob": "^3.3.3", "sharp": "^0.33.5", "tmp": "^0.2.3" } }, "sha512-P+tGofNLAtH0+e87M8sZc+juAtbOcnV6z2nA2MwB2OzUVVXGINJHAF2cK0ZUyXC9d8a7RL0+rQWkP4vXDA/gBw=="],
 
-    "@argos-ci/playwright": ["@argos-ci/playwright@5.0.5", "", { "dependencies": { "@argos-ci/browser": "4.1.2", "@argos-ci/core": "3.2.0", "@argos-ci/util": "2.3.1", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-ZqaqptjI8rVUjD2KQzpvI1olFDiiMjgDaIyFOMWo8531cB7CMCwPXDNsFw2psUfsz3a3LP91eH2OrJopmevEkQ=="],
+    "@argos-ci/playwright": ["@argos-ci/playwright@5.0.9", "", { "dependencies": { "@argos-ci/browser": "4.2.0", "@argos-ci/core": "3.2.1", "@argos-ci/util": "2.3.2", "chalk": "^5.4.1", "debug": "^4.4.0" } }, "sha512-FbUPjNVm+Qer9aUU56oGNiPeynqDCh33GOYKekzjikBlxWFZfhiW4NA+sOXF0VWzGb5ni9l1U7fy6ycOTSalAA=="],
 
-    "@argos-ci/util": ["@argos-ci/util@2.3.1", "", {}, "sha512-kE61HU2480fbAnimmA4x9HK45ZJvkoqLdW5GxT5uvwhkclQykVd2S6WfGFUr3JokTXfZ5LZEEfoWgtGA316KSQ=="],
+    "@argos-ci/util": ["@argos-ci/util@2.3.2", "", {}, "sha512-xtNHJxpWYNst/sMNn4Jv/vkODuFsJ+APr4FBeoFUdIa+Izjl4ZFHsYA2PUyu+ygIpQCkof8yZLL9U1/VpiyyIw=="],
 
     "@ast-grep/napi": ["@ast-grep/napi@0.35.0", "", { "optionalDependencies": { "@ast-grep/napi-darwin-arm64": "0.35.0", "@ast-grep/napi-darwin-x64": "0.35.0", "@ast-grep/napi-linux-arm64-gnu": "0.35.0", "@ast-grep/napi-linux-arm64-musl": "0.35.0", "@ast-grep/napi-linux-x64-gnu": "0.35.0", "@ast-grep/napi-linux-x64-musl": "0.35.0", "@ast-grep/napi-win32-arm64-msvc": "0.35.0", "@ast-grep/napi-win32-ia32-msvc": "0.35.0", "@ast-grep/napi-win32-x64-msvc": "0.35.0" } }, "sha512-3ucaaSxV6fxXoqHrE/rxAvP1THnDdY5jNzGlnvx+JvnY9C/dSRKc0jlRMRz59N3El572+/yNRUUpAV1T9aBJug=="],
 
@@ -799,7 +799,7 @@
 
     "@pkgjs/parseargs": ["@pkgjs/parseargs@0.11.0", "", {}, "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="],
 
-    "@playwright/test": ["@playwright/test@1.51.1", "", { "dependencies": { "playwright": "1.51.1" }, "bin": { "playwright": "cli.js" } }, "sha512-nM+kEaTSAoVlXmMPH10017vn3FSiFqr/bh4fKg9vmAdMfd9SDqRZNvPSiAHADc/itWak+qPvMPZQOPwCBW7k7Q=="],
+    "@playwright/test": ["@playwright/test@1.54.2", "", { "dependencies": { "playwright": "1.54.2" }, "bin": { "playwright": "cli.js" } }, "sha512-A+znathYxPf+72riFd1r1ovOLqsIIB0jKIoPjyK2kqEIe30/6jF6BC7QNluHuwUmsD2tv1XZVugN8GqfTMOxsA=="],
 
     "@popperjs/core": ["@popperjs/core@2.11.8", "", {}, "sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A=="],
 
@@ -3723,6 +3723,8 @@
 
     "@opennextjs/aws/path-to-regexp": ["path-to-regexp@6.3.0", "", {}, "sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ=="],
 
+    "@playwright/test/playwright": ["playwright@1.54.2", "", { "dependencies": { "playwright-core": "1.54.2" }, "optionalDependencies": { "fsevents": "2.3.2" }, "bin": { "playwright": "cli.js" } }, "sha512-Hu/BMoA1NAdRUuulyvQC0pEqZ4vQbGfn8f7wPXcnqQmM+zct9UliKxsIkLNmz/ku7LElUNqmaiv1TG/aL5ACsw=="],
+
     "@radix-ui/react-collection/@radix-ui/react-compose-refs": ["@radix-ui/react-compose-refs@1.1.1", "", { "peerDependencies": { "@types/react": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react"] }, "sha512-Y9VzoRDSJtgFMUCoiZBDVo084VQ5hfpXxVE+NgkdNsjiDBByiImMZKKhxMwCbdHvhlENG6a833CbFkOQvTricw=="],
 
     "@radix-ui/react-collection/@radix-ui/react-primitive": ["@radix-ui/react-primitive@2.0.1", "", { "dependencies": { "@radix-ui/react-slot": "1.1.1" }, "peerDependencies": { "@types/react": "*", "@types/react-dom": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc", "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react", "@types/react-dom"] }, "sha512-sHCWTtxwNn3L3fH8qAfnF3WbUZycW93SM1j3NFDzXBiz8D6F5UTTy8G1+WFEaiCdvCVRJWj6N2R4Xq6HdiHmDg=="],
@@ -4892,6 +4894,8 @@
     "@node-minify/core/glob/minipass": ["minipass@4.2.8", "", {}, "sha512-fNzuVyifolSLFL4NzpF+wEF4qrgqaaKX0haXPQEdQ7NKAN+WecoKMHV09YcuL/DHxrUsYQOK3MiuDf7Ip2OXfQ=="],
 
     "@node-minify/core/glob/path-scurry": ["path-scurry@1.11.1", "", { "dependencies": { "lru-cache": "^10.2.0", "minipass": "^5.0.0 || ^6.0.2 || ^7.0.0" } }, "sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA=="],
+
+    "@playwright/test/playwright/playwright-core": ["playwright-core@1.54.2", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-n5r4HFbMmWsB4twG7tJLDN9gmBUeSPcsBZiWSE4DnYz9mJMAFqr2ID7+eGC9kpEnxExJ1epttwR59LEWCk8mtA=="],
 
     "@radix-ui/react-dismissable-layer/@radix-ui/react-primitive/@radix-ui/react-slot": ["@radix-ui/react-slot@1.1.1", "", { "dependencies": { "@radix-ui/react-compose-refs": "1.1.1" }, "peerDependencies": { "@types/react": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react"] }, "sha512-RApLLOcINYJA+dMVbOju7MYv1Mb2EBp2nH4HdDzXTSyaR5optlm6Otrz1euW3HbdOR8UmmFK06TD+A9frYWv+g=="],
 
