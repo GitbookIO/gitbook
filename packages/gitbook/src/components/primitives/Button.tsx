@@ -190,7 +190,7 @@ export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonProps>(({ chil
         <div
             ref={ref}
             className={tcls(
-                '*:!transform-none *:!shadow-none flex h-fit items-stretch justify-start',
+                'flex h-fit items-stretch justify-start *:translate-y-0! *:shadow-none!',
                 '[&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
             )}
         >
