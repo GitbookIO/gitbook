@@ -11,6 +11,7 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@/lib/images';
+import { tcls } from '@/lib/tailwind';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
@@ -70,7 +71,14 @@ export async function SitePage(props: SitePageProps) {
                 <PageCover as="full" page={page} cover={page.cover} context={context} />
             ) : null}
             {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-            <div className="flex grow flex-row-reverse justify-end">
+            <div
+                className={tcls(
+                    'flex grow flex-row-reverse justify-end',
+                    withSections
+                        ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
+                        : '[--content-scroll-margin:calc(var(--spacing)*16)]'
+                )}
+            >
                 <PageAside
                     page={page}
                     document={document}
@@ -88,7 +96,7 @@ export async function SitePage(props: SitePageProps) {
                 />
             </div>
             <React.Suspense fallback={null}>
-                <PageClientLayout withSections={withSections} />
+                <PageClientLayout />
             </React.Suspense>
         </PageContextProvider>
     );

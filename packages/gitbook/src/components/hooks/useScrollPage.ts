@@ -10,16 +10,13 @@ import { useHash } from './useHash';
  * to the top of the page when navigating between pages (pathname)
  * or sections of a page (hash).
  */
-export function useScrollPage(props: { scrollMarginTop?: number }) {
+export function useScrollPage() {
     const hash = useHash();
     const pathname = usePathname();
     React.useLayoutEffect(() => {
         if (hash) {
             const element = document.getElementById(hash);
             if (element) {
-                if (props.scrollMarginTop) {
-                    element.style.scrollMarginTop = `${props.scrollMarginTop}px`;
-                }
                 element.scrollIntoView({
                     block: 'start',
                     behavior: 'smooth',
@@ -36,5 +33,5 @@ export function useScrollPage(props: { scrollMarginTop?: number }) {
                 }
             }
         };
-    }, [hash, pathname, props.scrollMarginTop]);
+    }, [hash, pathname]);
 }

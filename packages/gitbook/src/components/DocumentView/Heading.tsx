@@ -26,7 +26,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 'heading',
                 'flex',
                 'items-baseline',
-                'scroll-m-12',
+                'scroll-mt-(--content-scroll-margin)',
                 getTextAlignment(block.data.align),
                 hashLinkButtonWrapperStyles,
                 style,
