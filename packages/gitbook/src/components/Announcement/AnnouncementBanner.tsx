@@ -7,7 +7,7 @@ import { tcls } from '@/lib/tailwind';
 import { type CustomizationAnnouncement, SiteInsightsLinkPosition } from '@gitbook/api';
 import { Icon, type IconName } from '@gitbook/icons';
 import { CONTAINER_STYLE } from '../layout';
-import { Link } from '../primitives';
+import { Button, Link } from '../primitives';
 import { LinkStyles } from '../primitives/styles';
 import { ANNOUNCEMENT_CSS_CLASS, ANNOUNCEMENT_STORAGE_KEY } from './constants';
 
@@ -86,14 +86,15 @@ export function AnnouncementBanner(props: {
                             </div>
                         </Tag>
                         {closeable ? (
-                            <button
-                                className={`absolute top-0 right-4 mt-2 mr-2 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
-                                type="button"
+                            <Button
+                                iconOnly
+                                icon="close"
+                                label={tString(language, 'close')}
+                                variant="blank"
+                                size="default"
                                 onClick={dismissAnnouncement}
-                                title={tString(language, 'close')}
-                            >
-                                <Icon icon="close" className="size-4" />
-                            </button>
+                                className={`absolute top-0 right-4 mt-2 mr-2 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
+                            />
                         ) : null}
                     </div>
                 </div>
