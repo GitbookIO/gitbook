@@ -66,9 +66,9 @@ export async function middleware(request: NextRequest) {
 async function validateServerActionRequest(request: NextRequest) {
     // First thing we need to do is validate that the header is in a correct format.
     if (request.headers.has('next-action')) {
-        // A server action id is a 1byte hex string followed by a 20 bytes SHA1 hash
+        // A server action id is a 1-byte hex string (2 chars) followed by a 20-byte SHA1 hash (40 chars) = 42 total characters.
         // For ref https://github.com/vercel/next.js/blob/db561cb924cbea0f3384e89f251fc443a8aec1ae/crates/next-custom-transforms/src/transforms/server_actions.rs#L266-L268
-        const regex = /^[a-f0-9]{42}$/;
+        const regex = /^[a-fA-F0-9]{42}$/;
         const match = request.headers.get('next-action')?.match(regex);
         if (!match) {
             return new Response('Invalid request', {
