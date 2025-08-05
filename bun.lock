@@ -48,7 +48,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.14.1",
+      "version": "0.15.0",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/cache-tags": "workspace:*",
@@ -146,7 +146,7 @@
     },
     "packages/icons": {
       "name": "@gitbook/icons",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js",
       },
@@ -166,7 +166,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "2.2.2",
+      "version": "3.0.0",
       "dependencies": {
         "@scalar/openapi-parser": "^0.18.0",
         "@scalar/openapi-types": "^0.1.9",
@@ -181,7 +181,7 @@
     },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
-      "version": "0.7.2",
+      "version": "0.7.3",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*",
@@ -196,7 +196,7 @@
     },
     "packages/react-math": {
       "name": "@gitbook/react-math",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "bin": {
         "gitbook-math": "./bin/gitbook-math.js",
       },
@@ -213,7 +213,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.3.4",
+      "version": "1.3.5",
       "dependencies": {
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.3.16",
