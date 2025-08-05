@@ -1,5 +1,31 @@
 # gitbook
 
+## 0.15.0
+
+### Minor Changes
+
+- d130532: Suggest questions in the current space context
+
+### Patch Changes
+
+- 44f4151: Fix close buttons tooltips
+- d903273: Strip visitor params from URL
+- df7de8f: Fix an issue where links were not rendering properly in Ask AI answers
+- d270b4a: All tracking is now disabled for dynamic routes such as the site preview.
+- b1f608b: Implement basic URL scheme for assistant with ask
+- d024658: Prevent page breaks inside blocks when printing
+- 185cdb4: Fix scrolling to anchor positionning
+- 5c49235: Remove highlighting in Safari for PowerShell and C++ to avoid page crash until next version with bug fix is released
+- f1a6dec: Update OpenAPI parser
+- 2cdba53: Upgrade to Tailwind v4
+- Updated dependencies [2cdba53]
+- Updated dependencies [f1a6dec]
+  - @gitbook/react-math@0.6.1
+  - @gitbook/icons@0.2.2
+  - @gitbook/openapi-parser@3.0.0
+  - @gitbook/react-contentkit@0.7.3
+  - @gitbook/react-openapi@1.3.5
+
 ## 0.14.1
 
 ### Patch Changes
