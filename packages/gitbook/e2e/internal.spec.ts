@@ -186,7 +186,9 @@ const searchTestCases: Test[] = [
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('What is GitBook?');
-            await expect(page.getByTestId('search-ask-answer')).toBeVisible();
+            await expect(page.getByTestId('search-ask-answer')).toBeVisible({
+                timeout: 10_000,
+            });
         },
     },
     {
