@@ -21,9 +21,10 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
-    normalizeVisitorAuthURL,
+    normalizeVisitorURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
+import { cookies } from 'next/headers';
 import type { SiteURLData } from './lib/context';
 export const config = {
     matcher: [
@@ -141,6 +142,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         url: siteRequestURL,
     });
 
+    //
+    // Strip the tracking header to prevent users providing it themselves.
+    //
+    request.headers.delete('x-gitbook-disable-tracking');
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
@@ -215,13 +221,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             incomingURL.search = requestURL.search;
         }
         //
-        // Make sure the URL is clean of any va token after a successful lookup
-        // The token is stored in a cookie that is set on the redirect response
+        // Make sure the URL is clean of any va token after a successful lookup,
+        // and of any visitor.* params that may have been passed to the URL.
         //
-        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
-        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
+        // The token and the visitor.* params value are stored in cookies that are set
+        // on the redirect response.
+        //
+        const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
+        if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(incomingURLWithoutToken.toString()),
+                NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
             );
         }
@@ -249,6 +258,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             shareKey: siteURLData.shareKey,
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
+            contextId: siteURLData.contextId,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -328,11 +338,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
+        // Vercel already set this header, this is needed in OpenNext.
+        if (siteURLData.contextId) {
+            response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
+        }
+
         return writeResponseCookies(response, cookies);
     };
 
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {
+        // Do not track page views for preview requests
+        request.headers.set('x-gitbook-disable-tracking', 'true');
+
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
             `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
@@ -530,9 +549,16 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
 /**
  * Write the cookies to a response.
  */
-function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
-    cookies.forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value, cookie.options);
+async function writeResponseCookies<R extends NextResponse>(
+    response: R,
+    cookiesToSet: ResponseCookies
+): Promise<R> {
+    const cookiesFn = await cookies();
+    cookiesToSet.forEach((cookie) => {
+        // response.cookies.set(cookie.name, cookie.value, cookie.options);
+        // For some reason we have to use the cookies function instead of response.cookies.set
+        // Without it, it breaks the ai assistant server actions (it thinks it is a static route).
+        cookiesFn.set(cookie.name, cookie.value, cookie.options);
     });
 
     return response;

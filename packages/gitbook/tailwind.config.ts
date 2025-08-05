@@ -62,9 +62,9 @@ function opacity() {
 const config: Config = {
     darkMode: 'class',
     content: [
-        './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-        './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-        './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/pages/**/*.{js,ts,jsx,tsx,mdx,css}',
+        './src/components/**/*.{js,ts,jsx,tsx,mdx,css}',
+        './src/app/**/*.{js,ts,jsx,tsx,mdx,css}',
     ],
     theme: {
         extend: {
@@ -293,15 +293,33 @@ const config: Config = {
                     ])
                 ),
             },
+            divideColor: {
+                primary: generateVarShades('primary', [ColorCategory.borders]),
+                tint: generateVarShades('tint', [ColorCategory.borders]),
+                neutral: generateVarShades('neutral', [ColorCategory.borders]),
+
+                ...Object.fromEntries(
+                    semanticColors.map((color) => [
+                        color,
+                        generateVarShades(color, [ColorCategory.borders]),
+                    ])
+                ),
+            },
             transitionTimingFunction: {
                 quint: 'cubic-bezier(0.83, 0, 0.17, 1)',
             },
             animation: {
                 present: 'present 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+                'present-slow': 'present 500ms cubic-bezier(0.25, 1, 0.5, 1) both',
                 scaleIn: 'scaleIn 200ms ease both',
+                'scaleIn-slow': 'scaleIn 500ms ease both',
                 scaleOut: 'scaleOut 200ms ease both',
+                'scaleOut-slow': 'scaleOut 500ms ease both',
                 fadeIn: 'fadeIn 200ms ease both',
+                'fadeIn-slow': 'fadeIn 500ms ease both',
                 fadeOut: 'fadeOut 200ms ease both',
+                'fadeOut-slow': 'fadeOut 500ms ease both',
+
                 enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
@@ -517,7 +535,7 @@ const config: Config = {
             );
 
             // Variant to target first-of-type in a column
-            addVariant('column-first-of-type', ':merge(.group\\/column) > &:first-of-type'); // optional for group-based variants
+            addVariant('column-first-of-type', '.group\\/column > &:first-of-type'); // optional for group-based variants
 
             const customisationVariants = {
                 // Sidebar styles

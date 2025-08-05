@@ -34,6 +34,8 @@ export type RenderedInline = {
     body: React.ReactNode;
 };
 
+const isSafari =
+    typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const theme = createCssVariablesTheme();
 
 const { getSingletonHighlighter } = createSingletonShorthands(
@@ -65,8 +67,13 @@ export async function highlight(
     inlines: RenderedInline[]
 ): Promise<HighlightLine[]> {
     const langName = getBlockLang(block);
-    if (!langName) {
-        // Language not found, fallback to plain highlighting
+
+    if (!langName || (isSafari && ['powershell', 'cpp'].includes(langName))) {
+        // Fallback to plain highlighting if
+        // - language is not found
+        // - TEMP : language is PowerShell or C++ and browser is Safari:
+        //   RegExp#[Symbol.search] throws TypeError when `lastIndex` isn’t writable
+        //   Fixed in upcoming Safari 18.6, remove when it'll be released - RND-7772
         return plainHighlight(block, inlines);
     }
 

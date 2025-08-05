@@ -26,7 +26,7 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
                 'heading',
                 'flex',
                 'items-baseline',
-                'scroll-m-12',
+                'scroll-mt-(--content-scroll-margin)',
                 getTextAlignment(block.data.align),
                 hashLinkButtonWrapperStyles,
                 style,
@@ -44,8 +44,10 @@ export function Heading(props: BlockProps<DocumentBlockHeading>) {
             <div
                 className={tcls(
                     'flex-1',
-                    'z-[1]',
+                    'z-1',
                     'justify-self-start',
+                    'max-w-full',
+                    'break-words',
                     getTextAlignment(block.data.align),
                     textStyle.lineHeight
                 )}

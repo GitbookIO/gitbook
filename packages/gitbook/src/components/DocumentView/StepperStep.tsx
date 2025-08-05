@@ -24,6 +24,8 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
                 return '-mt-9';
             case 'heading-2':
                 return '-mt-[calc(1.25rem+1px)]';
+            case 'heading-3':
+                return '-mt-[calc(0.50rem+1px)]';
             default:
                 return '';
         }
@@ -40,7 +42,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
                 >
                     {index + 1}
                 </div>
-                <div className="can-override-bg absolute top-9 bottom-2 left-[0.875rem] w-px bg-primary-7 theme-muted:bg-primary-subtle" />
+                <div className="can-override-bg absolute top-9 bottom-2 left-3.5 w-px bg-primary-7 theme-muted:bg-primary-subtle" />
             </div>
             <Blocks
                 {...contextProps}

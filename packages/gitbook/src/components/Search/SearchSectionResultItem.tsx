@@ -23,6 +23,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
             size="small"
             active={active}
             action={tString(language, 'view')}
+            data-testid="search-page-section-result"
             insights={{
                 type: 'search_open_result',
                 query,
@@ -49,7 +50,7 @@ function highlightQueryInBody(body: string, query: string) {
 
     // Ensure the query to be highlighted is visible in the body.
     return (
-        <p className="relative line-clamp-3 text-sm [overflow-wrap:anywhere]">
+        <p className="wrap-anywhere relative line-clamp-3 text-sm">
             <HighlightQuery query={query} text={idx < 20 ? body : `...${body.slice(idx - 10)}`} />
         </p>
     );

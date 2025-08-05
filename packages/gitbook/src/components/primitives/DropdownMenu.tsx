@@ -82,11 +82,11 @@ export function DropdownMenu(props: {
                         onMouseLeave={() => setHovered(false)}
                         align={align}
                         side={side}
-                        className="z-40 animate-scaleIn border-tint pt-2"
+                        className="z-40 animate-scale-in border-tint pt-2"
                     >
                         <div
                             className={tcls(
-                                'flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
+                                'flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
                                 className
                             )}
                         >
@@ -153,11 +153,11 @@ export function DropdownMenuItem(
     const { children, active = false, href, className, insights, target, ...rest } = props;
 
     const itemClassName = tcls(
-        'rounded straight-corners:rounded-sm circular-corners:rounded-lg px-3 py-1 text-sm flex gap-2 items-center',
+        'rounded-xs straight-corners:rounded-xs circular-corners:rounded-lg px-3 py-1 text-sm flex gap-2 items-center',
         active
-            ? 'bg-primary text-primary-strong data-[highlighted]:bg-primary-hover'
-            : 'data-[highlighted]:bg-tint-hover',
-        'focus:outline-none',
+            ? 'bg-primary text-primary-strong data-highlighted:bg-primary-hover'
+            : 'data-highlighted:bg-tint-hover',
+        'focus:outline-hidden',
         props.disabled ? 'opacity-7 cursor-not-allowed' : 'cursor-pointer',
         className
     );
@@ -184,7 +184,7 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
 
     return (
         <RadixDropdownMenu.Sub>
-            <RadixDropdownMenu.SubTrigger className="flex cursor-pointer items-center justify-between rounded straight-corners:rounded-sm px-3 py-1 text-sm focus:outline-none data-[highlighted]:bg-tint-hover">
+            <RadixDropdownMenu.SubTrigger className="flex cursor-pointer items-center justify-between rounded-sm straight-corners:rounded-xs px-3 py-1 text-sm focus:outline-hidden data-highlighted:bg-tint-hover">
                 {label}
                 <Icon icon="chevron-right" className="size-3 shrink-0 opacity-6" />
             </RadixDropdownMenu.SubTrigger>
@@ -194,12 +194,21 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
                     collisionPadding={8}
                     className="z-40 animate-present"
                 >
-                    <div className="flex max-h-80 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
+                    <div className="flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
                         {children}
                     </div>
                 </RadixDropdownMenu.SubContent>
             </RadixDropdownMenu.Portal>
         </RadixDropdownMenu.Sub>
+    );
+}
+
+export function DropdownMenuSeparator(props: { className?: ClassValue }) {
+    const { className } = props;
+    return (
+        <RadixDropdownMenu.Separator
+            className={tcls('my-1 h-px w-full border-tint-subtle border-t', className)}
+        />
     );
 }
 

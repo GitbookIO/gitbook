@@ -9,12 +9,11 @@ import { AdminToolbar } from '@/components/AdminToolbar';
 import { CookiesToast } from '@/components/Cookies';
 import { LoadIntegrations } from '@/components/Integrations';
 import { SpaceLayout } from '@/components/SpaceLayout';
-import { buildVersion } from '@/lib/build';
-import { isSiteIndexable } from '@/lib/seo';
-
 import type { VisitorAuthClaims } from '@/lib/adaptive';
+import { buildVersion } from '@/lib/build';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
+import { isSiteIndexable } from '@/lib/seo';
 import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 
@@ -31,7 +30,9 @@ export async function SiteLayout(props: {
 }) {
     const { context, nonce, forcedTheme, withTracking, visitorAuthClaims, children } = props;
 
-    const { scripts, customization } = context;
+    const { customization } = context;
+    // Scripts are disabled when tracking is disabled
+    const scripts = withTracking ? context.scripts : [];
 
     ReactDOM.preconnect(GITBOOK_API_PUBLIC_URL);
     ReactDOM.preconnect(GITBOOK_ICONS_URL);
@@ -50,6 +51,7 @@ export async function SiteLayout(props: {
         <NuqsAdapter>
             <ClientContexts
                 nonce={nonce}
+                contextId={context.contextId}
                 forcedTheme={
                     forcedTheme ??
                     (customization.themes.toggeable ? undefined : customization.themes.default)

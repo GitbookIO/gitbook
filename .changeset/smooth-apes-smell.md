@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Add fullwidth page option
+Update OpenAPI parser

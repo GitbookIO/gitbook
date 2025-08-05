@@ -8,6 +8,7 @@ import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
 import { CustomizationAIMode } from '@gitbook/api';
+import { assert } from 'ts-essentials';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -33,9 +34,11 @@ type ResultType =
 
 /**
  * We cache the recommended questions globally to avoid calling the API multiple times
- * when re-opening the search modal.
+ * when re-opening the search modal. The cache is per space, so that we can
+ * have different recommended questions for different spaces of the same site.
+ * It should not be used outside of an useEffect.
  */
-let cachedRecommendedQuestions: null | ResultType[] = null;
+const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
 
 /**
  * Fetch the results of the keyboard navigable elements to display for a query:
@@ -49,10 +52,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         query: string;
         global: boolean;
         aiMode: CustomizationAIMode;
+        spaceId: string;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, aiMode, global } = props;
+    const { children, query, aiMode, global, spaceId } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -73,8 +77,10 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 return;
             }
 
-            if (cachedRecommendedQuestions) {
-                setResultsState({ results: cachedRecommendedQuestions, fetching: false });
+            if (cachedRecommendedQuestions.has(spaceId)) {
+                const results = cachedRecommendedQuestions.get(spaceId);
+                assert(results, `Cached recommended questions should be set for space ${spaceId}`);
+                setResultsState({ results, fetching: false });
                 return;
             }
 
@@ -92,7 +98,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     return;
                 }
 
-                const response = await streamRecommendedQuestions();
+                const response = await streamRecommendedQuestions(spaceId);
                 for await (const entry of readStreamableValue(response.stream)) {
                     if (!entry) {
                         continue;
@@ -109,7 +115,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                         id: question,
                         question,
                     });
-                    cachedRecommendedQuestions = recommendedQuestions;
+                    cachedRecommendedQuestions.set(spaceId, recommendedQuestions);
 
                     if (!cancelled) {
                         setResultsState({ results: [...recommendedQuestions], fetching: false });

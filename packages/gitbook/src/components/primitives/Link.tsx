@@ -123,11 +123,15 @@ export const Link = React.forwardRef(function Link(
         );
     }
 
+    // Not sure why yet, but it seems necessary to force prefetch to true
+    // default behavior doesn't seem to properly use the client router cache.
+    const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
+
     return (
         <NextLink
             ref={ref}
             href={href}
-            prefetch={prefetch}
+            prefetch={_prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
             onClick={onClick}

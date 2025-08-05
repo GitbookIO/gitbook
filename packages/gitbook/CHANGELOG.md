@@ -1,5 +1,22 @@
 # gitbook
 
+## 0.14.1
+
+### Patch Changes
+
+- 7c951ef: 'Support new colors in text formatting
+- 39c4f76: Add fullwidth page option
+- eb1bd3a: AI response feedback buttons
+- 2ba7e54: Fix headings styles in hint block
+- 250c194: Add nosnippet to announcement banner.
+- 4aeb81b: Fix search input styling & text cutoff
+- 68f0dbc: Add confirmation modal to contentkit button
+- 611e286: Remove padding on first Heading in Columns
+- b0c534f: Tweaks to AI Chat and AI Actions Dropdown
+- Updated dependencies [b5ad0ce]
+  - @gitbook/openapi-parser@2.2.2
+  - @gitbook/react-openapi@1.3.4
+
 ## 0.14.0
 
 ### Minor Changes

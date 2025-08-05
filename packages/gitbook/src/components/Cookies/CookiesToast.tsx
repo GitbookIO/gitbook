@@ -1,6 +1,4 @@
 'use client';
-
-import { Icon } from '@gitbook/icons';
 import * as React from 'react';
 
 import { Button, StyledLink } from '@/components/primitives';
@@ -45,7 +43,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'fixed',
                 'z-10',
                 'bg-tint-base',
-                'rounded',
+                'rounded-sm',
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-2xl',
                 'ring-1',
@@ -61,7 +59,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'text-balance',
                 'sm:left-auto',
                 'lg:chat-open:mr-80',
-                'xl:chat-open:mr-[25rem]',
+                'xl:chat-open:mr-100',
                 'transition-all',
                 'duration-300'
             )}
@@ -75,27 +73,14 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                     </StyledLink>
                 )}
             </p>
-            <button
-                type="button"
+            <Button
+                iconOnly
+                icon="close"
+                label={tString(language, 'close')}
+                variant="blank"
                 onClick={() => setShow(false)}
-                aria-label={tString(language, 'close')}
-                className={tcls(
-                    'absolute',
-                    'top-3',
-                    'right-3',
-                    'w-6',
-                    'h-6',
-                    'flex',
-                    'justify-center',
-                    'items-center',
-                    'rounded-sm',
-                    'circular-corners:rounded-full',
-                    'hover:bg-tint-hover'
-                )}
-                title={tString(language, 'close')}
-            >
-                <Icon icon="xmark" className={tcls('size-4')} />
-            </button>
+                className={tcls('absolute', 'top-2', 'right-2', 'hover:bg-tint-hover')}
+            />
             <div className={tcls('mt-3', 'flex', 'flex-row', 'gap-2')}>
                 <Button
                     variant="primary"

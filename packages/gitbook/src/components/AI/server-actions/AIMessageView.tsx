@@ -23,7 +23,7 @@ export function AIMessageView(
                     <div
                         key={index}
                         className={tcls(
-                            'flex animate-[fadeIn_500ms_both] flex-col gap-2',
+                            'flex animate-fade-in-slow flex-col gap-2',
                             step.content.nodes.length > 0 ? 'has-content' : ''
                         )}
                     >

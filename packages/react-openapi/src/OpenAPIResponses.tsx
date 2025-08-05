@@ -9,7 +9,12 @@ import { useResponseExamplesState } from './OpenAPIResponseExampleContent';
 import { StaticSection } from './StaticSection';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import { createStateKey, getStatusCodeClassName, getStatusCodeDefaultLabel } from './utils';
+import {
+    createStateKey,
+    getStatusCodeClassName,
+    getStatusCodeDefaultLabel,
+    resolveDescription,
+} from './utils';
 
 /**
  * Display an interactive response body.
@@ -58,7 +63,7 @@ export function OpenAPIResponses(props: {
                 }));
             })();
 
-            const description = response.description;
+            const description = resolveDescription(response);
 
             return {
                 key: statusCode,
