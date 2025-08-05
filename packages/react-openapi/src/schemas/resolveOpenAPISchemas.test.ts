@@ -6,7 +6,7 @@ import { resolveOpenAPISchemas } from './resolveOpenAPISchemas';
 async function fetchFilesystem(url: string) {
     const response = await fetch(url);
     const text = await response.text();
-    const filesystem = await parseOpenAPI({ value: text, rootURL: url });
+    const { filesystem } = await parseOpenAPI({ value: text, rootURL: url });
     const transformedFs = await traverse(filesystem, async (node) => {
         if ('description' in node && typeof node.description === 'string' && node.description) {
             node['x-gitbook-description-html'] = node.description;

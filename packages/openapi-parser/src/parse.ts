@@ -1,5 +1,6 @@
-import type { AnyObject, bundle } from '@scalar/openapi-parser';
+import type { AnyObject, ErrorObject, bundle } from '@scalar/openapi-parser';
 import { OpenAPIParseError } from './error';
+import type { Filesystem, OpenAPIV3xDocument } from './types';
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';
 import { parseOpenAPIV3 } from './v3';
 
@@ -15,15 +16,23 @@ export interface ParseOpenAPIInput {
      */
     rootURL: string | null;
     /**
-     * Trust the input. This will skip advanced validation.
-     */
-    trust?: boolean;
-    /**
      * Options for the parser.
      */
     options?: {
         plugins?: ParsePlugin[];
     };
+}
+
+export interface ParseOpenAPIResult {
+    /**
+     * Informational errors that were found while parsing the OpenAPI document.
+     */
+    errors: ErrorObject[];
+
+    /**
+     * The parsed OpenAPI document.
+     */
+    filesystem: Filesystem<OpenAPIV3xDocument>;
 }
 
 /**
