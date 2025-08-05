@@ -132,9 +132,10 @@ export async function serveResizedImage(
  * It means that dpr may not be respected for avif/webp formats, but it will also improve the cache hit ratio.
  */
 function chooseDPR(longestEdgeValue: number, maxAllowedSize: number, wantedDpr?: number): number {
-    const dpr = Math.floor(maxAllowedSize / longestEdgeValue);
-    const maxDpr = Math.min(wantedDpr ?? 1, 3); // Limit to a maximum of 3
-    return Math.min(Math.max(dpr, 1), maxDpr);
+    const maxDprBySize = Math.floor(maxAllowedSize / longestEdgeValue);
+    const clampedDpr = Math.min(wantedDpr ?? 1, 3); // Limit to a maximum of 3, default to 1 if not specified
+    // Ensure that the DPR is within the allowed range
+    return Math.max(1, Math.min(maxDprBySize, clampedDpr));
 }
 
 /**
