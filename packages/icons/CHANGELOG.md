@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.2.2
+
+### Patch Changes
+
+- 2cdba53: Upgrade to Tailwind v4
+
 ## 0.2.1
 
 ### Patch Changes

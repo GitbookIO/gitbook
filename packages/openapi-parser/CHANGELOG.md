@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.0
+
+### Major Changes
+
+- f1a6dec: Less strict OpenAPI parser, now returns { errors, filesystem }
+
 ## 2.2.2
 
 ### Patch Changes
