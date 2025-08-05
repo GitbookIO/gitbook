@@ -7,7 +7,7 @@ const spec = await Bun.file(new URL('./fixtures/multiline-spec.yaml', import.met
 
 describe('#enrichFilesystem', () => {
     it('supports multiline descriptions', async () => {
-        const filesystem = await parseOpenAPI({
+        const { filesystem } = await parseOpenAPI({
             value: spec,
             rootURL: null,
         });
