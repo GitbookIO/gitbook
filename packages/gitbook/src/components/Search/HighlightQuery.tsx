@@ -15,6 +15,8 @@ export function HighlightQuery(props: {
         query,
         text,
         highlight = [
+            '-z-1',
+            'relative',
             'text-bold',
             'bg-primary',
             'text-contrast-primary',
@@ -33,7 +35,7 @@ export function HighlightQuery(props: {
     const matches = matchString(text, query);
 
     return (
-        <span className={tcls('whitespace-break-spaces')}>
+        <span className={tcls('relative z-2 whitespace-break-spaces')}>
             {matches.map((entry, index) => (
                 <span key={index} className={tcls(entry.match ? highlight : null)}>
                     {entry.text}
