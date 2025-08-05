@@ -6,7 +6,7 @@ export const ru = {
     switch_to_light_theme: 'Переключиться на светлую тему',
     switch_to_system_theme: 'Переключиться на системную тему',
     search: 'Поиск',
-    search_or_ask: 'Спросить или найти',
+    search_or_ask: 'Найти или спросить',
     search_input_placeholder: 'Поиск по содержимому',
     search_ask_input_placeholder: 'Найти в содержимом или задать вопрос',
     search_no_results_for: 'Нет результатов для "${1}".',
@@ -103,7 +103,7 @@ export const ru = {
     copy_page_markdown: 'Скопировать страницу как Markdown для LLM',
     copy_page: 'Скопировать страницу',
     view_page_markdown: 'Посмотреть как Markdown',
-    view_page_plaintext: 'Посмотреть как plain text',
+    view_page_plaintext: 'Посмотреть как текст без форматирования',
     open_in: 'Открыть в ${1}',
     open_in_llms_pre_prompt: 'Прочитай ${1} и ответь на вопросы о содержимом.',
 };
