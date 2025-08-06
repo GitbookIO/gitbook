@@ -101,6 +101,15 @@ export interface GitBookDataFetcher {
     }): Promise<DataFetcherResponse<api.JSONDocument>>;
 
     /**
+     * Get the document of a reusable content by its space ID and reusable content ID.
+     */
+    getRevisionReusableContentDocument(params: {
+        spaceId: string;
+        revisionId: string;
+        reusableContentId: string;
+    }): Promise<DataFetcherResponse<api.JSONDocument>>;
+
+    /**
      * Get a document by its space ID and document ID.
      */
     getDocument(params: { spaceId: string; documentId: string }): Promise<
