@@ -8,7 +8,7 @@ import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
 import { useTrackEvent } from '../Insights';
-import { Button } from '../primitives';
+import { Button, ButtonGroup } from '../primitives';
 
 const MAX_COMMENT_LENGTH = 512;
 
@@ -61,31 +61,29 @@ export function PageFeedbackForm(props: {
         <div className={tcls('flex flex-col gap-3 text-sm', className)}>
             <div className="flex flex-wrap items-center gap-2">
                 <p>{t(languages, 'was_this_helpful')}</p>
-                <div className="rounded-full border border-tint-subtle bg-tint-base contrast-more:border-tint-12">
-                    <div className="flex">
-                        <RatingButton
-                            rating={PageFeedbackRating.Good}
-                            label={tString(languages, 'was_this_helpful_positive')}
-                            onClick={() => onSubmitRating(PageFeedbackRating.Good)}
-                            active={rating === PageFeedbackRating.Good}
-                            disabled={rating !== undefined}
-                        />
-                        <RatingButton
-                            rating={PageFeedbackRating.Ok}
-                            label={tString(languages, 'was_this_helpful_neutral')}
-                            onClick={() => onSubmitRating(PageFeedbackRating.Ok)}
-                            active={rating === PageFeedbackRating.Ok}
-                            disabled={rating !== undefined}
-                        />
-                        <RatingButton
-                            rating={PageFeedbackRating.Bad}
-                            label={tString(languages, 'was_this_helpful_negative')}
-                            onClick={() => onSubmitRating(PageFeedbackRating.Bad)}
-                            active={rating === PageFeedbackRating.Bad}
-                            disabled={rating !== undefined}
-                        />
-                    </div>
-                </div>
+                <ButtonGroup>
+                    <RatingButton
+                        rating={PageFeedbackRating.Good}
+                        label={tString(languages, 'was_this_helpful_positive')}
+                        onClick={() => onSubmitRating(PageFeedbackRating.Good)}
+                        active={rating === PageFeedbackRating.Good}
+                        disabled={rating !== undefined}
+                    />
+                    <RatingButton
+                        rating={PageFeedbackRating.Ok}
+                        label={tString(languages, 'was_this_helpful_neutral')}
+                        onClick={() => onSubmitRating(PageFeedbackRating.Ok)}
+                        active={rating === PageFeedbackRating.Ok}
+                        disabled={rating !== undefined}
+                    />
+                    <RatingButton
+                        rating={PageFeedbackRating.Bad}
+                        label={tString(languages, 'was_this_helpful_negative')}
+                        onClick={() => onSubmitRating(PageFeedbackRating.Bad)}
+                        active={rating === PageFeedbackRating.Bad}
+                        disabled={rating !== undefined}
+                    />
+                </ButtonGroup>
             </div>
             {rating ? (
                 <div className="flex flex-col gap-2">
@@ -148,9 +146,9 @@ function RatingButton(
         }[rating] ?? null;
 
     return (
-        <button
+        <Button
             className={tcls(
-                'p-2 first:rounded-l-full first:pl-2.5 last:rounded-r-full last:pr-2.5 hover:bg-primary-hover hover:text-primary-strong',
+                'border-x-0 bg-tint-base p-2 first:rounded-l-full first:border-l-1 first:pl-2.5 last:rounded-r-full last:border-r-1 last:pr-2.5 hover:bg-primary-hover hover:text-primary-strong',
                 'disabled:cursor-not-allowed disabled:hover:bg-inherit disabled:hover:text-inherit dark:disabled:hover:text-inherit',
                 'ring-tint contrast-more:hover:ring-1',
                 active
@@ -158,13 +156,13 @@ function RatingButton(
                     : 'disabled:opacity-7 contrast-more:disabled:ring-0'
             )}
             type="button"
-            {...attr}
-            aria-label={label}
-            title={label}
+            variant="secondary"
+            label={label}
             onClick={onClick}
-        >
-            {ratingIcon}
-        </button>
+            iconOnly
+            {...attr}
+            icon={ratingIcon}
+        />
     );
 }
 

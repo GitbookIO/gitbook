@@ -11,8 +11,8 @@ import { AIChatIcon } from './AIChatIcon';
 /**
  * Button to open/close the AI chat.
  */
-export function AIChatButton(props: { trademark: boolean }) {
-    const { trademark } = props;
+export function AIChatButton(props: { trademark: boolean; withLabel: boolean }) {
+    const { trademark, withLabel } = props;
     const chatController = useAIChatController();
     const chat = useAIChatState();
     const language = useLanguage();
@@ -21,8 +21,8 @@ export function AIChatButton(props: { trademark: boolean }) {
         <Button
             icon={<AIChatIcon trademark={trademark} />}
             data-testid="ai-chat-button"
-            iconOnly
-            size="default"
+            iconOnly={!withLabel}
+            size="medium"
             variant="header"
             className={tcls('h-9 px-2.5')}
             label={
@@ -38,6 +38,8 @@ export function AIChatButton(props: { trademark: boolean }) {
                     chatController.open();
                 }
             }}
-        />
+        >
+            {withLabel ? <span className="max-md:hidden">{t(language, 'ask')}</span> : null}
+        </Button>
     );
 }

@@ -135,7 +135,7 @@ export const Button = React.forwardRef<
                         icon
                     )
                 ) : null}
-                {iconOnly ? null : label}
+                {iconOnly ? null : (children ?? label)}
             </>
         );
 
@@ -171,7 +171,7 @@ export const Button = React.forwardRef<
             </button>
         );
 
-        return iconOnly && label ? (
+        return (children || iconOnly) && label ? (
             <Tooltip
                 rootProps={{ open: disabled === true ? false : undefined }}
                 label={label}
@@ -185,14 +185,21 @@ export const Button = React.forwardRef<
     }
 );
 
-export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonProps>(({ children }, ref) => {
+export const ButtonGroup = React.forwardRef<
+    HTMLDivElement,
+    ButtonProps & { combinedShape?: boolean }
+>(({ children, className, combinedShape = true, ...rest }, ref) => {
     return (
         <div
             ref={ref}
             className={tcls(
-                'flex h-fit items-stretch justify-start *:translate-y-0! *:shadow-none!',
-                '[&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                'flex h-fit items-stretch justify-start',
+                combinedShape
+                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                    : '',
+                className
             )}
+            {...rest}
         >
             {children}
         </div>

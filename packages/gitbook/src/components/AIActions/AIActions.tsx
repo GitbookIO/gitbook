@@ -231,13 +231,15 @@ function AIActionWrapper(props: {
                 }
                 size="xsmall"
                 variant="secondary"
-                label={shortLabel || label}
+                label={label ?? shortLabel}
                 className="bg-tint-base text-sm"
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
                 disabled={disabled || loading}
-            />
+            >
+                {shortLabel}
+            </Button>
         );
     }
 
