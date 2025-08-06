@@ -135,6 +135,9 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             canonical: linker
                 .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
                 .replace(/\/+$/, ''),
+            types: {
+                'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
+            },
         },
         openGraph: {
             images: [
