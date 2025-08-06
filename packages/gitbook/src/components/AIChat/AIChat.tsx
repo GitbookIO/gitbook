@@ -24,7 +24,7 @@ export function AIChat(props: { trademark: boolean }) {
     const chatController = useAIChatController();
 
     useHotkeys(
-        'mod+j',
+        'mod+i',
         (e) => {
             e.preventDefault();
             chatController.open();
