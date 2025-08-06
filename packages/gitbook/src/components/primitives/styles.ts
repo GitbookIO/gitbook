@@ -17,7 +17,7 @@ export const ButtonStyles = [
     'depth-subtle:shadow-xs',
     'hover:depth-subtle:shadow-md',
     'focus-visible:depth-subtle:shadow-md',
-    'active:shadow-none',
+    'active:depth-subtle:shadow-xs',
     'shadow-tint/6',
     'dark:shadow-tint-1',
 
@@ -27,6 +27,7 @@ export const ButtonStyles = [
 
     'hover:depth-subtle:-translate-y-px',
     'focus-visible:depth-subtle:-translate-y-px',
+    'active:depth-subtle:translate-y-0',
     'transition-all',
 
     'grow-0',

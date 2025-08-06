@@ -8,6 +8,7 @@ import {
 } from '@/components/AIActions/AIActions';
 import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
+import { tString, useLanguage } from '@/intl/client';
 import type { SiteCustomizationSettings } from '@gitbook/api';
 
 import { Icon } from '@gitbook/icons';
@@ -25,6 +26,7 @@ interface AIActionsDropdownProps {
  */
 export function AIActionsDropdown(props: AIActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
+    const language = useLanguage();
 
     return (
         <ButtonGroup ref={ref}>
@@ -41,6 +43,7 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
                                     className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
                                 />
                             }
+                            label={tString(language, 'more')}
                             iconOnly
                             size="xsmall"
                             variant="secondary"
