@@ -45,7 +45,7 @@ export function AIChatInput(props: {
     }, [disabled, loading]);
 
     useHotkeys(
-        'mod+j',
+        'mod+i',
         (e) => {
             e.preventDefault();
             inputRef.current?.focus();
@@ -54,7 +54,7 @@ export function AIChatInput(props: {
     );
 
     return (
-        <div className="relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base">
+        <div className="depth-subtle:has-[textarea:focus]:-translate-y-px relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 depth-subtle:shadow-sm shadow-tint/6 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:shadow-primary-subtle has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base dark:shadow-tint-1">
             <textarea
                 ref={inputRef}
                 disabled={disabled || loading}
@@ -99,10 +99,12 @@ export function AIChatInput(props: {
                     }
                 }}
             />
-            <div className="absolute top-2.5 right-3 animate-[fadeIn_0.2s_0.5s_ease-in-out_both] peer-focus:hidden">
-                <KeyboardShortcut keys={['mod', 'j']} />
-            </div>
-            <div className="absolute inset-x-0 bottom-0 flex items-center px-2 py-2">
+            {!disabled ? (
+                <div className="absolute top-2.5 right-3 animate-[fadeIn_0.2s_0.5s_ease-in-out_both] peer-focus:hidden">
+                    <KeyboardShortcut keys={['mod', 'i']} className="bg-tint-base" />
+                </div>
+            ) : null}
+            <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2 py-2">
                 <Tooltip
                     label={
                         <div className="flex flex-col gap-3 p-2">
@@ -126,11 +128,11 @@ export function AIChatInput(props: {
                     }
                     arrow
                 >
-                    <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2 py-1 text-tint/7 text-xs transition-all hover:bg-tint">
+                    <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
                         <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
                             {t(language, 'ai_chat_context_badge')}
                         </span>{' '}
-                        <span>{t(language, 'ai_chat_context_title')}</span>
+                        <span className="leading-none">{t(language, 'ai_chat_context_title')}</span>
                     </div>
                 </Tooltip>
                 <Button

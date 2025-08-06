@@ -2,7 +2,7 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { useAIChatController, useAIChatState } from '../AI/useAIChat';
+import { useAIChatController } from '../AI';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { getAIChatName } from './AIChat';
@@ -14,7 +14,6 @@ import { AIChatIcon } from './AIChatIcon';
 export function AIChatButton(props: { trademark: boolean }) {
     const { trademark } = props;
     const chatController = useAIChatController();
-    const chat = useAIChatState();
     const language = useLanguage();
 
     return (
@@ -28,15 +27,11 @@ export function AIChatButton(props: { trademark: boolean }) {
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', getAIChatName(trademark))}
-                    <KeyboardShortcut keys={['mod', 'j']} className="border-tint-11 text-tint-1" />
+                    <KeyboardShortcut keys={['mod', 'i']} className="border-tint-11 text-tint-1" />
                 </div>
             }
             onClick={() => {
-                if (chat.opened) {
-                    chatController.close();
-                } else {
-                    chatController.open();
-                }
+                chatController.open();
             }}
         />
     );
