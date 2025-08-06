@@ -9,7 +9,7 @@ import {
     type AIChatState,
     useAIChatController,
     useAIChatState,
-} from '../AI/useAIChat';
+} from '../AI';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';

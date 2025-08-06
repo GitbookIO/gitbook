@@ -1,5 +1,5 @@
 import { tString, useLanguage } from '@/intl/client';
-import type { AIChatController } from '../AI/useAIChat';
+import type { AIChatController } from '../AI';
 import { Button } from '../primitives';
 
 export default function AIChatSuggestedQuestions(props: { chatController: AIChatController }) {

@@ -2,7 +2,7 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { useAIChatController } from '../AI/useAIChat';
+import { useAIChatController } from '../AI';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { getAIChatName } from './AIChat';
