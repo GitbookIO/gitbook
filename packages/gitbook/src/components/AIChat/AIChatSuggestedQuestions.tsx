@@ -17,7 +17,6 @@ export default function AIChatSuggestedQuestions(props: { chatController: AIChat
             {DEFAULT_SUGGESTED_QUESTIONS.map((question, index) => (
                 <Button
                     key={question}
-                    label={question}
                     variant="secondary"
                     size="medium"
                     className="max-w-full animate-[present_500ms_both] whitespace-normal"
