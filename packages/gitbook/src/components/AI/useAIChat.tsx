@@ -187,6 +187,8 @@ export function useAIChatController(): AIChatController {
                 for await (const data of stream) {
                     if (!data) continue;
 
+                    if (globalState.getState().state.query !== input.message) break; // Chat was cleared, stop processing the stream
+
                     const event = data.event;
 
                     switch (event.type) {
