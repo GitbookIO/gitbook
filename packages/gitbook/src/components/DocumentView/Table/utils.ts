@@ -1,4 +1,9 @@
-import type { ContentRef, DocumentTableDefinition, DocumentTableRecord } from '@gitbook/api';
+import type {
+    ContentRef,
+    DocumentTableDefinition,
+    DocumentTableRecord,
+    DocumentTableViewCards,
+} from '@gitbook/api';
 import assertNever from 'assert-never';
 
 /**
@@ -10,6 +15,23 @@ export function getRecordValue<T extends number | string | boolean | string[] | 
 ): T {
     // @ts-ignore
     return record.values[definitionId];
+}
+
+/**
+ * Get the covers for a record card.
+ * Returns both the light and dark covers.
+ * The light cover is a string or a content ref (image or files column type).
+ * The dark cover is a content ref (image column type).
+ */
+export function getRecordCardCovers(record: DocumentTableRecord, view: DocumentTableViewCards) {
+    return {
+        light: view.coverDefinition
+            ? (getRecordValue(record, view.coverDefinition) as ContentRef | string[])
+            : null,
+        dark: view.coverDefinitionDark
+            ? (getRecordValue(record, view.coverDefinitionDark) as ContentRef)
+            : null,
+    };
 }
 
 /**
