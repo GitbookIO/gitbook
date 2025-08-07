@@ -80,7 +80,9 @@ export const Link = React.forwardRef(function Link(
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         const isExternalWithOrigin = isExternalLink(href, window.location.origin);
-        updateHashFromUrl(href);
+        if (!isExternal) {
+            updateHashFromUrl(href);
+        }
 
         if (insights) {
             trackEvent(insights, undefined, { immediate: isExternalWithOrigin });

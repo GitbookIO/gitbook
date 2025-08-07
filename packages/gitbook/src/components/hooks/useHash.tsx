@@ -18,16 +18,18 @@ function getHash(): string | null {
 
 export const HashProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
     const [hash, setHash] = React.useState<string | null>(getHash);
-    const memoizedHash = React.useMemo(() => hash, [hash]);
     const updateHashFromUrl = React.useCallback((href: string) => {
-        const url = new URL(href, 'http://localhost');
+        const url = new URL(
+            href,
+            typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
+        );
         setHash(url.hash.slice(1));
     }, []);
-    return (
-        <HashContext.Provider value={{ hash: memoizedHash, updateHashFromUrl }}>
-            {children}
-        </HashContext.Provider>
+    const memoizedValue = React.useMemo(
+        () => ({ hash, updateHashFromUrl }),
+        [hash, updateHashFromUrl]
     );
+    return <HashContext.Provider value={memoizedValue}>{children}</HashContext.Provider>;
 };
 
 /**
