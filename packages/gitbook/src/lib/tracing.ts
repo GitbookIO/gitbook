@@ -50,6 +50,41 @@ export async function trace<T>(
 }
 
 /**
+ * Record a performance trace for the given function, but only log errors.
+ * This is useful to not output too much noise in the logs, while still capturing important errors.
+ */
+export async function traceErrorOnly<T>(
+    name: string | TraceName,
+    fn: (span: TraceSpan) => Promise<T>
+): Promise<T> {
+    const { operation, name: executionName } =
+        typeof name === 'string' ? { operation: name, name: undefined } : name;
+    const completeName = executionName ? `${operation}(${executionName})` : operation;
+
+    const attributes: Record<string, boolean | string | number> = {};
+    const span: TraceSpan = {
+        setAttribute(label, value) {
+            attributes[label] = value;
+        },
+    };
+
+    const start = now();
+    let traceError: null | Error = null;
+    try {
+        return await fn(span);
+    } catch (error) {
+        span.setAttribute('error', true);
+        traceError = error as Error;
+        const logger = getLogger().subLogger(operation);
+        logger.error(
+            `trace ${completeName} failed with ${traceError.message} in ${now() - start}ms`,
+            attributes
+        );
+        throw error;
+    }
+}
+
+/**
  * Return the current time in milliseconds.
  */
 export function now(): number {

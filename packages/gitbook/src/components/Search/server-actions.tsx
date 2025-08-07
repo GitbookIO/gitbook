@@ -22,7 +22,7 @@ import type * as React from 'react';
 import { throwIfDataError } from '@/lib/data';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
-import { trace } from '@/lib/tracing';
+import { traceErrorOnly } from '@/lib/tracing';
 import type { IconName } from '@gitbook/icons';
 import { DocumentView } from '../DocumentView';
 
@@ -69,7 +69,7 @@ export interface AskAnswerResult {
  * Server action to search content in the entire site.
  */
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    return trace('Search.searchAllSiteContent', async () => {
+    return traceErrorOnly('Search.searchAllSiteContent', async () => {
         const context = await getServerActionBaseContext();
 
         return await searchSiteContent(context, {
@@ -83,7 +83,7 @@ export async function searchAllSiteContent(query: string): Promise<OrderedComput
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(query: string): Promise<OrderedComputedResult[]> {
-    return trace('Search.searchSiteSpaceContent', async () => {
+    return traceErrorOnly('Search.searchSiteSpaceContent', async () => {
         const context = await getServerActionBaseContext();
         const siteURLData = await getSiteURLDataFromMiddleware();
 
@@ -106,7 +106,7 @@ export async function streamAskQuestion({
 }: {
     question: string;
 }) {
-    return trace('Search.streamAskQuestion', async () => {
+    return traceErrorOnly('Search.streamAskQuestion', async () => {
         const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
         (async () => {
@@ -195,7 +195,7 @@ export async function streamAskQuestion({
  * Optionally scoped to a specific space.
  */
 export async function streamRecommendedQuestions(spaceId?: string) {
-    return trace('Search.streamRecommendedQuestions', async () => {
+    return traceErrorOnly('Search.streamRecommendedQuestions', async () => {
         const siteURLData = await getSiteURLDataFromMiddleware();
         const context = await getServerActionBaseContext();
 

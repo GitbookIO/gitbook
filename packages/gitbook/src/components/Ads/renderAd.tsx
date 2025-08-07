@@ -4,7 +4,7 @@ import type { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { trace } from '@/lib/tracing';
+import { traceErrorOnly } from '@/lib/tracing';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
@@ -41,7 +41,7 @@ interface FetchPlaceholderAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    return trace('Ads.renderAd', async () => {
+    return traceErrorOnly('Ads.renderAd', async () => {
         const [context, result] = await Promise.all([
             getServerActionBaseContext(),
             options.source === 'live' ? fetchAd(options) : getPlaceholderAd(),

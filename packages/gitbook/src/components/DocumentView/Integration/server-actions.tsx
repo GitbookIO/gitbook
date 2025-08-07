@@ -1,7 +1,7 @@
 'use server';
 
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { trace } from '@/lib/tracing';
+import { traceErrorOnly } from '@/lib/tracing';
 import type { RenderIntegrationUI } from '@gitbook/api';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
 import { contentKitServerContext } from './contentkit';
@@ -20,7 +20,7 @@ export async function renderIntegrationUi({
     };
     request: RenderIntegrationUI;
 }) {
-    return trace('DocumentView.renderIntegrationUi', async () => {
+    return traceErrorOnly('DocumentView.renderIntegrationUi', async () => {
         const serverAction = await getServerActionBaseContext();
         const output = await fetchSafeIntegrationUI(serverAction, {
             integrationName: renderContext.integrationName,

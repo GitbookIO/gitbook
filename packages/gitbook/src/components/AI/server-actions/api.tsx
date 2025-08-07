@@ -1,7 +1,7 @@
 'use server';
 import type { GitBookBaseContext } from '@/lib/context';
 import { fetchServerActionSiteContext } from '@/lib/server-actions';
-import { trace } from '@/lib/tracing';
+import { traceErrorOnly } from '@/lib/tracing';
 import {
     type AIMessage,
     AIMessageRole,
@@ -20,7 +20,7 @@ export async function streamRenderAIMessage(
     rawStream: AsyncIterable<AIStreamResponse>,
     options?: RenderAIMessageOptions
 ) {
-    return trace('AI.streamRenderAIMessage', async () => {
+    return traceErrorOnly('AI.streamRenderAIMessage', async () => {
         const message: AIMessage = {
             id: '',
             role: AIMessageRole.Assistant,

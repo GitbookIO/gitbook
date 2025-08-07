@@ -1,7 +1,7 @@
 'use server';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { getServerActionBaseContext } from '@/lib/server-actions';
-import { trace } from '@/lib/tracing';
+import { traceErrorOnly } from '@/lib/tracing';
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
 
@@ -15,7 +15,7 @@ export async function* streamAIResponseById({
     responseId: string;
     options?: RenderAIMessageOptions;
 }) {
-    const { stream } = await trace('AI.streamAIResponseById', async () => {
+    const { stream } = await traceErrorOnly('AI.streamAIResponseById', async () => {
         const context = await getServerActionBaseContext();
         const siteURLData = await getSiteURLDataFromMiddleware();
 
