@@ -3,6 +3,11 @@ import React from 'react';
 
 export const HashContext = React.createContext<{
     hash: string | null;
+    /**
+     * Updates the hash value from the URL provided here.
+     * It will then be used by the `useHash` hook.
+     * URL can be relative or absolute.
+     */
     updateHashFromUrl: (href: string) => void;
 }>({
     hash: null,
