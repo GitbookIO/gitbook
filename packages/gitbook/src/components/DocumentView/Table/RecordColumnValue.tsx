@@ -174,7 +174,6 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             <StyledLink
                                 key={index}
                                 href={ref.href}
-                                target="_blank"
                                 className="flex flex-row items-center gap-2"
                                 insights={
                                     ref.file
@@ -342,7 +341,6 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
                     <StyledLink
                         href={image.href}
-                        target="_blank"
                         className="flex flex-row items-center gap-2"
                         insights={
                             image.file
