@@ -1,5 +1,7 @@
 import type {
     ContentRef,
+    ContentRefFile,
+    ContentRefURL,
     DocumentTableDefinition,
     DocumentTableRecord,
     DocumentTableViewCards,
@@ -23,13 +25,29 @@ export function getRecordValue<T extends number | string | boolean | string[] | 
  * The light cover is a string or a content ref (image or files column type).
  * The dark cover is a content ref (image column type).
  */
-export function getRecordCardCovers(record: DocumentTableRecord, view: DocumentTableViewCards) {
+export function getRecordCardCovers(
+    record: DocumentTableRecord,
+    view: DocumentTableViewCards
+): { [key in 'light' | 'dark']: ContentRefFile | ContentRefURL | null } {
     return {
-        light: view.coverDefinition
-            ? (getRecordValue(record, view.coverDefinition) as ContentRef | string[])
-            : null,
+        light: (() => {
+            if (!view.coverDefinition) {
+                return null;
+            }
+
+            const value = getRecordValue(record, view.coverDefinition) as
+                | ContentRefFile
+                | ContentRefURL
+                | string[];
+
+            if (Array.isArray(value) && typeof value[0] === 'string') {
+                return { kind: 'file', file: value[0] };
+            }
+
+            return value as ContentRefFile | ContentRefURL;
+        })(),
         dark: view.coverDefinitionDark
-            ? (getRecordValue(record, view.coverDefinitionDark) as ContentRef)
+            ? (getRecordValue(record, view.coverDefinitionDark) as ContentRefFile | ContentRefURL)
             : null,
     };
 }

@@ -24,16 +24,8 @@ export async function RecordCard(
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
 
-    // Support for files coverDefinition (legacy)
-    const lightContentRef: ContentRef =
-        Array.isArray(light) && typeof light[0] === 'string'
-            ? { kind: 'file', file: light[0] }
-            : (light as ContentRef);
-
     const [lightCover, darkCover, target] = await Promise.all([
-        light && context.contentContext
-            ? resolveContentRef(lightContentRef, context.contentContext)
-            : null,
+        light && context.contentContext ? resolveContentRef(light, context.contentContext) : null,
         dark && context.contentContext ? resolveContentRef(dark, context.contentContext) : null,
         targetRef && context.contentContext
             ? resolveContentRef(targetRef, context.contentContext)
@@ -111,7 +103,7 @@ export async function RecordCard(
                                   darkCoverIsSquareOrPortrait
                                       ? 'dark:min-[432px]:aspect-video dark:min-[432px]:h-auto'
                                       : '',
-                              ]
+                              ].filter(Boolean)
                             : ['h-auto', 'aspect-video']
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
