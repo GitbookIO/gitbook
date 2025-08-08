@@ -48,7 +48,13 @@ class GitbookIncrementalCache implements IncrementalCache {
                 const result = (await localCacheEntry.json()) as WithLastModified<
                     CacheValue<CacheType>
                 >;
-                return this.returnNullOn404(result);
+                return this.returnNullOn404({
+                    ...result,
+                    // Because we use tag cache and also invalidate them every time,
+                    // if we get a cache hit, we don't need to check the tag cache as we already know it's not been revalidated
+                    // this should improve performance even further, and reduce costs
+                    shouldBypassTagCache: true,
+                });
             }
 
             const r2Object = await r2.get(cacheKey);
