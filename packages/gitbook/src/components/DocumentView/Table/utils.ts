@@ -40,15 +40,33 @@ export function getRecordCardCovers(
                 | ContentRefURL
                 | string[];
 
-            if (Array.isArray(value) && typeof value[0] === 'string') {
-                return { kind: 'file', file: value[0] };
+            if (Array.isArray(value)) {
+                if (value.length === 0) {
+                    return null;
+                }
+
+                if (typeof value[0] === 'string') {
+                    return { kind: 'file', file: value[0] };
+                }
             }
 
             return value as ContentRefFile | ContentRefURL;
         })(),
-        dark: view.coverDefinitionDark
-            ? (getRecordValue(record, view.coverDefinitionDark) as ContentRefFile | ContentRefURL)
-            : null,
+        dark: (() => {
+            if (!view.coverDefinitionDark) {
+                return null;
+            }
+
+            const value = getRecordValue(record, view.coverDefinitionDark) as
+                | ContentRefFile
+                | ContentRefURL;
+
+            if (!value) {
+                return null;
+            }
+
+            return value;
+        })(),
     };
 }
 
