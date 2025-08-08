@@ -4,6 +4,7 @@ import type { SiteInsightsAd, SiteInsightsAdPlacement } from '@gitbook/api';
 import { headers } from 'next/headers';
 
 import { getServerActionBaseContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 import { AdClassicRendering } from './AdClassicRendering';
 import { AdCoverRendering } from './AdCoverRendering';
 import { AdPixels } from './AdPixels';
@@ -40,40 +41,42 @@ interface FetchPlaceholderAdOptions {
  * and properly access user-agent and IP.
  */
 export async function renderAd(options: FetchAdOptions) {
-    const [context, result] = await Promise.all([
-        getServerActionBaseContext(),
-        options.source === 'live' ? fetchAd(options) : getPlaceholderAd(),
-    ]);
+    return traceErrorOnly('Ads.renderAd', async () => {
+        const [context, result] = await Promise.all([
+            getServerActionBaseContext(),
+            options.source === 'live' ? fetchAd(options) : getPlaceholderAd(),
+        ]);
 
-    const mode = options.source === 'live' ? options.mode : 'classic';
-    if (!result || !result.ad.description || !result.ad.statlink) {
-        return null;
-    }
+        const mode = options.source === 'live' ? options.mode : 'classic';
+        if (!result || !result.ad.description || !result.ad.statlink) {
+            return null;
+        }
 
-    const { ad } = result;
+        const { ad } = result;
 
-    const insightsAd: SiteInsightsAd | null =
-        options.source === 'live'
-            ? {
-                  placement: options.placement,
-                  zoneId: options.zoneId,
-                  domain: 'company' in ad ? ad.company : '',
-              }
-            : null;
+        const insightsAd: SiteInsightsAd | null =
+            options.source === 'live'
+                ? {
+                      placement: options.placement,
+                      zoneId: options.zoneId,
+                      domain: 'company' in ad ? ad.company : '',
+                  }
+                : null;
 
-    return {
-        children: (
-            <>
-                {mode === 'classic' || !('callToAction' in ad) ? (
-                    <AdClassicRendering ad={ad} insightsAd={insightsAd} context={context} />
-                ) : (
-                    <AdCoverRendering ad={ad} insightsAd={insightsAd} context={context} />
-                )}
-                {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
-            </>
-        ),
-        insightsAd,
-    };
+        return {
+            children: (
+                <>
+                    {mode === 'classic' || !('callToAction' in ad) ? (
+                        <AdClassicRendering ad={ad} insightsAd={insightsAd} context={context} />
+                    ) : (
+                        <AdCoverRendering ad={ad} insightsAd={insightsAd} context={context} />
+                    )}
+                    {ad.pixel ? <AdPixels rawPixel={ad.pixel} /> : null}
+                </>
+            ),
+            insightsAd,
+        };
+    });
 }
 
 async function fetchAd({

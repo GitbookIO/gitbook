@@ -1,6 +1,7 @@
 'use server';
 
 import { getServerActionBaseContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 import type { RenderIntegrationUI } from '@gitbook/api';
 import { ContentKitOutput } from '@gitbook/react-contentkit';
 import { contentKitServerContext } from './contentkit';
@@ -19,20 +20,22 @@ export async function renderIntegrationUi({
     };
     request: RenderIntegrationUI;
 }) {
-    const serverAction = await getServerActionBaseContext();
-    const output = await fetchSafeIntegrationUI(serverAction, {
-        integrationName: renderContext.integrationName,
-        request,
-    });
+    return traceErrorOnly('DocumentView.renderIntegrationUi', async () => {
+        const serverAction = await getServerActionBaseContext();
+        const output = await fetchSafeIntegrationUI(serverAction, {
+            integrationName: renderContext.integrationName,
+            request,
+        });
 
-    if (output.error) {
+        if (output.error) {
+            return {
+                error: output.error.message,
+            };
+        }
+
         return {
-            error: output.error.message,
+            children: <ContentKitOutput output={output.data} context={contentKitServerContext} />,
+            output: output.data,
         };
-    }
-
-    return {
-        children: <ContentKitOutput output={output.data} context={contentKitServerContext} />,
-        output: output.data,
-    };
+    });
 }

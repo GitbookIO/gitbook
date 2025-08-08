@@ -231,13 +231,15 @@ function AIActionWrapper(props: {
                 }
                 size="xsmall"
                 variant="secondary"
-                label={shortLabel || label}
+                label={label ?? shortLabel}
                 className="bg-tint-base text-sm"
                 onClick={onClick}
                 href={href}
                 target={href ? '_blank' : undefined}
                 disabled={disabled || loading}
-            />
+            >
+                {shortLabel}
+            </Button>
         );
     }
 
@@ -251,13 +253,13 @@ function AIActionWrapper(props: {
         >
             <div className="flex size-5 items-center justify-center text-tint">
                 {loading ? (
-                    <Icon icon="spinner-third" className="size-4 animate-spin" />
+                    <Icon icon="spinner-third" className="size-4 shrink-0 animate-spin" />
                 ) : icon ? (
                     typeof icon === 'string' ? (
                         <Icon
                             icon={icon as IconName}
                             iconStyle={IconStyle.Regular}
-                            className="size-4 fill-transparent stroke-current"
+                            className="size-4 shrink-0 fill-transparent stroke-current"
                         />
                     ) : (
                         icon
@@ -268,9 +270,9 @@ function AIActionWrapper(props: {
             <div className="flex flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2 text-tint-strong">
                     <span className="truncate font-medium text-sm">{label}</span>
-                    {href ? <Icon icon="arrow-up-right" className="size-3" /> : null}
+                    {href ? <Icon icon="arrow-up-right" className="size-3 shrink-0" /> : null}
                 </span>
-                {description && <span className="truncate text-tint text-xs">{description}</span>}
+                {description && <span className="text-tint text-xs">{description}</span>}
             </div>
         </DropdownMenuItem>
     );
