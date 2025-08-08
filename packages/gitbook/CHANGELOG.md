@@ -1,5 +1,20 @@
 # gitbook
 
+## 0.16.0
+
+### Minor Changes
+
+- cc2e615: Emit a <link rel="alternate"> for the markdown version of a page
+
+### Patch Changes
+
+- d30bcba: Improve `Button` and `ButtonGroup` styling
+- fb858a1: Tweaks to AIChatButton and AIChatInput
+- ea7e94f: Fix search bar layout shift caused by ToC
+- ff96bb5: Support new coverDefinitionDark for cards & image type
+- 388b20d: Clear AI chat properly
+- ba7ec14: Fix bug in search highlight in GBO
+
 ## 0.15.0
 
 ### Minor Changes
