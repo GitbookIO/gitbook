@@ -194,7 +194,7 @@ export async function streamAskQuestion({
  * Stream a list of suggested questions for the site.
  * Optionally scoped to a specific space.
  */
-export async function streamRecommendedQuestions(spaceId?: string) {
+export async function streamRecommendedQuestions(spaceId: string) {
     return traceErrorOnly('Search.streamRecommendedQuestions', async () => {
         const siteURLData = await getSiteURLDataFromMiddleware();
         const context = await getServerActionBaseContext();
