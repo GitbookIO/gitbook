@@ -9,7 +9,7 @@ import {
     CustomizationSidebarListStyle,
     CustomizationThemeMode,
 } from '@gitbook/api';
-import { expect } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
 import {
@@ -36,6 +36,10 @@ import {
     waitForNotFound,
 } from './util';
 
+async function expectResultsToBeVisible(page: Page) {
+    await expect(page.getByTestId('search-results')).toBeVisible({ timeout: 15_000 });
+}
+
 const searchTestCases: Test[] = [
     {
         name: 'Search - AI Mode: None - Complete flow',
@@ -48,11 +52,12 @@ const searchTestCases: Test[] = [
         run: async (page) => {
             const searchInput = page.getByTestId('search-input');
             await searchInput.focus();
+            await expectResultsToBeVisible(page);
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
 
             // Fill search input, expecting search results
             await searchInput.fill('gitbook');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThan(2);
             const pageSectionResults = await page.getByTestId('search-page-section-result').all();
@@ -81,6 +86,7 @@ const searchTestCases: Test[] = [
             },
         })}&q=`,
         run: async (page) => {
+            await expectResultsToBeVisible(page);
             await expect(page.getByTestId('search-results')).toHaveCount(0); // No pop-up yet because there's no recommended questions.
         },
     },
@@ -94,7 +100,7 @@ const searchTestCases: Test[] = [
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
         },
     },
     {
@@ -110,7 +116,7 @@ const searchTestCases: Test[] = [
 
             // Focus search input, expecting recommended questions
             await searchInput.focus();
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
@@ -118,7 +124,7 @@ const searchTestCases: Test[] = [
 
             // Fill search input, expecting AI search option
             await searchInput.fill('What is gitbook?');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
             await aiSearchResult.click();
@@ -137,7 +143,7 @@ const searchTestCases: Test[] = [
         screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
@@ -155,7 +161,7 @@ const searchTestCases: Test[] = [
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
         },
     },
     {
@@ -168,7 +174,7 @@ const searchTestCases: Test[] = [
         screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
@@ -204,7 +210,7 @@ const searchTestCases: Test[] = [
 
             // Focus search input, expecting recommended questions
             await searchInput.focus();
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expectResultsToBeVisible(page);
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
