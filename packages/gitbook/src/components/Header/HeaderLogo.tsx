@@ -57,7 +57,9 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         'max-h-10',
                         'lg:max-h-12',
                         'h-full',
-                        'w-auto'
+                        'w-full',
+                        'object-contain',
+                        'object-left'
                     )}
                 />
             ) : (
