@@ -55,7 +55,6 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         'lg:max-w-64',
                         'lg:site-header-none:page-no-toc:max-w-56',
                         'max-h-10',
-                        'lg:max-h-12',
                         'h-full',
                         'w-full',
                         'object-contain',
