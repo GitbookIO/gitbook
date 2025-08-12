@@ -31,16 +31,16 @@ export const variantClasses = {
         'hover:text-contrast-primary-solid-hover',
         'border-0',
         'contrast-more:border',
-        'disabled:bg-tint',
-        'disabled:text-tint/8',
+        'disabled:bg-primary-subtle',
+        'disabled:text-primary/8',
     ],
     blank: [
         'bg-transparent',
         'text-tint',
         'border-0',
         'shadow-none!',
-        'hover:bg-primary-hover',
-        'hover:text-primary-strong',
+        'hover:bg-tint-hover',
+        'hover:text-tint-strong',
         'contrast-more:bg-tint-subtle',
         'hover:depth-subtle:translate-y-0',
         'disabled:text-tint/8',
@@ -52,7 +52,7 @@ export const variantClasses = {
         'text-tint',
         'hover:bg-tint-hover',
         'hover:depth-flat:bg-tint-hover',
-        'hover:text-primary',
+        'hover:text-tint',
         'contrast-more:bg-tint-subtle',
         'disabled:bg-transparent',
         'disabled:text-tint/8',
@@ -135,7 +135,7 @@ export const Button = React.forwardRef<
                         icon
                     )
                 ) : null}
-                {iconOnly ? null : label}
+                {iconOnly ? null : (children ?? label)}
             </>
         );
 
@@ -171,7 +171,7 @@ export const Button = React.forwardRef<
             </button>
         );
 
-        return iconOnly && label ? (
+        return (children || iconOnly) && label ? (
             <Tooltip
                 rootProps={{ open: disabled === true ? false : undefined }}
                 label={label}
@@ -185,14 +185,21 @@ export const Button = React.forwardRef<
     }
 );
 
-export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonProps>(({ children }, ref) => {
+export const ButtonGroup = React.forwardRef<
+    HTMLDivElement,
+    ButtonProps & { combinedShape?: boolean }
+>(({ children, className, combinedShape = true, ...rest }, ref) => {
     return (
         <div
             ref={ref}
             className={tcls(
-                'flex h-fit items-stretch justify-start *:translate-y-0! *:shadow-none!',
-                '[&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                'flex h-fit items-stretch justify-start',
+                combinedShape
+                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                    : '',
+                className
             )}
+            {...rest}
         >
             {children}
         </div>

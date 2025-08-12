@@ -1,7 +1,7 @@
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type React from 'react';
-import type { AIChatController, AIChatState } from '../AI/useAIChat';
+import type { AIChatController, AIChatState } from '../AI';
 import { AIResponseFeedback } from './AIResponseFeedback';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 

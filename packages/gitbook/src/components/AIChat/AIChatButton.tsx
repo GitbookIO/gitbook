@@ -2,7 +2,7 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { useAIChatController, useAIChatState } from '../AI/useAIChat';
+import { useAIChatController } from '../AI';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { getAIChatName } from './AIChat';
@@ -11,33 +11,30 @@ import { AIChatIcon } from './AIChatIcon';
 /**
  * Button to open/close the AI chat.
  */
-export function AIChatButton(props: { trademark: boolean }) {
-    const { trademark } = props;
+export function AIChatButton(props: { trademark: boolean; withLabel: boolean }) {
+    const { trademark, withLabel } = props;
     const chatController = useAIChatController();
-    const chat = useAIChatState();
     const language = useLanguage();
 
     return (
         <Button
             icon={<AIChatIcon trademark={trademark} />}
             data-testid="ai-chat-button"
-            iconOnly
-            size="default"
+            iconOnly={!withLabel}
+            size="medium"
             variant="header"
             className={tcls('h-9 px-2.5')}
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', getAIChatName(trademark))}
-                    <KeyboardShortcut keys={['mod', 'j']} className="border-tint-11 text-tint-1" />
+                    <KeyboardShortcut keys={['mod', 'i']} className="border-tint-11 text-tint-1" />
                 </div>
             }
             onClick={() => {
-                if (chat.opened) {
-                    chatController.close();
-                } else {
-                    chatController.open();
-                }
+                chatController.open();
             }}
-        />
+        >
+            {withLabel ? <span className="max-md:hidden">{t(language, 'ask')}</span> : null}
+        </Button>
     );
 }

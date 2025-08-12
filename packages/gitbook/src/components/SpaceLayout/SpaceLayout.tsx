@@ -1,5 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationAIMode, CustomizationHeaderPreset } from '@gitbook/api';
+import {
+    CustomizationAIMode,
+    CustomizationHeaderPreset,
+    CustomizationSearchStyle,
+} from '@gitbook/api';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -62,7 +66,13 @@ export function SpaceLayout(props: {
                 />
             </React.Suspense>
             {aiMode === CustomizationAIMode.Assistant ? (
-                <AIChatButton trademark={customization.trademark.enabled} />
+                <AIChatButton
+                    withLabel={
+                        withTopHeader &&
+                        customization.styling.search === CustomizationSearchStyle.Prominent
+                    }
+                    trademark={customization.trademark.enabled}
+                />
             ) : null}
         </div>
     );

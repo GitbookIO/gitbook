@@ -174,7 +174,6 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             <StyledLink
                                 key={index}
                                 href={ref.href}
-                                target="_blank"
                                 className="flex flex-row items-center gap-2"
                                 insights={
                                     ref.file
@@ -326,6 +325,50 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             );
                         })}
                     </span>
+                </Tag>
+            );
+        }
+        case 'image': {
+            const image = context.contentContext
+                ? await resolveContentRef(value as ContentRef, context.contentContext)
+                : null;
+
+            if (!image) {
+                return null;
+            }
+
+            return (
+                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
+                    <StyledLink
+                        href={image.href}
+                        className="flex flex-row items-center gap-2"
+                        insights={
+                            image.file
+                                ? {
+                                      type: 'link_click',
+                                      link: {
+                                          target: value as ContentRef,
+                                          position: SiteInsightsLinkPosition.Content,
+                                      },
+                                  }
+                                : undefined
+                        }
+                    >
+                        <Image
+                            style={['max-h-lh', 'h-lh']}
+                            alt={image.text}
+                            sizes={[{ width: 24 }]}
+                            resize={context.contentContext?.imageResizer}
+                            sources={{
+                                light: {
+                                    src: image.href,
+                                    size: image.file?.dimensions,
+                                },
+                            }}
+                            priority="lazy"
+                        />
+                        {image.text}
+                    </StyledLink>
                 </Tag>
             );
         }

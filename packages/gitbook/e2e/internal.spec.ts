@@ -227,7 +227,7 @@ const searchTestCases: Test[] = [
         }),
         screenshot: false,
         run: async (page) => {
-            await page.keyboard.press('ControlOrMeta+J');
+            await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
         },
