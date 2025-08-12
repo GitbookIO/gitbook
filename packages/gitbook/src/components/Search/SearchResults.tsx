@@ -156,7 +156,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, global, withAI, trackEvent]);
+    }, [query, global, withAI, trackEvent, spaceId]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAI) {
