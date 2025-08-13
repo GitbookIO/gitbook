@@ -9,10 +9,7 @@ import type {
 
 type ResolveOpenAPIOperationBlockResult = ResolveOpenAPIBlockResult<OpenAPIOperationData>;
 
-const weakmap = new WeakMap<
-    AnyOpenAPIOperationsBlock,
-    Promise<ResolveOpenAPIOperationBlockResult>
->();
+const cache = new WeakMap<AnyOpenAPIOperationsBlock, Promise<ResolveOpenAPIOperationBlockResult>>();
 
 /**
  * Cache the result of resolving an OpenAPI block.
@@ -21,22 +18,24 @@ const weakmap = new WeakMap<
 export function resolveOpenAPIOperationBlock(
     args: ResolveOpenAPIBlockArgs<AnyOpenAPIOperationsBlock>
 ): Promise<ResolveOpenAPIOperationBlockResult> {
-    if (weakmap.has(args.block)) {
-        return weakmap.get(args.block)!;
+    const inCache = cache.get(args.block);
+    if (inCache) {
+        return inCache;
     }
 
-    const result = baseResolveOpenAPIOperationBlock(args);
-    weakmap.set(args.block, result);
-    return result;
+    const promise = resolveOpenAPIOperationBlockNoCache(args);
+    cache.set(args.block, promise);
+    return promise;
 }
 
 /**
  * Resolve OpenAPI operation block.
  */
-async function baseResolveOpenAPIOperationBlock(
+async function resolveOpenAPIOperationBlockNoCache(
     args: ResolveOpenAPIBlockArgs<AnyOpenAPIOperationsBlock>
 ): Promise<ResolveOpenAPIOperationBlockResult> {
     const { context, block } = args;
+
     if (!block.data.path || !block.data.method) {
         return { data: null, specUrl: null };
     }

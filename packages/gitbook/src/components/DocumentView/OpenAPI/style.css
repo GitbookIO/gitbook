@@ -147,7 +147,7 @@
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col gap-4 sticky top-4 site-header:top-20 site-header:xl:max-2xl:top-32 site-header-sections:top-32 site-header-sections:xl:max-2xl:top-44 print-mode:static;
+    @apply flex flex-col gap-4 sticky top-[calc(var(--toc-top-offset)+5rem)] print-mode:static;
 }
 
 .openapi-column-preview pre {

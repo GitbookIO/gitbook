@@ -40,7 +40,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     });
 
     return (
-        <ul className={tcls('sidebar-list-line:border-l', 'border-tint-subtle')}>
+        <ul className="flex flex-col border-tint-subtle sidebar-list-line:border-l">
             {sections.map((section) => (
                 <motion.li
                     key={section.id}
@@ -50,6 +50,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         'relative',
                         'h-fit',
                         'mt-2',
+                        'first:mt-0',
+                        'mb-0.5',
                         section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
                     )}
                 >
