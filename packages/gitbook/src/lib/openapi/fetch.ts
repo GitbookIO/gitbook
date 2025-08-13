@@ -36,25 +36,28 @@ export async function fetchOpenAPIFilesystem(
         return { filesystem: null, specUrl: null };
     }
 
-    const filesystem = await (() => {
+    const result = await (() => {
+        // If the reference is a new OpenAPI reference, we return it.
         if (ref.kind === 'openapi') {
             assert(resolved.openAPIFilesystem);
             return resolved.openAPIFilesystem;
         }
+        // For legacy blocks ("swagger"), we need to fetch the file system.
         return fetchFilesystem(resolved.href, context.space.id);
     })();
 
-    if ('error' in filesystem) {
-        throw new OpenAPIParseError(filesystem.error.message, { code: filesystem.error.code });
+    if ('error' in result) {
+        throw new OpenAPIParseError(result.error.message, { code: result.error.code });
     }
 
-    return {
-        filesystem,
-        specUrl: resolved.href,
-    };
+    return { filesystem: result, specUrl: resolved.href };
 }
 
-const fetchFilesystem = async (
+/**
+ * Fetch the filesystem from the URL.
+ * It's used for legacy "swagger" blocks.
+ */
+async function fetchFilesystem(
     url: string,
     spaceId: string
 ): Promise<
@@ -65,11 +68,11 @@ const fetchFilesystem = async (
               message: string;
           };
       }
-> => {
+> {
     'use cache';
     try {
         cacheTag(getCacheTag({ tag: 'space', space: spaceId }));
-        return await fetchFilesystemUncached(url);
+        return await fetchFilesystemNoCache(url);
     } catch (error) {
         // To avoid hammering the file with requests, we cache the error for around a minute.
         cacheLife('minutes');
@@ -86,21 +89,16 @@ const fetchFilesystem = async (
         console.error('Unknown error while fetching OpenAPI file:', error);
         return { error: { code: 'invalid' as const, message: 'Unknown error' } };
     }
-};
+}
 
-async function fetchFilesystemUncached(
-    url: string,
-    options?: {
-        signal?: AbortSignal;
-    }
-) {
+async function fetchFilesystemNoCache(url: string) {
+    console.log(url);
     // Wrap the raw string to prevent invalid URLs from being passed to fetch.
     // This can happen if the URL has whitespace, which is currently handled differently by Cloudflare's implementation of fetch:
     // https://github.com/cloudflare/workerd/issues/1957
     const response = await fetch(new URL(url), {
         ...noCacheFetchOptions,
         cache: 'no-store',
-        signal: options?.signal,
     });
 
     if (!response.ok) {
