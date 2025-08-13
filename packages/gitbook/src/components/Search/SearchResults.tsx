@@ -52,11 +52,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         query: string;
         global: boolean;
         aiMode: CustomizationAIMode;
-        spaceId: string;
+        siteSpaceId: string;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, aiMode, global, spaceId } = props;
+    const { children, query, aiMode, global, siteSpaceId } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -77,9 +77,12 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 return;
             }
 
-            if (cachedRecommendedQuestions.has(spaceId)) {
-                const results = cachedRecommendedQuestions.get(spaceId);
-                assert(results, `Cached recommended questions should be set for space ${spaceId}`);
+            if (cachedRecommendedQuestions.has(siteSpaceId)) {
+                const results = cachedRecommendedQuestions.get(siteSpaceId);
+                assert(
+                    results,
+                    `Cached recommended questions should be set for site-space ${siteSpaceId}`
+                );
                 setResultsState({ results, fetching: false });
                 return;
             }
@@ -98,7 +101,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     return;
                 }
 
-                const response = await streamRecommendedQuestions(spaceId);
+                const response = await streamRecommendedQuestions({ siteSpaceId });
                 for await (const entry of readStreamableValue(response.stream)) {
                     if (!entry) {
                         continue;
@@ -115,7 +118,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                         id: question,
                         question,
                     });
-                    cachedRecommendedQuestions.set(spaceId, recommendedQuestions);
+                    cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
                         setResultsState({ results: [...recommendedQuestions], fetching: false });
