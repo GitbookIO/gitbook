@@ -398,7 +398,20 @@ async function fetchImage(url: string, options?: ResizeImageOptions) {
 
     try {
         const { width, height } = imageSize(buffer);
-        return { src, width, height };
+        // If we provide a width and height in the options, we always want to use them
+        // The resize in cloudflare can fail and will fallback to the original size, which could stretch the image
+        // If the image is smaller than the requested size, it will also return the original image
+        if (
+            (options?.width && options.width !== width) ||
+            (options?.height && options.height !== height)
+        ) {
+            return {
+                src,
+                width: options.width,
+                height: options.height,
+            };
+        }
+        return { src, width: width, height: height };
     } catch {
         return null;
     }
