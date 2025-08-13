@@ -28,6 +28,8 @@ export async function PageHeader(props: {
         externalAI: true,
     };
 
+    const hasAncestors = ancestors.length > 0;
+
     return (
         <header
             className={tcls(
@@ -37,7 +39,8 @@ export async function PageHeader(props: {
                 'mb-6',
                 'space-y-3',
                 'page-api-block:ml-0',
-                'page-api-block:max-w-full'
+                'page-api-block:max-w-full',
+                hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >
             {page.layout.tableOfContents &&
@@ -45,8 +48,8 @@ export async function PageHeader(props: {
             (withAIChat || pageActions.markdown || pageActions.externalAI) ? (
                 <div
                     className={tcls(
-                        'float-right mb-2 ml-4 xl:max-2xl:page-api-block:mr-58',
-                        ancestors.length > 0 ? '-mt-2' : '-mt-3 xs:mt-2'
+                        'float-right ml-4 xl:max-2xl:page-api-block:mr-62',
+                        hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'
                     )}
                 >
                     <AIActionsDropdown
@@ -57,7 +60,7 @@ export async function PageHeader(props: {
                     />
                 </div>
             ) : null}
-            {ancestors.length > 0 && (
+            {hasAncestors && (
                 <nav aria-label="Breadcrumb">
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
                         {ancestors.map((breadcrumb, index) => {
