@@ -108,18 +108,20 @@ export function PageAside(props: {
                 )}
             >
                 <PageAsideHeader context={context} />
-                <div>
-                    {page.layout.outline && document ? (
-                        <React.Suspense fallback={null}>
-                            <PageAsideSections document={document} context={context} />
-                        </React.Suspense>
-                    ) : null}
-                    <PageAsideActions
-                        page={page}
-                        withPageFeedback={withPageFeedback}
-                        context={context}
-                    />
-                </div>
+                {page.layout.outline ? (
+                    <div>
+                        {document ? (
+                            <React.Suspense fallback={null}>
+                                <PageAsideSections document={document} context={context} />
+                            </React.Suspense>
+                        ) : null}
+                        <PageAsideActions
+                            page={page}
+                            withPageFeedback={withPageFeedback}
+                            context={context}
+                        />
+                    </div>
+                ) : null}
                 <PageAsideFooter context={context} />
             </div>
         </aside>
