@@ -39,7 +39,9 @@ describe('#parseOpenAPI', () => {
             });
         } catch (error) {
             if (error instanceof OpenAPIParseError) {
-                expect(error.message).toContain('Invalid OpenAPI document');
+                expect(error.message).toContain(
+                    'Can’t find supported Swagger/OpenAPI version in the provided document, version must be a string.'
+                );
             }
         }
     });

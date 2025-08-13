@@ -44,7 +44,7 @@ export function AIChatMessages(props: {
                         {message.content ? message.content : null}
 
                         {isLastMessage && chat.loading ? (
-                            <div className="flex w-full animate-fade-in-slow flex-wrap gap-2 group-has-[.has-content]/message:hidden">
+                            <div className="flex w-full animate-fade-in-slow flex-wrap gap-2">
                                 {Array.from({ length: 7 }).map((_, index) => (
                                     <div
                                         key={index}
