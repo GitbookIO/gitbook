@@ -109,7 +109,7 @@ export function PageAside(props: {
             >
                 <PageAsideHeader context={context} />
                 {page.layout.outline ? (
-                    <div>
+                    <div className="overflow-y-auto border-tint xl:max-2xl:page-api-block:border-t">
                         {document ? (
                             <React.Suspense fallback={null}>
                                 <PageAsideSections document={document} context={context} />
@@ -162,7 +162,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
     const sections = await getDocumentSections(context, document);
 
     return sections.length > 1 ? (
-        <div className="-mt-8 overflow-y-auto border-tint pt-8 pb-5 empty:hidden xl:max-2xl:page-api-block:mt-0 xl:max-2xl:border-t xl:max-2xl:page-api-block:p-2">
+        <div className="-mt-8 pt-8 pb-5 empty:hidden xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2">
             <ScrollSectionsList sections={sections} />
         </div>
     ) : null;
