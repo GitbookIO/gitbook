@@ -13,7 +13,6 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
 import { AIContextProvider } from '../AI';
 import { AIChat } from '../AIChat';
 import { Announcement } from '../Announcement';
@@ -85,9 +84,8 @@ export function SpaceLayout(props: {
                 visitorAuthClaims={visitorAuthClaims}
             >
                 <InsightsProvider
-                    enabled={withTracking}
-                    appURL={GITBOOK_APP_URL}
-                    apiHost={GITBOOK_API_PUBLIC_URL}
+                    enabled={true}
+                    basePath={context.linker.toPathInSite('')}
                     visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <SearchContextProvider>
