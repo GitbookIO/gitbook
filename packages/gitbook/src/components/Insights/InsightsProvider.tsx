@@ -55,11 +55,8 @@ interface InsightsProviderProps {
     /** If true, the visitor cookie tracking will be used */
     visitorCookieTrackingEnabled: boolean;
 
-    /** The URL of the app. */
-    appURL: string;
-
-    /** The host of the API. */
-    apiHost: string;
+    /** The base path of the site. */
+    basePath: string;
 
     /** The children of the provider. */
     children: React.ReactNode;
@@ -69,7 +66,7 @@ interface InsightsProviderProps {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled } = props;
+    const { enabled, children, visitorCookieTrackingEnabled, basePath } = props;
 
     const currentContent = useCurrentContent();
     const visitorIdRef = React.useRef<string | null>(null);
@@ -126,7 +123,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         if (allEvents.length > 0) {
             if (enabled) {
                 sendEvents({
-                    apiHost,
+                    basePath,
                     organizationId: currentContent.organizationId,
                     siteId: currentContent.siteId,
                     events: allEvents,
@@ -138,7 +135,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
     const flushBatchedEvents = useDebounceCallback(async () => {
         const visitorId =
-            visitorIdRef.current ?? (await getVisitorId(appURL, visitorCookieTrackingEnabled));
+            visitorIdRef.current ?? (await getVisitorId(basePath, visitorCookieTrackingEnabled));
         visitorIdRef.current = visitorId;
 
         flushEventsSync();
@@ -182,7 +179,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
      * Get the visitor ID and store it in a ref.
      */
     React.useEffect(() => {
-        getVisitorId(appURL, visitorCookieTrackingEnabled).then((visitorId) => {
+        getVisitorId(basePath, visitorCookieTrackingEnabled).then((visitorId) => {
             visitorIdRef.current = visitorId;
             // When the page is unloaded, flush all events, but only if the visitor ID is set
             window.addEventListener('beforeunload', flushEventsSync);
@@ -190,7 +187,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync, appURL, visitorCookieTrackingEnabled]);
+    }, [flushEventsSync, visitorCookieTrackingEnabled]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
@@ -216,14 +213,16 @@ export function useTrackEvent(): TrackEventCallback {
  * Post the events to the server.
  */
 function sendEvents(args: {
-    apiHost: string;
+    basePath: string;
     organizationId: string;
     siteId: string;
     events: api.SiteInsightsEvent[];
 }) {
-    const { apiHost, organizationId, siteId, events } = args;
-    const url = new URL(apiHost);
-    url.pathname = `/v1/orgs/${organizationId}/sites/${siteId}/insights/events`;
+    const { basePath, organizationId, siteId, events } = args;
+    const url = new URL(window.location.href);
+    url.pathname = `${basePath}/~gitbook/__evt`;
+    url.searchParams.set('o', organizationId);
+    url.searchParams.set('s', siteId);
 
     fetch(url.toString(), {
         method: 'POST',
