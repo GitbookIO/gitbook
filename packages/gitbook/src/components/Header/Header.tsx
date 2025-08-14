@@ -165,15 +165,10 @@ export function Header(props: {
                                     'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
                                 )}
                             >
-                                {withVariants && (
+                                {withVariants === 'generic' && (
                                     <div
                                         id="variants"
-                                        className={tcls(
-                                            'my-2 mr-5 grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64',
-                                            withVariants === 'translations'
-                                                ? ''
-                                                : 'page-no-toc:flex hidden'
-                                        )}
+                                        className="my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
                                     >
                                         <SpacesDropdown
                                             context={context}

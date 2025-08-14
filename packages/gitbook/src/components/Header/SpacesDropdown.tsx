@@ -44,18 +44,18 @@ export function SpacesDropdown(props: {
                         'hover:text-tint-strong',
                         'data-[state=open]:text-tint-strong',
 
-                        'ring-1',
-                        'ring-tint-subtle',
-                        'hover:ring-tint-hover',
-                        'data-[state=open]:ring-tint-hover',
+                        'border',
+                        'border-tint-subtle',
+                        'hover:border-tint-hover',
+                        'data-[state=open]:border-tint-hover',
 
                         'contrast-more:bg-tint-base',
-                        'contrast-more:ring-1',
-                        'contrast-more:hover:ring-2',
-                        'contrast-more:data-[state=open]:ring-2',
-                        'contrast-more:ring-tint',
-                        'contrast-more:hover:ring-tint-hover',
-                        'contrast-more:data-[state=open]:ring-tint-hover',
+                        'contrast-more:border',
+                        'contrast-more:hover:border-2',
+                        'contrast-more:data-[state=open]:border-2',
+                        'contrast-more:border-tint',
+                        'contrast-more:hover:border-tint-hover',
+                        'contrast-more:data-[state=open]:border-tint-hover',
 
                         className
                     )}
