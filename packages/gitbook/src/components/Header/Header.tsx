@@ -170,7 +170,7 @@ export function Header(props: {
                                         id="variants"
                                         className={tcls(
                                             'my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64',
-                                            withVariants === 'translations' ? 'xl:hidden' : ''
+                                            withVariants === 'translations' ? 'xl:hidden!' : ''
                                         )}
                                     >
                                         <SpacesDropdown
