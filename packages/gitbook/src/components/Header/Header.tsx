@@ -165,10 +165,13 @@ export function Header(props: {
                                     'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
                                 )}
                             >
-                                {withVariants === 'generic' && (
+                                {withVariants ? (
                                     <div
                                         id="variants"
-                                        className="my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
+                                        className={tcls(
+                                            'my-2 mr-5 page-no-toc:flex hidden grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64',
+                                            withVariants === 'translations' ? 'xl:hidden' : ''
+                                        )}
                                     >
                                         <SpacesDropdown
                                             context={context}
@@ -177,14 +180,17 @@ export function Header(props: {
                                             className="w-full grow py-1"
                                         />
                                     </div>
-                                )}
-                                {sections &&
-                                    (sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
-                                        sections.list.length > 1) && ( // Otherwise, show the tabs if there's more than one section
-                                        <SiteSectionTabs
-                                            sections={encodeClientSiteSections(context, sections)}
-                                        />
-                                    )}
+                                ) : null}
+                                {sections
+                                    ? (sections.list.some(
+                                          (s) => s.object === 'site-section-group'
+                                      ) || // If there's even a single group, show the tabs
+                                          sections.list.length > 1) && ( // Otherwise, show the tabs if there's more than one section
+                                          <SiteSectionTabs
+                                              sections={encodeClientSiteSections(context, sections)}
+                                          />
+                                      )
+                                    : null}
                             </div>
                         </div>
                     </div>

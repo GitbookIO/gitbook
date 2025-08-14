@@ -162,13 +162,16 @@ export function SpaceLayout(props: {
                                                     )}
                                                 />
                                             )}
-                                            {withVariants === 'generic' && (
+                                            {withVariants && (
                                                 <SpacesDropdown
                                                     context={context}
                                                     siteSpace={siteSpace}
                                                     siteSpaces={siteSpaces}
                                                     className={tcls(
                                                         'w-full',
+                                                        withVariants === 'translations'
+                                                            ? 'xl:hidden'
+                                                            : '',
                                                         'page-no-toc:hidden',
                                                         'page-no-toc:site-header-none:flex'
                                                     )}
