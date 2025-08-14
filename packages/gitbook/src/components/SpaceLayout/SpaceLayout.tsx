@@ -44,8 +44,18 @@ export function SpaceLayout(props: {
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
+    const currentLanguage =
+        siteSpace.space.language ?? context.customization.internationalization.locale;
+
     const withSections = Boolean(sections && sections.list.length > 1);
-    const isMultiVariants = Boolean(siteSpaces.length > 1);
+    const withVariants: 'generic' | 'translations' | undefined =
+        siteSpaces.length > 1
+            ? siteSpaces.some(
+                  (space) => space.space.language && space.space.language !== currentLanguage
+              )
+                ? 'translations'
+                : 'generic'
+            : undefined;
 
     const withFooter =
         customization.themes.toggeable ||
@@ -60,7 +70,7 @@ export function SpaceLayout(props: {
             <React.Suspense fallback={null}>
                 <SearchContainer
                     aiMode={aiMode}
-                    isMultiVariants={siteSpaces.length > 1}
+                    withVariants={Boolean(withVariants)}
                     spaceTitle={siteSpace.title}
                     siteSpaceId={siteSpace.id}
                 />
@@ -96,7 +106,12 @@ export function SpaceLayout(props: {
                     visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
-                    <Header withTopHeader={withTopHeader} context={context} search={searchAndAI} />
+                    <Header
+                        withVariants={withVariants}
+                        withTopHeader={withTopHeader}
+                        context={context}
+                        search={searchAndAI}
+                    />
                     {aiMode === CustomizationAIMode.Assistant ? (
                         <AIChat trademark={customization.trademark.enabled} />
                     ) : null}
@@ -147,7 +162,7 @@ export function SpaceLayout(props: {
                                                     )}
                                                 />
                                             )}
-                                            {isMultiVariants && !sections && (
+                                            {withVariants === 'generic' && (
                                                 <SpacesDropdown
                                                     context={context}
                                                     siteSpace={siteSpace}

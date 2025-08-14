@@ -17,9 +17,10 @@ import { SpacesDropdown } from './SpacesDropdown';
 export function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
+    withVariants?: 'generic' | 'translations';
     search?: React.ReactNode;
 }) {
-    const { context, withTopHeader, search } = props;
+    const { context, withTopHeader, withVariants, search } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
     return (
@@ -143,7 +144,7 @@ export function Header(props: {
                 </div>
             </div>
 
-            {sections || siteSpaces.length > 1 ? (
+            {sections || withVariants ? (
                 <div className="scroll-nojump">
                     <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                         <div
@@ -164,10 +165,15 @@ export function Header(props: {
                                     'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
                                 )}
                             >
-                                {siteSpaces.length > 1 && (
+                                {withVariants && (
                                     <div
                                         id="variants"
-                                        className="my-2 mr-5 grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
+                                        className={tcls(
+                                            'my-2 mr-5 grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64',
+                                            withVariants === 'translations'
+                                                ? ''
+                                                : 'page-no-toc:flex hidden'
+                                        )}
                                     >
                                         <SpacesDropdown
                                             context={context}
