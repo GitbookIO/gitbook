@@ -138,7 +138,7 @@ export function useAIChatController(): AIChatController {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { messages } = globalState.getState().state;
+            const { query, messages } = globalState.getState().state;
 
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
@@ -148,6 +148,11 @@ export function useAIChatController(): AIChatController {
                     global: prev?.global ?? false,
                     open: false,
                 }));
+            }
+
+            if (query === input.message) {
+                // Return early if the message is the same as the previous message
+                return;
             }
 
             trackEvent({ type: 'ask_question', query: input.message });
