@@ -1,5 +1,28 @@
 # gitbook
 
+## 0.16.0
+
+### Minor Changes
+
+- cc2e615: Emit a <link rel="alternate"> for the markdown version of a page
+
+### Patch Changes
+
+- d30bcba: Improve `Button` and `ButtonGroup` styling
+- e1b2cf6: Fix scroll of page outline
+- d655d3e: Support "objectivec" as alias for Objective C syntax
+- fb858a1: Tweaks to AIChatButton and AIChatInput
+- bcfa8d8: Improve vertical alignment of site items and fix floating page aside
+- ea7e94f: Fix search bar layout shift caused by ToC
+- ff96bb5: Support new coverDefinitionDark for cards & image type
+- 388b20d: Clear AI chat properly
+- ba7ec14: Fix bug in search highlight in GBO
+- 42c17f5: Improve OpenAPI parsing errors
+- 43766d6: Fix Custom logo not rendering on the published site
+- Updated dependencies [42c17f5]
+  - @gitbook/openapi-parser@3.0.1
+  - @gitbook/react-openapi@1.3.6
+
 ## 0.15.0
 
 ### Minor Changes
