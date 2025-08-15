@@ -18,7 +18,7 @@ import { useSearch } from './useSearch';
 interface SearchContainerProps {
     siteSpaceId: string;
     spaceTitle: string;
-    isMultiVariants: boolean;
+    withVariants: boolean;
     aiMode: CustomizationAIMode;
     className?: string;
 }
@@ -27,7 +27,7 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { siteSpaceId, spaceTitle, isMultiVariants, aiMode, className } = props;
+    const { siteSpaceId, spaceTitle, withVariants, aiMode, className } = props;
 
     const withAIChat = aiMode === CustomizationAIMode.Assistant;
     const [state, setSearchState] = useSearch(withAIChat);
@@ -142,7 +142,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     // Only show content if there's a query or Ask is enabled
                     (state?.query || aiMode !== CustomizationAIMode.None) && open ? (
                         <React.Suspense fallback={null}>
-                            {isMultiVariants && !showAsk ? (
+                            {withVariants && !showAsk ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
                             ) : null}
                             {state !== null && !showAsk ? (

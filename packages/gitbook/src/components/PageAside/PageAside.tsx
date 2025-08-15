@@ -15,6 +15,7 @@ import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
 import { Ad } from '../Ads';
+import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
@@ -292,6 +293,18 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
                 ignore={process.env.NODE_ENV !== 'production'}
                 style={site?.ads ? 'mt-4' : undefined}
             />
+            {context.siteSpaces.some(
+                (space) =>
+                    space.space.language &&
+                    space.space.language !== context.siteSpace.space.language
+            ) ? (
+                <SpacesDropdown
+                    context={context}
+                    siteSpace={context.siteSpace}
+                    siteSpaces={context.siteSpaces}
+                    className="mt-2 w-full grow py-2"
+                />
+            ) : null}
         </div>
     );
 }
