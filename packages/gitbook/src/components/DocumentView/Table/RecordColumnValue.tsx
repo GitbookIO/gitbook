@@ -15,12 +15,11 @@ import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
-
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
 import type { TableRecordKV } from './Table';
-import { type VerticalAlignment, getColumnAlignment } from './utils';
+import { type VerticalAlignment, getColumnAlignment, isContentRef } from './utils';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
     'text-left': '**:text-left text-left',
@@ -221,10 +220,10 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'content-ref': {
-            const contentRef = value ? (value as ContentRef) : null;
+            const contentRef = isContentRef(value) ? value : null;
             const resolved =
-                contentRef && context.contentContext
-                    ? await resolveContentRef(contentRef, context.contentContext, {
+                isContentRef(value) && context.contentContext
+                    ? await resolveContentRef(value, context.contentContext, {
                           resolveAnchorText: true,
                           iconStyle: ['mr-2', 'text-tint-subtle'],
                       })
@@ -329,8 +328,12 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'image': {
+            if (!isContentRef(value)) {
+                return null;
+            }
+
             const image = context.contentContext
-                ? await resolveContentRef(value as ContentRef, context.contentContext)
+                ? await resolveContentRef(value, context.contentContext)
                 : null;
 
             if (!image) {
