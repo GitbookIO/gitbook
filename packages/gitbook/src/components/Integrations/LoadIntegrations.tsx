@@ -1,9 +1,31 @@
 'use client';
 
 import * as React from 'react';
+import * as zustand from 'zustand';
 
-if (typeof window !== 'undefined') {
-    window.GitBook = {
+export const integrationsEvents = zustand.createStore<{
+    /**
+     * Events emitted by integrations
+     */
+    events: Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>;
+
+    /**
+     * Register an event listener
+     */
+    addEventListener: (
+        event: GitBookIntegrationEvent,
+        callback: GitBookIntegrationEventCallback
+    ) => void;
+
+    /**
+     * Remove an event listener
+     */
+    removeEventListener: (
+        event: GitBookIntegrationEvent,
+        callback: GitBookIntegrationEventCallback
+    ) => void;
+}>(() => {
+    return {
         events: new Map(),
         addEventListener: (event, callback) => {
             const handlers = window.GitBook?.events.get(event) ?? [];
@@ -16,6 +38,41 @@ if (typeof window !== 'undefined') {
             if (index !== -1) {
                 handlers.splice(index, 1);
             }
+        },
+    };
+});
+
+export const integrationsAssistantTools = zustand.createStore<{
+    /**
+     * Tools exposed to the assistant by integrations
+     */
+    tools: GitBookIntegrationTool[];
+
+    /**
+     * Register a tool with the assistant
+     */
+    registerTool: (tool: GitBookIntegrationTool) => void;
+}>((set) => {
+    return {
+        tools: [],
+        registerTool: (tool: GitBookIntegrationTool) => {
+            set((state) => ({
+                tools: [...state.tools, tool],
+            }));
+        },
+    };
+});
+
+if (typeof window !== 'undefined') {
+    window.GitBook = {
+        addEventListener: (event, callback) => {
+            integrationsEvents.getState().addEventListener(event, callback);
+        },
+        removeEventListener: (event, callback) => {
+            integrationsEvents.getState().removeEventListener(event, callback);
+        },
+        registerTool: (tool) => {
+            integrationsAssistantTools.getState().registerTool(tool);
         },
     };
 }
@@ -34,6 +91,8 @@ export function LoadIntegrations() {
  * Client function to dispatch a GitBook event.
  */
 function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: any[]) {
-    const handlers = window.GitBook?.events.get(type) || [];
-    handlers.forEach((handler) => handler(...args));
+    integrationsEvents
+        .getState()
+        .events.get(type)
+        ?.forEach((handler) => handler(...args));
 }
