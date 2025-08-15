@@ -55,6 +55,9 @@ interface InsightsProviderProps {
     /** If true, the visitor cookie tracking will be used */
     visitorCookieTrackingEnabled: boolean;
 
+    /** The application URL. */
+    appURL: string;
+
     /** The base path of the site. */
     basePath: string;
 
@@ -66,7 +69,7 @@ interface InsightsProviderProps {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, children, visitorCookieTrackingEnabled, basePath } = props;
+    const { enabled, children, visitorCookieTrackingEnabled, basePath, appURL } = props;
 
     const currentContent = useCurrentContent();
     const visitorIdRef = React.useRef<string | null>(null);
@@ -135,7 +138,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
 
     const flushBatchedEvents = useDebounceCallback(async () => {
         const visitorId =
-            visitorIdRef.current ?? (await getVisitorId(basePath, visitorCookieTrackingEnabled));
+            visitorIdRef.current ?? (await getVisitorId(appURL, visitorCookieTrackingEnabled));
         visitorIdRef.current = visitorId;
 
         flushEventsSync();
@@ -179,7 +182,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
      * Get the visitor ID and store it in a ref.
      */
     React.useEffect(() => {
-        getVisitorId(basePath, visitorCookieTrackingEnabled).then((visitorId) => {
+        getVisitorId(appURL, visitorCookieTrackingEnabled).then((visitorId) => {
             visitorIdRef.current = visitorId;
             // When the page is unloaded, flush all events, but only if the visitor ID is set
             window.addEventListener('beforeunload', flushEventsSync);
