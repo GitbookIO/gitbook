@@ -2,9 +2,11 @@
 
 import * as zustand from 'zustand';
 
-import { AIMessageRole } from '@gitbook/api';
+import { AIMessageRole, type AIToolCallResult } from '@gitbook/api';
+import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
+import { integrationsAssistantTools } from '../Integrations';
 import { useSearch } from '../Search';
 import { streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
@@ -13,6 +15,16 @@ export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+};
+
+export type AIChatPendingTool = {
+    icon?: IconName;
+    label: string;
+
+    /**
+     * Confirm the tool call by calling this function.
+     */
+    confirm: () => Promise<void>;
 };
 
 export type AIChatState = {
@@ -45,6 +57,11 @@ export type AIChatState = {
      * Suggestions for follow-up messages.
      */
     followUpSuggestions: string[];
+
+    /**
+     * Tools that are pending confirmation to be executed.
+     */
+    pendingTools: AIChatPendingTool[];
 
     /**
      * If true, the session is in progress.
@@ -82,6 +99,7 @@ const globalState = zustand.create<{
             messages: [],
             query: null,
             followUpSuggestions: [],
+            pendingTools: [],
             loading: false,
             error: false,
             initialQuery: null,
@@ -107,6 +125,8 @@ export function useAIChatController(): AIChatController {
     const setState = zustand.useStore(globalState, (state) => state.setState);
     const trackEvent = useTrackEvent();
     const [searchState, setSearchState] = useSearch(true);
+
+    const integrationTools = zustand.useStore(integrationsAssistantTools, (state) => state.tools);
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
@@ -134,6 +154,158 @@ export function useAIChatController(): AIChatController {
             open: false,
         }));
     }, [setState, setSearchState]);
+
+    // Stream a message with the AI backend
+    const streamResponse = React.useCallback(
+        async (input: {
+            /** Text message to send to the AI backend */
+            message?: string;
+            /** Tool call to send to the AI backend */
+            toolCall?: AIToolCallResult;
+        }) => {
+            setState((state) => {
+                return {
+                    ...state,
+                    responseId: null,
+                    followUpSuggestions: [],
+                    pendingTools: [],
+                    loading: true,
+                    error: false,
+                };
+            });
+
+            try {
+                const stream = await streamAIChatResponse({
+                    message: input.message,
+                    toolCall: input.toolCall,
+                    messageContext: messageContextRef.current,
+                    previousResponseId: globalState.getState().state.responseId ?? undefined,
+                    tools: integrationTools.map((tool) => ({
+                        name: tool.name,
+                        description: tool.description,
+                        inputSchema: tool.inputSchema,
+                        confirmation: {
+                            icon: tool.confirmation.icon,
+                            label: tool.confirmation.label,
+                        },
+                    })),
+                });
+
+                // Process streaming response
+                for await (const data of stream) {
+                    if (!data) continue;
+
+                    if (globalState.getState().state.query !== input.message) break; // Chat was cleared, stop processing the stream
+
+                    const event = data.event;
+
+                    switch (event.type) {
+                        case 'response_finish': {
+                            setState((state) => ({
+                                ...state,
+                                responseId: event.responseId,
+                                // Mark as not loading when the response is finished
+                                // Even if the stream might continue as we receive 'response_followup_suggestion'
+                                loading: false,
+                                error: false,
+                            }));
+                            break;
+                        }
+                        case 'response_followup_suggestion': {
+                            setState((state) => ({
+                                ...state,
+                                followUpSuggestions: [
+                                    ...state.followUpSuggestions,
+                                    ...event.suggestions,
+                                ],
+                            }));
+                            break;
+                        }
+                        case 'response_tool_confirm': {
+                            setState((state) => ({
+                                ...state,
+                                pendingTools: [
+                                    ...state.pendingTools,
+                                    {
+                                        icon: event.toolConfirmation.icon as IconName,
+                                        label: event.toolConfirmation.label,
+                                        confirm: async () => {
+                                            const toolDef = integrationTools.find(
+                                                (tool) => tool.name === event.toolCall.tool
+                                            );
+
+                                            if (!toolDef) {
+                                                throw new Error(
+                                                    `Tool ${event.toolCall.tool} not found`
+                                                );
+                                            }
+
+                                            try {
+                                                const result = await toolDef.execute(
+                                                    event.toolCall.input
+                                                );
+                                                streamResponse({
+                                                    toolCall: {
+                                                        tool: event.toolCall.tool,
+                                                        toolCallId: event.toolCallId,
+                                                        output: result.output,
+                                                        summary: result.summary,
+                                                    },
+                                                });
+                                            } catch (error) {
+                                                streamResponse({
+                                                    toolCall: {
+                                                        tool: event.toolCall.tool,
+                                                        toolCallId: event.toolCallId,
+                                                        output: {
+                                                            error:
+                                                                error instanceof Error
+                                                                    ? error.message
+                                                                    : 'Unknown error',
+                                                        },
+                                                        summary: {
+                                                            icon: 'bomb',
+                                                            text: 'An error occurred while executing the tool',
+                                                        },
+                                                    },
+                                                });
+                                            }
+                                        },
+                                    },
+                                ],
+                            }));
+                            break;
+                        }
+                    }
+
+                    // Update the assistant message with streamed content
+                    setState((state) => ({
+                        ...state,
+                        messages: [
+                            ...state.messages.slice(0, -1),
+                            {
+                                role: AIMessageRole.Assistant,
+                                content: data.content,
+                            },
+                        ],
+                    }));
+                }
+
+                setState((state) => ({
+                    ...state,
+                    loading: false,
+                    error: false,
+                }));
+            } catch {
+                setState((state) => ({
+                    ...state,
+                    loading: false,
+                    error: true,
+                }));
+            }
+        },
+        [messageContextRef.current, setState, integrationTools]
+    );
 
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
@@ -181,72 +353,9 @@ export function useAIChatController(): AIChatController {
                 };
             });
 
-            try {
-                const stream = await streamAIChatResponse({
-                    message: input.message,
-                    messageContext: messageContextRef.current,
-                    previousResponseId: globalState.getState().state.responseId ?? undefined,
-                });
-
-                // Process streaming response
-                for await (const data of stream) {
-                    if (!data) continue;
-
-                    if (globalState.getState().state.query !== input.message) break; // Chat was cleared, stop processing the stream
-
-                    const event = data.event;
-
-                    switch (event.type) {
-                        case 'response_finish': {
-                            setState((state) => ({
-                                ...state,
-                                responseId: event.responseId,
-                                // Mark as not loading when the response is finished
-                                // Even if the stream might continue as we receive 'response_followup_suggestion'
-                                loading: false,
-                                error: false,
-                            }));
-                            break;
-                        }
-                        case 'response_followup_suggestion': {
-                            setState((state) => ({
-                                ...state,
-                                followUpSuggestions: [
-                                    ...state.followUpSuggestions,
-                                    ...event.suggestions,
-                                ],
-                            }));
-                            break;
-                        }
-                    }
-
-                    // Update the assistant message with streamed content
-                    setState((state) => ({
-                        ...state,
-                        messages: [
-                            ...state.messages.slice(0, -1),
-                            {
-                                role: AIMessageRole.Assistant,
-                                content: data.content,
-                            },
-                        ],
-                    }));
-                }
-
-                setState((state) => ({
-                    ...state,
-                    loading: false,
-                    error: false,
-                }));
-            } catch {
-                setState((state) => ({
-                    ...state,
-                    loading: false,
-                    error: true,
-                }));
-            }
+            streamResponse({ message: input.message });
         },
-        [messageContextRef.current, setState, setSearchState, trackEvent]
+        [setState, setSearchState, trackEvent, streamResponse]
     );
 
     // Clear the conversation and reset ask parameter
@@ -257,6 +366,7 @@ export function useAIChatController(): AIChatController {
             messages: [],
             query: null,
             followUpSuggestions: [],
+            pendingTools: [],
             responseId: null,
             error: false,
             initialQuery: null,
