@@ -25,6 +25,11 @@ export type AIChatPendingTool = {
      * Confirm the tool call by calling this function.
      */
     confirm: () => Promise<void>;
+
+    /**
+     * Tool call result to cancel it.
+     */
+    cancelToolCall: AIToolCallResult;
 };
 
 export type AIChatState = {
@@ -173,12 +178,13 @@ export function useAIChatController(): AIChatController {
             });
 
             try {
+                const integrationTools = integrationsAssistantTools.getState().tools;
                 const stream = await streamAIChatResponse({
                     message: input.message,
                     toolCall: input.toolCall,
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().state.responseId ?? undefined,
-                    tools: integrationsAssistantTools.getState().tools.map((tool) => ({
+                    tools: integrationTools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,
                         inputSchema: tool.inputSchema,
@@ -227,6 +233,17 @@ export function useAIChatController(): AIChatController {
                                     {
                                         icon: event.toolConfirmation.icon as IconName,
                                         label: event.toolConfirmation.label,
+                                        cancelToolCall: {
+                                            tool: event.toolCall.tool,
+                                            toolCallId: event.toolCallId,
+                                            output: {
+                                                cancelled: 'User did not confirm the tool call',
+                                            },
+                                            summary: {
+                                                icon: 'forward',
+                                                text: `Skipped confirmation of "${event.toolConfirmation.label}"`,
+                                            },
+                                        },
                                         confirm: async () => {
                                             const toolDef = integrationTools.find(
                                                 (tool) => tool.name === event.toolCall.tool
@@ -308,7 +325,7 @@ export function useAIChatController(): AIChatController {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, messages } = globalState.getState().state;
+            const { query, messages, pendingTools } = globalState.getState().state;
 
             // For first message, update the ask parameter in URL
             if (messages.length === 0) {
@@ -351,7 +368,13 @@ export function useAIChatController(): AIChatController {
                 };
             });
 
-            streamResponse({ message: input.message });
+            const pendingTool = pendingTools[0];
+            streamResponse({
+                message: input.message,
+                // If we had a pending tool call, we need to send it as being cancelled
+                // otherwise the AI will fail to process the message
+                ...(pendingTool ? { toolCall: pendingTool.cancelToolCall } : {}),
+            });
         },
         [setState, setSearchState, trackEvent, streamResponse]
     );

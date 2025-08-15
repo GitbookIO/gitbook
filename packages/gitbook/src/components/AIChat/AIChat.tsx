@@ -238,7 +238,7 @@ export function AIChatWindow(props: {
                         value={input}
                         onChange={setInput}
                         loading={chat.loading}
-                        disabled={chat.loading || chat.error || chat.pendingTools.length > 0}
+                        disabled={chat.loading || chat.error}
                         onSubmit={() => {
                             chatController.postMessage({ message: input });
                             setInput('');
