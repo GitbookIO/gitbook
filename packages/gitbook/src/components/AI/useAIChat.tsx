@@ -169,7 +169,6 @@ export function useAIChatController(): AIChatController {
             setState((state) => {
                 return {
                     ...state,
-                    responseId: null,
                     followUpSuggestions: [],
                     pendingTools: [],
                     loading: true,
@@ -199,7 +198,10 @@ export function useAIChatController(): AIChatController {
                 for await (const data of stream) {
                     if (!data) continue;
 
-                    if (globalState.getState().state.query !== input.message) break; // Chat was cleared, stop processing the stream
+                    if (input.message && globalState.getState().state.query !== input.message) {
+                        // Chat was cleared, stop processing the stream
+                        break;
+                    }
 
                     const event = data.event;
 
@@ -361,7 +363,6 @@ export function useAIChatController(): AIChatController {
                         },
                     ],
                     query: input.message,
-                    responseId: null,
                     followUpSuggestions: [],
                     loading: true,
                     error: false,
