@@ -14,7 +14,7 @@ export function AIChatToolConfirmations(props: {
     }
 
     return (
-        <div className="mt-auto flex w-full flex-wrap justify-end gap-2">
+        <div className="flex w-full flex-wrap justify-end gap-2">
             {chat.pendingTools.map((tool, index) => (
                 <Button
                     key={index}

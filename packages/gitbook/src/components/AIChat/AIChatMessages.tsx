@@ -61,13 +61,17 @@ export function AIChatMessages(props: {
 
                         {isLastMessage ? (
                             <>
-                                {!chat.loading && !chat.error && chat.query && chat.responseId && (
+                                {!chat.loading &&
+                                !chat.error &&
+                                chat.query &&
+                                chat.responseId &&
+                                chat.pendingTools.length === 0 ? (
                                     <AIResponseFeedback
                                         responseId={chat.responseId}
                                         query={chat.query}
                                         className="-ml-1 -mt-4"
                                     />
-                                )}
+                                ) : null}
                                 <AIChatToolConfirmations chat={chat} />
                                 <AIChatFollowupSuggestions
                                     chat={chat}

@@ -126,8 +126,6 @@ export function useAIChatController(): AIChatController {
     const trackEvent = useTrackEvent();
     const [searchState, setSearchState] = useSearch(true);
 
-    const integrationTools = zustand.useStore(integrationsAssistantTools, (state) => state.tools);
-
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
         const { initialQuery } = globalState.getState().state;
@@ -180,7 +178,7 @@ export function useAIChatController(): AIChatController {
                     toolCall: input.toolCall,
                     messageContext: messageContextRef.current,
                     previousResponseId: globalState.getState().state.responseId ?? undefined,
-                    tools: integrationTools.map((tool) => ({
+                    tools: integrationsAssistantTools.getState().tools.map((tool) => ({
                         name: tool.name,
                         description: tool.description,
                         inputSchema: tool.inputSchema,
@@ -304,7 +302,7 @@ export function useAIChatController(): AIChatController {
                 }));
             }
         },
-        [messageContextRef.current, setState, integrationTools]
+        [messageContextRef.current, setState]
     );
 
     // Post a message to the AI chat
