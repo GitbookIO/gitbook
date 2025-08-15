@@ -13,6 +13,7 @@ export const ButtonStyles = [
     'border',
     'border-tint',
     'hover:border-tint-hover',
+    'disabled:border-tint',
 
     'depth-subtle:shadow-xs',
     'hover:depth-subtle:shadow-md',
