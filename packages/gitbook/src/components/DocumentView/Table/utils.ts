@@ -125,5 +125,5 @@ export function getColumnVerticalAlignment(column: DocumentTableDefinition): Ver
 }
 
 export function isContentRef(ref: DocumentTableRecord['values'][string]): ref is ContentRef {
-    return Boolean(ref && typeof ref === 'object' && 'kind' in ref && 'file' in ref);
+    return Boolean(ref && typeof ref === 'object' && 'kind' in ref);
 }

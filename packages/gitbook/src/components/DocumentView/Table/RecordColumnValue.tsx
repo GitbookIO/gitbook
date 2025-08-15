@@ -222,8 +222,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         case 'content-ref': {
             const contentRef = isContentRef(value) ? value : null;
             const resolved =
-                isContentRef(value) && context.contentContext
-                    ? await resolveContentRef(value, context.contentContext, {
+                contentRef && context.contentContext
+                    ? await resolveContentRef(contentRef, context.contentContext, {
                           resolveAnchorText: true,
                           iconStyle: ['mr-2', 'text-tint-subtle'],
                       })
