@@ -75,28 +75,6 @@ if (typeof window !== 'undefined') {
             integrationsAssistantTools.getState().registerTool(tool);
         },
     };
-
-    window.GitBook?.registerTool({
-        name: 'promptToOpenIntercom',
-        description:
-            'Show a button to user to open the Intercom Messenger to help them reach out to the support. Use this tool when you believe the user should talk to the support.',
-        confirmation: {
-            label: 'Contact support',
-            icon: 'message-arrow-up-right',
-        },
-        execute: async () => {
-            alert('Tada!');
-            return {
-                output: {
-                    clicked: true,
-                },
-                summary: {
-                    icon: 'message-middle',
-                    text: 'Opened chat with support',
-                },
-            };
-        },
-    });
 }
 
 /**
