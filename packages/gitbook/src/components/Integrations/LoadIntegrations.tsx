@@ -87,7 +87,9 @@ if (typeof window !== 'undefined') {
         execute: async () => {
             alert('Tada!');
             return {
-                output: {},
+                output: {
+                    clicked: true,
+                },
                 summary: {
                     icon: 'message-middle',
                     text: 'Opened chat with support',
