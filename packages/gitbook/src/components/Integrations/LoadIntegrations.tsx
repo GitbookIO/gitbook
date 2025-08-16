@@ -3,6 +3,13 @@
 import * as React from 'react';
 import * as zustand from 'zustand';
 
+import type {
+    GitBookGlobal,
+    GitBookIntegrationEvent,
+    GitBookIntegrationEventCallback,
+    GitBookIntegrationTool,
+} from '@gitbook/browser-types';
+
 export const integrationsEvents = zustand.createStore<{
     /**
      * Events emitted by integrations
@@ -64,7 +71,7 @@ export const integrationsAssistantTools = zustand.createStore<{
 });
 
 if (typeof window !== 'undefined') {
-    window.GitBook = {
+    const gitbookGlobal: GitBookGlobal = {
         addEventListener: (event, callback) => {
             integrationsEvents.getState().addEventListener(event, callback);
         },
@@ -75,6 +82,7 @@ if (typeof window !== 'undefined') {
             integrationsAssistantTools.getState().registerTool(tool);
         },
     };
+    window.GitBook = gitbookGlobal;
 }
 
 /**
