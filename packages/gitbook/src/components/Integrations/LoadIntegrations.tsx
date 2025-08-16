@@ -10,44 +10,7 @@ import type {
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
 
-export const integrationsEvents = zustand.createStore<{
-    /**
-     * Events emitted by integrations
-     */
-    events: Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>;
-
-    /**
-     * Register an event listener
-     */
-    addEventListener: (
-        event: GitBookIntegrationEvent,
-        callback: GitBookIntegrationEventCallback
-    ) => void;
-
-    /**
-     * Remove an event listener
-     */
-    removeEventListener: (
-        event: GitBookIntegrationEvent,
-        callback: GitBookIntegrationEventCallback
-    ) => void;
-}>(() => {
-    return {
-        events: new Map(),
-        addEventListener: (event, callback) => {
-            const handlers = window.GitBook?.events.get(event) ?? [];
-            handlers.push(callback);
-            window.GitBook?.events.set(event, handlers);
-        },
-        removeEventListener: (event, callback) => {
-            const handlers = window.GitBook?.events.get(event) ?? [];
-            const index = handlers.indexOf(callback);
-            if (index !== -1) {
-                handlers.splice(index, 1);
-            }
-        },
-    };
-});
+const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
 export const integrationsAssistantTools = zustand.createStore<{
     /**
@@ -73,10 +36,16 @@ export const integrationsAssistantTools = zustand.createStore<{
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
         addEventListener: (event, callback) => {
-            integrationsEvents.getState().addEventListener(event, callback);
+            const handlers = events.get(event) ?? [];
+            handlers.push(callback);
+            events.set(event, handlers);
         },
         removeEventListener: (event, callback) => {
-            integrationsEvents.getState().removeEventListener(event, callback);
+            const handlers = events.get(event) ?? [];
+            const index = handlers.indexOf(callback);
+            if (index !== -1) {
+                handlers.splice(index, 1);
+            }
         },
         registerTool: (tool) => {
             integrationsAssistantTools.getState().registerTool(tool);
@@ -99,8 +68,5 @@ export function LoadIntegrations() {
  * Client function to dispatch a GitBook event.
  */
 function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: any[]) {
-    integrationsEvents
-        .getState()
-        .events.get(type)
-        ?.forEach((handler) => handler(...args));
+    events.get(type)?.forEach((handler) => handler(...args));
 }
