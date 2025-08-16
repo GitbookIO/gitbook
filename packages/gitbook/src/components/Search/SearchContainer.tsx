@@ -1,9 +1,11 @@
 'use client';
 
-import { CustomizationAIMode } from '@gitbook/api';
+import { CustomizationAIMode, CustomizationSearchStyle } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useAI } from '../AI/useAI';
+import { AIChatButton } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Popover } from '../primitives';
@@ -19,7 +21,7 @@ interface SearchContainerProps {
     siteSpaceId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
-    aiMode: CustomizationAIMode;
+    style: CustomizationSearchStyle;
     className?: string;
 }
 
@@ -27,10 +29,15 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { siteSpaceId, spaceTitle, isMultiVariants, aiMode, className } = props;
+    const { siteSpaceId, spaceTitle, isMultiVariants, style, className } = props;
 
-    const withAIChat = aiMode === CustomizationAIMode.Assistant;
-    const [state, setSearchState] = useSearch(withAIChat);
+    // Assistants are provided by a unified hook (built-in + custom)
+    const { assistants, aiMode } = useAI();
+    const withAsk = aiMode === CustomizationAIMode.Search;
+    const withAssistant = assistants.length > 0;
+    const withAI = withAsk || withAssistant;
+
+    const [state, setSearchState] = useSearch(!withAssistant);
     const searchAsk = useSearchAskState();
     const router = useRouter();
     const trackEvent = useTrackEvent();
@@ -42,15 +49,16 @@ export function SearchContainer(props: SearchContainerProps) {
     // Derive open state from search state
     const open = state?.open ?? false;
 
-    React.useEffect(() => {
-        if (state?.ask && aiMode === CustomizationAIMode.Assistant) {
+    React.useLayoutEffect(() => {
+        if (state?.ask && !withAsk && withAssistant) {
             // Close the pop-over when we switch to “ask” mode
             setSearchState((prev) => (prev ? { ...prev, open: !state.ask } : prev));
-        } else if (state?.ask && aiMode === CustomizationAIMode.None) {
+            assistants[0].onOpen(state.ask);
+        } else if (state?.ask && !withAI) {
             // Rewrite ask to query when the site doesn't support AI
             setSearchState((prev) => (prev ? { ...prev, query: prev.ask, ask: null } : prev));
         }
-    }, [state?.ask, setSearchState, aiMode]);
+    }, [state?.ask, setSearchState, withAssistant, withAI]);
 
     const onClose = React.useCallback(
         async (to?: string) => {
@@ -83,16 +91,16 @@ export function SearchContainer(props: SearchContainerProps) {
             return;
         }
         setSearchState((prev) => ({
-            ask: aiMode === CustomizationAIMode.Assistant && prev ? prev.ask : null,
+            ask: withAssistant && prev ? prev.ask : null,
             global: prev?.global ?? false,
-            query: (!withAIChat ? prev?.ask : null) ?? prev?.query ?? '',
+            query: (!withAssistant ? prev?.ask : null) ?? prev?.query ?? '',
             open: true,
         }));
 
         trackEvent({
             type: 'search_open',
         });
-    }, [open, setSearchState, trackEvent, withAIChat]);
+    }, [open, setSearchState, trackEvent, withAssistant]);
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -122,7 +130,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onChange = (value: string) => {
         setSearchState((prev) => ({
-            ask: aiMode === CustomizationAIMode.Assistant && prev ? prev.ask : null, // When typing, we go back to the default search mode
+            ask: withAssistant && prev ? prev.ask : null,
             query: value,
             global: prev?.global ?? false,
             open: true,
@@ -133,7 +141,7 @@ export function SearchContainer(props: SearchContainerProps) {
     const normalizedQuery = state?.query?.trim() ?? '';
     const normalizedAsk = state?.ask?.trim() ?? '';
 
-    const showAsk = aiMode === CustomizationAIMode.Search && normalizedAsk;
+    const showAsk = withAsk && normalizedAsk;
 
     return (
         <SearchAskProvider value={searchAsk}>
@@ -150,7 +158,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     ref={resultsRef}
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
-                                    aiMode={aiMode}
+                                    withAI={withAI}
                                     siteSpaceId={siteSpaceId}
                                 />
                             ) : null}
@@ -189,7 +197,7 @@ export function SearchContainer(props: SearchContainerProps) {
             >
                 <SearchInput
                     ref={searchInputRef}
-                    value={(!withAIChat ? state?.ask : null) ?? state?.query ?? ''}
+                    value={(!withAssistant ? state?.ask : null) ?? state?.query ?? ''}
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
@@ -198,6 +206,15 @@ export function SearchContainer(props: SearchContainerProps) {
                     className={className}
                 />
             </Popover>
+            {assistants.map((assistant) => (
+                <AIChatButton
+                    key={assistant.label}
+                    {...assistant}
+                    showLabel={
+                        assistants.length === 1 && style === CustomizationSearchStyle.Prominent
+                    }
+                />
+            ))}
         </SearchAskProvider>
     );
 }

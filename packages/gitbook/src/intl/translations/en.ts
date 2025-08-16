@@ -16,7 +16,7 @@ export const en = {
     search_scope_all: 'All content',
     ask: 'Ask',
     search_ask: 'Ask "${1}"',
-    search_ask_description: 'Find the answer with AI',
+    search_ask_description: 'Find the answer with ${1}',
     search_ask_sources: 'Sources',
     search_ask_sources_no_answer: 'Related pages',
     search_ask_no_answer:

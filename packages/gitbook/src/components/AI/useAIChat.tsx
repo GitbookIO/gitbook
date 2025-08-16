@@ -106,7 +106,7 @@ export function useAIChatController(): AIChatController {
     const messageContextRef = useAIMessageContextRef();
     const setState = zustand.useStore(globalState, (state) => state.setState);
     const trackEvent = useTrackEvent();
-    const [searchState, setSearchState] = useSearch(true);
+    const [searchState, setSearchState] = useSearch(false);
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {

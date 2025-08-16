@@ -1,6 +1,5 @@
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
 import React from 'react';
-
 import type { LinkProps } from '../primitives';
 
 export interface SearchState {
@@ -27,7 +26,7 @@ export type UpdateSearchState = (
 /**
  * Hook to access the current search query and update it.
  */
-export function useSearch(withAIChat = false): [SearchState | null, UpdateSearchState] {
+export function useSearch(defaultOpen = true): [SearchState | null, UpdateSearchState] {
     const [rawState, setRawState] = useQueryStates(keyMap, {
         history: 'replace',
     });
@@ -47,7 +46,7 @@ export function useSearch(withAIChat = false): [SearchState | null, UpdateSearch
     // Separate local state for open (not synchronized with URL)
     // Default to true if there's already a query in the URL
     const [open, setIsOpen] = React.useState(() => {
-        return rawState?.q !== null || (!withAIChat && rawState?.ask !== null);
+        return rawState?.q !== null || (defaultOpen && rawState?.ask !== null);
     });
 
     const state = React.useMemo<SearchState | null>(() => {

@@ -48,6 +48,29 @@ if (typeof window !== 'undefined') {
             return customAssistants.getState().registerAssistant(assistant);
         },
     };
+
+    window.GitBook.registerCustomAssistant({
+        label: 'Custom AI',
+        icon: 'sparkle',
+        onOpen: (query) => {
+            alert(`Test assistant opened: ${query}`);
+        },
+    });
+
+    // window.GitBook.registerCustomAssistant({
+    //     label: 'Another AI Integration',
+    //     icon: 'puzzle-piece',
+    //     onOpen: (query) => {
+    //         console.log('Test 2 assistant opened', query);
+    //     },
+    // });
+}
+
+/**
+ * Get the current state of the assistants.
+ */
+export function useCustomAssistants(): Array<CustomAssistant> {
+    return zustand.useStore(customAssistants, (state) => state.assistants);
 }
 
 /**

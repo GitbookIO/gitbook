@@ -2,7 +2,7 @@ import React from 'react';
 
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
-import { AIChatIcon } from '../AIChat/';
+import type { AssistantItem } from '../AI/useAI';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
 
@@ -11,11 +11,11 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         question: string;
         active: boolean;
         recommended?: boolean;
-        withAIChat: boolean;
+        assistant?: AssistantItem;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { question, recommended = false, active, withAIChat } = props;
+    const { question, recommended = false, active, assistant } = props;
     const language = useLanguage();
     const getLinkProp = useSearchLink();
 
@@ -31,16 +31,11 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 open: false,
                 query: null,
             })}
+            onClick={() => {
+                assistant?.onOpen(question);
+            }}
             active={active}
-            leadingIcon={
-                recommended ? (
-                    <Icon icon="search" className="size-4" />
-                ) : withAIChat ? (
-                    <AIChatIcon className="size-4" />
-                ) : (
-                    <Icon icon="sparkles" className="size-4" />
-                )
-            }
+            leadingIcon={recommended ? <Icon icon="search" className="size-4" /> : assistant?.icon}
             className={recommended ? 'pr-1.5' : ''}
         >
             {recommended ? (
@@ -51,7 +46,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                         {t(language, 'search_ask', [question])}
                     </div>
                     <div className="text-sm text-tint-subtle">
-                        {t(language, 'search_ask_description')}
+                        {t(language, 'search_ask_description', assistant?.label)}
                     </div>
                 </>
             )}
