@@ -2,7 +2,11 @@
 
 import * as zustand from 'zustand';
 
-import { AIMessageRole, type AIToolCallResult } from '@gitbook/api';
+import {
+    AIMessageRole,
+    type AIStreamResponseToolCallPending,
+    type AIToolCallResult,
+} from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
@@ -176,6 +180,43 @@ export function useAIChatController(): AIChatController {
                 };
             });
 
+            // Execute a tool call
+            const executeToolCall = async (event: AIStreamResponseToolCallPending) => {
+                const integrationTools = integrationsAssistantTools.getState().tools;
+                const toolDef = integrationTools.find((tool) => tool.name === event.toolCall.tool);
+
+                if (!toolDef) {
+                    throw new Error(`Tool ${event.toolCall.tool} not found`);
+                }
+
+                try {
+                    const result = await toolDef.execute(event.toolCall.input);
+                    streamResponse({
+                        toolCall: {
+                            tool: event.toolCall.tool,
+                            toolCallId: event.toolCallId,
+                            output: result.output,
+                            summary: result.summary,
+                        },
+                    });
+                } catch (error) {
+                    streamResponse({
+                        toolCall: {
+                            tool: event.toolCall.tool,
+                            toolCallId: event.toolCallId,
+                            output: {
+                                error: error instanceof Error ? error.message : 'Unknown error',
+                            },
+                            summary: {
+                                icon: 'bomb',
+                                text: 'An error occurred while executing the tool',
+                            },
+                        },
+                    });
+                }
+            };
+
+            let toolToExecute: AIStreamResponseToolCallPending | null = null;
             try {
                 const integrationTools = integrationsAssistantTools.getState().tools;
                 const stream = await streamAIChatResponse({
@@ -227,70 +268,42 @@ export function useAIChatController(): AIChatController {
                             }));
                             break;
                         }
-                        case 'response_tool_confirm': {
-                            setState((state) => ({
-                                ...state,
-                                pendingTools: [
-                                    ...state.pendingTools,
-                                    {
-                                        icon: event.toolConfirmation.icon as IconName,
-                                        label: event.toolConfirmation.label,
-                                        cancelToolCall: {
-                                            tool: event.toolCall.tool,
-                                            toolCallId: event.toolCallId,
-                                            output: {
-                                                cancelled: 'User did not confirm the tool call',
+                        case 'response_tool_call_pending': {
+                            const toolDef = integrationsAssistantTools
+                                .getState()
+                                .tools.find((tool) => tool.name === event.toolCall.tool);
+                            if (!toolDef) {
+                                throw new Error(`Tool ${event.toolCall.tool} not found`);
+                            }
+
+                            if (toolDef.confirmation) {
+                                setState((state) => ({
+                                    ...state,
+                                    pendingTools: [
+                                        ...state.pendingTools,
+                                        {
+                                            icon: toolDef.confirmation.icon,
+                                            label: toolDef.confirmation.label,
+                                            cancelToolCall: {
+                                                tool: event.toolCall.tool,
+                                                toolCallId: event.toolCallId,
+                                                output: {
+                                                    cancelled: 'User did not confirm the tool call',
+                                                },
+                                                summary: {
+                                                    icon: 'forward',
+                                                    text: `Skipped confirmation of "${toolDef.confirmation.label}"`,
+                                                },
                                             },
-                                            summary: {
-                                                icon: 'forward',
-                                                text: `Skipped confirmation of "${event.toolConfirmation.label}"`,
+                                            confirm: async () => {
+                                                await executeToolCall(event);
                                             },
                                         },
-                                        confirm: async () => {
-                                            const toolDef = integrationTools.find(
-                                                (tool) => tool.name === event.toolCall.tool
-                                            );
-
-                                            if (!toolDef) {
-                                                throw new Error(
-                                                    `Tool ${event.toolCall.tool} not found`
-                                                );
-                                            }
-
-                                            try {
-                                                const result = await toolDef.execute(
-                                                    event.toolCall.input
-                                                );
-                                                streamResponse({
-                                                    toolCall: {
-                                                        tool: event.toolCall.tool,
-                                                        toolCallId: event.toolCallId,
-                                                        output: result.output,
-                                                        summary: result.summary,
-                                                    },
-                                                });
-                                            } catch (error) {
-                                                streamResponse({
-                                                    toolCall: {
-                                                        tool: event.toolCall.tool,
-                                                        toolCallId: event.toolCallId,
-                                                        output: {
-                                                            error:
-                                                                error instanceof Error
-                                                                    ? error.message
-                                                                    : 'Unknown error',
-                                                        },
-                                                        summary: {
-                                                            icon: 'bomb',
-                                                            text: 'An error occurred while executing the tool',
-                                                        },
-                                                    },
-                                                });
-                                            }
-                                        },
-                                    },
-                                ],
-                            }));
+                                    ],
+                                }));
+                            } else {
+                                toolToExecute = event;
+                            }
                             break;
                         }
                     }
@@ -306,6 +319,11 @@ export function useAIChatController(): AIChatController {
                             },
                         ],
                     }));
+                }
+
+                // Execute the tool call if it doesn't require confirmation
+                if (toolToExecute) {
+                    await executeToolCall(toolToExecute);
                 }
 
                 setState((state) => ({

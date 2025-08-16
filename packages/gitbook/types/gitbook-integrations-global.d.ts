@@ -6,19 +6,7 @@ declare global {
 
     type GitBookIntegrationEventCallback = (...args: any[]) => void;
 
-    type GitBookIntegrationTool = {
-        /**
-         * Name of the tool.
-         */
-        name: string;
-
-        /**
-         * Description of the tool.
-         * It'll not be displayed to the user, but will be passed to the AI assistant
-         * to understand the tool and its capabilities.
-         */
-        description: string;
-
+    type GitBookIntegrationTool = AIToolDefinition & {
         /**
          * Confirmation action to be displayed to the user before executing the tool.
          */
@@ -26,11 +14,6 @@ declare global {
             icon?: IconName;
             label: string;
         };
-
-        /**
-         * Input schema of the tool.
-         */
-        inputSchema?: AIToolDefinition['inputSchema'];
 
         /**
          * Execute the tool.
