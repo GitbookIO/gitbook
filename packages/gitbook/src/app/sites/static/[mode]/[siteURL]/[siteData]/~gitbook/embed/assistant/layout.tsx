@@ -1,6 +1,7 @@
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import { generateSiteLayoutMetadata, generateSiteLayoutViewport } from '@/components/SiteLayout';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 interface SiteStaticLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -14,7 +15,7 @@ export default async function EmbedAssistantRootLayout({
 
     return (
         <CustomizationRootLayout customization={context.customization}>
-            {children}
+            <NuqsAdapter>{children}</NuqsAdapter>
         </CustomizationRootLayout>
     );
 }

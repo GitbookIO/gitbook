@@ -1,6 +1,7 @@
 'use client';
 
 import { t, tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -44,15 +45,44 @@ export function AIChat(props: { trademark: boolean }) {
         return null;
     }
 
-    return <AIChatWindow trademark={trademark} chatController={chatController} chat={chat} />;
+    return (
+        <AIChatWindow
+            trademark={trademark}
+            chatController={chatController}
+            chat={chat}
+            className="inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
+        />
+    );
 }
 
-export function AIChatWindow(props: {
+/**
+ * Embeddable view of the AI chat window.
+ */
+export function AIChatEmbed(props: { trademark: boolean }) {
+    const { trademark } = props;
+    const chat = useAIChatState();
+    const chatController = useAIChatController();
+
+    return (
+        <AIChatWindow
+            trademark={trademark}
+            chatController={chatController}
+            chat={chat}
+            className="fixed inset-0"
+        />
+    );
+}
+
+/**
+ * Inner view of the AI chat window.
+ */
+function AIChatWindow(props: {
     chatController: AIChatController;
     chat: AIChatState;
     trademark: boolean;
+    className?: string;
 }) {
-    const { chatController, chat, trademark } = props;
+    const { chatController, chat, trademark, className } = props;
 
     const [input, setInput] = React.useState('');
 
@@ -119,11 +149,7 @@ export function AIChatWindow(props: {
     }, []);
 
     return (
-        <div
-            data-testid="ai-chat"
-            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
-            ref={containerRef}
-        >
+        <div data-testid="ai-chat" className={tcls('ai-chat', className)} ref={containerRef}>
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
                 <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     <AIChatIcon
