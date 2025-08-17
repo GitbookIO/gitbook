@@ -17,19 +17,9 @@ export const integrationsAssistantTools = zustand.createStore<{
      * Tools exposed to the assistant by integrations
      */
     tools: GitBookIntegrationTool[];
-
-    /**
-     * Register a tool with the assistant
-     */
-    registerTool: (tool: GitBookIntegrationTool) => void;
-}>((set) => {
+}>(() => {
     return {
         tools: [],
-        registerTool: (tool: GitBookIntegrationTool) => {
-            set((state) => ({
-                tools: [...state.tools, tool],
-            }));
-        },
     };
 });
 
@@ -48,7 +38,9 @@ if (typeof window !== 'undefined') {
             }
         },
         registerTool: (tool) => {
-            integrationsAssistantTools.getState().registerTool(tool);
+            integrationsAssistantTools.setState((state) => ({
+                tools: [...state.tools, tool],
+            }));
         },
     };
     window.GitBook = gitbookGlobal;
