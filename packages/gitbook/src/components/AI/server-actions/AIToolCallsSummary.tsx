@@ -10,6 +10,7 @@ import type {
     AIToolCallGetPageContent,
     AIToolCallGetPages,
     AIToolCallMCP,
+    AIToolCallOther,
     AIToolCallSearch,
     ContentRef,
 } from '@gitbook/api';
@@ -58,6 +59,8 @@ function getDescriptionForToolCall(toolCall: AIToolCall, context: GitBookSiteCon
             return <DescriptionForGetPagesToolCall toolCall={toolCall} context={context} />;
         case 'mcp':
             return <DescriptionForMCPToolCall toolCall={toolCall} context={context} />;
+        case 'other':
+            return <DescriptionForOtherToolCall toolCall={toolCall} context={context} />;
         default:
             return <>{toolCall.tool}</>;
     }
@@ -110,6 +113,15 @@ function DescriptionForMCPToolCall(props: {
             )}
         </p>
     );
+}
+
+function DescriptionForOtherToolCall(props: {
+    toolCall: AIToolCallOther;
+    context: GitBookSiteContext;
+}) {
+    const { toolCall } = props;
+
+    return <p>{toolCall.summary.text}</p>;
 }
 
 async function DescriptionForSearchToolCall(props: {
@@ -247,6 +259,8 @@ function getIconForToolCall(toolCall: AIToolCall): IconName {
             return 'magnifying-glass';
         case 'getPages':
             return 'files';
+        case 'other':
+            return (toolCall.summary.icon as IconName) ?? 'hammer';
         default:
             return 'hammer';
     }

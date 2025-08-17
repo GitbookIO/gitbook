@@ -25,7 +25,14 @@
             "bun-types" // add Bun global
         ]
     },
-    "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "types/**/*.d.ts"],
+    "include": [
+        "next-env.d.ts",
+        ".next/types/**/*.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "types/**/*.d.ts",
+        "@gitbook/browser-types"
+    ],
     "exclude": [
         "node_modules",
         "packages/openapi-parser",

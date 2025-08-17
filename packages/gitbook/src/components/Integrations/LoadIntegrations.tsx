@@ -1,23 +1,49 @@
 'use client';
 
 import * as React from 'react';
+import * as zustand from 'zustand';
+
+import type {
+    GitBookGlobal,
+    GitBookIntegrationEvent,
+    GitBookIntegrationEventCallback,
+    GitBookIntegrationTool,
+} from '@gitbook/browser-types';
+
+const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
+
+export const integrationsAssistantTools = zustand.createStore<{
+    /**
+     * Tools exposed to the assistant by integrations
+     */
+    tools: GitBookIntegrationTool[];
+}>(() => {
+    return {
+        tools: [],
+    };
+});
 
 if (typeof window !== 'undefined') {
-    window.GitBook = {
-        events: new Map(),
+    const gitbookGlobal: GitBookGlobal = {
         addEventListener: (event, callback) => {
-            const handlers = window.GitBook?.events.get(event) ?? [];
+            const handlers = events.get(event) ?? [];
             handlers.push(callback);
-            window.GitBook?.events.set(event, handlers);
+            events.set(event, handlers);
         },
         removeEventListener: (event, callback) => {
-            const handlers = window.GitBook?.events.get(event) ?? [];
+            const handlers = events.get(event) ?? [];
             const index = handlers.indexOf(callback);
             if (index !== -1) {
                 handlers.splice(index, 1);
             }
         },
+        registerTool: (tool) => {
+            integrationsAssistantTools.setState((state) => ({
+                tools: [...state.tools, tool],
+            }));
+        },
     };
+    window.GitBook = gitbookGlobal;
 }
 
 /**
@@ -34,6 +60,5 @@ export function LoadIntegrations() {
  * Client function to dispatch a GitBook event.
  */
 function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: any[]) {
-    const handlers = window.GitBook?.events.get(type) || [];
-    handlers.forEach((handler) => handler(...args));
+    events.get(type)?.forEach((handler) => handler(...args));
 }
