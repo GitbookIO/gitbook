@@ -9,13 +9,14 @@ export type GitBookIntegrationTool = AIToolDefinition & {
     /**
      * Confirmation action to be displayed to the user before executing the tool.
      */
-    confirmation: {
+    confirmation?: {
         icon?: IconName;
         label: string;
     };
 
     /**
-     * Execute the tool.
+     * Callback when the tool is executed.
+     * The input is provided by the AI assistant following the input schema of the tool.
      */
     execute: (input: object) => Promise<Pick<AIToolCallResult, 'output' | 'summary'>>;
 };
