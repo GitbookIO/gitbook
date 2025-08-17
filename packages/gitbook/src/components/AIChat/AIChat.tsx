@@ -58,29 +58,9 @@ export function AIChat(props: { trademark: boolean }) {
 }
 
 /**
- * Embeddable view of the AI chat window.
- */
-export function AIChatEmbed(props: { trademark: boolean }) {
-    const { trademark } = props;
-    const chat = useAIChatState();
-    const chatController = useAIChatController();
-
-    return (
-        <div className="fixed inset-0">
-            <AIChatWindow
-                trademark={trademark}
-                chatController={chatController}
-                chat={chat}
-                className=""
-            />
-        </div>
-    );
-}
-
-/**
  * Inner view of the AI chat window.
  */
-function AIChatWindow(props: {
+export function AIChatWindow(props: {
     chatController: AIChatController;
     chat: AIChatState;
     trademark: boolean;

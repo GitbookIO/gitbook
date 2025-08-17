@@ -12,7 +12,7 @@
     },
     "packages/browser-types": {
       "name": "@gitbook/browser-types",
-      "version": "0.3.1",
+      "version": "0.0.0",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:",
@@ -84,6 +84,7 @@
         "@tusbar/cache-control": "^1.0.2",
         "ai": "^4.2.2",
         "assert-never": "^1.2.1",
+        "bidc": "^0.0.2",
         "bun-types": "^1.1.20",
         "classnames": "^2.5.1",
         "direction": "^2.0.1",
@@ -1516,6 +1517,8 @@
     "before-after-hook": ["before-after-hook@3.0.2", "", {}, "sha512-Nik3Sc0ncrMK4UUdXQmAnRtzmNQTAAXmXIopizwZ1W1t8QmfJj+zL4OA2I7XPTPW5z5TDqv4hRo/JzouDJnX3A=="],
 
     "better-path-resolve": ["better-path-resolve@1.0.0", "", { "dependencies": { "is-windows": "^1.0.0" } }, "sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g=="],
+
+    "bidc": ["bidc@0.0.2", "", {}, "sha512-+t2xK8oQEpxYEM+350mMHSx7eZNoOX6SpjqD+p+lDpVwpYVXjkTCfy0N60xyjelZ2AOa8NAg/12uhAX3MuAR0g=="],
 
     "bignumber.js": ["bignumber.js@9.1.2", "", {}, "sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug=="],
 
