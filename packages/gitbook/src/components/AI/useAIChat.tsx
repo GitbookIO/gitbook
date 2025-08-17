@@ -272,14 +272,15 @@ export function useAIChatController(): AIChatController {
                                 throw new Error(`Tool ${event.toolCall.tool} not found`);
                             }
 
-                            if (toolDef.confirmation) {
+                            const confirmation = toolDef.confirmation;
+                            if (confirmation) {
                                 globalState.setState((state) => ({
                                     ...state,
                                     pendingTools: [
                                         ...state.pendingTools,
                                         {
-                                            icon: toolDef.confirmation.icon,
-                                            label: toolDef.confirmation.label,
+                                            icon: confirmation.icon,
+                                            label: confirmation.label,
                                             cancelToolCall: {
                                                 tool: event.toolCall.tool,
                                                 toolCallId: event.toolCallId,
@@ -288,7 +289,7 @@ export function useAIChatController(): AIChatController {
                                                 },
                                                 summary: {
                                                     icon: 'forward',
-                                                    text: `Skipped confirmation of "${toolDef.confirmation.label}"`,
+                                                    text: `Skipped confirmation of "${confirmation.label}"`,
                                                 },
                                             },
                                             confirm: async () => {
