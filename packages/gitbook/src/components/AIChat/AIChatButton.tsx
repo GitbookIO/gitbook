@@ -2,6 +2,7 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
+import type { Assistant } from '../AI';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
@@ -9,17 +10,15 @@ import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
  * Button to open/close the AI chat.
  */
 export function AIChatButton(props: {
-    label: string;
-    icon: React.ReactNode;
-    onOpen: () => void;
+    assistant: Assistant;
     showLabel?: boolean;
 }) {
-    const { label, icon, onOpen, showLabel = true } = props;
+    const { assistant, showLabel = true } = props;
     const language = useLanguage();
 
     return (
         <Button
-            icon={icon}
+            icon={assistant.icon}
             data-testid="ai-chat-button"
             iconOnly={!showLabel}
             size="medium"
@@ -27,11 +26,11 @@ export function AIChatButton(props: {
             className={tcls('h-9 px-2.5')}
             label={
                 <div className="flex items-center gap-2">
-                    {t(language, 'ai_chat_ask', label)}
+                    {t(language, 'ai_chat_ask', assistant.label)}
                     <KeyboardShortcut keys={['mod', 'i']} className="border-tint-11 text-tint-1" />
                 </div>
             }
-            onClick={() => onOpen()}
+            onClick={() => assistant.open()}
         >
             {showLabel ? <span className="max-md:hidden">{t(language, 'ask')}</span> : null}
         </Button>

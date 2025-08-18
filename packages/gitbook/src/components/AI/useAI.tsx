@@ -3,18 +3,41 @@
 import { CustomizationAIMode } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import * as React from 'react';
+import type { ReactNode } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
-import type { Assistant } from '@gitbook/browser-types';
+import type { GitBookAssistant } from '@gitbook/browser-types';
 import { useAIChatController, useAIChatState } from '.';
 import { AIChatIcon, getAIChatName } from '../AIChat';
-import { useCustomAssistants } from '../Integrations';
+import { useIntegrationAssistants } from '../Integrations';
 import { useSearch } from '../Search/useSearch';
 
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {
     aiMode: CustomizationAIMode;
     trademark: boolean;
+};
+
+export type Assistant = Omit<GitBookAssistant, 'icon'> & {
+    /**
+     * Unique identifier for the assistant. Generated automatically using Crypto.randomUUID().
+     * @example '123e4567-e89b-12d3-a456-426614174000'
+     */
+    id: string;
+
+    /**
+     * Display mode for the assistant. Currently, only `overlay` is supported for custom assistants.
+     * - `overlay`: Display the assistant in an overlay on top of the page.
+     * - `sidebar`: Display the assistant in a sidebar next to the page. Only supported for the GitBook Assistant.
+     * - `search`: Display the assistant inside the search container. Only supported for GitBook AI Search.
+     * @default 'overlay'
+     */
+    mode?: 'overlay' | 'sidebar' | 'search';
+
+    /**
+     * Icon of the assistant displayed in the UI.
+     */
+    icon: ReactNode | IconName;
 };
 
 const AIContext = React.createContext<AIConfig | null>(null);
@@ -33,7 +56,8 @@ function useAIConfig(): AIConfig {
     return ctx;
 }
 
-type AIContext = AIConfig & {
+type AIContext = {
+    config: AIConfig;
     assistants: Assistant[];
 };
 
@@ -60,13 +84,13 @@ export function useAI(): AIContext {
                     trademark={config.trademark}
                 />
             ),
-            onOpen: (query?: string) => {
+            open: (query?: string) => {
                 chatController.open();
                 if (query) {
                     chatController.postMessage({ message: query });
                 }
             },
-            button: true,
+            ui: true,
             mode: 'sidebar',
         });
     } else if (config.aiMode === CustomizationAIMode.Search) {
@@ -83,22 +107,22 @@ export function useAI(): AIContext {
                     />
                 </div>
             ),
-            onOpen: (query?: string) => {
+            open: (query?: string) => {
                 if (query) {
                     setSearchState((prev) =>
                         prev ? { ...prev, query: null, ask: query, open: true } : null
                     );
                 }
             },
-            button: false,
+            ui: false,
             mode: 'search',
         });
     }
 
-    const customAssistants = useCustomAssistants();
-    if (customAssistants.length > 0) {
+    const integrationAssistants = useIntegrationAssistants();
+    if (integrationAssistants.length > 0) {
         assistants.push(
-            ...customAssistants.map((assistant) => ({
+            ...integrationAssistants.map((assistant) => ({
                 ...assistant,
                 icon:
                     typeof assistant.icon === 'string' ? (
@@ -111,7 +135,7 @@ export function useAI(): AIContext {
     }
 
     return {
-        ...config,
+        config,
         assistants,
     };
 }

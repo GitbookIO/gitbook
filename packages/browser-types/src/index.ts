@@ -1,6 +1,5 @@
 import type { AIToolCallResult, AIToolDefinition } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
-import type { ReactNode } from 'react';
 
 export type GitBookIntegrationEvent = 'load' | 'unload';
 
@@ -22,13 +21,29 @@ export type GitBookIntegrationTool = AIToolDefinition & {
     execute: (input: object) => Promise<Pick<AIToolCallResult, 'output' | 'summary'>>;
 };
 
-export type Assistant = {
-    id: string;
+export type GitBookAssistant = {
+    /**
+     * Name of the assistant displayed in the UI.
+     */
     label: string;
-    icon: ReactNode | string;
-    onOpen: (query?: string) => void;
-    button?: boolean;
-    mode?: 'overlay' | 'sidebar' | 'search';
+
+    /**
+     * Icon of the assistant displayed in the UI.
+     * Any FontAwesome icon name is supported.
+     * @example 'sparkle'
+     */
+    icon: string;
+
+    /**
+     * Callback when the assistant is opened.
+     */
+    open: (query?: string) => void;
+
+    /**
+     * Whether to display the triggers for this assistant in the UI.
+     * @default true
+     */
+    ui?: boolean;
 };
 
 export type GitBookGlobal = {
@@ -56,7 +71,7 @@ export type GitBookGlobal = {
     /**
      * Register a custom assistant to be available on the site.
      */
-    registerCustomAssistant: (assistant: Omit<Assistant, 'id' | 'mode'>) => () => void;
+    registerAssistant: (assistant: GitBookAssistant) => () => void;
 };
 
 declare global {

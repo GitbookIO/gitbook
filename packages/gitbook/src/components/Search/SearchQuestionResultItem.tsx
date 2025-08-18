@@ -1,7 +1,7 @@
 import React from 'react';
 
+import type { Assistant } from '@/components/AI';
 import { t, tString, useLanguage } from '@/intl/client';
-import type { Assistant } from '@gitbook/browser-types';
 import { Icon } from '@gitbook/icons';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
@@ -33,7 +33,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                     open: assistant?.mode === 'search',
                 },
                 () => {
-                    assistant?.onOpen(question);
+                    assistant?.open(question);
                 }
             )}
             active={active}

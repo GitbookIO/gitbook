@@ -56,8 +56,8 @@ export function SearchContainer(props: SearchContainerProps) {
         initial.current = true;
 
         // For simplicity we're only triggering the first assistant
-        assistants[0].onOpen(state?.ask ?? undefined);
-    }, [state?.ask, assistants.length, assistants[0]?.onOpen]);
+        assistants[0].open(state?.ask ?? undefined);
+    }, [state?.ask, assistants.length, assistants[0]?.open]);
 
     const onClose = React.useCallback(
         async (to?: string) => {
@@ -209,11 +209,11 @@ export function SearchContainer(props: SearchContainerProps) {
                 />
             </Popover>
             {assistants
-                .filter((assistant) => assistant.button)
+                .filter((assistant) => assistant.ui === true)
                 .map((assistant) => (
                     <AIChatButton
-                        key={assistant.label}
-                        {...assistant}
+                        key={assistant.id}
+                        assistant={assistant}
                         showLabel={
                             assistants.length === 1 && style === CustomizationSearchStyle.Prominent
                         }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useAIChatState } from '@/components/AI';
+import type { Assistant } from '@/components/AI';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
@@ -8,7 +9,6 @@ import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
-import type { Assistant } from '@gitbook/browser-types';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import QuickLRU from 'quick-lru';
@@ -34,7 +34,7 @@ export function OpenAIAssistant(props: { assistant: Assistant; type: AIActionTyp
             description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
             disabled={chat.loading}
             onClick={() => {
-                assistant.onOpen(tString(language, 'ai_chat_suggested_questions_about_this_page'));
+                assistant.open(tString(language, 'ai_chat_suggested_questions_about_this_page'));
             }}
         />
     );

@@ -4,9 +4,9 @@ import { readStreamableValue } from 'ai/rsc';
 import assertNever from 'assert-never';
 import React from 'react';
 
+import type { Assistant } from '@/components/AI';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import type { Assistant } from '@gitbook/browser-types';
 import { assert } from 'ts-essentials';
 import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';

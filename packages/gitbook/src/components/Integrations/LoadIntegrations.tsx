@@ -4,12 +4,13 @@ import * as React from 'react';
 import * as zustand from 'zustand';
 
 import type {
-    Assistant,
+    GitBookAssistant,
     GitBookGlobal,
     GitBookIntegrationEvent,
     GitBookIntegrationEventCallback,
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
+import type { Assistant } from '../AI';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -24,27 +25,7 @@ export const integrationsAssistantTools = zustand.createStore<{
     };
 });
 
-export const customAssistants = zustand.createStore<{
-    assistants: Array<Assistant>;
-    registerAssistant: (assistant: Omit<Assistant, 'id' | 'mode'>) => () => void;
-}>((set) => ({
-    assistants: [],
-    registerAssistant: (assistant) => {
-        const id = window.crypto.randomUUID();
-        set((state) => ({
-            assistants: [
-                ...state.assistants,
-                { ...assistant, id, button: assistant.button ?? true, mode: 'overlay' },
-            ],
-        }));
-
-        return () => {
-            set((state) => ({
-                assistants: state.assistants.filter((a) => a.id !== id),
-            }));
-        };
-    },
-}));
+export const integrationAssistants = zustand.createStore<Assistant[]>(() => []);
 
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
@@ -65,8 +46,20 @@ if (typeof window !== 'undefined') {
                 tools: [...state.tools, tool],
             }));
         },
-        registerCustomAssistant: (assistant) => {
-            return customAssistants.getState().registerAssistant(assistant);
+        registerAssistant: (assistant: GitBookAssistant) => {
+            const id = window.crypto.randomUUID();
+            const newAssistant = {
+                ...assistant,
+                id,
+                button: assistant.ui ?? true,
+                mode: 'overlay' as const,
+            };
+
+            integrationAssistants.setState((state) => [...state, newAssistant as Assistant]);
+
+            return () => {
+                integrationAssistants.setState((state) => state.filter((a) => a.id !== id));
+            };
         },
     };
     window.GitBook = gitbookGlobal;
@@ -75,8 +68,8 @@ if (typeof window !== 'undefined') {
 /**
  * Get the current state of the assistants.
  */
-export function useCustomAssistants(): Array<Assistant> {
-    return zustand.useStore(customAssistants, (state) => state.assistants);
+export function useIntegrationAssistants(): Array<Assistant> {
+    return zustand.useStore(integrationAssistants);
 }
 
 /**
