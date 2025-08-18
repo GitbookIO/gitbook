@@ -1,4 +1,4 @@
-// 'use client';
+'use client';
 
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
 import React from 'react';
