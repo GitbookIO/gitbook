@@ -1,0 +1,38 @@
+:root {
+    --gitbook-widget-button-size: 50px;
+    --gitbook-widget-button-bottom: 20px;
+    --gitbook-widget-button-right: 20px;
+
+
+    --gitbook-widget-window-width: 450px;
+    --gitbook-widget-window-height: 640px;
+    --gitbook-widget-window-spacing: 10px;
+    --gitbook-widget-window-bottom: calc(var(--gitbook-widget-button-bottom) + var(--gitbook-widget-button-size) + var(--gitbook-widget-window-spacing));
+}
+
+#gitbook-widget-button {
+    position: fixed;
+    bottom: var(--gitbook-widget-button-bottom);
+    right: var(--gitbook-widget-button-right);
+    z-index: 1000;
+    width: var(--gitbook-widget-button-size);
+    height: var(--gitbook-widget-button-size);
+    cursor: pointer;
+}
+
+#gitbook-widget-window {
+    position: fixed;
+    bottom: var(--gitbook-widget-window-bottom);
+    right: var(--gitbook-widget-button-right);
+    z-index: 1000;
+    width: var(--gitbook-widget-window-width);
+    height: var(--gitbook-widget-window-height);
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+#gitbook-widget-window.hidden {
+    display: none;
+}

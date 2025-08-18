@@ -1,3 +1,5 @@
+import './style.css';
+
 import {
     type CreateGitBookOptions,
     type GitBookClient,
@@ -5,7 +7,7 @@ import {
     type GitBookPlaceholderSettings,
     type GitBookToolDefinition,
     createGitBook,
-} from './client';
+} from '../client';
 
 export type GitBook = () => void;
 
@@ -22,6 +24,8 @@ type StandaloneCalls =
     | ['open']
     // Close the window
     | ['close']
+    // Toggle the window
+    | ['toggle']
     // Post a user message
     | ['postUserMessage', string]
     // Register a tool
@@ -31,29 +35,20 @@ type StandaloneCalls =
     // Configure the placeholder
     | ['setPlaceholder', GitBookPlaceholderSettings];
 
+export type GitBookStandalone = ((...args: StandaloneCalls) => void) & {
+    q?: StandaloneCalls[];
+};
+
 if (typeof window !== 'undefined') {
     const widgetButton = document.createElement('button');
-    widgetButton.classList.add('gitbook-widget-button');
-    widgetButton.style.position = 'fixed';
-    widgetButton.style.bottom = '20px';
-    widgetButton.style.right = '20px';
-    widgetButton.style.zIndex = '1000';
-    widgetButton.style.width = '50px';
-    widgetButton.style.height = '50px';
+    widgetButton.id = 'gitbook-widget-button';
+    widgetButton.addEventListener('click', () => {
+        GitBook('toggle');
+    });
 
     const widgetWindow = document.createElement('div');
-    widgetWindow.classList.add('gitbook-widget-window');
-    widgetWindow.style.position = 'fixed';
-    widgetWindow.style.bottom = '20px';
-    widgetWindow.style.right = '20px';
-    widgetWindow.style.zIndex = '1000';
-    widgetWindow.style.width = '300px';
-    widgetWindow.style.height = '400px';
-    widgetWindow.style.backgroundColor = 'white';
-    widgetWindow.style.border = '1px solid #ccc';
-    widgetWindow.style.borderRadius = '5px';
-    widgetWindow.style.padding = '10px';
-    widgetWindow.style.boxShadow = '0 0 10px 0 rgba(0, 0, 0, 0.1)';
+    widgetWindow.id = 'gitbook-widget-window';
+    widgetWindow.classList.add('hidden');
 
     document.body.appendChild(widgetButton);
     document.body.appendChild(widgetWindow);
@@ -76,11 +71,20 @@ if (typeof window !== 'undefined') {
             case 'hide':
                 widgetButton.style.display = 'none';
                 break;
+            case 'open':
+                widgetWindow.classList.remove('hidden');
+                break;
+            case 'toggle':
+                widgetWindow.classList.toggle('hidden');
+                break;
+            case 'close':
+                widgetWindow.classList.add('hidden');
+                break;
         }
     };
 
     // @ts-expect-error - GitBook is not defined in the global scope
-    const precalls = ((window.GitBook as any) ?? []) as StandaloneCalls[];
+    const precalls = (window.GitBook as GitBookStandalone | undefined)?.q ?? [];
 
     // @ts-expect-error - GitBook is not defined in the global scope
     window.GitBook = GitBook;

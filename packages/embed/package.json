@@ -6,7 +6,8 @@
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js",
-            "standalone": "./dist/standalone.js"
+            "standalone": "./dist/standalone/index.js",
+            "react": "./dist/react/index.js"
         }
     },
     "version": "0.0.0",

@@ -14,7 +14,7 @@ You can find the embed script from your docs site settings, or you can copy the 
 
 ```html
 <script>
-(function(){var w=window;var gb=w.GitBook;if(typeof gb!=="function"){var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.GitBook=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://docs.company.com/~gitbook/embed/script.js';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x);};if(document.readyState==='complete'){l();}else if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+(function(){var w=window;var gb=w.GitBook;if(typeof ic==="function"){}else{var d=document;var g=function(){g.c(arguments);};g.q=[];g.c=function(args){g.q.push(args);};w.GitBook=g;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://docs.company.com/~gitbook/embed/script.js';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(document.readyState==='complete'){l();}else if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
 </script>
 ```
 
