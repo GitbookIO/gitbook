@@ -7,7 +7,7 @@
                 "public/~gitbook/static/math/**/*",
                 "public/~gitbook/static/embed/**/*"
             ],
-            "dependsOn": ["^generate", "@gitbook/embed:build"]
+            "dependsOn": ["^generate", "@gitbook/embed#build"]
         },
         "typecheck": {
             "dependsOn": ["^typecheck", "generate"]

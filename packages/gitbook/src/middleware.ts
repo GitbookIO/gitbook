@@ -539,6 +539,7 @@ function encodePathInSiteContent(rawPathname: string): {
         case 'sitemap-pages.xml':
         case 'robots.txt':
         case '~gitbook/embed/assistant':
+        case '~gitbook/embed/assistant.js':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
