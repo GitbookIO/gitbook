@@ -4,7 +4,6 @@ import * as React from 'react';
 import * as zustand from 'zustand';
 
 import type {
-    GitBookAssistant,
     GitBookGlobal,
     GitBookIntegrationEvent,
     GitBookIntegrationEventCallback,
@@ -25,7 +24,7 @@ export const integrationsAssistantTools = zustand.createStore<{
     };
 });
 
-export const integrationAssistants = zustand.createStore<Assistant[]>(() => []);
+export const integrationAssistants = zustand.createStore<Array<Assistant>>(() => []);
 
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
@@ -46,19 +45,18 @@ if (typeof window !== 'undefined') {
                 tools: [...state.tools, tool],
             }));
         },
-        registerAssistant: (assistant: GitBookAssistant) => {
+        registerAssistant: (assistant) => {
             const id = window.crypto.randomUUID();
-            const newAssistant = {
-                ...assistant,
-                id,
-                button: assistant.ui ?? true,
-                mode: 'overlay' as const,
-            };
-
-            integrationAssistants.setState((state) => [...state, newAssistant as Assistant]);
+            integrationAssistants.setState(
+                (state) => [
+                    ...state,
+                    { ...assistant, id, ui: assistant.ui ?? true, mode: 'overlay' },
+                ],
+                true
+            );
 
             return () => {
-                integrationAssistants.setState((state) => state.filter((a) => a.id !== id));
+                integrationAssistants.setState((state) => state.filter((a) => a.id !== id), true);
             };
         },
     };
