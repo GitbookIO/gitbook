@@ -32,6 +32,7 @@ export function PageAside(props: {
     withPageFeedback: boolean;
 }) {
     const { page, document, withPageFeedback, context } = props;
+    const { customization, site } = context;
 
     return (
         <aside
@@ -95,7 +96,8 @@ export function PageAside(props: {
                     'flex flex-col',
                     'overflow-hidden',
                     'w-full',
-                    'xl:max-2xl:page-api-block:rounded-md',
+                    'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
+                    'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
                     'xl:max-2xl:page-api-block:border',
                     'xl:max-2xl:page-api-block:border-tint',
                     'xl:max-2xl:page-api-block:bg-tint/9',
@@ -122,7 +124,9 @@ export function PageAside(props: {
                         />
                     </div>
                 ) : null}
-                <PageAsideFooter context={context} />
+                {customization.themes.toggeable || site.ads ? (
+                    <PageAsideFooter context={context} />
+                ) : null}
             </div>
         </aside>
     );
@@ -197,7 +201,7 @@ function PageAsideActions(props: {
                 'border-tint-subtle',
                 'py-5',
                 'first:pt-0',
-                'xl:max-2xl:page-api-block:px-5',
+                'xl:max-2xl:page-api-block:p-5',
                 'empty:hidden'
             )}
         >
@@ -270,7 +274,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
             className={tcls(
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
                 'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                'xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
+                'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
                 'py-4'
             )}
         >
