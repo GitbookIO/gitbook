@@ -2,6 +2,7 @@ import './style.css';
 
 import {
     type CreateGitBookOptions,
+    type GetFrameURLOptions,
     type GitBookClient,
     type GitBookFrameClient,
     type GitBookPlaceholderSettings,
@@ -13,7 +14,7 @@ export type GitBook = () => void;
 
 type StandaloneCalls =
     // Initialize the widget
-    | ['init', CreateGitBookOptions]
+    | ['init', CreateGitBookOptions, GetFrameURLOptions]
     // Unload the widget
     | ['unload']
     // Show the widget
@@ -50,20 +51,51 @@ if (typeof window !== 'undefined') {
     widgetWindow.id = 'gitbook-widget-window';
     widgetWindow.classList.add('hidden');
 
+    let widgetIframe: HTMLIFrameElement | undefined;
+
     document.body.appendChild(widgetButton);
     document.body.appendChild(widgetWindow);
 
-    let client: GitBookClient | undefined;
-    let frame: GitBookFrameClient | undefined;
+    let _client: GitBookClient | undefined;
+    let _frame: GitBookFrameClient | undefined;
+    let frameOptions: GetFrameURLOptions | undefined;
+
+    function getClient() {
+        if (!_client) {
+            throw new Error(
+                'GitBook client not initialized. Call GitBook("init", { siteURL: "..." }) first.'
+            );
+        }
+        return _client;
+    }
+
+    function getIframe() {
+        if (!widgetIframe || !_frame) {
+            const client = getClient();
+
+            widgetIframe?.remove();
+            widgetIframe = document.createElement('iframe');
+            widgetIframe.id = 'gitbook-widget-iframe';
+            widgetIframe.src = client.getFrameURL({
+                ...frameOptions,
+            });
+            widgetWindow.appendChild(widgetIframe);
+
+            _frame = client.createFrame(widgetIframe);
+        }
+        return { iframe: widgetIframe, frame: _frame };
+    }
 
     const GitBook = (...args: StandaloneCalls) => {
         switch (args[0]) {
             case 'init':
-                client = createGitBook(args[1]);
+                _client = createGitBook(args[1]);
+                frameOptions = args[2];
                 break;
             case 'unload':
-                client = undefined;
-                frame = undefined;
+                _client = undefined;
+                _frame = undefined;
+                widgetIframe?.remove();
                 break;
             case 'show':
                 widgetButton.style.display = 'block';
@@ -73,9 +105,11 @@ if (typeof window !== 'undefined') {
                 break;
             case 'open':
                 widgetWindow.classList.remove('hidden');
+                getIframe();
                 break;
             case 'toggle':
                 widgetWindow.classList.toggle('hidden');
+                getIframe();
                 break;
             case 'close':
                 widgetWindow.classList.add('hidden');

@@ -36,3 +36,9 @@
 #gitbook-widget-window.hidden {
     display: none;
 }
+
+#gitbook-widget-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
