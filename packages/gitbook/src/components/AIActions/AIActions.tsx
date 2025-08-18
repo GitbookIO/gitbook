@@ -1,7 +1,7 @@
 'use client';
 
-import type { AssistantItem } from '@/components/AI/useAI';
-import { useAIChatState } from '@/components/AI/useAIChat';
+import type { Assistant } from '@/components/AI';
+import { useAIChatState } from '@/components/AI';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
@@ -20,7 +20,7 @@ type AIActionType = 'button' | 'dropdown-menu-item';
 /**
  * Opens our AI Docs Assistant.
  */
-export function OpenAIAssistant(props: { assistant: AssistantItem; type: AIActionType }) {
+export function OpenAIAssistant(props: { assistant: Assistant; type: AIActionType }) {
     const { assistant, type } = props;
     const chat = useAIChatState();
     const language = useLanguage();

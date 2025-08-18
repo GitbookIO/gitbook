@@ -2,23 +2,20 @@
 
 import * as React from 'react';
 import * as zustand from 'zustand';
-
-interface CustomAssistant {
-    id: string;
-    label: string;
-    icon: string;
-    onOpen: (query?: string) => void;
-}
+import type { Assistant } from '../AI';
 
 export const customAssistants = zustand.createStore<{
-    assistants: Array<CustomAssistant>;
-    registerAssistant: (assistant: Omit<CustomAssistant, 'id'>) => () => void;
+    assistants: Array<Assistant>;
+    registerAssistant: (assistant: Omit<Assistant, 'id' | 'mode'>) => () => void;
 }>((set) => ({
     assistants: [],
     registerAssistant: (assistant) => {
         const id = window.crypto.randomUUID();
         set((state) => ({
-            assistants: [...state.assistants, { ...assistant, id }],
+            assistants: [
+                ...state.assistants,
+                { ...assistant, id, button: assistant.button ?? true, mode: 'overlay' },
+            ],
         }));
 
         return () => {
@@ -48,28 +45,12 @@ if (typeof window !== 'undefined') {
             return customAssistants.getState().registerAssistant(assistant);
         },
     };
-
-    window.GitBook.registerCustomAssistant({
-        label: 'Custom AI',
-        icon: 'sparkle',
-        onOpen: (query) => {
-            alert(`Test assistant opened: ${query}`);
-        },
-    });
-
-    // window.GitBook.registerCustomAssistant({
-    //     label: 'Another AI Integration',
-    //     icon: 'puzzle-piece',
-    //     onOpen: (query) => {
-    //         console.log('Test 2 assistant opened', query);
-    //     },
-    // });
 }
 
 /**
  * Get the current state of the assistants.
  */
-export function useCustomAssistants(): Array<CustomAssistant> {
+export function useCustomAssistants(): Array<Assistant> {
     return zustand.useStore(customAssistants, (state) => state.assistants);
 }
 

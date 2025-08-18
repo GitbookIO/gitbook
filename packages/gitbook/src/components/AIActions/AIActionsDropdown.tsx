@@ -12,7 +12,7 @@ import { tString, useLanguage } from '@/intl/client';
 import type { SiteCustomizationSettings } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
-import { useAI } from '../AI/useAI';
+import { useAI } from '../AI';
 
 interface AIActionsDropdownProps {
     markdownPageUrl: string;
@@ -25,7 +25,7 @@ interface AIActionsDropdownProps {
  */
 export function AIActionsDropdown(props: AIActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
-    const { assistants } = useAI();
+    const assistants = useAI().assistants.filter((assistant) => assistant.button === true);
     const language = useLanguage();
 
     return assistants.length > 0 || props.actions.markdown || props.actions.externalAI ? (
@@ -63,7 +63,7 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
  */
 function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
     const { markdownPageUrl, actions } = props;
-    const { assistants } = useAI();
+    const assistants = useAI().assistants.filter((assistant) => assistant.button === true);
 
     return (
         <>
@@ -103,7 +103,7 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
  */
 function DefaultAction(props: AIActionsDropdownProps) {
     const { markdownPageUrl, actions } = props;
-    const { assistants } = useAI();
+    const assistants = useAI().assistants.filter((assistant) => assistant.button === true);
 
     if (assistants.length) {
         return <OpenAIAssistant assistant={assistants[0]} type="button" />;

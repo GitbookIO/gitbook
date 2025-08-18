@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-import { CustomizationAIMode } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
 import { useClassnames } from '../primitives/StyleProvider';
@@ -14,7 +13,7 @@ interface SearchInputProps {
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onFocus: () => void;
     value: string;
-    aiMode: CustomizationAIMode;
+    withAI: boolean;
     isOpen: boolean;
     className?: string;
 }
@@ -27,7 +26,7 @@ const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'md:circular-corners:px-4'];
  */
 export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
     function SearchInput(props, ref) {
-        const { onChange, onKeyDown, onFocus, value, aiMode, isOpen, className } = props;
+        const { onChange, onKeyDown, onFocus, value, withAI, isOpen, className } = props;
         const inputRef = useRef<HTMLInputElement>(null);
 
         const language = useLanguage();
@@ -94,7 +93,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         onChange={(event) => onChange(event.target.value)}
                         value={value}
                         // We only show "search or ask" if the search input actually handles both search and ask.
-                        placeholder={`${tString(language, aiMode === CustomizationAIMode.Search ? 'search_or_ask' : 'search')}…`}
+                        placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}…`}
                         maxLength={512}
                         size={10}
                         data-testid="search-input"

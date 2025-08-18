@@ -1,14 +1,15 @@
 'use client';
 
 import { CustomizationAIMode } from '@gitbook/api';
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import * as React from 'react';
 import type { ReactNode } from 'react';
 
+import { tString, useLanguage } from '@/intl/client';
 import { useAIChatController, useAIChatState } from '.';
 import { AIChatIcon, getAIChatName } from '../AIChat';
 import { useCustomAssistants } from '../Integrations';
-import { useSearch } from '../Search';
+import { useSearch } from '../Search/useSearch';
 
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {
@@ -32,14 +33,17 @@ function useAIConfig(): AIConfig {
     return ctx;
 }
 
-export type AssistantItem = {
+export type Assistant = {
+    id: string;
     label: string;
-    icon: ReactNode;
+    icon: ReactNode | string;
     onOpen: (query?: string) => void;
+    button?: boolean;
+    mode?: 'overlay' | 'sidebar' | 'search';
 };
 
 type AIContext = AIConfig & {
-    assistants: AssistantItem[];
+    assistants: Assistant[];
 };
 
 /**
@@ -50,14 +54,14 @@ export function useAI(): AIContext {
     const config = useAIConfig();
     const chat = useAIChatState();
     const chatController = useAIChatController();
+    const language = useLanguage();
+    const [, setSearchState] = useSearch();
 
-    const withAssistant = config.aiMode === CustomizationAIMode.Assistant;
-    const [, setSearchState] = useSearch(!withAssistant);
+    const assistants: Assistant[] = [];
 
-    const assistants: AssistantItem[] = [];
-
-    if (withAssistant) {
+    if (config.aiMode === CustomizationAIMode.Assistant) {
         assistants.push({
+            id: 'gitbook-assistant',
             label: getAIChatName(config.trademark),
             icon: (
                 <AIChatIcon
@@ -69,14 +73,34 @@ export function useAI(): AIContext {
                 chatController.open();
                 if (query) {
                     chatController.postMessage({ message: query });
-                    setSearchState({
-                        ask: query,
-                        query: null,
-                        global: false,
-                        open: false,
-                    });
                 }
             },
+            button: true,
+            mode: 'sidebar',
+        });
+    } else if (config.aiMode === CustomizationAIMode.Search) {
+        assistants.push({
+            id: 'gitbook-ai-search',
+            label: tString(language, 'ai_chat_context_badge'),
+            icon: (
+                <div className="relative">
+                    <Icon icon="search" className="size-4" />
+                    <Icon
+                        icon="sparkle"
+                        iconStyle={IconStyle.Solid}
+                        className="absolute top-[2.5px] left-[2.6px] size-2"
+                    />
+                </div>
+            ),
+            onOpen: (query?: string) => {
+                if (query) {
+                    setSearchState((prev) =>
+                        prev ? { ...prev, query: null, ask: query, open: true } : null
+                    );
+                }
+            },
+            button: false,
+            mode: 'search',
         });
     }
 
@@ -85,7 +109,12 @@ export function useAI(): AIContext {
         assistants.push(
             ...customAssistants.map((assistant) => ({
                 ...assistant,
-                icon: <Icon icon={assistant.icon as IconName} className="size-4" />,
+                icon:
+                    typeof assistant.icon === 'string' ? (
+                        <Icon icon={assistant.icon as IconName} className="size-4" />
+                    ) : (
+                        assistant.icon
+                    ),
             }))
         );
     }

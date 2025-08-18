@@ -106,7 +106,7 @@ export function useAIChatController(): AIChatController {
     const messageContextRef = useAIMessageContextRef();
     const setState = zustand.useStore(globalState, (state) => state.setState);
     const trackEvent = useTrackEvent();
-    const [searchState, setSearchState] = useSearch(false);
+    const [, setSearchState] = useSearch();
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
@@ -178,6 +178,7 @@ export function useAIChatController(): AIChatController {
                     followUpSuggestions: [],
                     loading: true,
                     error: false,
+                    initialQuery: state.initialQuery ?? input.message,
                 };
             });
 
@@ -270,46 +271,6 @@ export function useAIChatController(): AIChatController {
             open: false,
         }));
     }, [setState, setSearchState]);
-
-    // Auto-trigger AI chat when ?ask= parameter appears in URL (only once)
-    React.useEffect(() => {
-        const hasNoAsk = searchState?.ask === undefined || searchState?.ask === null;
-        const hasQuery = searchState?.query !== null;
-
-        // Don't trigger if we have a regular search query active
-        if (hasNoAsk) return;
-        if (hasQuery && searchState.open === false) return;
-
-        // Open the chat when ask parameter appears
-        onOpen();
-
-        // Auto-post the message if ask has content
-        if (searchState?.ask?.trim()) {
-            const trimmedAsk = searchState.ask.trim();
-            const { loading, initialQuery } = globalState.getState().state;
-
-            // Don't trigger if we're already posting a message
-            if (loading) return;
-
-            // Only initialize once per URL ask value
-            if (initialQuery === trimmedAsk) return;
-
-            // Wait for messageContextRef to be defined before proceeding
-            if (!messageContextRef.current?.location) return;
-
-            // Mark this ask value as processed
-            setState((state) => ({ ...state, initialQuery: trimmedAsk }));
-            onPostMessage({ message: trimmedAsk });
-        }
-    }, [
-        searchState?.ask,
-        searchState?.query,
-        searchState?.open,
-        messageContextRef,
-        onOpen,
-        setState,
-        onPostMessage,
-    ]);
 
     return React.useMemo(() => {
         return {

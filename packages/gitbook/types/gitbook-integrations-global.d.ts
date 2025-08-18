@@ -20,6 +20,11 @@ declare global {
          * @param query The query string to process.
          */
         onOpen: (query?: string) => void;
+        /**
+         * Whether to show as a button in the UI
+         * @default true
+         */
+        button?: boolean;
     }
 
     interface Window {

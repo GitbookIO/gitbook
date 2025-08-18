@@ -2,7 +2,7 @@ import React from 'react';
 
 import { t, tString, useLanguage } from '@/intl/client';
 import { Icon } from '@gitbook/icons';
-import type { AssistantItem } from '../AI/useAI';
+import type { Assistant } from '../AI';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
 
@@ -11,7 +11,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         question: string;
         active: boolean;
         recommended?: boolean;
-        assistant?: AssistantItem;
+        assistant?: Assistant;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
@@ -26,14 +26,16 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
             ref={ref}
             data-testid={recommended ? 'search-recommended-question' : 'search-ask-question'}
             scroll={false}
-            {...getLinkProp({
-                ask: question,
-                open: false,
-                query: null,
-            })}
-            onClick={() => {
-                assistant?.onOpen(question);
-            }}
+            {...getLinkProp(
+                {
+                    ask: question,
+                    query: null,
+                    open: assistant?.mode === 'search',
+                },
+                () => {
+                    assistant?.onOpen(question);
+                }
+            )}
             active={active}
             leadingIcon={recommended ? <Icon icon="search" className="size-4" /> : assistant?.icon}
             className={recommended ? 'pr-1.5' : ''}

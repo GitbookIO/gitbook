@@ -6,11 +6,8 @@ import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
-
-import { CustomizationAIMode } from '@gitbook/api';
-import { Icon, IconStyle } from '@gitbook/icons';
 import { assert } from 'ts-essentials';
-import { type AssistantItem, useAI } from '../AI/useAI';
+import { type Assistant, useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
@@ -31,7 +28,7 @@ export interface SearchResultsRef {
 
 type ResultType =
     | OrderedComputedResult
-    | { type: 'question'; id: string; query: string; assistant: AssistantItem }
+    | { type: 'question'; id: string; query: string; assistant: Assistant }
     | { type: 'recommended-question'; id: string; question: string };
 
 /**
@@ -53,12 +50,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         children?: React.ReactNode;
         query: string;
         global: boolean;
-        withAI: boolean;
         siteSpaceId: string;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, global, withAI, siteSpaceId } = props;
+    const { children, query, global, siteSpaceId } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -69,25 +65,8 @@ export const SearchResults = React.forwardRef(function SearchResults(
     const [cursor, setCursor] = React.useState<number | null>(null);
     const refs = React.useRef<(null | HTMLAnchorElement)[]>([]);
 
-    const { assistants, aiMode } = useAI();
-
-    // Add a "Search" item at the top of the results list if the AI mode is Search.
-    if (aiMode === CustomizationAIMode.Search) {
-        assistants.unshift({
-            label: 'AI',
-            icon: (
-                <div className="relative">
-                    <Icon icon="search" className="size-4" />
-                    <Icon
-                        icon="sparkle"
-                        iconStyle={IconStyle.Solid}
-                        className="absolute top-[2.5px] left-[2.6px] size-2"
-                    />
-                </div>
-            ),
-            onOpen: () => {},
-        });
-    }
+    const { assistants } = useAI();
+    const withAI = assistants.length > 0;
 
     React.useEffect(() => {
         if (!query) {
@@ -178,7 +157,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, global, withAI, trackEvent, siteSpaceId]);
+    }, [query, global, trackEvent, withAI, siteSpaceId]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAI) {
@@ -207,7 +186,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             block: 'nearest',
             inline: 'nearest',
         });
-    }, [cursor, refs]);
+    }, [cursor]);
 
     const moveBy = React.useCallback(
         (delta: number) => {
@@ -228,7 +207,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
         }
 
         refs.current[cursor]?.click();
-    }, [cursor, refs]);
+    }, [cursor]);
 
     React.useImperativeHandle(
         ref,
@@ -351,7 +330,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 function withAskTriggers(
     results: ResultType[],
     query: string,
-    assistants: AssistantItem[]
+    assistants: Assistant[]
 ): ResultType[] {
     const without = results.filter((result) => result.type !== 'question');
 
