@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import * as zustand from 'zustand';
-import type { Assistant } from '../AI';
 
 import type {
+    Assistant,
     GitBookGlobal,
     GitBookIntegrationEvent,
     GitBookIntegrationEventCallback,

@@ -3,9 +3,9 @@
 import { CustomizationAIMode } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import * as React from 'react';
-import type { ReactNode } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
+import type { Assistant } from '@gitbook/browser-types';
 import { useAIChatController, useAIChatState } from '.';
 import { AIChatIcon, getAIChatName } from '../AIChat';
 import { useCustomAssistants } from '../Integrations';
@@ -32,15 +32,6 @@ function useAIConfig(): AIConfig {
     }
     return ctx;
 }
-
-export type Assistant = {
-    id: string;
-    label: string;
-    icon: ReactNode | string;
-    onOpen: (query?: string) => void;
-    button?: boolean;
-    mode?: 'overlay' | 'sidebar' | 'search';
-};
 
 type AIContext = AIConfig & {
     assistants: Assistant[];

@@ -6,8 +6,9 @@ import React from 'react';
 
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+import type { Assistant } from '@gitbook/browser-types';
 import { assert } from 'ts-essentials';
-import { type Assistant, useAI } from '../AI';
+import { useAI } from '../AI';
 import { useTrackEvent } from '../Insights';
 import { Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';

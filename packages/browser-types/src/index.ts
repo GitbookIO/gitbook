@@ -1,5 +1,6 @@
 import type { AIToolCallResult, AIToolDefinition } from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
+import type { ReactNode } from 'react';
 
 export type GitBookIntegrationEvent = 'load' | 'unload';
 
@@ -19,6 +20,15 @@ export type GitBookIntegrationTool = AIToolDefinition & {
      * The input is provided by the AI assistant following the input schema of the tool.
      */
     execute: (input: object) => Promise<Pick<AIToolCallResult, 'output' | 'summary'>>;
+};
+
+export type Assistant = {
+    id: string;
+    label: string;
+    icon: ReactNode | string;
+    onOpen: (query?: string) => void;
+    button?: boolean;
+    mode?: 'overlay' | 'sidebar' | 'search';
 };
 
 export type GitBookGlobal = {
@@ -42,6 +52,11 @@ export type GitBookGlobal = {
      * Register a custom tool to be exposed to the AI assistant.
      */
     registerTool: (tool: GitBookIntegrationTool) => void;
+
+    /**
+     * Register a custom assistant to be available on the site.
+     */
+    registerCustomAssistant: (assistant: Omit<Assistant, 'id' | 'mode'>) => () => void;
 };
 
 declare global {

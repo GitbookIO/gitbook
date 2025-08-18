@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { t, tString, useLanguage } from '@/intl/client';
+import type { Assistant } from '@gitbook/browser-types';
 import { Icon } from '@gitbook/icons';
-import type { Assistant } from '../AI';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
 

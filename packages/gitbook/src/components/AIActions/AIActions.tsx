@@ -1,6 +1,5 @@
 'use client';
 
-import type { Assistant } from '@/components/AI';
 import { useAIChatState } from '@/components/AI';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
@@ -9,6 +8,7 @@ import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
+import type { Assistant } from '@gitbook/browser-types';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import QuickLRU from 'quick-lru';
