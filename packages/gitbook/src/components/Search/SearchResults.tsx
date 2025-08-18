@@ -296,6 +296,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             key={item.id}
                                             question={item.question}
                                             active={index === cursor}
+                                            assistant={assistants[0]}
                                             recommended
                                         />
                                     );

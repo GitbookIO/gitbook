@@ -37,7 +37,7 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
     /**
      * Icon of the assistant displayed in the UI.
      */
-    icon: ReactNode | IconName;
+    icon: ReactNode;
 };
 
 const AIContext = React.createContext<AIConfig | null>(null);
@@ -124,12 +124,7 @@ export function useAI(): AIContext {
         assistants.push(
             ...integrationAssistants.map((assistant) => ({
                 ...assistant,
-                icon:
-                    typeof assistant.icon === 'string' ? (
-                        <Icon icon={assistant.icon as IconName} className="size-4" />
-                    ) : (
-                        assistant.icon
-                    ),
+                icon: <Icon icon={assistant.icon as IconName} className="size-4" />,
             }))
         );
     }

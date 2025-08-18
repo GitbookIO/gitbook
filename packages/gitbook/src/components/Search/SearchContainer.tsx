@@ -44,16 +44,15 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const withAI = assistants.length > 0;
     const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
-    // const withAssistantAI = withAI && !withSearchAI;
 
-    // Handle initial ask state (trigger once per unique ask when assistants are ready)
-    const initial = React.useRef(state?.ask === undefined || state?.ask === null); // If ask is not set on page load, we will never trigger
+    // Handle initial ask state on page load, once assistants are ready
+    const initialRef = React.useRef(state?.ask === undefined || state?.ask === null); // If ask is not set on page load, we will never trigger
     React.useEffect(() => {
-        if (initial.current) return;
+        if (initialRef.current) return;
         if (assistants.length === 0) return;
         if (state?.ask === undefined || state?.ask === null) return;
 
-        initial.current = true;
+        initialRef.current = true;
 
         // For simplicity we're only triggering the first assistant
         assistants[0].open(state?.ask ?? undefined);

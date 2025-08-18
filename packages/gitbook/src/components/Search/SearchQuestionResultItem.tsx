@@ -2,7 +2,6 @@ import React from 'react';
 
 import type { Assistant } from '@/components/AI';
 import { t, tString, useLanguage } from '@/intl/client';
-import { Icon } from '@gitbook/icons';
 import { SearchResultItem } from './SearchResultItem';
 import { useSearchLink } from './useSearch';
 
@@ -11,7 +10,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
         question: string;
         active: boolean;
         recommended?: boolean;
-        assistant?: Assistant;
+        assistant: Assistant;
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
@@ -30,14 +29,14 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                 {
                     ask: question,
                     query: null,
-                    open: assistant?.mode === 'search',
+                    open: assistant.mode === 'search',
                 },
                 () => {
-                    assistant?.open(question);
+                    assistant.open(question);
                 }
             )}
             active={active}
-            leadingIcon={recommended ? <Icon icon="search" className="size-4" /> : assistant?.icon}
+            leadingIcon={recommended ? 'search' : assistant.icon}
             className={recommended ? 'pr-1.5' : ''}
         >
             {recommended ? (
@@ -48,7 +47,7 @@ export const SearchQuestionResultItem = React.forwardRef(function SearchQuestion
                         {t(language, 'search_ask', [question])}
                     </div>
                     <div className="text-sm text-tint-subtle">
-                        {t(language, 'search_ask_description', assistant?.label)}
+                        {t(language, 'search_ask_description', assistant.label)}
                     </div>
                 </>
             )}

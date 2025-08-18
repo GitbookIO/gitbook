@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
 import React from 'react';
@@ -98,7 +98,7 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         [setRawState]
     );
 
-    return React.createElement(SearchContext.Provider, { value: { state, setState } }, children);
+    return <SearchContext.Provider value={{ state, setState }}>{children}</SearchContext.Provider>;
 }
 
 /**
