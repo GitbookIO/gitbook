@@ -18,7 +18,7 @@ export const ja: TranslationLanguage = {
     search_scope_all: '全てのコンテンツ',
     ask: '質問する',
     search_ask: '"${1}" を質問する',
-    search_ask_description: 'AIで答えを見つける',
+    search_ask_description: '${1}で答えを見つける',
     search_ask_sources: '情報源',
     search_ask_sources_no_answer: '関連ページ',
     search_ask_no_answer:

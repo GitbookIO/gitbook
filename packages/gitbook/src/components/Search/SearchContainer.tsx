@@ -131,7 +131,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onChange = (value: string) => {
         setSearchState((prev) => ({
-            ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null, // withAssistantAI && prev ? prev?.ask : null,
+            ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null, // When typing, we reset ask to get back to normal search (unless non-search assistants are defined)
             query: value,
             global: prev?.global ?? false,
             open: true,
