@@ -67,7 +67,7 @@ export async function SiteLayout(props: {
                     <>
                         <LoadIntegrations />
                         {scripts.map(({ script }) => (
-                            <script key={script} async src={script} nonce={nonce} />
+                            <script key={script} async src={script} />
                         ))}
                     </>
                 ) : null}
@@ -78,7 +78,7 @@ export async function SiteLayout(props: {
                     </React.Suspense>
                 ) : null}
 
-                <RocketLoaderDetector nonce={nonce} />
+                <RocketLoaderDetector />
 
                 <AdminToolbar context={context} />
             </SiteLayoutClientContexts>
