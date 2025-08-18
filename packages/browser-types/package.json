@@ -1,0 +1,24 @@
+{
+    "name": "@gitbook/browser-types",
+    "description": "Typescript types for the global variables available in a GitBook website. These types can be used by integrations embedding scripts.",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "version": "0.0.0",
+    "dependencies": {
+        "@gitbook/api": "catalog:",
+        "@gitbook/icons": "workspace:"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3"
+    },
+    "scripts": {
+        "build": "tsc",
+        "typecheck": "tsc --noEmit"
+    },
+    "files": ["dist", "README.md", "CHANGELOG.md"]
+}

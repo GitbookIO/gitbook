@@ -2,6 +2,7 @@ import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type React from 'react';
 import type { AIChatController, AIChatState } from '../AI';
+import { AIChatToolConfirmations } from './AIChatToolConfirmations';
 import { AIResponseFeedback } from './AIResponseFeedback';
 import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 
@@ -60,13 +61,18 @@ export function AIChatMessages(props: {
 
                         {isLastMessage ? (
                             <>
-                                {!chat.loading && !chat.error && chat.query && chat.responseId && (
+                                {!chat.loading &&
+                                !chat.error &&
+                                chat.query &&
+                                chat.responseId &&
+                                chat.pendingTools.length === 0 ? (
                                     <AIResponseFeedback
                                         responseId={chat.responseId}
                                         query={chat.query}
                                         className="-ml-1 -mt-4"
                                     />
-                                )}
+                                ) : null}
+                                <AIChatToolConfirmations chat={chat} />
                                 <AIChatFollowupSuggestions
                                     chat={chat}
                                     chatController={chatController}
