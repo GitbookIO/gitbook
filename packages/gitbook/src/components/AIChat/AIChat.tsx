@@ -29,7 +29,9 @@ export function AIChat(props: { trademark: boolean }) {
             e.preventDefault();
             chatController.open();
         },
-        []
+        {
+            enableOnFormTags: true,
+        }
     );
 
     useHotkeys(

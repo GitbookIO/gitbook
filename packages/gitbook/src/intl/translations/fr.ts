@@ -104,4 +104,5 @@ export const fr = {
     view_page_plaintext: 'Voir en texte brut',
     open_in: 'Ouvrir dans ${1}',
     open_in_llms_pre_prompt: 'Lire ${1} et répondre aux questions sur le contenu.',
+    press_to_confirm: 'Appuyez sur ${1} pour confirmer',
 };

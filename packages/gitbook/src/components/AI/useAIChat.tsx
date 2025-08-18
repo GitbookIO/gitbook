@@ -31,6 +31,11 @@ export type AIChatPendingTool = {
     confirm: () => Promise<void>;
 
     /**
+     * Cancel the tool call by calling this function.
+     */
+    cancel: () => void;
+
+    /**
      * Tool call result to cancel it.
      */
     cancelToolCall: AIToolCallResult;

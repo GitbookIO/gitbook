@@ -75,7 +75,9 @@ export function SearchContainer(props: SearchContainerProps) {
             e.preventDefault();
             onOpen();
         },
-        []
+        {
+            enableOnFormTags: true,
+        }
     );
 
     const onOpen = React.useCallback(() => {
