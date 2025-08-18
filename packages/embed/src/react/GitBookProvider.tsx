@@ -4,6 +4,9 @@ import * as React from 'react';
 import { type CreateGitBookOptions, createGitBook } from '../client';
 import { GitBookContext } from './context';
 
+/**
+ * Provider for the GitBook client.
+ */
 export function GitBookProvider(props: React.PropsWithChildren<CreateGitBookOptions>) {
     const { siteURL, children } = props;
 
@@ -19,6 +22,9 @@ export function GitBookProvider(props: React.PropsWithChildren<CreateGitBookOpti
     return <GitBookContext.Provider value={client}>{children}</GitBookContext.Provider>;
 }
 
+/**
+ * Hook to access the GitBook client.
+ */
 export function useGitBook() {
     const context = React.useContext(GitBookContext);
 

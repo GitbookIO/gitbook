@@ -32,9 +32,9 @@ import { GitBook } from '@gitbook/embed';
 After installing the NPM package, you can import prebuilt React components:
 
 ```tsx
-import { GitBookProvider, GitBookChatView } from '@gitbook/embed/react';
+import { GitBookProvider, GitBookAssistantFrame } from '@gitbook/embed/react';
 
 <GitBookProvider siteURL="https://docs.company.com">
-    <GitBookChatView />
+    <GitBookAssistantFrame />
 </GitBookProvider>
 ```

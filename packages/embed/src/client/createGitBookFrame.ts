@@ -1,5 +1,10 @@
 import { createChannel } from 'bidc';
-import type { CreateGitBookOptions } from './createGitBook';
+import type {
+    FrameToParentMessage,
+    GitBookPlaceholderSettings,
+    GitBookToolDefinition,
+    ParentToFrameMessage,
+} from './protocol';
 
 export type GitBookFrameClient = {
     /**
@@ -10,14 +15,63 @@ export type GitBookFrameClient = {
     /**
      * Register a custom tool.
      */
-    registerTool: (tool: {}) => void;
+    registerTool: (tool: GitBookToolDefinition) => void;
+
+    /**
+     * Clear the chat.
+     */
+    clearChat: () => void;
+
+    /**
+     * Set the placeholder settings.
+     */
+    setPlaceholder: (placeholder: GitBookPlaceholderSettings) => void;
+
+    /**
+     * Register an event listener.
+     */
+    on: (event: string, listener: (...args: any[]) => void) => () => void;
 };
 
-export function createGitBookFrame(
-    iframe: HTMLIFrameElement,
-    options: CreateGitBookOptions
-): GitBookFrameClient {
+/**
+ * Create a client to communicate with the GitBook Assistant frame.
+ */
+export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClient {
+    if (!iframe.contentWindow) {
+        throw new Error('Iframe must have a content window');
+    }
     const channel = createChannel(iframe.contentWindow);
 
-    // TODO: Implement the client.
+    channel.receive((message: FrameToParentMessage) => {
+        if (message.type === 'close') {
+            const listeners = events.get('close') || [];
+            if (listeners) {
+                listeners.forEach((listener) => listener());
+            }
+        }
+    });
+
+    const sendToFrame = (message: ParentToFrameMessage) => {
+        channel.send(message);
+    };
+
+    const events = new Map<string, Array<(...args: any[]) => void>>();
+
+    return {
+        postUserMessage: (message) => sendToFrame({ type: 'postUserMessage', message }),
+        registerTool: (tool) => sendToFrame({ type: 'registerTool', tool }),
+        clearChat: () => sendToFrame({ type: 'clearChat' }),
+        setPlaceholder: (settings) => sendToFrame({ type: 'setPlaceholder', settings }),
+        on: (event, listener) => {
+            const listeners = events.get(event) || [];
+            listeners.push(listener);
+            events.set(event, listeners);
+            return () => {
+                events.set(
+                    event,
+                    listeners.filter((l) => l !== listener)
+                );
+            };
+        },
+    };
 }
