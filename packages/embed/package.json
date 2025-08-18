@@ -24,8 +24,8 @@
         "react": "^19.0.0"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsc && bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
         "typecheck": "tsc --noEmit"
     },
-    "files": ["dist", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "README.md", "CHANGELOG.md", "standalone"]
 }
