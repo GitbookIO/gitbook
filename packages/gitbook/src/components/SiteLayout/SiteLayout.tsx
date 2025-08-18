@@ -14,21 +14,20 @@ import { buildVersion } from '@/lib/build';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
-import { ClientContexts } from './ClientContexts';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
+import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 
 /**
  * Layout when rendering a site.
  */
 export async function SiteLayout(props: {
-    nonce?: string;
     context: GitBookSiteContext;
     forcedTheme?: CustomizationThemeMode | null;
     withTracking: boolean;
     visitorAuthClaims: VisitorAuthClaims;
     children: React.ReactNode;
 }) {
-    const { context, nonce, forcedTheme, withTracking, visitorAuthClaims, children } = props;
+    const { context, forcedTheme, withTracking, visitorAuthClaims, children } = props;
 
     const { customization } = context;
     // Scripts are disabled when tracking is disabled
@@ -43,14 +42,12 @@ export async function SiteLayout(props: {
     scripts.forEach(({ script }) => {
         ReactDOM.preload(script, {
             as: 'script',
-            nonce,
         });
     });
 
     return (
         <NuqsAdapter>
-            <ClientContexts
-                nonce={nonce}
+            <SiteLayoutClientContexts
                 contextId={context.contextId}
                 forcedTheme={
                     forcedTheme ??
@@ -84,7 +81,7 @@ export async function SiteLayout(props: {
                 <RocketLoaderDetector nonce={nonce} />
 
                 <AdminToolbar context={context} />
-            </ClientContexts>
+            </SiteLayoutClientContexts>
         </NuqsAdapter>
     );
 }
