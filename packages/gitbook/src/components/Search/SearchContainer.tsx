@@ -215,7 +215,8 @@ export function SearchContainer(props: SearchContainerProps) {
                         key={assistant.id}
                         assistant={assistant}
                         showLabel={
-                            assistants.length === 1 && style === CustomizationSearchStyle.Prominent
+                            assistants.filter((assistant) => assistant.ui === true).length === 1 &&
+                            style === CustomizationSearchStyle.Prominent
                         }
                     />
                 ))}

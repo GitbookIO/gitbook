@@ -60,7 +60,7 @@ export function SpaceLayout(props: {
             <React.Suspense fallback={null}>
                 <SearchContainer
                     style={
-                        customization.header.preset !== CustomizationHeaderPreset.None
+                        customization.header.preset === CustomizationHeaderPreset.None
                             ? CustomizationSearchStyle.Subtle
                             : customization.styling.search
                     }
