@@ -48,6 +48,7 @@ export const zh: TranslationLanguage = {
     close: '关闭',
     view: '查看',
     edit_on_git: '在${1}上编辑',
+    edit: '编辑',
     notfound_title: '页面未找到',
     notfound_link: '此链接指向已被删除或不再存在的页面。',
     notfound: '您要找的页面不存在。',

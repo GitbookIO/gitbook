@@ -48,6 +48,7 @@ export const de = {
     close: 'Schließen',
     view: 'Anzeigen',
     edit_on_git: 'Bearbeiten auf ${1}',
+    edit: 'Bearbeiten',
     notfound_title: 'Seite nicht gefunden',
     notfound_link:
         'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',

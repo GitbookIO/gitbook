@@ -2,22 +2,29 @@
 
 import {
     CopyMarkdown,
+    GitEditLink,
     OpenAIAssistant,
     OpenInLLM,
     ViewAsMarkdown,
+    ViewAsPDF,
 } from '@/components/PageActions/PageActions';
 import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
-import type { SiteCustomizationSettings } from '@gitbook/api';
+import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
-import { useAI } from '../AI';
+import { type Assistant, useAI } from '../AI';
 
 interface PageActionsDropdownProps {
     markdownPageUrl: string;
     className?: string;
     actions: SiteCustomizationSettings['pageActions'];
+    editOnGit?: {
+        provider: GitSyncState['installationProvider'];
+        url: string;
+    };
+    pdfUrl?: string;
 }
 
 /**
@@ -25,13 +32,19 @@ interface PageActionsDropdownProps {
  */
 export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
     const language = useLanguage();
 
-    return assistants.length > 0 || props.actions.markdown || props.actions.externalAI ? (
+    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
+
+    const defaultActions = [assistants.length > 0, props.actions.markdown, props.editOnGit];
+    const dropdownActions = [props.actions.externalAI, props.pdfUrl];
+
+    return [...defaultActions, ...dropdownActions].some(Boolean) ? (
         <ButtonGroup ref={ref} className={props.className}>
-            <DefaultAction {...props} />
-            {props.actions.markdown || props.actions.externalAI ? (
+            {defaultActions.some(Boolean) ? (
+                <DefaultAction {...props} assistants={assistants} />
+            ) : null}
+            {dropdownActions.some(Boolean) ? (
                 <DropdownMenu
                     align="end"
                     className="!min-w-60 max-w-max"
@@ -43,15 +56,18 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
                                     className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
                                 />
                             }
-                            label={tString(language, 'more')}
-                            iconOnly
+                            label={tString(
+                                language,
+                                defaultActions.some(Boolean) ? 'more' : 'actions'
+                            )}
+                            iconOnly={defaultActions.some(Boolean)}
                             size="xsmall"
                             variant="secondary"
                             className="bg-tint-base text-sm"
                         />
                     }
                 >
-                    <PageActionsDropdownMenuContent {...props} />
+                    <PageActionsDropdownMenuContent {...props} assistants={assistants} />
                 </DropdownMenu>
             ) : null}
         </ButtonGroup>
@@ -61,9 +77,10 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
 /**
  * The content of the dropdown menu.
  */
-function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
-    const { markdownPageUrl, actions } = props;
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
+function PageActionsDropdownMenuContent(
+    props: PageActionsDropdownProps & { assistants: Assistant[] }
+) {
+    const { markdownPageUrl, actions, assistants } = props;
 
     return (
         <>
@@ -94,6 +111,22 @@ function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
                     <OpenInLLM provider="claude" url={markdownPageUrl} type="dropdown-menu-item" />
                 </>
             ) : null}
+
+            {props.editOnGit || props.pdfUrl ? (
+                <>
+                    <DropdownMenuSeparator className="first:hidden" />
+                    {props.editOnGit ? (
+                        <GitEditLink
+                            type="dropdown-menu-item"
+                            provider={props.editOnGit.provider}
+                            url={props.editOnGit.url}
+                        />
+                    ) : null}
+                    {props.pdfUrl ? (
+                        <ViewAsPDF url={props.pdfUrl} type="dropdown-menu-item" />
+                    ) : null}
+                </>
+            ) : null}
         </>
     );
 }
@@ -101,9 +134,8 @@ function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function DefaultAction(props: PageActionsDropdownProps) {
-    const { markdownPageUrl, actions } = props;
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
+function DefaultAction(props: PageActionsDropdownProps & { assistants: Assistant[] }) {
+    const { markdownPageUrl, actions, assistants } = props;
 
     if (assistants.length) {
         return <OpenAIAssistant assistant={assistants[0]} type="button" />;
@@ -119,11 +151,13 @@ function DefaultAction(props: PageActionsDropdownProps) {
         );
     }
 
-    if (actions.externalAI) {
+    if (props.editOnGit) {
         return (
-            <>
-                <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="button" />
-            </>
+            <GitEditLink
+                type="button"
+                provider={props.editOnGit.provider}
+                url={props.editOnGit.url}
+            />
         );
     }
 }
