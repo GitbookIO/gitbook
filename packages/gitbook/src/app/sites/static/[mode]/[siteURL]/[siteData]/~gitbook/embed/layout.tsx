@@ -1,4 +1,6 @@
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { AIChatDynamicIcon } from '@/components/AIChat';
+import { EmbeddableFrame } from '@/components/Embeddable';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayoutClientContexts,
@@ -25,7 +27,12 @@ export default async function EmbedAssistantRootLayout({
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
             >
-                {children}
+                <EmbeddableFrame
+                    icon={<AIChatDynamicIcon trademark={context.customization.trademark.enabled} />}
+                    title="Test"
+                >
+                    {children}
+                </EmbeddableFrame>
                 <EmbedIframeAPI />
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>

@@ -1,7 +1,6 @@
 'use client';
 
 import { t, tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -11,6 +10,7 @@ import {
     useAIChatController,
     useAIChatState,
 } from '../AI';
+import { EmbeddableFrame } from '../Embeddable';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
@@ -21,8 +21,21 @@ import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
 export function AIChat(props: { trademark: boolean }) {
     const { trademark } = props;
+
+    const language = useLanguage();
     const chat = useAIChatState();
     const chatController = useAIChatController();
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    // When the chat is opened, scroll to it (applicable on mobile, where it's displayed above the content)
+    React.useEffect(() => {
+        if (chat.opened) {
+            containerRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+    }, [chat.opened]);
 
     useHotkeys(
         'mod+i',
@@ -47,30 +60,103 @@ export function AIChat(props: { trademark: boolean }) {
 
     return (
         <div className="inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96">
-            <AIChatWindow
-                trademark={trademark}
-                chatController={chatController}
-                chat={chat}
-                className="circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle"
-            />
+            <EmbeddableFrame
+                data-testid="ai-chat"
+                className="ai-chat circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle"
+                icon={<AIChatDynamicIcon trademark={trademark} />}
+                title={getAIChatName(trademark)}
+                subtitle={
+                    chat.loading
+                        ? chat.messages[chat.messages.length - 1].content
+                            ? tString(language, 'ai_chat_working')
+                            : tString(language, 'ai_chat_thinking')
+                        : ''
+                }
+                buttons={
+                    <>
+                        {chat.messages.length > 0 ? (
+                            <DropdownMenu
+                                button={
+                                    <Button
+                                        onClick={() => {}}
+                                        iconOnly
+                                        icon="ellipsis"
+                                        label={tString(language, 'actions')}
+                                        variant="blank"
+                                        size="default"
+                                    />
+                                }
+                            >
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        chatController.clear();
+                                    }}
+                                >
+                                    <Icon
+                                        icon="broom-wide"
+                                        className="size-3 shrink-0 text-tint-subtle"
+                                    />
+                                    {t(language, 'ai_chat_clear_conversation')}
+                                </DropdownMenuItem>
+                            </DropdownMenu>
+                        ) : null}
+                        <Button
+                            onClick={() => chatController.close()}
+                            iconOnly
+                            icon="close"
+                            label={tString(language, 'close')}
+                            variant="blank"
+                            size="default"
+                        />
+                    </>
+                }
+            >
+                <AIChatBody chatController={chatController} chat={chat} trademark={trademark} />
+            </EmbeddableFrame>
         </div>
     );
 }
 
 /**
- * Inner view of the AI chat window.
+ * Dynamic icon to indicate the AI chat state.
  */
-export function AIChatWindow(props: {
+export function AIChatDynamicIcon(props: {
+    trademark: boolean;
+}) {
+    const { trademark } = props;
+    const chat = useAIChatState();
+
+    return (
+        <AIChatIcon
+            className="size-5 text-tint"
+            trademark={trademark}
+            state={
+                chat.error
+                    ? 'error'
+                    : chat.loading
+                      ? chat.messages[chat.messages.length - 1].content
+                          ? 'working'
+                          : 'thinking'
+                      : chat.messages.length > 0
+                        ? 'done'
+                        : 'default'
+            }
+        />
+    );
+}
+
+/**
+ * Body of the AI chat window.
+ */
+export function AIChatBody(props: {
     chatController: AIChatController;
     chat: AIChatState;
     trademark: boolean;
-    className?: string;
 }) {
-    const { chatController, chat, trademark, className } = props;
+    const { chatController, chat, trademark } = props;
 
     const [input, setInput] = React.useState('');
 
-    const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
     // Ref for the last user message element
     const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
@@ -101,12 +187,6 @@ export function AIChatWindow(props: {
     }, [chat.messages.length]);
 
     React.useEffect(() => {
-        // When the chat is opened, scroll to it (applicable on mobile, where it's displayed above the content)
-        containerRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-        });
-
         const timeout = setTimeout(() => {
             if (lastUserMessageRef.current) {
                 lastUserMessageRef.current.scrollIntoView({
@@ -133,77 +213,7 @@ export function AIChatWindow(props: {
     }, []);
 
     return (
-        <div
-            data-testid="ai-chat"
-            className={tcls(
-                'ai-chat relative flex h-full grow flex-col overflow-hidden bg-tint-base text-sm text-tint',
-                className
-            )}
-            ref={containerRef}
-        >
-            <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
-                <AIChatIcon
-                    className="size-5 text-tint"
-                    trademark={trademark}
-                    state={
-                        chat.error
-                            ? 'error'
-                            : chat.loading
-                              ? chat.messages[chat.messages.length - 1].content
-                                  ? 'working'
-                                  : 'thinking'
-                              : chat.messages.length > 0
-                                ? 'done'
-                                : 'default'
-                    }
-                />
-                <div className="flex flex-col">
-                    <div className="font-bold">{getAIChatName(trademark)}</div>
-                    <div
-                        className={`text-tint text-xs leading-none transition-all duration-500 ${
-                            chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'
-                        }`}
-                    >
-                        {chat.loading
-                            ? chat.messages[chat.messages.length - 1].content
-                                ? t(language, 'ai_chat_working')
-                                : t(language, 'ai_chat_thinking')
-                            : ''}
-                    </div>
-                </div>
-                <div className="ml-auto flex gap-2">
-                    <DropdownMenu
-                        button={
-                            <Button
-                                onClick={() => {}}
-                                iconOnly
-                                icon="ellipsis"
-                                label={tString(language, 'actions')}
-                                variant="blank"
-                                size="default"
-                            />
-                        }
-                    >
-                        <DropdownMenuItem
-                            onClick={() => {
-                                chatController.clear();
-                            }}
-                            disabled={isEmpty}
-                        >
-                            <Icon icon="broom-wide" className="size-3 shrink-0 text-tint-subtle" />
-                            {t(language, 'ai_chat_clear_conversation')}
-                        </DropdownMenuItem>
-                    </DropdownMenu>
-                    <Button
-                        onClick={() => chatController.close()}
-                        iconOnly
-                        icon="close"
-                        label={tString(language, 'close')}
-                        variant="blank"
-                        size="default"
-                    />
-                </div>
-            </div>
+        <div className="flex flex-1 flex-col">
             <div
                 ref={scrollContainerRef}
                 className="flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
