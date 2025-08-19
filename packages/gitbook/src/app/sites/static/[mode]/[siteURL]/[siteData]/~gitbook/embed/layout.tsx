@@ -5,6 +5,7 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
+import { getEmbedSiteContext } from './context';
 
 interface SiteStaticLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -14,7 +15,7 @@ export default async function EmbedAssistantRootLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
-    const { context } = await getStaticSiteContext(await params);
+    const { context } = await getEmbedSiteContext(await params);
 
     return (
         <CustomizationRootLayout customization={context.customization}>

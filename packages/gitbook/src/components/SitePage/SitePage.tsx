@@ -25,45 +25,17 @@ export type SitePageProps = {
  * Fetch and render a page.
  */
 export async function SitePage(props: SitePageProps) {
-    const { context, pageTarget } = await getPageDataWithFallback({
-        context: props.context,
-        pagePathParams: props.pageParams,
-    });
-
-    const rawPathname = getPathnameParam(props.pageParams);
-    if (!pageTarget) {
-        const pathname = rawPathname.toLowerCase();
-        if (pathname !== rawPathname) {
-            // If the pathname was not normalized, redirect to the normalized version
-            // before trying to resolve the page again
-            redirect(context.linker.toPathInSpace(pathname));
-        } else {
-            notFound();
-        }
-    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
-        redirect(
-            context.linker.toPathForPage({
-                pages: context.revision.pages,
-                page: pageTarget.page,
-            })
-        );
-    }
-
-    const { customization, sections } = context;
-    const { page, ancestors } = pageTarget;
-
-    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
-    const withFullPageCover = !!(
-        page.cover &&
-        page.layout.cover &&
-        page.layout.coverSize === 'full'
-    );
-    const withPageFeedback = customization.feedback.enabled;
-
-    const withSections = Boolean(sections && sections.list.length > 0);
+    const {
+        context,
+        page,
+        ancestors,
+        document,
+        withFullPageCover,
+        withPageFeedback,
+        withSections,
+        withTopHeader,
+    } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
-
-    const document = await getPageDocument(context, page);
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
@@ -153,6 +125,61 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             (await isSiteIndexable(context)) && isPageIndexable(ancestors, page)
                 ? 'index, follow'
                 : 'noindex, nofollow',
+    };
+}
+
+/**
+ * Fetches all the data required to render the site page.
+ */
+export async function getSitePageData(props: SitePageProps) {
+    const { context, pageTarget } = await getPageDataWithFallback({
+        context: props.context,
+        pagePathParams: props.pageParams,
+    });
+
+    const rawPathname = getPathnameParam(props.pageParams);
+    if (!pageTarget) {
+        const pathname = rawPathname.toLowerCase();
+        if (pathname !== rawPathname) {
+            // If the pathname was not normalized, redirect to the normalized version
+            // before trying to resolve the page again
+            redirect(context.linker.toPathInSpace(pathname));
+        } else {
+            notFound();
+        }
+    } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
+        redirect(
+            context.linker.toPathForPage({
+                pages: context.revision.pages,
+                page: pageTarget.page,
+            })
+        );
+    }
+
+    const { customization, sections } = context;
+    const { page, ancestors } = pageTarget;
+
+    const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
+    const withFullPageCover = !!(
+        page.cover &&
+        page.layout.cover &&
+        page.layout.coverSize === 'full'
+    );
+    const withPageFeedback = customization.feedback.enabled;
+
+    const withSections = Boolean(sections && sections.list.length > 0);
+
+    const document = await getPageDocument(context, page);
+
+    return {
+        context,
+        page,
+        ancestors,
+        document,
+        withSections,
+        withPageFeedback,
+        withFullPageCover,
+        withTopHeader,
     };
 }
 
