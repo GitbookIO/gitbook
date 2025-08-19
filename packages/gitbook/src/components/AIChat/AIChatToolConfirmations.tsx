@@ -29,12 +29,13 @@ export function AIChatToolConfirmations(props: {
     );
 
     return (
-        <div
-            className="flex w-full animate-present-slow flex-wrap justify-end gap-2"
-            style={{ animationDelay: `${chat.pendingTools.length * 100}ms` }}
-        >
+        <div className="flex w-full flex-wrap justify-end gap-2">
             {chat.pendingTools.map((tool, index) => (
-                <div className="flex w-full flex-col gap-1" key={index}>
+                <div
+                    className="flex w-full animate-present-slow flex-col gap-1"
+                    key={index}
+                    style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+                >
                     <Button
                         onClick={() => {
                             tool.confirm();
@@ -48,13 +49,16 @@ export function AIChatToolConfirmations(props: {
                     />
                     {index === 0 && (
                         <div
-                            className="flex pointer-none:hidden w-full animate-fade-in-slow items-center justify-end gap-2 text-tint-subtle text-xs"
-                            style={{ animationDelay: '500ms' }}
+                            className="flex pointer-none:hidden w-full animate-fade-in-slow items-center justify-end gap-2 text-tint text-xs"
+                            style={{ animationDelay: '1000ms' }}
                         >
                             {t(
                                 language,
                                 'press_to_confirm',
-                                <KeyboardShortcut keys={['mod', 'enter']} className="mx-0" />
+                                <KeyboardShortcut
+                                    keys={['mod', 'enter']}
+                                    className="mx-0 text-tint"
+                                />
                             )}
                         </div>
                     )}

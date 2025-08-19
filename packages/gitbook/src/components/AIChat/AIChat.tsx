@@ -139,7 +139,9 @@ export function AIChatWindow(props: {
                                       ? 'working'
                                       : 'thinking'
                                   : chat.messages.length > 0
-                                    ? 'done'
+                                    ? chat.pendingTools.length > 0
+                                        ? 'confirm'
+                                        : 'done'
                                     : 'default'
                         }
                     />
