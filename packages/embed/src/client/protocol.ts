@@ -53,6 +53,13 @@ export type ParentToFrameMessage =
     | {
           type: 'setPlaceholder';
           settings: GitBookPlaceholderSettings;
+      }
+    | {
+          type: 'navigateToPage';
+          pagePath: string;
+      }
+    | {
+          type: 'navigateToAssistant';
       };
 
 /**

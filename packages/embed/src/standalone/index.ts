@@ -34,7 +34,11 @@ type StandaloneCalls =
     // Clear the chat
     | ['clearChat']
     // Configure the placeholder
-    | ['setPlaceholder', GitBookPlaceholderSettings];
+    | ['setPlaceholder', GitBookPlaceholderSettings]
+    // Navigate to a page
+    | ['navigateToPage', string]
+    // Navigate to the assistant
+    | ['navigateToAssistant'];
 
 export type GitBookStandalone = ((...args: StandaloneCalls) => void) & {
     q?: StandaloneCalls[];
@@ -130,6 +134,12 @@ const GitBook = (...args: StandaloneCalls) => {
             break;
         case 'setPlaceholder':
             getIframe().frame.setPlaceholder(args[1]);
+            break;
+        case 'navigateToPage':
+            getIframe().frame.navigateToPage(args[1]);
+            break;
+        case 'navigateToAssistant':
+            getIframe().frame.navigateToAssistant();
             break;
     }
 };

@@ -8,6 +8,16 @@ import type {
 
 export type GitBookFrameClient = {
     /**
+     * Navigate to a page by its path.
+     */
+    navigateToPage: (path: string) => void;
+
+    /**
+     * Navigate to the assistant.
+     */
+    navigateToAssistant: () => void;
+
+    /**
      * Post a message to the chat.
      */
     postUserMessage: (message: string) => void;
@@ -58,6 +68,12 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     const events = new Map<string, Array<(...args: any[]) => void>>();
 
     return {
+        navigateToPage: (pagePath) => {
+            sendToFrame({ type: 'navigateToPage', pagePath });
+        },
+        navigateToAssistant: () => {
+            sendToFrame({ type: 'navigateToAssistant' });
+        },
         postUserMessage: (message) => sendToFrame({ type: 'postUserMessage', message }),
         registerTool: (tool) => sendToFrame({ type: 'registerTool', tool }),
         clearChat: () => sendToFrame({ type: 'clearChat' }),

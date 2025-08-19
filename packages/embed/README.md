@@ -13,8 +13,9 @@ The script is served at `https://docs.company.com/~gitbook/embed/script.js`.
 You can find the embed script from your docs site settings, or you can copy the following and replace the `docs.company.com` by your docs site hostname.
 
 ```html
+<script src="https://docs.company.com/~gitbook/embed/script.js"></script>
 <script>
-(function(){var w=window;var gb=w.GitBook;if(typeof ic==="function"){}else{var d=document;var g=function(){g.c(arguments);};g.q=[];g.c=function(args){g.q.push(args);};w.GitBook=g;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://docs.company.com/~gitbook/embed/script.js';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(document.readyState==='complete'){l();}else if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+window.GitBook('show');
 </script>
 ```
 
@@ -23,8 +24,16 @@ You can find the embed script from your docs site settings, or you can copy the 
 Install the package: `npm install @gitbook/embed` and import it in your web application:
 
 ```tsx
-import { GitBook } from '@gitbook/embed';
+import { createGitBook } from '@gitbook/embed';
 
+const gitbook = createGitBook({
+    siteURL: 'https://docs.company.com'
+});
+
+const iframe = document.createElement('iframe');
+iframe.src = gitbook.getFrameURL();
+
+const frame = gitbook.createFrame(iframe);
 ```
 
 ## As React components

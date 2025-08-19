@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export const dynamic = 'force-static';
 
 /**
- * This route serves a quick demo to test the assistant.js script.
+ * This route serves a quick demo to test the script.js script.
  * It is not used in production.
  */
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
 <html>
     <head></head>
     <body></body>
-    <script src="${context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/embed/assistant.js'))}"></script>
+    <script src="${context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/embed/script.js'))}"></script>
 </html>
 `,
         {
