@@ -1,5 +1,4 @@
 'use client';
-import { motion } from 'framer-motion';
 import React from 'react';
 
 import { useScrollActiveId } from '@/components/hooks';
@@ -14,13 +13,6 @@ import { AsideSectionHighlight } from './AsideSectionHighlight';
  * The threshold at which we consider a section as intersecting the viewport.
  */
 const SECTION_INTERSECTING_THRESHOLD = 0.9;
-
-const springCurve = {
-    type: 'spring',
-    stiffness: 700,
-    damping: 50,
-    mass: 0.8,
-};
 
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     const { sections } = props;
@@ -42,7 +34,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     return (
         <ul className="flex flex-col border-tint-subtle sidebar-list-line:border-l">
             {sections.map((section) => (
-                <motion.li
+                <li
                     key={section.id}
                     className={tcls(
                         'flex',
@@ -55,9 +47,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
                     )}
                 >
-                    {activeId === section.id ? (
+                    {activeId === section.id && (
                         <AsideSectionHighlight
-                            transition={springCurve}
                             className={tcls(
                                 'sidebar-list-default:hidden',
                                 section?.depth > 1
@@ -71,7 +62,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                       ]
                             )}
                         />
-                    ) : null}
+                    )}
                     <a
                         href={`#${section.id}`}
                         className={tcls(
@@ -148,7 +139,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             {section.title}
                         </span>
                     </a>
-                </motion.li>
+                </li>
             ))}
         </ul>
     );
