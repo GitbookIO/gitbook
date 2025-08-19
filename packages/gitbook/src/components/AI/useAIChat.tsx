@@ -31,11 +31,6 @@ export type AIChatPendingTool = {
     confirm: () => Promise<void>;
 
     /**
-     * Cancel the tool call by calling this function.
-     */
-    cancel: () => void;
-
-    /**
      * Tool call result to cancel it.
      */
     cancelToolCall: AIToolCallResult;
@@ -293,7 +288,7 @@ export function useAIChatController(): AIChatController {
                                                     cancelled: 'User did not confirm the tool call',
                                                 },
                                                 summary: {
-                                                    icon: 'forward',
+                                                    icon: 'circle-xmark',
                                                     text: `Skipped confirmation of "${confirmation.label}"`,
                                                 },
                                             },
