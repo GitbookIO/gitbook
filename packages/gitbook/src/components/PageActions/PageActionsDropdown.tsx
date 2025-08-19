@@ -5,7 +5,7 @@ import {
     OpenAIAssistant,
     OpenInLLM,
     ViewAsMarkdown,
-} from '@/components/AIActions/AIActions';
+} from '@/components/PageActions/PageActions';
 import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
@@ -14,7 +14,7 @@ import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
 import { useAI } from '../AI';
 
-interface AIActionsDropdownProps {
+interface PageActionsDropdownProps {
     markdownPageUrl: string;
     className?: string;
     actions: SiteCustomizationSettings['pageActions'];
@@ -23,7 +23,7 @@ interface AIActionsDropdownProps {
 /**
  * Dropdown menu for the AI Actions (Ask Docs Assistant, Copy page, View as Markdown, Open in LLM).
  */
-export function AIActionsDropdown(props: AIActionsDropdownProps) {
+export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
     const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
     const language = useLanguage();
@@ -51,7 +51,7 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
                         />
                     }
                 >
-                    <AIActionsDropdownMenuContent {...props} />
+                    <PageActionsDropdownMenuContent {...props} />
                 </DropdownMenu>
             ) : null}
         </ButtonGroup>
@@ -61,7 +61,7 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
 /**
  * The content of the dropdown menu.
  */
-function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
+function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
     const { markdownPageUrl, actions } = props;
     const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
 
@@ -101,7 +101,7 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function DefaultAction(props: AIActionsDropdownProps) {
+function DefaultAction(props: PageActionsDropdownProps) {
     const { markdownPageUrl, actions } = props;
     const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
 

@@ -2,9 +2,9 @@
 
 import { useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
-import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
-import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
-import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
+import { ChatGPTIcon } from '@/components/PageActions/assets/ChatGPTIcon';
+import { ClaudeIcon } from '@/components/PageActions/assets/ClaudeIcon';
+import { MarkdownIcon } from '@/components/PageActions/assets/MarkdownIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
@@ -15,18 +15,18 @@ import QuickLRU from 'quick-lru';
 import type React from 'react';
 import { create } from 'zustand';
 
-type AIActionType = 'button' | 'dropdown-menu-item';
+type PageActionType = 'button' | 'dropdown-menu-item';
 
 /**
  * Opens our AI Docs Assistant.
  */
-export function OpenAIAssistant(props: { assistant: Assistant; type: AIActionType }) {
+export function OpenAIAssistant(props: { assistant: Assistant; type: PageActionType }) {
     const { assistant, type } = props;
     const chat = useAIChatState();
     const language = useLanguage();
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={assistant.icon}
             label={assistant.label}
@@ -90,7 +90,7 @@ const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
  */
 export function CopyMarkdown(props: {
     markdownPageUrl: string;
-    type: AIActionType;
+    type: PageActionType;
     isDefaultAction?: boolean;
 }) {
     const { markdownPageUrl, type, isDefaultAction } = props;
@@ -130,7 +130,7 @@ export function CopyMarkdown(props: {
     };
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={copied ? 'check' : 'copy'}
             label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
@@ -145,12 +145,12 @@ export function CopyMarkdown(props: {
 /**
  * Redirects to the markdown version of the page.
  */
-export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionType }) {
+export function ViewAsMarkdown(props: { markdownPageUrl: string; type: PageActionType }) {
     const { markdownPageUrl, type } = props;
     const language = useLanguage();
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={<MarkdownIcon className="size-4 fill-current" />}
             label={tString(language, 'view_page_markdown')}
@@ -166,7 +166,7 @@ export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionT
 export function OpenInLLM(props: {
     provider: 'chatgpt' | 'claude';
     url: string;
-    type: AIActionType;
+    type: PageActionType;
 }) {
     const { provider, url, type } = props;
     const language = useLanguage();
@@ -174,7 +174,7 @@ export function OpenInLLM(props: {
     const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Claude';
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={
                 provider === 'chatgpt' ? (
@@ -194,8 +194,8 @@ export function OpenInLLM(props: {
 /**
  * Wraps an action in a button (for the default action) or dropdown menu item.
  */
-function AIActionWrapper(props: {
-    type: AIActionType;
+function PageActionWrapper(props: {
+    type: PageActionType;
     icon: IconName | React.ReactNode;
     label: string;
     /**
