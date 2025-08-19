@@ -5,6 +5,7 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
+import { EmbedIframeAPI } from './EmbedIframeAPI';
 import { getEmbedSiteContext } from './context';
 
 interface SiteStaticLayoutProps {
@@ -25,6 +26,7 @@ export default async function EmbedAssistantRootLayout({
                 contextId={context.contextId}
             >
                 {children}
+                <EmbedIframeAPI />
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>
     );
