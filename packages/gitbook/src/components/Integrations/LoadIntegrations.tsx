@@ -9,6 +9,7 @@ import type {
     GitBookIntegrationEventCallback,
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
+import type { Assistant } from '../AI';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -22,6 +23,8 @@ export const integrationsAssistantTools = zustand.createStore<{
         tools: [],
     };
 });
+
+export const integrationAssistants = zustand.createStore<Array<Assistant>>(() => []);
 
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
@@ -42,8 +45,29 @@ if (typeof window !== 'undefined') {
                 tools: [...state.tools, tool],
             }));
         },
+        registerAssistant: (assistant) => {
+            const id = window.crypto.randomUUID();
+            integrationAssistants.setState(
+                (state) => [
+                    ...state,
+                    { ...assistant, id, ui: assistant.ui ?? true, mode: 'overlay' },
+                ],
+                true
+            );
+
+            return () => {
+                integrationAssistants.setState((state) => state.filter((a) => a.id !== id), true);
+            };
+        },
     };
     window.GitBook = gitbookGlobal;
+}
+
+/**
+ * Get the current state of the assistants.
+ */
+export function useIntegrationAssistants(): Array<Assistant> {
+    return zustand.useStore(integrationAssistants);
 }
 
 /**

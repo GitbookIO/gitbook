@@ -21,6 +21,31 @@ export type GitBookIntegrationTool = AIToolDefinition & {
     execute: (input: object) => Promise<Pick<AIToolCallResult, 'output' | 'summary'>>;
 };
 
+export type GitBookAssistant = {
+    /**
+     * Name of the assistant displayed in the UI.
+     */
+    label: string;
+
+    /**
+     * Icon of the assistant displayed in the UI.
+     * Any FontAwesome icon name is supported.
+     * @example 'sparkle'
+     */
+    icon: string;
+
+    /**
+     * Callback when the assistant is opened.
+     */
+    open: (query?: string) => void;
+
+    /**
+     * Whether to display the triggers for this assistant in the UI.
+     * @default true
+     */
+    ui?: boolean;
+};
+
 export type GitBookGlobal = {
     /**
      * Register an event listener.
@@ -42,6 +67,11 @@ export type GitBookGlobal = {
      * Register a custom tool to be exposed to the AI assistant.
      */
     registerTool: (tool: GitBookIntegrationTool) => void;
+
+    /**
+     * Register a custom assistant to be available on the site.
+     */
+    registerAssistant: (assistant: GitBookAssistant) => () => void;
 };
 
 declare global {
