@@ -1,7 +1,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { CustomizationThemeMode } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -46,43 +45,41 @@ export async function SiteLayout(props: {
     });
 
     return (
-        <NuqsAdapter>
-            <SiteLayoutClientContexts
-                contextId={context.contextId}
-                forcedTheme={
-                    forcedTheme ??
-                    (customization.themes.toggeable ? undefined : customization.themes.default)
-                }
-                externalLinksTarget={customization.externalLinks.target}
+        <SiteLayoutClientContexts
+            contextId={context.contextId}
+            forcedTheme={
+                forcedTheme ??
+                (customization.themes.toggeable ? undefined : customization.themes.default)
+            }
+            externalLinksTarget={customization.externalLinks.target}
+        >
+            <SpaceLayout
+                context={context}
+                withTracking={withTracking}
+                visitorAuthClaims={visitorAuthClaims}
             >
-                <SpaceLayout
-                    context={context}
-                    withTracking={withTracking}
-                    visitorAuthClaims={visitorAuthClaims}
-                >
-                    {children}
-                </SpaceLayout>
+                {children}
+            </SpaceLayout>
 
-                {scripts.length > 0 ? (
-                    <>
-                        <LoadIntegrations />
-                        {scripts.map(({ script }) => (
-                            <script key={script} async src={script} />
-                        ))}
-                    </>
-                ) : null}
+            {scripts.length > 0 ? (
+                <>
+                    <LoadIntegrations />
+                    {scripts.map(({ script }) => (
+                        <script key={script} async src={script} />
+                    ))}
+                </>
+            ) : null}
 
-                {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
-                    <React.Suspense fallback={null}>
-                        <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
-                    </React.Suspense>
-                ) : null}
+            {scripts.some((script) => script.cookies) || customization.privacyPolicy.url ? (
+                <React.Suspense fallback={null}>
+                    <CookiesToast privacyPolicy={customization.privacyPolicy.url} />
+                </React.Suspense>
+            ) : null}
 
-                <RocketLoaderDetector />
+            <RocketLoaderDetector />
 
-                <AdminToolbar context={context} />
-            </SiteLayoutClientContexts>
-        </NuqsAdapter>
+            <AdminToolbar context={context} />
+        </SiteLayoutClientContexts>
     );
 }
 

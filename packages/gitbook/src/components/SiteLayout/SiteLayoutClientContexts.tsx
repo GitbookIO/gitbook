@@ -2,6 +2,7 @@
 
 import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/api';
 import { ThemeProvider } from 'next-themes';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type React from 'react';
 import { useClearRouterCache } from '../hooks/useClearRouterCache';
 import { LinkSettingsContext } from '../primitives';
@@ -20,10 +21,12 @@ export function SiteLayoutClientContexts(props: {
     useClearRouterCache(contextId);
 
     return (
-        <ThemeProvider attribute="class" enableSystem forcedTheme={forcedTheme}>
-            <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
-                {children}
-            </LinkSettingsContext.Provider>
-        </ThemeProvider>
+        <NuqsAdapter>
+            <ThemeProvider attribute="class" enableSystem forcedTheme={forcedTheme}>
+                <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
+                    {children}
+                </LinkSettingsContext.Provider>
+            </ThemeProvider>
+        </NuqsAdapter>
     );
 }
