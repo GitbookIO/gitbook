@@ -81,7 +81,7 @@ export const variantClasses = {
 const activeClasses = {
     primary: 'bg-primary-solid-hover',
     blank: 'bg-primary-active disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active',
-    secondary: 'bg-tint-active',
+    secondary: 'bg-tint-active disabled:bg-tint-active',
     header: 'bg-header-link/3',
 };
 
@@ -194,9 +194,9 @@ export const ButtonGroup = React.forwardRef<
         <div
             ref={ref}
             className={tcls(
-                'flex h-fit items-stretch justify-start',
+                'flex h-fit items-stretch justify-start overflow-hidden',
                 combinedShape
-                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
+                    ? '*:translate-y-0! *:shadow-none! [&>*:not(:first-child)]:border-l-0 [&>*:not(:first-child,:last-child)]:rounded-none! [&>*:not(:only-child):first-child]:rounded-r-none [&>*:not(:only-child):last-child]:rounded-l-none'
                     : '',
                 className
             )}

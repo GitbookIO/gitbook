@@ -2,7 +2,7 @@
 
 import {
     CopyMarkdown,
-    OpenDocsAssistant,
+    OpenAIAssistant,
     OpenInLLM,
     ViewAsMarkdown,
 } from '@/components/AIActions/AIActions';
@@ -10,14 +10,13 @@ import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { SiteCustomizationSettings } from '@gitbook/api';
-
 import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
+import { useAI } from '../AI';
 
 interface AIActionsDropdownProps {
     markdownPageUrl: string;
-    withAIChat?: boolean;
-    trademark: boolean;
+    className?: string;
     actions: SiteCustomizationSettings['pageActions'];
 }
 
@@ -26,10 +25,11 @@ interface AIActionsDropdownProps {
  */
 export function AIActionsDropdown(props: AIActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
+    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
     const language = useLanguage();
 
-    return (
-        <ButtonGroup ref={ref}>
+    return assistants.length > 0 || props.actions.markdown || props.actions.externalAI ? (
+        <ButtonGroup ref={ref} className={props.className}>
             <DefaultAction {...props} />
             {props.actions.markdown || props.actions.externalAI ? (
                 <DropdownMenu
@@ -55,26 +55,31 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
                 </DropdownMenu>
             ) : null}
         </ButtonGroup>
-    );
+    ) : null;
 }
 
 /**
  * The content of the dropdown menu.
  */
 function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
-    const { markdownPageUrl, withAIChat, trademark, actions } = props;
+    const { markdownPageUrl, actions } = props;
+    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
 
     return (
         <>
-            {withAIChat ? (
-                <OpenDocsAssistant trademark={trademark} type="dropdown-menu-item" />
-            ) : null}
+            {assistants.map((assistant) => (
+                <OpenAIAssistant
+                    key={assistant.label}
+                    assistant={assistant}
+                    type="dropdown-menu-item"
+                />
+            ))}
 
             {actions.markdown ? (
                 <>
                     <DropdownMenuSeparator className="first:hidden" />
                     <CopyMarkdown
-                        isDefaultAction={!withAIChat}
+                        isDefaultAction={!assistants.length}
                         markdownPageUrl={markdownPageUrl}
                         type="dropdown-menu-item"
                     />
@@ -97,16 +102,17 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
  * A default action shown as a quick-access button beside the dropdown menu
  */
 function DefaultAction(props: AIActionsDropdownProps) {
-    const { markdownPageUrl, withAIChat, trademark, actions } = props;
+    const { markdownPageUrl, actions } = props;
+    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
 
-    if (withAIChat) {
-        return <OpenDocsAssistant trademark={trademark} type="button" />;
+    if (assistants.length) {
+        return <OpenAIAssistant assistant={assistants[0]} type="button" />;
     }
 
     if (actions.markdown) {
         return (
             <CopyMarkdown
-                isDefaultAction={!withAIChat}
+                isDefaultAction={!assistants.length}
                 markdownPageUrl={markdownPageUrl}
                 type="button"
             />

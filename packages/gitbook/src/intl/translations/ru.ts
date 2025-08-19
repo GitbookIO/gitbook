@@ -16,7 +16,7 @@ export const ru = {
     search_scope_all: 'Все материалы',
     ask: 'Спросить',
     search_ask: 'Спросить "${1}"',
-    search_ask_description: 'Найти ответ с помощью ИИ',
+    search_ask_description: 'Найти ответ с помощью ${1}',
     search_ask_sources: 'Источники',
     search_ask_sources_no_answer: 'Похожие страницы',
     search_ask_no_answer:
