@@ -105,4 +105,5 @@ export const zh: TranslationLanguage = {
     open_in: '在 ${1} 中打开',
     open_in_llms_pre_prompt: '阅读 ${1} 并回答内容相关的问题。',
     press_to_confirm: '按 ${1} 确认',
+    tool_call_skipped: '已跳过 "${1}"',
 };

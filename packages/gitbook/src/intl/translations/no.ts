@@ -109,4 +109,5 @@ export const no: TranslationLanguage = {
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
     press_to_confirm: 'Trykk ${1} for å bekrefte',
+    tool_call_skipped: 'Hoppet over "${1}"',
 };

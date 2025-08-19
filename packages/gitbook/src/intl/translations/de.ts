@@ -109,4 +109,5 @@ export const de = {
     open_in: 'Öffnen in ${1}',
     open_in_llms_pre_prompt: 'Lies ${1} und beantworte Fragen zum Inhalt.',
     press_to_confirm: 'Drücke ${1} zum Bestätigen',
+    tool_call_skipped: 'Übersprungen "${1}"',
 };

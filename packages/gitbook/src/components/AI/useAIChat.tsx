@@ -2,6 +2,8 @@
 
 import * as zustand from 'zustand';
 
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
 import {
     AIMessageRole,
     type AIStreamResponseToolCallPending,
@@ -127,6 +129,7 @@ export function useAIChatController(): AIChatController {
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
+    const language = useLanguage();
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
@@ -288,8 +291,12 @@ export function useAIChatController(): AIChatController {
                                                     cancelled: 'User did not confirm the tool call',
                                                 },
                                                 summary: {
-                                                    icon: 'circle-xmark',
-                                                    text: `Skipped confirmation of "${confirmation.label}"`,
+                                                    icon: 'forward',
+                                                    text: tString(
+                                                        language,
+                                                        'tool_call_skipped',
+                                                        confirmation.label
+                                                    ),
                                                 },
                                             },
                                             confirm: async () => {

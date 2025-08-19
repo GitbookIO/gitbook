@@ -105,4 +105,5 @@ export const fr = {
     open_in: 'Ouvrir dans ${1}',
     open_in_llms_pre_prompt: 'Lire ${1} et répondre aux questions sur le contenu.',
     press_to_confirm: 'Appuyez sur ${1} pour confirmer',
+    tool_call_skipped: 'Ignoré "${1}"',
 };

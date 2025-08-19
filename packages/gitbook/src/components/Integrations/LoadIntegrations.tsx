@@ -61,6 +61,25 @@ if (typeof window !== 'undefined') {
         },
     };
     window.GitBook = gitbookGlobal;
+
+    window.GitBook?.registerTool({
+        name: 'promptToOpenIntercom',
+        description:
+            'Show a button to user to open the Intercom Messenger to help them reach out to the support. Use this tool when you believe the user should talk to the support.',
+        confirmation: {
+            label: 'Contact support',
+            icon: 'message-arrow-up-right',
+        },
+        execute: async () => {
+            console.log('Test');
+            return {
+                output: {
+                    clicked: true,
+                    message: 'Opened chat with support',
+                },
+            };
+        },
+    });
 }
 
 /**

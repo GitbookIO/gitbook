@@ -108,4 +108,5 @@ export const nl: TranslationLanguage = {
     open_in: 'Open in ${1}',
     open_in_llms_pre_prompt: 'Lees ${1} en beantwoord vragen over de inhoud.',
     press_to_confirm: 'Druk op ${1} om te bevestigen',
+    tool_call_skipped: '"${1}" overgeslagen',
 };

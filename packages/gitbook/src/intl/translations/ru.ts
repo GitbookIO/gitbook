@@ -107,4 +107,5 @@ export const ru = {
     open_in: 'Открыть в ${1}',
     open_in_llms_pre_prompt: 'Прочитай ${1} и ответь на вопросы о содержимом.',
     press_to_confirm: 'Нажмите ${1} для подтверждения',
+    tool_call_skipped: 'Пропущен "${1}"',
 };
