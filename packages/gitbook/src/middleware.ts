@@ -144,12 +144,17 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
         const orgs = requestURL.searchParams.get('o');
         const sites = requestURL.searchParams.get('s');
+        if (!orgs || !sites) {
+            return new Response('Missing required query parameters: o (orgs) and s (sites)', {
+                status: 400,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
         const url = new URL(`${GITBOOK_API_URL}/v1/orgs/${orgs}/sites/${sites}/insights/events`);
         return await fetch(url.toString(), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                cookie: request.headers.get('cookie') ?? '',
             },
             body: request.body,
         });

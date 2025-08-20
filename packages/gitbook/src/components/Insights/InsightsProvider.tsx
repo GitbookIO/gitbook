@@ -190,7 +190,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync, visitorCookieTrackingEnabled]);
+    }, [flushEventsSync, visitorCookieTrackingEnabled, appURL]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
