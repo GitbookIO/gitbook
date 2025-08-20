@@ -5,7 +5,7 @@ import type React from 'react';
 interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
     size?: number;
-    state?: 'default' | 'intro' | 'thinking' | 'working' | 'done' | 'error';
+    state?: 'default' | 'intro' | 'thinking' | 'working' | 'done' | 'error' | 'confirm';
     trademark?: boolean;
 }
 
@@ -38,6 +38,7 @@ export const AIChatIcon = ({
             preserveAspectRatio="xMaxYMid meet"
             className={className}
             aria-busy={state === 'thinking'}
+            overflow="visible"
             {...props}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -56,6 +57,7 @@ export const AIChatIcon = ({
                     (state === 'working' || state === 'thinking') &&
                         'animate-[fadeIn_.5s_.3s_both,spin_2s_1s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]',
                     state === 'done' && 'animate-[fadeOut_.5s_both]',
+                    state === 'confirm' && 'animate-[fadeOut_.5s_both]',
                     state === 'default' && 'animate-[fadeIn_0s_both]',
                     state === 'error' && 'hidden'
                 )}
@@ -95,8 +97,22 @@ export const AIChatIcon = ({
                     state === 'done'
                         ? 'animate-[fadeIn_.5s_.3s_both]'
                         : 'animate-[fadeOut_.5s_both]',
-                    state === 'intro' && 'hidden'
+                    state === 'intro' && 'hidden',
+                    state === 'confirm' && 'hidden'
                 )}
+            />
+
+            {/* Confirm */}
+            <path
+                className={tcls(
+                    'fill-primary-9',
+                    state === 'confirm'
+                        ? 'animate-[fadeIn_.5s_.3s_both,bounceSmall_1s_infinite_both]'
+                        : state === 'thinking'
+                          ? 'animate-[fadeOut_.5s_both]'
+                          : 'hidden'
+                )}
+                d="M12.9463 5.24512C13.3688 5.24422 13.713 5.58625 13.7139 6.00879C13.7146 6.43114 13.3725 6.77338 12.9502 6.77441C12.5279 6.77505 12.1845 6.43408 12.1836 6.01172C12.1828 5.58953 12.5242 5.24649 12.9463 5.24512ZM13.0391 0.0751953C14.0688 0.0730893 14.9049 0.90586 14.9072 1.93555C14.9084 2.5063 14.6484 3.04679 14.2012 3.40137L13.7773 3.7373C13.6151 3.86604 13.5201 4.06239 13.5205 4.26953V4.30371C13.5211 4.62139 13.2639 4.879 12.9463 4.87988C12.6288 4.88032 12.3701 4.62417 12.3691 4.30664V4.27246C12.3679 3.71272 12.6238 3.18263 13.0625 2.83496L13.4854 2.49902C13.6565 2.36341 13.7562 2.1568 13.7559 1.93848C13.755 1.54463 13.4358 1.22503 13.042 1.22559H12.9385C12.488 1.22679 12.1225 1.59352 12.123 2.04395L12.124 2.21875C12.1245 2.53649 11.8676 2.79522 11.5498 2.7959C11.2321 2.79653 10.9746 2.53928 10.9736 2.22168L10.9727 2.04688C10.9706 0.960578 11.8493 0.0778178 12.9355 0.0751953H13.0391Z"
             />
 
             {/* Background */}

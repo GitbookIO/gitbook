@@ -16,7 +16,7 @@ export const pt_br = {
     search_scope_all: 'Todo o conteúdo',
     ask: 'Perguntar',
     search_ask: 'Perguntar "${1}"',
-    search_ask_description: 'Encontre a resposta com IA',
+    search_ask_description: 'Encontre a resposta com ${1}',
     search_ask_sources: 'Fontes',
     search_ask_sources_no_answer: 'Páginas relacionadas',
     search_ask_no_answer:
@@ -107,4 +107,6 @@ export const pt_br = {
     view_page_plaintext: 'Ver esta página em texto simples',
     open_in: 'Abrir no ${1}',
     open_in_llms_pre_prompt: 'Leia ${1} e responda perguntas sobre o conteúdo.',
+    press_to_confirm: 'Pressione ${1} para confirmar',
+    tool_call_skipped: 'Pulado "${1}"',
 };

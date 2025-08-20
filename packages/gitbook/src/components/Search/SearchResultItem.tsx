@@ -1,5 +1,5 @@
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
 import { Button } from '../primitives';
 import { Link, type LinkInsightsProps } from '../primitives/Link';
@@ -53,7 +53,13 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
             )}
             {...rest}
         >
-            <div className="size-4 shrink-0 text-tint-subtle">{leadingIcon}</div>
+            <div className="size-4 shrink-0 text-tint-subtle">
+                {typeof leadingIcon === 'string' ? (
+                    <Icon icon={leadingIcon as IconName} className="size-4" />
+                ) : (
+                    leadingIcon
+                )}
+            </div>
             <div className="grow">{children}</div>
             {active ? (
                 <Button label={action} iconOnly variant="primary" icon="arrow-turn-down-left" />

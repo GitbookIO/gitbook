@@ -18,7 +18,7 @@ export const zh: TranslationLanguage = {
     search_scope_all: '所有内容',
     ask: '询问',
     search_ask: '询问"${1}"',
-    search_ask_description: '利用人工智能找到答案',
+    search_ask_description: '利用${1}找到答案',
     search_ask_sources: '来源',
     search_ask_sources_no_answer: '相关页面',
     search_ask_no_answer: '无法找到您的问题的答案。您可以尝试改述问题或提供更具体的信息。',
@@ -104,4 +104,6 @@ export const zh: TranslationLanguage = {
     view_page_plaintext: '以纯文本查看此页面',
     open_in: '在 ${1} 中打开',
     open_in_llms_pre_prompt: '阅读 ${1} 并回答内容相关的问题。',
+    press_to_confirm: '按 ${1} 确认',
+    tool_call_skipped: '已跳过 "${1}"',
 };

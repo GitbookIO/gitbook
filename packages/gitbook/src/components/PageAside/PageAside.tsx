@@ -32,6 +32,7 @@ export function PageAside(props: {
     withPageFeedback: boolean;
 }) {
     const { page, document, withPageFeedback, context } = props;
+    const { customization, site } = context;
 
     return (
         <aside
@@ -39,6 +40,7 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'pt-8',
+                'pb-4',
 
                 'xl:flex',
                 'xl:max-3xl:chat-open:hidden',
@@ -95,7 +97,8 @@ export function PageAside(props: {
                     'flex flex-col',
                     'overflow-hidden',
                     'w-full',
-                    'xl:max-2xl:page-api-block:rounded-md',
+                    'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
+                    'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
                     'xl:max-2xl:page-api-block:border',
                     'xl:max-2xl:page-api-block:border-tint',
                     'xl:max-2xl:page-api-block:bg-tint/9',
@@ -109,7 +112,7 @@ export function PageAside(props: {
             >
                 <PageAsideHeader context={context} />
                 {page.layout.outline ? (
-                    <div>
+                    <div className="flex shrink flex-col overflow-hidden">
                         {document ? (
                             <React.Suspense fallback={null}>
                                 <PageAsideSections document={document} context={context} />
@@ -122,7 +125,9 @@ export function PageAside(props: {
                         />
                     </div>
                 ) : null}
-                <PageAsideFooter context={context} />
+                {customization.themes.toggeable || site.ads ? (
+                    <PageAsideFooter context={context} />
+                ) : null}
             </div>
         </aside>
     );
@@ -161,11 +166,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
     const sections = await getDocumentSections(context, document);
 
-    return sections.length > 1 ? (
-        <div className="-mt-8 overflow-y-auto border-tint pt-8 pb-5 empty:hidden xl:max-2xl:page-api-block:mt-0 xl:max-2xl:border-t xl:max-2xl:page-api-block:p-2">
-            <ScrollSectionsList sections={sections} />
-        </div>
-    ) : null;
+    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
 }
 
 function PageAsideActions(props: {
@@ -195,9 +196,9 @@ function PageAsideActions(props: {
                 'border-t',
                 'first:border-none',
                 'border-tint-subtle',
-                'py-5',
+                'pt-5',
                 'first:pt-0',
-                'xl:max-2xl:page-api-block:px-5',
+                'xl:max-2xl:page-api-block:p-5',
                 'empty:hidden'
             )}
         >
@@ -270,8 +271,8 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
             className={tcls(
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
                 'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                'xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
-                'py-4'
+                'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
+                'pt-4'
             )}
         >
             {/* Mode Switcher */}

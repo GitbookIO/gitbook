@@ -6,6 +6,7 @@
         "@gitbook/api": "catalog:",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
+        "@gitbook/browser-types": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/fonts": "workspace:*",
         "@gitbook/icons": "workspace:*",

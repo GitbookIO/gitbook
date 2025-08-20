@@ -326,6 +326,16 @@ const config: Config = {
                 exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
             },
             keyframes: {
+                bounceSmall: {
+                    '0%, 100%': {
+                        transform: 'translateY(-15%)',
+                        animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)',
+                    },
+                    '50%': {
+                        transform: 'none',
+                        animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
+                    },
+                },
                 pulseAlt: {
                     '0%': {
                         transform: 'scale(0.01)',

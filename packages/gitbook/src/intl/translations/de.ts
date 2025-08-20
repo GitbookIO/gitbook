@@ -16,7 +16,7 @@ export const de = {
     search_scope_all: 'Alle Inhalte',
     ask: 'Fragen',
     search_ask: 'Fragen "${1}"',
-    search_ask_description: 'Finden Sie die Antwort mit AI',
+    search_ask_description: 'Finden Sie die Antwort mit ${1}',
     search_ask_sources: 'Quellen',
     search_ask_sources_no_answer: 'Verwandte Seiten',
     search_ask_no_answer:
@@ -108,4 +108,6 @@ export const de = {
     view_page_plaintext: 'Diese Seite als Klartext anzeigen',
     open_in: 'Öffnen in ${1}',
     open_in_llms_pre_prompt: 'Lies ${1} und beantworte Fragen zum Inhalt.',
+    press_to_confirm: 'Drücke ${1} zum Bestätigen',
+    tool_call_skipped: 'Übersprungen "${1}"',
 };

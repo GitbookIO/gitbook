@@ -50,7 +50,9 @@ export function AIChatInput(props: {
             e.preventDefault();
             inputRef.current?.focus();
         },
-        []
+        {
+            enableOnFormTags: true,
+        }
     );
 
     return (

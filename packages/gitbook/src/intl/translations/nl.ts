@@ -18,7 +18,7 @@ export const nl: TranslationLanguage = {
     search_scope_all: 'Alle inhoud',
     ask: 'Vragen',
     search_ask: 'Vraag "${1}"',
-    search_ask_description: 'Vind het antwoord met AI',
+    search_ask_description: 'Vind het antwoord met ${1}',
     search_ask_sources: 'Bronnen',
     search_ask_sources_no_answer: "Gerelateerde pagina's",
     search_ask_no_answer:
@@ -107,4 +107,6 @@ export const nl: TranslationLanguage = {
     view_page_plaintext: 'Bekijk deze pagina als platte tekst',
     open_in: 'Open in ${1}',
     open_in_llms_pre_prompt: 'Lees ${1} en beantwoord vragen over de inhoud.',
+    press_to_confirm: 'Druk op ${1} om te bevestigen',
+    tool_call_skipped: '"${1}" overgeslagen',
 };

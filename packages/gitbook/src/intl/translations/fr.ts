@@ -16,7 +16,7 @@ export const fr = {
     search_scope_all: 'Tous les contenus',
     ask: 'Poser une question',
     search_ask: 'Demander « ${1} »',
-    search_ask_description: 'Trouvez la réponse avec l’IA',
+    search_ask_description: 'Trouvez la réponse avec ${1}',
     search_ask_sources: 'Sources',
     search_ask_sources_no_answer: 'Pages associées',
     search_ask_no_answer: 'Pas de réponse trouvée. Essayez de reformuler votre question.',
@@ -104,4 +104,6 @@ export const fr = {
     view_page_plaintext: 'Voir en texte brut',
     open_in: 'Ouvrir dans ${1}',
     open_in_llms_pre_prompt: 'Lire ${1} et répondre aux questions sur le contenu.',
+    press_to_confirm: 'Appuyez sur ${1} pour confirmer',
+    tool_call_skipped: 'Ignoré "${1}"',
 };

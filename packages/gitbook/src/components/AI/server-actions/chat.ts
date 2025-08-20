@@ -2,7 +2,13 @@
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
-import { type AIMessageContext, AIMessageRole, AIModel } from '@gitbook/api';
+import {
+    type AIMessageContext,
+    AIMessageRole,
+    AIModel,
+    type AIToolCallResult,
+    type AIToolDefinition,
+} from '@gitbook/api';
 import { streamRenderAIMessage } from './api';
 import type { RenderAIMessageOptions } from './types';
 
@@ -13,11 +19,15 @@ export async function* streamAIChatResponse({
     message,
     messageContext,
     previousResponseId,
+    toolCall,
+    tools,
     options,
 }: {
-    message: string;
+    message?: string;
     messageContext: AIMessageContext;
     previousResponseId?: string;
+    toolCall?: AIToolCallResult;
+    tools?: AIToolDefinition[];
     options?: RenderAIMessageOptions;
 }) {
     const { stream } = await traceErrorOnly('AI.streamAIChatResponse', async () => {
@@ -29,17 +39,19 @@ export async function* streamAIChatResponse({
             siteURLData.organization,
             siteURLData.site,
             {
-                mode: 'assistant',
-                input: [
-                    {
-                        role: AIMessageRole.User,
-                        content: message,
-                        context: messageContext,
-                    },
-                ],
-                output: { type: 'document' },
+                input: message
+                    ? [
+                          {
+                              role: AIMessageRole.User,
+                              content: message,
+                              context: messageContext,
+                          },
+                      ]
+                    : [],
                 model: AIModel.ReasoningLow,
                 previousResponseId,
+                toolCall,
+                tools,
             }
         );
 

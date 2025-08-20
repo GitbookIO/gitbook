@@ -1,12 +1,10 @@
 'use client';
 
-import { useAIChatController } from '@/components/AI/useAIChat';
-import { useAIChatState } from '@/components/AI/useAIChat';
+import { useAIChatState } from '@/components/AI';
+import type { Assistant } from '@/components/AI';
 import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
 import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
 import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
-import { getAIChatName } from '@/components/AIChat';
-import { AIChatIcon } from '@/components/AIChat';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
@@ -22,32 +20,21 @@ type AIActionType = 'button' | 'dropdown-menu-item';
 /**
  * Opens our AI Docs Assistant.
  */
-export function OpenDocsAssistant(props: { type: AIActionType; trademark: boolean }) {
-    const { type, trademark } = props;
-    const chatController = useAIChatController();
+export function OpenAIAssistant(props: { assistant: Assistant; type: AIActionType }) {
+    const { assistant, type } = props;
     const chat = useAIChatState();
     const language = useLanguage();
 
     return (
         <AIActionWrapper
             type={type}
-            icon={
-                <AIChatIcon state={chat.loading ? 'thinking' : 'default'} trademark={trademark} />
-            }
-            label={tString(language, 'ai_chat_ask', getAIChatName(trademark))}
+            icon={assistant.icon}
+            label={assistant.label}
             shortLabel={tString(language, 'ask')}
-            description={tString(language, 'ai_chat_ask_about_page', getAIChatName(trademark))}
+            description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
             disabled={chat.loading}
             onClick={() => {
-                // Open the chat if it's not already open
-                if (!chat.opened) {
-                    chatController.open();
-                }
-
-                // Send the "What is this page about?" message
-                chatController.postMessage({
-                    message: tString(language, 'ai_chat_suggested_questions_about_this_page'),
-                });
+                assistant.open(tString(language, 'ai_chat_suggested_questions_about_this_page'));
             }}
         />
     );

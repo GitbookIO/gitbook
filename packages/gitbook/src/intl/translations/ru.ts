@@ -16,7 +16,7 @@ export const ru = {
     search_scope_all: 'Все материалы',
     ask: 'Спросить',
     search_ask: 'Спросить "${1}"',
-    search_ask_description: 'Найти ответ с помощью ИИ',
+    search_ask_description: 'Найти ответ с помощью ${1}',
     search_ask_sources: 'Источники',
     search_ask_sources_no_answer: 'Похожие страницы',
     search_ask_no_answer:
@@ -106,4 +106,6 @@ export const ru = {
     view_page_plaintext: 'Посмотреть как текст без форматирования',
     open_in: 'Открыть в ${1}',
     open_in_llms_pre_prompt: 'Прочитай ${1} и ответь на вопросы о содержимом.',
+    press_to_confirm: 'Нажмите ${1} для подтверждения',
+    tool_call_skipped: 'Пропущен "${1}"',
 };
