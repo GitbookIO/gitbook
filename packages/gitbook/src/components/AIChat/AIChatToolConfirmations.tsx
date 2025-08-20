@@ -1,5 +1,10 @@
+'use client';
+import { useLanguage } from '@/intl/client';
+import { t } from '@/intl/translate';
+import { useHotkeys } from 'react-hotkeys-hook';
 import type { AIChatState } from '../AI';
 import { Button } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
 /**
  * Display buttons to confirm tool calls.
@@ -9,27 +14,55 @@ export function AIChatToolConfirmations(props: {
 }) {
     const { chat } = props;
 
-    if (chat.pendingTools.length === 0) {
-        return null;
-    }
+    const language = useLanguage();
+
+    useHotkeys(
+        'mod+enter',
+        (e) => {
+            e.preventDefault();
+            chat.pendingTools[0]?.confirm();
+        },
+        {
+            enableOnFormTags: true,
+        },
+        [chat.pendingTools]
+    );
 
     return (
         <div className="flex w-full flex-wrap justify-end gap-2">
             {chat.pendingTools.map((tool, index) => (
-                <Button
+                <div
+                    className="flex w-full animate-present-slow flex-col gap-1"
                     key={index}
-                    onClick={() => {
-                        tool.confirm();
-                    }}
-                    label={tool.label}
-                    className="whitespace-normal! max-w-full animate-[present_500ms_both] text-left ring-1 ring-tint-subtle"
-                    size="medium"
-                    variant="primary"
-                    icon={tool.icon}
-                    style={{
-                        animationDelay: `${250 + Math.min(index * 50, 150)}ms`,
-                    }}
-                />
+                    style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+                >
+                    <Button
+                        onClick={() => {
+                            tool.confirm();
+                        }}
+                        tabIndex={index}
+                        label={tool.label}
+                        className="w-full justify-center"
+                        size={index === 0 ? 'default' : 'medium'}
+                        variant={index === 0 ? 'primary' : 'secondary'}
+                        icon={tool.icon}
+                    />
+                    {index === 0 && (
+                        <div
+                            className="flex pointer-none:hidden w-full animate-fade-in-slow items-center justify-end gap-2 text-tint text-xs"
+                            style={{ animationDelay: '1000ms' }}
+                        >
+                            {t(
+                                language,
+                                'press_to_confirm',
+                                <KeyboardShortcut
+                                    keys={['mod', 'enter']}
+                                    className="mx-0 text-tint"
+                                />
+                            )}
+                        </div>
+                    )}
+                </div>
             ))}
         </div>
     );
