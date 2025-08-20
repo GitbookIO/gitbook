@@ -170,7 +170,7 @@ export function SearchContainer(props: SearchContainerProps) {
                 rootProps={{
                     open: state?.open ?? false,
                     onOpenChange: (open) => {
-                        open === true ? onOpen() : onClose();
+                        open ? onOpen() : onClose();
                     },
                     modal: isMobile,
                 }}
