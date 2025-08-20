@@ -57,7 +57,7 @@ export function Header(props: {
                 )}
             >
                 <div className="scroll-nojump">
-                    <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <div className="transition-all duration-300">
                         <div
                             className={tcls(
                                 'gap-4',
@@ -145,7 +145,7 @@ export function Header(props: {
 
             {sections || siteSpaces.length > 1 ? (
                 <div className="scroll-nojump">
-                    <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <div className="transition-all duration-300">
                         <div
                             className={tcls(
                                 'w-full',

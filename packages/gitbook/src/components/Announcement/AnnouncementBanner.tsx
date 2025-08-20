@@ -35,7 +35,7 @@ export function AnnouncementBanner(props: {
             data-nosnippet=""
         >
             <div className="scroll-nojump">
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300">
                     <div className={tcls('relative', CONTAINER_STYLE)}>
                         <Tag
                             href={contentRef?.href ?? ''}

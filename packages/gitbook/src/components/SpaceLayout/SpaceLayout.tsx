@@ -101,11 +101,8 @@ export function SpaceLayout(props: {
                                 context={context}
                                 search={search}
                             />
-                            {aiMode === CustomizationAIMode.Assistant ? (
-                                <AIChat trademark={customization.trademark.enabled} />
-                            ) : null}
                             <div className="scroll-nojump">
-                                <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
+                                <div className="motion-safe:transition-all motion-safe:duration-300">
                                     <div
                                         className={tcls(
                                             'flex',
@@ -169,6 +166,9 @@ export function SpaceLayout(props: {
                                         <div className="flex min-w-0 flex-1 flex-col">
                                             {children}
                                         </div>
+                                        {aiMode === CustomizationAIMode.Assistant ? (
+                                            <AIChat trademark={customization.trademark.enabled} />
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>

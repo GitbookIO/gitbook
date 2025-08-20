@@ -1,6 +1,7 @@
 'use client';
 
 import { t, tString, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -123,7 +124,12 @@ export function AIChatWindow(props: {
     return (
         <div
             data-testid="ai-chat"
-            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
+            className={tcls(
+                'ai-chat sticky right-0 z-40 ml-8 flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-[width] duration-300 sm:px-6 lg:w-80 lg:animate-enter-from-right lg:px-0 xl:w-96',
+                'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
+                'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
+                'lg:-mr-[calc(max(0px,((100vw-96rem)/2)))]' // screen (100vw) - sidebar (18rem) - content (48rem) - chat window (20rem)
+            )}
             ref={containerRef}
         >
             <div className="relative flex h-full grow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-md bg-tint-base text-sm text-tint depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
