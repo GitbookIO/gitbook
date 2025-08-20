@@ -60,7 +60,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
         // For simplicity we're only triggering the first assistant
         first.open(state?.ask ?? undefined);
-    }, [state?.ask, assistants.length, assistants]);
+    }, [state?.ask, assistants.length, assistants, assistants[0]?.ready]);
 
     const onClose = React.useCallback(
         async (to?: string) => {
