@@ -108,4 +108,6 @@ export const ja: TranslationLanguage = {
     view_page_plaintext: 'このページをプレーンテキストで表示',
     open_in: '${1} で開く',
     open_in_llms_pre_prompt: '${1} を読んで内容に関する質問に答えてください。',
+    press_to_confirm: '確認するには${1}を押してください',
+    tool_call_skipped: '"${1}" をスキップしました',
 };

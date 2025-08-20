@@ -164,6 +164,7 @@ export const Button = React.forwardRef<
                 {...rest}
             >
                 {content}
+                {trailing}
             </button>
         );
 
