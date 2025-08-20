@@ -24,7 +24,7 @@ export default async function EmbedPage(props: PageProps) {
     });
 
     return (
-        <div className="p-6">
+        <div className="flex-1 overflow-auto p-6">
             <PageBody
                 context={context}
                 page={page}

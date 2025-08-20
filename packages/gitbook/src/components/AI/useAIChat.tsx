@@ -12,7 +12,7 @@ import * as React from 'react';
 import { useTrackEvent } from '../Insights';
 import { integrationsAssistantTools } from '../Integrations';
 import { useSearch } from '../Search';
-import { streamAIChatResponse } from './server-actions';
+import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
 export type AIChatMessage = {
@@ -96,6 +96,8 @@ export type AIChatController = {
     clear: () => void;
 };
 
+const AIChatControllerContext = React.createContext<AIChatController | null>(null);
+
 // Global state store for AI chat
 const globalState = zustand.create<AIChatState>(() => {
     return {
@@ -120,10 +122,14 @@ export function useAIChatState(): AIChatState {
 }
 
 /**
- * Get the controller to interact with the AI chat.
- * Integrates with search state to synchronize ?ask= parameter.
+ * Provide the controller to interact with the AI chat.
  */
-export function useAIChatController(): AIChatController {
+export function AIChatProvider(props: {
+    renderMessageOptions?: RenderAIMessageOptions;
+    children: React.ReactNode;
+}) {
+    const { renderMessageOptions, children } = props;
+
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
@@ -229,6 +235,10 @@ export function useAIChatController(): AIChatController {
                         description: tool.description,
                         inputSchema: tool.inputSchema,
                     })),
+                    options: {
+                        withLinkPreviews: renderMessageOptions?.withLinkPreviews ?? true,
+                        withToolCalls: renderMessageOptions?.withToolCalls ?? true,
+                    },
                 });
 
                 // Process streaming response
@@ -336,7 +346,11 @@ export function useAIChatController(): AIChatController {
                 }));
             }
         },
-        [messageContextRef.current]
+        [
+            messageContextRef.current,
+            renderMessageOptions?.withLinkPreviews,
+            renderMessageOptions?.withToolCalls,
+        ]
     );
 
     // Post a message to the AI chat
@@ -415,7 +429,7 @@ export function useAIChatController(): AIChatController {
         }));
     }, [setSearchState]);
 
-    return React.useMemo(() => {
+    const controller = React.useMemo(() => {
         return {
             open: onOpen,
             close: onClose,
@@ -423,4 +437,22 @@ export function useAIChatController(): AIChatController {
             postMessage: onPostMessage,
         };
     }, [onOpen, onClose, onClear, onPostMessage]);
+
+    return (
+        <AIChatControllerContext.Provider value={controller}>
+            {children}
+        </AIChatControllerContext.Provider>
+    );
+}
+
+/**
+ * Get the controller to interact with the AI chat.
+ * Integrates with search state to synchronize ?ask= parameter.
+ */
+export function useAIChatController(): AIChatController {
+    const controller = React.useContext(AIChatControllerContext);
+    if (!controller) {
+        throw new Error('useAIChatController must be used within an AIChatProvider');
+    }
+    return controller;
 }

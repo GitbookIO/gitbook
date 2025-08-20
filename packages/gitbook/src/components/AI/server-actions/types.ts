@@ -16,5 +16,11 @@ export type RenderAIMessageOptions = {
      * Render the tool calls.
      * @default true
      */
-    renderToolCalls?: boolean;
+    withToolCalls?: boolean;
+
+    /**
+     * Render the link previews.
+     * @default true
+     */
+    withLinkPreviews?: boolean;
 };

@@ -1,4 +1,5 @@
 import { type RouteLayoutParams, getStaticSiteContext } from '@/app/utils';
+import { AIChatProvider, AIContextProvider } from '@/components/AI';
 import { AIChatDynamicIcon } from '@/components/AIChat';
 import { EmbeddableFrame } from '@/components/Embeddable';
 import { CustomizationRootLayout } from '@/components/RootLayout';
@@ -7,6 +8,7 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
+import { CustomizationAIMode } from '@gitbook/api';
 import { EmbedIframeAPI } from './EmbedIframeAPI';
 import { getEmbedSiteContext } from './context';
 
@@ -32,9 +34,16 @@ export default async function EmbedAssistantRootLayout({
                     title="Test"
                     className="fixed inset-0"
                 >
-                    {children}
+                    <AIContextProvider
+                        aiMode={CustomizationAIMode.Assistant}
+                        trademark={context.customization.trademark.enabled}
+                    >
+                        <AIChatProvider renderMessageOptions={{ withLinkPreviews: false }}>
+                            {children}
+                            <EmbedIframeAPI />
+                        </AIChatProvider>
+                    </AIContextProvider>
                 </EmbeddableFrame>
-                <EmbedIframeAPI />
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>
     );

@@ -46,7 +46,7 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
                     </div>
                     <div className="ml-auto flex gap-2">{buttons}</div>
                 </div>
-                <div className="flex flex-1 flex-col">{children}</div>
+                <div className="flex flex-1 flex-col overflow-hidden">{children}</div>
             </div>
         );
     }
