@@ -37,6 +37,7 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'pt-8',
+                'pb-4',
 
                 'xl:flex',
                 'xl:max-3xl:chat-open:hidden',
@@ -158,13 +159,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
     const sections = await getDocumentSections(context, document);
 
-    return sections.length > 1 ? (
-        <div className="overflow-y-auto">
-            <div className="-mt-8 pt-8 pb-5 xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2">
-                <ScrollSectionsList sections={sections} />
-            </div>
-        </div>
-    ) : null;
+    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
 }
 
 function PageAsideActions(props: {
@@ -178,7 +173,7 @@ function PageAsideActions(props: {
             className={tcls(
                 'flex flex-col gap-3',
                 'border-tint-subtle border-t first:border-none',
-                'sidebar-list-default:px-3 py-5 first:pt-0 xl:max-2xl:page-api-block:p-5',
+                'sidebar-list-default:px-3 pt-5 first:pt-0 xl:max-2xl:page-api-block:p-5',
                 'empty:hidden'
             )}
         >
@@ -201,7 +196,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
                 'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                 'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
-                'py-4'
+                'pt-4'
             )}
         >
             {/* Mode Switcher */}
