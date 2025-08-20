@@ -12,12 +12,7 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import {
-    GITBOOK_API_URL,
-    GITBOOK_APP_URL,
-    isGitBookAssetsHostURL,
-    isGitBookHostURL,
-} from '@/lib/env';
+import { GITBOOK_API_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -142,21 +137,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     if (siteRequestURL.pathname.endsWith('/~gitbook/image')) {
         return await serveResizedImage(request, {
             imagesContextId: imagesContextId,
-        });
-    }
-    // Forwards to get a session id
-    if (siteRequestURL.pathname.endsWith('/~gitbook/__sess')) {
-        const url = new URL(`${GITBOOK_APP_URL}/__session`);
-        url.search = requestURL.search;
-        return await fetch(url.toString(), {
-            method: 'GET',
-            credentials: 'include', // Make sure to send/receive cookies.
-            cache: 'no-cache',
-            mode: 'cors',
-            headers: {
-                cookie: request.headers.get('cookie') ?? '',
-                referer: request.headers.get('referer') ?? '',
-            },
         });
     }
 
