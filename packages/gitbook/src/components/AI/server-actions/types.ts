@@ -23,4 +23,10 @@ export type RenderAIMessageOptions = {
      * @default true
      */
     withLinkPreviews?: boolean;
+
+    /**
+     * Generate links in the context of an embeddable view.
+     * @default false
+     */
+    asEmbeddable?: boolean;
 };

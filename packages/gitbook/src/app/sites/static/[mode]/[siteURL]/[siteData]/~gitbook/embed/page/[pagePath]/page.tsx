@@ -2,8 +2,8 @@ import { type RouteParams, getPagePathFromParams } from '@/app/utils';
 import { getSitePageData } from '@/components/SitePage';
 
 import { PageBody } from '@/components/PageBody';
+import { getEmbeddableContext } from '@/lib/embeddable';
 import type { Metadata } from 'next';
-import { getEmbedSiteContext } from '../../context';
 
 export const dynamic = 'force-static';
 
@@ -16,7 +16,7 @@ type PageProps = {
  */
 export default async function EmbedPage(props: PageProps) {
     const params = await props.params;
-    const { context } = await getEmbedSiteContext(params);
+    const { context } = await getEmbeddableContext(params);
     const pathname = getPagePathFromParams(params);
     const { page, document, ancestors, withPageFeedback } = await getSitePageData({
         context,

@@ -8,9 +8,9 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
+import { getEmbeddableContext } from '@/lib/embeddable';
 import { CustomizationAIMode } from '@gitbook/api';
 import { EmbedIframeAPI } from './EmbedIframeAPI';
-import { getEmbedSiteContext } from './context';
 
 interface SiteStaticLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -20,7 +20,7 @@ export default async function EmbedAssistantRootLayout({
     params,
     children,
 }: React.PropsWithChildren<SiteStaticLayoutProps>) {
-    const { context } = await getEmbedSiteContext(await params);
+    const { context } = await getEmbeddableContext(await params);
 
     return (
         <CustomizationRootLayout customization={context.customization}>
@@ -38,7 +38,12 @@ export default async function EmbedAssistantRootLayout({
                         aiMode={CustomizationAIMode.Assistant}
                         trademark={context.customization.trademark.enabled}
                     >
-                        <AIChatProvider renderMessageOptions={{ withLinkPreviews: false }}>
+                        <AIChatProvider
+                            renderMessageOptions={{
+                                withLinkPreviews: false,
+                                asEmbeddable: true,
+                            }}
+                        >
                             {children}
                             <EmbedIframeAPI />
                         </AIChatProvider>

@@ -238,6 +238,7 @@ export function AIChatProvider(props: {
                     options: {
                         withLinkPreviews: renderMessageOptions?.withLinkPreviews ?? true,
                         withToolCalls: renderMessageOptions?.withToolCalls ?? true,
+                        asEmbeddable: renderMessageOptions?.asEmbeddable ?? false,
                     },
                 });
 
@@ -350,6 +351,7 @@ export function AIChatProvider(props: {
             messageContextRef.current,
             renderMessageOptions?.withLinkPreviews,
             renderMessageOptions?.withToolCalls,
+            renderMessageOptions?.asEmbeddable,
         ]
     );
 
