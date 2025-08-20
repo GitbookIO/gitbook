@@ -150,7 +150,7 @@ export function SearchContainer(props: SearchContainerProps) {
             <Popover
                 content={
                     // Only show content if there's a query or Ask is enabled
-                    state?.query || withSearchAI ? (
+                    state?.query || withAI ? (
                         <React.Suspense fallback={null}>
                             {isMultiVariants && !showAsk ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
@@ -170,7 +170,7 @@ export function SearchContainer(props: SearchContainerProps) {
                 rootProps={{
                     open: state?.open ?? false,
                     onOpenChange: (open) => {
-                        setSearchState((prev) => (prev ? { ...prev, open } : null));
+                        open ? onOpen() : onClose();
                     },
                     modal: isMobile,
                 }}
