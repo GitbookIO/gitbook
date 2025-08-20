@@ -76,6 +76,8 @@ export async function PageCover(props: {
 
     return (
         <div
+            id="page-cover"
+            data-full={as === 'full' ? 'true' : 'false'}
             className={tcls(
                 'overflow-hidden',
                 // Negative margin to balance the container padding
