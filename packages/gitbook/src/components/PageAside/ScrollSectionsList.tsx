@@ -14,6 +14,11 @@ import { AsideSectionHighlight } from './AsideSectionHighlight';
  */
 const SECTION_INTERSECTING_THRESHOLD = 0.9;
 
+/**
+ * The offset from the top of the page when scrolling to the active item.
+ */
+const ACTIVE_ITEM_OFFSET = 100;
+
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     const { sections } = props;
 
@@ -31,8 +36,23 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
         enabled,
     });
 
+    const scrollContainerRef = React.useRef<HTMLUListElement>(null);
+    const activeItemRef = React.useRef<HTMLLIElement>(null);
+
+    React.useEffect(() => {
+        if (activeId && activeItemRef.current && scrollContainerRef.current) {
+            scrollContainerRef.current?.scrollTo({
+                top: activeItemRef.current.offsetTop - ACTIVE_ITEM_OFFSET,
+                behavior: 'smooth',
+            });
+        }
+    }, [activeId]);
+
     return (
-        <ul className="flex flex-col border-tint-subtle sidebar-list-line:border-l">
+        <ul
+            className="relative flex flex-col overflow-y-auto border-tint-subtle sidebar-list-line:border-l pb-5 xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2"
+            ref={scrollContainerRef}
+        >
             {sections.map((section) => (
                 <li
                     key={section.id}
@@ -46,6 +66,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                         'mb-0.5',
                         section.depth > 1 && ['ml-3', 'my-0', 'sidebar-list-line:ml-0']
                     )}
+                    ref={activeId === section.id ? activeItemRef : null}
                 >
                     {activeId === section.id && (
                         <AsideSectionHighlight

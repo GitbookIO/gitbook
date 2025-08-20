@@ -18,7 +18,7 @@ export const es: TranslationLanguage = {
     search_scope_all: 'Todo el contenido',
     ask: 'Preguntar',
     search_ask: 'Preguntar "${1}"',
-    search_ask_description: 'Encuentra la respuesta con IA',
+    search_ask_description: 'Encuentra la respuesta con ${1}',
     search_ask_sources: 'Fuentes',
     search_ask_sources_no_answer: 'Páginas relacionadas',
     search_ask_no_answer:
@@ -109,4 +109,6 @@ export const es: TranslationLanguage = {
     view_page_plaintext: 'Ver esta página como texto plano',
     open_in: 'Abrir en ${1}',
     open_in_llms_pre_prompt: 'Lee ${1} y responde preguntas sobre el contenido.',
+    press_to_confirm: 'Presiona ${1} para confirmar',
+    tool_call_skipped: 'Omitido "${1}"',
 };

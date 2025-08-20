@@ -18,7 +18,7 @@ export const ja: TranslationLanguage = {
     search_scope_all: '全てのコンテンツ',
     ask: '質問する',
     search_ask: '"${1}" を質問する',
-    search_ask_description: 'AIで答えを見つける',
+    search_ask_description: '${1}で答えを見つける',
     search_ask_sources: '情報源',
     search_ask_sources_no_answer: '関連ページ',
     search_ask_no_answer:
@@ -107,4 +107,6 @@ export const ja: TranslationLanguage = {
     view_page_plaintext: 'このページをプレーンテキストで表示',
     open_in: '${1} で開く',
     open_in_llms_pre_prompt: '${1} を読んで内容に関する質問に答えてください。',
+    press_to_confirm: '確認するには${1}を押してください',
+    tool_call_skipped: '"${1}" をスキップしました',
 };

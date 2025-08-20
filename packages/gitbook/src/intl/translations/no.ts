@@ -18,7 +18,7 @@ export const no: TranslationLanguage = {
     search_scope_all: 'Alt innhold',
     ask: 'Spør',
     search_ask: 'Spør "${1}"',
-    search_ask_description: 'Finn svaret med AI',
+    search_ask_description: 'Finn svaret med ${1}',
     search_ask_sources: 'Kilder',
     search_ask_sources_no_answer: 'Relaterte sider',
     search_ask_no_answer:
@@ -108,4 +108,6 @@ export const no: TranslationLanguage = {
     view_page_plaintext: 'Vis denne siden som ren tekst',
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
+    press_to_confirm: 'Trykk ${1} for å bekrefte',
+    tool_call_skipped: 'Hoppet over "${1}"',
 };
