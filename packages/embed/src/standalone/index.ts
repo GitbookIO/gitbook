@@ -50,8 +50,8 @@ widgetButton.addEventListener('click', () => {
     GitBook('toggle');
 });
 widgetButton.innerHTML = `
-<svg style="mask-image:url(https://static-2v.gitbook.com/~gitbook/static/icons/svgs/custom-icons/gitbook.svg?v=2)mask-repeat:no-repeat;mask-position:center;"></svg>
-    <span>Ask</span>
+    <span id="gitbook-widget-button-icon"></span>
+    <span id="gitbook-widget-button-label">Ask</span>
 `;
 
 const widgetWindow = document.createElement('div');
