@@ -44,7 +44,9 @@ export function AIChat(props: { trademark: boolean }) {
             e.preventDefault();
             chatController.open();
         },
-        []
+        {
+            enableOnFormTags: true,
+        }
     );
 
     useHotkeys(
@@ -141,7 +143,9 @@ export function AIChatDynamicIcon(props: {
                           ? 'working'
                           : 'thinking'
                       : chat.messages.length > 0
-                        ? 'done'
+                        ? chat.pendingTools.length > 0
+                            ? 'confirm'
+                            : 'done'
                         : 'default'
             }
         />
