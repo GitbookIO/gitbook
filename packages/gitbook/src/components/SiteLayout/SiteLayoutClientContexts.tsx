@@ -4,6 +4,7 @@ import type { CustomizationThemeMode, SiteExternalLinksTarget } from '@gitbook/a
 import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type React from 'react';
+import { SearchContextProvider } from '../Search';
 import { useClearRouterCache } from '../hooks/useClearRouterCache';
 import { LinkSettingsContext } from '../primitives';
 
@@ -24,7 +25,7 @@ export function SiteLayoutClientContexts(props: {
         <NuqsAdapter>
             <ThemeProvider attribute="class" enableSystem forcedTheme={forcedTheme}>
                 <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
-                    {children}
+                    <SearchContextProvider>{children}</SearchContextProvider>
                 </LinkSettingsContext.Provider>
             </ThemeProvider>
         </NuqsAdapter>

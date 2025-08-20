@@ -25,12 +25,12 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
 
         return (
             <div
+                {...divProps}
                 className={tcls(
                     'relative flex h-full grow flex-col overflow-hidden bg-tint-base text-sm text-tint',
                     divProps.className
                 )}
                 ref={ref}
-                {...divProps}
             >
                 <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
                     {icon}
@@ -46,6 +46,7 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
                     </div>
                     <div className="ml-auto flex gap-2">{buttons}</div>
                 </div>
+                <div className="flex flex-1 flex-col">{children}</div>
             </div>
         );
     }

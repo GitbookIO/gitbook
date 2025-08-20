@@ -1,6 +1,7 @@
 'use client';
 
 import { t, tString, useLanguage } from '@/intl/client';
+import type { TranslationLanguage } from '@/intl/translations';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -59,12 +60,14 @@ export function AIChat(props: { trademark: boolean }) {
     }
 
     return (
-        <div className="inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96">
+        <div
+            data-testid="ai-chat"
+            className=" ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
+        >
             <EmbeddableFrame
-                data-testid="ai-chat"
-                className="ai-chat circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle"
+                className="circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle"
                 icon={<AIChatDynamicIcon trademark={trademark} />}
-                title={getAIChatName(trademark)}
+                title={getAIChatName(language, trademark)}
                 subtitle={
                     chat.loading
                         ? chat.messages[chat.messages.length - 1].content
@@ -213,7 +216,7 @@ export function AIChatBody(props: {
     }, []);
 
     return (
-        <div className="flex flex-1 flex-col">
+        <div className="relative flex flex-1 flex-col">
             <div
                 ref={scrollContainerRef}
                 className="flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
@@ -298,9 +301,7 @@ function AIChatError(props: { chatController: AIChatController }) {
     );
 }
 
-export function getAIChatName(trademark: boolean) {
-    const language = useLanguage();
-
+export function getAIChatName(language: TranslationLanguage, trademark: boolean) {
     return trademark
         ? tString(language, 'ai_chat_assistant_name')
         : tString(language, 'ai_chat_assistant_name_unbranded');
