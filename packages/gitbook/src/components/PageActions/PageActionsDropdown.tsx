@@ -141,22 +141,22 @@ function DefaultAction(props: PageActionsDropdownProps & { assistants: Assistant
         return <OpenAIAssistant assistant={assistants[0]} type="button" />;
     }
 
-    if (actions.markdown) {
-        return (
-            <CopyMarkdown
-                isDefaultAction={!assistants.length}
-                markdownPageUrl={markdownPageUrl}
-                type="button"
-            />
-        );
-    }
-
     if (props.editOnGit) {
         return (
             <GitEditLink
                 type="button"
                 provider={props.editOnGit.provider}
                 url={props.editOnGit.url}
+            />
+        );
+    }
+
+    if (actions.markdown) {
+        return (
+            <CopyMarkdown
+                isDefaultAction={!assistants.length}
+                markdownPageUrl={markdownPageUrl}
+                type="button"
             />
         );
     }
