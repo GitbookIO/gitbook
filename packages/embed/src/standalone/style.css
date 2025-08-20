@@ -18,6 +18,22 @@
     width: var(--gitbook-widget-button-size);
     height: var(--gitbook-widget-button-size);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#gitbook-widget-button.hidden {
+    display: none;
+}
+
+#gitbook-widget-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+#gitbook-widget-button span {
+    font-size: 18px;
 }
 
 #gitbook-widget-window {
@@ -32,6 +48,10 @@
     border-radius: 5px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
     overflow: hidden;
+}
+
+body:has(#gitbook-widget-button.hidden) #gitbook-widget-window {
+    bottom: var(--gitbook-widget-window-spacing);
 }
 
 #gitbook-widget-window.hidden {

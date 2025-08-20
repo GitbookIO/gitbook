@@ -49,16 +49,19 @@ widgetButton.id = 'gitbook-widget-button';
 widgetButton.addEventListener('click', () => {
     GitBook('toggle');
 });
+widgetButton.innerHTML = `
+<svg style="mask-image:url(https://static-2v.gitbook.com/~gitbook/static/icons/svgs/custom-icons/gitbook.svg?v=2)mask-repeat:no-repeat;mask-position:center;"></svg>
+    <span>Ask</span>
+`;
 
 const widgetWindow = document.createElement('div');
 widgetWindow.id = 'gitbook-widget-window';
 widgetWindow.classList.add('hidden');
 
-let widgetIframe: HTMLIFrameElement | undefined;
-
 document.body.appendChild(widgetButton);
 document.body.appendChild(widgetWindow);
 
+let widgetIframe: HTMLIFrameElement | undefined;
 let _client: GitBookClient | undefined;
 let _frame: GitBookFrameClient | undefined;
 let frameOptions: GetFrameURLOptions | undefined;
@@ -107,10 +110,10 @@ const GitBook = (...args: StandaloneCalls) => {
             widgetWindow.classList.add('hidden');
             break;
         case 'show':
-            widgetButton.style.display = 'block';
+            widgetButton.classList.remove('hidden');
             break;
         case 'hide':
-            widgetButton.style.display = 'none';
+            widgetButton.classList.add('hidden');
             break;
         case 'open':
             widgetWindow.classList.remove('hidden');
