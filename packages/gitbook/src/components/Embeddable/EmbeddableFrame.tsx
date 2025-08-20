@@ -27,7 +27,7 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
             <div
                 {...divProps}
                 className={tcls(
-                    'relative flex h-full grow flex-col overflow-hidden bg-tint-base text-sm text-tint',
+                    'flex h-full grow flex-col overflow-hidden bg-tint-base text-sm text-tint',
                     divProps.className
                 )}
                 ref={ref}

@@ -30,6 +30,7 @@ export default async function EmbedAssistantRootLayout({
                 <EmbeddableFrame
                     icon={<AIChatDynamicIcon trademark={context.customization.trademark.enabled} />}
                     title="Test"
+                    className="fixed inset-0"
                 >
                     {children}
                 </EmbeddableFrame>

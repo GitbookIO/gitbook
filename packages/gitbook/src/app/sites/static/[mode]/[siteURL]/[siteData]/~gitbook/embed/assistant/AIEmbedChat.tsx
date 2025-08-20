@@ -13,9 +13,5 @@ export function AIEmbedChat(props: {
     const chat = useAIChatState();
     const chatController = useAIChatController();
 
-    return (
-        <div className="fixed inset-0 flex flex-col">
-            <AIChatBody trademark={trademark} chatController={chatController} chat={chat} />
-        </div>
-    );
+    return <AIChatBody trademark={trademark} chatController={chatController} chat={chat} />;
 }

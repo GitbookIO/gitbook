@@ -15,7 +15,7 @@ export function EmbedIframeAPI() {
     const router = useRouter();
 
     React.useEffect(() => {
-        if (!window.top) {
+        if (window.parent === window) {
             return;
         }
 
