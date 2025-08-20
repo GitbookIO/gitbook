@@ -23,6 +23,7 @@ export default class extends WorkerEntrypoint {
                     `gitbook-open-v2-${this.env.STAGE}="${this.env.WORKER_VERSION_ID}"`
                 );
                 return this.env.DEFAULT_WORKER?.fetch(reqOrResp, {
+                    redirect: 'manual',
                     cf: {
                         cacheEverything: false,
                     },
@@ -33,6 +34,9 @@ export default class extends WorkerEntrypoint {
             modifiedUrl.hostname = this.env.PREVIEW_HOSTNAME;
             const nextRequest = new Request(modifiedUrl, reqOrResp);
             return fetch(nextRequest, {
+                // We never want to follow the redirects here.
+                // Redirects are supposed to happen from the client.
+                redirect: 'manual',
                 cf: {
                     cacheEverything: false,
                 },

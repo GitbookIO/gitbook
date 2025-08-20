@@ -10,6 +10,17 @@
         "vercel": "^39.3.0",
       },
     },
+    "packages/browser-types": {
+      "name": "@gitbook/browser-types",
+      "version": "0.3.1",
+      "dependencies": {
+        "@gitbook/api": "catalog:",
+        "@gitbook/icons": "workspace:",
+      },
+      "devDependencies": {
+        "typescript": "^5.5.3",
+      },
+    },
     "packages/cache-tags": {
       "name": "@gitbook/cache-tags",
       "version": "0.3.1",
@@ -51,6 +62,7 @@
       "version": "0.15.0",
       "dependencies": {
         "@gitbook/api": "catalog:",
+        "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
@@ -246,7 +258,7 @@
     "react-dom": "^19.0.0",
   },
   "catalog": {
-    "@gitbook/api": "^0.133.0",
+    "@gitbook/api": "^0.136.0",
   },
   "packages": {
     "@ai-sdk/provider": ["@ai-sdk/provider@1.1.0", "", { "dependencies": { "json-schema": "^0.4.0" } }, "sha512-0M+qjp+clUD0R1E5eWQFhxEvWLNaOtGQRUaBn8CUABnSKredagq92hUS9VjOzGsTm37xLfpaxl97AVtbeOsHew=="],
@@ -611,7 +623,9 @@
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@6.6.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "6.6.0" } }, "sha512-KHwPkCk6oRT4HADE7smhfsKudt9N/9lm6EJ5BVg0tD1yPA5hht837fB87F8pn15D8JfTqQOjhKTktwmLMiD7Kg=="],
 
-    "@gitbook/api": ["@gitbook/api@0.133.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-Xi/A8NROQIj1haDA2XYr9b2+suUviyEVjplSslmwA2HyZnFNlkTaB1W0CwpVrZF8FZsfi3fZekQECOF34RLDDA=="],
+    "@gitbook/api": ["@gitbook/api@0.136.0", "", { "dependencies": { "event-iterator": "^2.0.0", "eventsource-parser": "^3.0.0" } }, "sha512-IxNqmXE6yUEUq0IzbenN8S/PcMfgxr4+akY8xh6V5ShI/+U37ixujJHZp2zJq6NdZOdBQoR3UQmhPnvtWrkF7g=="],
+
+    "@gitbook/browser-types": ["@gitbook/browser-types@workspace:packages/browser-types"],
 
     "@gitbook/cache-tags": ["@gitbook/cache-tags@workspace:packages/cache-tags"],
 

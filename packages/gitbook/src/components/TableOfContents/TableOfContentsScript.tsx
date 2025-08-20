@@ -18,16 +18,17 @@ export function TableOfContentsScript() {
 
             // Set sticky top position based on header
             const headerHeight = header?.offsetHeight ?? 0;
-            root.style.setProperty('--toc-top-offset', `${headerHeight}px`);
 
             // Start with full viewport height minus header
             let height = window.innerHeight - headerHeight;
+            let offset = headerHeight;
 
             // Subtract visible banner (if any)
             if (banner && window.getComputedStyle(banner).display !== 'none') {
                 const bannerRect = banner.getBoundingClientRect();
                 if (bannerRect.height > 0 && bannerRect.bottom > 0) {
                     height -= Math.min(bannerRect.height, bannerRect.bottom);
+                    offset += Math.min(bannerRect.height, bannerRect.bottom);
                 }
             }
 
@@ -41,6 +42,7 @@ export function TableOfContentsScript() {
 
             // Update height
             root.style.setProperty('--toc-height', `${height}px`);
+            root.style.setProperty('--toc-top-offset', `${offset}px`);
         };
 
         // Initial update

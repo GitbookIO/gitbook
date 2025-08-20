@@ -136,6 +136,9 @@ const syntaxAliases: Record<string, BundledLanguage> = {
     // "Parser" language does not exist in Shiki, but it's used in GitBook
     // The closest language is "Blade"
     parser: 'blade',
+
+    // From GitBook App we receive "objectivec" instead of "objective-c"
+    objectivec: 'objective-c',
 };
 
 function checkIsBundledLanguage(lang: string): lang is BundledLanguage {

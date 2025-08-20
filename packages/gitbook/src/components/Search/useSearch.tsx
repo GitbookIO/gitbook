@@ -1,6 +1,7 @@
+'use client';
+
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
 import React from 'react';
-
 import type { LinkProps } from '../primitives';
 
 export interface SearchState {
@@ -25,9 +26,17 @@ export type UpdateSearchState = (
 ) => Promise<URLSearchParams>;
 
 /**
- * Hook to access the current search query and update it.
+ * Context to share the search state updater so all consumers use the same instance.
  */
-export function useSearch(withAIChat = false): [SearchState | null, UpdateSearchState] {
+export const SearchContext = React.createContext<{
+    state: SearchState | null;
+    setState: UpdateSearchState;
+} | null>(null);
+
+export function SearchContextProvider(props: React.PropsWithChildren): React.ReactElement {
+    const { children } = props;
+
+    // URL-backed state
     const [rawState, setRawState] = useQueryStates(keyMap, {
         history: 'replace',
     });
@@ -44,22 +53,20 @@ export function useSearch(withAIChat = false): [SearchState | null, UpdateSearch
         }
     }, [rawState, setRawState]);
 
-    // Separate local state for open (not synchronized with URL)
-    // Default to true if there's already a query in the URL
+    // Local UI state for the popover open/close (not in URL)
     const [open, setIsOpen] = React.useState(() => {
-        return rawState?.q !== null || (!withAIChat && rawState?.ask !== null);
+        return rawState?.q !== null;
     });
 
     const state = React.useMemo<SearchState | null>(() => {
         if (rawState === null || (rawState.q === null && rawState.ask === null)) {
             return null;
         }
-
         return {
             query: rawState.q,
             ask: rawState.ask,
             global: !!rawState.global,
-            open: open,
+            open,
         };
     }, [rawState, open]);
 
@@ -78,16 +85,10 @@ export function useSearch(withAIChat = false): [SearchState | null, UpdateSearch
 
             if (update === null) {
                 setIsOpen(false);
-                return setRawState({
-                    q: null,
-                    ask: null,
-                    global: null,
-                });
+                return setRawState({ q: null, ask: null, global: null });
             }
 
-            // Update the local state
             setIsOpen(update.open);
-
             return setRawState({
                 q: update.query,
                 ask: update.ask,
@@ -97,37 +98,51 @@ export function useSearch(withAIChat = false): [SearchState | null, UpdateSearch
         [setRawState]
     );
 
-    return [state, setState];
+    return <SearchContext.Provider value={{ state, setState }}>{children}</SearchContext.Provider>;
+}
+
+/**
+ * Hook to access the current search query and update it.
+ */
+export function useSearch(): [SearchState | null, UpdateSearchState] {
+    const ctx = React.useContext(SearchContext);
+    if (!ctx) {
+        throw new Error('useSearch must be used within SearchContextProvider');
+    }
+    return [ctx.state, ctx.setState];
 }
 
 /**
  * Hook to create a link to a search query.
  */
-export function useSearchLink(): (query: Partial<SearchState>) => LinkProps {
-    const [, setSearch] = useSearch();
+export function useSearchLink(): (
+    params: Partial<SearchState>,
+    callback?: () => void
+) => LinkProps {
+    const [, setSearchState] = useSearch();
 
     return React.useCallback(
-        (query) => {
+        (params, callback) => {
             const searchParams = new URLSearchParams();
-            query.query ? searchParams.set('q', query.query) : searchParams.delete('q');
-            query.ask ? searchParams.set('ask', query.ask) : searchParams.delete('ask');
-            query.global ? searchParams.set('global', 'true') : searchParams.delete('global');
+            params.query ? searchParams.set('q', params.query) : searchParams.delete('q');
+            params.ask ? searchParams.set('ask', params.ask) : searchParams.delete('ask');
+            params.global ? searchParams.set('global', 'true') : searchParams.delete('global');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
                 onClick: (event) => {
                     event.preventDefault();
-                    setSearch((prev) => ({
-                        query: null,
-                        ask: null,
-                        global: false,
-                        open: query.open ?? prev?.open ?? false,
-                        ...(prev ?? {}),
-                        ...query,
+                    callback?.();
+                    setSearchState((prev) => ({
+                        ...prev,
+                        query: params.query !== undefined ? params.query : null,
+                        ask: params.ask !== undefined ? params.ask : null,
+                        global: params.global !== undefined ? params.global : false,
+                        open: params.open !== undefined ? params.open : false,
                     }));
                 },
             };
         },
-        [setSearch]
+        [setSearchState]
     );
 }

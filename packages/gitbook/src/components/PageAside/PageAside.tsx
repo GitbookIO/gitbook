@@ -32,33 +32,28 @@ export function PageAside(props: {
     withPageFeedback: boolean;
 }) {
     const { page, document, withPageFeedback, context } = props;
-    const { customization, site, space } = context;
-    const language = getSpaceLanguage(customization);
+    const { customization, site } = context;
 
-    const pdfHref = context.linker.toPathInSpace(
-        `~gitbook/pdf?${getPDFURLSearchParams({
-            page: page.id,
-            only: true,
-            limit: 100,
-        }).toString()}`
-    );
     return (
         <aside
             className={tcls(
                 'group/aside',
                 'hidden',
+                'pt-8',
+
                 'xl:flex',
                 'xl:max-3xl:chat-open:hidden',
                 'xl:max-3xl:chat-open:opacity-0',
                 'max-w-56',
+
+                // Animate the width of the aside when the chat is open
                 'xl:max-3xl:*:chat-open:w-56',
                 'xl:max-3xl:chat-open:max-w-0',
                 'xl:max-3xl:chat-open:ml-0',
 
-                'motion-safe:xl:transition-all motion-safe:xl:duration-300',
+                'motion-safe:xl:transition-[width,max-width,margin,opacity,display] motion-safe:xl:duration-300',
                 'motion-safe:transition-discrete',
 
-                'flex-col',
                 'basis-56',
                 'xl:ml-12',
                 'grow-0',
@@ -68,6 +63,7 @@ export function PageAside(props: {
                 'text-tint',
                 'contrast-more:text-tint-strong',
                 'sticky',
+
                 // Without header
                 'lg:top-0',
                 'lg:max-h-screen',
@@ -80,187 +76,87 @@ export function PageAside(props: {
                 'lg:site-header-sections:top-27',
                 'lg:site-header-sections:max-h-[calc(100vh-6.75rem)]',
 
+                // Client-side dynamic positioning (CSS vars applied by script)
+                'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
+                'lg:[html[style*="--toc-height"]_&]:max-h-(--toc-height)!',
+
                 // When in api page mode, we display it as an overlay on non-large resolutions
                 'xl:max-2xl:page-api-block:z-10',
                 'xl:max-2xl:page-api-block:fixed',
                 'xl:max-2xl:page-api-block:right-8',
-                'xl:max-2xl:page-api-block:w-56',
-                'xl:max-2xl:page-api-block:bg-tint/9',
-                'xl:max-2xl:contrast-more:page-api-block:bg-tint',
-                'xl:max-2xl:page-api-block:backdrop-blur-lg',
-                'xl:max-2xl:page-api-block:border',
-                'xl:max-2xl:page-api-block:border-tint',
-                'xl:max-2xl:page-api-block:hover:shadow-lg',
-                'xl:max-2xl:page-api-block:hover:shadow-tint-12/1',
-                'xl:max-2xl:dark:page-api-block:hover:shadow-tint-1/1',
-                'xl:max-2xl:page-api-block:rounded-md',
-                'xl:max-2xl:page-api-block:h-auto',
-                'xl:max-2xl:page-api-block:my-9',
-                'page-api-block:px-2',
-                'page-api-block:py-1.5'
+                'xl:max-2xl:page-api-block:w-60',
+                'xl:max-2xl:page-api-block:max-w-60',
+                'xl:max-2xl:page-api-block:pb-8',
+                'xl:max-2xl:page-api-block:pt-10',
+                'xl:max-2xl:[body:has(.openapi-block):has(.page-has-ancestors)_&]:pt-6.5'
             )}
         >
-            {page.layout.outline ? (
-                <>
-                    <div
-                        className={tcls(
-                            'hidden',
-                            'xl:max-2xl:page-api-block:flex',
-                            'text-xs',
-                            'tracking-wide',
-                            'font-semibold',
-                            'uppercase',
-
-                            'flex-row',
-                            'items-center',
-                            'gap-2'
-                        )}
-                    >
-                        <Icon icon="block-quote" className={tcls('size-3')} />
-                        {t(language, 'on_this_page')}
-                        <Icon
-                            icon="chevron-down"
-                            className={tcls(
-                                'size-3',
-                                'opacity-6',
-                                'ml-auto',
-                                'xl:max-2xl:page-api-block:group-hover/aside:hidden'
-                            )}
-                        />
-                    </div>
-                    <div
-                        className={tcls(
-                            'overflow-y-auto',
-                            'overflow-x-visible',
-
-                            'flex',
-                            'flex-col',
-                            'shrink',
-                            'pb-12',
-
-                            'sticky',
-                            'lg:top:0',
-                            'lg:site-header:top-16',
-                            'lg:site-header-sections:top-27',
-
-                            'gap-6',
-                            'pt-10',
-
-                            'xl:max-2xl:page-api-block:py-0',
-                            // Hide it for api page, until hovered
-                            'xl:max-2xl:page-api-block:hidden',
-                            'xl:max-2xl:page-api-block:group-hover/aside:flex'
-                        )}
-                    >
+            <div
+                className={tcls(
+                    'flex flex-col',
+                    'overflow-hidden',
+                    'w-full',
+                    'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
+                    'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
+                    'xl:max-2xl:page-api-block:border',
+                    'xl:max-2xl:page-api-block:border-tint',
+                    'xl:max-2xl:page-api-block:bg-tint/9',
+                    'xl:max-2xl:page-api-block:backdrop-blur-lg',
+                    'xl:max-2xl:contrast-more:page-api-block:bg-tint',
+                    'xl:max-2xl:page-api-block:hover:shadow-lg',
+                    'xl:max-2xl:page-api-block:hover:shadow-tint-12/1',
+                    'xl:max-2xl:dark:page-api-block:hover:shadow-tint-1/1',
+                    'xl:max-2xl:page-api-block:not-hover:*:hidden'
+                )}
+            >
+                <PageAsideHeader context={context} />
+                {page.layout.outline ? (
+                    <div className="overflow-y-auto border-tint xl:max-2xl:page-api-block:border-t">
                         {document ? (
                             <React.Suspense fallback={null}>
                                 <PageAsideSections document={document} context={context} />
                             </React.Suspense>
                         ) : null}
-                        <div
-                            className={tcls(
-                                'flex',
-                                'flex-col',
-                                'gap-3',
-                                'sidebar-list-default:px-3',
-                                'border-t',
-                                'first:border-none',
-                                'border-tint-subtle',
-                                'py-6',
-                                'first:pt-0',
-                                'xl:max-2xl:page-api-block:px-3',
-                                'empty:hidden'
-                            )}
-                        >
-                            {withPageFeedback ? (
-                                <React.Suspense fallback={null}>
-                                    <PageFeedbackForm pageId={page.id} />
-                                </React.Suspense>
-                            ) : null}
-                            {customization.git.showEditLink && space.gitSync?.url && page.git ? (
-                                <div>
-                                    <a
-                                        href={urlJoin(space.gitSync.url, page.git.path)}
-                                        className={tcls(
-                                            'flex',
-                                            'flex-row',
-                                            'items-center',
-                                            'text-sm',
-                                            'hover:text-tint-strong',
-                                            'links-accent:hover:underline',
-                                            'links-accent:hover:underline-offset-4',
-                                            'links-accent:hover:decoration-[3px]',
-                                            'links-accent:hover:decoration-primary-subtle',
-                                            'py-2'
-                                        )}
-                                    >
-                                        <Icon
-                                            icon={
-                                                space.gitSync.installationProvider === 'gitlab'
-                                                    ? 'gitlab'
-                                                    : 'github'
-                                            }
-                                            className={tcls('size-4', 'mr-1.5')}
-                                        />
-                                        {t(language, 'edit_on_git', getGitSyncName(space))}
-                                    </a>
-                                </div>
-                            ) : null}
-                            {customization.pdf.enabled ? (
-                                <div>
-                                    <a
-                                        href={pdfHref}
-                                        className={tcls(
-                                            'flex',
-                                            'flex-row',
-                                            'items-center',
-                                            'text-sm',
-                                            'hover:text-tint-strong',
-                                            'links-accent:hover:underline',
-                                            'links-accent:hover:underline-offset-4',
-                                            'links-accent:hover:decoration-[3px]',
-                                            'links-accent:hover:decoration-primary-subtle',
-                                            'py-2'
-                                        )}
-                                    >
-                                        <Icon
-                                            icon="file-pdf"
-                                            className={tcls('size-4', 'mr-1.5')}
-                                        />
-                                        {t(language, 'pdf_download')}
-                                    </a>
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
-                </>
-            ) : null}
-            <div
-                className={tcls(
-                    'sticky bottom-0 z-10 mt-auto flex flex-col bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle pb-4 xl:max-2xl:page-api-block:hidden xl:max-2xl:page-api-block:pb-0 xl:max-2xl:page-api-block:group-hover/aside:flex [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                    'xl:max-2xl:page-api-block:bg-transparent'
-                )}
-            >
-                {/* Mode Switcher */}
-                {customization.themes.toggeable ? (
-                    <div className="mt-4 flex items-center justify-end">
-                        <React.Suspense fallback={null}>
-                            <ThemeToggler />
-                        </React.Suspense>
+                        <PageAsideActions
+                            page={page}
+                            withPageFeedback={withPageFeedback}
+                            context={context}
+                        />
                     </div>
                 ) : null}
-                <Ad
-                    zoneId={
-                        site?.ads && site.ads.status === SiteAdsStatus.Live ? site.ads.zoneId : null
-                    }
-                    placement={SiteInsightsAdPlacement.Aside}
-                    spaceId={space.id}
-                    siteAdsStatus={site?.ads?.status ? site.ads.status : undefined}
-                    ignore={process.env.NODE_ENV !== 'production'}
-                    style={site?.ads ? 'mt-4' : undefined}
-                />
+                {customization.themes.toggeable || site.ads ? (
+                    <PageAsideFooter context={context} />
+                ) : null}
             </div>
         </aside>
+    );
+}
+
+function PageAsideHeader(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const language = getSpaceLanguage(context.customization);
+
+    return (
+        <div
+            className={tcls(
+                'hidden',
+                'xl:max-2xl:page-api-block:flex!',
+                'text-xs',
+                'tracking-wide',
+                'font-semibold',
+                'uppercase',
+                'px-2',
+                'py-1.5',
+
+                'flex-row',
+                'items-center',
+                'gap-2'
+            )}
+        >
+            <Icon icon="block-quote" className={tcls('size-3')} />
+            {t(language, 'on_this_page')}
+            <Icon icon="chevron-down" className={tcls('size-3', 'opacity-6', 'ml-auto')} />
+        </div>
     );
 }
 
@@ -269,7 +165,139 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
     const sections = await getDocumentSections(context, document);
 
-    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
+    return sections.length > 1 ? (
+        <div className="-mt-8 pt-8 pb-5 empty:hidden xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2">
+            <ScrollSectionsList sections={sections} />
+        </div>
+    ) : null;
+}
+
+function PageAsideActions(props: {
+    withPageFeedback: boolean;
+    context: GitBookSiteContext;
+    page: RevisionPageDocument;
+}) {
+    const { page, withPageFeedback, context } = props;
+    const { customization, space } = context;
+    const language = getSpaceLanguage(customization);
+
+    const pdfHref = context.linker.toPathInSpace(
+        `~gitbook/pdf?${getPDFURLSearchParams({
+            page: page.id,
+            only: true,
+            limit: 100,
+        }).toString()}`
+    );
+
+    return (
+        <div
+            className={tcls(
+                'flex',
+                'flex-col',
+                'gap-3',
+                'sidebar-list-default:px-3',
+                'border-t',
+                'first:border-none',
+                'border-tint-subtle',
+                'py-5',
+                'first:pt-0',
+                'xl:max-2xl:page-api-block:p-5',
+                'empty:hidden'
+            )}
+        >
+            {withPageFeedback ? (
+                <React.Suspense fallback={null}>
+                    <PageFeedbackForm pageId={page.id} />
+                </React.Suspense>
+            ) : null}
+            {customization.git.showEditLink && space.gitSync?.url && page.git ? (
+                <div>
+                    <a
+                        href={urlJoin(space.gitSync.url, page.git.path)}
+                        className={tcls(
+                            'flex',
+                            'flex-row',
+                            'items-center',
+                            'text-sm',
+                            'hover:text-tint-strong',
+                            'links-accent:hover:underline',
+                            'links-accent:hover:underline-offset-4',
+                            'links-accent:hover:decoration-[3px]',
+                            'links-accent:hover:decoration-primary-subtle',
+                            'py-2'
+                        )}
+                    >
+                        <Icon
+                            icon={
+                                space.gitSync.installationProvider === 'gitlab'
+                                    ? 'gitlab'
+                                    : 'github'
+                            }
+                            className={tcls('size-4', 'mr-1.5')}
+                        />
+                        {t(language, 'edit_on_git', getGitSyncName(space))}
+                    </a>
+                </div>
+            ) : null}
+            {customization.pdf.enabled ? (
+                <div>
+                    <a
+                        href={pdfHref}
+                        className={tcls(
+                            'flex',
+                            'flex-row',
+                            'items-center',
+                            'text-sm',
+                            'hover:text-tint-strong',
+                            'links-accent:hover:underline',
+                            'links-accent:hover:underline-offset-4',
+                            'links-accent:hover:decoration-[3px]',
+                            'links-accent:hover:decoration-primary-subtle',
+                            'py-2'
+                        )}
+                    >
+                        <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
+                        {t(language, 'pdf_download')}
+                    </a>
+                </div>
+            ) : null}
+        </div>
+    );
+}
+
+async function PageAsideFooter(props: { context: GitBookSiteContext }) {
+    const { context } = props;
+    const { customization, site, space } = context;
+
+    return (
+        <div
+            className={tcls(
+                'sticky bottom-0 z-10 mt-auto flex flex-col',
+                'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
+                'py-4'
+            )}
+        >
+            {/* Mode Switcher */}
+            {customization.themes.toggeable ? (
+                <div className="flex items-center justify-end">
+                    <React.Suspense fallback={null}>
+                        <ThemeToggler />
+                    </React.Suspense>
+                </div>
+            ) : null}
+            <Ad
+                zoneId={
+                    site?.ads && site.ads.status === SiteAdsStatus.Live ? site.ads.zoneId : null
+                }
+                placement={SiteInsightsAdPlacement.Aside}
+                spaceId={space.id}
+                siteAdsStatus={site?.ads?.status ? site.ads.status : undefined}
+                ignore={process.env.NODE_ENV !== 'production'}
+                style={site?.ads ? 'mt-4' : undefined}
+            />
+        </div>
+    );
 }
 
 function getGitSyncName(space: Space): string {

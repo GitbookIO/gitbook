@@ -16,7 +16,7 @@ export const de = {
     search_scope_all: 'Alle Inhalte',
     ask: 'Fragen',
     search_ask: 'Fragen "${1}"',
-    search_ask_description: 'Finden Sie die Antwort mit AI',
+    search_ask_description: 'Finden Sie die Antwort mit ${1}',
     search_ask_sources: 'Quellen',
     search_ask_sources_no_answer: 'Verwandte Seiten',
     search_ask_no_answer:
