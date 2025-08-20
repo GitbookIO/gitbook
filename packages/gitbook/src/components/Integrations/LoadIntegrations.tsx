@@ -61,7 +61,6 @@ if (typeof window !== 'undefined') {
         },
     };
     window.GitBook = gitbookGlobal;
-
 }
 
 /**
