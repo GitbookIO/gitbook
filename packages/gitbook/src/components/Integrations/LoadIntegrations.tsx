@@ -47,17 +47,39 @@ if (typeof window !== 'undefined') {
         },
         registerAssistant: (assistant) => {
             const id = window.crypto.randomUUID();
+            // Add assistant with ready=false until the integration signals readiness
             integrationAssistants.setState(
                 (state) => [
                     ...state,
-                    { ...assistant, id, ui: assistant.ui ?? true, mode: 'overlay' },
+                    { ...assistant, id, ui: assistant.ui ?? true, mode: 'overlay', ready: false },
                 ],
                 true
             );
 
-            return () => {
-                integrationAssistants.setState((state) => state.filter((a) => a.id !== id), true);
+            const ready = () => {
+                integrationAssistants.setState(
+                    (state) =>
+                        state.map((assistant) =>
+                            assistant.id === id ? { ...assistant, ready: true } : assistant
+                        ),
+                    true
+                );
             };
+
+            const dispose = () => {
+                integrationAssistants.setState(
+                    (state) => state.filter((assistant) => assistant.id !== id),
+                    true
+                );
+            };
+
+            const registration = (() => dispose()) as ((this: void) => void) & {
+                ready: () => void;
+                dispose: () => void;
+            };
+            registration.ready = ready;
+            registration.dispose = dispose;
+            return registration;
         },
     };
     window.GitBook = gitbookGlobal;
@@ -83,6 +105,6 @@ export function LoadIntegrations() {
 /**
  * Client function to dispatch a GitBook event.
  */
-function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: any[]) {
+function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: unknown[]) {
     events.get(type)?.forEach((handler) => handler(...args));
 }

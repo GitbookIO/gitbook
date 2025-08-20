@@ -3,7 +3,7 @@ import type { IconName } from '@gitbook/icons';
 
 export type GitBookIntegrationEvent = 'load' | 'unload';
 
-export type GitBookIntegrationEventCallback = (...args: any[]) => void;
+export type GitBookIntegrationEventCallback = (...args: unknown[]) => void;
 
 export type GitBookIntegrationTool = AIToolDefinition & {
     /**
@@ -70,8 +70,10 @@ export type GitBookGlobal = {
 
     /**
      * Register a custom assistant to be available on the site.
+     * Returns a registration object that lets the integration signal readiness
+     * and dispose the assistant when no longer needed.
      */
-    registerAssistant: (assistant: GitBookAssistant) => () => void;
+    registerAssistant: (assistant: GitBookAssistant) => GitBookAssistantRegistration;
 };
 
 declare global {
@@ -82,3 +84,16 @@ declare global {
         GitBook?: GitBookGlobal;
     }
 }
+
+export type GitBookAssistantRegistration = ((this: void) => void) & {
+    /**
+     * Call this when the integration has finished initializing and is ready to
+     * receive `open` calls.
+     */
+    ready: () => void;
+
+    /**
+     * Unregister the assistant.
+     */
+    dispose: () => void;
+};

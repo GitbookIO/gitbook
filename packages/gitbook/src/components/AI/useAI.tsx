@@ -38,6 +38,12 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
      * Icon of the assistant displayed in the UI.
      */
     icon: ReactNode;
+
+    /**
+     * Assistant readiness. Built-in assistants are always ready.
+     * Integrations set this to true via the registration's ready() callback.
+     */
+    ready?: boolean;
 };
 
 const AIContext = React.createContext<AIConfig | null>(null);
@@ -92,6 +98,7 @@ export function useAI(): AIContext {
             },
             ui: true,
             mode: 'sidebar',
+            ready: true,
         });
     } else if (config.aiMode === CustomizationAIMode.Search) {
         assistants.push({
@@ -116,6 +123,7 @@ export function useAI(): AIContext {
             },
             ui: false,
             mode: 'search',
+            ready: true,
         });
     }
 
