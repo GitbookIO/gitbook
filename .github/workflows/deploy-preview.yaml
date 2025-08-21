@@ -110,8 +110,8 @@ jobs:
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
               run: bun install --frozen-lockfile
-            - name: Setup Playwright
-              uses: ./.github/actions/setup-playwright
+              env:
+                  PUPPETEER_SKIP_DOWNLOAD: 1
             - name: Run Playwright tests
               run: bun e2e
               env:
