@@ -220,7 +220,7 @@ export function AIChatBody(props: {
     }, []);
 
     return (
-        <div className="relative flex flex-1 flex-col">
+        <>
             <div
                 ref={scrollContainerRef}
                 className="flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
@@ -275,7 +275,7 @@ export function AIChatBody(props: {
                     }}
                 />
             </div>
-        </div>
+        </>
     );
 }
 
