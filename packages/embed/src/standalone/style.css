@@ -9,8 +9,11 @@
     --gitbook-widget-text-size: 1rem;
     --gitbook-widget-text-color: #656973;
     --gitbook-widget-border-color: #e5e5e5;
-    --gitbook-widget-background-color: #FFFFFF;
-    --gitbook-widget-background-color-hover: #FBFBFB;
+
+    --gitbook-widget-background-translucent: rgba(255, 255, 255, 0.9);
+    --gitbook-widget-background-translucent-hover: rgba(250, 250, 250, 0.9);
+    --gitbook-widget-background-solid: #FFFFFF;
+    --gitbook-widget-background-solid-hover: #FBFBFB;
 
     --gitbook-widget-icon-size: 1.25rem;
 
@@ -45,7 +48,8 @@
 
     border-radius: 100px;
     border: 1px solid var(--gitbook-widget-border-color);
-    background-color: var(--gitbook-widget-background-color);
+    background-color: var(--gitbook-widget-background-translucent);
+    backdrop-filter: blur(16px);
 
     font-size: var(--gitbook-widget-text-size);
     color: var(--gitbook-widget-text-color);
@@ -56,8 +60,10 @@
     cursor:pointer;
 }
 
-#gitbook-widget-button:hover, #gitbook-widget-button:focus-visible, #gitbook-widget-button.open {
-    background-color: var(--gitbook-widget-background-color-hover);
+#gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
+    background-color: var(--gitbook-widget-background-translucent-hover);
+}
+#gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
 }
@@ -66,18 +72,25 @@
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05);
 }
 
+@media (prefers-contrast: more) {
+    #gitbook-widget-button {
+        background-color: var(--gitbook-widget-background-solid);
+    }
+    #gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
+        background-color: var(--gitbook-widget-background-solid-hover);
+    }
+}
+
 #gitbook-widget-button.hidden {
     display: none;
 }
 
 #gitbook-widget-button.open {
-    /* width: var(--gitbook-widget-button-height); */
     padding: .75rem;
     gap: 0;
 }
 
 /* Button: Icon */
-
 #gitbook-widget-button-icon {
     width: var(--gitbook-widget-icon-size);
     height: var(--gitbook-widget-icon-size);
@@ -93,7 +106,6 @@
 }
 
 /* Button: Label */
-
 #gitbook-widget-button.open #gitbook-widget-button-label {
     display: none;
 }
@@ -106,7 +118,7 @@
     z-index: 9998;
     width: var(--gitbook-widget-window-width);
     height: calc(min(var(--gitbook-widget-window-height), calc(100vh - var(--gitbook-widget-window-bottom) - var(--gitbook-widget-top))));
-    background-color: var(--gitbook-widget-background-color);
+    background-color: var(--gitbook-widget-background-solid);
     border: 1px solid var(--gitbook-widget-border-color);
     border-radius: var(--gitbook-widget-radius);
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -120,7 +132,6 @@
 
 @starting-style {
     #gitbook-widget-window {
-        /* translate: 0 5%; */
         opacity: 0;
         transform: scale(0.9);
     }
@@ -136,7 +147,6 @@ body:has(#gitbook-widget-button.hidden) #gitbook-widget-window {
     transition-timing-function: var(--gitbook-widget-easing);
     transition-behavior: allow-discrete;
     display: none;
-    /* translate: 0 5%; */
     opacity: 0;
     transform: scale(0.9);
 }
