@@ -7,7 +7,7 @@ import { joinPath } from '@/lib/paths';
 /**
  * Get the context for the embeddable routes.
  */
-export async function getEmbeddableContext(params: RouteLayoutParams) {
+export async function getEmbeddableStaticContext(params: RouteLayoutParams) {
     const { context: baseContext, visitorAuthClaims } = await getStaticSiteContext(params);
     const context: GitBookSiteContext = {
         ...baseContext,

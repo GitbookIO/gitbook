@@ -5,14 +5,12 @@ import { createChannel } from 'bidc';
 import React from 'react';
 
 import { useAIChatController } from '@/components/AI';
-import { useRouter } from 'next/navigation';
 
 /**
  * Expose the API to communicate with the parent window.
  */
-export function EmbedIframeAPI() {
+export function EmbeddableIframeAPI() {
     const chatController = useAIChatController();
-    const router = useRouter();
 
     React.useEffect(() => {
         if (window.parent === window) {
@@ -35,8 +33,7 @@ export function EmbedIframeAPI() {
                     });
                     break;
                 }
-                case 'navigateToPage': {
-                }
+                // TODO: Handle other messages
             }
         });
 

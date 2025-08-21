@@ -6,7 +6,7 @@ import { AIChatBody } from '@/components/AIChat';
 /**
  * Embeddable AI chat window in an iframe.
  */
-export function AIEmbedChat(props: {
+export function EmbeddableAIChat(props: {
     trademark: boolean;
 }) {
     const { trademark } = props;

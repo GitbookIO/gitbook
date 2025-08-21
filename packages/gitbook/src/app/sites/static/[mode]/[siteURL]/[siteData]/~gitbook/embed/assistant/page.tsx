@@ -1,6 +1,6 @@
 import type { RouteLayoutParams } from '@/app/utils';
-import { getEmbeddableContext } from '@/lib/embeddable';
-import { AIEmbedChat } from './AIEmbedChat';
+import { EmbeddableAssistantPage } from '@/components/Embeddable';
+import { getEmbeddableStaticContext } from '@/lib/embeddable';
 
 export const dynamic = 'force-static';
 
@@ -10,7 +10,7 @@ type PageProps = {
 
 export default async function EmbedAssistantPage(props: PageProps) {
     const params = await props.params;
-    const { context } = await getEmbeddableContext(params);
+    const { context } = await getEmbeddableStaticContext(params);
 
-    return <AIEmbedChat trademark={context.customization.trademark.enabled} />;
+    return <EmbeddableAssistantPage context={context} />;
 }
