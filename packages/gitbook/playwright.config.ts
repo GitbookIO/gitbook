@@ -14,7 +14,7 @@ export default defineConfig({
         // https://github.com/microsoft/playwright/issues/14434
         // https://playwright.dev/docs/browsers#google-chrome--microsoft-edge
         {
-            name: 'chrome',
+            name: 'chromium',
             use: {
                 ...devices['Desktop Chrome'],
                 channel: 'chrome',
