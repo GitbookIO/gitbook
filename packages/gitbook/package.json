@@ -101,7 +101,7 @@
     "scripts": {
         "generate": "./scripts/generate.sh",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math",
-        "dev": "env-cmd --silent -f ../../.env.local next --turbopack",
+        "dev": "env-cmd --silent -f ../../.env.local next",
         "build": "next build",
         "start": "next start",
         "build:cloudflare": "opennextjs-cloudflare build",
