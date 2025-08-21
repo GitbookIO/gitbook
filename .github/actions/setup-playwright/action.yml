@@ -11,27 +11,27 @@ runs:
               echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
 
         # Cache browser binaries, cache key is based on Playwright version and OS
-        - name: 🧰 Cache Playwright browser binaries
-          uses: actions/cache@v4
-          id: playwright-cache
-          with:
-              path: '~/.cache/ms-playwright'
-              key: '${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}'
-              restore-keys: |
-                  ${{ runner.os }}-playwright-
+        # - name: 🧰 Cache Playwright browser binaries
+        #   uses: actions/cache@v4
+        #   id: playwright-cache
+        #   with:
+        #       path: '~/.cache/ms-playwright'
+        #       key: '${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}'
+        #       restore-keys: |
+        #           ${{ runner.os }}-playwright-
 
         # Install browser binaries & OS dependencies if cache missed
         - name: 🏗 Install Playwright browser binaries & OS dependencies
-          if: steps.playwright-cache.outputs.cache-hit != 'true'
+          # if: steps.playwright-cache.outputs.cache-hit != 'true'
           shell: bash
           working-directory: packages/gitbook
           run: |
-              bun x playwright install --with-deps chromium
+              bun x playwright install --with-deps
 
         # Install only the OS dependencies if cache hit
-        - name: 🏗 Install Playwright OS dependencies
-          if: steps.playwright-cache.outputs.cache-hit == 'true'
-          shell: bash
-          working-directory: packages/gitbook
-          run: |
-              bun x playwright install-deps
+        # - name: 🏗 Install Playwright OS dependencies
+        #   if: steps.playwright-cache.outputs.cache-hit == 'true'
+        #   shell: bash
+        #   working-directory: packages/gitbook
+        #   run: |
+        #       bun x playwright install-deps
