@@ -109,8 +109,8 @@
         "dev:cloudflare": "wrangler dev --port 8771 --env preview",
         "dev:cf:middleware": "wrangler dev --port 8771 --inspector-port 9230 --env dev --config ./openNext/customWorkers/middlewareWrangler.jsonc",
         "dev:cf:server": "wrangler dev --port 8772 --env dev --config ./openNext/customWorkers/defaultWrangler.jsonc",
-        "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts",
-        "e2e-customers": "playwright test e2e/customers.spec.ts",
+        "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts --project=chrome",
+        "e2e-customers": "playwright test e2e/customers.spec.ts --project=chrome",
         "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
         "typecheck": "tsc --noEmit"
     },

@@ -21,12 +21,12 @@ runs:
         #           ${{ runner.os }}-playwright-
 
         # Install browser binaries & OS dependencies if cache missed
-        - name: 🏗 Install Playwright browser binaries & OS dependencies
-          # if: steps.playwright-cache.outputs.cache-hit != 'true'
-          shell: bash
-          working-directory: packages/gitbook
-          run: |
-              bun x playwright install --with-deps
+        # - name: 🏗 Install Playwright browser binaries & OS dependencies
+        #   # if: steps.playwright-cache.outputs.cache-hit != 'true'
+        #   shell: bash
+        #   working-directory: packages/gitbook
+        #   run: |
+        #       bun x playwright install --with-deps
 
         # Install only the OS dependencies if cache hit
         # - name: 🏗 Install Playwright OS dependencies
