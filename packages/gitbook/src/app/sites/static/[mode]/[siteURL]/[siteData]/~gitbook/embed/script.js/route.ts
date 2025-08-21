@@ -1,6 +1,6 @@
 import type { RouteLayoutParams } from '@/app/utils';
 import { getAssetURL } from '@/lib/assets';
-import { getEmbeddableContext } from '@/lib/embeddable';
+import { getEmbeddableStaticContext } from '@/lib/embeddable';
 import type { CreateGitBookOptions } from '@gitbook/embed';
 import type { NextRequest } from 'next/server';
 
@@ -13,7 +13,7 @@ export async function GET(
     _request: NextRequest,
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
-    const { context } = await getEmbeddableContext(await params);
+    const { context } = await getEmbeddableStaticContext(await params);
     const maxAge = 7 * 24 * 60 * 60;
     const initOptions: CreateGitBookOptions = {
         siteURL: context.linker.toAbsoluteURL(context.linker.toPathInSite('')),
