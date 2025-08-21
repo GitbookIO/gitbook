@@ -15,6 +15,7 @@ export function TableOfContentsScript() {
             const header = document.getElementById('site-header');
             const banner = document.getElementById('announcement-banner');
             const footer = document.getElementById('site-footer');
+            const pageCover = document.getElementById('page-cover');
 
             // Set sticky top position based on header
             const headerHeight = header?.offsetHeight ?? 0;
@@ -43,6 +44,28 @@ export function TableOfContentsScript() {
             // Update height
             root.style.setProperty('--toc-height', `${height}px`);
             root.style.setProperty('--toc-top-offset', `${offset}px`);
+
+            // Subtract visible pageCover (if any)
+            if (
+                pageCover &&
+                pageCover.dataset.full === 'true' &&
+                window.getComputedStyle(pageCover).display !== 'none'
+            ) {
+                const coverRect = pageCover.getBoundingClientRect();
+                if (coverRect.height > 0 && coverRect.bottom > 0) {
+                    height -= Math.min(
+                        coverRect.height,
+                        Math.max(coverRect.bottom - headerHeight, 0)
+                    );
+                    offset += Math.min(
+                        coverRect.height,
+                        Math.max(coverRect.bottom - headerHeight, 0)
+                    );
+                }
+            }
+
+            root.style.setProperty('--outline-height', `${height}px`);
+            root.style.setProperty('--outline-top-offset', `${offset}px`);
         };
 
         // Initial update
