@@ -58,6 +58,7 @@
     transition: all var(--gitbook-widget-transition-duration-fast) var(--gitbook-widget-easing);
 
     cursor:pointer;
+    animation: gitbook-widget-present var(--gitbook-widget-transition-duration-slow) var(--gitbook-widget-easing-bounce);
 }
 
 #gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
@@ -155,4 +156,15 @@ body:has(#gitbook-widget-button.hidden) #gitbook-widget-window {
     width: 100%;
     height: 100%;
     border: none;
+}
+
+@keyframes gitbook-widget-present {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
