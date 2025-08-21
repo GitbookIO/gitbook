@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
     testDir: './e2e',
@@ -12,9 +12,11 @@ export default defineConfig({
     projects: [
         // To speed up CI, we only test on Chrome.
         // https://github.com/microsoft/playwright/issues/14434
+        // https://playwright.dev/docs/browsers#google-chrome--microsoft-edge
         {
             name: 'chrome',
             use: {
+                ...devices['Desktop Chrome'],
                 channel: 'chrome',
             },
         },
