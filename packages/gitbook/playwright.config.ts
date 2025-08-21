@@ -10,6 +10,8 @@ export default defineConfig({
         ['@argos-ci/playwright/reporter', { uploadToArgos: !!process.env.CI }],
     ],
     projects: [
+        // To speed up CI, we only test on Chrome.
+        // https://github.com/microsoft/playwright/issues/14434
         {
             name: 'chrome',
             use: {
