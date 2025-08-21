@@ -117,14 +117,17 @@ const GitBook = (...args: StandaloneCalls) => {
             break;
         case 'open':
             widgetWindow.classList.remove('hidden');
+            widgetButton.classList.add('open');
             getIframe();
             break;
         case 'toggle':
             widgetWindow.classList.toggle('hidden');
+            widgetButton.classList.toggle('open');
             getIframe();
             break;
         case 'close':
             widgetWindow.classList.add('hidden');
+            widgetButton.classList.remove('open');
             break;
         case 'postUserMessage':
             getIframe().frame.postUserMessage(args[1]);

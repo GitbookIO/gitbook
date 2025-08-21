@@ -1,70 +1,144 @@
 :root {
-    --gitbook-widget-button-height: 42px;
-    --gitbook-widget-button-bottom: 20px;
-    --gitbook-widget-button-right: 20px;
+    --gitbook-widget-top: 1rem;
+    --gitbook-widget-bottom: 1rem;
+    --gitbook-widget-right: 1rem;
 
+    --gitbook-widget-button-height: 46px;
 
-    --gitbook-widget-window-width: 450px;
-    --gitbook-widget-window-height: 640px;
-    --gitbook-widget-window-spacing: 10px;
-    --gitbook-widget-window-bottom: calc(var(--gitbook-widget-button-bottom) + var(--gitbook-widget-button-height) + var(--gitbook-widget-window-spacing));
+    --gitbook-widget-radius: .5rem;
+    --gitbook-widget-text-size: 1rem;
+    --gitbook-widget-text-color: #656973;
+    --gitbook-widget-border-color: #e5e5e5;
+    --gitbook-widget-background-color: #FFFFFF;
+    --gitbook-widget-background-color-hover: #FBFBFB;
+
+    --gitbook-widget-icon-size: 1.25rem;
+
+    --gitbook-widget-window-width: 28rem; /* 448px */
+    --gitbook-widget-window-height: 40rem; /* 640px */
+    --gitbook-widget-window-spacing: .5rem; /* Spacing between the button and the window */
+    --gitbook-widget-window-bottom: calc(var(--gitbook-widget-bottom) + var(--gitbook-widget-button-height) + var(--gitbook-widget-window-spacing));
+
+    --gitbook-widget-transition-duration-fast: 0.2s;
+    --gitbook-widget-transition-duration-slow: 0.5s;
+    --gitbook-widget-easing: cubic-bezier(0.25, 1, 0.5, 1);
+    --gitbook-widget-easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+* {
+    box-sizing: border-box;
+}
+
+/* Button */
 #gitbook-widget-button {
     position: fixed;
-    bottom: var(--gitbook-widget-button-bottom);
-    right: var(--gitbook-widget-button-right);
-    z-index: 1000;
+    bottom: var(--gitbook-widget-bottom);
+    right: var(--gitbook-widget-right);
     height: var(--gitbook-widget-button-height);
-    cursor: pointer;
+    z-index: 9999;
+
     display: flex;
     align-items: center;
     flex-direction: row-reverse;
-    gap: 4px;
+    gap: .5rem;
+    padding: .75rem 1rem;
+
     border-radius: 100px;
-    color: #333;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    padding: 0 12px;
+    border: 1px solid var(--gitbook-widget-border-color);
+    background-color: var(--gitbook-widget-background-color);
+
+    font-size: var(--gitbook-widget-text-size);
+    color: var(--gitbook-widget-text-color);
+
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05);
+    transition: all var(--gitbook-widget-transition-duration-fast) var(--gitbook-widget-easing);
+
+    cursor:pointer;
+}
+
+#gitbook-widget-button:hover, #gitbook-widget-button:focus-visible, #gitbook-widget-button.open {
+    background-color: var(--gitbook-widget-background-color-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+}
+#gitbook-widget-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05);
 }
 
 #gitbook-widget-button.hidden {
     display: none;
 }
 
+#gitbook-widget-button.open {
+    /* width: var(--gitbook-widget-button-height); */
+    padding: .75rem;
+    gap: 0;
+}
+
+/* Button: Icon */
+
 #gitbook-widget-button-icon {
-    width: 18px;
-    height: 18px;
-    mask-image:url(https://static-2v.gitbook.com/~gitbook/static/icons/svgs/custom-icons/gitbook.svg?v=2);
-    mask-repeat:no-repeat;
+    width: var(--gitbook-widget-icon-size);
+    height: var(--gitbook-widget-icon-size);
+    mask-image: url("data:image/svg+xml,%3Csvg width='16' height='17' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_153_1955)'%3E%3Cpath d='M12.8916 1.48324C12.921 1.39969 13.0392 1.39972 13.0685 1.48326C13.239 1.9684 13.3439 2.26705 13.516 2.52379C13.6683 2.75102 13.8578 2.95092 14.0766 3.11509C14.3239 3.30059 14.6165 3.42127 15.0919 3.61731C15.1761 3.65201 15.1761 3.7712 15.0919 3.8059C14.6165 4.00194 14.3239 4.12262 14.0766 4.30811C13.8578 4.47229 13.6683 4.67219 13.516 4.89942C13.3439 5.15616 13.239 5.45482 13.0685 5.93996C13.0392 6.0235 12.921 6.02352 12.8916 5.93997C12.7212 5.45482 12.6162 5.15616 12.4442 4.89942C12.2919 4.67219 12.1023 4.47229 11.8835 4.30812C11.6363 4.12262 11.3436 4.00194 10.8682 3.8059C10.7841 3.77119 10.7841 3.652 10.8683 3.61729C11.3436 3.42127 11.6363 3.30059 11.8835 3.11509C12.1023 2.95092 12.2919 2.75102 12.4442 2.52379C12.6162 2.26705 12.7212 1.96839 12.8916 1.48324Z' stroke='black' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='M3.5625 9.20571L7.26347 11.3425C7.88227 11.6997 8.64467 11.6997 9.26347 11.3425L14.25 8.4635C14.5833 8.27105 15 8.51161 15 8.89651V10.6983C15 10.8769 14.9047 11.042 14.75 11.1313L9.26347 14.299C8.64467 14.6562 7.88228 14.6562 7.26347 14.299L3.5625 12.1622C2.70833 11.7184 1 10.3526 1 8.44009M1 8.44009C1 7.0654 1.84765 6.40757 2.62903 6.13761C3.15426 5.95614 3.71577 6.12628 4.19701 6.40413L7.26347 8.17455C7.88228 8.53181 8.64467 8.53181 9.26347 8.17455L10.9095 7.22422M1 8.44009C1 6.91509 2.03973 5.72791 2.5596 5.32494L7.37937 2.54224C7.79013 2.30509 8.26417 2.22536 8.71747 2.30305' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_153_1955'%3E%3Crect width='16' height='16' fill='white' transform='translate(0 0.420593)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+    mask-size: contain;
+    mask-repeat: no-repeat;
     mask-position: center;
     background-color: currentColor;
 }
 
-#gitbook-widget-button-label {
-    font-size: 18px;
+#gitbook-widget-button.open #gitbook-widget-button-icon {
+    mask-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.4619 4.43843C12.7246 4.17569 12.7246 3.75082 12.4619 3.49087C12.1991 3.23092 11.7743 3.22812 11.5143 3.49087L8.18807 6.81712L4.85903 3.48807C4.59628 3.22533 4.17141 3.22533 3.91146 3.48807C3.65151 3.75082 3.64872 4.17569 3.91146 4.43564L7.23771 7.76189L3.90867 11.0909C3.64592 11.3537 3.64592 11.7785 3.90867 12.0385C4.17141 12.2984 4.59628 12.3012 4.85623 12.0385L8.18248 8.71224L11.5115 12.0413C11.7743 12.304 12.1991 12.304 12.4591 12.0413C12.719 11.7785 12.7218 11.3537 12.4591 11.0937L9.13284 7.76748L12.4619 4.43843Z' fill='black'/%3E%3C/svg%3E%0A");
 }
 
+/* Button: Label */
+
+#gitbook-widget-button.open #gitbook-widget-button-label {
+    display: none;
+}
+
+/* Window */
 #gitbook-widget-window {
     position: fixed;
     bottom: var(--gitbook-widget-window-bottom);
-    right: var(--gitbook-widget-button-right);
-    z-index: 1000;
+    right: var(--gitbook-widget-right);
+    z-index: 9998;
     width: var(--gitbook-widget-window-width);
-    height: var(--gitbook-widget-window-height);
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    height: calc(min(var(--gitbook-widget-window-height), calc(100vh - var(--gitbook-widget-window-bottom) - var(--gitbook-widget-top))));
+    background-color: var(--gitbook-widget-background-color);
+    border: 1px solid var(--gitbook-widget-border-color);
+    border-radius: var(--gitbook-widget-radius);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     overflow: hidden;
+    transition-property: transform, opacity, display;
+    transition-duration: var(--gitbook-widget-transition-duration-slow);
+    transition-timing-function: var(--gitbook-widget-easing-bounce);
+    transform-origin: bottom right;
+    transition-behavior: allow-discrete;
+}
+
+@starting-style {
+    #gitbook-widget-window {
+        /* translate: 0 5%; */
+        opacity: 0;
+        transform: scale(0.9);
+    }
 }
 
 body:has(#gitbook-widget-button.hidden) #gitbook-widget-window {
-    bottom: var(--gitbook-widget-button-bottom);
+    bottom: var(--gitbook-widget-bottom);
 }
 
 #gitbook-widget-window.hidden {
+    transition-property: transform, opacity, display;
+    transition-duration: var(--gitbook-widget-transition-duration-fast);
+    transition-timing-function: var(--gitbook-widget-easing);
+    transition-behavior: allow-discrete;
     display: none;
+    /* translate: 0 5%; */
+    opacity: 0;
+    transform: scale(0.9);
 }
 
 #gitbook-widget-iframe {
