@@ -11,10 +11,10 @@ import {
     useAIChatController,
     useAIChatState,
 } from '../AI';
-import { EmbeddableFrame } from '../Embeddable';
+import { EmbeddableFrame } from '../Embeddable/EmbeddableFrame';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
-import { DropdownMenu, DropdownMenuItem } from '../primitives/DropdownMenu';
+import { DropdownMenu, DropdownMenuItem } from '../primitives';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
