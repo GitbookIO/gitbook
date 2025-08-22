@@ -3,7 +3,6 @@ import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import type { Assistant } from '../AI';
-import { useSearch } from '../Search';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
@@ -16,7 +15,6 @@ export function AIChatButton(props: {
 }) {
     const { assistant, showLabel = true } = props;
     const language = useLanguage();
-    const [, setSearchState] = useSearch();
 
     return (
         <Button
@@ -32,15 +30,7 @@ export function AIChatButton(props: {
                     <KeyboardShortcut keys={['mod', 'i']} className="border-tint-11 text-tint-1" />
                 </div>
             }
-            onClick={() => {
-                setSearchState((prev) => ({
-                    ask: prev?.ask ?? '',
-                    query: prev?.query ?? null,
-                    global: prev?.global ?? false,
-                    open: false,
-                }));
-                assistant.open();
-            }}
+            onClick={() => assistant.open()}
         >
             {showLabel ? <span className="max-md:hidden">{t(language, 'ask')}</span> : null}
         </Button>

@@ -139,8 +139,17 @@ export function AIChatProvider(props: {
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
+        const { initialQuery } = globalState.getState();
         globalState.setState((state) => ({ ...state, opened: true }));
-    }, []);
+
+        // Update search state to show ask mode with first message or current ask value
+        setSearchState((prev) => ({
+            ask: prev?.ask ?? initialQuery ?? '',
+            query: prev?.query ?? null,
+            global: prev?.global ?? false,
+            open: false, // Close search popover when opening chat
+        }));
+    }, [setSearchState]);
 
     // Close AI chat and clear ask parameter
     const onClose = React.useCallback(() => {
@@ -356,7 +365,17 @@ export function AIChatProvider(props: {
     // Post a message to the AI chat
     const onPostMessage = React.useCallback(
         async (input: { message: string }) => {
-            const { query, pendingTools } = globalState.getState();
+            const { query, messages, pendingTools } = globalState.getState();
+
+            // For first message, update the ask parameter in URL
+            if (messages.length === 0) {
+                setSearchState((prev) => ({
+                    ask: input.message,
+                    query: prev?.query ?? null,
+                    global: prev?.global ?? false,
+                    open: false,
+                }));
+            }
 
             if (query === input.message) {
                 // Return early if the message is the same as the previous message

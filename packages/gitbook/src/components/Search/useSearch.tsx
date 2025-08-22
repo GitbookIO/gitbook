@@ -25,21 +25,6 @@ export type UpdateSearchState = (
     update: React.SetStateAction<SearchState | null>
 ) => Promise<URLSearchParams>;
 
-// Imperative setter reference to allow non-React code to update search state
-let externalSetSearchState: UpdateSearchState | null = null;
-
-/**
- * Imperatively update the search state from non-React code.
- * No-op if the SearchContextProvider has not mounted yet.
- */
-export function setSearchStateExternal(
-    update: React.SetStateAction<SearchState | null>
-): Promise<URLSearchParams> | undefined {
-    if (externalSetSearchState) {
-        return externalSetSearchState(update);
-    }
-}
-
 /**
  * Context to share the search state updater so all consumers use the same instance.
  */
@@ -112,14 +97,6 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         },
         [setRawState]
     );
-
-    // Expose the setter for imperative usage
-    React.useEffect(() => {
-        externalSetSearchState = setState;
-        return () => {
-            externalSetSearchState = null;
-        };
-    }, [setState]);
 
     return <SearchContext.Provider value={{ state, setState }}>{children}</SearchContext.Provider>;
 }
