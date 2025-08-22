@@ -62,6 +62,23 @@
         "emoji-assets": "^8.0.0",
       },
     },
+    "packages/expr": {
+      "name": "@gitbook/expr",
+      "version": "0.0.1",
+      "dependencies": {
+        "acorn": "^8.14.0",
+        "acorn-loose": "8.4.0",
+        "acorn-walk": "^8.3.4",
+        "assert-never": "^1.2.1",
+        "eval-estree-expression": "^2.0.3",
+      },
+      "devDependencies": {
+        "@babel/types": "^7.26.0",
+        "@types/estree": "^1.0.6",
+        "@types/json-schema": "^7.0.15",
+        "bun-types": "^1.1.20",
+      },
+    },
     "packages/fonts": {
       "name": "@gitbook/fonts",
       "version": "0.1.0",
@@ -192,23 +209,6 @@
       },
       "peerDependencies": {
         "react": "*",
-      },
-    },
-    "packages/js-expr": {
-      "name": "@gitbook/js-expr",
-      "version": "1.0.0",
-      "dependencies": {
-        "acorn": "^8.14.0",
-        "acorn-loose": "8.4.0",
-        "acorn-walk": "^8.3.4",
-        "assert-never": "^1.2.1",
-        "eval-estree-expression": "^2.0.3",
-      },
-      "devDependencies": {
-        "@babel/types": "^7.26.0",
-        "@types/estree": "^1.0.6",
-        "@types/json-schema": "^7.0.15",
-        "bun-types": "^1.1.20",
       },
     },
     "packages/openapi-parser": {
@@ -671,13 +671,13 @@
 
     "@gitbook/emoji-codepoints": ["@gitbook/emoji-codepoints@workspace:packages/emoji-codepoints"],
 
+    "@gitbook/expr": ["@gitbook/expr@workspace:packages/expr"],
+
     "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.11", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.7.2" } }, "sha512-P+GZ/X7b2Uj4uxxFX6xez+QceK211SXgMBj54lXzgo3Py34QhOuYrh/2F3ChB1iK5SXDwjn2xAuQXI7HuM66Mg=="],
 
     "@gitbook/fonts": ["@gitbook/fonts@workspace:packages/fonts"],
 
     "@gitbook/icons": ["@gitbook/icons@workspace:packages/icons"],
-
-    "@gitbook/js-expr": ["@gitbook/js-expr@workspace:packages/js-expr"],
 
     "@gitbook/openapi-parser": ["@gitbook/openapi-parser@workspace:packages/openapi-parser"],
 

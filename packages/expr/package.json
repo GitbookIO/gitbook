@@ -1,6 +1,6 @@
 {
-    "name": "@gitbook/js-expr",
-    "description": "Safely evaluate & parse user-defined JS expression.",
+    "name": "@gitbook/expr",
+    "description": "Safely evaluate & parse user-defined GitBook expressions.",
     "version": "0.0.1",
     "type": "module",
     "exports": {
