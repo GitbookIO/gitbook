@@ -10,7 +10,6 @@ import type {
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
 import type { Assistant } from '../AI';
-import { setSearchStateExternal } from '../Search/useSearch';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -62,22 +61,9 @@ if (typeof window !== 'undefined') {
                 true
             );
 
-            const close = () => {
-                setSearchStateExternal((prev) =>
-                    prev
-                        ? {
-                              ...prev,
-                              ask: null,
-                          }
-                        : null
-                );
-            };
-
-            const dispose = () => {
+            return () => {
                 integrationAssistants.setState((state) => state.filter((a) => a.id !== id), true);
             };
-
-            return { close, dispose };
         },
     };
     window.GitBook = gitbookGlobal;
