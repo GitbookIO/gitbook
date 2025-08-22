@@ -56,7 +56,7 @@ if (typeof window !== 'undefined') {
                         id,
                         ui: assistant.ui ?? true,
                         mode: 'overlay',
-                        pageAction: undefined,
+                        pageAction: false,
                     },
                 ],
                 true
