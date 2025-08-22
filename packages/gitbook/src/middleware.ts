@@ -533,7 +533,7 @@ function encodePathInSiteContent(rawPathname: string): {
     const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1])}`,
+            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1]!)}`,
         };
     }
 
