@@ -1,0 +1,31 @@
+{
+    "name": "@gitbook/embed",
+    "description": "Embeddable components for GitBook",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js",
+            "standalone": "./dist/standalone/index.js",
+            "react": "./dist/react/index.js"
+        }
+    },
+    "version": "0.0.0",
+    "dependencies": {
+        "@gitbook/api": "catalog:",
+        "@gitbook/icons": "workspace:",
+        "bidc": "catalog:"
+    },
+    "peerDependencies": {
+        "react": "^18.0.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.3",
+        "react": "^19.0.0"
+    },
+    "scripts": {
+        "build": "tsc && bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
+        "typecheck": "tsc --noEmit"
+    },
+    "files": ["dist", "README.md", "CHANGELOG.md", "standalone"]
+}

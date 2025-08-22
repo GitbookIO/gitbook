@@ -75,7 +75,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         </StyledLink>
     );
 
-    if (context.shouldRenderLinkPreviews) {
+    if (context.withLinkPreviews) {
         return (
             <InlineLinkTooltipWrapper inline={inline} language={language} resolved={resolved}>
                 {content}

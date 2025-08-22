@@ -35,7 +35,7 @@ export interface DocumentContext {
      * If false, no link previews will be rendered.
      * @default false
      */
-    shouldRenderLinkPreviews?: boolean;
+    withLinkPreviews?: boolean;
 }
 
 export interface DocumentContextProps {

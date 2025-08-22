@@ -77,7 +77,7 @@ export function useAI(): AIContext {
     if (config.aiMode === CustomizationAIMode.Assistant) {
         assistants.push({
             id: 'gitbook-assistant',
-            label: getAIChatName(config.trademark),
+            label: getAIChatName(language, config.trademark),
             icon: (
                 <AIChatIcon
                     state={chat.loading ? 'thinking' : 'default'}
