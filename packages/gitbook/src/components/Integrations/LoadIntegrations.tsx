@@ -10,6 +10,7 @@ import type {
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
 import type { Assistant } from '../AI';
+import { setSearchStateExternal } from '../Search/useSearch';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -62,22 +63,14 @@ if (typeof window !== 'undefined') {
             );
 
             const close = () => {
-                // We don't have access to the search state here, so we need to
-                // manually remove the `ask` query parameter from the URL.
-                try {
-                    const url = new URL(window.location.href);
-                    if (url.searchParams.has('ask')) {
-                        url.searchParams.delete('ask');
-                        window.history.replaceState(
-                            {},
-                            '',
-                            `${url.pathname}${url.search}${url.hash}`
-                        );
-                        window.dispatchEvent(new PopStateEvent('popstate'));
-                    }
-                } catch (error) {
-                    console.error('Failed to remove `ask` query parameter from URL.', error);
-                }
+                setSearchStateExternal((prev) =>
+                    prev
+                        ? {
+                              ...prev,
+                              ask: null,
+                          }
+                        : null
+                );
             };
 
             const dispose = () => {
@@ -88,6 +81,17 @@ if (typeof window !== 'undefined') {
         },
     };
     window.GitBook = gitbookGlobal;
+
+    const assistant = window.GitBook.registerAssistant({
+        label: 'Test',
+        icon: 'sparkle',
+        open: (query) => {
+            console.log(`Test!: ${query}`);
+            setTimeout(() => {
+                assistant.close();
+            }, 1000);
+        },
+    });
 }
 
 /**
