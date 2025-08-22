@@ -35,6 +35,16 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
     mode?: 'overlay' | 'sidebar' | 'search';
 
     /**
+     * Configuration for the in-page action to open the assistant.
+     * The button is only rendered if `ui` and `pageAction` are both set.
+     * Currently not available for custom assistants.
+     */
+    pageAction?: {
+        description: string;
+        open: (query?: string) => void;
+    };
+
+    /**
      * Icon of the assistant displayed in the UI.
      */
     icon: ReactNode;
@@ -89,6 +99,19 @@ export function useAI(): AIContext {
                 if (query) {
                     chatController.postMessage({ message: query });
                 }
+            },
+            pageAction: {
+                description: tString(
+                    language,
+                    'ai_chat_ask_about_page',
+                    getAIChatName(language, config.trademark)
+                ),
+                open: (query?: string) => {
+                    chatController.open();
+                    if (query) {
+                        chatController.postMessage({ message: query });
+                    }
+                },
             },
             ui: true,
             mode: 'sidebar',

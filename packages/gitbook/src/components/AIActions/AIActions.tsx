@@ -31,7 +31,7 @@ export function OpenAIAssistant(props: { assistant: Assistant; type: AIActionTyp
             icon={assistant.icon}
             label={assistant.label}
             shortLabel={tString(language, 'ask')}
-            description={tString(language, 'ai_chat_ask_about_page', assistant.label)}
+            description={assistant.pageAction?.description}
             disabled={chat.loading}
             onClick={() => {
                 assistant.open(tString(language, 'ai_chat_suggested_questions_about_this_page'));

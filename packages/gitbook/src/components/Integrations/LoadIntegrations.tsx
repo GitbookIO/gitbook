@@ -50,14 +50,41 @@ if (typeof window !== 'undefined') {
             integrationAssistants.setState(
                 (state) => [
                     ...state,
-                    { ...assistant, id, ui: assistant.ui ?? true, mode: 'overlay' },
+                    {
+                        ...assistant,
+                        id,
+                        ui: assistant.ui ?? true,
+                        mode: 'overlay',
+                        pageAction: undefined,
+                    },
                 ],
                 true
             );
 
-            return () => {
+            const close = () => {
+                // We don't have access to the search state here, so we need to
+                // manually remove the `ask` query parameter from the URL.
+                try {
+                    const url = new URL(window.location.href);
+                    if (url.searchParams.has('ask')) {
+                        url.searchParams.delete('ask');
+                        window.history.replaceState(
+                            {},
+                            '',
+                            `${url.pathname}${url.search}${url.hash}`
+                        );
+                        window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                } catch (error) {
+                    console.error('Failed to remove `ask` query parameter from URL.', error);
+                }
+            };
+
+            const dispose = () => {
                 integrationAssistants.setState((state) => state.filter((a) => a.id !== id), true);
             };
+
+            return { close, dispose };
         },
     };
     window.GitBook = gitbookGlobal;

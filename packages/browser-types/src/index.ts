@@ -71,7 +71,7 @@ export type GitBookGlobal = {
     /**
      * Register a custom assistant to be available on the site.
      */
-    registerAssistant: (assistant: GitBookAssistant) => () => void;
+    registerAssistant: (assistant: GitBookAssistant) => { close: () => void; dispose: () => void };
 };
 
 declare global {
