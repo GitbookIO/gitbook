@@ -50,6 +50,7 @@ export const nl: TranslationLanguage = {
     close: 'Sluiten',
     view: 'Bekijken',
     edit_on_git: 'Bewerk op ${1}',
+    edit: 'Bewerken',
     notfound_title: 'Pagina niet gevonden',
     notfound_link: 'Deze link verwijst naar een pagina die is verwijderd of niet meer bestaat.',
     notfound: 'De pagina die je zoekt, bestaat niet.',

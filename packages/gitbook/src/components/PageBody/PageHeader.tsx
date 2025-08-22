@@ -1,9 +1,10 @@
-import { AIActionsDropdown } from '@/components/AIActions/AIActionsDropdown';
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import type { RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { getPDFURLSearchParams } from '../PDF';
+import { PageActionsDropdown } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
 import { StyledLink } from '../primitives';
 
@@ -18,8 +19,6 @@ export async function PageHeader(props: {
     if (!page.layout.title && !page.layout.description) {
         return null;
     }
-
-    const pageActions = context.customization.pageActions;
 
     const hasAncestors = ancestors.length > 0;
 
@@ -38,9 +37,30 @@ export async function PageHeader(props: {
         >
             {page.layout.tableOfContents ? (
                 // Show page actions if *any* of the actions are enabled
-                <AIActionsDropdown
+                <PageActionsDropdown
                     markdownPageUrl={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
-                    actions={pageActions}
+                    editOnGit={
+                        context.customization.git.showEditLink &&
+                        context.space.gitSync?.url &&
+                        page.git
+                            ? {
+                                  provider: context.space?.gitSync?.installationProvider,
+                                  url: context.linker.toPathInSpace(page.path),
+                              }
+                            : undefined
+                    }
+                    pdfUrl={
+                        context.customization.pdf.enabled
+                            ? context.linker.toPathInSpace(
+                                  `~gitbook/pdf?${getPDFURLSearchParams({
+                                      page: page.id,
+                                      only: true,
+                                      limit: 100,
+                                  }).toString()}`
+                              )
+                            : undefined
+                    }
+                    actions={context.customization.pageActions}
                     className={tcls(
                         'float-right ml-4 xl:max-2xl:page-api-block:mr-62',
                         hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'

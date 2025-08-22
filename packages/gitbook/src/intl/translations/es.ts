@@ -50,6 +50,7 @@ export const es: TranslationLanguage = {
     close: 'Cerrar',
     view: 'Ver',
     edit_on_git: 'Editar en ${1}',
+    edit: 'Editar',
     notfound_title: 'Página no encontrada',
     notfound_link: 'Este enlace apunta a una página que ha sido eliminada o ya no existe.',
     notfound: 'La página que buscas no existe.',

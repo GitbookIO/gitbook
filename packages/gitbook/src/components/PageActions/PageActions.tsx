@@ -2,31 +2,32 @@
 
 import { useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
-import { ChatGPTIcon } from '@/components/AIActions/assets/ChatGPTIcon';
-import { ClaudeIcon } from '@/components/AIActions/assets/ClaudeIcon';
-import { MarkdownIcon } from '@/components/AIActions/assets/MarkdownIcon';
+import { ChatGPTIcon } from '@/components/PageActions/assets/ChatGPTIcon';
+import { ClaudeIcon } from '@/components/PageActions/assets/ClaudeIcon';
+import { MarkdownIcon } from '@/components/PageActions/assets/MarkdownIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
+import type { GitSyncState } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import QuickLRU from 'quick-lru';
 import type React from 'react';
 import { create } from 'zustand';
 
-type AIActionType = 'button' | 'dropdown-menu-item';
+type PageActionType = 'button' | 'dropdown-menu-item';
 
 /**
  * Opens our AI Docs Assistant.
  */
-export function OpenAIAssistant(props: { assistant: Assistant; type: AIActionType }) {
+export function OpenAIAssistant(props: { assistant: Assistant; type: PageActionType }) {
     const { assistant, type } = props;
     const chat = useAIChatState();
     const language = useLanguage();
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={assistant.icon}
             label={assistant.label}
@@ -90,7 +91,7 @@ const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
  */
 export function CopyMarkdown(props: {
     markdownPageUrl: string;
-    type: AIActionType;
+    type: PageActionType;
     isDefaultAction?: boolean;
 }) {
     const { markdownPageUrl, type, isDefaultAction } = props;
@@ -130,7 +131,7 @@ export function CopyMarkdown(props: {
     };
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={copied ? 'check' : 'copy'}
             label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
@@ -145,12 +146,12 @@ export function CopyMarkdown(props: {
 /**
  * Redirects to the markdown version of the page.
  */
-export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionType }) {
+export function ViewAsMarkdown(props: { markdownPageUrl: string; type: PageActionType }) {
     const { markdownPageUrl, type } = props;
     const language = useLanguage();
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={<MarkdownIcon className="size-4 fill-current" />}
             label={tString(language, 'view_page_markdown')}
@@ -166,7 +167,7 @@ export function ViewAsMarkdown(props: { markdownPageUrl: string; type: AIActionT
 export function OpenInLLM(props: {
     provider: 'chatgpt' | 'claude';
     url: string;
-    type: AIActionType;
+    type: PageActionType;
 }) {
     const { provider, url, type } = props;
     const language = useLanguage();
@@ -174,7 +175,7 @@ export function OpenInLLM(props: {
     const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Claude';
 
     return (
-        <AIActionWrapper
+        <PageActionWrapper
             type={type}
             icon={
                 provider === 'chatgpt' ? (
@@ -191,11 +192,48 @@ export function OpenInLLM(props: {
     );
 }
 
+export function GitEditLink(props: {
+    type: PageActionType;
+    provider: GitSyncState['installationProvider'];
+    url: string;
+}) {
+    const { type, provider, url } = props;
+    const language = useLanguage();
+
+    const providerName =
+        provider === 'github' ? 'GitHub' : provider === 'gitlab' ? 'GitLab' : 'Git';
+
+    return (
+        <PageActionWrapper
+            type={type}
+            icon={provider === 'gitlab' ? 'gitlab' : 'github'}
+            label={tString(language, 'edit_on_git', providerName)}
+            shortLabel={tString(language, 'edit')}
+            href={url}
+        />
+    );
+}
+
+export function ViewAsPDF(props: { url: string; type: PageActionType }) {
+    const { url, type } = props;
+    const language = useLanguage();
+
+    return (
+        <PageActionWrapper
+            type={type}
+            icon="file-pdf"
+            label={tString(language, 'pdf_download')}
+            href={url}
+            target="_self"
+        />
+    );
+}
+
 /**
  * Wraps an action in a button (for the default action) or dropdown menu item.
  */
-function AIActionWrapper(props: {
-    type: AIActionType;
+function PageActionWrapper(props: {
+    type: PageActionType;
     icon: IconName | React.ReactNode;
     label: string;
     /**
@@ -205,10 +243,22 @@ function AIActionWrapper(props: {
     onClick?: (e: React.MouseEvent) => void;
     description?: string;
     href?: string;
+    target?: React.HTMLAttributeAnchorTarget;
     disabled?: boolean;
     loading?: boolean;
 }) {
-    const { type, icon, label, shortLabel, onClick, href, description, disabled, loading } = props;
+    const {
+        type,
+        icon,
+        label,
+        shortLabel,
+        onClick,
+        href,
+        target = '_blank',
+        description,
+        disabled,
+        loading,
+    } = props;
 
     if (type === 'button') {
         return (
@@ -222,7 +272,7 @@ function AIActionWrapper(props: {
                 className="bg-tint-base text-sm"
                 onClick={onClick}
                 href={href}
-                target={href ? '_blank' : undefined}
+                target={href ? target : undefined}
                 disabled={disabled || loading}
             >
                 {shortLabel}
@@ -234,7 +284,7 @@ function AIActionWrapper(props: {
         <DropdownMenuItem
             className="flex items-stretch gap-2.5 p-2"
             href={href}
-            target="_blank"
+            target={target}
             onClick={onClick}
             disabled={disabled || loading}
         >
@@ -255,9 +305,11 @@ function AIActionWrapper(props: {
             </div>
 
             <div className="flex flex-1 flex-col gap-0.5">
-                <span className="flex items-center gap-2 text-tint-strong">
+                <span className="flex items-center gap-1 text-tint-strong">
                     <span className="truncate font-medium text-sm">{label}</span>
-                    {href ? <Icon icon="arrow-up-right" className="size-3 shrink-0" /> : null}
+                    {href && target === '_blank' ? (
+                        <Icon icon="arrow-up-right" className="size-3 shrink-0 text-tint-subtle" />
+                    ) : null}
                 </span>
                 {description && <span className="text-tint text-xs">{description}</span>}
             </div>

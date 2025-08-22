@@ -50,6 +50,7 @@ export const no: TranslationLanguage = {
     close: 'Lukk',
     view: 'Vis',
     edit_on_git: 'Rediger på ${1}',
+    edit: 'Rediger',
     notfound_title: 'Siden ble ikke funnet',
     notfound_link:
         'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
