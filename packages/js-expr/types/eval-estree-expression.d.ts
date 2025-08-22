@@ -1,9 +1,3 @@
-// TODO-UTIL-EXPR: This type is defined here as a workaround for the @gitbook/util-expr package,
-// which relies on a JS expression evaluation library that lacks TypeScript typings and has no
-// support in DefinitelyTyped. Defining this type directly in @gitbook/util-expr is not feasible
-// due to the issue discussed here:
-// https://gitbook.slack.com/archives/C01NXGWJELS/p1732880405341719
-
 declare module 'eval-estree-expression' {
     /**
      * Options for evaluation and compilation.

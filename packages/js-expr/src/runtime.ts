@@ -9,9 +9,6 @@ import {
     tokenizer,
 } from 'acorn';
 import { parse as parseLoose } from 'acorn-loose';
-// TODO: Explore a better solution for typing this package or find an alternative library
-// that is well-typed and meets our evaluation requirements.
-// Once resolved, search for TODO-UTIL-EXPR to remove the temporary types added in packages/tsconfig.
 import { evaluate } from 'eval-estree-expression';
 
 import { AutoComplete } from './autocomplete';
