@@ -113,7 +113,6 @@ export async function streamAskQuestion({
 
             const apiClient = await context.dataFetcher.api();
 
-            console.log('DEBUG streamAskQuestion context', context);
             const stream = apiClient.orgs.streamAskInSite(
                 context.organizationId,
                 context.site.id,
@@ -178,11 +177,9 @@ export async function streamAskQuestion({
             }
         })()
             .then(() => {
-                console.log('DEBUG streamAskQuestion done');
                 responseStream.done();
             })
             .catch((error) => {
-                console.log('DEBUG streamAskQuestion ERROR', error);
                 responseStream.error(error);
             });
 
