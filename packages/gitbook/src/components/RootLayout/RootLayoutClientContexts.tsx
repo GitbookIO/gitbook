@@ -8,7 +8,10 @@ import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { HashProvider } from '../hooks';
 import { LoadingStateProvider } from '../primitives/LoadingStateProvider';
 
-export function ClientContexts(props: {
+/**
+ * Client component context providers for the root layout.
+ */
+export function RootLayoutClientContexts(props: {
     language: TranslationLanguage;
     children: React.ReactNode;
 }) {
