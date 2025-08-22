@@ -14,7 +14,7 @@ import {
 } from '../AI';
 import { EmbeddableFrame } from '../Embeddable/EmbeddableFrame';
 import { useNow } from '../hooks';
-import { Button } from '../primitives';
+import { Button, DropdownMenuSeparator } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
@@ -111,8 +111,18 @@ export function AIChat(props: { trademark: boolean }) {
                                         }
                                         className="size-3 shrink-0 text-tint-subtle"
                                     />
-                                    {chat.size === 'default' ? 'Maximize' : 'Minimize'}
+                                    <div className="flex flex-col gap-0.5">
+                                        <p className="font-medium">
+                                            {chat.size === 'default' ? 'Maximize' : 'Minimize'}
+                                        </p>
+                                        <p className="text-tint text-xs">
+                                            {chat.size === 'default'
+                                                ? 'Longer, more detailed answers'
+                                                : 'Shorter, more concise answers'}
+                                        </p>
+                                    </div>
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={() => {
                                         chatController.clear();
