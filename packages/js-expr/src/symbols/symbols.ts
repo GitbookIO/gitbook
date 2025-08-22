@@ -8,8 +8,8 @@ import {
     type NumberSymbolDef,
     type ObjectSymbolDef,
     type StringSymbolDef,
-    type SymbolsWithPropertiesAndMethods,
     SymbolType,
+    type SymbolsWithPropertiesAndMethods,
     type UndefinedSymbolDef,
     type UnionSymbolDef,
 } from './types';
