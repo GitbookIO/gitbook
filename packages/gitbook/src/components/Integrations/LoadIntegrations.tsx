@@ -50,7 +50,13 @@ if (typeof window !== 'undefined') {
             integrationAssistants.setState(
                 (state) => [
                     ...state,
-                    { ...assistant, id, ui: assistant.ui ?? true, mode: 'overlay' },
+                    {
+                        ...assistant,
+                        id,
+                        ui: assistant.ui ?? true,
+                        mode: 'overlay',
+                        pageAction: false,
+                    },
                 ],
                 true
             );
