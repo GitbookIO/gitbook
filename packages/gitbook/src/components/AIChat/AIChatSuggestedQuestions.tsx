@@ -13,13 +13,13 @@ export default function AIChatSuggestedQuestions(props: { chatController: AIChat
     ];
 
     return (
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex items-center gap-2 lg:flex-col">
             {DEFAULT_SUGGESTED_QUESTIONS.map((question, index) => (
                 <Button
                     key={question}
                     variant="secondary"
                     size="medium"
-                    className="max-w-full animate-[present_500ms_both] whitespace-normal"
+                    className="shrink grow animate-[present_500ms_both] whitespace-normal"
                     style={{
                         animationDelay: `${800 + index * 100}ms`,
                     }}

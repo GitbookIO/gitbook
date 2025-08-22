@@ -9,7 +9,7 @@ import type {
     GitBookIntegrationEventCallback,
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
-import type { Assistant } from '../AI';
+import { type Assistant, globalState } from '../AI';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
 
@@ -67,6 +67,24 @@ if (typeof window !== 'undefined') {
         },
     };
     window.GitBook = gitbookGlobal;
+
+    window.GitBook?.registerTool({
+        name: 'ExpandChatSize',
+        description:
+            'FREE TO USE: Expand the chat to a larger size. Use this tool before you start writing your final answer if you need to show a lot of content, like step-by-step instructions or codeblocks. You do not need to preface this tool with feedback to the user, just call it and the chat will expand.',
+        execute: async () => {
+            globalState.setState((state) => ({ ...state, size: 'large' }));
+            return {
+                output: {
+                    expanded: true,
+                },
+                summary: {
+                    icon: 'arrow-up-right-and-arrow-down-left-from-center',
+                    text: 'Chat size expanded',
+                },
+            };
+        },
+    });
 }
 
 /**
