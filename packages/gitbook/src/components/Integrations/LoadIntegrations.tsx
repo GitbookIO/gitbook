@@ -81,17 +81,6 @@ if (typeof window !== 'undefined') {
         },
     };
     window.GitBook = gitbookGlobal;
-
-    const assistant = window.GitBook.registerAssistant({
-        label: 'Test',
-        icon: 'sparkle',
-        open: (query) => {
-            console.log(`Test!: ${query}`);
-            setTimeout(() => {
-                assistant.close();
-            }, 1000);
-        },
-    });
 }
 
 /**
