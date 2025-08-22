@@ -27,7 +27,7 @@ import { getSpaceLanguage } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
-import { ClientContexts } from './ClientContexts';
+import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
@@ -197,7 +197,9 @@ export async function CustomizationRootLayout(props: {
                             : null) || IconStyle.Regular
                     }
                 >
-                    <ClientContexts language={language}>{children}</ClientContexts>
+                    <RootLayoutClientContexts language={language}>
+                        {children}
+                    </RootLayoutClientContexts>
                 </IconsProvider>
             </body>
         </html>

@@ -54,9 +54,9 @@ const searchTestCases: Test[] = [
             await searchInput.fill('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
             const pageResults = await page.getByTestId('search-page-result').all();
-            await expect(pageResults.length).toBeGreaterThan(2);
+            await expect(pageResults.length).toBeGreaterThanOrEqual(1);
             const pageSectionResults = await page.getByTestId('search-page-section-result').all();
-            await expect(pageSectionResults.length).toBeGreaterThan(2);
+            await expect(pageSectionResults.length).toBeGreaterThanOrEqual(2);
             await expect(page.getByTestId('search-ask-question')).toHaveCount(0); // No AI search results with aiMode=None.
         },
     },

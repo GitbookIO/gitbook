@@ -529,13 +529,24 @@ function encodePathInSiteContent(rawPathname: string): {
         };
     }
 
+    // If the pathname is an embedded page
+    const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
+    if (embedPage) {
+        return {
+            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1])}`,
+        };
+    }
+
     switch (pathname) {
+        case '~gitbook/embed/assistant':
         case '~gitbook/icon':
             return { pathname };
         case 'llms.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
+        case '~gitbook/embed/script.js':
+        case '~gitbook/embed/assistant-demo':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };

@@ -1,0 +1,170 @@
+:root {
+    --gitbook-widget-top: 1rem;
+    --gitbook-widget-bottom: 1rem;
+    --gitbook-widget-right: 1rem;
+
+    --gitbook-widget-button-height: 46px;
+
+    --gitbook-widget-radius: .5rem;
+    --gitbook-widget-text-size: 1rem;
+    --gitbook-widget-text-color: #656973;
+    --gitbook-widget-border-color: #e5e5e5;
+
+    --gitbook-widget-background-translucent: rgba(255, 255, 255, 0.9);
+    --gitbook-widget-background-translucent-hover: rgba(250, 250, 250, 0.9);
+    --gitbook-widget-background-solid: #FFFFFF;
+    --gitbook-widget-background-solid-hover: #FBFBFB;
+
+    --gitbook-widget-icon-size: 1.25rem;
+
+    --gitbook-widget-window-width: 28rem; /* 448px */
+    --gitbook-widget-window-height: 40rem; /* 640px */
+    --gitbook-widget-window-spacing: .5rem; /* Spacing between the button and the window */
+    --gitbook-widget-window-bottom: calc(var(--gitbook-widget-bottom) + var(--gitbook-widget-button-height) + var(--gitbook-widget-window-spacing));
+
+    --gitbook-widget-transition-duration-fast: 0.2s;
+    --gitbook-widget-transition-duration-slow: 0.5s;
+    --gitbook-widget-easing: cubic-bezier(0.25, 1, 0.5, 1);
+    --gitbook-widget-easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Button */
+#gitbook-widget-button {
+    position: fixed;
+    bottom: var(--gitbook-widget-bottom);
+    right: var(--gitbook-widget-right);
+    height: var(--gitbook-widget-button-height);
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: .5rem;
+    padding: .75rem 1rem;
+
+    border-radius: 100px;
+    border: 1px solid var(--gitbook-widget-border-color);
+    background-color: var(--gitbook-widget-background-translucent);
+    backdrop-filter: blur(16px);
+
+    font-size: var(--gitbook-widget-text-size);
+    color: var(--gitbook-widget-text-color);
+
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05);
+    transition: all var(--gitbook-widget-transition-duration-fast) var(--gitbook-widget-easing);
+
+    cursor:pointer;
+    animation: gitbook-widget-present var(--gitbook-widget-transition-duration-slow) var(--gitbook-widget-easing-bounce);
+}
+
+#gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
+    background-color: var(--gitbook-widget-background-translucent-hover);
+}
+#gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+}
+#gitbook-widget-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05);
+}
+
+@media (prefers-contrast: more) {
+    #gitbook-widget-button {
+        background-color: var(--gitbook-widget-background-solid);
+    }
+    #gitbook-widget-button:hover, #gitbook-widget-button:focus-visible {
+        background-color: var(--gitbook-widget-background-solid-hover);
+    }
+}
+
+#gitbook-widget-button.hidden {
+    display: none;
+}
+
+#gitbook-widget-button.open {
+    padding: .75rem;
+    gap: 0;
+}
+
+/* Button: Icon */
+#gitbook-widget-button-icon {
+    width: var(--gitbook-widget-icon-size);
+    height: var(--gitbook-widget-icon-size);
+    mask-image: url("https://static-2v.gitbook.com/~gitbook/static/icons/svgs/custom-icons/gitbook-assistant.svg?v=2");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: currentColor;
+}
+
+#gitbook-widget-button.open #gitbook-widget-button-icon {
+    mask-image: url('https://ka-p.fontawesome.com/releases/v6.6.0/svgs/regular/close.svg?v=2&token=a463935e93');
+}
+
+/* Button: Label */
+#gitbook-widget-button.open #gitbook-widget-button-label {
+    display: none;
+}
+
+/* Window */
+#gitbook-widget-window {
+    position: fixed;
+    bottom: var(--gitbook-widget-window-bottom);
+    right: var(--gitbook-widget-right);
+    z-index: 9998;
+    width: var(--gitbook-widget-window-width);
+    height: calc(min(var(--gitbook-widget-window-height), calc(100vh - var(--gitbook-widget-window-bottom) - var(--gitbook-widget-top))));
+    background-color: var(--gitbook-widget-background-solid);
+    border: 1px solid var(--gitbook-widget-border-color);
+    border-radius: var(--gitbook-widget-radius);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    transition-property: transform, opacity, display;
+    transition-duration: var(--gitbook-widget-transition-duration-slow);
+    transition-timing-function: var(--gitbook-widget-easing-bounce);
+    transform-origin: bottom right;
+    transition-behavior: allow-discrete;
+}
+
+@starting-style {
+    #gitbook-widget-window {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+body:has(#gitbook-widget-button.hidden) #gitbook-widget-window {
+    bottom: var(--gitbook-widget-bottom);
+}
+
+#gitbook-widget-window.hidden {
+    transition-property: transform, opacity, display;
+    transition-duration: var(--gitbook-widget-transition-duration-fast);
+    transition-timing-function: var(--gitbook-widget-easing);
+    transition-behavior: allow-discrete;
+    display: none;
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+#gitbook-widget-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+@keyframes gitbook-widget-present {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
