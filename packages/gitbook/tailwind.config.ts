@@ -36,14 +36,13 @@ function generateVarShades(varName: string, filter: ColorCategory[] = []) {
  */
 function generateShades(color: string) {
     const rawShades = shadesOfColor(color);
-    const shadeMap = shades.reduce(
-        (acc, shade) => {
-            acc[shade] = `rgb(${hexToRgb(rawShades[`${shade}`])} / <alpha-value>)`;
-            return acc;
-        },
-        {} as Record<string, string>
-    );
+    const shadeMap = shades.reduce((acc: Record<string, string>, shade) => {
+        // @ts-expect-error
+        acc[shade] = `rgb(${hexToRgb(rawShades[`${shade}`])} / <alpha-value>)`;
+        return acc;
+    }, {});
 
+    // @ts-expect-error
     shadeMap.DEFAULT = shadeMap[500];
 
     return shadeMap;

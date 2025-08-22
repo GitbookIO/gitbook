@@ -7,6 +7,8 @@
         "moduleResolution": "bundler",
         "isolatedModules": true,
         "incremental": true,
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
         "noEmit": true,
         "noPropertyAccessFromIndexSignature": false,
         "types": [

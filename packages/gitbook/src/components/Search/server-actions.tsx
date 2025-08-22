@@ -71,8 +71,7 @@ export interface AskAnswerResult {
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
     return traceErrorOnly('Search.searchAllSiteContent', async () => {
         const context = await getServerActionBaseContext();
-
-        return await searchSiteContent(context, {
+        return searchSiteContent(context, {
             query,
             scope: { mode: 'all' },
         });
@@ -114,6 +113,7 @@ export async function streamAskQuestion({
 
             const apiClient = await context.dataFetcher.api();
 
+            console.log('DEBUG streamAskQuestion context', context);
             const stream = apiClient.orgs.streamAskInSite(
                 context.organizationId,
                 context.site.id,
@@ -178,9 +178,11 @@ export async function streamAskQuestion({
             }
         })()
             .then(() => {
+                console.log('DEBUG streamAskQuestion done');
                 responseStream.done();
             })
             .catch((error) => {
+                console.log('DEBUG streamAskQuestion ERROR', error);
                 responseStream.error(error);
             });
 
@@ -270,7 +272,7 @@ async function searchSiteContent(
 
     return (
         await Promise.all(
-            searchResults.map(async (spaceItem) => {
+            searchResults.map((spaceItem) => {
                 const found = findSiteSpaceBy(
                     structure,
                     (siteSpace) => siteSpace.space.id === spaceItem.id

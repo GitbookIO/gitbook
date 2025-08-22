@@ -19,14 +19,8 @@ const SECTION_INTERSECTING_THRESHOLD = 0.9;
  */
 const ACTIVE_ITEM_OFFSET = 100;
 
-export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
-    const { sections } = props;
-
-    const ids = React.useMemo(() => {
-        return sections.map((section) => {
-            return section.id;
-        });
-    }, [sections]);
+export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }) {
+    const ids = React.useMemo(() => sections.map(({ id }) => id), [sections]);
 
     const enabled = useBodyLoaded();
 

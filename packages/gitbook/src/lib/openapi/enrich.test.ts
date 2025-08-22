@@ -12,7 +12,7 @@ describe('#enrichFilesystem', () => {
             rootURL: null,
         });
         const enriched = await enrichFilesystem(filesystem);
-        expect(enriched[0].specification.paths['/pet'].put['x-gitbook-description-html']).toBe(
+        expect(enriched[0]?.specification.paths['/pet'].put['x-gitbook-description-html']).toBe(
             '<p>Social platform</p>'
         );
     });

@@ -135,7 +135,7 @@ export function AIChatWindow(props: {
                             chat.error
                                 ? 'error'
                                 : chat.loading
-                                  ? chat.messages[chat.messages.length - 1].content
+                                  ? chat.messages[chat.messages.length - 1]?.content
                                       ? 'working'
                                       : 'thinking'
                                   : chat.messages.length > 0
@@ -153,7 +153,7 @@ export function AIChatWindow(props: {
                             }`}
                         >
                             {chat.loading
-                                ? chat.messages[chat.messages.length - 1].content
+                                ? chat.messages[chat.messages.length - 1]?.content
                                     ? t(language, 'ai_chat_working')
                                     : t(language, 'ai_chat_thinking')
                                 : ''}

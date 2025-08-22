@@ -43,9 +43,9 @@ export function getBlockTextStyle(block: DocumentBlock): {
         case 'list-ordered':
         case 'list-tasks':
         case 'list-unordered':
-            return getBlockTextStyle(block.nodes[0]);
+            return getBlockTextStyle(block.nodes[0]!);
         case 'list-item':
-            return getBlockTextStyle(block.nodes[0]);
+            return getBlockTextStyle(block.nodes[0]!);
         default:
             return {
                 textSize: 'text-base',
