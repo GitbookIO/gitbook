@@ -133,6 +133,15 @@ export function useAI(): AIContext {
             ...integrationAssistants.map((assistant) => ({
                 ...assistant,
                 icon: <Icon icon={assistant.icon as IconName} className="size-4" />,
+                open: (query?: string) => {
+                    setSearchState((prev) => ({
+                        ask: null, // Reset ask as we assume the assistant will handle it
+                        query: prev?.query ?? null,
+                        global: prev?.global ?? false,
+                        open: false,
+                    }));
+                    assistant.open(query);
+                },
             }))
         );
     }
