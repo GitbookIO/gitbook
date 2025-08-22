@@ -1,32 +1,48 @@
 'use client';
 import { tcls } from '@/lib/tailwind';
-import * as Tooltip from '@radix-ui/react-tooltip';
+import * as RadixHoverCard from '@radix-ui/react-hover-card';
 
-export function HoverCardRoot(props: Tooltip.TooltipProps) {
-    return <Tooltip.Root delayDuration={200} {...props} />;
-}
-
-export function HoverCardTrigger(props: { children: React.ReactNode }) {
-    return <Tooltip.Trigger asChild>{props.children}</Tooltip.Trigger>;
-}
-
-export function HoverCard(props: {
-    children: React.ReactNode;
-    className?: string;
-}) {
+export function HoverCardRoot(props: RadixHoverCard.HoverCardProps) {
     return (
-        <Tooltip.Portal>
-            <Tooltip.Content className="z-40 w-screen max-w-md animate-present px-4 sm:w-auto">
+        <RadixHoverCard.Root
+            openDelay={props.openDelay ?? 200}
+            closeDelay={props.closeDelay ?? 100}
+            {...props}
+        />
+    );
+}
+
+export function HoverCardTrigger(props: RadixHoverCard.HoverCardTriggerProps) {
+    return (
+        <RadixHoverCard.Trigger asChild {...props}>
+            {props.children}
+        </RadixHoverCard.Trigger>
+    );
+}
+
+export function HoverCard(
+    props: RadixHoverCard.HoverCardContentProps & { arrow?: RadixHoverCard.HoverCardArrowProps }
+) {
+    const { arrow, ...cardProps } = props;
+    return (
+        <RadixHoverCard.Portal>
+            <RadixHoverCard.Content
+                side={props.side ?? 'top'}
+                className="z-40 w-screen max-w-md animate-present px-4 sm:w-auto"
+            >
                 <div
                     className={tcls(
                         'overflow-hidden rounded-md straight-corners:rounded-none bg-tint-base shadow-lg shadow-tint-12/4 ring-1 ring-tint-subtle dark:shadow-tint-1',
-                        props.className
+                        cardProps.className
                     )}
                 >
-                    {props.children}
+                    {cardProps.children}
                 </div>
-                <Tooltip.Arrow className="fill-tint-1" />
-            </Tooltip.Content>
-        </Tooltip.Portal>
+                <RadixHoverCard.Arrow
+                    className={tcls('fill-tint-1', arrow?.className)}
+                    {...arrow}
+                />
+            </RadixHoverCard.Content>
+        </RadixHoverCard.Portal>
     );
 }

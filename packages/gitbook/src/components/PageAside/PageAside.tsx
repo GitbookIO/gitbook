@@ -75,8 +75,8 @@ export function PageAside(props: {
                 'lg:site-header-sections:max-h-[calc(100vh-6.75rem)]',
 
                 // Client-side dynamic positioning (CSS vars applied by script)
-                'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
-                'lg:[html[style*="--toc-height"]_&]:max-h-(--toc-height)!',
+                'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
+                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
 
                 // When in api page mode, we display it as an overlay on non-large resolutions
                 'xl:max-2xl:page-api-block:z-10',

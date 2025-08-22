@@ -190,6 +190,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                     )}
                     {...getSearchLinkProps({
                         ask: question,
+                        open: true,
                     })}
                 >
                     <Icon

@@ -2,12 +2,9 @@
  * Insert inline JS to detect Cloudflare Rocket Loader and notify the user that the content will not load correctly.
  * It needs to be inserted as a script tag so that we can pass `data-cfasync="false"` to avoid being processed by Rocket Loader.
  */
-export function RocketLoaderDetector(props: { nonce?: string }) {
-    const { nonce } = props;
-
+export function RocketLoaderDetector() {
     return (
         <script
-            nonce={nonce}
             suppressHydrationWarning
             data-cfasync="false"
             dangerouslySetInnerHTML={{

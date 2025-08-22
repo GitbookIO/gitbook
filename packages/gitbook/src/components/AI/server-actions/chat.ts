@@ -1,4 +1,5 @@
 'use server';
+import { getEmbeddableLinker } from '@/lib/embeddable';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { getServerActionBaseContext } from '@/lib/server-actions';
 import { traceErrorOnly } from '@/lib/tracing';
@@ -31,7 +32,11 @@ export async function* streamAIChatResponse({
     options?: RenderAIMessageOptions;
 }) {
     const { stream } = await traceErrorOnly('AI.streamAIChatResponse', async () => {
-        const context = await getServerActionBaseContext();
+        let context = await getServerActionBaseContext();
+        if (options?.asEmbeddable) {
+            context = { ...context, linker: getEmbeddableLinker(context.linker) };
+        }
+
         const siteURLData = await getSiteURLDataFromMiddleware();
 
         const api = await context.dataFetcher.api();

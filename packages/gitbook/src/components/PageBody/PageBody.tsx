@@ -33,7 +33,7 @@ export function PageBody(props: {
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
 
     // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
-    const shouldRenderLinkPreviews = document
+    const withLinkPreviews = document
         ? !hasMoreThan(
               document,
               (inline) => inline.object === 'inline' && inline.type === 'link',
@@ -81,7 +81,7 @@ export function PageBody(props: {
                             context={{
                                 mode: 'default',
                                 contentContext: context,
-                                shouldRenderLinkPreviews,
+                                withLinkPreviews,
                             }}
                         />
                     </React.Suspense>
