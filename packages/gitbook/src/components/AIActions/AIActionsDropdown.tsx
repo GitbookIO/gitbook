@@ -25,7 +25,9 @@ interface AIActionsDropdownProps {
  */
 export function AIActionsDropdown(props: AIActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
+    const assistants = useAI().assistants.filter(
+        (assistant) => assistant.ui === true && assistant.pageAction
+    );
     const language = useLanguage();
 
     return assistants.length > 0 || props.actions.markdown || props.actions.externalAI ? (
@@ -63,7 +65,9 @@ export function AIActionsDropdown(props: AIActionsDropdownProps) {
  */
 function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
     const { markdownPageUrl, actions } = props;
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
+    const assistants = useAI().assistants.filter(
+        (assistant) => assistant.ui === true && assistant.pageAction
+    );
 
     return (
         <>
@@ -103,7 +107,9 @@ function AIActionsDropdownMenuContent(props: AIActionsDropdownProps) {
  */
 function DefaultAction(props: AIActionsDropdownProps) {
     const { markdownPageUrl, actions } = props;
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
+    const assistants = useAI().assistants.filter(
+        (assistant) => assistant.ui === true && assistant.pageAction
+    );
 
     const assistant = assistants[0];
     if (assistant) {
