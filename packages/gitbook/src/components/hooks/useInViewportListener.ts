@@ -30,8 +30,9 @@ export function useInViewportListener(
 
         const observer = new IntersectionObserver(
             ([entry]) => {
-                isIntersectingRef.current = entry.isIntersecting;
-                listenerRef.current(entry.isIntersecting, () => {
+                const isIntersecting = entry?.isIntersecting ?? false;
+                isIntersectingRef.current = isIntersecting;
+                listenerRef.current(isIntersecting, () => {
                     observer.disconnect();
                 });
             },

@@ -71,8 +71,7 @@ export interface AskAnswerResult {
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
     return traceErrorOnly('Search.searchAllSiteContent', async () => {
         const context = await getServerActionBaseContext();
-
-        return await searchSiteContent(context, {
+        return searchSiteContent(context, {
             query,
             scope: { mode: 'all' },
         });
@@ -270,7 +269,7 @@ async function searchSiteContent(
 
     return (
         await Promise.all(
-            searchResults.map(async (spaceItem) => {
+            searchResults.map((spaceItem) => {
                 const found = findSiteSpaceBy(
                     structure,
                     (siteSpace) => siteSpace.space.id === spaceItem.id

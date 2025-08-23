@@ -55,7 +55,7 @@ export function SearchContainer(props: SearchContainerProps) {
         initialRef.current = true;
 
         // For simplicity we're only triggering the first assistant
-        assistants[0].open(state?.ask ?? undefined);
+        assistants[0]?.open(state?.ask ?? undefined);
     }, [state?.ask, assistants.length, assistants[0]?.open]);
 
     const onClose = React.useCallback(

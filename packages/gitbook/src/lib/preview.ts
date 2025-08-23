@@ -9,5 +9,5 @@ export function getPreviewRequestIdentifier(requestURL: URL): string {
     // For preview requests, we extract the site ID from the pathname
     // e.g. https://preview/site_id/...
     const pathname = requestURL.pathname.slice(1).split('/');
-    return pathname[0];
+    return pathname[0]!;
 }

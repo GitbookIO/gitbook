@@ -206,7 +206,7 @@ export function DynamicTabs(
                             'max-w-full',
                             'truncate',
 
-                            active.id === tab.id
+                            active?.id === tab.id
                                 ? [
                                       'shrink-0',
                                       'active-tab',
@@ -222,7 +222,7 @@ export function DynamicTabs(
                         <button
                             type="button"
                             role="tab"
-                            aria-selected={active.id === tab.id}
+                            aria-selected={active?.id === tab.id}
                             aria-controls={getTabPanelId(tab.id)}
                             id={getTabButtonId(tab.id)}
                             onClick={() => {
@@ -255,7 +255,7 @@ export function DynamicTabs(
                     role="tabpanel"
                     id={getTabPanelId(tab.id)}
                     aria-labelledby={getTabButtonId(tab.id)}
-                    className={tcls('p-4', tab.id !== active.id ? 'hidden' : null)}
+                    className={tcls('p-4', tab.id !== active?.id ? 'hidden' : null)}
                 >
                     {tabsBody[index]}
                 </div>

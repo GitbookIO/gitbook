@@ -25,7 +25,9 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
     /* Only show the header when configured and not empty */
     const withHeader =
         !view.hideHeader &&
-        view.columns.some((columnId) => block.data.definition[columnId].title.trim().length > 0);
+        view.columns.some(
+            (columnId) => (block.data.definition[columnId]?.title.trim().length ?? 0) > 0
+        );
 
     return (
         <div className={tcls(style, styles.tableWrapper)}>
@@ -43,28 +45,31 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         )}
                     >
                         <div role="row" className={tcls('flex', 'w-full')}>
-                            {view.columns.map((column) => (
-                                <div
-                                    key={column}
-                                    role="columnheader"
-                                    className={tcls(
-                                        styles.columnHeader,
-                                        getColumnAlignment(block.data.definition[column])
-                                    )}
-                                    style={{
-                                        width: getColumnWidth({
-                                            column,
-                                            columnWidths,
-                                            autoSizedColumns,
-                                            fixedColumns,
-                                        }),
-                                        minWidth: columnWidths?.[column] || '100px',
-                                    }}
-                                    title={block.data.definition[column].title}
-                                >
-                                    {block.data.definition[column].title}
-                                </div>
-                            ))}
+                            {view.columns.map((column) => {
+                                const definition = block.data.definition[column]!;
+                                return (
+                                    <div
+                                        key={column}
+                                        role="columnheader"
+                                        className={tcls(
+                                            styles.columnHeader,
+                                            getColumnAlignment(definition)
+                                        )}
+                                        style={{
+                                            width: getColumnWidth({
+                                                column,
+                                                columnWidths,
+                                                autoSizedColumns,
+                                                fixedColumns,
+                                            }),
+                                            minWidth: columnWidths?.[column] || '100px',
+                                        }}
+                                        title={definition.title}
+                                    >
+                                        {definition.title}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

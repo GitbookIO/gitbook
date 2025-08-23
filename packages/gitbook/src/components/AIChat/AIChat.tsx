@@ -72,7 +72,7 @@ export function AIChat(props: { trademark: boolean }) {
                 title={getAIChatName(language, trademark)}
                 subtitle={
                     chat.loading
-                        ? chat.messages[chat.messages.length - 1].content
+                        ? chat.messages[chat.messages.length - 1]?.content
                             ? tString(language, 'ai_chat_working')
                             : tString(language, 'ai_chat_thinking')
                         : ''
@@ -139,7 +139,7 @@ export function AIChatDynamicIcon(props: {
                 chat.error
                     ? 'error'
                     : chat.loading
-                      ? chat.messages[chat.messages.length - 1].content
+                      ? chat.messages[chat.messages.length - 1]?.content
                           ? 'working'
                           : 'thinking'
                       : chat.messages.length > 0

@@ -331,8 +331,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             pathname,
         ].join('/');
 
-        console.log(`rewriting ${request.nextUrl.toString()} to ${route}`);
-
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
         rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
 
@@ -535,7 +533,7 @@ function encodePathInSiteContent(rawPathname: string): {
     const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1])}`,
+            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1]!)}`,
         };
     }
 

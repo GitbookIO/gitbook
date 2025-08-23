@@ -19,9 +19,9 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
 
     const parent = ancestorBlocks[ancestorBlocks.length - 1];
     assert(
-        (parent && parent.type === 'list-ordered') ||
-            parent.type === 'list-unordered' ||
-            parent.type === 'list-tasks',
+        parent?.type === 'list-ordered' ||
+            parent?.type === 'list-unordered' ||
+            parent?.type === 'list-tasks',
         'Invalid parent list type'
     );
 
@@ -112,11 +112,11 @@ function getListItemDepth(input: {
 
     for (let i = ancestorBlocks.length - 1; i >= 0; i--) {
         const block = ancestorBlocks[i];
-        if (block.type === type) {
+        if (block?.type === type) {
             depth = depth + 1;
             continue;
         }
-        if (block.type === 'list-item') {
+        if (block?.type === 'list-item') {
             continue;
         }
         break;

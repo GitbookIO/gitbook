@@ -119,7 +119,7 @@ export async function highlight(
         currentIndex += 1; // for the \n
 
         return {
-            highlighted: Boolean(lineBlock.data.highlighted),
+            highlighted: Boolean(lineBlock?.data.highlighted),
             tokens: result,
         };
     });

@@ -10,7 +10,7 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
     const { block, style, ancestorBlocks, ...contextProps } = props;
 
     const ancestor = ancestorBlocks[ancestorBlocks.length - 1];
-    assert(ancestor.type === 'stepper', 'Ancestor block must be a stepper');
+    assert(ancestor?.type === 'stepper', 'Ancestor block must be a stepper');
 
     const index = ancestor.nodes.indexOf(block);
 

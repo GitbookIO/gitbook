@@ -157,7 +157,7 @@ export function getVisitorUnsignedClaims(args: {
                 if (typeof parsed === 'object' && parsed !== null) {
                     Object.assign(claims, parsed);
                 }
-            } catch (_err) {
+            } catch {
                 console.warn(`Invalid JSON in unsigned claim cookie "${cookie.name}"`);
             }
         }
@@ -188,7 +188,7 @@ function setVisitorClaimByPath(
     let current = claims;
 
     for (let index = 0; index < keys.length; index++) {
-        const key = keys[index];
+        const key = keys[index]!;
 
         if (index === keys.length - 1) {
             current[key] = value;

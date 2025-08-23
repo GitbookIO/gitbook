@@ -111,7 +111,7 @@ export function getURLLookupAlternatives(input: URL) {
     // Mark the longuest entry to lookup as primary
     alternatives.sort((a, b) => b.extraPath.length - a.extraPath.length);
     if (alternatives.length > 0) {
-        alternatives[alternatives.length - 1].primary = true;
+        alternatives[alternatives.length - 1]!.primary = true;
     }
 
     return { urls: alternatives, basePath, changeRequest, revision };

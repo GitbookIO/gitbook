@@ -11,7 +11,7 @@ const args = process.argv.slice(2);
 const versionId = args[0];
 
 // The preview URL is in the format https://<versionId>-gitbook-open-v2-server-preview.gitbook.workers.dev
-const previewHostname = `${versionId.split('-')[0]}-gitbook-open-v2-server-preview.gitbook.workers.dev`;
+const previewHostname = `${versionId?.split('-')[0]}-gitbook-open-v2-server-preview.gitbook.workers.dev`;
 
 let updatedFile = file.replace(
     /"PREVIEW_HOSTNAME": "TO_REPLACE"/,

@@ -28,6 +28,7 @@ export function t(
             const [partToPush, partToReplace] = currentStringToReplace.split(`\${${i + 1}}`);
             parts.push(<React.Fragment key={`string-${i}`}>{partToPush}</React.Fragment>);
             parts.push(<React.Fragment key={`arg-${i}`}>{arg}</React.Fragment>);
+            // @ts-expect-error
             currentStringToReplace = partToReplace;
         }
     });

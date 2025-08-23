@@ -122,17 +122,6 @@ export function getCacheTag(
 }
 
 /**
- * Get the cache tag for a given URL.
- */
-export function getCacheTagForURL(url: string | URL) {
-    const parsedURL = url instanceof URL ? url : new URL(url);
-    return getCacheTag({
-        tag: 'url',
-        hostname: parsedURL.hostname,
-    });
-}
-
-/**
  * Get the tags for a computed content source.
  */
 export function getComputedContentSourceCacheTags(
@@ -182,7 +171,7 @@ export function getComputedContentSourceCacheTags(
                     break;
                 default:
                     // Do not throw for unknown dependency types
-                    // as it might mean we are lacking behind the API version
+                    // as it might mean we are lagging behind the API version
                     break;
             }
         });
@@ -198,9 +187,8 @@ export function getComputedContentSourceCacheTags(
     }
 
     // We invalidate the computed content when a new version of the integration is deployed.
-
     if (source.type.startsWith('integration:')) {
-        const integration = source.type.split(':')[1];
+        const integration = source.type.split(':')[1]!;
         tags.push(
             getCacheTag({
                 tag: 'integration',

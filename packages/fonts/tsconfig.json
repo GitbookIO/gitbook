@@ -4,6 +4,7 @@
         "module": "ESNext",
         "target": "es2022",
         "strict": true,
+        "noUncheckedIndexedAccess": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "moduleResolution": "bundler",

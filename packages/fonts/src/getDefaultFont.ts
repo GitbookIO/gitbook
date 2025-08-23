@@ -67,7 +67,7 @@ function getBestUnicodeRange(text: string, ranges: Record<string, string>): stri
 
         const body = token.slice(2); // drop "U+"
         const [startHex, endHex] = body.split('-');
-        const start = Number.parseInt(startHex, 16);
+        const start = Number.parseInt(startHex!, 16);
         const end = endHex ? Number.parseInt(endHex, 16) : start;
 
         if (Number.isNaN(start) || Number.isNaN(end) || end < start) return null;
@@ -92,7 +92,7 @@ function getBestUnicodeRange(text: string, ranges: Record<string, string>): stri
 
         for (const [label, rangesArr] of Object.entries(parsed)) {
             if (rangesArr.some(([lo, hi]) => cp >= lo && cp <= hi)) {
-                hits[label]++;
+                hits[label]!++;
             }
         }
     }
