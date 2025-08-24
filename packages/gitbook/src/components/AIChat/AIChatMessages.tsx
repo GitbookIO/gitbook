@@ -32,6 +32,7 @@ export function AIChatMessages(props: {
                             'scroll-mt-36',
                             'lg:scroll-mt-0',
                             'flex flex-col gap-6',
+                            'break-words',
                             'group/message',
                             message.role === AIMessageRole.User
                                 ? 'max-w-[80%] self-end circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint px-4 py-2'

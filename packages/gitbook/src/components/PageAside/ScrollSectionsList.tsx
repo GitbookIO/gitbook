@@ -19,13 +19,6 @@ const SECTION_INTERSECTING_THRESHOLD = 0.9;
  */
 const ACTIVE_ITEM_OFFSET = 100;
 
-const springCurve = {
-    type: 'spring',
-    stiffness: 700,
-    damping: 50,
-    mass: 0.8,
-};
-
 export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
     const { sections } = props;
 
@@ -75,9 +68,8 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                     )}
                     ref={activeId === section.id ? activeItemRef : null}
                 >
-                    {activeId === section.id ? (
+                    {activeId === section.id && (
                         <AsideSectionHighlight
-                            transition={springCurve}
                             className={tcls(
                                 'sidebar-list-default:hidden',
                                 section?.depth > 1
@@ -91,7 +83,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                                       ]
                             )}
                         />
-                    ) : null}
+                    )}
                     <a
                         href={`#${section.id}`}
                         className={tcls(

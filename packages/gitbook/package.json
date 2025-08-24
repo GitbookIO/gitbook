@@ -17,6 +17,7 @@
         "@opennextjs/cloudflare": "^1.6.4",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dropdown-menu": "^2.1.12",
+        "@radix-ui/react-hover-card": "^1.1.15",
         "@radix-ui/react-navigation-menu": "^1.2.3",
         "@radix-ui/react-popover": "^1.0.7",
         "@radix-ui/react-tooltip": "^1.1.8",
@@ -44,7 +45,7 @@
         "memoizee": "^0.4.17",
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
-        "next": "^15.3.2",
+        "next": "^15.5.0",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -69,7 +70,8 @@
         "url-join": "^5.0.0",
         "usehooks-ts": "^3.1.0",
         "warn-once": "^0.1.1",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "bidc": "catalog:"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
@@ -98,8 +100,7 @@
         "vercel": "^39.3.0"
     },
     "scripts": {
-        "generate": "gitbook-icons ./public/~gitbook/static/icons custom-icons && gitbook-math ./public/~gitbook/static/math && wrangler types",
-        "copy:icons": "gitbook-icons ./public/~gitbook/static/icons",
+        "generate": "./scripts/generate.sh",
         "clean": "rm -rf ./.next && rm -rf ./public/~gitbook/static/icons && rm -rf ./public/~gitbook/static/math",
         "dev": "env-cmd --silent -f ../../.env.local next",
         "build": "next build",
@@ -108,8 +109,8 @@
         "dev:cloudflare": "wrangler dev --port 8771 --env preview",
         "dev:cf:middleware": "wrangler dev --port 8771 --inspector-port 9230 --env dev --config ./openNext/customWorkers/middlewareWrangler.jsonc",
         "dev:cf:server": "wrangler dev --port 8772 --env dev --config ./openNext/customWorkers/defaultWrangler.jsonc",
-        "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts",
-        "e2e-customers": "playwright test e2e/customers.spec.ts",
+        "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts --project=chromium",
+        "e2e-customers": "playwright test e2e/customers.spec.ts --project=chromium",
         "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
         "typecheck": "tsc --noEmit"
     },
