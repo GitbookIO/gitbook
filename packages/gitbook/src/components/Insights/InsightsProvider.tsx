@@ -58,8 +58,8 @@ interface InsightsProviderProps {
     /** The application URL. */
     appURL: string;
 
-    /** The base path of the site. */
-    basePath: string;
+    /** The url of the endpoint to send events to */
+    eventUrl: string;
 
     /** The children of the provider. */
     children: React.ReactNode;
@@ -69,7 +69,7 @@ interface InsightsProviderProps {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, children, visitorCookieTrackingEnabled, basePath, appURL } = props;
+    const { enabled, children, visitorCookieTrackingEnabled, eventUrl, appURL } = props;
 
     const currentContent = useCurrentContent();
     const visitorIdRef = React.useRef<string | null>(null);
@@ -126,9 +126,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         if (allEvents.length > 0) {
             if (enabled) {
                 sendEvents({
-                    basePath,
-                    organizationId: currentContent.organizationId,
-                    siteId: currentContent.siteId,
+                    eventUrl,
                     events: allEvents,
                 });
             } else {
@@ -216,18 +214,12 @@ export function useTrackEvent(): TrackEventCallback {
  * Post the events to the server.
  */
 function sendEvents(args: {
-    basePath: string;
-    organizationId: string;
-    siteId: string;
+    eventUrl: string;
     events: api.SiteInsightsEvent[];
 }) {
-    const { basePath, organizationId, siteId, events } = args;
-    const url = new URL(window.location.href);
-    url.pathname = `${basePath}/~gitbook/__evt`;
-    url.searchParams.set('o', organizationId);
-    url.searchParams.set('s', siteId);
+    const { eventUrl, events } = args;
 
-    fetch(url.toString(), {
+    fetch(eventUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

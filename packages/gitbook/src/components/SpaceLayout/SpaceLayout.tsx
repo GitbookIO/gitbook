@@ -69,6 +69,12 @@ export function SpaceLayout(props: {
         </div>
     );
 
+    const eventUrl = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
+    );
+    eventUrl.searchParams.set('o', context.organizationId);
+    eventUrl.searchParams.set('s', context.site.id);
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <CurrentContentProvider
@@ -84,7 +90,7 @@ export function SpaceLayout(props: {
                 <InsightsProvider
                     enabled={withTracking}
                     appURL={GITBOOK_APP_URL}
-                    basePath={context.linker.toPathInSite('')}
+                    eventUrl={eventUrl.toString()}
                     visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />

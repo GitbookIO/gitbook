@@ -12,7 +12,7 @@ import {
     normalizeURL,
     throwIfDataError,
 } from '@/lib/data';
-import { GITBOOK_API_URL, isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
+import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
 import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
@@ -26,6 +26,7 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
 import type { SiteURLData } from './lib/context';
+import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -142,22 +143,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     //Forwards analytics events
     if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
-        const orgs = requestURL.searchParams.get('o');
-        const sites = requestURL.searchParams.get('s');
-        if (!orgs || !sites) {
-            return new Response('Missing required query parameters: o (orgs) and s (sites)', {
-                status: 400,
-                headers: { 'content-type': 'text/plain' },
-            });
-        }
-        const url = new URL(`${GITBOOK_API_URL}/v1/orgs/${orgs}/sites/${sites}/insights/events`);
-        return await fetch(url.toString(), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: request.body,
-        });
+        return await serveProxyAnalyticsEvent(request);
     }
 
     // We want to filter hostnames that contains a port here as this is likely a malicious request.
