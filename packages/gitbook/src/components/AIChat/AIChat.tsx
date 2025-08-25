@@ -2,6 +2,7 @@
 
 import { t, tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -13,7 +14,7 @@ import {
 } from '../AI';
 import { EmbeddableFrame } from '../Embeddable/EmbeddableFrame';
 import { useNow } from '../hooks';
-import { Button } from '../primitives';
+import { Button, DropdownMenuSeparator } from '../primitives';
 import { DropdownMenu, DropdownMenuItem } from '../primitives';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
@@ -64,7 +65,10 @@ export function AIChat(props: { trademark: boolean }) {
     return (
         <div
             data-testid="ai-chat"
-            className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
+            className={tcls(
+                'ai-chat z-40 mx-auto flex max-h-full w-full max-w-3xl animate-present scroll-mt-36 p-4 transition-all duration-300 max-md:inset-x-0 max-md:bottom-0 lg:fixed lg:inset-y-0 lg:right-0 lg:animate-enter-from-right',
+                chat.size === 'large' ? 'lg:w-104 xl:w-156' : 'lg:w-80 xl:w-96'
+            )}
         >
             <EmbeddableFrame
                 className="relative circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle"
@@ -92,6 +96,33 @@ export function AIChat(props: { trademark: boolean }) {
                                     />
                                 }
                             >
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        chatController.setSize(
+                                            chat.size === 'default' ? 'large' : 'default'
+                                        );
+                                    }}
+                                >
+                                    <Icon
+                                        icon={
+                                            chat.size === 'default'
+                                                ? 'arrow-up-right-and-arrow-down-left-from-center'
+                                                : 'arrow-down-left-and-arrow-up-right-to-center'
+                                        }
+                                        className="size-3 shrink-0 text-tint-subtle"
+                                    />
+                                    <div className="flex flex-col gap-0.5">
+                                        <p className="font-medium">
+                                            {chat.size === 'default' ? 'Maximize' : 'Minimize'}
+                                        </p>
+                                        <p className="text-tint text-xs">
+                                            {chat.size === 'default'
+                                                ? 'Longer, more detailed answers'
+                                                : 'Shorter, more concise answers'}
+                                        </p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={() => {
                                         chatController.clear();
@@ -223,27 +254,32 @@ export function AIChatBody(props: {
         <>
             <div
                 ref={scrollContainerRef}
-                className="flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
+                className={tcls(
+                    'flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4 transition-all',
+                    chat.size === 'large' ? 'text-base' : 'text-sm'
+                )}
                 style={{
                     paddingBottom: `${inputHeight}px`,
                 }}
             >
                 {isEmpty ? (
                     <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
-                        <div className="flex size-32 animate-fade-in-slow items-center justify-center rounded-full bg-tint-subtle">
-                            <AIChatIcon
-                                state="intro"
-                                trademark={trademark}
-                                className="size-16 animate-[present_500ms_200ms_both]"
-                            />
-                        </div>
-                        <div className="animate-[fadeIn_500ms_400ms_both]">
-                            <h5 className=" text-center font-bold text-lg text-tint-strong">
-                                {timeGreeting}
-                            </h5>
-                            <p className="text-center text-tint">
-                                {t(language, 'ai_chat_assistant_description')}
-                            </p>
+                        <div className="flex items-center gap-4 lg:flex-col">
+                            <div className="flex animate-fade-in-slow items-center justify-center rounded-full bg-tint-subtle p-4 lg:p-8">
+                                <AIChatIcon
+                                    state="intro"
+                                    trademark={trademark}
+                                    className="size-8 animate-[present_500ms_200ms_both] lg:size-16"
+                                />
+                            </div>
+                            <div className="animate-[fadeIn_500ms_400ms_both]">
+                                <h5 className="font-bold text-lg text-tint-strong lg:text-center">
+                                    {timeGreeting}
+                                </h5>
+                                <p className="text-tint lg:text-center">
+                                    {t(language, 'ai_chat_assistant_description')}
+                                </p>
+                            </div>
                         </div>
                         {!chat.error ? (
                             <AIChatSuggestedQuestions chatController={chatController} />

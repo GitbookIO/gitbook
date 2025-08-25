@@ -23,6 +23,8 @@ export type AIChatMessage = {
     query?: string;
 };
 
+export type AIChatSize = 'default' | 'large';
+
 export type AIChatPendingTool = {
     icon?: IconName;
     label: string;
@@ -85,6 +87,11 @@ export type AIChatState = {
      * display an error alert. Clearing the conversation will reset this flag.
      */
     error: boolean;
+
+    /**
+     * The size of the chat window.
+     */
+    size: AIChatSize;
 };
 
 export type AIChatController = {
@@ -96,12 +103,14 @@ export type AIChatController = {
     postMessage: (input: { message: string }) => void;
     /** Clear the conversation */
     clear: () => void;
+    /** Toggle the size of the chat window */
+    setSize: (size: AIChatSize) => void;
 };
 
 const AIChatControllerContext = React.createContext<AIChatController | null>(null);
 
 // Global state store for AI chat
-const globalState = zustand.create<AIChatState>(() => {
+export const globalState = zustand.create<AIChatState>(() => {
     return {
         opened: false,
         responseId: null,
@@ -112,6 +121,7 @@ const globalState = zustand.create<AIChatState>(() => {
         loading: false,
         error: false,
         initialQuery: null,
+        size: 'default',
     };
 });
 
@@ -438,14 +448,19 @@ export function AIChatProvider(props: {
         }));
     }, [setSearchState]);
 
+    const onSetSize = React.useCallback((size: AIChatSize) => {
+        globalState.setState((state) => ({ ...state, size }));
+    }, []);
+
     const controller = React.useMemo(() => {
         return {
             open: onOpen,
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
+            setSize: onSetSize,
         };
-    }, [onOpen, onClose, onClear, onPostMessage]);
+    }, [onOpen, onClose, onClear, onPostMessage, onSetSize]);
 
     return (
         <AIChatControllerContext.Provider value={controller}>
