@@ -357,6 +357,10 @@ html.dark.code-monochrome {
     --shiki-token-function: rgb(var(--primary-10));
 }
 
+html.font-Lato {
+    font-variant-ligatures: no-common-ligatures;
+}
+
 /* Code blocks */
 .highlight-line {
     @apply grid grid-cols-subgrid col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-1 rounded-sm;
