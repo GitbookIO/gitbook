@@ -22,7 +22,7 @@ import {
 } from '../Embeddable/EmbeddableFrame';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
-import { DropdownMenu, DropdownMenuItem } from '../primitives';
+import { AIChatControlButton } from './AIChatControlButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
@@ -90,32 +90,7 @@ export function AIChat(props: { trademark: boolean }) {
                         </EmbeddableFrameSubtitle>
                     </EmbeddableFrameHeaderMain>
                     <EmbeddableFrameButtons>
-                        {chat.messages.length > 0 ? (
-                            <DropdownMenu
-                                button={
-                                    <Button
-                                        onClick={() => {}}
-                                        iconOnly
-                                        icon="ellipsis"
-                                        label={tString(language, 'actions')}
-                                        variant="blank"
-                                        size="default"
-                                    />
-                                }
-                            >
-                                <DropdownMenuItem
-                                    onClick={() => {
-                                        chatController.clear();
-                                    }}
-                                >
-                                    <Icon
-                                        icon="broom-wide"
-                                        className="size-3 shrink-0 text-tint-subtle"
-                                    />
-                                    {t(language, 'ai_chat_clear_conversation')}
-                                </DropdownMenuItem>
-                            </DropdownMenu>
-                        ) : null}
+                        <AIChatControlButton />
                         <Button
                             onClick={() => chatController.close()}
                             iconOnly

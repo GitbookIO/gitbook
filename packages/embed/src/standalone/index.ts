@@ -4,9 +4,8 @@ import {
     type CreateGitBookOptions,
     type GetFrameURLOptions,
     type GitBookClient,
+    type GitBookEmbeddableConfiguration,
     type GitBookFrameClient,
-    type GitBookPlaceholderSettings,
-    type GitBookToolDefinition,
     createGitBook,
 } from '../client';
 
@@ -29,12 +28,10 @@ type StandaloneCalls =
     | ['toggle']
     // Post a user message
     | ['postUserMessage', string]
-    // Register a tool
-    | ['registerTool', GitBookToolDefinition]
     // Clear the chat
     | ['clearChat']
-    // Configure the placeholder
-    | ['setPlaceholder', GitBookPlaceholderSettings]
+    // Configure the embed
+    | ['configure', Partial<GitBookEmbeddableConfiguration>]
     // Navigate to a page
     | ['navigateToPage', string]
     // Navigate to the assistant
@@ -132,14 +129,11 @@ const GitBook = (...args: StandaloneCalls) => {
         case 'postUserMessage':
             getIframe().frame.postUserMessage(args[1]);
             break;
-        case 'registerTool':
-            getIframe().frame.registerTool(args[1]);
+        case 'configure':
+            getIframe().frame.configure(args[1]);
             break;
         case 'clearChat':
             getIframe().frame.clearChat();
-            break;
-        case 'setPlaceholder':
-            getIframe().frame.setPlaceholder(args[1]);
             break;
         case 'navigateToPage':
             getIframe().frame.navigateToPage(args[1]);

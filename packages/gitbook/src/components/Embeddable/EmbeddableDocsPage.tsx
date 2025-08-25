@@ -7,6 +7,7 @@ import { Button } from '../primitives';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
+    EmbeddableFrameButtons,
     EmbeddableFrameHeader,
     EmbeddableFrameHeaderMain,
 } from './EmbeddableFrame';
@@ -41,7 +42,9 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                         label="Back"
                     />
                 </EmbeddableFrameHeaderMain>
-                <EmbeddableIframeButtons />
+                <EmbeddableFrameButtons>
+                    <EmbeddableIframeButtons />
+                </EmbeddableFrameButtons>
             </EmbeddableFrameHeader>
             <EmbeddableFrameBody>
                 <div className="flex-1 overflow-auto p-6">
