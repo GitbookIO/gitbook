@@ -556,8 +556,10 @@ function mergeAlternatives(
                     schemaOrRef.enum
                 ) {
                     const keys = Object.keys(schemaOrRef);
-                    if (keys.every((key) => ['type', 'enum', 'nullable'].includes(key))) {
-                        latest.enum = Array.from(new Set([...latest.enum, ...schemaOrRef.enum]));
+                    if (keys.some((key) => ['type', 'enum', 'nullable'].includes(key))) {
+                        latest.enum = Array.from(
+                            new Set([...(latest.enum || []), ...(schemaOrRef.enum || [])])
+                        );
                         latest.nullable = latest.nullable || schemaOrRef.nullable;
                         return acc;
                     }
@@ -566,18 +568,20 @@ function mergeAlternatives(
                 if (latest && latest.type === 'object' && schemaOrRef.type === 'object') {
                     const keys = Object.keys(schemaOrRef);
                     if (
-                        keys.every((key) =>
+                        keys.some((key) =>
                             ['type', 'properties', 'required', 'nullable'].includes(key)
                         )
                     ) {
                         latest.properties = {
-                            ...latest.properties,
-                            ...schemaOrRef.properties,
+                            ...(latest.properties || {}),
+                            ...(schemaOrRef.properties || {}),
                         };
                         latest.required = Array.from(
                             new Set([
-                                ...(Array.isArray(latest.required) ? latest.required : []),
-                                ...(Array.isArray(schemaOrRef.required)
+                                ...(latest.required && Array.isArray(latest.required)
+                                    ? latest.required
+                                    : []),
+                                ...(schemaOrRef.required && Array.isArray(schemaOrRef.required)
                                     ? schemaOrRef.required
                                     : []),
                             ])
