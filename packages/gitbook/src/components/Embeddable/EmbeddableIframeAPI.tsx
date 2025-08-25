@@ -48,7 +48,7 @@ export function EmbeddableIframeAPI() {
 export function EmbeddableIframeButtons() {
     return (
         <EmbeddableFrameButtons>
-            <Button size="medium" variant="blank" icon="close" label="Close" iconOnly />
+            <Button size="default" variant="blank" icon="close" label="Close" iconOnly />
         </EmbeddableFrameButtons>
     );
 }

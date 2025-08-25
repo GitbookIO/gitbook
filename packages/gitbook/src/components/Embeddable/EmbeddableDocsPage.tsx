@@ -35,7 +35,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                 <EmbeddableFrameHeaderMain>
                     <Button
                         href={context.linker.toPathInSite('~gitbook/embed/assistant')}
-                        size="medium"
+                        size="default"
                         variant="blank"
                         icon="arrow-left"
                         label="Back"
