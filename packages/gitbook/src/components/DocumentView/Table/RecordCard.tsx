@@ -25,8 +25,12 @@ export async function RecordCard(
         : null;
 
     const [lightCover, darkCover, target] = await Promise.all([
-        light && context.contentContext ? resolveContentRef(light, context.contentContext) : null,
-        dark && context.contentContext ? resolveContentRef(dark, context.contentContext) : null,
+        light.contentRef && context.contentContext
+            ? resolveContentRef(light.contentRef, context.contentContext)
+            : null,
+        dark.contentRef && context.contentContext
+            ? resolveContentRef(dark.contentRef, context.contentContext)
+            : null,
         targetRef && context.contentContext
             ? resolveContentRef(targetRef, context.contentContext)
             : null,
@@ -94,7 +98,12 @@ export async function RecordCard(
                         'min-w-0',
                         'w-full',
                         'h-full',
-                        'object-cover',
+                        'bg-tint-subtle',
+                        getObjectFitClass(light.objectFit),
+                        // Apply dark mode object-fit if different from light
+                        dark.objectFit && dark.objectFit !== light.objectFit
+                            ? `dark:${getObjectFitClass(dark.objectFit)}`
+                            : '',
                         lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                             ? [
                                   lightCoverIsSquareOrPortrait
@@ -189,4 +198,18 @@ function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
     }
 
     return file.dimensions?.width / file.dimensions?.height <= 1;
+}
+
+/**
+ * Get the CSS class for object-fit based on the objectFit value.
+ */
+function getObjectFitClass(objectFit?: string): string {
+    switch (objectFit) {
+        case 'contain':
+            return 'object-contain';
+        case 'fill':
+            return 'object-fill';
+        default:
+            return 'object-cover';
+    }
 }
