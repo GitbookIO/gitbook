@@ -14,7 +14,7 @@ export function AIMessageView(
         context: GitBookSiteContext;
     }
 ) {
-    const { message, context, renderToolCalls = true } = props;
+    const { message, context, withToolCalls = true, withLinkPreviews = true } = props;
 
     return (
         <div className="flex flex-col gap-2">
@@ -33,12 +33,12 @@ export function AIMessageView(
                                 mode: 'default',
                                 contentContext: context,
                                 wrapBlocksInSuspense: false,
-                                shouldRenderLinkPreviews: true,
+                                withLinkPreviews,
                             }}
                             style="mt-2 space-y-4 empty:hidden"
                         />
 
-                        {renderToolCalls && step.toolCalls && step.toolCalls.length > 0 ? (
+                        {withToolCalls && step.toolCalls && step.toolCalls.length > 0 ? (
                             <AIToolCallsSummary toolCalls={step.toolCalls} context={context} />
                         ) : null}
                     </div>

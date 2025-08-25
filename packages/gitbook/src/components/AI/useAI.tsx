@@ -35,6 +35,12 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
     mode?: 'overlay' | 'sidebar' | 'search';
 
     /**
+     * Whether the assistant is displayed in the page action menu.
+     * @default false
+     */
+    pageAction: boolean;
+
+    /**
      * Icon of the assistant displayed in the UI.
      */
     icon: ReactNode;
@@ -77,7 +83,7 @@ export function useAI(): AIContext {
     if (config.aiMode === CustomizationAIMode.Assistant) {
         assistants.push({
             id: 'gitbook-assistant',
-            label: getAIChatName(config.trademark),
+            label: getAIChatName(language, config.trademark),
             icon: (
                 <AIChatIcon
                     state={chat.loading ? 'thinking' : 'default'}
@@ -90,6 +96,7 @@ export function useAI(): AIContext {
                     chatController.postMessage({ message: query });
                 }
             },
+            pageAction: true,
             ui: true,
             mode: 'sidebar',
         });
@@ -114,6 +121,7 @@ export function useAI(): AIContext {
                     );
                 }
             },
+            pageAction: false,
             ui: false,
             mode: 'search',
         });
@@ -125,6 +133,15 @@ export function useAI(): AIContext {
             ...integrationAssistants.map((assistant) => ({
                 ...assistant,
                 icon: <Icon icon={assistant.icon as IconName} className="size-4" />,
+                open: (query?: string) => {
+                    setSearchState((prev) => ({
+                        ask: null, // Reset ask as we assume the assistant will handle it
+                        query: prev?.query ?? null,
+                        global: prev?.global ?? false,
+                        open: false,
+                    }));
+                    assistant.open(query);
+                },
             }))
         );
     }

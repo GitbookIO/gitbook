@@ -40,6 +40,7 @@ export function PageAside(props: {
                 'group/aside',
                 'hidden',
                 'pt-8',
+                'pb-4',
 
                 'xl:flex',
                 'xl:max-3xl:chat-open:hidden',
@@ -77,8 +78,8 @@ export function PageAside(props: {
                 'lg:site-header-sections:max-h-[calc(100vh-6.75rem)]',
 
                 // Client-side dynamic positioning (CSS vars applied by script)
-                'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
-                'lg:[html[style*="--toc-height"]_&]:max-h-(--toc-height)!',
+                'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
+                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
 
                 // When in api page mode, we display it as an overlay on non-large resolutions
                 'xl:max-2xl:page-api-block:z-10',
@@ -111,7 +112,7 @@ export function PageAside(props: {
             >
                 <PageAsideHeader context={context} />
                 {page.layout.outline ? (
-                    <div className="overflow-y-auto border-tint xl:max-2xl:page-api-block:border-t">
+                    <div className="flex shrink flex-col overflow-hidden">
                         {document ? (
                             <React.Suspense fallback={null}>
                                 <PageAsideSections document={document} context={context} />
@@ -165,11 +166,7 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
     const sections = await getDocumentSections(context, document);
 
-    return sections.length > 1 ? (
-        <div className="-mt-8 pt-8 pb-5 empty:hidden xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2">
-            <ScrollSectionsList sections={sections} />
-        </div>
-    ) : null;
+    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
 }
 
 function PageAsideActions(props: {
@@ -199,7 +196,7 @@ function PageAsideActions(props: {
                 'border-t',
                 'first:border-none',
                 'border-tint-subtle',
-                'py-5',
+                'pt-5',
                 'first:pt-0',
                 'xl:max-2xl:page-api-block:p-5',
                 'empty:hidden'
@@ -275,7 +272,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
                 'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                 'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
-                'py-4'
+                'pt-4'
             )}
         >
             {/* Mode Switcher */}

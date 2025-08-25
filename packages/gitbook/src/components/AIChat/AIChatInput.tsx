@@ -3,9 +3,8 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { Button } from '../primitives';
+import { Button, HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
-import { Tooltip } from '../primitives/Tooltip';
 
 export function AIChatInput(props: {
     value: string;
@@ -50,7 +49,9 @@ export function AIChatInput(props: {
             e.preventDefault();
             inputRef.current?.focus();
         },
-        []
+        {
+            enableOnFormTags: true,
+        }
     );
 
     return (
@@ -105,10 +106,15 @@ export function AIChatInput(props: {
                 </div>
             ) : null}
             <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2 py-2">
-                <Tooltip
-                    label={
+                <HoverCardRoot>
+                    <HoverCard
+                        className="max-w-xs bg-tint p-2 text-sm text-tint"
+                        arrow={{ className: 'fill-tint-3' }}
+                    >
                         <div className="flex flex-col gap-3 p-2">
-                            <p>{t(language, 'ai_chat_context_description')}</p>
+                            <p className="font-semibold">
+                                {t(language, 'ai_chat_context_description')}
+                            </p>
                             <ul className="flex flex-col gap-2">
                                 <li className="flex items-center gap-2">
                                     <Icon icon="memo" className="size-3.5 opacity-7" />
@@ -125,16 +131,19 @@ export function AIChatInput(props: {
                             </ul>
                             <p>{t(language, 'ai_chat_context_disclaimer')}</p>
                         </div>
-                    }
-                    arrow
-                >
-                    <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
-                        <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
-                            {t(language, 'ai_chat_context_badge')}
-                        </span>{' '}
-                        <span className="leading-none">{t(language, 'ai_chat_context_title')}</span>
-                    </div>
-                </Tooltip>
+                    </HoverCard>
+                    <HoverCardTrigger>
+                        <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
+                            <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
+                                {t(language, 'ai_chat_context_badge')}
+                            </span>{' '}
+                            <span className="leading-none">
+                                {t(language, 'ai_chat_context_title')}
+                            </span>
+                            <Icon icon="question-circle" className="size-3" />
+                        </div>
+                    </HoverCardTrigger>
+                </HoverCardRoot>
                 <Button
                     label={tString(language, 'send')}
                     size="medium"
