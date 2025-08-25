@@ -1,7 +1,15 @@
 'use client';
 
 import { useAIChatController, useAIChatState } from '@/components/AI';
-import { AIChatBody } from '@/components/AIChat';
+import { AIChatBody, AIChatDynamicIcon } from '@/components/AIChat';
+import {
+    EmbeddableFrame,
+    EmbeddableFrameBody,
+    EmbeddableFrameHeader,
+    EmbeddableFrameHeaderMain,
+    EmbeddableFrameTitle,
+} from './EmbeddableFrame';
+import { EmbeddableIframeButtons } from './EmbeddableIframeAPI';
 
 /**
  * Embeddable AI chat window in an iframe.
@@ -13,5 +21,18 @@ export function EmbeddableAIChat(props: {
     const chat = useAIChatState();
     const chatController = useAIChatController();
 
-    return <AIChatBody trademark={trademark} chatController={chatController} chat={chat} />;
+    return (
+        <EmbeddableFrame>
+            <EmbeddableFrameHeader>
+                <AIChatDynamicIcon trademark={trademark} />
+                <EmbeddableFrameHeaderMain>
+                    <EmbeddableFrameTitle>Chat with us</EmbeddableFrameTitle>
+                </EmbeddableFrameHeaderMain>
+                <EmbeddableIframeButtons />
+            </EmbeddableFrameHeader>
+            <EmbeddableFrameBody>
+                <AIChatBody trademark={trademark} chatController={chatController} chat={chat} />
+            </EmbeddableFrameBody>
+        </EmbeddableFrame>
+    );
 }

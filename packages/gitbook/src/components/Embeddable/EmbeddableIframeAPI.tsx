@@ -5,6 +5,8 @@ import { createChannel } from 'bidc';
 import React from 'react';
 
 import { useAIChatController } from '@/components/AI';
+import { Button } from '../primitives';
+import { EmbeddableFrameButtons } from './EmbeddableFrame';
 
 /**
  * Expose the API to communicate with the parent window.
@@ -41,4 +43,12 @@ export function EmbeddableIframeAPI() {
     }, [chatController]);
 
     return null;
+}
+
+export function EmbeddableIframeButtons() {
+    return (
+        <EmbeddableFrameButtons>
+            <Button size="medium" variant="blank" icon="close" label="Close" iconOnly />
+        </EmbeddableFrameButtons>
+    );
 }

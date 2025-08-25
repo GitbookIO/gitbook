@@ -3,6 +3,14 @@ import { type PagePathParams, getSitePageData } from '@/components/SitePage';
 import { PageBody } from '@/components/PageBody';
 import type { GitBookSiteContext } from '@/lib/context';
 import type { Metadata } from 'next';
+import { Button } from '../primitives';
+import {
+    EmbeddableFrame,
+    EmbeddableFrameBody,
+    EmbeddableFrameHeader,
+    EmbeddableFrameHeaderMain,
+} from './EmbeddableFrame';
+import { EmbeddableIframeButtons } from './EmbeddableIframeAPI';
 
 export const dynamic = 'force-static';
 
@@ -22,15 +30,31 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
     });
 
     return (
-        <div className="flex-1 overflow-auto p-6">
-            <PageBody
-                context={context}
-                page={page}
-                ancestors={ancestors}
-                document={document}
-                withPageFeedback={withPageFeedback}
-            />
-        </div>
+        <EmbeddableFrame>
+            <EmbeddableFrameHeader>
+                <EmbeddableFrameHeaderMain>
+                    <Button
+                        href={context.linker.toPathInSite('~gitbook/embed/assistant')}
+                        size="medium"
+                        variant="blank"
+                        icon="arrow-left"
+                        label="Back"
+                    />
+                </EmbeddableFrameHeaderMain>
+                <EmbeddableIframeButtons />
+            </EmbeddableFrameHeader>
+            <EmbeddableFrameBody>
+                <div className="flex-1 overflow-auto p-6">
+                    <PageBody
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        document={document}
+                        withPageFeedback={withPageFeedback}
+                    />
+                </div>
+            </EmbeddableFrameBody>
+        </EmbeddableFrame>
     );
 }
 
