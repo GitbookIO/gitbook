@@ -21,18 +21,42 @@ export type GitBookToolDefinition = AIToolDefinition & {
 };
 
 /**
- * Placeholder settings.
+ * Custom button definition to be passed to the embeddable GitBook.
  */
-export type GitBookPlaceholderSettings = {
+export type GitBookEmbeddableButtonDefinition = {
     /**
-     * Welcome message to be displayed in the placeholder.
+     * Icon to be displayed in the button.
      */
-    welcomeMessage: string;
+    icon: IconName;
 
     /**
-     * Suggestions to be displayed in the placeholder.
+     * Label to be displayed in the button.
      */
+    label: string;
+
+    /**
+     * Callback when the button is clicked.
+     */
+    onClick: () => void | Promise<void>;
+};
+
+/**
+ * Overall configuration for the layout of the embeddable GitBook.
+ */
+export type GitBookEmbeddableConfiguration = {
+    /**
+     * Buttons to be displayed in the header of the embeddable GitBook.
+     */
+    buttons: GitBookEmbeddableButtonDefinition[];
+
+    /** Message to be displayed in the welcome page. */
+    welcomeMessage: string;
+
+    /** Suggestions of questions to be displayed in the welcome page. */
     suggestions: string[];
+
+    /** Tools to be provided to the assistant. */
+    tools: GitBookToolDefinition[];
 };
 
 /**
@@ -44,15 +68,11 @@ export type ParentToFrameMessage =
           message: string;
       }
     | {
-          type: 'registerTool';
-          tool: GitBookToolDefinition;
-      }
-    | {
           type: 'clearChat';
       }
     | {
-          type: 'setPlaceholder';
-          settings: GitBookPlaceholderSettings;
+          type: 'configure';
+          settings: GitBookEmbeddableConfiguration;
       }
     | {
           type: 'navigateToPage';

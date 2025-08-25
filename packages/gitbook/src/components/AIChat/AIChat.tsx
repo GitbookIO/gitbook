@@ -11,10 +11,18 @@ import {
     useAIChatController,
     useAIChatState,
 } from '../AI';
-import { EmbeddableFrame } from '../Embeddable/EmbeddableFrame';
+import {
+    EmbeddableFrame,
+    EmbeddableFrameBody,
+    EmbeddableFrameButtons,
+    EmbeddableFrameHeader,
+    EmbeddableFrameHeaderMain,
+    EmbeddableFrameSubtitle,
+    EmbeddableFrameTitle,
+} from '../Embeddable/EmbeddableFrame';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
-import { DropdownMenu, DropdownMenuItem } from '../primitives';
+import { AIChatControlButton } from './AIChatControlButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
@@ -66,45 +74,23 @@ export function AIChat(props: { trademark: boolean }) {
             data-testid="ai-chat"
             className="ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl animate-present scroll-mt-36 px-4 py-4 transition-all duration-300 sm:px-6 lg:fixed lg:w-80 lg:animate-enter-from-right lg:pr-4 lg:pl-0 xl:w-96"
         >
-            <EmbeddableFrame
-                className="relative circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle"
-                icon={<AIChatDynamicIcon trademark={trademark} />}
-                title={getAIChatName(language, trademark)}
-                subtitle={
-                    chat.loading
-                        ? chat.messages[chat.messages.length - 1].content
-                            ? tString(language, 'ai_chat_working')
-                            : tString(language, 'ai_chat_thinking')
-                        : ''
-                }
-                buttons={
-                    <>
-                        {chat.messages.length > 0 ? (
-                            <DropdownMenu
-                                button={
-                                    <Button
-                                        onClick={() => {}}
-                                        iconOnly
-                                        icon="ellipsis"
-                                        label={tString(language, 'actions')}
-                                        variant="blank"
-                                        size="default"
-                                    />
-                                }
-                            >
-                                <DropdownMenuItem
-                                    onClick={() => {
-                                        chatController.clear();
-                                    }}
-                                >
-                                    <Icon
-                                        icon="broom-wide"
-                                        className="size-3 shrink-0 text-tint-subtle"
-                                    />
-                                    {t(language, 'ai_chat_clear_conversation')}
-                                </DropdownMenuItem>
-                            </DropdownMenu>
-                        ) : null}
+            <EmbeddableFrame className="relative circular-corners:rounded-3xl rounded-corners:rounded-md depth-subtle:shadow-lg shadow-tint ring-1 ring-tint-subtle">
+                <EmbeddableFrameHeader>
+                    <AIChatDynamicIcon trademark={trademark} />
+                    <EmbeddableFrameHeaderMain>
+                        <EmbeddableFrameTitle>
+                            {getAIChatName(language, trademark)}
+                        </EmbeddableFrameTitle>
+                        <EmbeddableFrameSubtitle
+                            className={chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'}
+                        >
+                            {chat.messages[chat.messages.length - 1].content
+                                ? tString(language, 'ai_chat_working')
+                                : tString(language, 'ai_chat_thinking')}
+                        </EmbeddableFrameSubtitle>
+                    </EmbeddableFrameHeaderMain>
+                    <EmbeddableFrameButtons>
+                        <AIChatControlButton />
                         <Button
                             onClick={() => chatController.close()}
                             iconOnly
@@ -113,10 +99,11 @@ export function AIChat(props: { trademark: boolean }) {
                             variant="blank"
                             size="default"
                         />
-                    </>
-                }
-            >
-                <AIChatBody chatController={chatController} chat={chat} trademark={trademark} />
+                    </EmbeddableFrameButtons>
+                </EmbeddableFrameHeader>
+                <EmbeddableFrameBody>
+                    <AIChatBody chatController={chatController} chat={chat} trademark={trademark} />
+                </EmbeddableFrameBody>
             </EmbeddableFrame>
         </div>
     );
