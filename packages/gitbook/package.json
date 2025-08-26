@@ -4,9 +4,9 @@
     "private": true,
     "dependencies": {
         "@gitbook/api": "catalog:",
+        "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
-        "@gitbook/browser-types": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/fonts": "workspace:*",
         "@gitbook/icons": "workspace:*",
@@ -27,6 +27,7 @@
         "@tusbar/cache-control": "^1.0.2",
         "ai": "^4.2.2",
         "assert-never": "^1.2.1",
+        "bidc": "catalog:",
         "bun-types": "^1.1.20",
         "classnames": "^2.5.1",
         "direction": "^2.0.1",
@@ -45,7 +46,7 @@
         "memoizee": "^0.4.17",
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
-        "next": "^15.5.0",
+        "next": "15.3.5",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -70,8 +71,7 @@
         "url-join": "^5.0.0",
         "usehooks-ts": "^3.1.0",
         "warn-once": "^0.1.1",
-        "zustand": "^5.0.3",
-        "bidc": "catalog:"
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
