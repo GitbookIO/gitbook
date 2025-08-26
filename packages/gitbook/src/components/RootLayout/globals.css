@@ -358,6 +358,7 @@ html.dark.code-monochrome {
 }
 
 html.font-Lato {
+    /* Lato's default ligatures impact readability, so we turn them off */
     font-variant-ligatures: no-common-ligatures;
 }
 
