@@ -26,10 +26,13 @@ export function EmbeddableIframeAPI() {
             return;
         }
 
+        console.log('[gitbook] create channel with parent window');
         const channel = createChannel();
 
         channel.receive((payload) => {
             const message = payload as ParentToFrameMessage;
+
+            console.log('[gitbook] received message', message);
 
             switch (message.type) {
                 case 'clearChat': {
@@ -57,17 +60,30 @@ export function EmbeddableIframeAPI() {
             }
         });
 
-        return channel.cleanup();
+        return () => {
+            console.log('[gitbook] cleanup');
+            channel.cleanup();
+        };
     }, [chatController]);
 
     return null;
 }
 
 /**
+ * Hook to get the configuration from the parent window.
+ */
+export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
+    // @ts-expect-error - This is a workaround to allow the function to be optional.
+    fn: (state: GitBookEmbeddableConfiguration) => T = (state) => state
+) {
+    return useStore(embeddableConfiguration, fn);
+}
+
+/**
  * Display the buttons defined by the parent window.
  */
 export function EmbeddableIframeButtons() {
-    const buttons = useStore(embeddableConfiguration, (state) => state.buttons);
+    const buttons = useEmbeddableConfiguration((state) => state.buttons);
 
     return (
         <>

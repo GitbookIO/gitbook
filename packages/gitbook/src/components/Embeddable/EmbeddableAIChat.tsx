@@ -10,7 +10,7 @@ import {
     EmbeddableFrameHeaderMain,
     EmbeddableFrameTitle,
 } from './EmbeddableFrame';
-import { EmbeddableIframeButtons } from './EmbeddableIframeAPI';
+import { EmbeddableIframeButtons, useEmbeddableConfiguration } from './EmbeddableIframeAPI';
 
 /**
  * Embeddable AI chat window in an iframe.
@@ -21,6 +21,7 @@ export function EmbeddableAIChat(props: {
     const { trademark } = props;
     const chat = useAIChatState();
     const chatController = useAIChatController();
+    const configuration = useEmbeddableConfiguration();
 
     return (
         <EmbeddableFrame>
@@ -35,7 +36,12 @@ export function EmbeddableAIChat(props: {
                 </EmbeddableFrameButtons>
             </EmbeddableFrameHeader>
             <EmbeddableFrameBody>
-                <AIChatBody trademark={trademark} chatController={chatController} chat={chat} />
+                <AIChatBody
+                    trademark={trademark}
+                    chatController={chatController}
+                    chat={chat}
+                    suggestions={configuration.suggestions}
+                />
             </EmbeddableFrameBody>
         </EmbeddableFrame>
     );

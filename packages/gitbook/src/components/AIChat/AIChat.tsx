@@ -146,8 +146,10 @@ export function AIChatBody(props: {
     chatController: AIChatController;
     chat: AIChatState;
     trademark: boolean;
+    welcomeMessage?: string;
+    suggestions?: string[];
 }) {
-    const { chatController, chat, trademark } = props;
+    const { chatController, chat, trademark, welcomeMessage, suggestions } = props;
 
     const [input, setInput] = React.useState('');
 
@@ -233,7 +235,10 @@ export function AIChatBody(props: {
                             </p>
                         </div>
                         {!chat.error ? (
-                            <AIChatSuggestedQuestions chatController={chatController} />
+                            <AIChatSuggestedQuestions
+                                chatController={chatController}
+                                suggestions={suggestions}
+                            />
                         ) : null}
                     </div>
                 ) : (

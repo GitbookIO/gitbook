@@ -47,6 +47,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     const channel = createChannel(iframe.contentWindow);
 
     channel.receive((message: FrameToParentMessage) => {
+        console.log('[gitbook:embed] received message', message);
         if (message.type === 'close') {
             const listeners = events.get('close') || [];
             if (listeners) {
@@ -56,6 +57,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     });
 
     const sendToFrame = (message: ParentToFrameMessage) => {
+        console.log('[gitbook:embed] send message', message);
         channel.send(message);
     };
 
