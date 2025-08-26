@@ -46,7 +46,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         }, [isOpen, value]);
 
         return (
-            <div className="relative flex size-9 grow">
+            <div className={tcls('relative flex size-9 grow', className)}>
                 {/* biome-ignore lint/a11y/useKeyWithClickEvents: this div needs an onClick to show the input on mobile, where it's normally hidden.
                 Normally you'd also need to add a keyboard trigger to do the same without a pointer, but in this case the input already be focused on its own. */}
                 <div
@@ -62,8 +62,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         'theme-bold:border-header-link/3 has-[input:focus-visible]:theme-bold:border-header-link/5 has-[input:focus-visible]:theme-bold:bg-header-link/3 has-[input:focus-visible]:theme-bold:ring-header-link/5',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
                         'relative z-30 shrink grow justify-start max-md:absolute max-md:right-0',
-                        isOpen ? 'max-md:w-56' : 'max-md:w-[38px]',
-                        className
+                        isOpen ? 'max-md:w-56' : 'max-md:w-[38px]'
                     )}
                 >
                     {value && isOpen ? (
