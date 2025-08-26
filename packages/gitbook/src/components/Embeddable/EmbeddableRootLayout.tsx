@@ -38,7 +38,9 @@ export async function EmbeddableRootLayout({
                         }}
                     >
                         <div className="fixed inset-0 flex flex-col">{children}</div>
-                        <EmbeddableIframeAPI />
+                        <EmbeddableIframeAPI
+                            baseURL={context.linker.toPathInSpace('~gitbook/embed/')}
+                        />
                     </AIChatProvider>
                 </AIContextProvider>
             </SiteLayoutClientContexts>

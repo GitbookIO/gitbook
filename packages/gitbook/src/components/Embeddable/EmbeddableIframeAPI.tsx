@@ -5,6 +5,7 @@ import { createChannel } from 'bidc';
 import React from 'react';
 
 import { useAIChatController } from '@/components/AI';
+import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { Button } from '../primitives';
 
@@ -18,7 +19,12 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
 /**
  * Expose the API to communicate with the parent window.
  */
-export function EmbeddableIframeAPI() {
+export function EmbeddableIframeAPI(props: {
+    baseURL: string;
+}) {
+    const { baseURL } = props;
+
+    const router = useRouter();
     const chatController = useAIChatController();
 
     React.useEffect(() => {
@@ -50,11 +56,11 @@ export function EmbeddableIframeAPI() {
                     break;
                 }
                 case 'navigateToPage': {
-                    throw new Error('Not implemented');
+                    router.push(`${baseURL}/page/${message.pagePath}`);
                     break;
                 }
                 case 'navigateToAssistant': {
-                    throw new Error('Not implemented');
+                    router.push(`${baseURL}/assistant`);
                     break;
                 }
             }
