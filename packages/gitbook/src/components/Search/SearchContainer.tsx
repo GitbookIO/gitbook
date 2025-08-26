@@ -23,13 +23,14 @@ interface SearchContainerProps {
     isMultiVariants: boolean;
     style: CustomizationSearchStyle;
     className?: string;
+    viewport?: 'desktop' | 'mobile';
 }
 
 /**
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { siteSpaceId, spaceTitle, isMultiVariants, style, className } = props;
+    const { siteSpaceId, spaceTitle, isMultiVariants, style, className, viewport } = props;
 
     const { assistants } = useAI();
 
@@ -158,6 +159,8 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const showAsk = withSearchAI && normalizedAsk; // withSearchAI && normalizedAsk;
 
+    const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
+
     return (
         <SearchAskProvider value={searchAsk}>
             <Popover
@@ -181,7 +184,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     ) : null
                 }
                 rootProps={{
-                    open: state?.open ?? false,
+                    open: visible && (state?.open ?? false),
                     onOpenChange: (open) => {
                         open ? onOpen() : onClose();
                     },

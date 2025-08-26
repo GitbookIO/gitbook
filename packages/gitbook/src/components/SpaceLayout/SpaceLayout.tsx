@@ -4,7 +4,7 @@ import {
     CustomizationHeaderPreset,
     CustomizationSearchStyle,
 } from '@gitbook/api';
-import React from 'react';
+import type React from 'react';
 
 import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
@@ -52,23 +52,6 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const search = (
-        <div className="flex grow items-center gap-2">
-            <React.Suspense fallback={null}>
-                <SearchContainer
-                    style={
-                        customization.header.preset === CustomizationHeaderPreset.None
-                            ? CustomizationSearchStyle.Subtle
-                            : customization.styling.search
-                    }
-                    isMultiVariants={siteSpaces.length > 1}
-                    spaceTitle={siteSpace.title}
-                    siteSpaceId={siteSpace.id}
-                />
-            </React.Suspense>
-        </div>
-    );
-
     const eventUrl = new URL(
         context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
     );
@@ -94,7 +77,7 @@ export function SpaceLayout(props: {
                     visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
-                    <Header withTopHeader={withTopHeader} context={context} search={search} />
+                    <Header withTopHeader={withTopHeader} context={context} />
                     {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                         <AIChat trademark={customization.trademark.enabled} />
                     ) : null}
@@ -121,7 +104,7 @@ export function SpaceLayout(props: {
                                                 className={tcls(
                                                     'hidden',
                                                     'pr-4',
-                                                    'md:flex',
+                                                    'lg:flex',
                                                     'grow-0',
                                                     'flex-wrap',
                                                     'dark:shadow-light/1',
@@ -135,7 +118,16 @@ export function SpaceLayout(props: {
                                     innerHeader={
                                         // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                                         <>
-                                            {!withTopHeader && search}
+                                            {!withTopHeader && (
+                                                <SearchContainer
+                                                    style={CustomizationSearchStyle.Subtle}
+                                                    isMultiVariants={siteSpaces.length > 1}
+                                                    spaceTitle={siteSpace.title}
+                                                    siteSpaceId={siteSpace.id}
+                                                    className="max-lg:hidden"
+                                                    viewport="desktop"
+                                                />
+                                            )}
                                             {!withTopHeader && withSections && sections && (
                                                 <SiteSectionList
                                                     className={tcls('hidden', 'lg:block')}
