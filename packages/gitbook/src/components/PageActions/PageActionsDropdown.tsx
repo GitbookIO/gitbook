@@ -14,7 +14,7 @@ import { tString, useLanguage } from '@/intl/client';
 import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
-import { type Assistant, useAI } from '../AI';
+import { useAI } from '../AI';
 
 interface PageActionsDropdownProps {
     markdownPageUrl: string;
@@ -32,18 +32,17 @@ interface PageActionsDropdownProps {
  */
 export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
+    const assistants = useAI().assistants.filter(
+        (assistant) => assistant.ui === true && assistant.pageAction
+    );
     const language = useLanguage();
-
-    const assistants = useAI().assistants.filter((assistant) => assistant.ui === true);
 
     const defaultActions = [assistants.length > 0, props.actions.markdown, props.editOnGit];
     const dropdownActions = [props.actions.externalAI, props.pdfUrl];
 
     return [...defaultActions, ...dropdownActions].some(Boolean) ? (
         <ButtonGroup ref={ref} className={props.className}>
-            {defaultActions.some(Boolean) ? (
-                <DefaultAction {...props} assistants={assistants} />
-            ) : null}
+            {defaultActions.some(Boolean) ? <DefaultAction {...props} /> : null}
             {dropdownActions.some(Boolean) ? (
                 <DropdownMenu
                     align="end"
@@ -67,7 +66,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
                         />
                     }
                 >
-                    <PageActionsDropdownMenuContent {...props} assistants={assistants} />
+                    <PageActionsDropdownMenuContent {...props} />
                 </DropdownMenu>
             ) : null}
         </ButtonGroup>
@@ -77,10 +76,11 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
 /**
  * The content of the dropdown menu.
  */
-function PageActionsDropdownMenuContent(
-    props: PageActionsDropdownProps & { assistants: Assistant[] }
-) {
-    const { markdownPageUrl, actions, assistants } = props;
+function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
+    const { markdownPageUrl, actions } = props;
+    const assistants = useAI().assistants.filter(
+        (assistant) => assistant.ui === true && assistant.pageAction
+    );
 
     return (
         <>
@@ -134,8 +134,11 @@ function PageActionsDropdownMenuContent(
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function DefaultAction(props: PageActionsDropdownProps & { assistants: Assistant[] }) {
-    const { markdownPageUrl, actions, assistants } = props;
+function DefaultAction(props: PageActionsDropdownProps) {
+    const { markdownPageUrl, actions } = props;
+    const assistants = useAI().assistants.filter(
+        (assistant) => assistant.ui === true && assistant.pageAction
+    );
 
     if (assistants.length) {
         return <OpenAIAssistant assistant={assistants[0]} type="button" />;

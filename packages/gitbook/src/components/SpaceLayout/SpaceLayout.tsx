@@ -13,7 +13,7 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
+import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChat } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
@@ -69,6 +69,12 @@ export function SpaceLayout(props: {
         </div>
     );
 
+    const eventUrl = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
+    );
+    eventUrl.searchParams.set('o', context.organizationId);
+    eventUrl.searchParams.set('s', context.site.id);
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
             <CurrentContentProvider
@@ -84,7 +90,7 @@ export function SpaceLayout(props: {
                 <InsightsProvider
                     enabled={withTracking}
                     appURL={GITBOOK_APP_URL}
-                    apiHost={GITBOOK_API_PUBLIC_URL}
+                    eventUrl={eventUrl.toString()}
                     visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
