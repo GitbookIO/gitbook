@@ -62,6 +62,12 @@ let widgetIframe: HTMLIFrameElement | undefined;
 let _client: GitBookClient | undefined;
 let _frame: GitBookFrameClient | undefined;
 let frameOptions: GetFrameURLOptions | undefined;
+let frameConfiguration: GitBookEmbeddableConfiguration = {
+    buttons: [],
+    welcomeMessage: '',
+    suggestions: [],
+    tools: [],
+};
 
 function getClient() {
     if (!_client) {
@@ -130,7 +136,25 @@ const GitBook = (...args: StandaloneCalls) => {
             getIframe().frame.postUserMessage(args[1]);
             break;
         case 'configure':
-            getIframe().frame.configure(args[1]);
+            frameConfiguration = {
+                ...frameConfiguration,
+                ...args[1],
+            };
+            getIframe().frame.configure({
+                ...frameConfiguration,
+                buttons: [
+                    ...frameConfiguration.buttons,
+
+                    // Always include a close button
+                    {
+                        icon: 'close',
+                        label: 'Close',
+                        onClick: () => {
+                            GitBook('close');
+                        },
+                    },
+                ],
+            });
             break;
         case 'clearChat':
             getIframe().frame.clearChat();
@@ -150,3 +174,5 @@ const precalls = (window.GitBook as GitBookStandalone | undefined)?.q ?? [];
 // @ts-expect-error - GitBook is not defined in the global scope
 window.GitBook = GitBook;
 precalls.forEach((call) => GitBook(...call));
+
+GitBook('configure', {});
