@@ -88,6 +88,19 @@ export function SearchContainer(props: SearchContainerProps) {
         }
     );
 
+    useHotkeys(
+        'mod+i',
+        (e) => {
+            e.preventDefault();
+            if (assistants) {
+                assistants[0]?.open();
+            }
+        },
+        {
+            enableOnFormTags: true,
+        }
+    );
+
     const onOpen = React.useCallback(() => {
         if (state?.open) {
             return;
@@ -211,10 +224,11 @@ export function SearchContainer(props: SearchContainerProps) {
             </Popover>
             {assistants
                 .filter((assistant) => assistant.ui === true)
-                .map((assistant) => (
+                .map((assistant, index) => (
                     <AIChatButton
                         key={assistant.id}
                         assistant={assistant}
+                        withShortcut={index === 0}
                         showLabel={
                             assistants.filter((assistant) => assistant.ui === true).length === 1 &&
                             style === CustomizationSearchStyle.Prominent
