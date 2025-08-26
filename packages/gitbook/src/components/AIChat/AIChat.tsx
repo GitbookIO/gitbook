@@ -47,17 +47,6 @@ export function AIChat(props: { trademark: boolean }) {
     }, [chat.opened]);
 
     useHotkeys(
-        'mod+i',
-        (e) => {
-            e.preventDefault();
-            chatController.open();
-        },
-        {
-            enableOnFormTags: true,
-        }
-    );
-
-    useHotkeys(
         'esc',
         () => {
             chatController.close();
