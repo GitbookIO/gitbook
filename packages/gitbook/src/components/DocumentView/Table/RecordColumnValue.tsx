@@ -19,7 +19,7 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
 import type { TableRecordKV } from './Table';
-import { type VerticalAlignment, getColumnAlignment, isContentRef } from './utils';
+import { type VerticalAlignment, getColumnAlignment } from './utils';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
     'text-left': '**:text-left text-left',
@@ -220,7 +220,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'content-ref': {
-            const contentRef = isContentRef(value) ? value : null;
+            const contentRef = value ? (value as ContentRef) : null;
             const resolved =
                 contentRef && context.contentContext
                     ? await resolveContentRef(contentRef, context.contentContext, {
@@ -328,12 +328,13 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'image': {
-            if (!isContentRef(value)) {
+            const contentRef = value ? (value as ContentRef) : null;
+            if (!contentRef) {
                 return null;
             }
 
             const image = context.contentContext
-                ? await resolveContentRef(value, context.contentContext)
+                ? await resolveContentRef(contentRef, context.contentContext)
                 : null;
 
             if (!image) {

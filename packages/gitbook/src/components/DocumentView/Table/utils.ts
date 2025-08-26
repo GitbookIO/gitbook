@@ -123,7 +123,3 @@ export function getColumnVerticalAlignment(column: DocumentTableDefinition): Ver
 
     return 'self-center';
 }
-
-export function isContentRef(ref: DocumentTableRecord['values'][string]): ref is ContentRef {
-    return Boolean(ref && typeof ref === 'object' && 'kind' in ref);
-}
