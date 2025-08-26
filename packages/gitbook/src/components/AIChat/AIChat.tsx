@@ -81,13 +81,7 @@ export function AIChat(props: { trademark: boolean }) {
                         <EmbeddableFrameTitle>
                             {getAIChatName(language, trademark)}
                         </EmbeddableFrameTitle>
-                        <EmbeddableFrameSubtitle
-                            className={chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'}
-                        >
-                            {chat.messages[chat.messages.length - 1].content
-                                ? tString(language, 'ai_chat_working')
-                                : tString(language, 'ai_chat_thinking')}
-                        </EmbeddableFrameSubtitle>
+                        <AIChatSubtitle chat={chat} />
                     </EmbeddableFrameHeaderMain>
                     <EmbeddableFrameButtons>
                         <AIChatControlButton />
@@ -126,7 +120,7 @@ export function AIChatDynamicIcon(props: {
                 chat.error
                     ? 'error'
                     : chat.loading
-                      ? chat.messages[chat.messages.length - 1].content
+                      ? chat.messages[chat.messages.length - 1]?.content
                           ? 'working'
                           : 'thinking'
                       : chat.messages.length > 0
@@ -140,6 +134,24 @@ export function AIChatDynamicIcon(props: {
 }
 
 /**
+ * Subtitle of the AI chat window.
+ */
+export function AIChatSubtitle(props: {
+    chat: AIChatState;
+}) {
+    const { chat } = props;
+    const language = useLanguage();
+
+    return (
+        <EmbeddableFrameSubtitle className={chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'}>
+            {chat.messages[chat.messages.length - 1]?.content
+                ? tString(language, 'ai_chat_working')
+                : tString(language, 'ai_chat_thinking')}
+        </EmbeddableFrameSubtitle>
+    );
+}
+
+/**
  * Body of the AI chat window.
  */
 export function AIChatBody(props: {
@@ -149,7 +161,7 @@ export function AIChatBody(props: {
     welcomeMessage?: string;
     suggestions?: string[];
 }) {
-    const { chatController, chat, trademark, welcomeMessage, suggestions } = props;
+    const { chatController, chat, trademark, suggestions } = props;
 
     const [input, setInput] = React.useState('');
 
