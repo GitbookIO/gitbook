@@ -125,7 +125,7 @@ export function SpaceLayout(props: {
                                                     spaceTitle={siteSpace.title}
                                                     siteSpaceId={siteSpace.id}
                                                     className="max-lg:hidden"
-                                                    visibility="desktop"
+                                                    viewport="desktop"
                                                 />
                                             )}
                                             {!withTopHeader && withSections && sections && (

@@ -122,7 +122,7 @@ export function Header(props: {
                                     isMultiVariants={siteSpaces.length > 1}
                                     spaceTitle={siteSpace.title}
                                     siteSpaceId={siteSpace.id}
-                                    visibility={!withTopHeader ? 'mobile' : undefined}
+                                    viewport={!withTopHeader ? 'mobile' : undefined}
                                 />
                             </div>
 
