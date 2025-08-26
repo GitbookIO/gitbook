@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.1
+
+### Patch Changes
+
+- 42c17f5: Improve OpenAPI parsing errors
+
 ## 3.0.0
 
 ### Major Changes
