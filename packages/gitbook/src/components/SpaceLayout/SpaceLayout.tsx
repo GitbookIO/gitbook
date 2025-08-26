@@ -124,7 +124,7 @@ export function SpaceLayout(props: {
                                                     isMultiVariants={siteSpaces.length > 1}
                                                     spaceTitle={siteSpace.title}
                                                     siteSpaceId={siteSpace.id}
-                                                    className="my-4 max-lg:hidden"
+                                                    className="max-lg:hidden"
                                                     visibility="desktop"
                                                 />
                                             )}
