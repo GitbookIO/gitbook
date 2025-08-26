@@ -1,5 +1,5 @@
 import { tcls } from '@/lib/tailwind';
-import type { VerticalAlignment, DocumentBlockColumns, Length } from '@gitbook/api';
+import type { DocumentBlockColumns, Length, VerticalAlignment } from '@gitbook/api';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 
@@ -10,7 +10,11 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
             {block.nodes.map((columnBlock) => {
                 console.log('Rendering column with width:', columnBlock);
                 return (
-                    <Column key={columnBlock.key} width={columnBlock.data.width} verticalAlignment={columnBlock.data.verticalAlignment}>
+                    <Column
+                        key={columnBlock.key}
+                        width={columnBlock.data.width}
+                        verticalAlignment={columnBlock.data.verticalAlignment}
+                    >
                         <Blocks
                             key={columnBlock.key}
                             nodes={columnBlock.nodes}
@@ -34,10 +38,17 @@ export function Column(props: {
     const { width, verticalAlignment } = props;
     const { className, style } = transformLengthToCSS(width);
     return (
-        <div className={tcls('flex flex-col', 
-                    (verticalAlignment === VerticalAlignment.Top || !verticalAlignment) && 'justify-start',
-                    verticalAlignment === VerticalAlignment.Middle && 'justify-center',
-                   verticalAlignment === VerticalAlignment.Bottom && 'justify-end', className)} style={style}>
+        <div
+            className={tcls(
+                'flex flex-col',
+                (verticalAlignment === VerticalAlignment.Top || !verticalAlignment) &&
+                    'justify-start',
+                verticalAlignment === VerticalAlignment.Middle && 'justify-center',
+                verticalAlignment === VerticalAlignment.Bottom && 'justify-end',
+                className
+            )}
+            style={style}
+        >
             {props.children}
         </div>
     );
