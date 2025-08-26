@@ -140,7 +140,13 @@ export async function CustomizationRootLayout(props: {
                                     customization.styling.primaryColor.light
                             )
                         };
-                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
+                        --header-link: ${hexToRgb(
+                            // @ts-expect-error
+                            customization.header.linkColor?.light ??
+                                colorContrast(
+                                    tintColor?.light ?? customization.styling.primaryColor.light
+                                )
+                        )};
 
                         ${generateColorVariable('info', infoColor.light)}
                         ${generateColorVariable('warning', warningColor.light)}
@@ -154,7 +160,13 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
-                        --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
+                        --header-link: ${hexToRgb(
+                            // @ts-expect-error
+                            customization.header.linkColor?.dark ??
+                                colorContrast(
+                                    tintColor?.dark ?? customization.styling.primaryColor.dark
+                                )
+                        )};
 
                         ${generateColorVariable('info', infoColor.dark, { darkMode: true })}
                         ${generateColorVariable('warning', warningColor.dark, { darkMode: true })}
@@ -325,6 +337,7 @@ function generateColorVariable(
     return Object.entries(shades)
         .map(([key, value]) => {
             const rgbValue = hexToRgb(value); // Check the original hex value
+            // @ts-expect-error
             const contrastValue = withContrast ? hexToRgb(colorContrast(value)) : undefined; // Add contrast if needed
             return `--${name}-${key}: ${rgbValue}; ${
                 contrastValue ? `--contrast-${name}-${key}: ${contrastValue};` : ''

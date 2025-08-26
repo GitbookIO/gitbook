@@ -195,7 +195,7 @@ export async function fetchSiteContextByURLLookup(
     baseContext: GitBookBaseContext,
     data: SiteURLData
 ): Promise<GitBookSiteContext> {
-    return await fetchSiteContextByIds(baseContext, {
+    return fetchSiteContextByIds(baseContext, {
         organization: data.organization,
         site: data.site,
         siteSection: data.siteSection,

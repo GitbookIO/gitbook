@@ -21,7 +21,7 @@ export function isBlockOffscreen(
 
     const allAncestors = [document, ...ancestorBlocks];
     for (let index = allAncestors.length - 1; index >= 0; index--) {
-        const parent = allAncestors[index];
+        const parent = allAncestors[index]!;
         const offset = getBlockOffset({ block: current, parent });
 
         if (offset > screenHeight) {
