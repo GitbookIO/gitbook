@@ -18,6 +18,7 @@
             "**/.vercel/**/*",
             "**/.cache/**/*",
             "**/.wrangler/**/*",
+            "packages/embed/standalone/**/*",
             "packages/openapi-parser/src/fixtures/**/*",
             "packages/emoji-codepoints/index.ts",
             "packages/icons/src/data/*.json",
