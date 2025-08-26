@@ -15,14 +15,16 @@ export function HighlightQuery(props: {
         query,
         text,
         highlight = [
+            '-z-1',
+            'relative',
             'text-bold',
             'bg-primary',
             'text-contrast-primary',
             'px-0.5',
             '-mx-0.5',
             'py-0.5',
-            'rounded',
-            'straight-corners:rounded-sm',
+            'rounded-sm',
+            'straight-corners:rounded-xs',
             'transition-colors',
             'group-hover:bg-primary-active',
             'group-hover:text-contrast-primary-active',
@@ -33,7 +35,7 @@ export function HighlightQuery(props: {
     const matches = matchString(text, query);
 
     return (
-        <span className={tcls('whitespace-break-spaces')}>
+        <span className={tcls('relative z-2 whitespace-break-spaces')}>
             {matches.map((entry, index) => (
                 <span key={index} className={tcls(entry.match ? highlight : null)}>
                     {entry.text}

@@ -9,7 +9,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "2.2.1",
+    "version": "3.0.0",
     "sideEffects": false,
     "dependencies": {
         "@scalar/openapi-parser": "^0.18.0",

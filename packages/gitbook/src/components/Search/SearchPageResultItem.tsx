@@ -30,6 +30,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
             ref={ref}
             href={item.href}
             active={active}
+            data-testid="search-page-result"
             action={tString(language, 'view')}
             leadingIcon={<Icon icon="memo" className="size-4" />}
             insights={{

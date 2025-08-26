@@ -16,13 +16,13 @@
             "default": "./src/style.css"
         }
     },
-    "version": "0.2.1",
+    "version": "0.2.2",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.6.0",
         "@fortawesome/fontawesome-free": "^6.6.0"
     },
     "optionalDependencies": {
-        "@gitbook/fontawesome-pro": "1.0.8"
+        "@gitbook/fontawesome-pro": "1.0.11"
     },
     "devDependencies": {
         "typescript": "^5.5.3"

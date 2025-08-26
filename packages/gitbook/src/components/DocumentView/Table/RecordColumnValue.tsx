@@ -23,9 +23,9 @@ import type { TableRecordKV } from './Table';
 import { type VerticalAlignment, getColumnAlignment } from './utils';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
-    'text-left': '[&_*]:text-left text-left',
-    'text-center': '[&_*]:text-center text-center',
-    'text-right': '[&_*]:text-right text-right',
+    'text-left': '**:text-left text-left',
+    'text-center': '**:text-center text-center',
+    'text-right': '**:text-right text-right',
 };
 
 /**
@@ -174,7 +174,6 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             <StyledLink
                                 key={index}
                                 href={ref.href}
-                                target="_blank"
                                 className="flex flex-row items-center gap-2"
                                 insights={
                                     ref.file
@@ -193,7 +192,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             >
                                 {contentType === 'image' ? (
                                     <Image
-                                        style={['max-h-[1lh]', 'h-[1lh]']}
+                                        style={['max-h-lh', 'h-lh']}
                                         alt={ref.text}
                                         sizes={[{ width: 24 }]}
                                         resize={context.contentContext?.imageResizer}
@@ -314,7 +313,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     className={tcls(
                                         'text-sm',
                                         'whitespace-pre',
-                                        'rounded',
+                                        'rounded-sm',
                                         'py-1',
                                         'px-2',
                                         'bg-primary',
@@ -326,6 +325,50 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                             );
                         })}
                     </span>
+                </Tag>
+            );
+        }
+        case 'image': {
+            const image = context.contentContext
+                ? await resolveContentRef(value as ContentRef, context.contentContext)
+                : null;
+
+            if (!image) {
+                return null;
+            }
+
+            return (
+                <Tag className={tcls('text-base')} aria-labelledby={ariaLabelledBy}>
+                    <StyledLink
+                        href={image.href}
+                        className="flex flex-row items-center gap-2"
+                        insights={
+                            image.file
+                                ? {
+                                      type: 'link_click',
+                                      link: {
+                                          target: value as ContentRef,
+                                          position: SiteInsightsLinkPosition.Content,
+                                      },
+                                  }
+                                : undefined
+                        }
+                    >
+                        <Image
+                            style={['max-h-lh', 'h-lh']}
+                            alt={image.text}
+                            sizes={[{ width: 24 }]}
+                            resize={context.contentContext?.imageResizer}
+                            sources={{
+                                light: {
+                                    src: image.href,
+                                    size: image.file?.dimensions,
+                                },
+                            }}
+                            priority="lazy"
+                        />
+                        {image.text}
+                    </StyledLink>
                 </Tag>
             );
         }

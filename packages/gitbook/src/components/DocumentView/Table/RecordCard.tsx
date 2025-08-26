@@ -1,18 +1,16 @@
+import { LinkBox, LinkOverlay } from '@/components/primitives';
+import { Image } from '@/components/utils';
+import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import { tcls } from '@/lib/tailwind';
 import {
     type ContentRef,
     type DocumentTableViewCards,
     SiteInsightsLinkPosition,
 } from '@gitbook/api';
-
-import { LinkBox, LinkOverlay } from '@/components/primitives';
-import { Image } from '@/components/utils';
-import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
-
 import { RecordColumnValue } from './RecordColumnValue';
 import type { TableRecordKV, TableViewProps } from './Table';
 import { RecordCardStyles } from './styles';
-import { getRecordValue } from './utils';
+import { getRecordCardCovers } from './utils';
 
 export async function RecordCard(
     props: TableViewProps<DocumentTableViewCards> & {
@@ -21,25 +19,21 @@ export async function RecordCard(
 ) {
     const { view, record, context, block, isOffscreen } = props;
 
-    const coverFile = view.coverDefinition
-        ? getRecordValue<string[]>(record[1], view.coverDefinition)?.[0]
-        : null;
+    const { dark, light } = getRecordCardCovers(record[1], view);
     const targetRef = view.targetDefinition
         ? (record[1].values[view.targetDefinition] as ContentRef)
         : null;
 
-    const [cover, target] = await Promise.all([
-        coverFile && context.contentContext
-            ? resolveContentRef({ kind: 'file', file: coverFile }, context.contentContext)
-            : null,
+    const [lightCover, darkCover, target] = await Promise.all([
+        light && context.contentContext ? resolveContentRef(light, context.contentContext) : null,
+        dark && context.contentContext ? resolveContentRef(dark, context.contentContext) : null,
         targetRef && context.contentContext
             ? resolveContentRef(targetRef, context.contentContext)
             : null,
     ]);
 
-    const coverIsSquareOrPortrait =
-        cover?.file?.dimensions &&
-        cover.file?.dimensions?.width / cover.file?.dimensions?.height <= 1;
+    const darkCoverIsSquareOrPortrait = isSquareOrPortrait(darkCover);
+    const lightCoverIsSquareOrPortrait = isSquareOrPortrait(lightCover);
 
     const body = (
         <div
@@ -50,8 +44,8 @@ export async function RecordCard(
                 'bg-tint-base',
                 'w-[calc(100%+2px)]',
                 'h-[calc(100%+2px)]',
-                'inset-[-1px]',
-                'rounded',
+                '-inset-px',
+                'rounded-sm',
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-xl',
                 'overflow-hidden',
@@ -63,23 +57,32 @@ export async function RecordCard(
                 // On mobile, check if we can display the cover responsively or not:
                 // - If the file has a landscape aspect ratio, we display it normally
                 // - If the file is square or portrait, we display it left with 40% of the card width
-                coverIsSquareOrPortrait
+                lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                     ? [
-                          'grid-cols-[40%,_1fr]',
-                          'min-[432px]:grid-cols-none',
-                          'min-[432px]:grid-rows-[auto,1fr]',
-                      ]
-                    : 'grid-rows-[auto,1fr]'
+                          lightCoverIsSquareOrPortrait
+                              ? 'grid-cols-[40%__1fr] min-[432px]:grid-cols-none min-[432px]:grid-rows-[auto_1fr]'
+                              : '',
+                          darkCoverIsSquareOrPortrait
+                              ? 'dark:grid-cols-[40%__1fr] dark:min-[432px]:grid-cols-none dark:min-[432px]:grid-rows-[auto_1fr]'
+                              : '',
+                      ].filter(Boolean)
+                    : 'grid-rows-[auto_1fr]'
             )}
         >
-            {cover ? (
+            {lightCover ? (
                 <Image
                     alt="Cover"
                     sources={{
                         light: {
-                            src: cover.href,
-                            size: cover.file?.dimensions,
+                            src: lightCover.href,
+                            size: lightCover.file?.dimensions,
                         },
+                        dark: darkCover
+                            ? {
+                                  src: darkCover.href,
+                                  size: darkCover.file?.dimensions,
+                              }
+                            : null,
                     }}
                     sizes={[
                         {
@@ -92,8 +95,15 @@ export async function RecordCard(
                         'w-full',
                         'h-full',
                         'object-cover',
-                        coverIsSquareOrPortrait
-                            ? ['min-[432px]:h-auto', 'min-[432px]:aspect-video']
+                        lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
+                            ? [
+                                  lightCoverIsSquareOrPortrait
+                                      ? 'min-[432px]:aspect-video min-[432px]:h-auto'
+                                      : '',
+                                  darkCoverIsSquareOrPortrait
+                                      ? 'dark:min-[432px]:aspect-video dark:min-[432px]:h-auto'
+                                      : '',
+                              ].filter(Boolean)
                             : ['h-auto', 'aspect-video']
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
@@ -166,4 +176,17 @@ export async function RecordCard(
     }
 
     return <div className={tcls(RecordCardStyles)}>{body}</div>;
+}
+
+/**
+ * Check if a file is square or portrait.
+ */
+function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
+    const file = contentRef?.file;
+
+    if (!file || !file.dimensions) {
+        return false;
+    }
+
+    return file.dimensions?.width / file.dimensions?.height <= 1;
 }

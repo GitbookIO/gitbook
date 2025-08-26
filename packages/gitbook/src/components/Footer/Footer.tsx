@@ -35,16 +35,16 @@ export function Footer(props: { context: GitBookSiteContext }) {
             <div className={tcls(CONTAINER_STYLE, 'px-4', 'py-8', 'lg:py-12', 'mx-auto')}>
                 <div
                     className={tcls(
-                        'lg:!max-w-none mx-auto grid max-w-3xl site-width-wide:max-w-screen-2xl justify-between gap-12',
+                        'mx-auto grid max-w-3xl site-width-wide:max-w-screen-2xl justify-between gap-12 lg:max-w-none!',
                         'grid-cols-[auto_auto]',
-                        'lg:grid-cols-[18rem_minmax(auto,_48rem)_auto]',
-                        'xl:grid-cols-[18rem_minmax(auto,_48rem)_14rem]',
-                        'site-width-wide:lg:grid-cols-[18rem_minmax(auto,_80rem)_auto]',
-                        'site-width-wide:xl:grid-cols-[18rem_minmax(auto,_80rem)_14rem]',
-                        'page-no-toc:lg:grid-cols-[minmax(auto,_48rem)_auto]',
-                        'page-no-toc:xl:grid-cols-[14rem_minmax(auto,_48rem)_14rem]',
-                        '[body:has(.site-width-wide,.page-no-toc)_&]:lg:grid-cols-[minmax(auto,_90rem)_auto]',
-                        '[body:has(.site-width-wide,.page-no-toc)_&]:xl:grid-cols-[14rem_minmax(auto,_90rem)_14rem]'
+                        'lg:grid-cols-[18rem_minmax(auto,48rem)_auto]',
+                        'xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
+                        'lg:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_auto]',
+                        'xl:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_14rem]',
+                        'lg:page-no-toc:grid-cols-[minmax(auto,48rem)_auto]',
+                        'xl:page-no-toc:grid-cols-[14rem_minmax(auto,48rem)_14rem]',
+                        'lg:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[minmax(auto,90rem)_auto]',
+                        'xl:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[14rem_minmax(auto,90rem)_14rem]'
                     )}
                 >
                     {
@@ -73,8 +73,8 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                         'lg:max-h-12',
                                         'object-contain',
                                         'object-left',
-                                        'rounded',
-                                        'straight-corners:rounded-sm',
+                                        'rounded-sm',
+                                        'straight-corners:rounded-xs',
                                     ]}
                                     sizes={[
                                         {
@@ -102,7 +102,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         customization.footer.groups?.length > 0 ? (
                             <div
                                 className={tcls(
-                                    'col-span-2 page-has-toc:lg:col-span-1 page-has-toc:lg:col-start-2 page-no-toc:xl:col-span-1 page-no-toc:xl:col-start-2'
+                                    'col-span-2 lg:page-has-toc:col-span-1 lg:page-has-toc:col-start-2 xl:page-no-toc:col-span-1 xl:page-no-toc:col-start-2'
                                 )}
                             >
                                 <div className="mx-auto flex max-w-3xl site-width-wide:max-w-screen-2xl flex-col gap-10 sm:flex-row sm:gap-6">

@@ -14,6 +14,9 @@ const nextConfig = {
             dynamic: 3600, // 1 hour
             static: 3600, // 1 hour
         },
+
+        // Since content is fully static, we don't want to fetch on hover again
+        optimisticClientCache: false,
     },
 
     env: {

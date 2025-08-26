@@ -46,7 +46,7 @@ export function OpenAPIResponseExample(props: {
         .map(([key, responseObject]) => {
             const description = resolveDescription(responseObject);
             const label = description ? (
-                <Markdown source={description} />
+                <Markdown key={`response-description-${key}`} source={description} />
             ) : (
                 getStatusCodeDefaultLabel(key, context)
             );

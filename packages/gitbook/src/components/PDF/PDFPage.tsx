@@ -107,7 +107,7 @@ export async function PDFPage(props: {
                             'p-4',
                             'rounded-full',
                             'bg-white',
-                            'shadow-sm',
+                            'shadow-xs',
                             'hover:shadow-md',
                             'border-slate-300',
                             'border'
@@ -132,7 +132,7 @@ export async function PDFPage(props: {
                         'p-4',
                         'rounded-full',
                         'bg-white',
-                        'shadow-sm',
+                        'shadow-xs',
                         'hover:shadow-md',
                         'border-slate-300',
                         'border'
@@ -245,7 +245,7 @@ async function PDFPageDocument(props: {
                             page,
                         },
                         getId: (id) => getPagePDFContainerId(page, id),
-                        shouldRenderLinkPreviews: false, // We don't want to render link previews in the PDF.
+                        withLinkPreviews: false, // We don't want to render link previews in the PDF.
                     }}
                     // We consider all pages as offscreen in PDF mode
                     // to ensure we can efficiently render as many pages as possible
@@ -280,7 +280,7 @@ function PrintPage(
                 'print:p-0',
                 'shadow-xl',
                 'print:shadow-none',
-                'rounded-sm',
+                'rounded-xs',
                 'bg-white',
                 'min-h-[29.7cm]',
                 'print:min-h-0',

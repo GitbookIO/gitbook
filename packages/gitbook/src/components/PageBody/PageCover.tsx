@@ -43,31 +43,30 @@ export async function PageCover(props: {
 
     const getImage = async (resolved: ResolvedContentRef | null, returnNull = false) => {
         if (!resolved && returnNull) return;
-        const [attrs, size] = await Promise.all([
-            getImageAttributes({
-                sizes,
-                source: resolved
-                    ? {
-                          src: resolved.href,
-                          size: resolved.file?.dimensions ?? null,
-                      }
-                    : {
-                          src: defaultPageCover.src,
-                          size: {
-                              width: defaultPageCover.width,
-                              height: defaultPageCover.height,
-                          },
+        // If we don't have a size for the image, we want to calculate it so that we can use srcSet
+        const size =
+            resolved?.file?.dimensions ??
+            (await context.imageResizer?.getImageSize(resolved?.href || defaultPageCover.src, {}));
+        const attrs = await getImageAttributes({
+            sizes,
+            source: resolved
+                ? {
+                      src: resolved.href,
+                      size: size ?? null,
+                  }
+                : {
+                      src: defaultPageCover.src,
+                      size: {
+                          width: defaultPageCover.width,
+                          height: defaultPageCover.height,
                       },
-                quality: 100,
-                resize: context.imageResizer ?? false,
-            }),
-            context.imageResizer
-                ?.getImageSize(resolved?.href || defaultPageCover.src, {})
-                .then((size) => size ?? undefined),
-        ]);
+                  },
+            quality: 100,
+            resize: context.imageResizer ?? false,
+        });
         return {
             ...attrs,
-            size,
+            size: size ?? undefined,
         };
     };
 
@@ -77,6 +76,8 @@ export async function PageCover(props: {
 
     return (
         <div
+            id="page-cover"
+            data-full={String(as === 'full')}
             className={tcls(
                 'overflow-hidden',
                 // Negative margin to balance the container padding
@@ -89,7 +90,7 @@ export async function PageCover(props: {
                           'lg:-ml-12',
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
-                              ? 'xl:-ml-[19rem]'
+                              ? 'xl:-ml-76'
                               : null,
                       ]
                     : [

@@ -26,14 +26,15 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
     }
 
     const { reusableContent } = resolved;
-    if (!reusableContent || !reusableContent.revisionReusableContent.document) {
+    if (!reusableContent) {
         return null;
     }
 
     const document = await getDataOrNull(
-        dataFetcher.getDocument({
+        dataFetcher.getRevisionReusableContentDocument({
             spaceId: reusableContent.context.space.id,
-            documentId: reusableContent.revisionReusableContent.document,
+            revisionId: reusableContent.context.revisionId,
+            reusableContentId: reusableContent.revisionReusableContent.id,
         })
     );
 

@@ -58,12 +58,11 @@ export const Icon = React.forwardRef(function Icon(
             {...rest}
             style={{
                 maskImage: `url(${url})`,
-                //@ts-ignore // For compatibility with older browsers
-                '-webkit-mask-image': `url(${url})`,
+                WebkitMaskImage: `url(${url})`,
                 maskRepeat: 'no-repeat',
-                '-webkit-mask-repeat': 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
                 maskPosition: 'center',
-                '-webkit-mask-position': 'center',
+                WebkitMaskPosition: 'center',
                 ...(size ? { width: size, height: size } : {}),
                 ...rest.style,
             }}

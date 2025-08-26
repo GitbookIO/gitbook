@@ -36,6 +36,11 @@ class GitbookIncrementalCache implements IncrementalCache {
         const r2 = getCloudflareContext().env[BINDING_NAME];
         const localCache = await this.getCacheInstance();
         if (!r2) throw new Error('No R2 bucket');
+        if (process.env.SHOULD_BYPASS_CACHE === 'true') {
+            // We are in a local middleware environment, we should bypass the cache
+            // and go directly to the server.
+            return null;
+        }
         try {
             // Check local cache first if available
             const localCacheEntry = await localCache.match(this.getCacheUrlKey(cacheKey));
@@ -43,7 +48,13 @@ class GitbookIncrementalCache implements IncrementalCache {
                 const result = (await localCacheEntry.json()) as WithLastModified<
                     CacheValue<CacheType>
                 >;
-                return this.returnNullOn404(result);
+                return this.returnNullOn404({
+                    ...result,
+                    // Because we use tag cache and also invalidate them every time,
+                    // if we get a cache hit, we don't need to check the tag cache as we already know it's not been revalidated
+                    // this should improve performance even further, and reduce costs
+                    shouldBypassTagCache: true,
+                });
             }
 
             const r2Object = await r2.get(cacheKey);
@@ -134,19 +145,27 @@ class GitbookIncrementalCache implements IncrementalCache {
     }
 
     async writeToR2(key: string, value: string): Promise<void> {
-        const env = getCloudflareContext().env as {
-            WRITE_BUFFER: DurableObjectNamespace<
-                Rpc.DurableObjectBranded & {
-                    write: (key: string, value: string) => Promise<void>;
-                }
-            >;
-        };
-        const id = env.WRITE_BUFFER.idFromName(key);
+        try {
+            const env = getCloudflareContext().env as {
+                WRITE_BUFFER: DurableObjectNamespace<
+                    Rpc.DurableObjectBranded & {
+                        write: (key: string, value: string) => Promise<void>;
+                    }
+                >;
+            };
+            const id = env.WRITE_BUFFER.idFromName(key);
 
-        // A stub is a client used to invoke methods on the Durable Object
-        const stub = env.WRITE_BUFFER.get(id);
+            // A stub is a client used to invoke methods on the Durable Object
+            const stub = env.WRITE_BUFFER.get(id);
 
-        await stub.write(key, value);
+            await stub.write(key, value);
+        } catch {
+            // We fallback to writing directly to R2
+            // it can fail locally because the limit is 1Mb per args
+            // It is 32Mb in production, so we should be fine
+            const r2 = getCloudflareContext().env[BINDING_NAME];
+            r2?.put(key, value);
+        }
     }
 
     async getCacheInstance(): Promise<Cache> {

@@ -92,6 +92,13 @@ export function createDataFetcher(
                 pageId: params.pageId,
             });
         },
+        getRevisionReusableContentDocument(params) {
+            return getRevisionReusableContentDocument(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                reusableContentId: params.reusableContentId,
+            });
+        },
         getLatestOpenAPISpecVersionContent(params) {
             return getLatestOpenAPISpecVersionContent(input, {
                 organizationId: params.organizationId,
@@ -336,6 +343,39 @@ const getRevisionPageDocument = cache(
                         params.spaceId,
                         params.revisionId,
                         params.pageId,
+                        {
+                            evaluated: true,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLifeFromResponse(res, 'max');
+
+                    return res.data;
+                }
+            );
+        });
+    }
+);
+
+const getRevisionReusableContentDocument = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; reusableContentId: string }
+    ) => {
+        'use cache';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `getRevisionReusableContentDocument(${params.spaceId}, ${params.revisionId}, ${params.reusableContentId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getReusableContentDocumentInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.reusableContentId,
                         {
                             evaluated: true,
                         },

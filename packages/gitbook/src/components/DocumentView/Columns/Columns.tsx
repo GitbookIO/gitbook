@@ -51,7 +51,7 @@ function transformLengthToCSS(length: Length | undefined) {
     if (length.unit === '%') {
         return {
             className: [
-                'md:flex-shrink-0',
+                'md:shrink-0',
                 COLUMN_WIDTHS[Math.round(length.value * 0.01 * (COLUMN_WIDTHS.length - 1))],
             ],
         };

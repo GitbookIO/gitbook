@@ -1,6 +1,7 @@
 'use server';
 import type { GitBookBaseContext } from '@/lib/context';
 import { fetchServerActionSiteContext } from '@/lib/server-actions';
+import { traceErrorOnly } from '@/lib/tracing';
 import {
     type AIMessage,
     AIMessageRole,
@@ -19,97 +20,100 @@ export async function streamRenderAIMessage(
     rawStream: AsyncIterable<AIStreamResponse>,
     options?: RenderAIMessageOptions
 ) {
-    const message: AIMessage = {
-        id: '',
-        role: AIMessageRole.Assistant,
-        steps: [],
-    };
-
-    const updateProcessingMessageStep = (
-        stepIndex: number,
-        callback: (step: AIMessageStep) => void
-    ) => {
-        if (stepIndex > message.steps.length) {
-            throw new Error(
-                `Step index out of bounds ${stepIndex} (${message.steps.length} steps)`
-            );
-        }
-
-        if (message.steps[stepIndex]) {
-            message.steps = [...message.steps];
-            message.steps[stepIndex] = { ...message.steps[stepIndex] };
-            callback(message.steps[stepIndex]);
-        } else {
-            message.steps = [
-                ...message.steps,
-                {
-                    content: {
-                        object: 'document',
-                        data: {},
-                        nodes: [],
-                    },
-                },
-            ];
-            callback(message.steps[stepIndex]);
-        }
-    };
-
-    // Fetch the full-context in the background to avoid blocking the stream.
-    const promiseContext = fetchServerActionSiteContext(baseContext);
-
-    return parseResponse<{
-        content: React.ReactNode;
-        event: AIStreamResponse;
-    }>(rawStream, async (event) => {
-        switch (event.type) {
-            /**
-             * The agent is processing a tool call in a new message.
-             */
-            case 'response_tool_call': {
-                updateProcessingMessageStep(event.stepIndex, (step) => {
-                    step.toolCalls ??= [];
-                    step.toolCalls.push(event.toolCall);
-                });
-                break;
-            }
-
-            /**
-             * The agent is writing the content of a new message.
-             */
-            case 'response_reasoning':
-            case 'response_document': {
-                updateProcessingMessageStep(event.stepIndex, (step) => {
-                    const container = event.type === 'response_reasoning' ? 'reasoning' : 'content';
-
-                    step[container] ??= {
-                        object: 'document',
-                        data: {},
-                        nodes: [],
-                    };
-                    step[container] = {
-                        ...step[container],
-                        nodes: [...step[container].nodes],
-                    };
-                    if (event.operation === 'insert') {
-                        step[container].nodes.push(...event.blocks);
-                    } else {
-                        step[container].nodes.splice(
-                            -event.blocks.length,
-                            event.blocks.length,
-                            ...event.blocks
-                        );
-                    }
-                });
-                break;
-            }
-        }
-
-        return {
-            event,
-            content: (
-                <AIMessageView message={message} context={await promiseContext} {...options} />
-            ),
+    return traceErrorOnly('AI.streamRenderAIMessage', async () => {
+        const message: AIMessage = {
+            id: '',
+            role: AIMessageRole.Assistant,
+            steps: [],
         };
+
+        const updateProcessingMessageStep = (
+            stepIndex: number,
+            callback: (step: AIMessageStep) => void
+        ) => {
+            if (stepIndex > message.steps.length) {
+                throw new Error(
+                    `Step index out of bounds ${stepIndex} (${message.steps.length} steps)`
+                );
+            }
+
+            if (message.steps[stepIndex]) {
+                message.steps = [...message.steps];
+                message.steps[stepIndex] = { ...message.steps[stepIndex] };
+                callback(message.steps[stepIndex]);
+            } else {
+                message.steps = [
+                    ...message.steps,
+                    {
+                        content: {
+                            object: 'document',
+                            data: {},
+                            nodes: [],
+                        },
+                    },
+                ];
+                callback(message.steps[stepIndex]);
+            }
+        };
+
+        // Fetch the full-context in the background to avoid blocking the stream.
+        const promiseContext = fetchServerActionSiteContext(baseContext);
+
+        return parseResponse<{
+            content: React.ReactNode;
+            event: AIStreamResponse;
+        }>(rawStream, async (event) => {
+            switch (event.type) {
+                /**
+                 * The agent is processing a tool call in a new message.
+                 */
+                case 'response_tool_call': {
+                    updateProcessingMessageStep(event.stepIndex, (step) => {
+                        step.toolCalls ??= [];
+                        step.toolCalls.push(event.toolCall);
+                    });
+                    break;
+                }
+
+                /**
+                 * The agent is writing the content of a new message.
+                 */
+                case 'response_reasoning':
+                case 'response_document': {
+                    updateProcessingMessageStep(event.stepIndex, (step) => {
+                        const container =
+                            event.type === 'response_reasoning' ? 'reasoning' : 'content';
+
+                        step[container] ??= {
+                            object: 'document',
+                            data: {},
+                            nodes: [],
+                        };
+                        step[container] = {
+                            ...step[container],
+                            nodes: [...step[container].nodes],
+                        };
+                        if (event.operation === 'insert') {
+                            step[container].nodes.push(...event.blocks);
+                        } else {
+                            step[container].nodes.splice(
+                                -event.blocks.length,
+                                event.blocks.length,
+                                ...event.blocks
+                            );
+                        }
+                    });
+                    break;
+                }
+            }
+
+            return {
+                event,
+                content: (
+                    <AIMessageView message={message} context={await promiseContext} {...options} />
+                ),
+            };
+        });
     });
 }
 

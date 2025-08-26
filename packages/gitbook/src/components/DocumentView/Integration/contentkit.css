@@ -1,3 +1,5 @@
+@reference '../../RootLayout/globals.css';
+
 /** Stacks */
 .contentkit-stack {
     @apply flex gap-4;
@@ -114,7 +116,7 @@
 
 /** Modals */
 .contentkit-modal-backdrop {
-    @apply fixed inset-0 z-40 px-7 pb-11 pt-4 md:pt-[min(8vw,_6rem)] flex items-start justify-center backdrop-blur-2xl bg-tint-12/4 dark:bg-tint-1/6;
+    @apply fixed inset-0 z-40 px-7 pb-11 pt-4 md:pt-[min(8vw,6rem)] flex items-start justify-center backdrop-blur-2xl bg-tint-12/4 dark:bg-tint-1/6;
 }
 .contentkit-modal {
     @apply flex flex-col gap-6 relative z-50 bg-tint

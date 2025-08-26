@@ -77,7 +77,7 @@ export async function PageBodyBlankslate(props: {
                 'gap-4',
                 'grid-cols-1',
                 'sm:grid-cols-2',
-                'page-width-wide:md:grid-cols-3'
+                'md:page-width-wide:grid-cols-3'
             )}
         >
             {pageElements}

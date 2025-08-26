@@ -60,16 +60,7 @@ function OpenAPIResponseExampleHeader(props: {
 
         return (
             <span className="openapi-response-examples-statuscode-title">
-                <span
-                    className={clsx(
-                        'openapi-statuscode',
-                        `openapi-statuscode-${getStatusCodeClassName(item.statusCode)}`,
-                        'openapi-response-examples-statuscode'
-                    )}
-                >
-                    {item.statusCode}
-                </span>
-                <span>{item.label}</span>
+                <OpenAPIResponseExampleItem item={item} />
             </span>
         );
     }
@@ -83,19 +74,30 @@ function OpenAPIResponseExampleHeader(props: {
         >
             {items.map((item) => (
                 <OpenAPISelectItem key={item.key} id={item.key} value={item}>
-                    <span
-                        className={clsx(
-                            'openapi-statuscode',
-                            `openapi-statuscode-${getStatusCodeClassName(item.statusCode)}`,
-                            'openapi-response-examples-statuscode'
-                        )}
-                    >
-                        {item.statusCode}
-                    </span>
-                    <span>{item.label}</span>
+                    <OpenAPIResponseExampleItem item={item} />
                 </OpenAPISelectItem>
             ))}
         </OpenAPISelect>
+    );
+}
+
+function OpenAPIResponseExampleItem(props: {
+    item: OpenAPIResponseExampleItem;
+}) {
+    const { item } = props;
+    return (
+        <>
+            <span
+                className={clsx(
+                    'openapi-statuscode',
+                    `openapi-statuscode-${getStatusCodeClassName(item.statusCode)}`,
+                    'openapi-response-examples-statuscode'
+                )}
+            >
+                {item.statusCode}
+            </span>
+            <span className="openapi-response-examples-statuscode-label">{item.label}</span>
+        </>
     );
 }
 

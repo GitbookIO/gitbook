@@ -33,41 +33,42 @@ export async function TableOfContents(props: {
                     'shrink-0',
                     'basis-full',
                     'lg:basis-72',
-                    'page-no-toc:lg:basis-56',
+                    'lg:page-no-toc:basis-56',
 
                     'relative',
-                    'z-[1]',
+                    'z-1',
                     'lg:sticky',
                     'lg:mr-12',
 
                     // Server-side static positioning
                     'lg:top-0',
                     'lg:h-screen',
-                    'announcement:lg:h-[calc(100vh-4.25rem)]',
+                    'lg:announcement:h-[calc(100vh-4.25rem)]',
 
-                    'site-header:lg:top-16',
-                    'site-header:lg:h-[calc(100vh-4rem)]',
-                    'announcement:site-header:lg:h-[calc(100vh-4rem-4.25rem)]',
+                    // With header
+                    'lg:site-header:top-16',
+                    'lg:site-header:h-[calc(100vh-4rem)]',
+                    'lg:announcement:site-header:h-[calc(100vh-4rem-4.25rem)]',
 
-                    'site-header-sections:lg:top-[6.75rem]',
-                    'site-header-sections:lg:h-[calc(100vh-6.75rem)]',
-                    'announcement:site-header-sections:lg:h-[calc(100vh-6.75rem-4.25rem)]',
+                    'lg:site-header-sections:top-27',
+                    'lg:site-header-sections:h-[calc(100vh-6.75rem)]',
+                    'lg:site-header-sections:announcement:h-[calc(100vh-6.75rem-4.25rem)]',
 
                     // Client-side dynamic positioning (CSS vars applied by script)
-                    '[html[style*="--toc-top-offset"]_&]:lg:!top-[var(--toc-top-offset)]',
-                    '[html[style*="--toc-height"]_&]:lg:!h-[var(--toc-height)]',
+                    'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
+                    'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
 
                     'pt-6',
                     'pb-4',
-                    'sidebar-filled:lg:pr-6',
-                    'page-no-toc:lg:pr-0',
+                    'lg:sidebar-filled:pr-6',
+                    'lg:page-no-toc:pr-0',
 
                     'hidden',
-                    'navigation-open:!flex',
+                    'navigation-open:flex!',
                     'lg:flex',
-                    'page-no-toc:lg:hidden',
-                    'page-no-toc:xl:flex',
-                    'site-header-none:page-no-toc:lg:flex',
+                    'lg:page-no-toc:hidden',
+                    'xl:page-no-toc:flex',
+                    'lg:site-header-none:page-no-toc:flex',
                     'flex-col',
                     'gap-4',
 
@@ -79,7 +80,7 @@ export async function TableOfContents(props: {
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
                         'lg:-ms-5',
-                        'relative flex flex-grow flex-col overflow-hidden border-tint-subtle',
+                        'relative flex grow flex-col overflow-hidden border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
                         'theme-muted:bg-tint-subtle',
@@ -87,25 +88,25 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
-                        'page-no-toc:!bg-transparent',
-                        'page-no-toc:!border-none',
+                        'page-no-toc:bg-transparent!',
+                        'page-no-toc:border-none!',
 
                         'sidebar-filled:rounded-xl',
                         'straight-corners:rounded-none',
-                        '[html.sidebar-filled.circular-corners_&]:page-has-toc:rounded-3xl'
+                        'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-3xl'
                     )}
                 >
                     {innerHeader && <div className="px-5 *:my-4">{innerHeader}</div>}
                     <TOCScrollContainer // The scrollview inside the sidebar
                         className={tcls(
-                            'flex flex-grow flex-col p-2',
+                            'flex grow flex-col p-2',
                             customization.trademark.enabled && 'lg:pb-20',
                             'lg:gutter-stable overflow-y-auto',
                             '[&::-webkit-scrollbar]:bg-transparent',
                             '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                            'group-hover:[&::-webkit-scrollbar]:bg-tint-subtle',
-                            'group-hover:[&::-webkit-scrollbar-thumb]:bg-tint-7',
-                            'group-hover:[&::-webkit-scrollbar-thumb:hover]:bg-tint-8'
+                            '[&::-webkit-scrollbar]:group-hover:bg-tint-subtle',
+                            '[&::-webkit-scrollbar-thumb]:group-hover:bg-tint-7',
+                            '[&::-webkit-scrollbar-thumb:hover]:group-hover:bg-tint-8'
                         )}
                     >
                         <PagesList

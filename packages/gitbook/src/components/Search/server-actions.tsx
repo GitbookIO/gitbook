@@ -22,6 +22,7 @@ import type * as React from 'react';
 import { throwIfDataError } from '@/lib/data';
 import { getSiteURLDataFromMiddleware } from '@/lib/middleware';
 import { joinPathWithBaseURL } from '@/lib/paths';
+import { traceErrorOnly } from '@/lib/tracing';
 import type { IconName } from '@gitbook/icons';
 import { DocumentView } from '../DocumentView';
 
@@ -68,11 +69,13 @@ export interface AskAnswerResult {
  * Server action to search content in the entire site.
  */
 export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = await getServerActionBaseContext();
+    return traceErrorOnly('Search.searchAllSiteContent', async () => {
+        const context = await getServerActionBaseContext();
 
-    return await searchSiteContent(context, {
-        query,
-        scope: { mode: 'all' },
+        return await searchSiteContent(context, {
+            query,
+            scope: { mode: 'all' },
+        });
     });
 }
 
@@ -80,16 +83,18 @@ export async function searchAllSiteContent(query: string): Promise<OrderedComput
  * Server action to search content in a space.
  */
 export async function searchSiteSpaceContent(query: string): Promise<OrderedComputedResult[]> {
-    const context = await getServerActionBaseContext();
-    const siteURLData = await getSiteURLDataFromMiddleware();
+    return traceErrorOnly('Search.searchSiteSpaceContent', async () => {
+        const context = await getServerActionBaseContext();
+        const siteURLData = await getSiteURLDataFromMiddleware();
 
-    return await searchSiteContent(context, {
-        query,
-        // If we have a siteSectionId that means its a sections site use `current` mode
-        // which searches in the current space + all default spaces of sections
-        scope: siteURLData.siteSection
-            ? { mode: 'current', siteSpaceId: siteURLData.siteSpace }
-            : { mode: 'specific', siteSpaceIds: [siteURLData.siteSpace] },
+        return await searchSiteContent(context, {
+            query,
+            // If we have a siteSectionId that means its a sections site use `current` mode
+            // which searches in the current space + all default spaces of sections
+            scope: siteURLData.siteSection
+                ? { mode: 'current', siteSpaceId: siteURLData.siteSpace }
+                : { mode: 'specific', siteSpaceIds: [siteURLData.siteSpace] },
+        });
     });
 }
 
@@ -101,116 +106,126 @@ export async function streamAskQuestion({
 }: {
     question: string;
 }) {
-    const responseStream = createStreamableValue<AskAnswerResult | undefined>();
+    return traceErrorOnly('Search.streamAskQuestion', async () => {
+        const responseStream = createStreamableValue<AskAnswerResult | undefined>();
 
-    (async () => {
-        const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
+        (async () => {
+            const context = await fetchServerActionSiteContext(await getServerActionBaseContext());
 
-        const apiClient = await context.dataFetcher.api();
+            const apiClient = await context.dataFetcher.api();
 
-        const stream = apiClient.orgs.streamAskInSite(
-            context.organizationId,
-            context.site.id,
-            {
-                question,
-                context: {
-                    siteSpaceId: context.siteSpace.id,
+            const stream = apiClient.orgs.streamAskInSite(
+                context.organizationId,
+                context.site.id,
+                {
+                    question,
+                    context: {
+                        siteSpaceId: context.siteSpace.id,
+                    },
+                    scope: {
+                        mode: 'default',
+                        // Include the current site space regardless.
+                        includedSiteSpaces: [context.siteSpace.id],
+                    },
                 },
-                scope: {
-                    mode: 'default',
-                    // Include the current site space regardless.
-                    includedSiteSpaces: [context.siteSpace.id],
-                },
-            },
-            { format: 'document' }
-        );
-
-        const spacePromises = new Map<string, Promise<Revision>>();
-        for await (const chunk of stream) {
-            const answer = chunk.answer;
-
-            // Register the space of each page source into the promise queue.
-            const spaces = answer.sources
-                .map((source) => {
-                    if (source.type !== 'page') {
-                        return null;
-                    }
-
-                    if (!spacePromises.has(source.space)) {
-                        spacePromises.set(
-                            source.space,
-                            throwIfDataError(
-                                context.dataFetcher.getRevision({
-                                    spaceId: source.space,
-                                    revisionId: source.revision,
-                                })
-                            )
-                        );
-                    }
-
-                    return source.space;
-                })
-                .filter(filterOutNullable);
-
-            // Get the pages for all spaces referenced by this answer.
-            const pages = await Promise.all(
-                spaces.map(async (space) => {
-                    const revision = await spacePromises.get(space);
-                    return { space, pages: revision?.pages };
-                })
-            ).then((results) => {
-                return results.reduce((map, result) => {
-                    if (result.pages) {
-                        map.set(result.space, result.pages);
-                    }
-                    return map;
-                }, new Map<string, RevisionPage[]>());
-            });
-            responseStream.update(
-                await transformAnswer(context, { answer: chunk.answer, spacePages: pages })
+                { format: 'document' }
             );
-        }
-    })()
-        .then(() => {
-            responseStream.done();
-        })
-        .catch((error) => {
-            responseStream.error(error);
-        });
 
-    return {
-        stream: responseStream.value,
-    };
+            const spacePromises = new Map<string, Promise<Revision>>();
+            for await (const chunk of stream) {
+                const answer = chunk.answer;
+
+                // Register the space of each page source into the promise queue.
+                const spaces = answer.sources
+                    .map((source) => {
+                        if (source.type !== 'page') {
+                            return null;
+                        }
+
+                        if (!spacePromises.has(source.space)) {
+                            spacePromises.set(
+                                source.space,
+                                throwIfDataError(
+                                    context.dataFetcher.getRevision({
+                                        spaceId: source.space,
+                                        revisionId: source.revision,
+                                    })
+                                )
+                            );
+                        }
+
+                        return source.space;
+                    })
+                    .filter(filterOutNullable);
+
+                // Get the pages for all spaces referenced by this answer.
+                const pages = await Promise.all(
+                    spaces.map(async (space) => {
+                        const revision = await spacePromises.get(space);
+                        return { space, pages: revision?.pages };
+                    })
+                ).then((results) => {
+                    return results.reduce((map, result) => {
+                        if (result.pages) {
+                            map.set(result.space, result.pages);
+                        }
+                        return map;
+                    }, new Map<string, RevisionPage[]>());
+                });
+                responseStream.update(
+                    await transformAnswer(context, { answer: chunk.answer, spacePages: pages })
+                );
+            }
+        })()
+            .then(() => {
+                responseStream.done();
+            })
+            .catch((error) => {
+                responseStream.error(error);
+            });
+
+        return {
+            stream: responseStream.value,
+        };
+    });
 }
 
 /**
  * Stream a list of suggested questions for the site.
+ * Optionally scoped to a specific space.
  */
-export async function streamRecommendedQuestions() {
-    const siteURLData = await getSiteURLDataFromMiddleware();
-    const context = await getServerActionBaseContext();
+export async function streamRecommendedQuestions(args: { siteSpaceId?: string }) {
+    return traceErrorOnly('Search.streamRecommendedQuestions', async () => {
+        const siteURLData = await getSiteURLDataFromMiddleware();
+        const context = await getServerActionBaseContext();
 
-    const responseStream = createStreamableValue<SearchAIRecommendedQuestionStream | undefined>();
+        const responseStream = createStreamableValue<
+            SearchAIRecommendedQuestionStream | undefined
+        >();
 
-    (async () => {
-        const apiClient = await context.dataFetcher.api();
-        const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
-            siteURLData.organization,
-            siteURLData.site
-        );
+        (async () => {
+            const apiClient = await context.dataFetcher.api();
+            const apiStream = apiClient.orgs.streamRecommendedQuestionsInSite(
+                siteURLData.organization,
+                siteURLData.site,
+                {
+                    siteSpaceId: args.siteSpaceId,
+                }
+            );
 
-        for await (const chunk of apiStream) {
-            responseStream.update(chunk);
-        }
-    })()
-        .then(() => {
-            responseStream.done();
-        })
-        .catch((error) => {
-            responseStream.error(error);
-        });
+            for await (const chunk of apiStream) {
+                responseStream.update(chunk);
+            }
+        })()
+            .then(() => {
+                responseStream.done();
+            })
+            .catch((error) => {
+                responseStream.error(error);
+            });
 
-    return { stream: responseStream.value };
+        return { stream: responseStream.value };
+    });
 }
 
 /**
@@ -338,9 +353,9 @@ async function transformAnswer(
                     document={answer.answer.document}
                     context={{
                         mode: 'default',
-                        contentContext: undefined,
+                        contentContext: context,
                         wrapBlocksInSuspense: false,
-                        shouldRenderLinkPreviews: false, // We don't want to render link previews in the AI answer.
+                        withLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
                     style={['space-y-5']}
                 />

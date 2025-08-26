@@ -22,7 +22,11 @@
             "vars": {
                 "STAGE": "dev",
                 "NEXT_PRIVATE_DEBUG_CACHE": "true",
-                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
+                // When deployed locally, we don't have access to the tag cache here,
+                // we should just bypass the cache to go to the server directly
+                "SHOULD_BYPASS_CACHE": "true",
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                "GITBOOK_URL": "http://localhost:8771"
             },
             "r2_buckets": [
                 {

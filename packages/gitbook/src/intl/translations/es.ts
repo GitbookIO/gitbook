@@ -18,7 +18,7 @@ export const es: TranslationLanguage = {
     search_scope_all: 'Todo el contenido',
     ask: 'Preguntar',
     search_ask: 'Preguntar "${1}"',
-    search_ask_description: 'Encuentra la respuesta con IA',
+    search_ask_description: 'Encuentra la respuesta con ${1}',
     search_ask_sources: 'Fuentes',
     search_ask_sources_no_answer: 'Páginas relacionadas',
     search_ask_no_answer:
@@ -51,6 +51,7 @@ export const es: TranslationLanguage = {
     view: 'Ver',
     edit_on_git: 'Editar en ${1}',
     notfound_title: 'Página no encontrada',
+    notfound_link: 'Este enlace apunta a una página que ha sido eliminada o ya no existe.',
     notfound: 'La página que buscas no existe.',
     unexpected_error_title: 'Ocurrió un error',
     unexpected_error:
@@ -88,8 +89,9 @@ export const es: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site: 'Información proporcionada por el sitio',
     ai_chat_context_previous_messages: 'Mensajes anteriores',
     ai_chat_context_disclaimer: 'Las respuestas de IA pueden contener errores.',
-    ai_chat_input_placeholder: 'Pregunta, busca o realiza una acción...',
+    ai_chat_input_placeholder: 'Pregunta, busca o explica...',
     send: 'Enviar',
+    actions: 'Acciones',
     ai_chat_suggested_questions_title: 'Preguntas sugeridas',
     ai_chat_suggested_questions_about_this_page: '¿De qué trata esta página?',
     ai_chat_suggested_questions_read_next: '¿Qué debería leer después?',
@@ -107,4 +109,6 @@ export const es: TranslationLanguage = {
     view_page_plaintext: 'Ver esta página como texto plano',
     open_in: 'Abrir en ${1}',
     open_in_llms_pre_prompt: 'Lee ${1} y responde preguntas sobre el contenido.',
+    press_to_confirm: 'Presiona ${1} para confirmar',
+    tool_call_skipped: 'Omitido "${1}"',
 };

@@ -1,6 +1,213 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@config '../../../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
+
+@utility hide-scroll {
+    /*  hide scroll bar but still scroll */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+@utility linear-mask-gradient {
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
+}
+
+@utility linear-mask-util {
+    mask-image: linear-gradient(to bottom, white, white);
+    mask-image: linear-gradient(to bottom, white, white);
+}
+
+@utility grid-area-1-1 {
+    grid-area: 1 / 1;
+    grid-area: 1 / 1;
+}
+
+@utility gutter-stable {
+    scrollbar-gutter: stable;
+    scrollbar-gutter: stable;
+}
+
+@utility triangle {
+    position: relative;
+    background-color: orange;
+    text-align: left;
+    transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+    &:before {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    &:after {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    width: inherit;
+    height: inherit;
+    border-top-right-radius: 30%;
+    &:before {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+    &:after {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+
+    &:before {
+        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+    }
+    &:after {
+        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+    }
+    position: relative;
+    background-color: orange;
+    text-align: left;
+    transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
+    &:before {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    &:after {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+    }
+    width: inherit;
+    height: inherit;
+    border-top-right-radius: 30%;
+    &:before {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+    &:after {
+        width: inherit;
+        height: inherit;
+        border-top-right-radius: 30%;
+    }
+
+    &:before {
+        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+    }
+    &:after {
+        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+    }
+}
+
+@utility break-anywhere {
+    word-break: break-word;
+    @supports (overflow-wrap: anywhere) {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+    word-break: break-word;
+    @supports (overflow-wrap: anywhere) {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+}
+
+@utility bg-gradient-primary {
+    @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+    @apply bg-linear-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
+}
+
+@utility bg-gradient-tint {
+    @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+    @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+}
+
+@utility scroll-nojump {
+    /**
+     * Utility to prevent horizontal jumps when the vertical scrollbar appears
+     * It should be used on main containers of the layout, while preserving horizontal delimiters.
+     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
+     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
+     */
+    width: 100%;
+    @media screen and (min-width: 1536px) {
+        margin-left: var(--scrollbar-width);
+        margin-right: 0;
+        width: calc(100% - var(--scrollbar-width));
+        body:has(.page-full-width) & {
+            margin-left: 0;
+            width: 100%;
+        }
+    }
+
+    /**
+     * Utility to prevent horizontal jumps when the vertical scrollbar appears
+     * It should be used on main containers of the layout, while preserving horizontal delimiters.
+     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
+     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
+     */
+    width: 100%;
+    @media screen and (min-width: 1536px) {
+        margin-left: var(--scrollbar-width);
+        margin-right: 0;
+        width: calc(100% - var(--scrollbar-width));
+    }
+}
+
+@utility page-full-width {
+    @media screen and (min-width: 1536px) {
+        body:has(&) .scroll-nojump {
+            margin-left: 0;
+            width: 100%;
+        }
+    }
+}
+
+@utility elevate-link {
+    & a[href]:not(.link-overlay) {
+        position: relative;
+        z-index: 20;
+    }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
 
 @layer base {
     :root {
@@ -31,7 +238,12 @@
     button,
     input,
     textarea {
-        @apply outline-2 outline-primary;
+        @apply focus-visible:outline-2 focus-visible:outline-primary;
+    }
+
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
     }
 
     code,
@@ -41,75 +253,10 @@
     }
 
     .flip-heading-hash {
-        @apply [&:is(h1,h2,h3,h4)]:flex-row-reverse;
-        @apply [&:is(h1,h2,h3,h4)]:[justify-content:start];
-        @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-2;
-    }
-}
-
-@layer utilities {
-    .linear-mask-gradient {
-        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 96px, rgba(0, 0, 0, 0));
-    }
-    .linear-mask-util {
-        mask-image: linear-gradient(to bottom, white, white);
-    }
-    .grid-area-1-1 {
-        grid-area: 1 / 1;
-    }
-    .gutter-stable {
-        scrollbar-gutter: stable;
-    }
-
-    .triangle {
-        position: relative;
-        background-color: orange;
-        text-align: left;
-        transform: rotate(-60deg) skewX(-30deg) scale(1, 0.866);
-    }
-    .triangle:before,
-    .triangle:after {
-        content: "";
-        position: absolute;
-        background-color: inherit;
-    }
-    .triangle,
-    .triangle:before,
-    .triangle:after {
-        width: inherit;
-        height: inherit;
-        border-top-right-radius: 30%;
-    }
-
-    .triangle:before {
-        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
-    }
-    .triangle:after {
-        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
-    }
-
-    .break-anywhere {
-        word-break: break-word;
-    }
-    @supports (overflow-wrap: anywhere) {
-        .break-anywhere {
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-    }
-
-    .bg-gradient-primary {
-        @apply bg-gradient-to-bl from-primary-4 to-tint-base to-60% bg-fixed;
-    }
-    .bg-gradient-tint {
-        @apply bg-gradient-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
-    }
-
-    .elevate-link {
-        & a[href]:not(.link-overlay) {
-            position: relative;
-            z-index: 20;
-        }
+        @apply [h1,h2,h3,h4]:content-start;
+        @apply [h1,h2,h3,h4]:auto-cols-[auto_1fr];
+        @apply [&:is(h1,h2,h3,h4)>div:first-child]:[grid-area:1/2];
+        @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-1;
     }
 }
 
@@ -130,83 +277,83 @@ html.announcement-hidden #announcement-banner {
 
 /* Shiki theme */
 :root {
-    --shiki-color-text: theme("colors.tint.11");
-    --shiki-token-punctuation: theme("colors.tint.11");
-    --shiki-token-comment: theme("colors.neutral.9/.7");
-    --shiki-token-link: theme("colors.primary.10");
+    --shiki-color-text: rgb(var(--tint-11));
+    --shiki-token-punctuation: rgb(var(--tint-11));
+    --shiki-token-comment: rgb(var(--neutral-9));
+    --shiki-token-link: rgb(var(--primary-10));
 
-    --shiki-token-constant: theme("colors.warning.10");
-    --shiki-token-string: theme("colors.warning.10");
-    --shiki-token-string-expression: theme("colors.success.10");
-    --shiki-token-keyword: theme("colors.danger.10");
-    --shiki-token-parameter: theme("colors.warning.10");
-    --shiki-token-function: theme("colors.primary.10");
+    --shiki-token-constant: rgb(var(--warning-10));
+    --shiki-token-string: rgb(var(--warning-10));
+    --shiki-token-string-expression: rgb(var(--success-10));
+    --shiki-token-keyword: rgb(var(--danger-10));
+    --shiki-token-parameter: rgb(var(--warning-10));
+    --shiki-token-function: rgb(var(--primary-10));
 
-    --shiki-token-inserted: theme("colors.success.10");
-    --shiki-token-deleted: theme("colors.danger.10");
-    --shiki-token-changed: theme("colors.tint.12");
+    --shiki-token-inserted: rgb(var(--success-10));
+    --shiki-token-deleted: rgb(var(--danger-10));
+    --shiki-token-changed: rgb(var(--tint-12));
 }
 
 @media (prefers-contrast: more) {
     :root {
-        --shiki-color-text: theme("colors.tint.12");
-        --shiki-token-punctuation: theme("colors.tint.12");
-        --shiki-token-comment: theme("colors.neutral.11");
-        --shiki-token-link: theme("colors.primary.11");
+        --shiki-color-text: rgb(var(--tint-12));
+        --shiki-token-punctuation: rgb(var(--tint-12));
+        --shiki-token-comment: rgb(var(--neutral-11));
+        --shiki-token-link: rgb(var(--primary-11));
 
-        --shiki-token-constant: theme("colors.warning.11");
-        --shiki-token-string: theme("colors.warning.11");
-        --shiki-token-string-expression: theme("colors.success.11");
-        --shiki-token-keyword: theme("colors.danger.11");
-        --shiki-token-parameter: theme("colors.warning.11");
-        --shiki-token-function: theme("colors.primary.11");
+        --shiki-token-constant: rgb(var(--warning-11));
+        --shiki-token-string: rgb(var(--warning-11));
+        --shiki-token-string-expression: rgb(var(--success-11));
+        --shiki-token-keyword: rgb(var(--danger-11));
+        --shiki-token-parameter: rgb(var(--warning-11));
+        --shiki-token-function: rgb(var(--primary-11));
 
-        --shiki-token-inserted: theme("colors.success.11");
-        --shiki-token-deleted: theme("colors.danger.11");
-        --shiki-token-changed: theme("colors.tint.12");
+        --shiki-token-inserted: rgb(var(--success-11));
+        --shiki-token-deleted: rgb(var(--danger-11));
+        --shiki-token-changed: rgb(var(--tint-12));
     }
 }
 
 html.dark {
     /* Override select colors to have more contrast */
-    --shiki-token-comment: theme("colors.neutral.9");
+    --shiki-token-comment: rgb(var(--neutral-9));
 
-    --shiki-token-constant: theme("colors.warning.11");
-    --shiki-token-string: theme("colors.warning.11");
-    --shiki-token-string-expression: theme("colors.success.11");
-    --shiki-token-keyword: theme("colors.danger.11");
-    --shiki-token-parameter: theme("colors.warning.11");
-    --shiki-token-function: theme("colors.primary.11");
+    --shiki-token-constant: rgb(var(--warning-11));
+    --shiki-token-string: rgb(var(--warning-11));
+    --shiki-token-string-expression: rgb(var(--success-11));
+    --shiki-token-keyword: rgb(var(--danger-11));
+    --shiki-token-parameter: rgb(var(--warning-11));
+    --shiki-token-function: rgb(var(--primary-11));
 }
 
 .code-monochrome {
-    --shiki-token-constant: theme("colors.tint.11");
-    --shiki-token-string: theme("colors.tint.12");
-    --shiki-token-string-expression: theme("colors.tint.12");
-    --shiki-token-keyword: theme("colors.primary.10");
-    --shiki-token-parameter: theme("colors.tint.9");
-    --shiki-token-function: theme("colors.primary.9");
+    --shiki-token-constant: rgb(var(--tint-11));
+    --shiki-token-string: rgb(var(--tint-12));
+    --shiki-token-string-expression: rgb(var(--tint-12));
+    --shiki-token-keyword: rgb(var(--primary-10));
+    --shiki-token-parameter: rgb(var(--tint-9));
+    --shiki-token-function: rgb(var(--primary-9));
 }
 
 html.dark.code-monochrome {
-    --shiki-token-constant: theme("colors.tint.11");
-    --shiki-token-string: theme("colors.tint.12");
-    --shiki-token-string-expression: theme("colors.tint.12");
-    --shiki-token-keyword: theme("colors.primary.11");
-    --shiki-token-parameter: theme("colors.tint.10");
-    --shiki-token-function: theme("colors.primary.10");
+    --shiki-token-constant: rgb(var(--tint-11));
+    --shiki-token-string: rgb(var(--tint-12));
+    --shiki-token-string-expression: rgb(var(--tint-12));
+    --shiki-token-keyword: rgb(var(--primary-11));
+    --shiki-token-parameter: rgb(var(--tint-10));
+    --shiki-token-function: rgb(var(--primary-10));
 }
 
 /* Code blocks */
 .highlight-line {
-    @apply grid [grid-template-columns:subgrid] col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-[1] rounded;
+    @apply grid grid-cols-subgrid col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-1 rounded-sm;
     @apply only:hover:ring-transparent;
     @apply [counter-increment:line];
 
     &.highlighted {
         @apply bg-tint-active;
-        @apply first:rounded-t-md *:first:mt-1;
-        @apply last:rounded-b-md *:last:mb-1;
+        @apply first:rounded-t-md first:*:mt-1;
+        @apply last:rounded-b-md last:*:mb-1;
         @apply rounded-none;
     }
 
@@ -224,11 +371,11 @@ html.dark.code-monochrome {
 }
 
 .highlight-line-number {
-    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-gradient-to-r from-80% from-tint-subtle contrast-more:from-tint-base theme-muted:from-tint-base [html.theme-bold.sidebar-filled_&]:from-tint-base to-transparent;
+    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-linear-to-r from-80% from-tint-subtle contrast-more:from-tint-base theme-muted:from-tint-base [html.theme-bold.sidebar-filled_&]:from-tint-base to-transparent;
     @apply before:text-tint before:content-[counter(line)];
 
     .highlight-line.highlighted > & {
-        @apply before:text-tint bg-gradient-to-r from-80% from-tint-active to-transparent;
+        @apply before:text-tint bg-linear-to-r from-80% from-tint-active to-transparent;
     }
 }
 

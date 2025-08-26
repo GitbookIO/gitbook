@@ -5,8 +5,9 @@ import {
     generateSiteLayoutMetadata,
     generateSiteLayoutViewport,
 } from '@/components/SiteLayout';
-import { GITBOOK_DISABLE_TRACKING } from '@/lib/env';
 import { getThemeFromMiddleware } from '@/lib/middleware';
+import { shouldTrackEvents } from '@/lib/tracking';
+import { headers } from 'next/headers';
 
 interface SiteDynamicLayoutProps {
     params: Promise<RouteLayoutParams>;
@@ -18,13 +19,14 @@ export default async function SiteDynamicLayout({
 }: React.PropsWithChildren<SiteDynamicLayoutProps>) {
     const { context, visitorAuthClaims } = await getDynamicSiteContext(await params);
     const forcedTheme = await getThemeFromMiddleware();
+    const withTracking = shouldTrackEvents(await headers());
 
     return (
         <CustomizationRootLayout forcedTheme={forcedTheme} customization={context.customization}>
             <SiteLayout
                 context={context}
                 forcedTheme={forcedTheme}
-                withTracking={!GITBOOK_DISABLE_TRACKING}
+                withTracking={withTracking}
                 visitorAuthClaims={visitorAuthClaims}
             >
                 {children}

@@ -1,11 +1,11 @@
 'use client';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import type { IconName } from '@gitbook/icons';
 import { useTheme } from 'next-themes';
 import React from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
+import { Button, ButtonGroup } from '../primitives';
 
 type ThemeMode = 'light' | 'system' | 'dark';
 
@@ -27,7 +27,7 @@ export function ThemeToggler() {
     };
 
     return (
-        <div role="radiogroup" className="flex flex-row gap-2">
+        <ButtonGroup role="radiogroup" className="gap-2" combinedShape={false}>
             <ThemeButton
                 active={mounted && theme === 'light'}
                 icon="sun-bright"
@@ -46,7 +46,7 @@ export function ThemeToggler() {
                 onClick={() => onSwitchMode('dark')}
                 title={tString(language, 'switch_to_dark_theme')}
             />
-        </div>
+        </ButtonGroup>
     );
 }
 
@@ -58,38 +58,21 @@ function ThemeButton(props: {
 }) {
     const { icon, onClick, title, active } = props;
     return (
-        <button
+        <Button
             type="button"
             role="radio"
             onClick={onClick}
-            aria-label={title}
-            title={title}
+            label={title}
             aria-checked={active}
-            className={tcls(
-                'p-2',
-                'rounded',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-full',
-                'transition-all',
-                'text-tint',
-                'contrast-more:text-tint-strong',
-                'hover:bg-tint-hover',
-                'contrast-more:hover:ring-2',
-                'contrast-more:focus:ring-2',
-                'ring-tint',
-                active && [
-                    'bg-primary',
-                    'theme-muted:bg-primary-hover',
-                    '[html.sidebar-filled.theme-bold.tint_&]:bg-primary-hover',
-                    'hover:bg-primary',
-                    'text-primary-strong',
-                    'contrast-more:text-primary-strong',
-                    'contrast-more:ring-1',
-                    'ring-primary',
-                ]
-            )}
-        >
-            <Icon icon={icon} className={tcls('size-4')} />
-        </button>
+            variant="blank"
+            size="default"
+            className={
+                active
+                    ? 'bg-primary theme-muted:bg-primary-hover text-primary-strong ring-primary hover:bg-primary contrast-more:text-primary-strong contrast-more:ring-1 [html.sidebar-filled.theme-bold.tint_&]:bg-primary-hover'
+                    : ''
+            }
+            icon={icon}
+            iconOnly
+        />
     );
 }

@@ -10,6 +10,7 @@ import type {
     AIToolCallGetPageContent,
     AIToolCallGetPages,
     AIToolCallMCP,
+    AIToolCallOther,
     AIToolCallSearch,
     ContentRef,
 } from '@gitbook/api';
@@ -38,7 +39,7 @@ function ToolCallSummary(props: { toolCall: AIToolCall; context: GitBookSiteCont
     const { toolCall, context } = props;
 
     return (
-        <div className="flex origin-left animate-[scaleIn_500ms_500ms_both] items-start gap-2 text-sm text-tint-subtle">
+        <div className="flex origin-left animate-scale-in-slow items-start gap-2 text-sm text-tint-subtle">
             <Icon
                 icon={getIconForToolCall(toolCall)}
                 className="mt-1 size-3 shrink-0 text-tint-subtle/8"
@@ -58,6 +59,8 @@ function getDescriptionForToolCall(toolCall: AIToolCall, context: GitBookSiteCon
             return <DescriptionForGetPagesToolCall toolCall={toolCall} context={context} />;
         case 'mcp':
             return <DescriptionForMCPToolCall toolCall={toolCall} context={context} />;
+        case 'other':
+            return <DescriptionForOtherToolCall toolCall={toolCall} context={context} />;
         default:
             return <>{toolCall.tool}</>;
     }
@@ -112,6 +115,15 @@ function DescriptionForMCPToolCall(props: {
     );
 }
 
+function DescriptionForOtherToolCall(props: {
+    toolCall: AIToolCallOther;
+    context: GitBookSiteContext;
+}) {
+    const { toolCall } = props;
+
+    return <p>{toolCall.summary.text}</p>;
+}
+
 async function DescriptionForSearchToolCall(props: {
     toolCall: AIToolCallSearch;
     context: GitBookSiteContext;
@@ -151,13 +163,13 @@ async function DescriptionForSearchToolCall(props: {
         <details className={tcls('-ml-5 group flex w-full flex-col', hasResults ? 'gap-2' : '')}>
             <summary
                 className={tcls(
-                    '-mx-2 flex list-none items-center gap-2 rounded-corners:rounded-md pr-4 pl-7 transition-colors marker:hidden',
+                    '-mx-2 flex list-none items-center gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md pr-4 pl-7 transition-colors marker:hidden',
                     hasResults ? '-my-2 cursor-pointer py-2 hover:bg-primary-hover' : ''
                 )}
             >
-                <div className="flex flex-col">
+                <div className="flex min-w-0 flex-col break-words leading-snug">
                     <p>{t(language, 'searched_for', <strong>{toolCall.query}</strong>)}</p>
-                    <p className="text-tint-subtle text-xs">
+                    <p className="mt-0.5 text-tint-subtle text-xs">
                         {hasResults
                             ? t(language, 'search_results_count', toolCall.results.length)
                             : t(language, 'search_no_results')}
@@ -175,12 +187,12 @@ async function DescriptionForSearchToolCall(props: {
                 ) : null}
             </summary>
             {hasResults ? (
-                <div className="max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all duration-500 [transition-behavior:allow-discrete] group-open:max-h-96 group-open:opacity-11">
+                <div className="mt-1 max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all transition-discrete duration-500 group-open:max-h-96 group-open:opacity-11">
                     <ol className="space-y-1">
                         {searchResultsWithHrefs.map((result, index) => (
                             <li
                                 key={`${result.pageId}-${index}`}
-                                className="animate-fadeIn"
+                                className="animate-fade-in-slow"
                                 style={{
                                     animationDelay: `${index * 25}ms`,
                                 }}
@@ -247,6 +259,8 @@ function getIconForToolCall(toolCall: AIToolCall): IconName {
             return 'magnifying-glass';
         case 'getPages':
             return 'files';
+        case 'other':
+            return (toolCall.summary.icon as IconName) ?? 'hammer';
         default:
             return 'hammer';
     }

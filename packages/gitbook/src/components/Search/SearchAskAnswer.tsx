@@ -15,7 +15,7 @@ import { useTrackEvent } from '../Insights';
 import { Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
 import { type AskAnswerResult, type AskAnswerSource, streamAskQuestion } from './server-actions';
-import { useSearch, useSearchLink } from './useSearch';
+import { useSearchLink } from './useSearch';
 
 export type SearchAskState =
     | {
@@ -37,7 +37,6 @@ export function SearchAskAnswer(props: { query: string }) {
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
-    const [, setSearchState] = useSearch();
     const [askState, setAskState] = useSearchAskContext();
 
     React.useEffect(() => {
@@ -50,10 +49,6 @@ export function SearchAskAnswer(props: { query: string }) {
                 type: 'ask_question',
                 query,
             });
-
-            // When we pass in "ask" mode, the query could still be updated by the client
-            // we ensure that the query is up-to-date before starting the stream.
-            setSearchState((prev) => (prev ? { ...prev, query, ask: true } : null));
 
             const { stream } = await streamAskQuestion({ question: query });
             for await (const chunk of readStreamableValue(stream)) {
@@ -80,7 +75,7 @@ export function SearchAskAnswer(props: { query: string }) {
                 cancelled = true;
             }
         };
-    }, [query, setAskState, setSearchState, trackEvent]);
+    }, [query, setAskState, trackEvent]);
 
     React.useEffect(() => {
         return () => {
@@ -186,7 +181,7 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'px-4',
                         '-mx-4',
                         'py-2',
-                        'rounded',
+                        'rounded-sm',
                         'straight-corners:rounded-none',
                         'circular-corners:rounded-full',
                         'text-tint',
@@ -194,8 +189,8 @@ function AnswerFollowupQuestions(props: { followupQuestions: string[] }) {
                         'focus-within:bg-tint-hover'
                     )}
                     {...getSearchLinkProps({
-                        query: question,
-                        ask: true,
+                        ask: question,
+                        open: true,
                     })}
                 >
                     <Icon

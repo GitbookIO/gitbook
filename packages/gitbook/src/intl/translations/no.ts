@@ -18,7 +18,7 @@ export const no: TranslationLanguage = {
     search_scope_all: 'Alt innhold',
     ask: 'Spør',
     search_ask: 'Spør "${1}"',
-    search_ask_description: 'Finn svaret med AI',
+    search_ask_description: 'Finn svaret med ${1}',
     search_ask_sources: 'Kilder',
     search_ask_sources_no_answer: 'Relaterte sider',
     search_ask_no_answer:
@@ -51,6 +51,8 @@ export const no: TranslationLanguage = {
     view: 'Vis',
     edit_on_git: 'Rediger på ${1}',
     notfound_title: 'Siden ble ikke funnet',
+    notfound_link:
+        'Denne lenken peker til en side som har blitt fjernet eller ikke lenger eksisterer.',
     notfound: 'Siden du leter etter eksisterer ikke.',
     unexpected_error_title: 'En feil oppstod',
     unexpected_error: 'Beklager, en uventet feil har oppstått. Vennligst prøv igjen senere.',
@@ -86,8 +88,9 @@ export const no: TranslationLanguage = {
     ai_chat_context_info_provided_by_the_site: 'Informasjon gitt av nettstedet',
     ai_chat_context_previous_messages: 'Tidligere meldinger',
     ai_chat_context_disclaimer: 'AI-svar kan inneholde feil.',
-    ai_chat_input_placeholder: 'Spør, søk eller utfør en handling...',
+    ai_chat_input_placeholder: 'Spør, søk eller forklar...',
     send: 'Send',
+    actions: 'Handlinger',
     ai_chat_suggested_questions_title: 'Foreslåtte spørsmål',
     ai_chat_suggested_questions_about_this_page: 'Hva handler denne siden om?',
     ai_chat_suggested_questions_read_next: 'Hva bør jeg lese neste?',
@@ -105,4 +108,6 @@ export const no: TranslationLanguage = {
     view_page_plaintext: 'Vis denne siden som ren tekst',
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
+    press_to_confirm: 'Trykk ${1} for å bekrefte',
+    tool_call_skipped: 'Hoppet over "${1}"',
 };

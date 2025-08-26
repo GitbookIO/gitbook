@@ -1,3 +1,5 @@
+@reference "../../RootLayout/globals.css";
+
 /* Layout Components */
 .openapi-operation,
 .openapi-schemas,
@@ -32,7 +34,7 @@
 
 .openapi-deprecated,
 .openapi-stability {
-    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 .openapi-stability-alpha {
@@ -70,7 +72,7 @@
 }
 
 .openapi-markdown code {
-    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 .openapi-markdown pre code {
@@ -79,7 +81,7 @@
 
 /* Markdown Base */
 .openapi-markdown {
-    @apply prose text-tint-strong prose-p:!my-2 dark:prose-invert max-w-none whitespace-normal;
+    @apply prose text-tint-strong prose-p:my-2! dark:prose-invert max-w-none whitespace-normal;
 }
 
 .openapi-markdown > *:first-child {
@@ -145,7 +147,7 @@
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col gap-4 sticky top-4 site-header:top-20 site-header:xl:max-2xl:top-32 site-header-sections:top-32 site-header-sections:xl:max-2xl:top-44 print-mode:static;
+    @apply flex flex-col gap-4 sticky top-[calc(var(--toc-top-offset)+5rem)] print-mode:static;
 }
 
 .openapi-column-preview pre {
@@ -158,7 +160,7 @@
 }
 
 .openapi-schema-root-description.openapi-markdown {
-    @apply prose-sm text-balance mt-1.5 !text-[0.813rem] text-tint overflow-hidden !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-balance mt-1.5 text-[0.813rem]! text-tint overflow-hidden font-normal! select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-root-description {
@@ -273,7 +275,7 @@
 
 /* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply prose-sm text-tint overflow-hidden text-pretty !font-normal select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint overflow-hidden text-pretty font-normal! select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre:has(code) {
@@ -302,7 +304,7 @@
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code,
 .openapi-schema-default code {
-    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:!content-none after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 /* Authentication */
@@ -335,7 +337,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply prose-sm text-tint !font-normal select-text text-pretty prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint font-normal! select-text text-pretty prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 .openapi-securities-label {
@@ -366,7 +368,7 @@
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply prose-sm text-tint !font-normal text-pretty select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply prose-sm text-tint font-normal! text-pretty select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
 /* Responses */
@@ -379,21 +381,23 @@
 }
 
 .openapi-response-tab-content {
-    @apply flex items-baseline truncate grow shrink max-w-max basis-[60%] mr-auto;
+    @apply flex items-baseline truncate grow shrink max-w-max basis-full mr-auto;
     @apply text-left text-pretty relative leading-tight text-tint select-text;
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply text-left truncate prose-sm text-sm leading-tight text-tint select-text prose-strong:font-semibold prose-strong:text-inherit;
+    @apply text-left prose-sm text-sm leading-tight text-tint select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-.openapi-disclosure-group-trigger[aria-expanded="true"] .openapi-response-tab-content {
-    @apply basis-full;
-}
-
-.openapi-disclosure-group-trigger[aria-expanded="true"]
+.openapi-disclosure-group-trigger[aria-expanded="false"] {
     .openapi-response-description.openapi-markdown {
-    @apply whitespace-normal;
+        @apply truncate;
+        @apply [&>*:not(:first-child)]:hidden *:truncate *:!p-0 *:!m-0;
+    }
+
+    .openapi-response-tab-content {
+        @apply basis-[60%]
+    }
 }
 
 .openapi-response-body {
@@ -465,7 +469,7 @@
 }
 
 .openapi-path-variable {
-    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-none before:!content-none after:!content-none;
+    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-none before:content-none! after:!content-none;
 }
 
 .openapi-path-server {
@@ -551,6 +555,10 @@
     @apply text-[0.813rem] truncate text-tint font-normal;
 }
 
+.openapi-response-examples-statuscode-label {
+    @apply truncate;
+}
+
 .openapi-response-examples-panel,
 .openapi-codesample-panel {
     @apply flex-1 text-sm relative focus-visible:outline-none;
@@ -583,10 +591,6 @@ body:has(.openapi-select-popover) {
     @apply shrink truncate flex items-center;
 }
 
-.openapi-select > button > span.react-aria-SelectValue span:not(.openapi-statuscode) {
-    @apply truncate;
-}
-
 .openapi-select > button .openapi-markdown {
     @apply *:leading-none;
 }
@@ -610,18 +614,18 @@ body:has(.openapi-select-popover) {
 
 .openapi-select-item {
     @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 *:truncate text-tint ring-0 border-none rounded !outline-none;
-    @apply hover:bg-tint-hover theme-gradient:hover:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
+    @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
 }
 
 .openapi-select button .openapi-markdown,
 .openapi-select-item .openapi-markdown {
-    @apply text-[0.813rem] *:truncate;
+    @apply text-[0.813rem] *:truncate *:!p-0 *:!m-0 [&>*:not(:first-child)]:hidden;
 }
 
 .openapi-select-item-selected,
 .openapi-select-item-selected .openapi-markdown {
     @apply text-primary-subtle hover:text-primary hover:bg-primary-hover;
-    @apply theme-muted:hover:bg-primary-active theme-gradient:hover:bg-primary-active tint:font-semibold;
+    @apply hover:theme-muted:bg-primary-active hover:theme-gradient:bg-primary-active tint:font-semibold;
     @apply contrast-more:text-primary contrast-more:hover:text-primary-strong contrast-more:font-semibold;
 }
 
@@ -693,7 +697,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tabs-tab[aria-selected="true"] {
-    @apply !text-primary-subtle after:absolute after:-bottom-[calc(0.375rem_+_1px)] after:z-20 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
+    @apply text-primary-subtle! after:absolute after:-bottom-[calc(0.375rem+1px)] after:z-20 after:left-0 after:w-full after:h-px after:bg-primary-solid after:transition-all;
 }
 
 .openapi-tabs-panel {
@@ -769,7 +773,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-schema .openapi-schema-properties .openapi-schema {
-    @apply animate-fadeIn [animation-fill-mode:both];
+    animation: fadeIn 0.2s ease-in-out both;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger[aria-expanded="true"] > svg {
@@ -830,7 +834,8 @@ body:has(.openapi-select-popover) {
 
 .openapi-disclosure-trigger:hover > .openapi-disclosure-trigger-label span,
 .openapi-disclosure-trigger[aria-expanded="true"] > .openapi-disclosure-trigger-label span {
-    @apply block animate-fadeIn;
+    @apply block;
+    animation: fadeIn 0.2s ease-in-out both;
 }
 
 @media (hover: none) {

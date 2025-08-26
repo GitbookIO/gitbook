@@ -16,7 +16,7 @@ export const pt_br = {
     search_scope_all: 'Todo o conteúdo',
     ask: 'Perguntar',
     search_ask: 'Perguntar "${1}"',
-    search_ask_description: 'Encontre a resposta com IA',
+    search_ask_description: 'Encontre a resposta com ${1}',
     search_ask_sources: 'Fontes',
     search_ask_sources_no_answer: 'Páginas relacionadas',
     search_ask_no_answer:
@@ -49,6 +49,7 @@ export const pt_br = {
     view: 'Ver',
     edit_on_git: 'Editar no ${1}',
     notfound_title: 'Página não encontrada',
+    notfound_link: 'Este link aponta para uma página que foi removida ou não existe mais.',
     notfound: 'A página que você está procurando não existe.',
     unexpected_error_title: 'Aconteceu um erro',
     unexpected_error:
@@ -86,8 +87,9 @@ export const pt_br = {
     ai_chat_context_info_provided_by_the_site: 'Informações fornecidas pelo site',
     ai_chat_context_previous_messages: 'Mensagens anteriores',
     ai_chat_context_disclaimer: 'Respostas de IA podem conter erros.',
-    ai_chat_input_placeholder: 'Pergunte, pesquise ou execute uma ação...',
+    ai_chat_input_placeholder: 'Pergunte, pesquise ou explique...',
     send: 'Enviar',
+    actions: 'Ações',
     ai_chat_suggested_questions_title: 'Perguntas sugeridas',
     ai_chat_suggested_questions_about_this_page: 'Sobre o que é esta página?',
     ai_chat_suggested_questions_read_next: 'O que devo ler em seguida?',
@@ -105,4 +107,6 @@ export const pt_br = {
     view_page_plaintext: 'Ver esta página em texto simples',
     open_in: 'Abrir no ${1}',
     open_in_llms_pre_prompt: 'Leia ${1} e responda perguntas sobre o conteúdo.',
+    press_to_confirm: 'Pressione ${1} para confirmar',
+    tool_call_skipped: 'Pulado "${1}"',
 };

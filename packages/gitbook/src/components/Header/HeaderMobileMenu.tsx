@@ -47,7 +47,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
             aria-label={tString(language, 'table_of_contents_button_label')}
             onClick={toggleNavigation}
             className={tcls(
-                'flex flex-row items-center rounded straight-corners:rounded-sm px-2 py-1',
+                'flex flex-row items-center rounded-sm straight-corners:rounded-xs px-2 py-1',
                 props.className
             )}
         >

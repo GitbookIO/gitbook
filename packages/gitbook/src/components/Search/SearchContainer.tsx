@@ -1,9 +1,11 @@
 'use client';
 
-import { CustomizationAIMode } from '@gitbook/api';
+import { CustomizationSearchStyle } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useAI } from '../AI';
+import { AIChatButton } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Popover } from '../primitives';
@@ -16,9 +18,10 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 
 interface SearchContainerProps {
+    siteSpaceId: string;
     spaceTitle: string;
     isMultiVariants: boolean;
-    aiMode: CustomizationAIMode;
+    style: CustomizationSearchStyle;
     className?: string;
 }
 
@@ -26,7 +29,9 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { spaceTitle, isMultiVariants, aiMode, className } = props;
+    const { siteSpaceId, spaceTitle, isMultiVariants, style, className } = props;
+
+    const { assistants } = useAI();
 
     const [state, setSearchState] = useSearch();
     const searchAsk = useSearchAskState();
@@ -37,20 +42,40 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const isMobile = useIsMobile();
 
-    // Derive open state from search state
-    const open = state?.open ?? false;
+    const withAI = assistants.length > 0;
+    const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
 
-    const onClose = async (to?: string) => {
-        if (state?.query === '') {
-            await setSearchState(null);
-        } else if (state) {
-            await setSearchState({ ...state, open: false });
-        }
+    // Handle initial ask state on page load, once assistants are ready
+    const initialRef = React.useRef(state?.ask === undefined || state?.ask === null); // If ask is not set on page load, we will never trigger
+    React.useEffect(() => {
+        if (initialRef.current) return;
+        if (assistants.length === 0) return;
+        if (state?.ask === undefined || state?.ask === null) return;
 
-        if (to) {
-            router.push(to);
-        }
-    };
+        initialRef.current = true;
+
+        // For simplicity we're only triggering the first assistant
+        assistants[0].open(state?.ask ?? undefined);
+    }, [state?.ask, assistants.length, assistants[0]?.open]);
+
+    const onClose = React.useCallback(
+        async (to?: string) => {
+            setSearchState((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          open: false,
+                          query: prev.query === '' ? null : prev.query,
+                      }
+                    : null
+            );
+
+            if (to) {
+                router.push(to);
+            }
+        },
+        [setSearchState, router]
+    );
 
     useHotkeys(
         'mod+k',
@@ -58,24 +83,26 @@ export function SearchContainer(props: SearchContainerProps) {
             e.preventDefault();
             onOpen();
         },
-        []
+        {
+            enableOnFormTags: true,
+        }
     );
 
-    const onOpen = () => {
-        if (open) {
+    const onOpen = React.useCallback(() => {
+        if (state?.open) {
             return;
         }
         setSearchState((prev) => ({
-            ask: prev?.ask ?? false,
+            ask: withAI ? (prev?.ask ?? null) : null,
             global: prev?.global ?? false,
-            query: prev?.query ?? '',
+            query: prev?.query ?? (withSearchAI || !withAI ? prev?.ask : null) ?? '',
             open: true,
         }));
 
         trackEvent({
             type: 'search_open',
         });
-    };
+    }, [state?.open, setSearchState, trackEvent, withAI, withSearchAI]);
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -105,7 +132,7 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onChange = (value: string) => {
         setSearchState((prev) => ({
-            ask: false, // When typing, we go back to the default search mode
+            ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null, // When typing, we reset ask to get back to normal search (unless non-search assistants are defined)
             query: value,
             global: prev?.global ?? false,
             open: true,
@@ -113,45 +140,50 @@ export function SearchContainer(props: SearchContainerProps) {
     };
 
     // We trim the query to avoid invalidating the search when the user is typing between words.
-    const normalizedQuery = state?.query.trim() ?? '';
+    const normalizedQuery = state?.query?.trim() ?? '';
+    const normalizedAsk = state?.ask?.trim() ?? '';
+
+    const showAsk = withSearchAI && normalizedAsk; // withSearchAI && normalizedAsk;
 
     return (
         <SearchAskProvider value={searchAsk}>
             <Popover
                 content={
                     // Only show content if there's a query or Ask is enabled
-                    (state?.query || aiMode !== CustomizationAIMode.None) && open ? (
+                    state?.query || withAI ? (
                         <React.Suspense fallback={null}>
-                            {isMultiVariants && !state?.ask ? (
+                            {isMultiVariants && !showAsk ? (
                                 <SearchScopeToggle spaceTitle={spaceTitle} />
                             ) : null}
-                            {state !== null && !state.ask ? (
+                            {state !== null && !showAsk ? (
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
-                                    aiMode={aiMode}
+                                    siteSpaceId={siteSpaceId}
                                 />
                             ) : null}
-                            {state?.ask ? <SearchAskAnswer query={normalizedQuery} /> : null}
+                            {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }
                 rootProps={{
-                    open: open,
+                    open: state?.open ?? false,
+                    onOpenChange: (open) => {
+                        open ? onOpen() : onClose();
+                    },
                     modal: isMobile,
                 }}
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base has-[.empty]:hidden scroll-py-2 w-[32rem] p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        'bg-tint-base has-[.empty]:hidden scroll-py-2 w-128 p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: (event) => {
                         // Don't close if clicking on the search input itself
                         if (searchInputRef.current?.contains(event.target as Node)) {
                             return;
                         }
-                        onClose();
                     },
                     sideOffset: 8,
                     collisionPadding: {
@@ -168,15 +200,27 @@ export function SearchContainer(props: SearchContainerProps) {
             >
                 <SearchInput
                     ref={searchInputRef}
-                    value={state?.query ?? ''}
+                    value={state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? ''}
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    aiMode={aiMode}
-                    isOpen={open}
+                    withAI={withSearchAI}
+                    isOpen={state?.open ?? false}
                     className={className}
                 />
             </Popover>
+            {assistants
+                .filter((assistant) => assistant.ui === true)
+                .map((assistant) => (
+                    <AIChatButton
+                        key={assistant.id}
+                        assistant={assistant}
+                        showLabel={
+                            assistants.filter((assistant) => assistant.ui === true).length === 1 &&
+                            style === CustomizationSearchStyle.Prominent
+                        }
+                    />
+                ))}
         </SearchAskProvider>
     );
 }

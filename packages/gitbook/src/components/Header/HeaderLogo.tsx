@@ -53,11 +53,12 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                         'min-w-0',
                         'max-w-40',
                         'lg:max-w-64',
-                        'site-header-none:page-no-toc:lg:max-w-56',
+                        'lg:site-header-none:page-no-toc:max-w-56',
                         'max-h-10',
-                        'lg:max-h-12',
                         'h-full',
-                        'w-auto'
+                        'w-full',
+                        'object-contain',
+                        'object-left'
                     )}
                 />
             ) : (

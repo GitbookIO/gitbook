@@ -50,12 +50,12 @@ export function Details(props: {
                 'border-b-0',
                 'border-tint-subtle',
                 //all
-                '[&]:mt-[0px]',
+                'mt-0!',
                 //select first child
-                '[&:first-child]:mt-5',
-                '[&:first-child]:rounded-t-lg',
+                'first:mt-5!',
+                'first:rounded-t-lg',
                 //select first in group
-                '[:not(&)_+&]:mt-5',
+                '[:not(&)_+&]:mt-5!',
                 '[:not(&)_+&]:rounded-t-lg',
                 //select last in group
                 '[&:not(:has(+_&))]:mb-5',

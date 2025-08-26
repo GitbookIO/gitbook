@@ -1,5 +1,4 @@
 import { AIActionsDropdown } from '@/components/AIActions/AIActionsDropdown';
-import { isAIChatEnabled } from '@/components/utils/isAIChatEnabled';
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
@@ -20,13 +19,9 @@ export async function PageHeader(props: {
         return null;
     }
 
-    const withAIChat = isAIChatEnabled(context);
+    const pageActions = context.customization.pageActions;
 
-    const pageActions = context.customization.pageActions ?? {
-        // TODO: After 25/07/2025, we can remove this default values as the cache will be updated
-        markdown: true,
-        externalAI: true,
-    };
+    const hasAncestors = ancestors.length > 0;
 
     return (
         <header
@@ -37,27 +32,23 @@ export async function PageHeader(props: {
                 'mb-6',
                 'space-y-3',
                 'page-api-block:ml-0',
-                'page-api-block:max-w-full'
+                'page-api-block:max-w-full',
+                hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >
-            {page.layout.tableOfContents &&
-            // Show page actions if *any* of the actions are enabled
-            (withAIChat || pageActions.markdown || pageActions.externalAI) ? (
-                <div
+            {page.layout.tableOfContents ? (
+                // Show page actions if *any* of the actions are enabled
+                <AIActionsDropdown
+                    markdownPageUrl={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
+                    actions={pageActions}
                     className={tcls(
-                        'float-right mb-2 ml-4',
-                        ancestors.length > 0 ? '-mt-2' : 'xs:mt-2'
+                        'float-right ml-4 xl:max-2xl:page-api-block:mr-62',
+                        hasAncestors ? '-my-1.5' : '-mt-3 xs:mt-2'
                     )}
-                >
-                    <AIActionsDropdown
-                        markdownPageUrl={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
-                        withAIChat={withAIChat}
-                        trademark={context.customization.trademark.enabled}
-                        actions={pageActions}
-                    />
-                </div>
+                />
             ) : null}
-            {ancestors.length > 0 && (
+
+            {hasAncestors && (
                 <nav aria-label="Breadcrumb">
                     <ol className={tcls('flex', 'flex-wrap', 'items-center', 'gap-2', 'text-tint')}>
                         {ancestors.map((breadcrumb, index) => {

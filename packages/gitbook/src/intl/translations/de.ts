@@ -16,7 +16,7 @@ export const de = {
     search_scope_all: 'Alle Inhalte',
     ask: 'Fragen',
     search_ask: 'Fragen "${1}"',
-    search_ask_description: 'Finden Sie die Antwort mit AI',
+    search_ask_description: 'Finden Sie die Antwort mit ${1}',
     search_ask_sources: 'Quellen',
     search_ask_sources_no_answer: 'Verwandte Seiten',
     search_ask_no_answer:
@@ -49,6 +49,8 @@ export const de = {
     view: 'Anzeigen',
     edit_on_git: 'Bearbeiten auf ${1}',
     notfound_title: 'Seite nicht gefunden',
+    notfound_link:
+        'Dieser Link verweist auf eine Seite, die entfernt wurde oder nicht mehr existiert.',
     notfound: 'Die gesuchte Seite existiert nicht.',
     unexpected_error_title: 'Ein Fehler ist aufgetreten',
     unexpected_error:
@@ -86,8 +88,9 @@ export const de = {
     ai_chat_context_info_provided_by_the_site: 'Von der Website bereitgestellte Informationen',
     ai_chat_context_previous_messages: 'Vorherige Nachrichten',
     ai_chat_context_disclaimer: 'KI-Antworten können Fehler enthalten.',
-    ai_chat_input_placeholder: 'Fragen, suchen oder Aktion ausführen...',
+    ai_chat_input_placeholder: 'Fragen, suchen oder erklären...',
     send: 'Senden',
+    actions: 'Aktionen',
     ai_chat_suggested_questions_title: 'Vorgeschlagene Fragen',
     ai_chat_suggested_questions_about_this_page: 'Worum geht es auf dieser Seite?',
     ai_chat_suggested_questions_read_next: 'Was sollte ich als nächstes lesen?',
@@ -105,4 +108,6 @@ export const de = {
     view_page_plaintext: 'Diese Seite als Klartext anzeigen',
     open_in: 'Öffnen in ${1}',
     open_in_llms_pre_prompt: 'Lies ${1} und beantworte Fragen zum Inhalt.',
+    press_to_confirm: 'Drücke ${1} zum Bestätigen',
+    tool_call_skipped: 'Übersprungen "${1}"',
 };

@@ -44,6 +44,7 @@ export type SiteURLData = Pick<
     | 'siteSection'
     | 'siteBasePath'
     | 'basePath'
+    | 'contextId'
 > & {
     /**
      * Identifier used for image resizing.
@@ -123,6 +124,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Scripts to load for the site. */
     scripts: SiteIntegrationScript[];
+
+    /** Context ID used by adaptive content. It represents an unique identifier for the authentication context */
+    contextId?: string;
 };
 
 /**
@@ -200,6 +204,7 @@ export async function fetchSiteContextByURLLookup(
         shareKey: data.shareKey,
         changeRequest: data.changeRequest,
         revision: data.revision,
+        contextId: data.contextId,
     });
 }
 
@@ -217,6 +222,7 @@ export async function fetchSiteContextByIds(
         shareKey: string | undefined;
         changeRequest: string | undefined;
         revision: string | undefined;
+        contextId?: string;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -314,6 +320,7 @@ export async function fetchSiteContextByIds(
         structure: siteStructure,
         sections,
         scripts,
+        contextId: ids.contextId,
     };
 }
 

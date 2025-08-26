@@ -21,10 +21,12 @@ import {
     getPathScopedCookieName,
     getResponseCookiesForVisitorAuth,
     getVisitorData,
-    normalizeVisitorAuthURL,
+    normalizeVisitorURL,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
+import { cookies } from 'next/headers';
 import type { SiteURLData } from './lib/context';
+import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -63,20 +65,34 @@ export async function middleware(request: NextRequest) {
 }
 
 async function validateServerActionRequest(request: NextRequest) {
-    // We need to reject incorrect server actions requests
-    // We do not do it in cloudflare workers as there is a bug that prevents us from reading the request body.
-    if (request.headers.has('next-action') && process.env.GITBOOK_RUNTIME !== 'cloudflare') {
-        // We just test that the json body is parseable
-        try {
-            const clonedRequest = request.clone();
-            await clonedRequest.json();
-        } catch (e) {
-            console.warn('Invalid server action request', e);
-            // If the body is not parseable, we reject the request
+    // First thing we need to do is validate that the header is in a correct format.
+    if (request.headers.has('next-action')) {
+        // A server action id is a 1-byte hex string (2 chars) followed by a 20-byte SHA1 hash (40 chars) = 42 total characters.
+        // For ref https://github.com/vercel/next.js/blob/db561cb924cbea0f3384e89f251fc443a8aec1ae/crates/next-custom-transforms/src/transforms/server_actions.rs#L266-L268
+        const regex = /^[a-fA-F0-9]{42}$/;
+        const match = request.headers.get('next-action')?.match(regex);
+        if (!match) {
             return new Response('Invalid request', {
                 status: 400,
                 headers: { 'content-type': 'text/plain' },
             });
+        }
+
+        // We need to reject incorrect server actions requests
+        // We do not do it in cloudflare workers as there is a bug that prevents us from reading the request body.
+        if (process.env.GITBOOK_RUNTIME !== 'cloudflare') {
+            // We just test that the json body is parseable
+            try {
+                const clonedRequest = request.clone();
+                await clonedRequest.json();
+            } catch (e) {
+                console.warn('Invalid server action request', e);
+                // If the body is not parseable, we reject the request
+                return new Response('Invalid request', {
+                    status: 400,
+                    headers: { 'content-type': 'text/plain' },
+                });
+            }
         }
     }
 }
@@ -125,6 +141,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         });
     }
 
+    //Forwards analytics events
+    if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
+        return await serveProxyAnalyticsEvent(request);
+    }
+
     // We want to filter hostnames that contains a port here as this is likely a malicious request.
     if (shouldFilterMaliciousRequests(siteRequestURL)) {
         return new Response('Invalid request', {
@@ -140,6 +161,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         cookies: request.cookies.getAll(),
         url: siteRequestURL,
     });
+
+    //
+    // Strip the tracking header to prevent users providing it themselves.
+    //
+    request.headers.delete('x-gitbook-disable-tracking');
 
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
@@ -215,13 +241,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             incomingURL.search = requestURL.search;
         }
         //
-        // Make sure the URL is clean of any va token after a successful lookup
-        // The token is stored in a cookie that is set on the redirect response
+        // Make sure the URL is clean of any va token after a successful lookup,
+        // and of any visitor.* params that may have been passed to the URL.
         //
-        const incomingURLWithoutToken = normalizeVisitorAuthURL(incomingURL);
-        if (incomingURLWithoutToken.toString() !== incomingURL.toString()) {
+        // The token and the visitor.* params value are stored in cookies that are set
+        // on the redirect response.
+        //
+        const normalizedVisitorURL = normalizeVisitorURL(incomingURL);
+        if (normalizedVisitorURL.toString() !== incomingURL.toString()) {
             return writeResponseCookies(
-                NextResponse.redirect(incomingURLWithoutToken.toString()),
+                NextResponse.redirect(normalizedVisitorURL.toString()),
                 cookies
             );
         }
@@ -249,6 +278,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             shareKey: siteURLData.shareKey,
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
+            contextId: siteURLData.contextId,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -328,11 +358,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         response.headers.set('x-gitbook-route-type', routeType);
         response.headers.set('x-gitbook-route-site', siteURLWithoutProtocol);
 
+        // When we use adaptive content, we want to ensure that the cache is not used at all on the client side.
+        // Vercel already set this header, this is needed in OpenNext.
+        if (siteURLData.contextId) {
+            response.headers.set('cache-control', 'public, max-age=0, must-revalidate');
+        }
+
         return writeResponseCookies(response, cookies);
     };
 
     // For https://preview/<siteURL> requests,
     if (siteRequestURL.hostname === 'preview') {
+        // Do not track page views for preview requests
+        request.headers.set('x-gitbook-disable-tracking', 'true');
+
         return serveWithQueryAPIToken(
             // We scope the API token to the site ID.
             `${siteRequestURL.hostname}/${requestURL.pathname.slice(1).split('/')[0]}`,
@@ -498,13 +537,24 @@ function encodePathInSiteContent(rawPathname: string): {
         };
     }
 
+    // If the pathname is an embedded page
+    const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
+    if (embedPage) {
+        return {
+            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1])}`,
+        };
+    }
+
     switch (pathname) {
+        case '~gitbook/embed/assistant':
         case '~gitbook/icon':
             return { pathname };
         case 'llms.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
+        case '~gitbook/embed/script.js':
+        case '~gitbook/embed/assistant-demo':
             // LLMs.txt, sitemap, sitemap-pages and robots.txt are always static
             // as they only depend on the site structure / pages.
             return { pathname, routeType: 'static' };
@@ -530,9 +580,16 @@ function appendQueryParams(url: URL, from: URLSearchParams) {
 /**
  * Write the cookies to a response.
  */
-function writeResponseCookies<R extends NextResponse>(response: R, cookies: ResponseCookies): R {
-    cookies.forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value, cookie.options);
+async function writeResponseCookies<R extends NextResponse>(
+    response: R,
+    cookiesToSet: ResponseCookies
+): Promise<R> {
+    const cookiesFn = await cookies();
+    cookiesToSet.forEach((cookie) => {
+        // response.cookies.set(cookie.name, cookie.value, cookie.options);
+        // For some reason we have to use the cookies function instead of response.cookies.set
+        // Without it, it breaks the ai assistant server actions (it thinks it is a static route).
+        cookiesFn.set(cookie.name, cookie.value, cookie.options);
     });
 
     return response;

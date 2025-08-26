@@ -6,6 +6,7 @@ import React from 'react';
 import { tcls } from '@/lib/tailwind';
 import { SiteExternalLinksTarget } from '@gitbook/api';
 import { type TrackEventInput, useTrackEvent } from '../Insights';
+import { HashContext } from '../hooks';
 import { isExternalLink } from '../utils/link';
 import { type DesignTokenName, useClassnames } from './StyleProvider';
 
@@ -71,6 +72,7 @@ export const Link = React.forwardRef(function Link(
 ) {
     const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
     const { externalLinksTarget } = React.useContext(LinkSettingsContext);
+    const { updateHashFromUrl } = React.useContext(HashContext);
     const trackEvent = useTrackEvent();
     const forwardedClassNames = useClassnames(classNames || []);
     const isExternal = isExternalLink(href);
@@ -78,6 +80,9 @@ export const Link = React.forwardRef(function Link(
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         const isExternalWithOrigin = isExternalLink(href, window.location.origin);
+        if (!isExternal) {
+            updateHashFromUrl(href);
+        }
 
         if (insights) {
             trackEvent(insights, undefined, { immediate: isExternalWithOrigin });
@@ -123,11 +128,15 @@ export const Link = React.forwardRef(function Link(
         );
     }
 
+    // Not sure why yet, but it seems necessary to force prefetch to true
+    // default behavior doesn't seem to properly use the client router cache.
+    const _prefetch = prefetch === null || prefetch === undefined ? true : prefetch;
+
     return (
         <NextLink
             ref={ref}
             href={href}
-            prefetch={prefetch}
+            prefetch={_prefetch}
             className={tcls(...forwardedClassNames, className)}
             {...domProps}
             onClick={onClick}

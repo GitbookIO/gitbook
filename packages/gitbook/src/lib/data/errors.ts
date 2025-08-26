@@ -181,9 +181,6 @@ export function extractCacheControl(error: GitBookAPIError) {
  */
 export function getExposableError(error: Error): DataFetcherErrorData {
     if (error instanceof GitBookAPIError) {
-        if (error.code >= 500) {
-            throw error;
-        }
         const cache = extractCacheControl(error);
 
         return {
@@ -194,10 +191,6 @@ export function getExposableError(error: Error): DataFetcherErrorData {
     }
 
     if (error instanceof DataFetcherError) {
-        if (error.code >= 500) {
-            throw error;
-        }
-
         return {
             code: error.code,
             message: error.message,

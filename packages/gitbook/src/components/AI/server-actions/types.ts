@@ -16,5 +16,17 @@ export type RenderAIMessageOptions = {
      * Render the tool calls.
      * @default true
      */
-    renderToolCalls?: boolean;
+    withToolCalls?: boolean;
+
+    /**
+     * Render the link previews.
+     * @default true
+     */
+    withLinkPreviews?: boolean;
+
+    /**
+     * Generate links in the context of an embeddable view.
+     * @default false
+     */
+    asEmbeddable?: boolean;
 };

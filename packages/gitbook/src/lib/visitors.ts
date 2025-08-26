@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import hash from 'object-hash';
 
 const VISITOR_AUTH_PARAM = 'jwt_token';
+const VISITOR_PARAM_PREFIX = 'visitor.';
 export const VISITOR_TOKEN_COOKIE = 'gitbook-visitor-token';
 const VISITOR_UNSIGNED_CLAIMS_PREFIX = 'gitbook-visitor-public';
 
@@ -163,8 +164,8 @@ export function getVisitorUnsignedClaims(args: {
     }
 
     for (const [key, value] of url.searchParams.entries()) {
-        if (key.startsWith('visitor.')) {
-            const claimPath = key.substring('visitor.'.length);
+        if (key.startsWith(VISITOR_PARAM_PREFIX)) {
+            const claimPath = key.substring(VISITOR_PARAM_PREFIX.length);
             const claimValue = parseVisitorQueryParamValue(value);
 
             setVisitorClaimByPath(claims, claimPath, claimValue);
@@ -326,16 +327,21 @@ export function getVisitorAuthCookieValue(basePath: string, token: string): stri
 }
 
 /**
- * Normalize the URL by removing the visitor authentication token from the query parameters (if present).
+ * Normalize the URL by removing the visitor JWT token and visitor.* param from the query parameters (if present).
  */
-export function normalizeVisitorAuthURL(url: URL): URL {
+export function normalizeVisitorURL(url: URL): URL {
+    const withoutVisitorParamsURL = new URL(url);
     if (url.searchParams.has(VISITOR_AUTH_PARAM)) {
-        const withoutVAParam = new URL(url);
-        withoutVAParam.searchParams.delete(VISITOR_AUTH_PARAM);
-        return withoutVAParam;
+        withoutVisitorParamsURL.searchParams.delete(VISITOR_AUTH_PARAM);
     }
 
-    return url;
+    for (const [urlParam] of url.searchParams.entries()) {
+        if (urlParam.startsWith(VISITOR_PARAM_PREFIX)) {
+            withoutVisitorParamsURL.searchParams.delete(urlParam);
+        }
+    }
+
+    return withoutVisitorParamsURL;
 }
 
 /**

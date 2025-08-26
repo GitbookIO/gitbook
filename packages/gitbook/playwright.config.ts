@@ -10,9 +10,15 @@ export default defineConfig({
         ['@argos-ci/playwright/reporter', { uploadToArgos: !!process.env.CI }],
     ],
     projects: [
+        // To speed up CI, we only test on Chrome.
+        // https://github.com/microsoft/playwright/issues/14434
+        // https://playwright.dev/docs/browsers#google-chrome--microsoft-edge
         {
             name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chrome',
+            },
         },
     ],
     use: {

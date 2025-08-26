@@ -55,11 +55,11 @@ interface InsightsProviderProps {
     /** If true, the visitor cookie tracking will be used */
     visitorCookieTrackingEnabled: boolean;
 
-    /** The URL of the app. */
+    /** The application URL. */
     appURL: string;
 
-    /** The host of the API. */
-    apiHost: string;
+    /** The url of the endpoint to send events to */
+    eventUrl: string;
 
     /** The children of the provider. */
     children: React.ReactNode;
@@ -69,7 +69,7 @@ interface InsightsProviderProps {
  * Wrap the content of the app with the InsightsProvider to track events.
  */
 export function InsightsProvider(props: InsightsProviderProps) {
-    const { enabled, appURL, apiHost, children, visitorCookieTrackingEnabled } = props;
+    const { enabled, children, visitorCookieTrackingEnabled, eventUrl, appURL } = props;
 
     const currentContent = useCurrentContent();
     const visitorIdRef = React.useRef<string | null>(null);
@@ -126,9 +126,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         if (allEvents.length > 0) {
             if (enabled) {
                 sendEvents({
-                    apiHost,
-                    organizationId: currentContent.organizationId,
-                    siteId: currentContent.siteId,
+                    eventUrl,
                     events: allEvents,
                 });
             } else {
@@ -190,7 +188,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         return () => {
             window.removeEventListener('beforeunload', flushEventsSync);
         };
-    }, [flushEventsSync, appURL, visitorCookieTrackingEnabled]);
+    }, [flushEventsSync, visitorCookieTrackingEnabled, appURL]);
 
     return (
         <InsightsContext.Provider value={trackEvent}>
@@ -216,16 +214,12 @@ export function useTrackEvent(): TrackEventCallback {
  * Post the events to the server.
  */
 function sendEvents(args: {
-    apiHost: string;
-    organizationId: string;
-    siteId: string;
+    eventUrl: string;
     events: api.SiteInsightsEvent[];
 }) {
-    const { apiHost, organizationId, siteId, events } = args;
-    const url = new URL(apiHost);
-    url.pathname = `/v1/orgs/${organizationId}/sites/${siteId}/insights/events`;
+    const { eventUrl, events } = args;
 
-    fetch(url.toString(), {
+    fetch(eventUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

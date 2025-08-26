@@ -1,5 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationAIMode, CustomizationHeaderPreset } from '@gitbook/api';
+import {
+    CustomizationAIMode,
+    CustomizationHeaderPreset,
+    CustomizationSearchStyle,
+} from '@gitbook/api';
 import React from 'react';
 
 import { Footer } from '@/components/Footer';
@@ -9,9 +13,8 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import type { VisitorAuthClaims } from '@/lib/adaptive';
-import { GITBOOK_API_PUBLIC_URL, GITBOOK_APP_URL } from '@/lib/env';
+import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChat } from '../AIChat';
-import { AIChatButton } from '../AIChat';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -49,22 +52,28 @@ export function SpaceLayout(props: {
         customization.footer.logo ||
         customization.footer.groups?.length;
 
-    const aiMode = customization.ai?.mode;
-
-    const searchAndAI = (
+    const search = (
         <div className="flex grow items-center gap-2">
             <React.Suspense fallback={null}>
                 <SearchContainer
-                    aiMode={aiMode}
+                    style={
+                        customization.header.preset === CustomizationHeaderPreset.None
+                            ? CustomizationSearchStyle.Subtle
+                            : customization.styling.search
+                    }
                     isMultiVariants={siteSpaces.length > 1}
                     spaceTitle={siteSpace.title}
+                    siteSpaceId={siteSpace.id}
                 />
             </React.Suspense>
-            {aiMode === CustomizationAIMode.Assistant ? (
-                <AIChatButton trademark={customization.trademark.enabled} />
-            ) : null}
         </div>
     );
+
+    const eventUrl = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/__evt'))
+    );
+    eventUrl.searchParams.set('o', context.organizationId);
+    eventUrl.searchParams.set('s', context.site.id);
 
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
@@ -81,12 +90,12 @@ export function SpaceLayout(props: {
                 <InsightsProvider
                     enabled={withTracking}
                     appURL={GITBOOK_APP_URL}
-                    apiHost={GITBOOK_API_PUBLIC_URL}
+                    eventUrl={eventUrl.toString()}
                     visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                 >
                     <Announcement context={context} />
-                    <Header withTopHeader={withTopHeader} context={context} search={searchAndAI} />
-                    {aiMode === CustomizationAIMode.Assistant ? (
+                    <Header withTopHeader={withTopHeader} context={context} search={search} />
+                    {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                         <AIChat trademark={customization.trademark.enabled} />
                     ) : null}
 
@@ -126,7 +135,7 @@ export function SpaceLayout(props: {
                                 innerHeader={
                                     // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                                     <>
-                                        {!withTopHeader && searchAndAI}
+                                        {!withTopHeader && search}
                                         {!withTopHeader && withSections && sections && (
                                             <SiteSectionList
                                                 className={tcls('hidden', 'lg:block')}
@@ -144,7 +153,7 @@ export function SpaceLayout(props: {
                                                 className={tcls(
                                                     'w-full',
                                                     'page-no-toc:hidden',
-                                                    'site-header-none:page-no-toc:flex'
+                                                    'page-no-toc:site-header-none:flex'
                                                 )}
                                             />
                                         )}

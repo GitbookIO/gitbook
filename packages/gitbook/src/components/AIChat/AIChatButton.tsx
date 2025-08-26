@@ -2,41 +2,37 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-import { useAIChatController, useAIChatState } from '../AI/useAIChat';
+import type { Assistant } from '../AI';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
-import { getAIChatName } from './AIChat';
-import { AIChatIcon } from './AIChatIcon';
 
 /**
  * Button to open/close the AI chat.
  */
-export function AIChatButton(props: { trademark: boolean }) {
-    const { trademark } = props;
-    const chatController = useAIChatController();
-    const chat = useAIChatState();
+export function AIChatButton(props: {
+    assistant: Assistant;
+    showLabel?: boolean;
+}) {
+    const { assistant, showLabel = true } = props;
     const language = useLanguage();
 
     return (
         <Button
-            icon={<AIChatIcon trademark={trademark} />}
-            iconOnly
-            size="default"
+            icon={assistant.icon}
+            data-testid="ai-chat-button"
+            iconOnly={!showLabel}
+            size="medium"
             variant="header"
             className={tcls('h-9 px-2.5')}
             label={
                 <div className="flex items-center gap-2">
-                    {t(language, 'ai_chat_ask', getAIChatName(trademark))}
-                    <KeyboardShortcut keys={['mod', 'j']} className="border-tint-11 text-tint-1" />
+                    {t(language, 'ai_chat_ask', assistant.label)}
+                    <KeyboardShortcut keys={['mod', 'i']} className="border-tint-11 text-tint-1" />
                 </div>
             }
-            onClick={() => {
-                if (chat.opened) {
-                    chatController.close();
-                } else {
-                    chatController.open();
-                }
-            }}
-        />
+            onClick={() => assistant.open()}
+        >
+            {showLabel ? <span className="max-md:hidden">{t(language, 'ask')}</span> : null}
+        </Button>
     );
 }
