@@ -7,6 +7,7 @@ import React from 'react';
 import { useAIChatController } from '@/components/AI';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
+import { integrationsAssistantTools } from '../Integrations';
 import { Button } from '../primitives';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
@@ -53,6 +54,9 @@ export function EmbeddableIframeAPI(props: {
                 }
                 case 'configure': {
                     embeddableConfiguration.setState(message.settings);
+                    integrationsAssistantTools.setState({
+                        tools: message.settings.tools,
+                    });
                     break;
                 }
                 case 'navigateToPage': {
@@ -70,7 +74,7 @@ export function EmbeddableIframeAPI(props: {
             console.log('[gitbook] cleanup');
             channel.cleanup();
         };
-    }, [chatController]);
+    }, [chatController, router, baseURL]);
 
     return null;
 }

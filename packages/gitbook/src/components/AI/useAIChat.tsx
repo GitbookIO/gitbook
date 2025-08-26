@@ -346,7 +346,8 @@ export function AIChatProvider(props: {
                     loading: false,
                     error: false,
                 }));
-            } catch {
+            } catch (error) {
+                console.error('Error streaming AI response', error);
                 globalState.setState((state) => ({
                     ...state,
                     loading: false,
@@ -359,6 +360,7 @@ export function AIChatProvider(props: {
             renderMessageOptions?.withLinkPreviews,
             renderMessageOptions?.withToolCalls,
             renderMessageOptions?.asEmbeddable,
+            language,
         ]
     );
 
