@@ -101,12 +101,7 @@ export async function TableOfContents(props: {
                         className={tcls(
                             'flex grow flex-col p-2',
                             customization.trademark.enabled && 'lg:pb-20',
-                            'lg:gutter-stable overflow-y-auto',
-                            '[&::-webkit-scrollbar]:bg-transparent',
-                            '[&::-webkit-scrollbar-thumb]:bg-transparent',
-                            '[&::-webkit-scrollbar]:group-hover:bg-tint-subtle',
-                            '[&::-webkit-scrollbar-thumb]:group-hover:bg-tint-7',
-                            '[&::-webkit-scrollbar-thumb:hover]:group-hover:bg-tint-8'
+                            'hide-scrollbar overflow-y-auto'
                         )}
                     >
                         <PagesList
