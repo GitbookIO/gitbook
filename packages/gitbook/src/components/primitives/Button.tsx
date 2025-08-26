@@ -147,7 +147,7 @@ export const Button = React.forwardRef<
                 classNames={['ButtonStyles']}
                 insights={insights}
                 aria-label={label?.toString()}
-                aria-pressed={active === undefined ? undefined : active}
+                aria-pressed={active}
                 target={target}
                 {...rest}
             >
@@ -159,7 +159,7 @@ export const Button = React.forwardRef<
                 type="button"
                 className={tcls(buttonOnlyClassNames, domClassName)}
                 aria-label={label?.toString()}
-                aria-pressed={active === undefined ? undefined : active}
+                aria-pressed={active}
                 disabled={disabled}
                 {...rest}
             >

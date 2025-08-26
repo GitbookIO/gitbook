@@ -37,13 +37,15 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     );
     const language = useLanguage();
 
-    const defaultActions = [assistants.length > 0, props.actions.markdown, props.editOnGit];
-    const dropdownActions = [props.actions.externalAI, props.pdfUrl];
+    const defaultActions = [assistants.length > 0, props.actions.markdown, props.editOnGit].filter(
+        Boolean
+    );
+    const dropdownActions = [props.actions.externalAI, props.pdfUrl].filter(Boolean);
 
-    return [...defaultActions, ...dropdownActions].some(Boolean) ? (
+    return [...defaultActions, ...dropdownActions].length > 0 ? (
         <ButtonGroup ref={ref} className={props.className}>
-            {defaultActions.some(Boolean) ? <DefaultAction {...props} /> : null}
-            {dropdownActions.some(Boolean) ? (
+            {defaultActions.length > 0 ? <DefaultAction {...props} /> : null}
+            {dropdownActions.length > 0 ? (
                 <DropdownMenu
                     align="end"
                     className="!min-w-60 max-w-max"
