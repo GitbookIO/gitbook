@@ -167,7 +167,7 @@ async function DescriptionForSearchToolCall(props: {
                     hasResults ? '-my-2 cursor-pointer py-2 hover:bg-primary-hover' : ''
                 )}
             >
-                <div className="flex flex-col leading-snug">
+                <div className="flex min-w-0 flex-col break-words leading-snug">
                     <p>{t(language, 'searched_for', <strong>{toolCall.query}</strong>)}</p>
                     <p className="mt-0.5 text-tint-subtle text-xs">
                         {hasResults

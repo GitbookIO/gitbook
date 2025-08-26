@@ -1,0 +1,34 @@
+{
+    "name": "@gitbook/expr",
+    "description": "Safely evaluate & parse user-defined GitBook expressions.",
+    "version": "0.0.1",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "development": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "sideEffects": false,
+    "dependencies": {
+        "eval-estree-expression": "^2.0.3",
+        "acorn": "^8.14.0",
+        "acorn-loose": "8.4.0",
+        "acorn-walk": "^8.3.4",
+        "assert-never": "^1.2.1"
+    },
+    "devDependencies": {
+        "bun-types": "^1.1.20",
+        "@types/estree": "^1.0.6",
+        "@babel/types": "^7.26.0",
+        "@types/json-schema": "^7.0.15"
+    },
+    "scripts": {
+        "build": "tsc --project tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "unit": "bun test",
+        "clean": "rm -rf ./dist"
+    },
+    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+}
