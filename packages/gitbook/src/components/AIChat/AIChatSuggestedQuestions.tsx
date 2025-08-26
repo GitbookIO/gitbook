@@ -2,19 +2,23 @@ import { tString, useLanguage } from '@/intl/client';
 import type { AIChatController } from '../AI';
 import { Button } from '../primitives';
 
-export default function AIChatSuggestedQuestions(props: { chatController: AIChatController }) {
-    const { chatController } = props;
+export default function AIChatSuggestedQuestions(props: {
+    chatController: AIChatController;
+    suggestions?: string[];
+}) {
     const language = useLanguage();
-
-    const DEFAULT_SUGGESTED_QUESTIONS = [
-        tString(language, 'ai_chat_suggested_questions_about_this_page'),
-        tString(language, 'ai_chat_suggested_questions_read_next'),
-        tString(language, 'ai_chat_suggested_questions_example'),
-    ];
+    const {
+        chatController,
+        suggestions = [
+            tString(language, 'ai_chat_suggested_questions_about_this_page'),
+            tString(language, 'ai_chat_suggested_questions_read_next'),
+            tString(language, 'ai_chat_suggested_questions_example'),
+        ],
+    } = props;
 
     return (
         <div className="flex flex-col items-center gap-2">
-            {DEFAULT_SUGGESTED_QUESTIONS.map((question, index) => (
+            {suggestions.map((question, index) => (
                 <Button
                     key={question}
                     variant="secondary"

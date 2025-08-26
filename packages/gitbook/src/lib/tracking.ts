@@ -1,5 +1,5 @@
 import type { headers as nextHeaders } from 'next/headers';
-import { GITBOOK_DISABLE_TRACKING } from './env';
+import { GITBOOK_API_URL, GITBOOK_DISABLE_TRACKING } from './env';
 
 /**
  * Return true if events should be tracked on the site.
@@ -20,4 +20,28 @@ export function shouldTrackEvents(headers?: Awaited<ReturnType<typeof nextHeader
     }
 
     return true;
+}
+
+/**
+ * Serve as a proxy to the analytics endpoint, forwarding the request body and required parameters.
+ */
+export async function serveProxyAnalyticsEvent(req: Request) {
+    const requestURL = new URL(req.url);
+
+    const org = requestURL.searchParams.get('o');
+    const site = requestURL.searchParams.get('s');
+    if (!org || !site) {
+        return new Response('Missing required query parameters: o (org) and s (site)', {
+            status: 400,
+            headers: { 'content-type': 'text/plain' },
+        });
+    }
+    const url = new URL(`${GITBOOK_API_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
+    return await fetch(url.toString(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: req.body,
+    });
 }

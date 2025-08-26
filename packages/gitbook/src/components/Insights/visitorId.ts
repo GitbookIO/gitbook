@@ -53,7 +53,7 @@ async function fetchVisitorID(
     const proposed = generateRandomId();
 
     const url = new URL(appURL);
-    url.pathname = '/__session';
+    url.pathname = '/__session/2/';
     url.searchParams.set('proposed', proposed);
 
     try {

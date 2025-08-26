@@ -26,6 +26,7 @@ import {
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
 import type { SiteURLData } from './lib/context';
+import { serveProxyAnalyticsEvent } from './lib/tracking';
 export const config = {
     matcher: [
         '/((?!_next/static|_next/image|~gitbook/static|~gitbook/revalidate|~gitbook/monitoring|~scalar/proxy).*)',
@@ -138,6 +139,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         return await serveResizedImage(request, {
             imagesContextId: imagesContextId,
         });
+    }
+
+    //Forwards analytics events
+    if (siteRequestURL.pathname.endsWith('/~gitbook/__evt')) {
+        return await serveProxyAnalyticsEvent(request);
     }
 
     // We want to filter hostnames that contains a port here as this is likely a malicious request.

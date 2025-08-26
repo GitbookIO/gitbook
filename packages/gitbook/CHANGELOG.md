@@ -1,5 +1,44 @@
 # gitbook
 
+## 0.16.0
+
+### Minor Changes
+
+- 6830815: Support custom AI providers
+- cbc71a5: Allow integrations to provide tools to the Docs Assistant
+- cc2e615: Emit a <link rel="alternate"> for the markdown version of a page
+- 81a6bd7: Support customization of buttons and tools through iframe API
+- 8927e8f: Start routes for embeddable version of the assistant and docs pages.
+
+### Patch Changes
+
+- d30bcba: Improve `Button` and `ButtonGroup` styling
+- e1b2cf6: Fix scroll of page outline
+- d655d3e: Support "objectivec" as alias for Objective C syntax
+- 13ff22b: Fix AI Search follow-up question closing search
+- ffa866c: Small fixes to search modal
+- 36af03f: Fixes to `PageAside`
+- fb858a1: Tweaks to AIChatButton and AIChatInput
+- bcfa8d8: Improve vertical alignment of site items and fix floating page aside
+- ea7e94f: Fix search bar layout shift caused by ToC
+- 2e6e28e: Fix: Long strings overflow out of message bubble in docs assistant
+- ff96bb5: Support new coverDefinitionDark for cards & image type
+- 388b20d: Clear AI chat properly
+- ba7ec14: Fix bug in search highlight in GBO
+- 6217a2e: Page outline: scroll to active item
+- 42c17f5: Improve OpenAPI parsing errors
+- 854c448: Custom assistants followup
+- 43766d6: Fix Custom logo not rendering on the published site
+- Updated dependencies [cbc71a5]
+- Updated dependencies [25e2b40]
+- Updated dependencies [42c17f5]
+- Updated dependencies [854c448]
+  - @gitbook/browser-types@0.1.0
+  - @gitbook/icons@0.3.0
+  - @gitbook/openapi-parser@3.0.1
+  - @gitbook/react-contentkit@0.7.4
+  - @gitbook/react-openapi@1.3.6
+
 ## 0.15.0
 
 ### Minor Changes
