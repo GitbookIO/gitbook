@@ -31,7 +31,9 @@ import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 
 import '@gitbook/icons/style.css';
 import './globals.css';
+import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
+import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
 
 function preloadFont(fontData: FontData) {
@@ -56,12 +58,14 @@ function preloadFont(fontData: FontData) {
  */
 export async function CustomizationRootLayout(props: {
     forcedTheme?: CustomizationThemeMode | null;
-    customization: SiteCustomizationSettings;
+    context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
-    const { customization, forcedTheme, children } = props;
+    const { context, forcedTheme, children } = props;
+    const customization =
+        'customization' in context ? context.customization : defaultCustomization();
 
-    const language = getSpaceLanguage(customization);
+    const language = getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
     const sidebarStyles = getSidebarStyles(customization);
@@ -141,7 +145,6 @@ export async function CustomizationRootLayout(props: {
                             )
                         };
                         --header-link: ${hexToRgb(
-                            // @ts-expect-error
                             customization.header.linkColor?.light ??
                                 colorContrast(
                                     tintColor?.light ?? customization.styling.primaryColor.light
@@ -161,7 +164,6 @@ export async function CustomizationRootLayout(props: {
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
                         --header-link: ${hexToRgb(
-                            // @ts-expect-error
                             customization.header.linkColor?.dark ??
                                 colorContrast(
                                     tintColor?.dark ?? customization.styling.primaryColor.dark
@@ -337,7 +339,6 @@ function generateColorVariable(
     return Object.entries(shades)
         .map(([key, value]) => {
             const rgbValue = hexToRgb(value); // Check the original hex value
-            // @ts-expect-error
             const contrastValue = withContrast ? hexToRgb(colorContrast(value)) : undefined; // Add contrast if needed
             return `--${name}-${key}: ${rgbValue}; ${
                 contrastValue ? `--contrast-${name}-${key}: ${contrastValue};` : ''
