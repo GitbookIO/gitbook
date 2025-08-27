@@ -4,18 +4,15 @@ import {
     type RevisionPageDocument,
     SiteAdsStatus,
     SiteInsightsAdPlacement,
-    type Space,
 } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
-import urlJoin from 'url-join';
 
 import { getSpaceLanguage, t } from '@/intl/server';
 import { getDocumentSections } from '@/lib/document-sections';
 import { tcls } from '@/lib/tailwind';
 
 import { Ad } from '../Ads';
-import { getPDFURLSearchParams } from '../PDF';
 import { PageFeedbackForm } from '../PageFeedback';
 import { ThemeToggler } from '../ThemeToggler';
 import { ScrollSectionsList } from './ScrollSectionsList';
@@ -118,11 +115,7 @@ export function PageAside(props: {
                                 <PageAsideSections document={document} context={context} />
                             </React.Suspense>
                         ) : null}
-                        <PageAsideActions
-                            page={page}
-                            withPageFeedback={withPageFeedback}
-                            context={context}
-                        />
+                        <PageAsideActions page={page} withPageFeedback={withPageFeedback} />
                     </div>
                 ) : null}
                 {customization.themes.toggeable || site.ads ? (
@@ -171,34 +164,16 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
 function PageAsideActions(props: {
     withPageFeedback: boolean;
-    context: GitBookSiteContext;
     page: RevisionPageDocument;
 }) {
-    const { page, withPageFeedback, context } = props;
-    const { customization, space } = context;
-    const language = getSpaceLanguage(customization);
-
-    const pdfHref = context.linker.toPathInSpace(
-        `~gitbook/pdf?${getPDFURLSearchParams({
-            page: page.id,
-            only: true,
-            limit: 100,
-        }).toString()}`
-    );
+    const { page, withPageFeedback } = props;
 
     return (
         <div
             className={tcls(
-                'flex',
-                'flex-col',
-                'gap-3',
-                'sidebar-list-default:px-3',
-                'border-t',
-                'first:border-none',
-                'border-tint-subtle',
-                'pt-5',
-                'first:pt-0',
-                'xl:max-2xl:page-api-block:p-5',
+                'flex flex-col gap-3',
+                'border-tint-subtle border-t first:border-none',
+                'sidebar-list-default:px-3 pt-5 first:pt-0 xl:max-2xl:page-api-block:p-5',
                 'empty:hidden'
             )}
         >
@@ -206,57 +181,6 @@ function PageAsideActions(props: {
                 <React.Suspense fallback={null}>
                     <PageFeedbackForm pageId={page.id} />
                 </React.Suspense>
-            ) : null}
-            {customization.git.showEditLink && space.gitSync?.url && page.git ? (
-                <div>
-                    <a
-                        href={urlJoin(space.gitSync.url, page.git.path)}
-                        className={tcls(
-                            'flex',
-                            'flex-row',
-                            'items-center',
-                            'text-sm',
-                            'hover:text-tint-strong',
-                            'links-accent:hover:underline',
-                            'links-accent:hover:underline-offset-4',
-                            'links-accent:hover:decoration-[3px]',
-                            'links-accent:hover:decoration-primary-subtle',
-                            'py-2'
-                        )}
-                    >
-                        <Icon
-                            icon={
-                                space.gitSync.installationProvider === 'gitlab'
-                                    ? 'gitlab'
-                                    : 'github'
-                            }
-                            className={tcls('size-4', 'mr-1.5')}
-                        />
-                        {t(language, 'edit_on_git', getGitSyncName(space))}
-                    </a>
-                </div>
-            ) : null}
-            {customization.pdf.enabled ? (
-                <div>
-                    <a
-                        href={pdfHref}
-                        className={tcls(
-                            'flex',
-                            'flex-row',
-                            'items-center',
-                            'text-sm',
-                            'hover:text-tint-strong',
-                            'links-accent:hover:underline',
-                            'links-accent:hover:underline-offset-4',
-                            'links-accent:hover:decoration-[3px]',
-                            'links-accent:hover:decoration-primary-subtle',
-                            'py-2'
-                        )}
-                    >
-                        <Icon icon="file-pdf" className={tcls('size-4', 'mr-1.5')} />
-                        {t(language, 'pdf_download')}
-                    </a>
-                </div>
             ) : null}
         </div>
     );
@@ -295,15 +219,4 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
             />
         </div>
     );
-}
-
-function getGitSyncName(space: Space): string {
-    if (space.gitSync?.installationProvider === 'github') {
-        return 'GitHub';
-    }
-    if (space.gitSync?.installationProvider === 'gitlab') {
-        return 'GitLab';
-    }
-
-    return 'Git';
 }

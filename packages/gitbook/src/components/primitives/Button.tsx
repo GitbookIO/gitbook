@@ -139,31 +139,27 @@ export const Button = React.forwardRef<
             </>
         );
 
-        if (href) {
-            return (
-                <Link
-                    ref={ref as React.Ref<HTMLAnchorElement>}
-                    href={href}
-                    className={domClassName}
-                    classNames={['ButtonStyles']}
-                    insights={insights}
-                    aria-label={label?.toString()}
-                    aria-pressed={active === undefined ? undefined : active}
-                    target={target}
-                    {...rest}
-                >
-                    {content}
-                </Link>
-            );
-        }
-
-        const button = (
+        const button = href ? (
+            <Link
+                ref={ref as React.Ref<HTMLAnchorElement>}
+                href={href}
+                className={domClassName}
+                classNames={['ButtonStyles']}
+                insights={insights}
+                aria-label={label?.toString()}
+                aria-pressed={active}
+                target={target}
+                {...rest}
+            >
+                {content}
+            </Link>
+        ) : (
             <button
                 ref={ref as React.Ref<HTMLButtonElement>}
                 type="button"
                 className={tcls(buttonOnlyClassNames, domClassName)}
                 aria-label={label?.toString()}
-                aria-pressed={active === undefined ? undefined : active}
+                aria-pressed={active}
                 disabled={disabled}
                 {...rest}
             >
