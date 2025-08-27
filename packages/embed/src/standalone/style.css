@@ -2,6 +2,7 @@
     --gitbook-widget-top: 1rem;
     --gitbook-widget-bottom: 1rem;
     --gitbook-widget-right: 1rem;
+    --gitbook-widget-left: 1rem;
 
     --gitbook-widget-button-height: 46px;
 
@@ -117,7 +118,7 @@
     bottom: var(--gitbook-widget-window-bottom);
     right: var(--gitbook-widget-right);
     z-index: 9998;
-    width: var(--gitbook-widget-window-width);
+    width: calc(min(var(--gitbook-widget-window-width), calc(100vw - var(--gitbook-widget-right) - var(--gitbook-widget-left))));
     height: calc(min(var(--gitbook-widget-window-height), calc(100vh - var(--gitbook-widget-window-bottom) - var(--gitbook-widget-top))));
     background-color: var(--gitbook-widget-background-solid);
     border: 1px solid var(--gitbook-widget-border-color);
