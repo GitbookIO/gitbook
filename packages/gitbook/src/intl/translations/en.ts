@@ -79,6 +79,8 @@ export const en = {
     ai_chat_working: 'Working...',
     ai_chat_context_badge: 'AI',
     ai_chat_error: 'Something went wrong.',
+    ai_chat_hold_message_1: 'Thinking it through…',
+    ai_chat_hold_message_2: 'Just a moment…',
     ai_chat_context_title: 'Based on your context',
     ai_chat_context_description:
         'The assistant uses AI and your context to generate answers and perform actions.',

@@ -1,3 +1,5 @@
+import { useLanguage } from '@/intl/client';
+import { tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { AIMessageRole } from '@gitbook/api';
 import type React from 'react';
@@ -12,6 +14,7 @@ export function AIChatMessages(props: {
     lastUserMessageRef?: React.RefObject<HTMLDivElement>;
 }) {
     const { chat, chatController, lastUserMessageRef } = props;
+    const language = useLanguage();
 
     return (
         <>
@@ -46,17 +49,49 @@ export function AIChatMessages(props: {
                         {message.content ? message.content : null}
 
                         {isLastMessage && chat.loading ? (
-                            <div className="flex w-full animate-fade-in-slow flex-wrap gap-2">
-                                {Array.from({ length: 7 }).map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className="h-4 animate-[fadeIn_500ms_ease_both,pulse_1.5s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-4"
-                                        style={{
-                                            width: `calc(${(index % 4) * 20 + 10}% - 4px)`,
-                                            animationDelay: `${index * 0.1}s`,
-                                        }}
-                                    />
-                                ))}
+                            <div className="flex w-full animate-fade-in-slow flex-col gap-2">
+                                {!message.content ? (
+                                    <div className="animate-[heightIn_500ms_4500ms_ease_both] py-2 text-tint-subtle">
+                                        {tString(language, 'ai_chat_hold_message_1')
+                                            .split(' ')
+                                            .map((word, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="animate-fade-in-slow"
+                                                    style={{
+                                                        animationDelay: `${5000 + index * 200}ms`,
+                                                    }}
+                                                >
+                                                    {word}{' '}
+                                                </span>
+                                            ))}
+                                        {tString(language, 'ai_chat_hold_message_2')
+                                            .split(' ')
+                                            .map((word, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="animate-fade-in-slow"
+                                                    style={{
+                                                        animationDelay: `${10000 + index * 200}ms`,
+                                                    }}
+                                                >
+                                                    {word}{' '}
+                                                </span>
+                                            ))}
+                                    </div>
+                                ) : null}
+                                <div className="flex flex-wrap gap-2">
+                                    {Array.from({ length: 7 }).map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className="h-4 animate-[fadeIn_500ms_ease_both,pulse_1.5s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-4"
+                                            style={{
+                                                width: `calc(${(index % 4) * 20 + 10}% - 4px)`,
+                                                animationDelay: `${index * 0.1}s`,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         ) : null}
 

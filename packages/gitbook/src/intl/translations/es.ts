@@ -83,6 +83,8 @@ export const es: TranslationLanguage = {
     ai_chat_working: 'Trabajando...',
     ai_chat_context_badge: 'IA',
     ai_chat_error: 'Algo salió mal.',
+    ai_chat_hold_message_1: 'Pensándolo bien…',
+    ai_chat_hold_message_2: 'Un momento…',
     ai_chat_context_title: 'Basado en tu contexto',
     ai_chat_context_description:
         'El asistente usa IA y tu contexto para generar respuestas y realizar acciones.',

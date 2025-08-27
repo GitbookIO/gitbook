@@ -82,6 +82,8 @@ export const no: TranslationLanguage = {
     ai_chat_working: 'Arbeider...',
     ai_chat_context_badge: 'AI',
     ai_chat_error: 'Noe gikk galt.',
+    ai_chat_hold_message_1: 'Tenker det gjennom…',
+    ai_chat_hold_message_2: 'Et øyeblikk…',
     ai_chat_context_title: 'Basert på din kontekst',
     ai_chat_context_description:
         'Assistenten bruker AI og din kontekst til å generere svar og utføre handlinger.',

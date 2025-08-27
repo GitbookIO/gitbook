@@ -81,6 +81,8 @@ export const pt_br = {
     ai_chat_working: 'Trabalhando...',
     ai_chat_context_badge: 'IA',
     ai_chat_error: 'Algo deu errado.',
+    ai_chat_hold_message_1: 'Pensando sobre isso…',
+    ai_chat_hold_message_2: 'Um momento…',
     ai_chat_context_title: 'Baseado no seu contexto',
     ai_chat_context_description:
         'O assistente usa IA e seu contexto para gerar respostas e realizar ações.',
