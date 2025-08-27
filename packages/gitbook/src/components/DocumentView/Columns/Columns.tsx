@@ -8,7 +8,6 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
     return (
         <div className={tcls('flex flex-col gap-x-8 md:flex-row', style)}>
             {block.nodes.map((columnBlock) => {
-                console.log('Rendering column with width:', columnBlock);
                 return (
                     <Column
                         key={columnBlock.key}
