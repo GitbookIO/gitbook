@@ -32,9 +32,7 @@
         "clean": "turbo run clean"
     },
     "workspaces": {
-        "packages": [
-            "packages/*"
-        ],
+        "packages": ["packages/*"],
         "catalog": {
             "@gitbook/api": "^0.137.0",
             "bidc": "^0.0.2"
