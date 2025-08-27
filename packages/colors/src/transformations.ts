@@ -419,7 +419,10 @@ export function dpsContrast(a: RGBColor, b: RGBColor) {
     return contrast < 7.5 ? 0 : contrast;
 }
 
-export function colorContrast(background: string, foreground: string[] = [LIGHT_BASE, DARK_BASE]) {
+export function colorContrast(
+    background: string,
+    foreground: string[] = [LIGHT_BASE, DARK_BASE]
+): string {
     const bg = hexToRgbArray(background);
 
     const best: { color?: RGBColor; contrast: number } = {
@@ -436,5 +439,5 @@ export function colorContrast(background: string, foreground: string[] = [LIGHT_
         }
     }
 
-    return best.color ? rgbArrayToHex(best.color) : foreground[0];
+    return best.color ? rgbArrayToHex(best.color) : foreground[0] || LIGHT_BASE;
 }
