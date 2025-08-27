@@ -5,7 +5,7 @@ export * from './translate';
 
 type TranslationLocale = keyof typeof languages;
 
-export const DEFAULT_LOCALE: TranslationLocale = 'en';
+export const DEFAULT_LOCALE = 'en' satisfies TranslationLocale;
 
 /**
  * Get the locale to use for a space.
