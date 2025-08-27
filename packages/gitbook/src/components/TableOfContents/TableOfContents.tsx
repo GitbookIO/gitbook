@@ -16,7 +16,7 @@ export async function TableOfContents(props: {
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
 }) {
     const { innerHeader, context, header } = props;
-    const { space, customization, revision } = context;
+    const { customization, revision } = context;
 
     const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
 
@@ -110,8 +110,7 @@ export async function TableOfContents(props: {
                         />
                         {customization.trademark.enabled ? (
                             <Trademark
-                                space={space}
-                                customization={customization}
+                                context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
                             />
                         ) : null}

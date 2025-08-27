@@ -318,11 +318,14 @@ const config: Config = {
                 'fadeIn-slow': 'fadeIn 500ms ease both',
                 fadeOut: 'fadeOut 200ms ease both',
                 'fadeOut-slow': 'fadeOut 500ms ease both',
+                appear: 'appear 200ms ease both allow-discrete',
 
                 enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+
+                heightIn: 'heightIn 200ms ease both',
             },
             keyframes: {
                 bounceSmall: {
@@ -356,6 +359,7 @@ const config: Config = {
                         opacity: '1',
                     },
                 },
+
                 present: {
                     from: {
                         opacity: '0',
@@ -486,6 +490,10 @@ const config: Config = {
                 fadeOut: {
                     from: { opacity: '1' },
                     to: { opacity: '0' },
+                },
+                heightIn: {
+                    from: { height: '0' },
+                    to: { height: 'max-content' },
                 },
             },
             boxShadow: {

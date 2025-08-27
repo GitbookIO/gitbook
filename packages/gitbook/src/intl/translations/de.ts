@@ -82,6 +82,8 @@ export const de = {
     ai_chat_working: 'Arbeite...',
     ai_chat_context_badge: 'KI',
     ai_chat_error: 'Etwas ist schief gelaufen.',
+    ai_chat_hold_message_1: 'Überlege es mir durch…',
+    ai_chat_hold_message_2: 'Einen Moment…',
     ai_chat_context_title: 'Basierend auf Ihrem Kontext',
     ai_chat_context_description:
         'Der Assistent verwendet KI und Ihren Kontext, um Antworten zu generieren und Aktionen durchzuführen.',

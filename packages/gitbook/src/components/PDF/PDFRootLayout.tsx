@@ -1,6 +1,5 @@
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import type { GitBookSiteContext, GitBookSpaceContext } from '@/lib/context';
-import { defaultCustomization } from '@/lib/utils';
 import { CustomizationThemeMode } from '@gitbook/api';
 
 /**
@@ -13,12 +12,7 @@ export async function PDFRootLayout(props: {
     const { context, children } = props;
 
     return (
-        <CustomizationRootLayout
-            customization={
-                'customization' in context ? context.customization : defaultCustomization()
-            }
-            forcedTheme={CustomizationThemeMode.Light}
-        >
+        <CustomizationRootLayout context={context} forcedTheme={CustomizationThemeMode.Light}>
             {children}
         </CustomizationRootLayout>
     );

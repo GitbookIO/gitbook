@@ -186,6 +186,7 @@
 @layer base {
     :root {
         @apply leading-relaxed;
+        interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
     }
     
     /* Modern browsers with `scrollbar-*` support */

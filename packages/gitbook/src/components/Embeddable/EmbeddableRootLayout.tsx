@@ -21,7 +21,7 @@ export async function EmbeddableRootLayout({
     children,
 }: React.PropsWithChildren<EmbeddableRootLayoutProps>) {
     return (
-        <CustomizationRootLayout customization={context.customization}>
+        <CustomizationRootLayout context={context}>
             <SiteLayoutClientContexts
                 forcedTheme={context.customization.themes.default}
                 externalLinksTarget={context.customization.externalLinks.target}

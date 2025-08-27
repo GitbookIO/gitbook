@@ -137,7 +137,7 @@ export function Header(props: {
                                     );
                                 })}
                                 <HeaderLinkMore
-                                    label={t(getSpaceLanguage(customization), 'more')}
+                                    label={t(getSpaceLanguage(context), 'more')}
                                     links={customization.header.links}
                                     context={context}
                                 />

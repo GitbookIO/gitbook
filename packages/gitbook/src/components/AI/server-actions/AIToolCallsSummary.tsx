@@ -72,7 +72,7 @@ function DescriptionForPageContentToolCall(props: {
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context.customization);
+    const language = getSpaceLanguage(context);
 
     return (
         <p>
@@ -102,7 +102,7 @@ function DescriptionForMCPToolCall(props: {
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context.customization);
+    const language = getSpaceLanguage(context);
 
     return (
         <p>
@@ -130,7 +130,7 @@ async function DescriptionForSearchToolCall(props: {
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context.customization);
+    const language = getSpaceLanguage(context);
 
     // Resolve all hrefs for search results in parallel
     const searchResultsWithHrefs = await Promise.all(
@@ -241,7 +241,7 @@ function DescriptionForGetPagesToolCall(props: {
 }) {
     const { toolCall, context } = props;
 
-    const language = getSpaceLanguage(context.customization);
+    const language = getSpaceLanguage(context);
 
     return (
         <p>
