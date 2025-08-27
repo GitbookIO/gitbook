@@ -3,6 +3,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
@@ -17,9 +18,8 @@ import { SpacesDropdown } from './SpacesDropdown';
 export function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
-    search?: React.ReactNode;
 }) {
-    const { context, withTopHeader, search } = props;
+    const { context, withTopHeader } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
     return (
@@ -116,7 +116,13 @@ export function Header(props: {
                                     : ['order-last']
                             )}
                         >
-                            {search}
+                            <SearchContainer
+                                style={customization.styling.search}
+                                isMultiVariants={siteSpaces.length > 1}
+                                spaceTitle={siteSpace.title}
+                                siteSpaceId={siteSpace.id}
+                                viewport={!withTopHeader ? 'mobile' : undefined}
+                            />
                         </div>
 
                         {customization.header.links.length > 0 && (

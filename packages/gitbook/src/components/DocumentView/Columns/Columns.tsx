@@ -1,5 +1,5 @@
-import { type ClassValue, tcls } from '@/lib/tailwind';
-import type { DocumentBlockColumns, Length } from '@gitbook/api';
+import { tcls } from '@/lib/tailwind';
+import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitbook/api';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 
@@ -8,10 +8,12 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
     return (
         <div className={tcls('flex flex-col gap-x-8 md:flex-row', style)}>
             {block.nodes.map((columnBlock) => {
-                const width = columnBlock.data.width;
-                const { className, style } = transformLengthToCSS(width);
                 return (
-                    <Column key={columnBlock.key} className={className} style={style}>
+                    <Column
+                        key={columnBlock.key}
+                        width={columnBlock.data.width}
+                        verticalAlignment={columnBlock.data.verticalAlignment}
+                    >
                         <Blocks
                             key={columnBlock.key}
                             nodes={columnBlock.nodes}
@@ -29,11 +31,23 @@ export function Columns(props: BlockProps<DocumentBlockColumns>) {
 
 export function Column(props: {
     children?: React.ReactNode;
-    className?: ClassValue;
-    style?: React.CSSProperties;
+    width?: Length;
+    verticalAlignment?: VerticalAlignment;
 }) {
+    const { width, verticalAlignment } = props;
+    const { className, style } = transformLengthToCSS(width);
     return (
-        <div className={tcls('flex-col', props.className)} style={props.style}>
+        <div
+            className={tcls(
+                'flex flex-col',
+                (verticalAlignment === VerticalAlignment.Top || !verticalAlignment) &&
+                    'justify-start',
+                verticalAlignment === VerticalAlignment.Middle && 'justify-center',
+                verticalAlignment === VerticalAlignment.Bottom && 'justify-end',
+                className
+            )}
+            style={style}
+        >
             {props.children}
         </div>
     );

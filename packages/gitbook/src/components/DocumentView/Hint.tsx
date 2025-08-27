@@ -7,13 +7,16 @@ import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
 
-export function Hint(props: BlockProps<DocumentBlockHint>) {
-    const { block, style, ancestorBlocks, ...contextProps } = props;
+export function Hint({
+    block,
+    style,
+    ancestorBlocks,
+    ...contextProps
+}: BlockProps<DocumentBlockHint>) {
     const hintStyle = HINT_STYLES[block.data.style] ?? HINT_STYLES.info;
-    const firstLine = getBlockTextStyle(block.nodes[0]);
-
-    const firstNode = block.nodes[0];
-    const hasHeading = ['heading-1', 'heading-2', 'heading-3'].includes(block.nodes[0].type);
+    const firstNode = block.nodes[0]!;
+    const firstLine = getBlockTextStyle(firstNode);
+    const hasHeading = ['heading-1', 'heading-2', 'heading-3'].includes(firstNode.type);
 
     return (
         <div

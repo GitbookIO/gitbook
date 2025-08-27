@@ -25,7 +25,7 @@ export const AsideSectionHighlight = React.memo(
                     'rounded-md',
                     'straight-corners:rounded-none',
                     'circular-corners:rounded-2xl',
-                    'sidebar-list-line:rounded-l-none',
+                    'sidebar-list-line:rounded-l-none!',
 
                     'sidebar-list-pill:bg-primary',
                     '[html.theme-muted.sidebar-list-pill_&]:bg-primary-hover',

@@ -26,6 +26,7 @@ export function RecordRow(
                     autoSizedColumns,
                     fixedColumns,
                 });
+                // @ts-expect-error
                 const verticalAlignment = getColumnVerticalAlignment(block.data.definition[column]);
 
                 return (

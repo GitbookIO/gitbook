@@ -86,7 +86,7 @@ export function DropdownMenu(props: {
                     >
                         <div
                             className={tcls(
-                                'flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
+                                'flex max-h-[30rem] min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
                                 className
                             )}
                         >

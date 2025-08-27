@@ -359,6 +359,11 @@ html.dark.code-monochrome {
     --shiki-token-function: rgb(var(--primary-10));
 }
 
+html.font-Lato {
+    /* Lato's default ligatures impact readability, so we turn them off */
+    font-variant-ligatures: no-common-ligatures;
+}
+
 /* Code blocks */
 .highlight-line {
     @apply grid grid-cols-subgrid col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-1 rounded-sm;

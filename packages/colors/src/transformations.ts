@@ -8,7 +8,7 @@ type RGBColor = [number, number, number];
 type OKLABColor = { L: number; A: number; B: number };
 type OKLCHColor = { L: number; C: number; H: number };
 
-const D65 = [95.047, 100.0, 108.883]; // Reference white (D65)
+const D65 = [95.047, 100.0, 108.883] as const; // Reference white (D65)
 
 export enum ColorCategory {
     backgrounds = 'backgrounds',
@@ -211,8 +211,8 @@ export function colorScale(
     const result = [];
 
     for (let index = 0; index < mapping.length; index++) {
-        const targetL =
-            foregroundColor.L * mapping[index] + backgroundColor.L * (1 - mapping[index]);
+        const step = mapping[index]!;
+        const targetL = foregroundColor.L * step + backgroundColor.L * (1 - step);
 
         if (
             index === 8 &&
@@ -295,7 +295,7 @@ export function rgbArrayToHex(rgb: RGBColor): string {
 
 export function getColor(percentage: number, start: RGBColor, end: RGBColor) {
     const rgb = end.map((channel, index) => {
-        return Math.round(channel + percentage * (start[index] - channel));
+        return Math.round(channel + percentage * (start[index]! - channel));
     });
 
     return rgbArrayToHex(rgb as RGBColor);
@@ -392,14 +392,14 @@ export function xyzToLab65(xyz: [number, number, number]): {
     B: number;
 } {
     const [x, y, z] = xyz.map((v, i) => {
-        const scaled = v / D65[i];
+        const scaled = v / D65[i]!;
         return scaled > 0.008856 ? Math.cbrt(scaled) : 7.787 * scaled + 16 / 116;
     });
 
     return {
-        L: 116 * y - 16,
-        A: 500 * (x - y),
-        B: 200 * (y - z),
+        L: 116 * y! - 16,
+        A: 500 * (x! - y!),
+        B: 200 * (y! - z!),
     };
 }
 
