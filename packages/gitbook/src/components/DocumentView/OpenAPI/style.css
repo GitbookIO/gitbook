@@ -565,7 +565,7 @@
 }
 
 .openapi-example-empty {
-    @apply relative text-tint bg-tint min-h-20 flex flex-col justify-center items-center;
+    @apply relative text-tint min-h-20 flex flex-col justify-center items-center text-sm;
 }
 
 /* Common Elements */
