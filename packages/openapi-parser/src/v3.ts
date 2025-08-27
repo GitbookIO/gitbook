@@ -10,7 +10,14 @@ import type { ParseOpenAPIInput, ParseOpenAPIResult } from './parse';
  */
 export async function parseOpenAPIV3(input: ParseOpenAPIInput): Promise<ParseOpenAPIResult> {
     const { value, rootURL, options = {} } = input;
-    const result = await validate(value);
+
+    const result = await validate(value).catch((error) => {
+        throw new OpenAPIParseError('Invalid OpenAPI document', {
+            code: 'invalid',
+            rootURL,
+            cause: error,
+        });
+    });
 
     // If there is no version, we consider it invalid instantely.
     if (!result.version) {
