@@ -101,7 +101,7 @@ export function ScrollSectionsList(props: { sections: DocumentSection[] }) {
                             'rounded-md',
                             'straight-corners:rounded-none',
                             'circular-corners:rounded-2xl',
-                            'sidebar-list-line:rounded-l-none',
+                            'sidebar-list-line:rounded-l-none!',
 
                             'hover:bg-tint-hover',
                             'theme-gradient:hover:bg-tint-12/1',
