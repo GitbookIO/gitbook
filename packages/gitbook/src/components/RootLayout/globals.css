@@ -29,10 +29,17 @@
 }
 
 @utility hide-scrollbar {
+    /* Hide scrollbar by default */
     scrollbar-color: transparent transparent;
     transition: scrollbar-color 0.2s ease-in-out;
 
     &:hover {
+        /* Show scrollbar on hover */
+        scrollbar-color: unset;
+    }
+
+    @media (prefers-contrast: more) {
+        /* Always show scrollbar in high contrast mode */
         scrollbar-color: unset;
     }
 }
@@ -187,6 +194,13 @@
             scrollbar-color: theme("colors.tint.7") transparent;
             scrollbar-width: thin;
         }
+
+        @media (prefers-contrast: more) {
+            * {
+                scrollbar-color: theme("colors.tint.11") transparent;
+                scrollbar-width: auto;
+            }
+        }
     }
     
     /* Otherwise, use `::-webkit-scrollbar-*` pseudo-elements */
@@ -204,6 +218,16 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: theme("colors.tint.8");
+        }
+
+        @media (prefers-contrast: more) {
+            ::-webkit-scrollbar-thumb {
+                background: theme("colors.tint.11");
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: theme("colors.tint.12");
+            }
         }
     }
 
