@@ -14,6 +14,7 @@ import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
 import { AIChatProvider, AIContextProvider } from '../AI';
+import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 
@@ -45,6 +46,10 @@ export async function SiteLayout(props: {
         });
     });
 
+    const getVisitorClaimsUrl = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/visitor'))
+    );
+
     return (
         <SiteLayoutClientContexts
             contextId={context.contextId}
@@ -54,20 +59,25 @@ export async function SiteLayout(props: {
             }
             externalLinksTarget={customization.externalLinks.target}
         >
-            <AIContextProvider
-                aiMode={customization.ai?.mode}
-                trademark={customization.trademark.enabled}
+            <AdaptiveVisitorContextProvider
+                contextId={context.contextId}
+                getVisitorClaimsUrl={getVisitorClaimsUrl.toString()}
             >
-                <AIChatProvider>
-                    <SpaceLayout
-                        context={context}
-                        withTracking={withTracking}
-                        visitorAuthClaims={visitorAuthClaims}
-                    >
-                        {children}
-                    </SpaceLayout>
-                </AIChatProvider>
-            </AIContextProvider>
+                <AIContextProvider
+                    aiMode={customization.ai?.mode}
+                    trademark={customization.trademark.enabled}
+                >
+                    <AIChatProvider>
+                        <SpaceLayout
+                            context={context}
+                            withTracking={withTracking}
+                            visitorAuthClaims={visitorAuthClaims}
+                        >
+                            {children}
+                        </SpaceLayout>
+                    </AIChatProvider>
+                </AIContextProvider>
+            </AdaptiveVisitorContextProvider>
 
             {scripts.length > 0 ? (
                 <>
