@@ -128,7 +128,7 @@ export function PageAside(props: {
 
 function PageAsideHeader(props: { context: GitBookSiteContext }) {
     const { context } = props;
-    const language = getSpaceLanguage(context.customization);
+    const language = getSpaceLanguage(context);
 
     return (
         <div

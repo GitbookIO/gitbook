@@ -115,8 +115,7 @@ export async function TableOfContents(props: {
                         />
                         {customization.trademark.enabled ? (
                             <Trademark
-                                space={space}
-                                customization={customization}
+                                context={context}
                                 placement={SiteInsightsTrademarkPlacement.Sidebar}
                             />
                         ) : null}

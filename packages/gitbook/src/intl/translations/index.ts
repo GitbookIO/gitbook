@@ -1,5 +1,3 @@
-import type { CustomizationLocale } from '@gitbook/api';
-
 import { de } from './de';
 import { en } from './en';
 import { es } from './es';
@@ -14,11 +12,7 @@ import { zh } from './zh';
 
 export * from './types';
 
-export const languages: {
-    [key: string]: TranslationLanguage;
-} & {
-    [locale in CustomizationLocale]: TranslationLanguage;
-} = {
+export const languages = {
     de,
     en,
     fr,
@@ -29,4 +23,6 @@ export const languages: {
     no,
     'pt-br': pt_br,
     ru,
+} satisfies {
+    [key: string]: TranslationLanguage;
 };

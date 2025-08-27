@@ -1,21 +1,17 @@
-import type {
-    SiteCustomizationSettings,
-    SiteInsightsTrademarkPlacement,
-    Space,
-} from '@gitbook/api';
+import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
+import type { GitBookSpaceContext } from '@/lib/context';
 import { Link } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
  */
 export function Trademark(props: {
-    space: Space;
-    customization: SiteCustomizationSettings;
+    context: GitBookSpaceContext;
     placement: SiteInsightsTrademarkPlacement;
 }) {
     return (
@@ -71,12 +67,12 @@ export function Trademark(props: {
  * Trademark link to the GitBook.
  */
 export function TrademarkLink(props: {
-    space: Space;
-    customization: SiteCustomizationSettings;
+    context: GitBookSpaceContext;
     placement: SiteInsightsTrademarkPlacement;
 }) {
-    const { space, customization, placement } = props;
-    const language = getSpaceLanguage(customization);
+    const { context, placement } = props;
+    const { space } = context;
+    const language = getSpaceLanguage(context);
 
     const url = new URL('https://www.gitbook.com');
     url.searchParams.set('utm_source', 'content');
