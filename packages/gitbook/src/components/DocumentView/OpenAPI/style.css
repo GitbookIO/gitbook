@@ -746,6 +746,10 @@ body:has(.openapi-select-popover) {
     @apply px-3 transition-all;
 }
 
+.openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-label {
+    @apply font-medium;
+}
+
 .openapi-disclosure-group-trigger[aria-expanded="true"] > .openapi-disclosure-group-icon > svg {
     @apply rotate-90;
 }
