@@ -1,5 +1,5 @@
 import { tcls } from '@/lib/tailwind';
-import type { DocumentBlockColumns, Length, VerticalAlignment } from '@gitbook/api';
+import { type DocumentBlockColumns, type Length, VerticalAlignment } from '@gitbook/api';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 
