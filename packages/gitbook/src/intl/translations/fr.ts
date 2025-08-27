@@ -78,6 +78,8 @@ export const fr = {
     ai_chat_working: 'Traitement en cours…',
     ai_chat_context_badge: 'IA',
     ai_chat_error: 'Une erreur est survenue.',
+    ai_chat_hold_message_1: 'Je réfléchis…',
+    ai_chat_hold_message_2: 'Un instant…',
     ai_chat_context_title: 'En se basant sur votre contexte',
     ai_chat_context_description:
         'L’assistant utilise l’IA et votre contexte pour répondre et vous aider.',

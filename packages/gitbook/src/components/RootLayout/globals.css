@@ -213,6 +213,7 @@
     :root {
         --scrollbar-width: calc(100vw - 100%);
         @apply leading-relaxed;
+        interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
     }
     body {
         @apply text-tint-strong antialiased;

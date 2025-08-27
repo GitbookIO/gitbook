@@ -80,6 +80,8 @@ export const ru = {
     ai_chat_working: 'Работает…',
     ai_chat_context_badge: 'ИИ',
     ai_chat_error: 'Что-то пошло не так.',
+    ai_chat_hold_message_1: 'Обдумываю…',
+    ai_chat_hold_message_2: 'Минутку…',
     ai_chat_context_title: 'На основе вашего контекста',
     ai_chat_context_description:
         'Помощник использует ИИ и ваш контекст для генерации ответов и выполнения действий.',
