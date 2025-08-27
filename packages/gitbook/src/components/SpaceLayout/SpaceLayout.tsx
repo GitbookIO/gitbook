@@ -92,7 +92,10 @@ export function SpaceLayout(props: {
                                     'site-width-wide:max-w-full',
 
                                     // Ensure the footer is display below the viewport even if the content is not enough
-                                    withFooter && 'min-h-[calc(100vh-64px)]',
+                                    withFooter && [
+                                        'site-header:min-h-[calc(100vh-64px)]',
+                                        'site-header-sections:min-h-[calc(100vh-108px)]',
+                                    ],
                                     withTopHeader ? null : 'lg:min-h-screen'
                                 )}
                             >
