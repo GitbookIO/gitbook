@@ -50,6 +50,20 @@ export function OpenAPIResponses(props: {
                     ];
                 }
 
+                if (!response.content) {
+                    return [
+                        {
+                            key: 'default',
+                            label: '',
+                            body: (
+                                <pre className="openapi-example-empty">
+                                    <p>{t(context.translation, 'no_content')}</p>
+                                </pre>
+                            ),
+                        },
+                    ];
+                }
+
                 return Object.entries(response.content ?? {}).map(([contentType, mediaType]) => ({
                     key: contentType,
                     label: contentType,
