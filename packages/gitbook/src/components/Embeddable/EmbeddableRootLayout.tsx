@@ -1,6 +1,4 @@
 import { AIChatProvider, AIContextProvider } from '@/components/AI';
-import { AIChatDynamicIcon } from '@/components/AIChat';
-import { EmbeddableFrame } from '@/components/Embeddable';
 import { CustomizationRootLayout } from '@/components/RootLayout';
 import {
     SiteLayoutClientContexts,
@@ -29,26 +27,22 @@ export async function EmbeddableRootLayout({
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
             >
-                <EmbeddableFrame
-                    icon={<AIChatDynamicIcon trademark={context.customization.trademark.enabled} />}
-                    title="Test"
-                    className="fixed inset-0"
+                <AIContextProvider
+                    aiMode={CustomizationAIMode.Assistant}
+                    trademark={context.customization.trademark.enabled}
                 >
-                    <AIContextProvider
-                        aiMode={CustomizationAIMode.Assistant}
-                        trademark={context.customization.trademark.enabled}
+                    <AIChatProvider
+                        renderMessageOptions={{
+                            withLinkPreviews: false,
+                            asEmbeddable: true,
+                        }}
                     >
-                        <AIChatProvider
-                            renderMessageOptions={{
-                                withLinkPreviews: false,
-                                asEmbeddable: true,
-                            }}
-                        >
-                            {children}
-                            <EmbeddableIframeAPI />
-                        </AIChatProvider>
-                    </AIContextProvider>
-                </EmbeddableFrame>
+                        <div className="fixed inset-0 flex flex-col">{children}</div>
+                        <EmbeddableIframeAPI
+                            baseURL={context.linker.toPathInSpace('~gitbook/embed/')}
+                        />
+                    </AIChatProvider>
+                </AIContextProvider>
             </SiteLayoutClientContexts>
         </CustomizationRootLayout>
     );

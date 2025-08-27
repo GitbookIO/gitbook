@@ -1,19 +1,9 @@
 import { tcls } from '@/lib/tailwind';
 import React from 'react';
 
-export type EmbeddableFrameHeaderProps = {
-    icon: React.ReactNode;
-
-    title: string;
-    subtitle?: string;
-
-    buttons?: React.ReactNode;
+export type EmbeddableFrameProps = React.ComponentProps<'div'> & {
+    children: React.ReactNode;
 };
-
-export type EmbeddableFrameProps = EmbeddableFrameHeaderProps &
-    React.ComponentProps<'div'> & {
-        children: React.ReactNode;
-    };
 
 /**
  * Presentation component to display an embeddable frame.
@@ -21,7 +11,7 @@ export type EmbeddableFrameProps = EmbeddableFrameHeaderProps &
  */
 export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameProps>(
     (props, ref) => {
-        const { icon, title, subtitle, buttons, children, ...divProps } = props;
+        const { children, ...divProps } = props;
 
         return (
             <div
@@ -32,22 +22,70 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
                 )}
                 ref={ref}
             >
-                <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
-                    {icon}
-                    <div className="flex flex-col">
-                        <div className="font-bold">{title}</div>
-                        <div
-                            className={`text-tint text-xs leading-none transition-all duration-500 ${
-                                subtitle ? 'h-3 opacity-11' : 'h-0 opacity-0'
-                            }`}
-                        >
-                            {subtitle}
-                        </div>
-                    </div>
-                    <div className="ml-auto flex gap-2">{buttons}</div>
-                </div>
-                <div className="flex flex-1 flex-col overflow-hidden">{children}</div>
+                {children}
             </div>
         );
     }
 );
+
+export function EmbeddableFrameHeader(props: {
+    children: React.ReactNode;
+}) {
+    const { children } = props;
+
+    return (
+        <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
+            {children}
+        </div>
+    );
+}
+
+export function EmbeddableFrameHeaderMain(props: {
+    children: React.ReactNode;
+}) {
+    const { children } = props;
+
+    return <div className="flex flex-1 flex-col">{children}</div>;
+}
+
+export function EmbeddableFrameBody(props: {
+    children: React.ReactNode;
+}) {
+    const { children } = props;
+
+    return <div className="flex flex-1 flex-col overflow-hidden">{children}</div>;
+}
+
+export function EmbeddableFrameTitle(props: {
+    children: React.ReactNode;
+}) {
+    const { children } = props;
+
+    return <div className="font-bold">{children}</div>;
+}
+
+export function EmbeddableFrameSubtitle(props: {
+    children: React.ReactNode;
+    className?: string;
+}) {
+    const { children, className } = props;
+
+    return (
+        <div
+            className={tcls(
+                'text-tint text-xs leading-none transition-all duration-500',
+                className
+            )}
+        >
+            {children}
+        </div>
+    );
+}
+
+export function EmbeddableFrameButtons(props: {
+    children: React.ReactNode;
+}) {
+    const { children } = props;
+
+    return <div className="ml-auto flex gap-2">{children}</div>;
+}

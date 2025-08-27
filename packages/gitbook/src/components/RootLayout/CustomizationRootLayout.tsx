@@ -94,7 +94,9 @@ export async function CustomizationRootLayout(props: {
                 'depth' in customization.styling && `depth-${customization.styling.depth}`,
                 fontNotoColorEmoji.variable,
                 monospaceFontData.type === 'default' ? monospaceFontData.variable : null,
-                fontData.type === 'default' ? fontData.variable : null,
+                fontData.type === 'default'
+                    ? [fontData.variable, `font-${customization.styling.font}`]
+                    : null,
 
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
                 (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
@@ -138,7 +140,13 @@ export async function CustomizationRootLayout(props: {
                                     customization.styling.primaryColor.light
                             )
                         };
-                        --header-link: ${hexToRgb(customization.header.linkColor?.light ?? colorContrast(tintColor?.light ?? customization.styling.primaryColor.light))};
+                        --header-link: ${hexToRgb(
+                            // @ts-expect-error
+                            customization.header.linkColor?.light ??
+                                colorContrast(
+                                    tintColor?.light ?? customization.styling.primaryColor.light
+                                )
+                        )};
 
                         ${generateColorVariable('info', infoColor.light)}
                         ${generateColorVariable('warning', warningColor.light)}
@@ -152,7 +160,13 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
 
                         --header-background: ${hexToRgb(customization.header.backgroundColor?.dark ?? tintColor?.dark ?? customization.styling.primaryColor.dark)};
-                        --header-link: ${hexToRgb(customization.header.linkColor?.dark ?? colorContrast(tintColor?.dark ?? customization.styling.primaryColor.dark))};
+                        --header-link: ${hexToRgb(
+                            // @ts-expect-error
+                            customization.header.linkColor?.dark ??
+                                colorContrast(
+                                    tintColor?.dark ?? customization.styling.primaryColor.dark
+                                )
+                        )};
 
                         ${generateColorVariable('info', infoColor.dark, { darkMode: true })}
                         ${generateColorVariable('warning', warningColor.dark, { darkMode: true })}
@@ -323,6 +337,7 @@ function generateColorVariable(
     return Object.entries(shades)
         .map(([key, value]) => {
             const rgbValue = hexToRgb(value); // Check the original hex value
+            // @ts-expect-error
             const contrastValue = withContrast ? hexToRgb(colorContrast(value)) : undefined; // Add contrast if needed
             return `--${name}-${key}: ${rgbValue}; ${
                 contrastValue ? `--contrast-${name}-${key}: ${contrastValue};` : ''

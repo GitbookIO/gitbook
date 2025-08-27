@@ -23,13 +23,14 @@ interface SearchContainerProps {
     isMultiVariants: boolean;
     style: CustomizationSearchStyle;
     className?: string;
+    viewport?: 'desktop' | 'mobile';
 }
 
 /**
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { siteSpaceId, spaceTitle, isMultiVariants, style, className } = props;
+    const { siteSpaceId, spaceTitle, isMultiVariants, style, className, viewport } = props;
 
     const { assistants } = useAI();
 
@@ -55,7 +56,7 @@ export function SearchContainer(props: SearchContainerProps) {
         initialRef.current = true;
 
         // For simplicity we're only triggering the first assistant
-        assistants[0].open(state?.ask ?? undefined);
+        assistants[0]?.open(state?.ask ?? undefined);
     }, [state?.ask, assistants.length, assistants[0]?.open]);
 
     const onClose = React.useCallback(
@@ -82,6 +83,19 @@ export function SearchContainer(props: SearchContainerProps) {
         (e) => {
             e.preventDefault();
             onOpen();
+        },
+        {
+            enableOnFormTags: true,
+        }
+    );
+
+    useHotkeys(
+        'mod+i',
+        (e) => {
+            e.preventDefault();
+            if (assistants) {
+                assistants[0]?.open();
+            }
         },
         {
             enableOnFormTags: true,
@@ -145,6 +159,8 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const showAsk = withSearchAI && normalizedAsk; // withSearchAI && normalizedAsk;
 
+    const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
+
     return (
         <SearchAskProvider value={searchAsk}>
             <Popover
@@ -168,7 +184,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     ) : null
                 }
                 rootProps={{
-                    open: state?.open ?? false,
+                    open: visible && (state?.open ?? false),
                     onOpenChange: (open) => {
                         open ? onOpen() : onClose();
                     },
@@ -211,10 +227,11 @@ export function SearchContainer(props: SearchContainerProps) {
             </Popover>
             {assistants
                 .filter((assistant) => assistant.ui === true)
-                .map((assistant) => (
+                .map((assistant, index) => (
                     <AIChatButton
                         key={assistant.id}
                         assistant={assistant}
+                        withShortcut={index === 0}
                         showLabel={
                             assistants.filter((assistant) => assistant.ui === true).length === 1 &&
                             style === CustomizationSearchStyle.Prominent

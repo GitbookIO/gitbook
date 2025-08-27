@@ -1,8 +1,7 @@
 import { createChannel } from 'bidc';
 import type {
     FrameToParentMessage,
-    GitBookPlaceholderSettings,
-    GitBookToolDefinition,
+    GitBookEmbeddableConfiguration,
     ParentToFrameMessage,
 } from './protocol';
 
@@ -23,11 +22,6 @@ export type GitBookFrameClient = {
     postUserMessage: (message: string) => void;
 
     /**
-     * Register a custom tool.
-     */
-    registerTool: (tool: GitBookToolDefinition) => void;
-
-    /**
      * Clear the chat.
      */
     clearChat: () => void;
@@ -35,7 +29,7 @@ export type GitBookFrameClient = {
     /**
      * Set the placeholder settings.
      */
-    setPlaceholder: (placeholder: GitBookPlaceholderSettings) => void;
+    configure: (settings: Partial<GitBookEmbeddableConfiguration>) => void;
 
     /**
      * Register an event listener.
@@ -53,6 +47,7 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     const channel = createChannel(iframe.contentWindow);
 
     channel.receive((message: FrameToParentMessage) => {
+        console.log('[gitbook:embed] received message', message);
         if (message.type === 'close') {
             const listeners = events.get('close') || [];
             if (listeners) {
@@ -62,10 +57,18 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
     });
 
     const sendToFrame = (message: ParentToFrameMessage) => {
+        console.log('[gitbook:embed] send message', message);
         channel.send(message);
     };
 
     const events = new Map<string, Array<(...args: any[]) => void>>();
+
+    const configuration: GitBookEmbeddableConfiguration = {
+        buttons: [],
+        welcomeMessage: '',
+        suggestions: [],
+        tools: [],
+    };
 
     return {
         navigateToPage: (pagePath) => {
@@ -75,9 +78,11 @@ export function createGitBookFrame(iframe: HTMLIFrameElement): GitBookFrameClien
             sendToFrame({ type: 'navigateToAssistant' });
         },
         postUserMessage: (message) => sendToFrame({ type: 'postUserMessage', message }),
-        registerTool: (tool) => sendToFrame({ type: 'registerTool', tool }),
+        configure: (settings) => {
+            Object.assign(configuration, settings);
+            sendToFrame({ type: 'configure', settings: configuration });
+        },
         clearChat: () => sendToFrame({ type: 'clearChat' }),
-        setPlaceholder: (settings) => sendToFrame({ type: 'setPlaceholder', settings }),
         on: (event, listener) => {
             const listeners = events.get(event) || [];
             listeners.push(listener);

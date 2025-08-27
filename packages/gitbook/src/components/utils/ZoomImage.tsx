@@ -41,8 +41,8 @@ export function ZoomImage(
                       // Since the image is removed from the DOM when the modal is opened,
                       // We only care when the size is defined.
                       if (imgEntry && imgEntry.contentRect.width !== 0) {
-                          viewWidth = entries[0]?.contentRect.width;
-                          setPlaceholderRect(entries[0].contentRect);
+                          viewWidth = imgEntry.contentRect.width;
+                          setPlaceholderRect(imgEntry.contentRect);
                           onChange();
                       }
                   })

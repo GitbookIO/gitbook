@@ -12,8 +12,9 @@ import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 export function AIChatButton(props: {
     assistant: Assistant;
     showLabel?: boolean;
+    withShortcut?: boolean;
 }) {
-    const { assistant, showLabel = true } = props;
+    const { assistant, showLabel = true, withShortcut = true } = props;
     const language = useLanguage();
 
     return (
@@ -27,7 +28,12 @@ export function AIChatButton(props: {
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', assistant.label)}
-                    <KeyboardShortcut keys={['mod', 'i']} className="border-tint-11 text-tint-1" />
+                    {withShortcut ? (
+                        <KeyboardShortcut
+                            keys={['mod', 'i']}
+                            className="border-tint-11 text-tint-1"
+                        />
+                    ) : null}
                 </div>
             }
             onClick={() => assistant.open()}

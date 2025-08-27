@@ -110,7 +110,7 @@ function isEmptyMarkdownPage(markdown: string): boolean {
         if (
             node.type === 'paragraph' &&
             node.children.length === 1 &&
-            node.children[0].type === 'text' &&
+            node.children[0]!.type === 'text' &&
             !node.children[0].value.trim()
         ) {
             continue;

@@ -123,7 +123,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 body: colorContrast(
                     customization.header.backgroundColor?.[theme] || colors.background,
                     [baseColors.light, baseColors.dark]
-                ),
+                )!,
             };
             gridAsset = colors.body === baseColors.light ? gridWhite : gridBlack;
             break;
@@ -134,15 +134,15 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 gradient: colorContrast(customization.styling.primaryColor[theme], [
                     baseColors.light,
                     baseColors.dark,
-                ]),
+                ])!,
                 title: colorContrast(customization.styling.primaryColor[theme], [
                     baseColors.light,
                     baseColors.dark,
-                ]),
+                ])!,
                 body: colorContrast(customization.styling.primaryColor[theme], [
                     baseColors.light,
                     baseColors.dark,
-                ]),
+                ])!,
             };
             gridAsset = colors.body === baseColors.light ? gridWhite : gridBlack;
             break;

@@ -142,8 +142,9 @@ function DefaultAction(props: PageActionsDropdownProps) {
         (assistant) => assistant.ui === true && assistant.pageAction
     );
 
-    if (assistants.length) {
-        return <OpenAIAssistant assistant={assistants[0]} type="button" />;
+    const assistant = assistants[0];
+    if (assistant) {
+        return <OpenAIAssistant assistant={assistant} type="button" />;
     }
 
     if (props.editOnGit) {
@@ -159,7 +160,7 @@ function DefaultAction(props: PageActionsDropdownProps) {
     if (actions.markdown) {
         return (
             <CopyMarkdown
-                isDefaultAction={!assistants.length}
+                isDefaultAction={!assistant}
                 markdownPageUrl={markdownPageUrl}
                 type="button"
             />
