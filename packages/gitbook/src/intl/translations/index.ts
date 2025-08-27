@@ -11,6 +11,7 @@ import { pt_br } from './pt-br';
 import { ru } from './ru';
 import type { TranslationLanguage } from './types';
 import { zh } from './zh';
+import { th } from './th';
 
 export * from './types';
 
@@ -29,4 +30,5 @@ export const languages: {
     no,
     'pt-br': pt_br,
     ru,
+    th,
 };
