@@ -41,7 +41,7 @@ export const fontNotoColorEmoji = Noto_Color_Emoji({
  */
 
 const inter = Inter({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -49,7 +49,7 @@ const inter = Inter({
 });
 
 const firaSans = Fira_Sans_Extra_Condensed({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -81,7 +81,7 @@ const merriweather = Merriweather({
 });
 
 const notoSans = Noto_Sans({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -97,7 +97,7 @@ const openSans = Open_Sans({
 });
 
 const overpass = Overpass({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -105,7 +105,7 @@ const overpass = Overpass({
 });
 
 const poppins = Poppins({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -113,7 +113,7 @@ const poppins = Poppins({
 });
 
 const raleway = Raleway({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -121,7 +121,7 @@ const raleway = Raleway({
 });
 
 const roboto = Roboto({
-    weight: ['400', '500', '700'],
+    weight: ['400', '500', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -129,7 +129,7 @@ const roboto = Roboto({
 });
 
 const robotoSlab = Roboto_Slab({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -137,7 +137,7 @@ const robotoSlab = Roboto_Slab({
 });
 
 const sourceSansPro = Source_Sans_3({
-    weight: ['400', '500', '600', '700'],
+    weight: ['400', '500', '600', '700', '900'],
     variable: '--font-content',
     preload: false,
     display: 'swap',
@@ -160,7 +160,7 @@ const abcFavorit = localFont({
     src: [
         {
             path: './ABCFavorit/ABCFavorit-Variable.woff2',
-            weight: '400 700',
+            weight: '400 900',
             style: 'normal',
         },
         {
