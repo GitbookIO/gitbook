@@ -2,10 +2,7 @@
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { ExpressionRuntime, parseTemplate } from '@gitbook/expr';
-import {
-    OpenAPIOperationContextProvider,
-    OpenAPITryItPrefillContextProvider,
-} from '@gitbook/react-openapi';
+import { OpenAPITryItPrefillContextProvider } from '@gitbook/react-openapi';
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
@@ -75,13 +72,11 @@ export function AdaptiveVisitorContextProvider(
         <AdaptiveVisitorContext.Provider
             value={visitorClaimsData ? { visitorClaims: visitorClaimsData } : null}
         >
-            <OpenAPIOperationContextProvider>
-                <OpenAPITryItPrefillContextProvider
-                    resolveTryItPrefillExpression={resolveTryItPrefillExpression}
-                >
-                    {children}
-                </OpenAPITryItPrefillContextProvider>
-            </OpenAPIOperationContextProvider>
+            <OpenAPITryItPrefillContextProvider
+                resolveTryItPrefillExpression={resolveTryItPrefillExpression}
+            >
+                {children}
+            </OpenAPITryItPrefillContextProvider>
         </AdaptiveVisitorContext.Provider>
     );
 }

@@ -4,6 +4,11 @@ import type { OpenAPIOperationData } from '../types';
 
 export type TryItPrefillExpressionResolver = (expr: string) => string | undefined;
 
+export interface TryItPrefillConfiguration {
+    authentication?: ApiClientConfiguration['authentication'];
+    servers?: ApiClientConfiguration['servers'];
+}
+
 /**
  * Resolve the Scalar API client prefill configuration for a given OpenAPI operation.
  */
@@ -19,10 +24,7 @@ export function resolveTryItPrefillForOperation(args: {
      * x-gitbook-tryit-prefill: {{ visitor.claims.apiKey }}
      */
     resolveTryItPrefillExpression: TryItPrefillExpressionResolver;
-}): {
-    authentication?: ApiClientConfiguration['authentication'];
-    servers?: ApiClientConfiguration['servers'];
-} {
+}): TryItPrefillConfiguration {
     const {
         operation: { securities, servers },
         resolveTryItPrefillExpression,
