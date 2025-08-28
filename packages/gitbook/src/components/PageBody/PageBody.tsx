@@ -42,7 +42,7 @@ export function PageBody(props: {
         : false;
     const pageWidthWide = page.layout.width === 'wide';
     const siteWidthWide = pageWidthWide || contentFullWidth;
-    const language = getSpaceLanguage(customization);
+    const language = getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
     return (

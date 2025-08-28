@@ -11,7 +11,7 @@ import { Heading } from '../Heading';
 
 import './scalar.css';
 import './style.css';
-import { DEFAULT_LOCALE, getCustomizationLocale } from '@/intl/server';
+import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import type { GitBookAnyContext } from '@/lib/context';
 import type {
     AnyOpenAPIOperationsBlock,
@@ -30,10 +30,7 @@ export function getOpenAPIContext(args: {
     const { props, specUrl, context } = args;
     const { block } = props;
 
-    const customization = context && 'customization' in context ? context.customization : null;
-    const customizationLocale = customization
-        ? getCustomizationLocale(customization)
-        : DEFAULT_LOCALE;
+    const customizationLocale = context ? getSpaceLocale(context) : DEFAULT_LOCALE;
     const locale = checkIsValidLocale(customizationLocale) ? customizationLocale : DEFAULT_LOCALE;
 
     return {

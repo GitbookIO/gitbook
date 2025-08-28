@@ -20,10 +20,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
         : null;
     const { contentContext } = context;
 
-    const language =
-        contentContext && 'customization' in contentContext
-            ? getSpaceLanguage(contentContext.customization)
-            : languages.en;
+    const language = contentContext ? getSpaceLanguage(contentContext) : languages.en;
 
     if (!contentContext || !resolved) {
         return (
