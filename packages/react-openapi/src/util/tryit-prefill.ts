@@ -126,6 +126,7 @@ function resolveTryItPrefillServersForOperationServers(args: {
             ? { ...server.variables }
             : {};
 
+        // Variable-level prefill
         if (server.variables) {
             for (const [varName, variable] of Object.entries(server.variables)) {
                 const { 'x-gitbook-tryit-prefill': tryItPrefillVarExpr, ...variableProps } =

@@ -475,7 +475,7 @@ export function serveVisitorClaimsDataRequest(request: NextRequest, siteRequestU
             visitor: {
                 claims: {
                     ...visitorClaims.visitor.claims,
-                    ...decodedJwtPayload, // merged decoded claims (preserving `unsigned`)
+                    ...decodedJwtPayload,
                 },
             },
         });
