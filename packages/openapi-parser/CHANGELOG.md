@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.2
+
+### Patch Changes
+
+- 7fefe49: Catch OpenAPI validation errors
+
 ## 3.0.1
 
 ### Patch Changes
