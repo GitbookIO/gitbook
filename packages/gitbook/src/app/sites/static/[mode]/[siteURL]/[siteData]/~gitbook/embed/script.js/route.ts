@@ -1,5 +1,6 @@
 import type { RouteLayoutParams } from '@/app/utils';
 import { getAssetURL } from '@/lib/assets';
+import { buildVersion } from '@/lib/build';
 import { getEmbeddableStaticContext } from '@/lib/embeddable';
 import type { CreateGitBookOptions } from '@gitbook/embed';
 import type { NextRequest } from 'next/server';
@@ -14,7 +15,6 @@ export async function GET(
     { params }: { params: Promise<RouteLayoutParams> }
 ) {
     const { context } = await getEmbeddableStaticContext(await params);
-    const maxAge = 7 * 24 * 60 * 60;
     const initOptions: CreateGitBookOptions = {
         siteURL: context.linker.toAbsoluteURL(context.linker.toPathInSite('')),
     };
@@ -45,13 +45,13 @@ export async function GET(
     const load = function () {
       const style = document.createElement('link');
       style.rel = 'stylesheet';
-      style.href = ${JSON.stringify(getAssetURL('embed/index.css'))};
+      style.href = ${JSON.stringify(getAssetURL(`embed/index.css?v=${buildVersion()}`))};
       document.head.appendChild(style);
 
       const script = d.createElement('script');
       script.type = 'text/javascript';
       script.async = true;
-      script.src = ${JSON.stringify(getAssetURL('embed/index.js'))};
+      script.src = ${JSON.stringify(getAssetURL(`embed/index.js?v=${buildVersion()}`))};
 
       var latestScript = d.getElementsByTagName('script')[0];
       latestScript.parentNode.insertBefore(script, latestScript);
@@ -70,7 +70,7 @@ export async function GET(
         {
             headers: {
                 'Content-Type': 'application/javascript',
-                'Cache-Control': `public, max-age=${maxAge}, immutable`,
+                'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
             },
         }
     );
