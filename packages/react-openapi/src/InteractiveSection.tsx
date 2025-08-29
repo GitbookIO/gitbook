@@ -112,7 +112,7 @@ export function InteractiveSection(props: {
                             event.stopPropagation();
                         }}
                     >
-                        {tabs.length > 1 ? (
+                        {tabs.length > 0 ? (
                             <OpenAPISelect
                                 stateKey={stateKey}
                                 items={tabs}

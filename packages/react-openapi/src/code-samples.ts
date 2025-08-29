@@ -1,3 +1,4 @@
+import yaml from 'js-yaml';
 import {
     isCSV,
     isFormData,
@@ -8,6 +9,7 @@ import {
     isPlainObject,
     isText,
     isXML,
+    isYAML,
 } from './contentTypeChecks';
 import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
@@ -154,7 +156,8 @@ ${headerString}${bodyString}`;
         label: 'Python',
         syntax: 'python',
         generate: ({ method, url, headers, body }) => {
-            let code = 'import requests\n\n';
+            const contentType = headers?.['Content-Type'];
+            let code = `${isJSON(contentType) ? 'import json\n' : ''}import requests\n\n`;
 
             if (body) {
                 const lines = BodyGenerators.getPythonBody(body, headers);
@@ -174,7 +177,6 @@ ${headerString}${bodyString}`;
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
 
-            const contentType = headers?.['Content-Type'];
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
@@ -256,6 +258,8 @@ const BodyGenerators = {
         } else if (isPDF(contentType)) {
             // We use --data-binary to avoid cURL converting newlines to \r\n
             body = `--data-binary '@${String(body)}'`;
+        } else if (isYAML(contentType)) {
+            body = `--data-binary $'${yaml.dump(body).replace(/'/g, '').replace(/\\n/g, '\n')}'`;
         } else {
             body = `--data '${stringifyOpenAPI(body, null, 2).replace(/\\n/g, '\n')}'`;
         }
@@ -325,6 +329,9 @@ const BodyGenerators = {
             code += indent(convertBodyToXML(body), 4);
             code += '`;\n\n';
             body = 'xml';
+        } else if (isYAML(contentType)) {
+            code += `const yamlBody = \`\n${indent(yaml.dump(body), 4)}\`;\n\n`;
+            body = 'yamlBody';
         } else if (isText(contentType)) {
             body = stringifyOpenAPI(body, null, 2);
         } else {
@@ -355,6 +362,9 @@ const BodyGenerators = {
         } else if (isXML(contentType)) {
             // Convert JSON to XML if needed
             body = JSON.stringify(convertBodyToXML(body));
+        } else if (isYAML(contentType)) {
+            code += `yamlBody = \"\"\"\n${indent(yaml.dump(body), 4)}\"\"\"\n\n`;
+            body = 'yamlBody';
         } else {
             body = stringifyOpenAPI(
                 body,
@@ -399,6 +409,7 @@ const BodyGenerators = {
                 // Convert JSON to XML if needed
                 return `"${convertBodyToXML(body)}"`;
             },
+            yaml: () => `"${yaml.dump(body).replace(/"/g, '\\"')}"`,
             csv: () => `"${stringifyOpenAPI(body).replace(/"/g, '')}"`,
             default: () => `${stringifyOpenAPI(body, null, 2)}`,
         };
@@ -407,6 +418,7 @@ const BodyGenerators = {
         if (isFormUrlEncoded(contentType)) return typeHandlers.formUrlEncoded();
         if (isText(contentType)) return typeHandlers.text();
         if (isXML(contentType)) return typeHandlers.xml();
+        if (isYAML(contentType)) return typeHandlers.yaml();
         if (isCSV(contentType)) return typeHandlers.csv();
 
         return typeHandlers.default();

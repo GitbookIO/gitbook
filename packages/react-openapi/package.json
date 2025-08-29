@@ -20,9 +20,11 @@
         "react-aria-components": "^1.6.0",
         "react-aria": "^3.37.0",
         "usehooks-ts": "^3.1.0",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "js-yaml": "^4.1.0"
     },
     "devDependencies": {
+        "@types/js-yaml": "^4.0.9",
         "bun-types": "^1.1.20",
         "typescript": "^5.5.3"
     },
