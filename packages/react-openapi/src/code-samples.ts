@@ -156,7 +156,8 @@ ${headerString}${bodyString}`;
         label: 'Python',
         syntax: 'python',
         generate: ({ method, url, headers, body }) => {
-            let code = 'import requests\n\n';
+            const contentType = headers?.['Content-Type'];
+            let code = `${isJSON(contentType) ? 'import json\n' : ''}import requests\n\n`;
 
             if (body) {
                 const lines = BodyGenerators.getPythonBody(body, headers);
@@ -176,7 +177,6 @@ ${headerString}${bodyString}`;
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
             }
 
-            const contentType = headers?.['Content-Type'];
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
