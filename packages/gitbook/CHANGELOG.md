@@ -1,5 +1,28 @@
 # gitbook
 
+## 0.16.1
+
+### Patch Changes
+
+- 2e0d706: Fix corner radius of active section on "Line" sidebar style
+- 1edc5d6: Add "hold message" to Assistant
+- 61b8507: OpenAPI: Make responses without objects clickable
+- d1fdc13: Remove ligatures from Lato font
+- a8fca0e: Fix custom assistant keyboard shortcut
+- 262a9b1: Fix embed script and assets being cached for too long
+- 1839ea2: Fix content min-height with sections
+- 9201e2c: Adds vertical align to column block
+- 193d591: Use space language as source of truth for UI locale
+- f08dd29: Fix Search results are not clickable on sites without header
+- 4f35882: Fix event ask_question not being tracked
+- 6f368b5: Fix embed assistant window width on small screens
+- Updated dependencies [193d591]
+- Updated dependencies [61b8507]
+- Updated dependencies [7fefe49]
+  - @gitbook/colors@0.3.4
+  - @gitbook/react-openapi@1.3.7
+  - @gitbook/openapi-parser@3.0.2
+
 ## 0.16.0
 
 ### Minor Changes

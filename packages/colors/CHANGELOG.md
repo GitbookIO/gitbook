@@ -1,5 +1,11 @@
 # @gitbook/colors
 
+## 0.3.4
+
+### Patch Changes
+
+- 193d591: Fix return type for `colorContrast`
+
 ## 0.3.3
 
 ### Patch Changes

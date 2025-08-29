@@ -1,5 +1,11 @@
 # @gitbook/embed
 
+## 0.1.1
+
+### Patch Changes
+
+- 6f368b5: Fix embed assistant window width on small screens
+
 ## 0.1.0
 
 ### Minor Changes

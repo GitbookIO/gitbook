@@ -1,5 +1,13 @@
 # @gitbook/react-openapi
 
+## 1.3.7
+
+### Patch Changes
+
+- 61b8507: OpenAPI: Make responses without objects clickable
+- Updated dependencies [7fefe49]
+  - @gitbook/openapi-parser@3.0.2
+
 ## 1.3.6
 
 ### Patch Changes
