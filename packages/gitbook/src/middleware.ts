@@ -22,6 +22,7 @@ import {
     getResponseCookiesForVisitorAuth,
     getVisitorData,
     normalizeVisitorURL,
+    serveVisitorClaimsDataRequest,
 } from '@/lib/visitors';
 import { serveResizedImage } from '@/routes/image';
 import { cookies } from 'next/headers';
@@ -126,7 +127,6 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
     const { url: siteRequestURL, mode } = match;
     const imagesContextId = getImageResizingContextId(siteRequestURL);
-
     /**
      * Serve image resizing requests (all requests containing `/~gitbook/image`).
      * All URLs containing `/~gitbook/image` are rewritten to `/~gitbook/image`
@@ -152,6 +152,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             status: 400,
             headers: { 'content-type': 'text/plain' },
         });
+    }
+
+    // Handler that returns visitor data for the app to consume.
+    if (siteRequestURL.pathname.endsWith('/~gitbook/visitor')) {
+        return serveVisitorClaimsDataRequest(request, siteRequestURL);
     }
 
     //

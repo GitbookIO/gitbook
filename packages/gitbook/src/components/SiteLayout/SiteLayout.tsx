@@ -14,6 +14,7 @@ import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
 import { AIContextProvider } from '../AI';
+import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
 
@@ -44,6 +45,9 @@ export async function SiteLayout(props: {
             as: 'script',
         });
     });
+    const getVisitorClaimsUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathInSite('/~gitbook/visitor')
+    );
 
     return (
         <SiteLayoutClientContexts
@@ -54,18 +58,23 @@ export async function SiteLayout(props: {
             }
             externalLinksTarget={customization.externalLinks.target}
         >
-            <AIContextProvider
-                aiMode={customization.ai?.mode}
-                trademark={customization.trademark.enabled}
+            <AdaptiveVisitorContextProvider
+                contextId={context.contextId}
+                visitorClaimsURL={getVisitorClaimsUrl}
             >
-                <SpaceLayout
-                    context={context}
-                    withTracking={withTracking}
-                    visitorAuthClaims={visitorAuthClaims}
+                <AIContextProvider
+                    aiMode={customization.ai?.mode}
+                    trademark={customization.trademark.enabled}
                 >
-                    {children}
-                </SpaceLayout>
-            </AIContextProvider>
+                    <SpaceLayout
+                        context={context}
+                        withTracking={withTracking}
+                        visitorAuthClaims={visitorAuthClaims}
+                    >
+                        {children}
+                    </SpaceLayout>
+                </AIContextProvider>
+            </AdaptiveVisitorContextProvider>
 
             {scripts.length > 0 ? (
                 <>

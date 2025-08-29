@@ -11,9 +11,11 @@
     "version": "1.3.6",
     "sideEffects": false,
     "dependencies": {
+        "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.3.16",
         "@scalar/oas-utils": "^0.2.130",
+        "@scalar/types": "^0.1.9",
         "clsx": "^2.1.1",
         "flatted": "^3.2.9",
         "json-xml-parse": "^1.3.0",

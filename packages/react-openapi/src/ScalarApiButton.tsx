@@ -6,8 +6,11 @@ import { createPortal } from 'react-dom';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
+import { useOpenAPIPrefillContext } from './OpenAPIPrefillContextProvider';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
+import type { OpenAPIOperationData } from './types';
+import { resolveTryItPrefillForOperation } from './util/tryit-prefill';
 
 /**
  * Button which launches the Scalar API Client
@@ -15,21 +18,30 @@ import { t } from './translate';
 export function ScalarApiButton(props: {
     method: OpenAPIV3_1.HttpMethods;
     path: string;
+    securities: OpenAPIOperationData['securities'];
+    servers: OpenAPIOperationData['servers'];
     specUrl: string;
     context: OpenAPIClientContext;
 }) {
-    const { method, path, specUrl, context } = props;
+    const { method, path, securities, servers, specUrl, context } = props;
+    const getPrefillInputContextData = useOpenAPIPrefillContext();
     const [isOpen, setIsOpen] = useState(false);
+    const [prefillInputContext, setPrefillInputContext] = useState<Record<string, unknown> | null>(
+        null
+    );
     const controllerRef = useRef<ScalarModalControllerRef>(null);
+
+    // Fetch visitor data and open modal
+    const openModal = async () => {
+        const data = await getPrefillInputContextData();
+        setPrefillInputContext(data);
+        controllerRef.current?.openClient?.();
+        setIsOpen(true);
+    };
+
     return (
         <div className="scalar scalar-activate">
-            <button
-                className="scalar-activate-button button"
-                onClick={() => {
-                    controllerRef.current?.openClient?.();
-                    setIsOpen(true);
-                }}
-            >
+            <button className="scalar-activate-button button" onClick={openModal}>
                 {t(context.translation, 'test_it')}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" fill="currentColor">
                     <path
@@ -41,12 +53,16 @@ export function ScalarApiButton(props: {
             </button>
 
             {isOpen &&
+                prefillInputContext &&
                 createPortal(
                     <ScalarModal
                         controllerRef={controllerRef}
                         method={method}
                         path={path}
+                        securities={securities}
+                        servers={servers}
                         specUrl={specUrl}
+                        prefillInputContext={prefillInputContext}
                     />,
                     document.body
                 )}
@@ -57,12 +73,25 @@ export function ScalarApiButton(props: {
 function ScalarModal(props: {
     method: OpenAPIV3_1.HttpMethods;
     path: string;
+    securities: OpenAPIOperationData['securities'];
+    servers: OpenAPIOperationData['servers'];
     specUrl: string;
     controllerRef: React.Ref<ScalarModalControllerRef>;
+    prefillInputContext: Record<string, unknown>;
 }) {
-    const { method, path, specUrl, controllerRef } = props;
+    const { method, path, securities, servers, specUrl, controllerRef, prefillInputContext } =
+        props;
+
+    const prefillConfig = resolveTryItPrefillForOperation({
+        operation: { securities, servers },
+        prefillInputContext,
+    });
+
     return (
-        <ApiClientModalProvider configuration={{ url: specUrl }} initialRequest={{ method, path }}>
+        <ApiClientModalProvider
+            configuration={{ url: specUrl, ...prefillConfig }}
+            initialRequest={{ method, path }}
+        >
             <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
         </ApiClientModalProvider>
     );
@@ -84,7 +113,11 @@ function ScalarModalController(props: {
     const openClient = useMemo(() => {
         if (openScalarClient) {
             return () => {
-                openScalarClient({ method, path, _source: 'gitbook' });
+                openScalarClient({
+                    method,
+                    path,
+                    _source: 'gitbook',
+                });
                 trackClientOpening({ method, path });
             };
         }

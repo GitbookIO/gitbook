@@ -194,7 +194,7 @@ function OpenAPICodeSampleFooter(props: {
     context: OpenAPIContext;
 }) {
     const { data, context, renderers } = props;
-    const { method, path } = data;
+    const { method, path, securities, servers } = data;
     const { specUrl } = context;
     const hideTryItPanel = data['x-hideTryItPanel'] || data.operation['x-hideTryItPanel'];
     const hasMultipleMediaTypes =
@@ -226,6 +226,8 @@ function OpenAPICodeSampleFooter(props: {
                     context={getOpenAPIClientContext(context)}
                     method={method}
                     path={path}
+                    securities={securities}
+                    servers={servers}
                     specUrl={specUrl}
                 />
             )}
