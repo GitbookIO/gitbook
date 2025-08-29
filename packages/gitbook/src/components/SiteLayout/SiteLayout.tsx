@@ -13,7 +13,7 @@ import { buildVersion } from '@/lib/build';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_ASSETS_URL, GITBOOK_ICONS_URL } from '@/lib/env';
 import { getResizedImageURL } from '@/lib/images';
 import { isSiteIndexable } from '@/lib/seo';
-import { AIChatProvider, AIContextProvider } from '../AI';
+import { AIContextProvider } from '../AI';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { RocketLoaderDetector } from './RocketLoaderDetector';
 import { SiteLayoutClientContexts } from './SiteLayoutClientContexts';
@@ -45,7 +45,6 @@ export async function SiteLayout(props: {
             as: 'script',
         });
     });
-
     const getVisitorClaimsUrl = context.linker.toAbsoluteURL(
         context.linker.toPathInSite('/~gitbook/visitor')
     );
@@ -67,15 +66,13 @@ export async function SiteLayout(props: {
                     aiMode={customization.ai?.mode}
                     trademark={customization.trademark.enabled}
                 >
-                    <AIChatProvider>
-                        <SpaceLayout
-                            context={context}
-                            withTracking={withTracking}
-                            visitorAuthClaims={visitorAuthClaims}
-                        >
-                            {children}
-                        </SpaceLayout>
-                    </AIChatProvider>
+                    <SpaceLayout
+                        context={context}
+                        withTracking={withTracking}
+                        visitorAuthClaims={visitorAuthClaims}
+                    >
+                        {children}
+                    </SpaceLayout>
                 </AIContextProvider>
             </AdaptiveVisitorContextProvider>
 

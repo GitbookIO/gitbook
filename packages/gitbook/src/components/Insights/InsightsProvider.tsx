@@ -46,7 +46,9 @@ type TrackEventCallback = <EventName extends InsightsEventName>(
     options?: InsightsEventOptions
 ) => void;
 
-const InsightsContext = React.createContext<TrackEventCallback>(() => {});
+const InsightsContext = React.createContext<TrackEventCallback>(() => {
+    console.error('useTrackEvent must be used within an InsightsProvider');
+});
 
 interface InsightsProviderProps {
     /** If true, the events will be sent to the server. */

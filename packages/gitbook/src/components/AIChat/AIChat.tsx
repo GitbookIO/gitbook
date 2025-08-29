@@ -213,7 +213,7 @@ export function AIChatBody(props: {
         <>
             <div
                 ref={scrollContainerRef}
-                className="flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
+                className="gutter-stable flex grow scroll-pt-4 flex-col gap-4 overflow-y-auto p-4"
                 style={{
                     paddingBottom: `${inputHeight}px`,
                 }}

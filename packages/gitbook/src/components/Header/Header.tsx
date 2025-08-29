@@ -56,141 +56,137 @@ export function Header(props: {
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="scroll-nojump">
-                    <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <div
+                        className={tcls(
+                            'gap-4',
+                            'lg:gap-6',
+                            'flex',
+                            'items-center',
+                            'justify-between',
+                            'w-full',
+                            'py-3',
+                            'min-h-16',
+                            'sm:h-16',
+                            CONTAINER_STYLE
+                        )}
+                    >
                         <div
                             className={tcls(
-                                'gap-4',
-                                'lg:gap-6',
-                                'flex',
-                                'items-center',
-                                'justify-between',
-                                'w-full',
-                                'py-3',
-                                'min-h-16',
-                                'sm:h-16',
-                                CONTAINER_STYLE
+                                'flex max-w-full lg:basis-72',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
                             )}
                         >
-                            <div
+                            <HeaderMobileMenu
                                 className={tcls(
-                                    'flex max-w-full lg:basis-72',
-                                    'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
+                                    'lg:hidden',
+                                    '-ml-2',
+                                    'text-tint-strong',
+                                    'theme-bold:text-header-link',
+                                    'hover:bg-tint-hover',
+                                    'hover:theme-bold:bg-header-link/3',
+                                    'page-no-toc:hidden'
                                 )}
-                            >
-                                <HeaderMobileMenu
-                                    className={tcls(
-                                        'lg:hidden',
-                                        '-ml-2',
-                                        'text-tint-strong',
-                                        'theme-bold:text-header-link',
-                                        'hover:bg-tint-hover',
-                                        'hover:theme-bold:bg-header-link/3',
-                                        'page-no-toc:hidden'
-                                    )}
-                                />
-                                <HeaderLogo context={context} />
-                            </div>
-
-                            <div
-                                className={tcls(
-                                    'flex',
-                                    'grow-0',
-                                    'shrink-0',
-                                    'md:basis-56',
-                                    'justify-self-end',
-                                    'items-center',
-                                    'gap-2',
-                                    'search' in customization.styling &&
-                                        customization.styling.search === 'prominent'
-                                        ? [
-                                              'md:grow-[0.8]',
-                                              'lg:basis-40',
-                                              'md:max-w-[40%]',
-                                              'lg:max-w-lg',
-                                              'lg:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                              'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                              'md:mr-auto',
-                                              'order-last',
-                                              'md:order-[unset]',
-                                          ]
-                                        : ['order-last']
-                                )}
-                            >
-                                <SearchContainer
-                                    style={customization.styling.search}
-                                    isMultiVariants={siteSpaces.length > 1}
-                                    spaceTitle={siteSpace.title}
-                                    siteSpaceId={siteSpace.id}
-                                    viewport={!withTopHeader ? 'mobile' : undefined}
-                                />
-                            </div>
-
-                            {customization.header.links.length > 0 && (
-                                <HeaderLinks>
-                                    {customization.header.links.map((link) => {
-                                        return (
-                                            <HeaderLink
-                                                key={link.title}
-                                                link={link}
-                                                context={context}
-                                            />
-                                        );
-                                    })}
-                                    <HeaderLinkMore
-                                        label={t(getSpaceLanguage(context), 'more')}
-                                        links={customization.header.links}
-                                        context={context}
-                                    />
-                                </HeaderLinks>
-                            )}
+                            />
+                            <HeaderLogo context={context} />
                         </div>
+
+                        <div
+                            className={tcls(
+                                'flex',
+                                'grow-0',
+                                'shrink-0',
+                                'md:basis-56',
+                                'justify-self-end',
+                                'items-center',
+                                'gap-2',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? [
+                                          'md:grow-[0.8]',
+                                          'lg:basis-40',
+                                          'md:max-w-[40%]',
+                                          'lg:max-w-lg',
+                                          'lg:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          'md:mr-auto',
+                                          'order-last',
+                                          'md:order-[unset]',
+                                      ]
+                                    : ['order-last']
+                            )}
+                        >
+                            <SearchContainer
+                                style={customization.styling.search}
+                                isMultiVariants={siteSpaces.length > 1}
+                                spaceTitle={siteSpace.title}
+                                siteSpaceId={siteSpace.id}
+                                viewport={!withTopHeader ? 'mobile' : undefined}
+                            />
+                        </div>
+
+                        {customization.header.links.length > 0 && (
+                            <HeaderLinks>
+                                {customization.header.links.map((link) => {
+                                    return (
+                                        <HeaderLink
+                                            key={link.title}
+                                            link={link}
+                                            context={context}
+                                        />
+                                    );
+                                })}
+                                <HeaderLinkMore
+                                    label={t(getSpaceLanguage(context), 'more')}
+                                    links={customization.header.links}
+                                    context={context}
+                                />
+                            </HeaderLinks>
+                        )}
                     </div>
                 </div>
             </div>
 
             {sections || siteSpaces.length > 1 ? (
-                <div className="scroll-nojump">
-                    <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <div
+                        className={tcls(
+                            'w-full',
+                            'overflow-x-auto',
+                            'no-scrollbar',
+                            '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
+                            !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
+                        )}
+                    >
                         <div
                             className={tcls(
-                                'w-full',
-                                'overflow-x-auto',
-                                'no-scrollbar',
-                                '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
-                                !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
+                                CONTAINER_STYLE,
+                                'grow',
+                                'flex',
+                                'items-end',
+                                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
                             )}
                         >
-                            <div
-                                className={tcls(
-                                    CONTAINER_STYLE,
-                                    'grow',
-                                    'flex',
-                                    'items-end',
-                                    'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
+                            {siteSpaces.length > 1 && (
+                                <div
+                                    id="variants"
+                                    className="my-2 mr-5 grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
+                                >
+                                    <SpacesDropdown
+                                        context={context}
+                                        siteSpace={siteSpace}
+                                        siteSpaces={siteSpaces}
+                                        className="w-full grow py-1"
+                                    />
+                                </div>
+                            )}
+                            {sections &&
+                                (sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
+                                    sections.list.length > 1) && ( // Otherwise, show the tabs if there's more than one section
+                                    <SiteSectionTabs
+                                        sections={encodeClientSiteSections(context, sections)}
+                                    />
                                 )}
-                            >
-                                {siteSpaces.length > 1 && (
-                                    <div
-                                        id="variants"
-                                        className="my-2 mr-5 grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
-                                    >
-                                        <SpacesDropdown
-                                            context={context}
-                                            siteSpace={siteSpace}
-                                            siteSpaces={siteSpaces}
-                                            className="w-full grow py-1"
-                                        />
-                                    </div>
-                                )}
-                                {sections &&
-                                    (sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
-                                        sections.list.length > 1) && ( // Otherwise, show the tabs if there's more than one section
-                                        <SiteSectionTabs
-                                            sections={encodeClientSiteSections(context, sections)}
-                                        />
-                                    )}
-                            </div>
                         </div>
                     </div>
                 </div>

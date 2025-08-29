@@ -20,13 +20,28 @@
     }
 }
 
-@utility hide-scroll {
-    /*  hide scroll bar but still scroll */
+@utility no-scrollbar {
     &::-webkit-scrollbar {
         display: none;
     }
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+@utility hide-scrollbar {
+    /* Hide scrollbar by default */
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.2s ease-in-out;
+
+    &:hover {
+        /* Show scrollbar on hover */
+        scrollbar-color: unset;
+    }
+
+    @media (prefers-contrast: more) {
+        /* Always show scrollbar in high contrast mode */
+        scrollbar-color: unset;
+    }
 }
 
 @utility linear-mask-gradient {
@@ -143,47 +158,6 @@
     @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
 }
 
-@utility scroll-nojump {
-    /**
-     * Utility to prevent horizontal jumps when the vertical scrollbar appears
-     * It should be used on main containers of the layout, while preserving horizontal delimiters.
-     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
-     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
-     */
-    width: 100%;
-    @media screen and (min-width: 1536px) {
-        margin-left: var(--scrollbar-width);
-        margin-right: 0;
-        width: calc(100% - var(--scrollbar-width));
-        body:has(.page-full-width) & {
-            margin-left: 0;
-            width: 100%;
-        }
-    }
-
-    /**
-     * Utility to prevent horizontal jumps when the vertical scrollbar appears
-     * It should be used on main containers of the layout, while preserving horizontal delimiters.
-     * It basically adds a margin-left with the width of the scrollbar, and a width that compensates for it; when a scrollbar is displayed.
-     * Inspired by https://aykevl.nl/2014/09/fix-jumping-scrollbar, but adapted to work on child elements of "html"
-     */
-    width: 100%;
-    @media screen and (min-width: 1536px) {
-        margin-left: var(--scrollbar-width);
-        margin-right: 0;
-        width: calc(100% - var(--scrollbar-width));
-    }
-}
-
-@utility page-full-width {
-    @media screen and (min-width: 1536px) {
-        body:has(&) .scroll-nojump {
-            margin-left: 0;
-            width: 100%;
-        }
-    }
-}
-
 @utility elevate-link {
     & a[href]:not(.link-overlay) {
         position: relative;
@@ -211,15 +185,59 @@
 
 @layer base {
     :root {
-        --scrollbar-width: calc(100vw - 100%);
         @apply leading-relaxed;
         interpolate-size: allow-keywords; /* Opt-in for modern browsers to interpolate "auto" values in transitions/animations. */
     }
+    
+    /* Modern browsers with `scrollbar-*` support */
+    @supports (scrollbar-color: auto) {
+        * {
+            scrollbar-color: theme("colors.tint.7") transparent;
+            scrollbar-width: thin;
+        }
+
+        @media (prefers-contrast: more) {
+            * {
+                scrollbar-color: theme("colors.tint.11") transparent;
+                scrollbar-width: auto;
+            }
+        }
+    }
+    
+    /* Otherwise, use `::-webkit-scrollbar-*` pseudo-elements */
+    @supports selector(::-webkit-scrollbar) {
+        ::-webkit-scrollbar {
+            background: transparent;
+            max-width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: theme("colors.tint.7");
+            border-radius: 8px;
+            transition: background 0.2s ease-in-out;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme("colors.tint.8");
+        }
+
+        @media (prefers-contrast: more) {
+            ::-webkit-scrollbar-thumb {
+                background: theme("colors.tint.11");
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: theme("colors.tint.12");
+            }
+        }
+    }
+
+
     body {
         @apply text-tint-strong antialiased;
     }
     html {
-        @apply gutter-stable;
+        scrollbar-width: auto;
     }
     h1 {
         @apply tracking-[-0.025em] text-tint-strong text-balance;
@@ -248,22 +266,6 @@
     pre {
         /* Don't apply antialiased to `code` and `pre` elements */
         @apply subpixel-antialiased;
-    }
-
-    /*  Light mode */
-    ::-webkit-scrollbar {
-        @apply bg-tint-subtle;
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        @apply bg-tint-7;
-        border-radius: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        @apply bg-tint-8;
     }
 
     .flip-heading-hash {
