@@ -34,7 +34,6 @@ export function ScalarApiButton(props: {
     // Fetch visitor data and open modal
     const openModal = async () => {
         const data = await getPrefillInputContextData();
-        console.log('!!Fetched data', data);
         setPrefillInputContext(data);
         controllerRef.current?.openClient?.();
         setIsOpen(true);
@@ -87,7 +86,6 @@ function ScalarModal(props: {
         operation: { securities, servers },
         prefillInputContext,
     });
-    console.log('!!prefillConfig', prefillConfig);
 
     return (
         <ApiClientModalProvider
