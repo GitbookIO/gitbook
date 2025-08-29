@@ -38,7 +38,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
             >
                 <TOCScrollContainer
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
-                    className="gutter-stable overflow-y-auto px-2 pb-6"
+                    className="overflow-y-auto px-2 pb-6"
                 >
                     {sectionsAndGroups.map((item) => {
                         if (item.object === 'site-section-group') {

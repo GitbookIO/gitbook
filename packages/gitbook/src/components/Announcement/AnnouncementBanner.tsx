@@ -34,69 +34,67 @@ export function AnnouncementBanner(props: {
             className="theme-bold:bg-header-background pt-4 pb-2"
             data-nosnippet=""
         >
-            <div className="scroll-nojump">
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
-                    <div className={tcls('relative', CONTAINER_STYLE)}>
-                        <Tag
-                            href={contentRef?.href ?? ''}
-                            className={tcls(
-                                'flex w-full items-start justify-center overflow-hidden circular-corners:rounded-xl rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
-                                style.container,
-                                closeable && 'pr-12',
-                                hasLink && style.hover
-                            )}
-                            insights={
-                                announcement.link
-                                    ? {
-                                          type: 'link_click',
-                                          link: {
-                                              target: announcement.link.to,
-                                              position: SiteInsightsLinkPosition.Announcement,
-                                          },
-                                      }
-                                    : undefined
-                            }
-                        >
-                            <Icon
-                                icon={style.icon as IconName}
-                                className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
-                            />
-                            <div>
-                                {announcement.message}
-                                {hasLink ? (
-                                    <div className={tcls(LinkStyles, style.link, 'ml-1 inline')}>
-                                        {contentRef?.icon ? (
-                                            <span className="mr-1 ml-2 *:inline">
-                                                {contentRef?.icon}
-                                            </span>
-                                        ) : null}
-                                        {announcement.link?.title && (
-                                            <span className="mr-1">{announcement.link?.title}</span>
-                                        )}
-                                        <Icon
-                                            icon={
-                                                announcement.link?.to.kind === 'url'
-                                                    ? 'arrow-up-right'
-                                                    : 'chevron-right'
-                                            }
-                                            className={tcls('mb-0.5 inline size-3')}
-                                        />
-                                    </div>
-                                ) : null}
-                            </div>
-                        </Tag>
-                        {closeable ? (
-                            <Button
-                                iconOnly
-                                icon="close"
-                                label={tString(language, 'close')}
-                                variant="blank"
-                                size="default"
-                                onClick={dismissAnnouncement}
-                                className={`absolute top-0 right-4 mt-2 mr-2 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
-                            />
-                        ) : null}
-                    </div>
+            <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className={tcls('relative', CONTAINER_STYLE)}>
+                    <Tag
+                        href={contentRef?.href ?? ''}
+                        className={tcls(
+                            'flex w-full items-start justify-center overflow-hidden circular-corners:rounded-xl rounded-md straight-corners:rounded-none px-4 py-3 text-neutral-strong text-sm theme-bold:ring-1 theme-gradient:ring-1 ring-inset transition-colors',
+                            style.container,
+                            closeable && 'pr-12',
+                            hasLink && style.hover
+                        )}
+                        insights={
+                            announcement.link
+                                ? {
+                                      type: 'link_click',
+                                      link: {
+                                          target: announcement.link.to,
+                                          position: SiteInsightsLinkPosition.Announcement,
+                                      },
+                                  }
+                                : undefined
+                        }
+                    >
+                        <Icon
+                            icon={style.icon as IconName}
+                            className={`mt-0.5 mr-3 size-4 shrink-0 ${style.iconColor}`}
+                        />
+                        <div>
+                            {announcement.message}
+                            {hasLink ? (
+                                <div className={tcls(LinkStyles, style.link, 'ml-1 inline')}>
+                                    {contentRef?.icon ? (
+                                        <span className="mr-1 ml-2 *:inline">
+                                            {contentRef?.icon}
+                                        </span>
+                                    ) : null}
+                                    {announcement.link?.title && (
+                                        <span className="mr-1">{announcement.link?.title}</span>
+                                    )}
+                                    <Icon
+                                        icon={
+                                            announcement.link?.to.kind === 'url'
+                                                ? 'arrow-up-right'
+                                                : 'chevron-right'
+                                        }
+                                        className={tcls('mb-0.5 inline size-3')}
+                                    />
+                                </div>
+                            ) : null}
+                        </div>
+                    </Tag>
+                    {closeable ? (
+                        <Button
+                            iconOnly
+                            icon="close"
+                            label={tString(language, 'close')}
+                            variant="blank"
+                            size="default"
+                            onClick={dismissAnnouncement}
+                            className={`absolute top-0 right-4 mt-2 mr-2 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 sm:right-6 md:right-8 ${style.close}`}
+                        />
+                    ) : null}
                 </div>
             </div>
         </div>
