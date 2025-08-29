@@ -74,7 +74,7 @@ export interface OpenAPICustomOperationProperties {
  * Custom properties that can be defined to enable prefilling for the TryIt functionality.
  */
 export interface OpenAPICustomTryItPrefillProperties {
-    'x-gitbook-tryit-prefill'?: string;
+    'x-gitbook-prefill'?: string;
 }
 
 export type OpenAPIStability = 'experimental' | 'alpha' | 'beta';

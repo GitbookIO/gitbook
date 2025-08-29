@@ -46,8 +46,8 @@ export async function SiteLayout(props: {
         });
     });
 
-    const getVisitorClaimsUrl = new URL(
-        context.linker.toAbsoluteURL(context.linker.toPathInSite('/~gitbook/visitor'))
+    const getVisitorClaimsUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathInSite('/~gitbook/visitor')
     );
 
     return (
@@ -61,7 +61,7 @@ export async function SiteLayout(props: {
         >
             <AdaptiveVisitorContextProvider
                 contextId={context.contextId}
-                getVisitorClaimsUrl={getVisitorClaimsUrl.toString()}
+                visitorClaimsURL={getVisitorClaimsUrl}
             >
                 <AIContextProvider
                     aiMode={customization.ai?.mode}

@@ -11,6 +11,7 @@
     "version": "1.3.6",
     "sideEffects": false,
     "dependencies": {
+        "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "^1.3.16",
         "@scalar/oas-utils": "^0.2.130",
@@ -24,7 +25,6 @@
         "zustand": "^5.0.3"
     },
     "devDependencies": {
-        "@gitbook/expr": "workspace:*",
         "bun-types": "^1.1.20",
         "typescript": "^5.5.3"
     },

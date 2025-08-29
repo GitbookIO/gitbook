@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
 import { useOpenAPIOperationContext } from './OpenAPIOperationContext';
-import { useOpenAPITryItPrefillContext } from './OpenAPITryItPrefillContext';
+import { useOpenAPIPrefillContext } from './OpenAPIPrefillContextProvider';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 import type { OpenAPIOperationData } from './types';
@@ -24,17 +24,25 @@ export function ScalarApiButton(props: {
     context: OpenAPIClientContext;
 }) {
     const { method, path, securities, servers, specUrl, context } = props;
+    const getPrefillInputContextData = useOpenAPIPrefillContext();
     const [isOpen, setIsOpen] = useState(false);
+    const [prefillInputContext, setPrefillInputContext] = useState<Record<string, unknown> | null>(
+        null
+    );
     const controllerRef = useRef<ScalarModalControllerRef>(null);
+
+    // Fetch visitor data and open modal
+    const openModal = async () => {
+        const data = await getPrefillInputContextData();
+        console.log('!!Fetched data', data);
+        setPrefillInputContext(data);
+        controllerRef.current?.openClient?.();
+        setIsOpen(true);
+    };
+
     return (
         <div className="scalar scalar-activate">
-            <button
-                className="scalar-activate-button button"
-                onClick={() => {
-                    controllerRef.current?.openClient?.();
-                    setIsOpen(true);
-                }}
-            >
+            <button className="scalar-activate-button button" onClick={openModal}>
                 {t(context.translation, 'test_it')}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" fill="currentColor">
                     <path
@@ -46,6 +54,7 @@ export function ScalarApiButton(props: {
             </button>
 
             {isOpen &&
+                prefillInputContext &&
                 createPortal(
                     <ScalarModal
                         controllerRef={controllerRef}
@@ -54,6 +63,7 @@ export function ScalarApiButton(props: {
                         securities={securities}
                         servers={servers}
                         specUrl={specUrl}
+                        prefillInputContext={prefillInputContext}
                     />,
                     document.body
                 )}
@@ -68,21 +78,20 @@ function ScalarModal(props: {
     servers: OpenAPIOperationData['servers'];
     specUrl: string;
     controllerRef: React.Ref<ScalarModalControllerRef>;
+    prefillInputContext: Record<string, unknown>;
 }) {
-    const { method, path, securities, servers, specUrl, controllerRef } = props;
-    const { resolveTryItPrefillExpression } = useOpenAPITryItPrefillContext();
+    const { method, path, securities, servers, specUrl, controllerRef, prefillInputContext } =
+        props;
 
     const prefillConfig = resolveTryItPrefillForOperation({
         operation: { securities, servers },
-        resolveTryItPrefillExpression,
+        prefillInputContext,
     });
+    console.log('!!prefillConfig', prefillConfig);
 
     return (
         <ApiClientModalProvider
-            configuration={{
-                url: specUrl,
-                ...prefillConfig,
-            }}
+            configuration={{ url: specUrl, ...prefillConfig }}
             initialRequest={{ method, path }}
         >
             <ScalarModalController method={method} path={path} controllerRef={controllerRef} />

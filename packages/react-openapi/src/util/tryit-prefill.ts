@@ -1,8 +1,8 @@
+import { ExpressionRuntime, parseTemplate } from '@gitbook/expr';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type { ApiClientConfiguration } from '@scalar/types';
+import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
 import type { OpenAPIOperationData } from '../types';
-
-export type TryItPrefillExpressionResolver = (expr: string) => string | undefined;
 
 export interface TryItPrefillConfiguration {
     authentication?: ApiClientConfiguration['authentication'];
@@ -18,23 +18,31 @@ export function resolveTryItPrefillForOperation(args: {
      */
     operation: Pick<OpenAPIOperationData, 'securities' | 'servers'>;
     /**
-     * Function to resolve a user-defined expression contained in a try it prefill extension attribute,
-     * e.g:
-     *
-     * x-gitbook-tryit-prefill: {{ visitor.claims.apiKey }}
+     * Prefill input context data.
      */
-    resolveTryItPrefillExpression: TryItPrefillExpressionResolver;
+    prefillInputContext: PrefillInputContextData | null;
 }): TryItPrefillConfiguration {
     const {
         operation: { securities, servers },
-        resolveTryItPrefillExpression,
+        prefillInputContext,
     } = args;
+
+    // Fixed ExpressionRuntime and resolveTryItPrefillExpression function
+    const runtime = new ExpressionRuntime();
+    const resolveTryItPrefillExpression = (expr: string) => {
+        if (!prefillInputContext) return undefined;
+        const parts = parseTemplate(expr);
+        if (!parts.length) return undefined;
+        return runtime.evaluateTemplate(expr, prefillInputContext);
+    };
+
     const prefillAuth = securities
         ? resolveTryItPrefillAuthForOperationSecurities({
               securities,
               resolveTryItPrefillExpression,
           })
         : undefined;
+
     const prefillServers = servers
         ? resolveTryItPrefillServersForOperationServers({ servers, resolveTryItPrefillExpression })
         : [];
@@ -50,14 +58,14 @@ export function resolveTryItPrefillForOperation(args: {
  */
 function resolveTryItPrefillAuthForOperationSecurities(args: {
     securities: OpenAPIOperationData['securities'];
-    resolveTryItPrefillExpression: TryItPrefillExpressionResolver;
+    resolveTryItPrefillExpression: (expr: string) => string | undefined;
 }): ApiClientConfiguration['authentication'] | undefined {
     const { securities, resolveTryItPrefillExpression } = args;
     const prefillAuthConfig: ApiClientConfiguration['authentication']['securitySchemes'] = {};
 
     for (const [schemeName, security] of Object.values(securities)) {
-        const tryitPrefillAuthValue = security['x-gitbook-tryit-prefill']
-            ? resolveTryItPrefillExpression(security['x-gitbook-tryit-prefill'])
+        const tryitPrefillAuthValue = security['x-gitbook-prefill']
+            ? resolveTryItPrefillExpression(security['x-gitbook-prefill'])
             : undefined;
 
         if (!tryitPrefillAuthValue) {
@@ -67,18 +75,13 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
         switch (security.type) {
             case 'http': {
                 if (security.scheme?.includes('bearer')) {
-                    prefillAuthConfig[schemeName] = {
-                        token: tryitPrefillAuthValue,
-                    };
+                    prefillAuthConfig[schemeName] = { token: tryitPrefillAuthValue };
                 } else if (
                     security.scheme?.includes('basic') &&
                     tryitPrefillAuthValue.includes(':')
                 ) {
                     const [username, password] = tryitPrefillAuthValue.split(':', 2);
-                    prefillAuthConfig[schemeName] = {
-                        username,
-                        password,
-                    };
+                    prefillAuthConfig[schemeName] = { username, password };
                 }
                 break;
             }
@@ -90,7 +93,6 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
                 };
                 break;
             }
-            // TODO: Add support for oauth2/openIdConnect schemes.
             case 'oauth2':
             case 'openIdConnect': {
                 break;
@@ -99,9 +101,7 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
     }
 
     return Object.keys(prefillAuthConfig).length > 0
-        ? {
-              securitySchemes: prefillAuthConfig,
-          }
+        ? { securitySchemes: prefillAuthConfig }
         : undefined;
 }
 
@@ -110,14 +110,14 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
  */
 function resolveTryItPrefillServersForOperationServers(args: {
     servers: OpenAPIOperationData['servers'];
-    resolveTryItPrefillExpression: TryItPrefillExpressionResolver;
+    resolveTryItPrefillExpression: (expr: string) => string | undefined;
 }): ApiClientConfiguration['servers'] | undefined {
     const { servers, resolveTryItPrefillExpression } = args;
     const resolvedServers: ApiClientConfiguration['servers'] = [];
 
     for (const server of servers) {
         // Url-level prefill
-        const tryItPrefillServerUrlExpr = server['x-gitbook-tryit-prefill'];
+        const tryItPrefillServerUrlExpr = server['x-gitbook-prefill'];
         const tryItPrefillServerUrlValue = tryItPrefillServerUrlExpr
             ? resolveTryItPrefillExpression(tryItPrefillServerUrlExpr)
             : undefined;
@@ -129,8 +129,7 @@ function resolveTryItPrefillServersForOperationServers(args: {
         // Variable-level prefill
         if (server.variables) {
             for (const [varName, variable] of Object.entries(server.variables)) {
-                const { 'x-gitbook-tryit-prefill': tryItPrefillVarExpr, ...variableProps } =
-                    variable;
+                const { 'x-gitbook-prefill': tryItPrefillVarExpr, ...variableProps } = variable;
 
                 const tryItPrefillVarValue = tryItPrefillVarExpr
                     ? resolveTryItPrefillExpression(tryItPrefillVarExpr)

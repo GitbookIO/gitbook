@@ -1,28 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { ExpressionRuntime, parseTemplate } from '@gitbook/expr';
+import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
 import type { OpenAPIOperationData } from '../types';
-import {
-    type TryItPrefillExpressionResolver,
-    resolveTryItPrefillForOperation,
-} from './tryit-prefill';
-
-const expressionRuntime = new ExpressionRuntime();
-
-/**
- * Create a try it prefill expression resolver with visitor data for testing.
- */
-function createTryItPrefillResolverWithVisitorData(
-    visitorData: Record<string, unknown>
-): TryItPrefillExpressionResolver {
-    return (expr: string) => {
-        const parts = parseTemplate(expr);
-        if (!parts.length) {
-            return undefined;
-        }
-
-        return expressionRuntime.evaluateTemplate(expr, visitorData);
-    };
-}
+import { resolveTryItPrefillForOperation } from './tryit-prefill';
 
 describe('resolveTryItPrefillForOperation', () => {
     describe('prefill authentication info', () => {
@@ -38,17 +17,19 @@ describe('resolveTryItPrefillForOperation', () => {
                         {
                             type: 'http',
                             scheme: 'bearer',
-                            'x-gitbook-tryit-prefill': '{{ visitor.claims.apiToken }}',
+                            'x-gitbook-prefill': '{{ visitor.claims.apiToken }}',
                         },
                     ],
                 ],
             };
 
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: { claims: { apiToken: 'gb_api_testToken' } },
+            };
+
             const result = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: { claims: { apiToken: 'gb_api_testToken' } },
-                }),
+                prefillInputContext,
             });
 
             expect(result).toEqual({
@@ -72,17 +53,19 @@ describe('resolveTryItPrefillForOperation', () => {
                         {
                             type: 'http',
                             scheme: 'basic',
-                            'x-gitbook-tryit-prefill': '{{ visitor.claims.basicAuth }}',
+                            'x-gitbook-prefill': '{{ visitor.claims.basicAuth }}',
                         },
                     ],
                 ],
             };
 
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: { claims: { basicAuth: 'testuser:testpassword' } },
+            };
+
             const result = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: { claims: { basicAuth: 'testuser:testpassword' } },
-                }),
+                prefillInputContext,
             });
 
             expect(result).toEqual({
@@ -107,17 +90,19 @@ describe('resolveTryItPrefillForOperation', () => {
                             type: 'apiKey',
                             in: 'header',
                             name: 'X-API-KEY',
-                            'x-gitbook-tryit-prefill': '{{ visitor.claims.apiKey }}',
+                            'x-gitbook-prefill': '{{ visitor.claims.apiKey }}',
                         },
                     ],
                 ],
             };
 
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: { claims: { apiKey: 'key-123' } },
+            };
+
             const result = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: { claims: { apiKey: 'key-123' } },
-                }),
+                prefillInputContext,
             });
 
             expect(result).toEqual({
@@ -141,17 +126,19 @@ describe('resolveTryItPrefillForOperation', () => {
                         {
                             type: 'http',
                             scheme: 'bearer',
-                            'x-gitbook-tryit-prefill': '{{ visitor.claims.missing }}',
+                            'x-gitbook-prefill': '{{ visitor.claims.missing }}',
                         },
                     ],
                 ],
             };
 
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: { claims: {} },
+            };
+
             const result = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: { claims: {} },
-                }),
+                prefillInputContext,
             });
 
             expect(result).toEqual({});
@@ -168,21 +155,21 @@ describe('resolveTryItPrefillForOperation', () => {
                     {
                         url: 'https://api.gitbook.com/v1/',
                         description: 'GitBook API endpoint',
-                        'x-gitbook-tryit-prefill': '{{ visitor.claims.api.endpointUrl }}',
+                        'x-gitbook-prefill': '{{ visitor.claims.api.endpointUrl }}',
                     },
                 ],
                 securities: [],
             };
 
+            const prefillInputContext: PrefillInputContextData = {
+                visitor: {
+                    claims: { api: { endpointUrl: 'https://api.gitbook-staging.com/v1/' } },
+                },
+            };
+
             const result = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: {
-                        claims: {
-                            api: { endpointUrl: 'https://api.gitbook-staging.com/v1/' },
-                        },
-                    },
-                }),
+                prefillInputContext,
             });
 
             expect(result).toEqual({
@@ -207,12 +194,12 @@ describe('resolveTryItPrefillForOperation', () => {
                         variables: {
                             domain: {
                                 default: 'gitbook.com',
-                                'x-gitbook-tryit-prefill':
+                                'x-gitbook-prefill':
                                     '{{ visitor.claims.api.env === "staging" ?  "gitbook-staging.com" : "gitbook.com" }}',
                             },
                             version: {
                                 default: 'v1',
-                                'x-gitbook-tryit-prefill': '{{ visitor.claims.api.version }}',
+                                'x-gitbook-prefill': '{{ visitor.claims.api.version }}',
                             },
                         },
                     },
@@ -220,85 +207,57 @@ describe('resolveTryItPrefillForOperation', () => {
                 securities: [],
             };
 
+            // Override env
             const overrideEnvResult = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: {
-                        claims: {
-                            api: { env: 'staging' },
-                        },
-                    },
-                }),
+                prefillInputContext: { visitor: { claims: { api: { env: 'staging' } } } },
             });
-
             expect(overrideEnvResult).toEqual({
                 servers: [
                     {
                         url: 'https://api.{domain}/{version}/',
                         description: 'Versioned API endpoint by environment',
                         variables: {
-                            domain: {
-                                default: 'gitbook-staging.com',
-                            },
-                            version: {
-                                default: 'v1',
-                            },
+                            domain: { default: 'gitbook-staging.com' },
+                            version: { default: 'v1' },
                         },
                     },
                 ],
             });
 
+            // Override version
             const overrideVersionResult = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: {
-                        claims: {
-                            api: { version: 'v2' },
-                        },
-                    },
-                }),
+                prefillInputContext: { visitor: { claims: { api: { version: 'v2' } } } },
             });
-
             expect(overrideVersionResult).toEqual({
                 servers: [
                     {
                         url: 'https://api.{domain}/{version}/',
                         description: 'Versioned API endpoint by environment',
                         variables: {
-                            domain: {
-                                default: 'gitbook.com',
-                            },
-                            version: {
-                                default: 'v2',
-                            },
+                            domain: { default: 'gitbook.com' },
+                            version: { default: 'v2' },
                         },
                     },
                 ],
             });
 
+            // Override both
             const overrideBoth = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: {
-                        claims: {
-                            api: { env: 'staging', version: 'v2' },
-                        },
-                    },
-                }),
+                prefillInputContext: {
+                    visitor: { claims: { api: { env: 'staging', version: 'v2' } } },
+                },
             });
-
             expect(overrideBoth).toEqual({
                 servers: [
                     {
                         url: 'https://api.{domain}/{version}/',
                         description: 'Versioned API endpoint by environment',
                         variables: {
-                            domain: {
-                                default: 'gitbook-staging.com',
-                            },
-                            version: {
-                                default: 'v2',
-                            },
+                            domain: { default: 'gitbook-staging.com' },
+                            version: { default: 'v2' },
                         },
                     },
                 ],
@@ -317,12 +276,12 @@ describe('resolveTryItPrefillForOperation', () => {
                         variables: {
                             domain: {
                                 default: 'gitbook.com',
-                                'x-gitbook-tryit-prefill':
+                                'x-gitbook-prefill':
                                     '{{ visitor.claims.api.env === "staging" ?  "gitbook-staging.com" : "gitbook.com" }}',
                             },
                             version: {
                                 default: 'v1',
-                                'x-gitbook-tryit-prefill': '{{ visitor.claims.api.version }}',
+                                'x-gitbook-prefill': '{{ visitor.claims.api.version }}',
                             },
                         },
                     },
@@ -332,9 +291,7 @@ describe('resolveTryItPrefillForOperation', () => {
 
             const result = resolveTryItPrefillForOperation({
                 operation,
-                resolveTryItPrefillExpression: createTryItPrefillResolverWithVisitorData({
-                    visitor: { claims: { isBetaUser: true } },
-                }),
+                prefillInputContext: { visitor: { claims: { isBetaUser: true } } },
             });
 
             expect(result).toEqual({
@@ -343,12 +300,8 @@ describe('resolveTryItPrefillForOperation', () => {
                         url: 'https://api.{domain}/{version}/',
                         description: 'Versioned API endpoint by environment',
                         variables: {
-                            domain: {
-                                default: 'gitbook.com',
-                            },
-                            version: {
-                                default: 'v1',
-                            },
+                            domain: { default: 'gitbook.com' },
+                            version: { default: 'v1' },
                         },
                     },
                 ],
