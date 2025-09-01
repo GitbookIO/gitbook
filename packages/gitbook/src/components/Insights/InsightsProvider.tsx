@@ -16,6 +16,7 @@ export type InsightsEventName = api.SiteInsightsEvent['type'];
  * Context for an event on a page.
  */
 export interface InsightsEventPageContext {
+    displayContext: api.SiteInsightsDisplayContext;
     pageId: string | null;
 }
 
@@ -265,6 +266,7 @@ function transformEvents(input: {
         siteShareKey: input.context.siteShareKey ?? null,
         revision: input.context.revisionId,
         page: input.pageContext.pageId,
+        displayContext: input.pageContext.displayContext,
     };
 
     return input.events.map((partialEvent) => {

@@ -7,6 +7,9 @@ import {
     AIChatDynamicIcon,
     AIChatSubtitle,
 } from '@/components/AIChat';
+import * as api from '@gitbook/api';
+import React from 'react';
+import { useTrackEvent } from '../Insights';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
@@ -27,6 +30,20 @@ export function EmbeddableAIChat(props: {
     const chat = useAIChatState();
     const chatController = useAIChatController();
     const configuration = useEmbeddableConfiguration();
+
+    // Track the view of the AI chat
+    const trackEvent = useTrackEvent();
+    React.useEffect(() => {
+        trackEvent(
+            {
+                type: 'ask_view',
+            },
+            {
+                pageId: null,
+                displayContext: api.SiteInsightsDisplayContext.Embed,
+            }
+        );
+    }, [trackEvent]);
 
     return (
         <EmbeddableFrame>
