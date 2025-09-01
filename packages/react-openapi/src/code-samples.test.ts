@@ -406,7 +406,7 @@ describe('python code sample generator', () => {
 
     it('should format application/json body properly', () => {
         const input: CodeSampleInput = {
-            method: 'GET',
+            method: 'POST',
             url: 'https://example.com/path',
             headers: {
                 'Content-Type': 'application/json',
@@ -422,7 +422,7 @@ describe('python code sample generator', () => {
         const output = generator?.generate(input);
 
         expect(output).toBe(
-            'import requests\n\nresponse = requests.get(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data=json.dumps({\n      "key": "value",\n      "truethy": True,\n      "falsey": False,\n      "nullish": None\n    })\n)\n\ndata = response.json()'
+            'import json\nimport requests\n\nresponse = requests.post(\n    "https://example.com/path",\n    headers={"Content-Type":"application/json"},\n    data=json.dumps({\n      "key": "value",\n      "truethy": True,\n      "falsey": False,\n      "nullish": None\n    })\n)\n\ndata = response.json()'
         );
     });
 
