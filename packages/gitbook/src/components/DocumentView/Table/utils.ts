@@ -45,58 +45,51 @@ export function getRecordCardCovers(
         objectFit?: string;
     };
 } {
+    const lightValue = view.coverDefinition
+        ? (getRecordValue(record, view.coverDefinition) as CoverValue | string[])
+        : null;
+
+    const darkValue = view.coverDefinitionDark
+        ? (getRecordValue(record, view.coverDefinitionDark) as CoverValue)
+        : null;
+
     return {
-        light: (() => {
-            if (!view.coverDefinition) {
-                return { contentRef: null };
-            }
-
-            const value = getRecordValue(record, view.coverDefinition) as CoverValue | string[];
-
-            if (Array.isArray(value)) {
-                if (value.length === 0) {
-                    return { contentRef: null };
-                }
-
-                if (typeof value[0] === 'string') {
-                    return { contentRef: { kind: 'file', file: value[0] } };
-                }
-            }
-
-            // Check if it's the new schema with objectFit
-            if (value && typeof value === 'object' && 'ref' in value && 'objectFit' in value) {
-                return {
-                    contentRef: value.ref,
-                    objectFit: value.objectFit,
-                };
-            }
-
-            // It's a direct ContentRef
-            return { contentRef: value as ContentRefFile | ContentRefURL };
-        })(),
-        dark: (() => {
-            if (!view.coverDefinitionDark) {
-                return { contentRef: null };
-            }
-
-            const value = getRecordValue(record, view.coverDefinitionDark) as CoverValue;
-
-            if (!value) {
-                return { contentRef: null };
-            }
-
-            // Check if it's the new schema with objectFit
-            if (typeof value === 'object' && 'ref' in value && 'objectFit' in value) {
-                return {
-                    contentRef: value.ref,
-                    objectFit: value.objectFit,
-                };
-            }
-
-            // It's a direct ContentRef
-            return { contentRef: value as ContentRefFile | ContentRefURL };
-        })(),
+        light: processCoverValue(lightValue),
+        dark: processCoverValue(darkValue),
     };
+}
+
+/**
+ * Process a cover value and return the content ref and object fit.
+ */
+function processCoverValue(value: CoverValue | string[] | null | undefined): {
+    contentRef: ContentRefFile | ContentRefURL | null;
+    objectFit?: string;
+} {
+    if (!value) {
+        return { contentRef: null };
+    }
+
+    if (Array.isArray(value)) {
+        if (value.length === 0) {
+            return { contentRef: null };
+        }
+
+        if (typeof value[0] === 'string') {
+            return { contentRef: { kind: 'file', file: value[0] } };
+        }
+    }
+
+    // Check if it's the new schema with objectFit
+    if (value && typeof value === 'object' && 'ref' in value && 'objectFit' in value) {
+        return {
+            contentRef: value.ref,
+            objectFit: value.objectFit,
+        };
+    }
+
+    // It's a direct ContentRef
+    return { contentRef: value as ContentRefFile | ContentRefURL };
 }
 
 /**
