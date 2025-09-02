@@ -3,6 +3,7 @@ import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import type { RevisionPageDocument } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import urlJoin from 'url-join';
 import { getPDFURLSearchParams } from '../PDF';
 import { PageActionsDropdown } from '../PageActions/PageActionsDropdown';
 import { PageIcon } from '../PageIcon';
@@ -45,7 +46,7 @@ export async function PageHeader(props: {
                         page.git
                             ? {
                                   provider: context.space?.gitSync?.installationProvider,
-                                  url: context.linker.toPathInSpace(page.path),
+                                  url: urlJoin(context.space.gitSync.url, page.git.path),
                               }
                             : undefined
                     }

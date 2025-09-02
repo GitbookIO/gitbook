@@ -20,6 +20,7 @@ import {
     EmbeddableFrameSubtitle,
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
+import { useTrackEvent } from '../Insights';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { AIChatControlButton } from './AIChatControlButton';
@@ -53,6 +54,16 @@ export function AIChat(props: { trademark: boolean }) {
         },
         []
     );
+
+    // Track the view of the AI chat
+    const trackEvent = useTrackEvent();
+    React.useEffect(() => {
+        if (chat.opened) {
+            trackEvent({
+                type: 'ask_view',
+            });
+        }
+    }, [chat.opened, trackEvent]);
 
     if (!chat.opened) {
         return null;

@@ -3,6 +3,7 @@
 import { TrackPageViewEvent } from '@/components/Insights';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
+import { SiteInsightsDisplayContext } from '@gitbook/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSpaceBasePath } from '../SpaceLayout/SpaceLayoutContext';
@@ -46,7 +47,7 @@ export function SitePageNotFound() {
                 </div>
 
                 {/* Track the page not found as a page view */}
-                <TrackPageViewEvent />
+                <TrackPageViewEvent displayContext={SiteInsightsDisplayContext.Site} />
             </div>
         </CurrentPageProvider>
     );

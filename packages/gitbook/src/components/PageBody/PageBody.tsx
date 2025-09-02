@@ -1,5 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import type { JSONDocument, RevisionPageDocument } from '@gitbook/api';
+import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
 import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
@@ -26,8 +26,9 @@ export function PageBody(props: {
     ancestors: AncestorRevisionPage[];
     document: JSONDocument | null;
     withPageFeedback: boolean;
+    insightsDisplayContext: SiteInsightsDisplayContext;
 }) {
-    const { page, context, ancestors, document, withPageFeedback } = props;
+    const { page, context, ancestors, document, withPageFeedback, insightsDisplayContext } = props;
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
@@ -117,7 +118,7 @@ export function PageBody(props: {
                 }
             </main>
 
-            <TrackPageViewEvent />
+            <TrackPageViewEvent displayContext={insightsDisplayContext} />
         </CurrentPageProvider>
     );
 }

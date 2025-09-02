@@ -1,6 +1,10 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data';
-import { CustomizationHeaderPreset, CustomizationThemeMode } from '@gitbook/api';
+import {
+    CustomizationHeaderPreset,
+    CustomizationThemeMode,
+    SiteInsightsDisplayContext,
+} from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import React from 'react';
@@ -65,6 +69,7 @@ export async function SitePage(props: SitePageProps) {
                     ancestors={ancestors}
                     document={document}
                     withPageFeedback={withPageFeedback}
+                    insightsDisplayContext={SiteInsightsDisplayContext.Site}
                 />
             </div>
             <React.Suspense fallback={null}>

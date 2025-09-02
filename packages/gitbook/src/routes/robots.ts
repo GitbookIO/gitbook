@@ -13,11 +13,11 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const lines = isIndexable
         ? [
               'User-agent: *',
+              // Disallow other dynamic routes / search queries
+              'Disallow: /*?',
               // Allow image resizing and icon generation routes for favicons and search results
               'Allow: /~gitbook/image?*',
               'Allow: /~gitbook/icon?*',
-              // Disallow other dynamic routes / search queries
-              'Disallow: /*?',
               'Allow: /',
               `Sitemap: ${linker.toAbsoluteURL(linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml'))}`,
           ]

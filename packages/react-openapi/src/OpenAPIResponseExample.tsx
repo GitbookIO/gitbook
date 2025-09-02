@@ -42,7 +42,13 @@ export function OpenAPIResponseExample(props: {
     });
 
     const tabs = responses
-        .filter(([_, responseObject]) => responseObject && typeof responseObject === 'object')
+        .filter(
+            ([_, responseObject]) =>
+                responseObject &&
+                typeof responseObject === 'object' &&
+                // Make sure the response is not hidden
+                !responseObject['x-hideSample']
+        )
         .map(([key, responseObject]) => {
             const description = resolveDescription(responseObject);
             const label = description ? (

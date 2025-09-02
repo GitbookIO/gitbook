@@ -2,6 +2,7 @@ import { type PagePathParams, getSitePageData } from '@/components/SitePage';
 
 import { PageBody } from '@/components/PageBody';
 import type { GitBookSiteContext } from '@/lib/context';
+import { SiteInsightsDisplayContext } from '@gitbook/api';
 import type { Metadata } from 'next';
 import { Button } from '../primitives';
 import {
@@ -54,6 +55,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                         ancestors={ancestors}
                         document={document}
                         withPageFeedback={withPageFeedback}
+                        insightsDisplayContext={SiteInsightsDisplayContext.Embed}
                     />
                 </div>
             </EmbeddableFrameBody>

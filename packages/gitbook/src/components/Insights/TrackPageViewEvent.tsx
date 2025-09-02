@@ -1,5 +1,6 @@
 'use client';
 
+import type { SiteInsightsDisplayContext } from '@gitbook/api';
 import * as React from 'react';
 
 import { useCurrentPage } from '../hooks';
@@ -8,7 +9,10 @@ import { useTrackEvent } from './InsightsProvider';
 /**
  * Track a page view event.
  */
-export function TrackPageViewEvent() {
+export function TrackPageViewEvent(props: {
+    displayContext: SiteInsightsDisplayContext;
+}) {
+    const { displayContext } = props;
     const page = useCurrentPage();
     const trackEvent = useTrackEvent();
 
@@ -19,9 +23,10 @@ export function TrackPageViewEvent() {
             },
             {
                 pageId: page?.pageId ?? null,
+                displayContext,
             }
         );
-    }, [page, trackEvent]);
+    }, [page, trackEvent, displayContext]);
 
     return null;
 }

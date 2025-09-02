@@ -6,6 +6,10 @@ export function isXML(contentType?: string): boolean {
     return contentType?.toLowerCase().includes('application/xml') || false;
 }
 
+export function isYAML(contentType?: string): boolean {
+    return contentType?.toLowerCase().includes('application/yaml') || false;
+}
+
 export function isGraphQL(contentType?: string): boolean {
     return contentType?.toLowerCase().includes('application/graphql') || false;
 }
