@@ -3,6 +3,7 @@ import { Image } from '@/components/utils';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import {
+    type CardsImageObjectFit,
     type ContentRef,
     type DocumentTableViewCards,
     SiteInsightsLinkPosition,
@@ -38,6 +39,14 @@ export async function RecordCard(
 
     const darkCoverIsSquareOrPortrait = isSquareOrPortrait(darkCover);
     const lightCoverIsSquareOrPortrait = isSquareOrPortrait(lightCover);
+
+    const darkObjectFit = dark.objectFit
+        ? `dark:${getObjectFitClass(dark.objectFit as CardsImageObjectFit)}`
+        : '';
+    const lightObjectFit = light.objectFit
+        ? getObjectFitClass(light.objectFit as CardsImageObjectFit)
+        : '';
+    const objectFits = `${lightObjectFit} ${darkObjectFit}`;
 
     const body = (
         <div
@@ -99,11 +108,6 @@ export async function RecordCard(
                         'w-full',
                         'h-full',
                         'bg-tint-subtle',
-                        getObjectFitClass(light.objectFit),
-                        // Apply dark mode object-fit if different from light
-                        dark.objectFit && dark.objectFit !== light.objectFit
-                            ? `dark:${getObjectFitClass(dark.objectFit)}`
-                            : '',
                         lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                             ? [
                                   lightCoverIsSquareOrPortrait
@@ -113,7 +117,8 @@ export async function RecordCard(
                                       ? 'dark:min-[432px]:aspect-video dark:min-[432px]:h-auto'
                                       : '',
                               ].filter(Boolean)
-                            : ['h-auto', 'aspect-video']
+                            : ['h-auto', 'aspect-video'],
+                        objectFits
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload
@@ -203,13 +208,15 @@ function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
 /**
  * Get the CSS class for object-fit based on the objectFit value.
  */
-function getObjectFitClass(objectFit?: string): string {
+function getObjectFitClass(objectFit?: CardsImageObjectFit): string {
     switch (objectFit) {
         case 'contain':
             return 'object-contain';
         case 'fill':
             return 'object-fill';
-        default:
+        case 'cover':
             return 'object-cover';
+        default:
+            throw new Error(`Unsupported object fit: ${objectFit}`);
     }
 }

@@ -1,22 +1,13 @@
 import type {
+    CardsImageObjectFit,
     ContentRef,
     ContentRefFile,
     ContentRefURL,
     DocumentTableDefinition,
+    DocumentTableImageRecord,
     DocumentTableRecord,
     DocumentTableViewCards,
 } from '@gitbook/api';
-
-/**
- * Cover value can be either a direct ContentRef or an object with objectFit and ref
- */
-export type CoverValue =
-    | ContentRefFile
-    | ContentRefURL
-    | {
-          objectFit: string;
-          ref: ContentRefFile | ContentRefURL;
-      };
 import assertNever from 'assert-never';
 
 /**
@@ -42,15 +33,15 @@ export function getRecordCardCovers(
 ): {
     [key in 'light' | 'dark']: {
         contentRef: ContentRefFile | ContentRefURL | null;
-        objectFit?: string;
+        objectFit?: CardsImageObjectFit;
     };
 } {
     const lightValue = view.coverDefinition
-        ? (getRecordValue(record, view.coverDefinition) as CoverValue | string[])
+        ? (getRecordValue(record, view.coverDefinition) as DocumentTableImageRecord | string[])
         : null;
 
     const darkValue = view.coverDefinitionDark
-        ? (getRecordValue(record, view.coverDefinitionDark) as CoverValue)
+        ? (getRecordValue(record, view.coverDefinitionDark) as DocumentTableImageRecord)
         : null;
 
     return {
@@ -62,9 +53,9 @@ export function getRecordCardCovers(
 /**
  * Process a cover value and return the content ref and object fit.
  */
-function processCoverValue(value: CoverValue | string[] | null | undefined): {
+function processCoverValue(value: DocumentTableImageRecord | string[] | null | undefined): {
     contentRef: ContentRefFile | ContentRefURL | null;
-    objectFit?: string;
+    objectFit?: CardsImageObjectFit;
 } {
     if (!value) {
         return { contentRef: null };
