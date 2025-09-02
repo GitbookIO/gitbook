@@ -25,11 +25,13 @@ type ButtonProps = {
 
 export const variantClasses = {
     primary: [
-        'bg-primary-solid',
-        'text-contrast-primary-solid',
+        'bg-primary-original',
+        'text-contrast-primary-original',
         'hover:bg-primary-solid-hover',
         'hover:text-contrast-primary-solid-hover',
         'border-0',
+        'contrast-more:bg-primary-solid',
+        'contrast-more:text-contrast-primary-solid',
         'contrast-more:border',
         'disabled:bg-primary-subtle',
         'disabled:text-primary/8',

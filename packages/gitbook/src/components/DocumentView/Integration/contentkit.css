@@ -99,7 +99,7 @@
 }
 
 .contentkit-button-style-primary {
-    @apply bg-primary-solid text-contrast-primary-solid hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover ring-0 contrast-more:ring-1;
+    @apply bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover ring-0 contrast-more:ring-1;
 }
 
 .contentkit-button-style-secondary {
