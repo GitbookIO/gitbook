@@ -22,11 +22,14 @@ import { visit } from 'unist-util-visit';
 // or file descriptor limits.
 const MAX_CONCURRENCY = 100;
 
+// Default limit for pages per batch
+const DEFAULT_PAGE_LIMIT = 100;
+
 /**
  * Generate a llms-full.txt file for the site.
  * As the result can be large, we stream it as we generate it.
  */
-export async function serveLLMsFullTxt(context: GitBookSiteContext) {
+export async function serveLLMsFullTxt(context: GitBookSiteContext, startingNumber = 0) {
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
@@ -34,7 +37,7 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext) {
     return new Response(
         new ReadableStream<Uint8Array>({
             async pull(controller) {
-                await streamMarkdownFromSiteStructure(context, controller);
+                await streamMarkdownFromSiteStructure(context, controller, startingNumber);
                 controller.close();
             },
         }),
@@ -51,17 +54,26 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext) {
  */
 async function streamMarkdownFromSiteStructure(
     context: GitBookSiteContext,
-    stream: ReadableStreamDefaultController<Uint8Array>
+    stream: ReadableStreamDefaultController<Uint8Array>,
+    startingNumber: number
 ): Promise<void> {
     switch (context.structure.type) {
         case 'sections':
             return streamMarkdownFromSections(
                 context,
                 stream,
-                getSiteStructureSections(context.structure, { ignoreGroups: true })
+                getSiteStructureSections(context.structure, { ignoreGroups: true }),
+                startingNumber
             );
         case 'siteSpaces':
-            return streamMarkdownFromSiteSpaces(context, stream, context.structure.structure, '');
+            await streamMarkdownFromSiteSpaces(
+                context,
+                stream,
+                context.structure.structure,
+                '',
+                startingNumber
+            );
+            return;
         default:
             assertNever(context.structure);
     }
@@ -73,15 +85,25 @@ async function streamMarkdownFromSiteStructure(
 async function streamMarkdownFromSections(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
-    siteSections: SiteSection[]
+    siteSections: SiteSection[],
+    startingNumber: number
 ): Promise<void> {
+    let currentPageIndex = 0;
+
     for (const siteSection of siteSections) {
-        await streamMarkdownFromSiteSpaces(
+        const result = await streamMarkdownFromSiteSpaces(
             context,
             stream,
             siteSection.siteSpaces,
-            siteSection.path
+            siteSection.path,
+            startingNumber,
+            currentPageIndex
         );
+        currentPageIndex = result.currentPageIndex;
+
+        if (result.reachedLimit) {
+            break;
+        }
     }
 }
 
@@ -92,9 +114,16 @@ async function streamMarkdownFromSiteSpaces(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
     siteSpaces: SiteSpace[],
-    basePath: string
-): Promise<void> {
+    basePath: string,
+    startingNumber = 0,
+    initialPageIndex = 0
+): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
     const { dataFetcher } = context;
+    let totalPagesProcessed = initialPageIndex;
+
+    // Collect all pages first
+    const allPages: Array<{ page: RevisionPageDocument; siteSpace: SiteSpace; basePath: string }> =
+        [];
 
     for (const siteSpace of siteSpaces) {
         const siteSpaceUrl = siteSpace.urls.published;
@@ -109,27 +138,45 @@ async function streamMarkdownFromSiteSpaces(
         );
         const pages = getIndexablePages(revision.pages);
 
-        for await (const markdown of pMapIterable(
-            pages,
-            async ({ page }) => {
-                if (page.type !== 'document') {
-                    return '';
-                }
-
-                return getMarkdownForPage(
-                    context,
-                    siteSpace,
+        // Add document pages to our collection
+        for (const { page } of pages) {
+            if (page.type === 'document') {
+                allPages.push({
                     page,
-                    joinPath(basePath, siteSpace.path)
-                );
-            },
-            {
-                concurrency: MAX_CONCURRENCY,
+                    siteSpace,
+                    basePath: joinPath(basePath, siteSpace.path),
+                });
             }
-        )) {
-            stream.enqueue(new TextEncoder().encode(markdown));
         }
     }
+
+    // Apply pagination - skip pages before startingNumber
+    const pagesToProcess = allPages.slice(startingNumber, startingNumber + DEFAULT_PAGE_LIMIT);
+    totalPagesProcessed = startingNumber;
+
+    // Process the pages
+    for await (const markdown of pMapIterable(
+        pagesToProcess,
+        async ({ page, siteSpace, basePath }) => {
+            return getMarkdownForPage(context, siteSpace, page, basePath);
+        },
+        {
+            concurrency: MAX_CONCURRENCY,
+        }
+    )) {
+        stream.enqueue(new TextEncoder().encode(markdown));
+        totalPagesProcessed++;
+    }
+
+    // Check if there are more pages and add next page link if needed
+    const hasMorePages = allPages.length > startingNumber + DEFAULT_PAGE_LIMIT;
+    if (hasMorePages) {
+        const nextPageUrl = context.linker.toPathInSite(`llms-full.txt/${totalPagesProcessed}`);
+        const nextPageLink = `\n\n---\n\n[Next Page](${nextPageUrl})\n\n`;
+        stream.enqueue(new TextEncoder().encode(nextPageLink));
+    }
+
+    return { currentPageIndex: totalPagesProcessed, reachedLimit: hasMorePages };
 }
 
 /**
