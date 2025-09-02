@@ -2,12 +2,29 @@
 
 import * as React from 'react';
 
+/**
+ * Prefill data that can be used to dynamically inject info into OpenAPI operation blocks.
+ *
+ * This is typically dynamic input context, such as visitor data or environment info.
+ */
 export type PrefillInputContextData = Record<string, unknown>;
 
+/**
+ * Context value is function that returns a promise resolving to prefill data.
+ *
+ * It is defined as a function rather than raw data because the data may need to be
+ * fetched or computed asynchronously, and consumers should be able to call it on
+ * demand to always receive the latest context.
+ *
+ * Returning a promise makes it easy for components to await the result.
+ */
 type PrefillContextValue = () => Promise<PrefillInputContextData | null>;
 
-const OpenAPITryItPrefillContext = React.createContext<PrefillContextValue | null>(null);
+const OpenAPIPrefillContext = React.createContext<PrefillContextValue | null>(null);
 
+/**
+ * Provide context to help prefill dynamic info like visitor data in OpenAPI blocks.
+ */
 export function OpenAPIPrefillContextProvider(
     props: React.PropsWithChildren<{
         getPrefillInputContextData: () => Promise<PrefillInputContextData | null>;
@@ -15,12 +32,15 @@ export function OpenAPIPrefillContextProvider(
 ) {
     const { getPrefillInputContextData, children } = props;
     return (
-        <OpenAPITryItPrefillContext.Provider value={getPrefillInputContextData}>
+        <OpenAPIPrefillContext.Provider value={getPrefillInputContextData}>
             {children}
-        </OpenAPITryItPrefillContext.Provider>
+        </OpenAPIPrefillContext.Provider>
     );
 }
 
+/**
+ * Hook to access the prefill context function.
+ */
 export function useOpenAPIPrefillContext(): PrefillContextValue {
-    return React.useContext(OpenAPITryItPrefillContext) ?? (() => Promise.resolve(null));
+    return React.useContext(OpenAPIPrefillContext) ?? (() => Promise.resolve(null));
 }

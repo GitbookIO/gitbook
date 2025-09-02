@@ -1,21 +1,21 @@
 import type {
     OpenAPICustomOperationProperties,
+    OpenAPICustomPrefillProperties,
     OpenAPICustomSpecProperties,
-    OpenAPICustomTryItPrefillProperties,
     OpenAPIV3,
 } from '@gitbook/openapi-parser';
 
 export type OpenAPIServerVariableWithCustomProperties = OpenAPIV3.ServerVariableObject &
-    OpenAPICustomTryItPrefillProperties;
+    OpenAPICustomPrefillProperties;
 
 export type OpenAPIServerWithCustomProperties = Omit<OpenAPIV3.ServerObject, 'variables'> & {
     variables?: {
         [variable: string]: OpenAPIServerVariableWithCustomProperties;
     };
-} & OpenAPICustomTryItPrefillProperties;
+} & OpenAPICustomPrefillProperties;
 
 export type OpenAPISecurityWithRequired = OpenAPIV3.SecuritySchemeObject &
-    OpenAPICustomTryItPrefillProperties & { required?: boolean };
+    OpenAPICustomPrefillProperties & { required?: boolean };
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;
