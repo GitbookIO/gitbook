@@ -3,6 +3,7 @@ import { Image } from '@/components/utils';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import {
+    CardsImageObjectFit,
     type ContentRef,
     type DocumentTableViewCards,
     SiteInsightsLinkPosition,
@@ -25,8 +26,12 @@ export async function RecordCard(
         : null;
 
     const [lightCover, darkCover, target] = await Promise.all([
-        light && context.contentContext ? resolveContentRef(light, context.contentContext) : null,
-        dark && context.contentContext ? resolveContentRef(dark, context.contentContext) : null,
+        light.contentRef && context.contentContext
+            ? resolveContentRef(light.contentRef, context.contentContext)
+            : null,
+        dark.contentRef && context.contentContext
+            ? resolveContentRef(dark.contentRef, context.contentContext)
+            : null,
         targetRef && context.contentContext
             ? resolveContentRef(targetRef, context.contentContext)
             : null,
@@ -34,6 +39,10 @@ export async function RecordCard(
 
     const darkCoverIsSquareOrPortrait = isSquareOrPortrait(darkCover);
     const lightCoverIsSquareOrPortrait = isSquareOrPortrait(lightCover);
+
+    const darkObjectFit = dark.objectFit ? `dark:${getObjectFitClass(dark.objectFit)}` : '';
+    const lightObjectFit = light.objectFit ? getObjectFitClass(light.objectFit) : '';
+    const objectFits = `${lightObjectFit} ${darkObjectFit}`;
 
     const body = (
         <div
@@ -94,7 +103,7 @@ export async function RecordCard(
                         'min-w-0',
                         'w-full',
                         'h-full',
-                        'object-cover',
+                        'bg-tint-subtle',
                         lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                             ? [
                                   lightCoverIsSquareOrPortrait
@@ -104,7 +113,8 @@ export async function RecordCard(
                                       ? 'dark:min-[432px]:aspect-video dark:min-[432px]:h-auto'
                                       : '',
                               ].filter(Boolean)
-                            : ['h-auto', 'aspect-video']
+                            : ['h-auto', 'aspect-video'],
+                        objectFits
                     )}
                     priority={isOffscreen ? 'lazy' : 'high'}
                     preload
@@ -189,4 +199,20 @@ function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
     }
 
     return file.dimensions?.width / file.dimensions?.height <= 1;
+}
+
+/**
+ * Get the CSS class for object-fit based on the objectFit value.
+ */
+function getObjectFitClass(objectFit: CardsImageObjectFit): string {
+    switch (objectFit) {
+        case CardsImageObjectFit.Contain:
+            return 'object-contain';
+        case CardsImageObjectFit.Fill:
+            return 'object-fill';
+        case CardsImageObjectFit.Cover:
+            return 'object-cover';
+        default:
+            throw new Error(`Unsupported object fit: ${objectFit}`);
+    }
 }
