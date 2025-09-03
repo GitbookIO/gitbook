@@ -3,7 +3,7 @@ import { Image } from '@/components/utils';
 import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import {
-    type CardsImageObjectFit,
+    CardsImageObjectFit,
     type ContentRef,
     type DocumentTableViewCards,
     SiteInsightsLinkPosition,
@@ -40,12 +40,8 @@ export async function RecordCard(
     const darkCoverIsSquareOrPortrait = isSquareOrPortrait(darkCover);
     const lightCoverIsSquareOrPortrait = isSquareOrPortrait(lightCover);
 
-    const darkObjectFit = dark.objectFit
-        ? `dark:${getObjectFitClass(dark.objectFit as CardsImageObjectFit)}`
-        : '';
-    const lightObjectFit = light.objectFit
-        ? getObjectFitClass(light.objectFit as CardsImageObjectFit)
-        : '';
+    const darkObjectFit = dark.objectFit ? `dark:${getObjectFitClass(dark.objectFit)}` : '';
+    const lightObjectFit = light.objectFit ? getObjectFitClass(light.objectFit) : '';
     const objectFits = `${lightObjectFit} ${darkObjectFit}`;
 
     const body = (
@@ -208,13 +204,13 @@ function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
 /**
  * Get the CSS class for object-fit based on the objectFit value.
  */
-function getObjectFitClass(objectFit?: CardsImageObjectFit): string {
+function getObjectFitClass(objectFit: CardsImageObjectFit): string {
     switch (objectFit) {
-        case 'contain':
+        case CardsImageObjectFit.Contain:
             return 'object-contain';
-        case 'fill':
+        case CardsImageObjectFit.Fill:
             return 'object-fill';
-        case 'cover':
+        case CardsImageObjectFit.Cover:
             return 'object-cover';
         default:
             throw new Error(`Unsupported object fit: ${objectFit}`);
