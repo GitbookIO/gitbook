@@ -61,7 +61,6 @@
 
 @utility gutter-stable {
     scrollbar-gutter: stable;
-    scrollbar-gutter: stable;
 }
 
 @utility triangle {
@@ -156,6 +155,15 @@
 @utility bg-gradient-tint {
     @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
     @apply bg-linear-to-bl from-tint-4 to-tint-base to-60% bg-fixed;
+}
+
+@utility site-background {
+    @apply [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle;
+    @apply bg-tint-base;
+    @apply theme-muted:bg-tint-subtle;
+
+    @apply theme-gradient:bg-gradient-primary;
+    @apply theme-gradient-tint:bg-gradient-tint;
 }
 
 @utility elevate-link {

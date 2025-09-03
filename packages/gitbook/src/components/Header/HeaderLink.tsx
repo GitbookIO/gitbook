@@ -138,7 +138,7 @@ function HeaderItemButton(
 
 function getHeaderLinkClassName(_props: { headerPreset: CustomizationHeaderPreset }) {
     return tcls(
-        'flex items-center',
+        'flex items-center gap-1',
         'shrink',
         'contrast-more:underline',
         'truncate',

@@ -12,6 +12,7 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
+import { getSpaceLanguage } from '@/intl/server';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChatProvider } from '../AI';
@@ -93,7 +94,16 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const withSections = Boolean(sections && sections.list.length > 1);
-    const isMultiVariants = Boolean(siteSpaces.length > 1);
+
+    const currentLanguage = getSpaceLanguage(context);
+    const withVariants: 'generic' | 'translations' | undefined =
+        siteSpaces.length > 1
+            ? siteSpaces.some(
+                  (space) => space.space.language && space.space.language !== currentLanguage.locale
+              )
+                ? 'translations'
+                : 'generic'
+            : undefined;
 
     const withFooter =
         customization.themes.toggeable ||
@@ -104,7 +114,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     return (
         <SpaceLayoutServerContext {...props}>
             <Announcement context={context} />
-            <Header withTopHeader={withTopHeader} context={context} />
+            <Header withTopHeader={withTopHeader} withVariants={withVariants} context={context} />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                 <AIChat trademark={customization.trademark.enabled} />
             ) : null}
@@ -164,16 +174,12 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         sections={encodeClientSiteSections(context, sections)}
                                     />
                                 )}
-                                {isMultiVariants && !sections && (
+                                {withVariants === 'generic' && (
                                     <SpacesDropdown
                                         context={context}
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
-                                        className={tcls(
-                                            'w-full',
-                                            'page-no-toc:hidden',
-                                            'page-no-toc:site-header-none:flex'
-                                        )}
+                                        className="w-full px-3 py-2"
                                     />
                                 )}
                             </>

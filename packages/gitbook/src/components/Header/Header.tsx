@@ -10,7 +10,7 @@ import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
-import { SpacesDropdown } from './SpacesDropdown';
+import { TranslationsDropdown } from './SpacesDropdown';
 
 /**
  * Render the header for the space.
@@ -18,8 +18,9 @@ import { SpacesDropdown } from './SpacesDropdown';
 export function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
+    withVariants?: 'generic' | 'translations';
 }) {
-    const { context, withTopHeader } = props;
+    const { context, withTopHeader, withVariants } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
     return (
@@ -143,11 +144,19 @@ export function Header(props: {
                                 />
                             </HeaderLinks>
                         )}
+                        {!sections && withVariants === 'translations' ? (
+                            <TranslationsDropdown
+                                context={context}
+                                siteSpace={siteSpace}
+                                siteSpaces={siteSpaces}
+                                className="theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
+                            />
+                        ) : null}
                     </div>
                 </div>
             </div>
 
-            {sections || siteSpaces.length > 1 ? (
+            {sections ? (
                 <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         className={tcls(
@@ -167,26 +176,21 @@ export function Header(props: {
                                 'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
                             )}
                         >
-                            {siteSpaces.length > 1 && (
-                                <div
-                                    id="variants"
-                                    className="my-2 mr-5 grow border-tint border-r pr-5 *:grow only:mr-0 only:border-none only:pr-0 sm:max-w-64"
-                                >
-                                    <SpacesDropdown
+                            {sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
+                            sections.list.length > 1 ? ( // Otherwise, show the tabs if there's more than one section
+                                <SiteSectionTabs
+                                    sections={encodeClientSiteSections(context, sections)}
+                                />
+                            ) : null}
+                            {withVariants === 'translations' ? (
+                                <div className="site-background before:contents[] -mr-4 sm:-mr-6 md:-mr-8 sticky inset-y-0 right-0 ml-6 flex h-full items-center py-2 pr-4 before:mr-4 before:h-full before:border-tint before:border-l sm:pr-6 md:pr-8">
+                                    <TranslationsDropdown
                                         context={context}
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
-                                        className="w-full grow py-1"
                                     />
                                 </div>
-                            )}
-                            {sections &&
-                                (sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
-                                    sections.list.length > 1) && ( // Otherwise, show the tabs if there's more than one section
-                                    <SiteSectionTabs
-                                        sections={encodeClientSiteSections(context, sections)}
-                                    />
-                                )}
+                            ) : null}
                         </div>
                     </div>
                 </div>
