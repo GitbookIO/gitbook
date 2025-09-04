@@ -86,7 +86,7 @@ export function Header(props: {
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
-                                    'page-no-toc:hidden'
+                                    withVariants === 'generic' ? '' : 'page-no-toc:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />
