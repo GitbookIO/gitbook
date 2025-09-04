@@ -10,13 +10,7 @@ import * as React from 'react';
 export type PrefillInputContextData = Record<string, unknown>;
 
 /**
- * Context value is function that returns a promise resolving to prefill data.
- *
- * It is defined as a function rather than raw data because the data may need to be
- * fetched or computed asynchronously, and consumers should be able to call it on
- * demand to always receive the latest context.
- *
- * Returning a promise makes it easy for components to await the result.
+ * Context value is function that returns prefill data.
  */
 type PrefillContextValue = () => PrefillInputContextData | null;
 
