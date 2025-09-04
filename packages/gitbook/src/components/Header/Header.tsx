@@ -183,7 +183,7 @@ export function Header(props: {
                                 />
                             ) : null}
                             {withVariants === 'translations' ? (
-                                <div className="site-background before:contents[] -mr-4 sm:-mr-6 md:-mr-8 sticky inset-y-0 right-0 ml-6 flex h-full items-center py-2 pr-4 before:mr-4 before:h-full before:border-tint before:border-l sm:pr-6 md:pr-8">
+                                <div className="site-background before:contents[] -mr-4 sm:-mr-6 md:-mr-8 sticky inset-y-0 right-0 z-10 ml-6 flex h-full items-center py-2 pr-4 before:mr-4 before:h-full before:border-tint before:border-l sm:pr-6 md:pr-8">
                                     <TranslationsDropdown
                                         context={context}
                                         siteSpace={siteSpace}
