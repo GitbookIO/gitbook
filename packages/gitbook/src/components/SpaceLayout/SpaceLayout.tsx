@@ -149,14 +149,16 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                             <>
                                 {!withTopHeader && (
-                                    <SearchContainer
-                                        style={CustomizationSearchStyle.Subtle}
-                                        isMultiVariants={siteSpaces.length > 1}
-                                        spaceTitle={siteSpace.title}
-                                        siteSpaceId={siteSpace.id}
-                                        className="max-lg:hidden"
-                                        viewport="desktop"
-                                    />
+                                    <div className="flex gap-2">
+                                        <SearchContainer
+                                            style={CustomizationSearchStyle.Subtle}
+                                            isMultiVariants={siteSpaces.length > 1}
+                                            spaceTitle={siteSpace.title}
+                                            siteSpaceId={siteSpace.id}
+                                            className="max-lg:hidden"
+                                            viewport="desktop"
+                                        />
+                                    </div>
                                 )}
                                 {!withTopHeader && withSections && sections && (
                                     <SiteSectionList
