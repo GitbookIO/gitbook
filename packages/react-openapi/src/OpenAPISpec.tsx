@@ -117,19 +117,22 @@ function getParameterGroupName(paramIn: string, context: OpenAPIClientContext): 
 /** Deduplicate parameters by name and in.
  * Some specs have both parameters define at path and operation level.
  * We only want to display one of them.
+ * Parameters can have the wrong type (object instead of array) sometimes, we just return an empty array in that case.
  */
 function deduplicateParameters(parameters: OpenAPI.Parameters): OpenAPI.Parameters {
     const seen = new Set();
 
-    return parameters.filter((param) => {
-        const key = `${param.name}:${param.in}`;
+    return Array.isArray(parameters)
+        ? parameters.filter((param) => {
+              const key = `${param.name}:${param.in}`;
 
-        if (seen.has(key)) {
-            return false;
-        }
+              if (seen.has(key)) {
+                  return false;
+              }
 
-        seen.add(key);
+              seen.add(key);
 
-        return true;
-    });
+              return true;
+          })
+        : [];
 }
