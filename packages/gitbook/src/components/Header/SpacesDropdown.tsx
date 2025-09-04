@@ -1,4 +1,5 @@
 import type { SiteSpace } from '@gitbook/api';
+import { useMemo } from 'react';
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { getSiteSpaceURL } from '@/lib/sites';
@@ -6,6 +7,13 @@ import { tcls } from '@/lib/tailwind';
 import { Button, type ButtonProps } from '../primitives';
 import { DropdownChevron, DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
+
+// Memoized regex for checking if a string starts with an emoji
+const EMOJI_REGEX = /^\p{Emoji}/u;
+
+function startsWithEmoji(text: string): boolean {
+    return EMOJI_REGEX.test(text);
+}
 
 export function SpacesDropdown(props: {
     context: GitBookSiteContext;
@@ -57,6 +65,9 @@ export function TranslationsDropdown(props: {
 }) {
     const { context, siteSpace, siteSpaces, className } = props;
 
+    // Memoize the emoji check to avoid repeated regex execution
+    const hasEmojiPrefix = useMemo(() => startsWithEmoji(siteSpace.title), [siteSpace.title]);
+
     return (
         <SpacesDropdown
             icon="globe"
@@ -66,7 +77,7 @@ export function TranslationsDropdown(props: {
             variant="blank"
             className={tcls(
                 '-mx-2 bg-transparent px-2 py-1 lg:max-w-64 max-md:[&_.button-content]:hidden',
-                siteSpace.title.match(/^\p{Emoji}/u)
+                hasEmojiPrefix
                     ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
                     : '',
                 className
