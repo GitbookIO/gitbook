@@ -27,15 +27,15 @@ export function ScalarApiButton(props: {
     const [isOpen, setIsOpen] = useState(false);
     const controllerRef = useRef<ScalarModalControllerRef>(null);
 
-    // Fetch visitor data and open modal
-    const openModal = async () => {
-        controllerRef.current?.openClient?.();
-        setIsOpen(true);
-    };
-
     return (
         <div className="scalar scalar-activate">
-            <button className="scalar-activate-button button" onClick={openModal}>
+            <button
+                className="scalar-activate-button button"
+                onClick={() => {
+                    controllerRef.current?.openClient?.();
+                    setIsOpen(true);
+                }}
+            >
                 {t(context.translation, 'test_it')}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" fill="currentColor">
                     <path
