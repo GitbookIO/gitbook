@@ -126,31 +126,36 @@ export function Header(props: {
                             />
                         </div>
 
-                        {customization.header.links.length > 0 && (
+                        {customization.header.links.length > 0 ||
+                        (!sections && withVariants === 'translations') ? (
                             <HeaderLinks>
-                                {customization.header.links.map((link) => {
-                                    return (
-                                        <HeaderLink
-                                            key={link.title}
-                                            link={link}
+                                {customization.header.links.length > 0 ? (
+                                    <>
+                                        {customization.header.links.map((link) => {
+                                            return (
+                                                <HeaderLink
+                                                    key={link.title}
+                                                    link={link}
+                                                    context={context}
+                                                />
+                                            );
+                                        })}
+                                        <HeaderLinkMore
+                                            label={t(getSpaceLanguage(context), 'more')}
+                                            links={customization.header.links}
                                             context={context}
                                         />
-                                    );
-                                })}
-                                <HeaderLinkMore
-                                    label={t(getSpaceLanguage(context), 'more')}
-                                    links={customization.header.links}
-                                    context={context}
-                                />
+                                    </>
+                                ) : null}
+                                {!sections && withVariants === 'translations' ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={siteSpace}
+                                        siteSpaces={siteSpaces}
+                                        className="theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
+                                    />
+                                ) : null}
                             </HeaderLinks>
-                        )}
-                        {!sections && withVariants === 'translations' ? (
-                            <TranslationsDropdown
-                                context={context}
-                                siteSpace={siteSpace}
-                                siteSpaces={siteSpaces}
-                                className="theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
-                            />
                         ) : null}
                     </div>
                 </div>
