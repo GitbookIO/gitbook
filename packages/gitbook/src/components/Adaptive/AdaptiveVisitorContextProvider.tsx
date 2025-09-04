@@ -3,7 +3,6 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { OpenAPIPrefillContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
-
 import { createContext, useContext } from 'react';
 
 export type AdaptiveVisitorClaimsData = {
@@ -13,62 +12,61 @@ export type AdaptiveVisitorClaimsData = {
 };
 
 /**
- * In-memory cache of visitor claims, keyed by contextId.
+ * In-memory cache of visitor claim readers keyed by contextId.
  */
-const adaptiveVisitorCache = new Map<
+const adaptiveVisitorReaderCache = new Map<
     string,
-    {
-        data: AdaptiveVisitorClaimsData | null;
-        promise: Promise<AdaptiveVisitorClaimsData | null> | null;
-    }
+    ReturnType<typeof createResourceReader<AdaptiveVisitorClaimsData | null>>
 >();
 
-/**
- * Factory that creates a function to fetch visitor claims
- * for a given endpoint URL and contextId so it can be exposed as adaptive visitor context.
- *
- * The returned function caches results per context ID to avoids duplicate
- * requests to fetch the claims when the context ID doesn't change.
- */
-async function getAdaptiveVisitorClaimsFactory(
-    url: string,
-    contextId?: string
-): Promise<AdaptiveVisitorClaimsData | null> {
-    // Only fetch visitor claims if contextId is defined (adaptive content site).
-    if (!contextId) {
-        return null;
-    }
+function createResourceReader<T>(promise: Promise<T>) {
+    let result: T | null | undefined;
 
-    const cached = adaptiveVisitorCache.get(contextId);
-    if (cached?.data) {
-        return cached.data;
-    }
-    if (cached?.promise) {
-        return cached.promise;
-    }
-
-    const promise = (async () => {
+    const suspender = (async () => {
         try {
-            const res = await fetch(url);
-            if (!res.ok) {
-                return null;
-            }
-            const data = await res.json<AdaptiveVisitorClaimsData>();
-            adaptiveVisitorCache.set(contextId, { data, promise: null });
-            return data;
+            result = await promise;
         } catch {
-            return null;
+            result = null;
         }
     })();
 
-    adaptiveVisitorCache.set(contextId, { data: null, promise });
-
-    return promise;
+    return {
+        read() {
+            if (result === undefined) {
+                throw suspender;
+            }
+            return result;
+        },
+    };
 }
 
-const AdaptiveVisitorContext = createContext<() => Promise<AdaptiveVisitorClaimsData | null>>(() =>
-    Promise.resolve(null)
-);
+/**
+ * Return an adaptive visitor claims cached reader for a given endpoint URL and contextId.
+ */
+function getAdaptiveVisitorClaimsReader(url: string, contextId: string) {
+    let reader = adaptiveVisitorReaderCache.get(contextId);
+    if (!reader) {
+        const promise = (async () => {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) {
+                    return null;
+                }
+                return await res.json<AdaptiveVisitorClaimsData>();
+            } catch {
+                return null;
+            }
+        })();
+
+        reader = createResourceReader(promise);
+        adaptiveVisitorReaderCache.set(contextId, reader);
+    }
+    return reader;
+}
+
+export type AdaptiveVisitorContextValue = () => AdaptiveVisitorClaimsData | null;
+
+const AdaptiveVisitorContext = createContext<AdaptiveVisitorContextValue>(() => null);
 
 /**
  * Provide context to adapt site based on visitor claims.
@@ -76,15 +74,17 @@ const AdaptiveVisitorContext = createContext<() => Promise<AdaptiveVisitorClaims
 export function AdaptiveVisitorContextProvider(
     props: React.PropsWithChildren<{
         visitorClaimsURL: string;
-        contextId: GitBookSiteContext['contextId'];
+        contextId: GitBookSiteContext['contextId'] | undefined;
     }>
 ) {
     const { visitorClaimsURL, contextId, children } = props;
 
-    const getAdaptiveVisitorClaims = React.useCallback(
-        () => getAdaptiveVisitorClaimsFactory(visitorClaimsURL, contextId),
-        [visitorClaimsURL, contextId]
-    );
+    const getAdaptiveVisitorClaims = React.useCallback(() => {
+        if (!contextId) {
+            return null;
+        }
+        return getAdaptiveVisitorClaimsReader(visitorClaimsURL, contextId).read();
+    }, [visitorClaimsURL, contextId]);
 
     return (
         <AdaptiveVisitorContext.Provider value={getAdaptiveVisitorClaims}>
@@ -95,6 +95,9 @@ export function AdaptiveVisitorContextProvider(
     );
 }
 
-export function useAdaptiveVisitor() {
+/**
+ * Hook that returns a suspensable getter for adaptive visitor claims data.
+ */
+export function useAdaptiveVisitor(): AdaptiveVisitorContextValue {
     return useContext(AdaptiveVisitorContext);
 }

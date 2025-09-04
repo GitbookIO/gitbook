@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiClientModalProvider, useApiClientModal } from '@scalar/api-client-react';
-import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import type { OpenAPIV3_1 } from '@gitbook/openapi-parser';
@@ -24,17 +24,11 @@ export function ScalarApiButton(props: {
     context: OpenAPIClientContext;
 }) {
     const { method, path, securities, servers, specUrl, context } = props;
-    const getPrefillInputContextData = useOpenAPIPrefillContext();
     const [isOpen, setIsOpen] = useState(false);
-    const [prefillInputContext, setPrefillInputContext] = useState<Record<string, unknown> | null>(
-        null
-    );
     const controllerRef = useRef<ScalarModalControllerRef>(null);
 
     // Fetch visitor data and open modal
     const openModal = async () => {
-        const data = await getPrefillInputContextData();
-        setPrefillInputContext(data);
         controllerRef.current?.openClient?.();
         setIsOpen(true);
     };
@@ -53,17 +47,17 @@ export function ScalarApiButton(props: {
             </button>
 
             {isOpen &&
-                prefillInputContext &&
                 createPortal(
-                    <ScalarModal
-                        controllerRef={controllerRef}
-                        method={method}
-                        path={path}
-                        securities={securities}
-                        servers={servers}
-                        specUrl={specUrl}
-                        prefillInputContext={prefillInputContext}
-                    />,
+                    <Suspense fallback={null}>
+                        <ScalarModal
+                            controllerRef={controllerRef}
+                            method={method}
+                            path={path}
+                            securities={securities}
+                            servers={servers}
+                            specUrl={specUrl}
+                        />
+                    </Suspense>,
                     document.body
                 )}
         </div>
@@ -77,10 +71,11 @@ function ScalarModal(props: {
     servers: OpenAPIOperationData['servers'];
     specUrl: string;
     controllerRef: React.Ref<ScalarModalControllerRef>;
-    prefillInputContext: Record<string, unknown>;
 }) {
-    const { method, path, securities, servers, specUrl, controllerRef, prefillInputContext } =
-        props;
+    const { method, path, securities, servers, specUrl, controllerRef } = props;
+
+    const getPrefillInputContextData = useOpenAPIPrefillContext();
+    const prefillInputContext = getPrefillInputContextData();
 
     const prefillConfig = resolveTryItPrefillForOperation({
         operation: { securities, servers },

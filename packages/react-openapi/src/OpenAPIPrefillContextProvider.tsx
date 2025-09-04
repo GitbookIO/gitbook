@@ -18,7 +18,7 @@ export type PrefillInputContextData = Record<string, unknown>;
  *
  * Returning a promise makes it easy for components to await the result.
  */
-type PrefillContextValue = () => Promise<PrefillInputContextData | null>;
+type PrefillContextValue = () => PrefillInputContextData | null;
 
 const OpenAPIPrefillContext = React.createContext<PrefillContextValue | null>(null);
 
@@ -27,7 +27,7 @@ const OpenAPIPrefillContext = React.createContext<PrefillContextValue | null>(nu
  */
 export function OpenAPIPrefillContextProvider(
     props: React.PropsWithChildren<{
-        getPrefillInputContextData: () => Promise<PrefillInputContextData | null>;
+        getPrefillInputContextData: () => PrefillInputContextData | null;
     }>
 ) {
     const { getPrefillInputContextData, children } = props;
@@ -42,5 +42,5 @@ export function OpenAPIPrefillContextProvider(
  * Hook to access the prefill context function.
  */
 export function useOpenAPIPrefillContext(): PrefillContextValue {
-    return React.useContext(OpenAPIPrefillContext) ?? (() => Promise.resolve(null));
+    return React.useContext(OpenAPIPrefillContext) ?? (() => null);
 }
