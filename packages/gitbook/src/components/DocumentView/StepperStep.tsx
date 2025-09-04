@@ -36,8 +36,8 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
             <div className="relative select-none">
                 <div
                     className={tcls(
-                        'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-solid theme-muted:bg-primary-subtle tabular-nums',
-                        'font-medium text-contrast-primary-solid theme-muted:text-primary'
+                        'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-original theme-muted:bg-primary-subtle tabular-nums contrast-more:bg-primary-solid',
+                        'font-medium text-contrast-primary-original theme-muted:text-primary contrast-more:text-contrast-primary-solid'
                     )}
                 >
                     {index + 1}

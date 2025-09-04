@@ -31,8 +31,8 @@ export const Checkbox = React.forwardRef<
             'flex',
             'items-center',
             'justify-center',
-            'data-[state=checked]:bg-primary-solid',
-            'data-[state=checked]:text-contrast-primary-solid',
+            'data-[state=checked]:bg-primary-original',
+            'data-[state=checked]:text-contrast-primary-original',
             'contrast-more:ring-tint-12',
             { small: 'size-4', medium: 'size-5' }[size],
             className

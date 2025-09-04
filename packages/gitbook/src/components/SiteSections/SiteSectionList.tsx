@@ -38,7 +38,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
             >
                 <TOCScrollContainer
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
-                    className="overflow-y-auto px-2 pb-6"
+                    className="overflow-y-auto px-2 pb-4"
                 >
                     {sectionsAndGroups.map((item) => {
                         if (item.object === 'site-section-group') {
@@ -110,7 +110,7 @@ export function SiteSectionListItem(props: {
                 className={tcls(
                     'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
                     isActive
-                        ? 'bg-primary tint:bg-primary-solid text-primary-subtle tint:text-contrast-primary-solid shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary contrast-more:ring-2 contrast-more:ring-primary'
+                        ? 'bg-primary tint:bg-primary-original text-primary-subtle tint:text-contrast-primary-original shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary contrast-more:ring-2 contrast-more:ring-primary'
                         : null
                 )}
             >

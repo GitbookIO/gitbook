@@ -272,9 +272,8 @@ body {
 }
 .scalar-activate-button {
     @apply flex gap-2 items-center;
-    @apply bg-primary-solid text-contrast-primary-solid hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover contrast-more:ring-1 rounded-md straight-corners:rounded-none circular-corners:rounded-full circular-corners:px-3 place-self-start;
-    @apply ring-1 ring-tint hover:ring-tint-hover;
-    @apply shadow-sm shadow-tint dark:shadow-tint-1 hover:shadow-md active:shadow-none;
+    @apply bg-primary-original text-contrast-primary-original hover:bg-primary-solid-hover hover:text-contrast-primary-solid-hover contrast-more:ring-1 rounded-md straight-corners:rounded-none circular-corners:rounded-full circular-corners:px-3 place-self-start;
+    @apply shadow-sm shadow-primary dark:shadow-primary-1 hover:shadow-md active:shadow-none;
     @apply contrast-more:ring-tint-12 contrast-more:hover:ring-2 contrast-more:hover:ring-tint-12;
     @apply hover:scale-105 active:scale-100 transition-all;
     @apply grow-0 shrink-0 truncate;

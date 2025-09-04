@@ -19,7 +19,7 @@ export enum ColorCategory {
 }
 
 type ColorSubScale = {
-    [key: string]: number;
+    [key: string]: number | string;
 };
 
 /**
@@ -56,6 +56,8 @@ export const scale: Record<ColorCategory, ColorSubScale> = {
         solid: 9,
         /** Hovered solid backgrounds */
         'solid-hover': 10,
+        /** Original color */
+        original: 'original',
     },
     [ColorCategory.text]: {
         /** Very low-contrast text
