@@ -70,6 +70,13 @@ export interface OpenAPICustomOperationProperties {
     'x-stability'?: OpenAPIStability;
 }
 
+/**
+ * Custom properties that can be defined to enable prefilling for OpenAPI blocks (e.g TryIt functionality).
+ */
+export interface OpenAPICustomPrefillProperties {
+    'x-gitbook-prefill'?: string;
+}
+
 export type OpenAPIStability = 'experimental' | 'alpha' | 'beta';
 
 /**

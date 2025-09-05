@@ -110,7 +110,6 @@ export function DropdownChevron() {
                 'shrink-0',
                 'opacity-6',
                 'size-3',
-                'ms-1',
                 'transition-all',
                 'group-hover/dropdown:opacity-11',
                 'group-data-[state=open]/dropdown:opacity-11',

@@ -59,15 +59,15 @@ interface MarkedLeafProps<Mark extends DocumentTextMark> {
 }
 
 function Bold(props: MarkedLeafProps<DocumentMarkBold>) {
-    return <strong className={tcls('font-bold')}>{props.children}</strong>;
+    return <strong className="font-bold">{props.children}</strong>;
 }
 
 function Italic(props: MarkedLeafProps<DocumentMarkItalic>) {
-    return <i className={tcls('font-italic')}>{props.children}</i>;
+    return <i className="font-italic">{props.children}</i>;
 }
 
 function Strikethrough(props: MarkedLeafProps<DocumentMarkStrikethrough>) {
-    return <s className={tcls('line-through')}>{props.children}</s>;
+    return <s className="line-through">{props.children}</s>;
 }
 
 function Keyboard(props: MarkedLeafProps<DocumentMarkKeyboard>) {

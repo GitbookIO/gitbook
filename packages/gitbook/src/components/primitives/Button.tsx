@@ -9,7 +9,7 @@ import { Link, type LinkInsightsProps } from './Link';
 import { useClassnames } from './StyleProvider';
 import { Tooltip } from './Tooltip';
 
-type ButtonProps = {
+export type ButtonProps = {
     href?: string;
     variant?: 'primary' | 'secondary' | 'blank' | 'header';
     icon?: IconName | React.ReactNode;
@@ -132,7 +132,10 @@ export const Button = React.forwardRef<
             <>
                 {icon ? (
                     typeof icon === 'string' ? (
-                        <Icon icon={icon as IconName} className={tcls('size-[1em]')} />
+                        <Icon
+                            icon={icon as IconName}
+                            className={tcls('button-leading-icon size-[1em]')}
+                        />
                     ) : (
                         icon
                     )
@@ -166,7 +169,7 @@ export const Button = React.forwardRef<
                 {...rest}
             >
                 {content}
-                {trailing}
+                {trailing ? <span className="button-trailing-icon ms-auto">{trailing}</span> : null}
             </button>
         );
 

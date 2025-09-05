@@ -1,11 +1,12 @@
+import type { Plugin } from '@scalar/json-magic/bundle';
 import { normalize } from '@scalar/openapi-parser';
-import type { ParsePlugin } from '../parse';
 
 export const fetchUrlsDefaultConfiguration = {
     limit: 40,
 };
 
-export const fetchURL = (): ParsePlugin => ({
+export const fetchURL = (): Plugin => ({
+    type: 'loader',
     validate(value) {
         return URL.canParse(value);
     },
