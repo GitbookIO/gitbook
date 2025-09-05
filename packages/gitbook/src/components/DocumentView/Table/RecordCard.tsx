@@ -40,8 +40,8 @@ export async function RecordCard(
     const darkCoverIsSquareOrPortrait = isSquareOrPortrait(darkCover);
     const lightCoverIsSquareOrPortrait = isSquareOrPortrait(lightCover);
 
-    const darkObjectFit = dark.objectFit ? `dark:${getObjectFitClass(dark.objectFit)}` : '';
-    const lightObjectFit = light.objectFit ? getObjectFitClass(light.objectFit) : '';
+    const darkObjectFit = `dark:${getObjectFitClass(dark.objectFit)}`;
+    const lightObjectFit = getObjectFitClass(light.objectFit);
     const objectFits = `${lightObjectFit} ${darkObjectFit}`;
 
     const body = (
@@ -204,7 +204,11 @@ function isSquareOrPortrait(contentRef: ResolvedContentRef | null) {
 /**
  * Get the CSS class for object-fit based on the objectFit value.
  */
-function getObjectFitClass(objectFit: CardsImageObjectFit): string {
+function getObjectFitClass(objectFit: CardsImageObjectFit | undefined): string {
+    if (!objectFit) {
+        return 'object-cover';
+    }
+
     switch (objectFit) {
         case CardsImageObjectFit.Contain:
             return 'object-contain';
