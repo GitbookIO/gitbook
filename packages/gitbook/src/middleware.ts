@@ -540,6 +540,11 @@ function encodePathInSiteContent(rawPathname: string): {
         };
     }
 
+    // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
+    if (pathname.match(/^llms-full\.txt\/\d+$/)) {
+        return { pathname, routeType: 'static' };
+    }
+
     // If the pathname is an embedded page
     const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
     if (embedPage) {
