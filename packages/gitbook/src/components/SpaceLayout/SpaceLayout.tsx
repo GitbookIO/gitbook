@@ -17,6 +17,7 @@ import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
+import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
@@ -56,29 +57,38 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
     eventUrl.searchParams.set('o', context.organizationId);
     eventUrl.searchParams.set('s', context.site.id);
 
+    const getVisitorClaimsUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathInSite('/~gitbook/visitor')
+    );
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
-            <CurrentContentProvider
-                organizationId={context.organizationId}
-                siteId={context.site.id}
-                siteSectionId={context.sections?.current?.id ?? null}
-                siteSpaceId={context.siteSpace.id}
-                siteShareKey={context.shareKey ?? null}
-                spaceId={context.space.id}
-                revisionId={context.revisionId}
-                visitorAuthClaims={visitorAuthClaims}
+            <AdaptiveVisitorContextProvider
+                contextId={context.contextId}
+                visitorClaimsURL={getVisitorClaimsUrl}
             >
-                <InsightsProvider
-                    enabled={withTracking}
-                    appURL={GITBOOK_APP_URL}
-                    eventUrl={eventUrl.toString()}
-                    visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
+                <CurrentContentProvider
+                    organizationId={context.organizationId}
+                    siteId={context.site.id}
+                    siteSectionId={context.sections?.current?.id ?? null}
+                    siteSpaceId={context.siteSpace.id}
+                    siteShareKey={context.shareKey ?? null}
+                    spaceId={context.space.id}
+                    revisionId={context.revisionId}
+                    visitorAuthClaims={visitorAuthClaims}
                 >
-                    <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
-                        {children}
-                    </AIChatProvider>
-                </InsightsProvider>
-            </CurrentContentProvider>
+                    <InsightsProvider
+                        enabled={withTracking}
+                        appURL={GITBOOK_APP_URL}
+                        eventUrl={eventUrl.toString()}
+                        visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
+                    >
+                        <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
+                            {children}
+                        </AIChatProvider>
+                    </InsightsProvider>
+                </CurrentContentProvider>
+            </AdaptiveVisitorContextProvider>
         </SpaceLayoutContextProvider>
     );
 }

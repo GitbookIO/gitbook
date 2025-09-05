@@ -7,6 +7,7 @@
         "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
+        "@gitbook/expr": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/fonts": "workspace:*",
         "@gitbook/icons": "workspace:*",
