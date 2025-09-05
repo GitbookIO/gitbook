@@ -1,10 +1,9 @@
-import type { AnyObject, ErrorObject, bundle } from '@scalar/openapi-parser';
+import type { Plugin } from '@scalar/json-magic/bundle';
+import type { AnyObject, ErrorObject } from '@scalar/openapi-parser';
 import { OpenAPIParseError } from './error';
 import type { Filesystem, OpenAPIV3xDocument } from './types';
 import { convertOpenAPIV2ToOpenAPIV3 } from './v2';
 import { parseOpenAPIV3 } from './v3';
-
-export type ParsePlugin = Parameters<typeof bundle>[1]['plugins'][number];
 
 export interface ParseOpenAPIInput {
     /**
@@ -19,7 +18,7 @@ export interface ParseOpenAPIInput {
      * Options for the parser.
      */
     options?: {
-        plugins?: ParsePlugin[];
+        plugins?: Plugin[];
     };
 }
 
