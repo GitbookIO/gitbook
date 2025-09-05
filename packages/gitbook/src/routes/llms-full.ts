@@ -29,15 +29,17 @@ const DEFAULT_PAGE_LIMIT = 100;
  * Generate a llms-full.txt file for the site.
  * As the result can be large, we stream it as we generate it.
  */
-export async function serveLLMsFullTxt(context: GitBookSiteContext, startingNumber = 0) {
+export async function serveLLMsFullTxt(context: GitBookSiteContext, page = 0) {
     if (!checkIsRootSiteContext(context)) {
         return new Response('llms.txt is only served from the root of the site', { status: 404 });
     }
 
+    const offset = page * DEFAULT_PAGE_LIMIT;
+
     return new Response(
         new ReadableStream<Uint8Array>({
             async pull(controller) {
-                await streamMarkdownFromSiteStructure(context, controller, startingNumber);
+                await streamMarkdownFromSiteStructure(context, controller, offset);
                 controller.close();
             },
         }),
@@ -55,7 +57,7 @@ export async function serveLLMsFullTxt(context: GitBookSiteContext, startingNumb
 async function streamMarkdownFromSiteStructure(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
-    startingNumber: number
+    offset: number
 ): Promise<void> {
     switch (context.structure.type) {
         case 'sections':
@@ -63,7 +65,7 @@ async function streamMarkdownFromSiteStructure(
                 context,
                 stream,
                 getSiteStructureSections(context.structure, { ignoreGroups: true }),
-                startingNumber
+                offset
             );
         case 'siteSpaces':
             await streamMarkdownFromSiteSpaces(
@@ -71,7 +73,7 @@ async function streamMarkdownFromSiteStructure(
                 stream,
                 context.structure.structure,
                 '',
-                startingNumber
+                offset
             );
             return;
         default:
@@ -86,7 +88,7 @@ async function streamMarkdownFromSections(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
     siteSections: SiteSection[],
-    startingNumber: number
+    offset: number
 ): Promise<void> {
     let currentPageIndex = 0;
 
@@ -96,7 +98,7 @@ async function streamMarkdownFromSections(
             stream,
             siteSection.siteSpaces,
             siteSection.path,
-            startingNumber,
+            offset,
             currentPageIndex
         );
         currentPageIndex = result.currentPageIndex;
@@ -115,7 +117,7 @@ async function streamMarkdownFromSiteSpaces(
     stream: ReadableStreamDefaultController<Uint8Array>,
     siteSpaces: SiteSpace[],
     basePath: string,
-    startingNumber = 0,
+    offset = 0,
     initialPageIndex = 0
 ): Promise<{ currentPageIndex: number; reachedLimit: boolean }> {
     const { dataFetcher } = context;
@@ -150,9 +152,9 @@ async function streamMarkdownFromSiteSpaces(
         }
     }
 
-    // Apply pagination - skip pages before startingNumber
-    const pagesToProcess = allPages.slice(startingNumber, startingNumber + DEFAULT_PAGE_LIMIT);
-    totalPagesProcessed = startingNumber;
+    // Apply pagination - skip pages before offset
+    const pagesToProcess = allPages.slice(offset, offset + DEFAULT_PAGE_LIMIT);
+    totalPagesProcessed = offset;
 
     // Process the pages
     for await (const markdown of pMapIterable(
@@ -169,9 +171,10 @@ async function streamMarkdownFromSiteSpaces(
     }
 
     // Check if there are more pages and add next page link if needed
-    const hasMorePages = allPages.length > startingNumber + DEFAULT_PAGE_LIMIT;
+    const hasMorePages = allPages.length > offset + DEFAULT_PAGE_LIMIT;
     if (hasMorePages) {
-        const nextPageUrl = context.linker.toPathInSite(`llms-full.txt/${totalPagesProcessed}`);
+        const nextPage = Math.floor(offset / DEFAULT_PAGE_LIMIT) + 1;
+        const nextPageUrl = context.linker.toPathInSite(`llms-full.txt/${nextPage}`);
         const nextPageLink = `\n\n---\n\n[Next Page](${nextPageUrl})\n\n`;
         stream.enqueue(new TextEncoder().encode(nextPageLink));
     }
