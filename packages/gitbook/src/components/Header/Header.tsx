@@ -152,7 +152,7 @@ export function Header(props: {
                                         context={context}
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
-                                        className="theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
+                                        className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
                                     />
                                 ) : null}
                             </HeaderLinks>
