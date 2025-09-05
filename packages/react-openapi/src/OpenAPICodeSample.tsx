@@ -66,7 +66,11 @@ function generateCodeSamples(props: {
     const searchParams = new URLSearchParams();
     const headersObject: { [k: string]: string } = {};
 
-    data.operation.parameters?.forEach((param) => {
+    // The parser can sometimes returns invalid parameters (an object instead of an array).
+    // It should get fixed in scalar, but in the meantime we just ignore the parameters in that case.
+    const params = Array.isArray(data.operation.parameters) ? data.operation.parameters : [];
+
+    params.forEach((param) => {
         if (!param) {
             return;
         }
