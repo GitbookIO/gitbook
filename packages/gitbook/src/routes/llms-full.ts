@@ -112,7 +112,7 @@ async function streamMarkdownFromSections(
 /**
  * Stream markdown from site spaces.
  */
-async function streamMarkdownFromSiteSpaces(
+export async function streamMarkdownFromSiteSpaces(
     context: GitBookSiteContext,
     stream: ReadableStreamDefaultController<Uint8Array>,
     siteSpaces: SiteSpace[],
