@@ -177,16 +177,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body
-                className={tcls(
-                    '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                    'bg-tint-base',
-                    'theme-muted:bg-tint-subtle',
-
-                    'theme-gradient:bg-gradient-primary',
-                    'theme-gradient-tint:bg-gradient-tint'
-                )}
-            >
+            <body className="site-background">
                 <IconsProvider
                     assetsURL={GITBOOK_ICONS_URL}
                     assetsURLToken={GITBOOK_ICONS_TOKEN}

@@ -3,7 +3,6 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-
 import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
@@ -57,6 +56,8 @@ export async function TableOfContents(props: {
                     // Client-side dynamic positioning (CSS vars applied by script)
                     'lg:[html[style*="--toc-top-offset"]_&]:top-(--toc-top-offset)!',
                     'lg:[html[style*="--toc-height"]_&]:h-(--toc-height)!',
+                    'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
+                    'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
                     'pt-6',
                     'pb-4',
