@@ -1,5 +1,15 @@
 # @gitbook/colors
 
+## 0.4.0
+
+### Minor Changes
+
+- 17dd382: Add `original` background color step
+
+### Patch Changes
+
+- 193d591: Fix return type for `colorContrast`
+
 ## 0.3.3
 
 ### Patch Changes

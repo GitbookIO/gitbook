@@ -1,5 +1,21 @@
 # @gitbook/react-openapi
 
+## 1.4.0
+
+### Minor Changes
+
+- 12c9d76: Adapt OpenAPI blocks to eval adaptive exprs & prefill TryIt config
+
+### Patch Changes
+
+- 4927e96: Add support for YAML content type in request body/example
+- 61b8507: OpenAPI: Make responses without objects clickable
+- 98e42cf: Handle OpenAPI ignored responses
+- Updated dependencies [12c9d76]
+- Updated dependencies [7fefe49]
+- Updated dependencies [360aa1c]
+  - @gitbook/openapi-parser@3.0.2
+
 ## 1.3.6
 
 ### Patch Changes
