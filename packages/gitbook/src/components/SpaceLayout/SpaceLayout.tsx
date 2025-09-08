@@ -162,14 +162,14 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     )}
                                 >
                                     <HeaderLogo context={context} />
-                                    {!withTopHeader && (
+                                    {withVariants === 'translations' ? (
                                         <TranslationsDropdown
                                             context={context}
                                             siteSpace={siteSpace}
                                             siteSpaces={siteSpaces}
                                             className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
                                         />
-                                    )}
+                                    ) : null}
                                 </div>
                             )
                         }
