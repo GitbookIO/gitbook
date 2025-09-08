@@ -80,13 +80,14 @@ export function Header(props: {
                         >
                             <HeaderMobileMenu
                                 className={tcls(
-                                    'lg:hidden',
                                     '-ml-2',
                                     'text-tint-strong',
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
-                                    withVariants === 'generic' ? '' : 'page-no-toc:hidden'
+                                    withVariants === 'generic'
+                                        ? 'xl:hidden'
+                                        : 'page-no-toc:hidden lg:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />
