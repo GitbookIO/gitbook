@@ -68,6 +68,7 @@ export const no: TranslationLanguage = {
     pdf_limit_reached_continue: 'Utvid med ${1} flere sider.',
     more: 'Mer',
     link_tooltip_external_link: 'Ekstern lenke til',
+    link_tooltip_email: 'Send e-post til',
     link_tooltip_page_anchor: 'Hopp til seksjon',
     open_in_new_tab: 'Åpne i ny fane',
     ai_chat_assistant_name: 'GitBook-assistent',

@@ -66,6 +66,7 @@ export const ru = {
     pdf_limit_reached_continue: 'Расширьте ещё на ${1} страниц.',
     more: 'Ещё',
     link_tooltip_external_link: 'Внешняя ссылка на',
+    link_tooltip_email: 'Отправить письмо на',
     link_tooltip_page_anchor: 'Перейти к разделу',
     open_in_new_tab: 'Открыть в новой вкладке',
     ai_chat_assistant_name: 'GitBook-помощник',

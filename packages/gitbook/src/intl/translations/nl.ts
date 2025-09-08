@@ -67,6 +67,7 @@ export const nl: TranslationLanguage = {
     pdf_limit_reached_continue: "Verleng met ${1} extra pagina's.",
     more: 'Meer',
     link_tooltip_external_link: 'Externe link naar',
+    link_tooltip_email: 'E-mail versturen naar',
     link_tooltip_page_anchor: 'Spring naar sectie',
     open_in_new_tab: 'Open in nieuw tabblad',
     ai_chat_assistant_name: 'GitBook Assistent',
