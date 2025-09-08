@@ -123,3 +123,35 @@ export function getColumnVerticalAlignment(column: DocumentTableDefinition): Ver
 
     return 'self-center';
 }
+
+/**
+ * Check if a value is a ContentRef.
+ * @param ref The value to check.
+ * @returns True if the value is a ContentRef, false otherwise.
+ */
+export function isContentRef(ref?: DocumentTableRecord['values'][string]): ref is ContentRef {
+    return Boolean(ref && typeof ref === 'object' && 'kind' in ref);
+}
+
+/**
+ * Check if a value is an array of strings.
+ * @param value The value to check.
+ * @returns True if the value is an array of strings, false otherwise.
+ */
+export function isStringArray(value?: DocumentTableRecord['values'][string]): value is string[] {
+    return Array.isArray(value) && value.every((v) => typeof v === 'string');
+}
+
+/**
+ * Check if a value is a DocumentTableImageRecord.
+ * @param value The value to check.
+ * @returns True if the value is a DocumentTableImageRecord, false otherwise.
+ */
+export function isDocumentTableImageRecord(
+    value?: DocumentTableRecord['values'][string]
+): value is DocumentTableImageRecord {
+    if (isContentRef(value) && (value.kind === 'file' || value.kind === 'url')) {
+        return true;
+    }
+    return Boolean(value && typeof value === 'object' && 'ref' in value && isContentRef(value.ref));
+}
