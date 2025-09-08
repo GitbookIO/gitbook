@@ -141,3 +141,17 @@ export function isContentRef(ref?: DocumentTableRecord['values'][string]): ref i
 export function isStringArray(value?: DocumentTableRecord['values'][string]): value is string[] {
     return Array.isArray(value) && value.every((v) => typeof v === 'string');
 }
+
+/**
+ * Check if a value is a DocumentTableImageRecord.
+ * @param value The value to check.
+ * @returns True if the value is a DocumentTableImageRecord, false otherwise.
+ */
+export function isDocumentTableImageRecord(
+    value?: DocumentTableRecord['values'][string]
+): value is DocumentTableImageRecord {
+    if (isContentRef(value) && (value.kind === 'file' || value.kind === 'url')) {
+        return true;
+    }
+    return Boolean(value && typeof value === 'object' && 'ref' in value && isContentRef(value.ref));
+}
