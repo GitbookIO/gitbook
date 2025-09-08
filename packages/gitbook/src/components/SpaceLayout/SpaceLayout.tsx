@@ -20,7 +20,7 @@ import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
-import { SpacesDropdown } from '../Header/SpacesDropdown';
+import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
@@ -156,12 +156,20 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         'pr-4',
                                         'lg:flex',
                                         'grow-0',
-                                        'flex-wrap',
                                         'dark:shadow-light/1',
-                                        'text-base/tight'
+                                        'text-base/tight',
+                                        'items-center'
                                     )}
                                 >
                                     <HeaderLogo context={context} />
+                                    {!withTopHeader && (
+                                        <TranslationsDropdown
+                                            context={context}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={siteSpaces}
+                                            className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                        />
+                                    )}
                                 </div>
                             )
                         }
