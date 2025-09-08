@@ -69,8 +69,7 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
                     icon="envelope"
                     className="ml-1 inline size-3 links-accent:text-tint-subtle"
                 />
-            ) : null}
-            {isExternal && !isMailto ? (
+            ) : isExternal ? (
                 <Icon
                     icon="arrow-up-right"
                     className="ml-0.5 inline size-3 links-accent:text-tint-subtle"
@@ -106,13 +105,7 @@ function InlineLinkTooltipWrapper(props: {
     const isMailto = resolved.href.startsWith('mailto:');
     const isExternal = inline.data.ref.kind === 'url';
     const isSamePage = inline.data.ref.kind === 'anchor' && inline.data.ref.page === undefined;
-    if (isExternal) {
-        breadcrumbs = [
-            {
-                label: tString(language, 'link_tooltip_external_link'),
-            },
-        ];
-    }
+
     if (isMailto) {
         resolved.text = resolved.text.split('mailto:')[1] ?? resolved.text;
         breadcrumbs = [
@@ -120,8 +113,13 @@ function InlineLinkTooltipWrapper(props: {
                 label: tString(language, 'link_tooltip_email'),
             },
         ];
-    }
-    if (isSamePage) {
+    } else if (isExternal) {
+        breadcrumbs = [
+            {
+                label: tString(language, 'link_tooltip_external_link'),
+            },
+        ];
+    } else if (isSamePage) {
         breadcrumbs = [
             {
                 label: tString(language, 'link_tooltip_page_anchor'),
