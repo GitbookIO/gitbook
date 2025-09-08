@@ -1,143 +1,30 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { Icon } from '@gitbook/icons';
-import React from 'react';
+import { AdminToolbarClient } from './AdminToolbarClient';
 
-import { tcls } from '@/lib/tailwind';
-import { DateRelative } from '../primitives';
-import { IframeWrapper } from './IframeWrapper';
-import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
-import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
-
-interface AdminToolbarProps {
+export interface AdminToolbarProps {
     context: GitBookSiteContext;
 }
 
-function ToolbarLayout(props: { children: React.ReactNode }) {
-    return (
-        <div
-            className={tcls(
-                'fixed',
-                'bottom-5',
-                'left-1/2',
-                'z-50',
-                'transform',
-                '-translate-x-1/2',
-                'rounded-full',
+// Serializable version of GitBookSiteContext (excludes functions)
+export type SerializableGitBookSiteContext = Omit<
+    GitBookSiteContext,
+    'linker' | 'imageResizer' | 'dataFetcher'
+>;
 
-                'bg-tint-12/9',
-                'dark:bg-tint-1/9',
-
-                'shadow-lg',
-                'min-h-10',
-                'min-w-40',
-                'p-2',
-                'max-w-md',
-                'border-tint-12/1',
-                'backdrop-blur-md'
-            )}
-        >
-            <React.Suspense fallback={null}>{props.children}</React.Suspense>
-        </div>
-    );
+export interface AdminToolbarClientProps {
+    context: SerializableGitBookSiteContext;
 }
 
 /**
- * Toolbar with information for the content admin when previewing a revision or change-request.
+ * Server component that determines what type of toolbar to show and passes data to client component
  */
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
 
-    if (context.changeRequest) {
-        return (
-            <IframeWrapper>
-                <ChangeRequestToolbar context={context} />
-            </IframeWrapper>
-        );
+    if (context.changeRequest || context.revisionId !== context.space.revision) {
+        // Create a serializable version of the context by removing function-containing objects
+        const { linker, imageResizer, dataFetcher, ...serializableContext } = context;
+
+        return <AdminToolbarClient context={serializableContext} />;
     }
-
-    if (context.revisionId !== context.space.revision) {
-        return (
-            <IframeWrapper>
-                <RevisionToolbar context={context} />
-            </IframeWrapper>
-        );
-    }
-
-    return null;
-}
-
-async function ChangeRequestToolbar(props: { context: GitBookSiteContext }) {
-    const { context } = props;
-    const { space, changeRequest } = context;
-
-    if (!changeRequest) {
-        return null;
-    }
-
-    return (
-        <ToolbarLayout>
-            <Toolbar>
-                <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
-                    <Icon icon="code-branch" className="size-4" />
-                </ToolbarButton>
-                <ToolbarBody>
-                    <p>
-                        #{changeRequest.number}: {changeRequest.subject ?? 'No subject'}
-                    </p>
-                    <p className="text-tint-2 text-xs dark:text-tint-11">
-                        Change request updated <DateRelative value={changeRequest.updatedAt} />
-                    </p>
-                </ToolbarBody>
-                <ToolbarButtonGroups>
-                    <ToolbarButton title="Open in application" href={changeRequest.urls.app}>
-                        <Icon icon="arrow-up-right-from-square" className="size-4" />
-                    </ToolbarButton>
-                    <RefreshChangeRequestButton
-                        spaceId={space.id}
-                        changeRequestId={changeRequest.id}
-                        revisionId={changeRequest.revision}
-                        updatedAt={new Date(changeRequest.updatedAt).getTime()}
-                    />
-                </ToolbarButtonGroups>
-            </Toolbar>
-        </ToolbarLayout>
-    );
-}
-
-async function RevisionToolbar(props: { context: GitBookSiteContext }) {
-    const { context } = props;
-    const { revision } = context;
-
-    return (
-        <ToolbarLayout>
-            <Toolbar>
-                <ToolbarButton title="Open in application" href={revision.urls.app}>
-                    <Icon icon="code-commit" className="size-4" />
-                </ToolbarButton>
-                <ToolbarBody>
-                    <p>
-                        Revision created <DateRelative value={revision.createdAt} />
-                    </p>
-                    {revision.git ? (
-                        <p className="text-tint-2 text-xs dark:text-tint-11">
-                            {revision.git.message}
-                        </p>
-                    ) : null}
-                </ToolbarBody>
-                <ToolbarButtonGroups>
-                    <ToolbarButton title="Open in application" href={revision.urls.app}>
-                        <Icon icon="arrow-up-right-from-square" className="size-4" />
-                    </ToolbarButton>
-                    {revision.git?.url ? (
-                        <ToolbarButton title="Open git commit" href={revision.git.url}>
-                            <Icon
-                                icon={revision.git.url.includes('github.com') ? 'github' : 'gitlab'}
-                                className="size-4"
-                            />
-                        </ToolbarButton>
-                    ) : null}
-                </ToolbarButtonGroups>
-            </Toolbar>
-        </ToolbarLayout>
-    );
 }
