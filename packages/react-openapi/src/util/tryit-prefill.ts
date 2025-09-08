@@ -27,12 +27,16 @@ export function resolveTryItPrefillForOperation(args: {
         prefillInputContext,
     } = args;
 
-    // Fixed ExpressionRuntime and resolveTryItPrefillExpression function
+    if (!prefillInputContext) {
+        return {};
+    }
+
     const runtime = new ExpressionRuntime();
     const resolveTryItPrefillExpression = (expr: string) => {
-        if (!prefillInputContext) return undefined;
         const parts = parseTemplate(expr);
-        if (!parts.length) return undefined;
+        if (!parts.length) {
+            return undefined;
+        }
         return runtime.evaluateTemplate(expr, prefillInputContext);
     };
 
