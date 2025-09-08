@@ -104,8 +104,10 @@ function shouldIncludeSection(context: GitBookSiteContext, section: SiteSection)
 /**
  * Find the best default site space to navigate to for a givent section:
  * 1. If we are on the default, continue on the default.
- * 2. If a site space has the same path as the current one, return it.
- * 3. Otherwise, return the default one.
+ * 2. If there are site spaces with the same language as the current, filter by language.
+ * 3. If a site space has the same path as the current one, return it.
+ * 4. Otherwise, return the default first language match.
+ * 5. Otherwise, return the default one.
  */
 function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
     const { siteSpace: currentSiteSpace } = context;
@@ -114,9 +116,15 @@ function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
         return getSectionURL(context, section);
     }
 
-    const bestMatch = section.siteSpaces.find((siteSpace) =>
-        areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
-    );
+    const possibleMatches =
+        section.siteSpaces.filter((siteSpace) =>
+            areSiteSpacesSameLanguage(siteSpace, currentSiteSpace)
+        ) ?? section.siteSpaces;
+
+    const bestMatch =
+        possibleMatches.find((siteSpace) => areSiteSpacesEquivalent(siteSpace, currentSiteSpace)) ??
+        possibleMatches[0];
+
     if (bestMatch) {
         return getSiteSpaceURL(context, bestMatch);
     }
@@ -129,4 +137,8 @@ function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
  */
 function areSiteSpacesEquivalent(siteSpace1: SiteSpace, siteSpace2: SiteSpace) {
     return siteSpace1.path === siteSpace2.path;
+}
+
+function areSiteSpacesSameLanguage(siteSpace1: SiteSpace, siteSpace2: SiteSpace) {
+    return siteSpace1.space.language === siteSpace2.space.language;
 }
