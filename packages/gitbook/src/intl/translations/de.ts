@@ -68,6 +68,7 @@ export const de = {
     pdf_limit_reached_continue: 'Mit ${1} weiteren Seiten erweitern.',
     more: 'Mehr',
     link_tooltip_external_link: 'Externe Verlinkung zu',
+    link_tooltip_email: 'E-Mail senden an',
     link_tooltip_page_anchor: 'Zum Abschnitt springen',
     open_in_new_tab: 'In neuem Tab öffnen',
     ai_chat_assistant_name: 'GitBook-Assistent',

@@ -67,6 +67,7 @@ export const pt_br = {
     pdf_limit_reached_continue: 'Extender com mais ${1} páginas.',
     more: 'Mais',
     link_tooltip_external_link: 'Link externo para',
+    link_tooltip_email: 'Enviar e-mail para',
     link_tooltip_page_anchor: 'Pular para a seção',
     open_in_new_tab: 'Abrir em uma nova guia',
     ai_chat_assistant_name: 'Assistente do GitBook',

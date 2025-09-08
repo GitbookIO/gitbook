@@ -65,6 +65,7 @@ export const zh: TranslationLanguage = {
     pdf_limit_reached_continue: '使用${1}页进行扩展。',
     more: '更多',
     link_tooltip_external_link: '外部链接到',
+    link_tooltip_email: '发送邮件到',
     link_tooltip_page_anchor: '跳转到页面',
     open_in_new_tab: '在新标签页中打开',
     ai_chat_assistant_name: 'GitBook 助手',

@@ -67,6 +67,7 @@ export const ja: TranslationLanguage = {
     pdf_limit_reached_continue: 'さらに${1}ページで拡張',
     more: '詳細',
     link_tooltip_external_link: '外部リンク先',
+    link_tooltip_email: 'メールを送信',
     link_tooltip_page_anchor: 'ページ内リンク先',
     open_in_new_tab: '新しいタブで開く',
     ai_chat_assistant_name: 'GitBookアシスタント',
