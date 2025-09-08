@@ -67,7 +67,6 @@ if (typeof window !== 'undefined') {
         },
     };
     window.GitBook = gitbookGlobal;
-        name: 'send_email',
 }
 
 /**
