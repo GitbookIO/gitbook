@@ -19,7 +19,7 @@ import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { FileIcon } from '../FileIcon';
 import type { TableRecordKV } from './Table';
-import { type VerticalAlignment, getColumnAlignment } from './utils';
+import { type VerticalAlignment, getColumnAlignment, isContentRef, isStringArray } from './utils';
 
 const alignmentMap: Record<'text-left' | 'text-center' | 'text-right', string> = {
     'text-left': '**:text-left text-left',
@@ -57,18 +57,28 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
         return null;
     }
 
+    // Because definition and value depends on column, we have to check typing in each case at runtime.
+    // Validation should have been done at the API level, but we can't know typing based on `definition.type`.
+    // OpenAPI types cannot really handle discriminated unions based on a dynamic key.
     switch (definition.type) {
-        case 'checkbox':
+        case 'checkbox': {
+            if (value === null || typeof value !== 'boolean') {
+                return null;
+            }
             return (
                 <Checkbox
                     className={tcls('w-5', 'h-5')}
-                    checked={value as boolean}
+                    checked={value}
                     disabled={true}
                     aria-labelledby={ariaLabelledBy}
                 />
             );
+        }
         case 'rating': {
-            const rating = value as number;
+            if (typeof value !== 'number') {
+                return null;
+            }
+            const rating = value;
             const max = definition.max;
 
             return (
@@ -107,15 +117,21 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                 </Tag>
             );
         }
-        case 'number':
+        case 'number': {
+            if (typeof value !== 'number') {
+                return null;
+            }
             return (
                 <Tag
                     className={tcls('text-base', 'tabular-nums', 'tracking-tighter')}
                     aria-labelledby={ariaLabelledBy}
                 >{`${value}`}</Tag>
             );
+        }
         case 'text': {
-            // @ts-ignore
+            if (typeof value !== 'string') {
+                return null;
+            }
             const fragment = getNodeFragmentByName(block, value);
             if (!fragment) {
                 return <Tag className={tcls(['w-full', verticalAlignment])}>{''}</Tag>;
@@ -148,8 +164,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'files': {
+            if (!isStringArray(value)) {
+                return null;
+            }
             const files = await Promise.all(
-                (value as string[]).map((fileId) =>
+                value.map((fileId) =>
                     context.contentContext
                         ? resolveContentRef(
                               {
@@ -220,10 +239,12 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'content-ref': {
-            const contentRef = value ? (value as ContentRef) : null;
+            if (value === null || !isContentRef(value)) {
+                return null;
+            }
             const resolved =
-                contentRef && context.contentContext
-                    ? await resolveContentRef(contentRef, context.contentContext, {
+                value && context.contentContext
+                    ? await resolveContentRef(value, context.contentContext, {
                           resolveAnchorText: true,
                           iconStyle: ['mr-2', 'text-tint-subtle'],
                       })
@@ -238,11 +259,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         <StyledLink
                             href={resolved.href}
                             insights={
-                                contentRef
+                                value
                                     ? {
                                           type: 'link_click',
                                           link: {
-                                              target: contentRef,
+                                              target: value,
                                               position: SiteInsightsLinkPosition.Content,
                                           },
                                       }
@@ -256,8 +277,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'users': {
+            if (!isStringArray(value)) {
+                return null;
+            }
             const resolved = await Promise.all(
-                (value as string[]).map(async (userId) => {
+                value.map(async (userId) => {
                     const contentRef: ContentRefUser = {
                         kind: 'user',
                         user: userId,
@@ -294,10 +318,13 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'select': {
+            if (!isStringArray(value)) {
+                return null;
+            }
             return (
                 <Tag aria-labelledby={ariaLabelledBy}>
                     <span className={tcls('inline-flex', 'gap-2', 'flex-wrap')}>
-                        {(value as string[]).map((selectId) => {
+                        {value.map((selectId) => {
                             const option = definition.options.find(
                                 (option) => option.value === selectId
                             );
@@ -328,13 +355,12 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             );
         }
         case 'image': {
-            const contentRef = value ? (value as ContentRef) : null;
-            if (!contentRef) {
+            if (!isContentRef(value)) {
                 return null;
             }
 
             const image = context.contentContext
-                ? await resolveContentRef(contentRef, context.contentContext)
+                ? await resolveContentRef(value, context.contentContext)
                 : null;
 
             if (!image) {
