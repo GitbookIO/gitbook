@@ -2,9 +2,9 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { Icon } from '@gitbook/icons';
 import React from 'react';
 
-import { isPreviewRequest } from '@/lib/preview';
 import { tcls } from '@/lib/tailwind';
 import { DateRelative } from '../primitives';
+import { IframeWrapper } from './IframeWrapper';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
 
@@ -47,23 +47,20 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
 
-    // Get the current URL from the linker (which accounts for both static and dynamic routes)
-    const currentURL = new URL(context.linker.toAbsoluteURL('/'));
-
-    // Check if this url is opened within the GitBook app's in-editor preview tab.
-    const isInAppPreview = isPreviewRequest(currentURL);
-
-    // Don't show admin toolbar for preview requests
-    if (isInAppPreview) {
-        return null;
-    }
-
     if (context.changeRequest) {
-        return <ChangeRequestToolbar context={context} />;
+        return (
+            <IframeWrapper>
+                <ChangeRequestToolbar context={context} />
+            </IframeWrapper>
+        );
     }
 
     if (context.revisionId !== context.space.revision) {
-        return <RevisionToolbar context={context} />;
+        return (
+            <IframeWrapper>
+                <RevisionToolbar context={context} />
+            </IframeWrapper>
+        );
     }
 
     return null;
