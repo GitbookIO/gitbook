@@ -1,10 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { Icon } from '@gitbook/icons';
-import { headers } from 'next/headers';
 import React from 'react';
 
+import { isPreviewRequest } from '@/lib/preview';
 import { tcls } from '@/lib/tailwind';
-
 import { DateRelative } from '../primitives';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
@@ -47,10 +46,15 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
  */
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
-    const mode = (await headers()).get('x-gitbook-mode');
 
-    if (mode === 'multi-id') {
-        // We don't show the admin toolbar in multi-id mode, as it's used for previewing in the dashboard.
+    // Get the current URL from the linker (which accounts for both static and dynamic routes)
+    const currentURL = new URL(context.linker.toAbsoluteURL('/'));
+
+    // Check if this url is opened within the GitBook app's in-editor preview tab.
+    const isInAppPreview = isPreviewRequest(currentURL);
+
+    // Don't show admin toolbar for preview requests
+    if (isInAppPreview) {
         return null;
     }
 
