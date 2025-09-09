@@ -1,11 +1,10 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { Icon } from '@gitbook/icons';
-import { headers } from 'next/headers';
 import React from 'react';
 
 import { tcls } from '@/lib/tailwind';
-
 import { DateRelative } from '../primitives';
+import { IframeWrapper } from './IframeWrapper';
 import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
 import { Toolbar, ToolbarBody, ToolbarButton, ToolbarButtonGroups } from './Toolbar';
 
@@ -47,19 +46,21 @@ function ToolbarLayout(props: { children: React.ReactNode }) {
  */
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
-    const mode = (await headers()).get('x-gitbook-mode');
-
-    if (mode === 'multi-id') {
-        // We don't show the admin toolbar in multi-id mode, as it's used for previewing in the dashboard.
-        return null;
-    }
 
     if (context.changeRequest) {
-        return <ChangeRequestToolbar context={context} />;
+        return (
+            <IframeWrapper>
+                <ChangeRequestToolbar context={context} />
+            </IframeWrapper>
+        );
     }
 
     if (context.revisionId !== context.space.revision) {
-        return <RevisionToolbar context={context} />;
+        return (
+            <IframeWrapper>
+                <RevisionToolbar context={context} />
+            </IframeWrapper>
+        );
     }
 
     return null;
