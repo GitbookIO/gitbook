@@ -78,20 +78,6 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
  * Test if a section should be included in the list of sections.
  */
 function shouldIncludeSection(context: GitBookSiteContext, section: SiteSection) {
-    if (context.site.id !== 'site_JOVzv') {
-        return true;
-    }
-
-    // Testing for a new mode of navigation where the multi-variants section are hidden
-    // if they do not include an equivalent of the current site space.
-
-    // TODO: replace with a proper flag on the section
-    const withNavigateOnlyIfEquivalent = section.id === 'sitesc_4jvEm';
-
-    if (!withNavigateOnlyIfEquivalent) {
-        return true;
-    }
-
     const { siteSpace: currentSiteSpace } = context;
     if (section.siteSpaces.length === 1) {
         return true;
