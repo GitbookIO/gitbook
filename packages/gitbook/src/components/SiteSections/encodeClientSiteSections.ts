@@ -30,9 +30,7 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
     for (const item of list) {
         switch (item.object) {
             case 'site-section-group': {
-                const sections = item.sections
-                    .filter((section) => shouldIncludeSection(context, section))
-                    .map((section) => encodeSection(context, section));
+                const sections = item.sections.map((section) => encodeSection(context, section));
 
                 // Skip empty groups
                 if (sections.length === 0) {
@@ -72,19 +70,6 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
         object: section.object,
         url: findBestTargetURL(context, section),
     };
-}
-
-/**
- * Test if a section should be included in the list of sections.
- */
-function shouldIncludeSection(context: GitBookSiteContext, section: SiteSection) {
-    const { siteSpace: currentSiteSpace } = context;
-    if (section.siteSpaces.length === 1) {
-        return true;
-    }
-    return section.siteSpaces.some((siteSpace) =>
-        areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
-    );
 }
 
 /**
