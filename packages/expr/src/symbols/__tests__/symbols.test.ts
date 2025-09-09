@@ -338,6 +338,8 @@ describe('ExpressionRuntime', () => {
                     'visitor.claims.hello.length',
                     'visitor.claims.hello.at',
                     'visitor.claims.hello.includes',
+                    'visitor.claims.hello.some',
+                    'visitor.claims.hello.every',
                 ],
             });
         });

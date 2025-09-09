@@ -14,7 +14,7 @@ declare module 'eval-estree-expression' {
         /**
          * Enable support for function statements and expressions by enabling the functions option AND by passing the .generate() function from the escodegen library. Default: undefined
          */
-        generate?: boolean;
+        generate?: boolean | ((node: any) => string);
         /**
          * Enable the =~ regex operator to support testing values without using functions (example name =~ /^a.*c$/). Default: true
          */
