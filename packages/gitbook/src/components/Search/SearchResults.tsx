@@ -49,13 +49,15 @@ const cachedRecommendedQuestions: Map<string, ResultType[]> = new Map();
 export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         children?: React.ReactNode;
+        id: string;
         query: string;
         global: boolean;
         siteSpaceId: string;
+        onResultsChanged?: (results: ResultType[], showing: boolean, cursor: number | null) => void;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, global, siteSpaceId } = props;
+    const { children, id, query, global, siteSpaceId, onResultsChanged } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -161,6 +163,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
     }, [query, global, trackEvent, withAI, siteSpaceId]);
 
     const results: ResultType[] = React.useMemo(() => {
+        onResultsChanged?.(resultsState.results, !resultsState.fetching, cursor);
         if (!withAI) {
             return resultsState.results;
         }
@@ -179,6 +182,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
 
     // Scroll to the active result.
     React.useEffect(() => {
+        onResultsChanged?.(resultsState.results, !resultsState.fetching, cursor);
         if (cursor === null || !refs.current[cursor]) {
             return;
         }
@@ -258,8 +262,20 @@ export const SearchResults = React.forwardRef(function SearchResults(
                 )
             ) : (
                 <>
-                    <div data-testid="search-results" className="flex flex-col gap-y-1">
+                    <div
+                        data-testid="search-results"
+                        className="flex flex-col gap-y-1"
+                        aria-label={`Search results`}
+                        id={id}
+                        role="listbox"
+                        aria-live="polite"
+                    >
                         {results.map((item, index) => {
+                            const resultItemProps = {
+                                'aria-posinset': index + 1,
+                                'aria-setsize': results.length,
+                                id: `${id}-${index}`,
+                            };
                             switch (item.type) {
                                 case 'page': {
                                     return (
@@ -271,6 +287,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             query={query}
                                             item={item}
                                             active={index === cursor}
+                                            {...resultItemProps}
                                         />
                                     );
                                 }
@@ -284,6 +301,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             question={query}
                                             active={index === cursor}
                                             assistant={item.assistant}
+                                            {...resultItemProps}
                                         />
                                     );
                                 }
@@ -298,6 +316,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             active={index === cursor}
                                             assistant={assistants[0]!}
                                             recommended
+                                            {...resultItemProps}
                                         />
                                     );
                                 }
@@ -311,6 +330,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
                                             query={query}
                                             item={item}
                                             active={index === cursor}
+                                            {...resultItemProps}
                                         />
                                     );
                                 }

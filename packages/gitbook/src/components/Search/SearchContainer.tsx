@@ -161,6 +161,16 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
 
+    const [resultsState, setResultsState] = React.useState<{
+        count: number;
+        showing: boolean;
+        cursor: number | null;
+    }>({
+        count: 0,
+        showing: false,
+        cursor: null,
+    });
+    const searchResultsId = `search-results-${React.useId()}`;
     return (
         <SearchAskProvider value={searchAsk}>
             <Popover
@@ -177,6 +187,10 @@ export function SearchContainer(props: SearchContainerProps) {
                                     query={normalizedQuery}
                                     global={state?.global ?? false}
                                     siteSpaceId={siteSpaceId}
+                                    onResultsChanged={(results, showing, cursor) => {
+                                        setResultsState({ count: results.length, showing, cursor });
+                                    }}
+                                    id={searchResultsId}
                                 />
                             ) : null}
                             {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
@@ -223,6 +237,10 @@ export function SearchContainer(props: SearchContainerProps) {
                     withAI={withSearchAI}
                     isOpen={state?.open ?? false}
                     className={className}
+                    resultsShowing={resultsState.showing}
+                    resultsCount={resultsState.count}
+                    cursor={resultsState.cursor}
+                    controlsId={searchResultsId}
                 />
             </Popover>
             {assistants

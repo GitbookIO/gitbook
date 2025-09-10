@@ -13,7 +13,7 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active } = props;
+    const { query, item, active, ...rest } = props;
     const language = useLanguage();
 
     return (
@@ -32,6 +32,8 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     spaceId: item.spaceId,
                 },
             }}
+            aria-label={`Section${item.title ? ` with title '${item.title}'` : item.body ? ` with content '${getAbbreviatedBody(item.body, query)}'` : ''}`}
+            {...rest}
         >
             <div className="grow border-tint-subtle border-l-2 pl-4">
                 {item.title ? (
@@ -51,7 +53,12 @@ function highlightQueryInBody(body: string, query: string) {
     // Ensure the query to be highlighted is visible in the body.
     return (
         <p className="wrap-anywhere relative line-clamp-3 text-sm">
-            <HighlightQuery query={query} text={idx < 20 ? body : `...${body.slice(idx - 10)}`} />
+            <HighlightQuery query={query} text={idx < 20 ? body : `…${body.slice(idx - 10)}`} />
         </p>
     );
+}
+
+function getAbbreviatedBody(body: string, query: string) {
+    const idx = body.toLocaleLowerCase().indexOf(query.toLocaleLowerCase());
+    return idx < 20 ? body.slice(0, 100) : `…${body.slice(idx - 10, idx + query.length + 30)}…`;
 }

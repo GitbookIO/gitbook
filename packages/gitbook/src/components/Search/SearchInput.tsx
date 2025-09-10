@@ -16,6 +16,10 @@ interface SearchInputProps {
     withAI: boolean;
     isOpen: boolean;
     className?: string;
+    resultsCount: number;
+    cursor: number | null;
+    resultsShowing: boolean;
+    controlsId: string;
 }
 
 // Size classes for medium size button
@@ -26,7 +30,19 @@ const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'md:circular-corners:px-4'];
  */
 export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
     function SearchInput(props, ref) {
-        const { onChange, onKeyDown, onFocus, value, withAI, isOpen, className } = props;
+        const {
+            onChange,
+            onKeyDown,
+            onFocus,
+            resultsCount,
+            resultsShowing,
+            cursor,
+            value,
+            withAI,
+            isOpen,
+            className,
+            controlsId,
+        } = props;
         const inputRef = useRef<HTMLInputElement>(null);
 
         const language = useLanguage();
@@ -84,9 +100,16 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             className="size-4 shrink-0 animate-scale-in"
                         />
                     )}
-
+                    <div className="sr-only" aria-live="assertive" role="alert" aria-relevant="all">
+                        {resultsShowing
+                            ? resultsCount > 0
+                                ? `${resultsCount} results`
+                                : 'No results'
+                            : ''}
+                    </div>
                     <input
                         type="text"
+                        role="combobox"
                         onFocus={onFocus}
                         onKeyDown={onKeyDown}
                         onChange={(event) => onChange(event.target.value)}
@@ -100,6 +123,15 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-hidden transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             isOpen ? '' : 'max-md:opacity-0'
                         )}
+                        aria-haspopup="listbox"
+                        aria-controls={controlsId}
+                        autoComplete="off"
+                        aria-autocomplete="list"
+                        aria-expanded={value && isOpen ? 'true' : 'false'}
+                        aria-activedescendant={
+                            cursor !== null ? `${controlsId}-${cursor}` : undefined
+                        }
+                        // Forward
                         ref={inputRef}
                     />
                     {!isOpen ? <Shortcut /> : null}
