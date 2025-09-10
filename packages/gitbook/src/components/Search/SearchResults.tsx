@@ -265,7 +265,6 @@ export const SearchResults = React.forwardRef(function SearchResults(
                     <div
                         data-testid="search-results"
                         className="flex flex-col gap-y-1"
-                        aria-label={`Search results`}
                         id={id}
                         role="listbox"
                         aria-live="polite"

@@ -41,7 +41,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     spaceId: item.spaceId,
                 },
             }}
-            aria-label={`Page with title '${item.title}'`}
+            aria-label={tString(language, 'search_page_result_title', item.title)}
             {...rest}
         >
             {breadcrumbs.length > 0 ? (

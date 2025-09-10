@@ -32,7 +32,13 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                     spaceId: item.spaceId,
                 },
             }}
-            aria-label={`Section${item.title ? ` with title '${item.title}'` : item.body ? ` with content '${getAbbreviatedBody(item.body, query)}'` : ''}`}
+            aria-label={
+                item.title
+                    ? tString(language, 'search_section_result_title', item.title)
+                    : item.body
+                    ? tString(language, 'search_section_result_content', getAbbreviatedBody(item.body, query))
+                    : tString(language, 'search_section_result_default')
+            }
             {...rest}
         >
             <div className="grow border-tint-subtle border-l-2 pl-4">

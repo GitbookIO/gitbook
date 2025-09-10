@@ -2,7 +2,7 @@
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import { tString, useLanguage } from '@/intl/client';
+import { t, tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
@@ -103,8 +103,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     <div className="sr-only" aria-live="assertive" role="alert" aria-relevant="all">
                         {resultsShowing
                             ? resultsCount > 0
-                                ? `${resultsCount} results`
-                                : 'No results'
+                                ? t(language, 'search_results_count', resultsCount)
+                                : t(language, 'search_no_results')
                             : ''}
                     </div>
                     <input
