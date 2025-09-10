@@ -36,8 +36,12 @@ export const SearchSectionResultItem = React.forwardRef(function SearchSectionRe
                 item.title
                     ? tString(language, 'search_section_result_title', item.title)
                     : item.body
-                    ? tString(language, 'search_section_result_content', getAbbreviatedBody(item.body, query))
-                    : tString(language, 'search_section_result_default')
+                      ? tString(
+                            language,
+                            'search_section_result_content',
+                            getAbbreviatedBody(item.body, query)
+                        )
+                      : tString(language, 'search_section_result_default')
             }
             {...rest}
         >
