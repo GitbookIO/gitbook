@@ -14,7 +14,7 @@ export const en = {
     search_results_count: '${1} results',
     search_scope_current_depth_single: '${1}',
     search_scope_current_depth_full: 'All content',
-    search_scope_all_depth_single: 'Most relevant',
+    search_scope_all_depth_single: 'Best match',
     search_scope_all_depth_full: 'Everything',
     ask: 'Ask',
     search_ask: 'Ask "${1}"',

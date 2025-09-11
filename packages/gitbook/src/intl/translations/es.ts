@@ -16,7 +16,7 @@ export const es: TranslationLanguage = {
     search_results_count: '${1} resultados',
     search_scope_current_depth_single: '${1}',
     search_scope_current_depth_full: 'Todo el contenido',
-    search_scope_all_depth_single: 'Más relevante',
+    search_scope_all_depth_single: 'Mejor match',
     search_scope_all_depth_full: 'Todo',
     ask: 'Preguntar',
     search_ask: 'Preguntar "${1}"',

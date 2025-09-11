@@ -27,7 +27,18 @@ export function SearchScopeToggle(props: {
     return (
         <>
             {withSections ? (
-                <SegmentedControl className="animate-scale-in @max-md:flex-col">
+                <SegmentedControl className="animate-scale-in">
+                    <SegmentedControlItem
+                        active={state.scope === 'all' && state.depth === 'single'}
+                        label={
+                            withSiteVariants
+                                ? tString(language, 'search_scope_all_depth_single')
+                                : tString(language, 'search_scope_all_depth_full')
+                        }
+                        className={withSiteVariants ? '@max-md:basis-full' : ''}
+                        icon={withSiteVariants ? 'bullseye-arrow' : 'infinity'}
+                        onClick={() => setSearchState({ ...state, scope: 'all', depth: 'single' })}
+                    />
                     <SegmentedControlItem
                         active={state.scope === 'current'}
                         icon={section?.icon ?? 'crosshairs'}
@@ -39,16 +50,6 @@ export function SearchScopeToggle(props: {
                         onClick={() =>
                             setSearchState({ ...state, scope: 'current', depth: 'single' })
                         }
-                    />
-                    <SegmentedControlItem
-                        active={state.scope === 'all' && state.depth === 'single'}
-                        label={
-                            withSiteVariants
-                                ? tString(language, 'search_scope_all_depth_single')
-                                : tString(language, 'search_scope_all_depth_full')
-                        }
-                        icon={withSiteVariants ? 'bullseye-arrow' : 'infinity'}
-                        onClick={() => setSearchState({ ...state, scope: 'all', depth: 'single' })}
                     />
                     {withSiteVariants ? (
                         <SegmentedControlItem
@@ -69,15 +70,13 @@ export function SearchScopeToggle(props: {
                         active={state.depth === 'single'}
                         className="py-1"
                         label={tString(language, 'search_scope_current_depth_single', spaceTitle)}
-                        // icon="crosshairs"
                         onClick={() => setSearchState({ ...state, depth: 'single' })}
                     />
                     <SegmentedControlItem
                         size={state.scope === 'current' ? 'small' : 'medium'}
                         active={state.depth === 'full'}
                         className="py-1"
-                        label={tString(language, 'search_scope_current_depth_full', section?.title)}
-                        // icon="rectangle-vertical-history"
+                        label={tString(language, 'search_scope_current_depth_full')}
                         onClick={() => setSearchState({ ...state, depth: 'full' })}
                     />
                 </SegmentedControl>

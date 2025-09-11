@@ -16,7 +16,7 @@ export const nl: TranslationLanguage = {
     search_results_count: '${1} resultaten',
     search_scope_current_depth_single: '${1}',
     search_scope_current_depth_full: 'Alle inhoud',
-    search_scope_all_depth_single: 'Meest relevant',
+    search_scope_all_depth_single: 'Beste match',
     search_scope_all_depth_full: 'Alles',
     ask: 'Vragen',
     search_ask: 'Vraag "${1}"',

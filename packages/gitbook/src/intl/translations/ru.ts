@@ -14,7 +14,7 @@ export const ru = {
     search_results_count: '${1} — число результатов',
     search_scope_current_depth_single: '${1}',
     search_scope_current_depth_full: 'Все материалы',
-    search_scope_all_depth_single: 'Наиболее релевантные',
+    search_scope_all_depth_single: 'Лучший матч',
     search_scope_all_depth_full: 'Всё',
     ask: 'Спросить',
     search_ask: 'Спросить "${1}"',

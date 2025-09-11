@@ -26,7 +26,7 @@ export function SegmentedControlItem(props: ButtonProps) {
             variant="blank"
             size={size}
             className={tcls(
-                'flex-1 justify-center whitespace-normal not-contrast-more:data-[active=true]:bg-tint-base',
+                'shrink grow justify-center whitespace-normal not-contrast-more:data-[active=true]:bg-tint-base',
                 className
             )}
             {...rest}

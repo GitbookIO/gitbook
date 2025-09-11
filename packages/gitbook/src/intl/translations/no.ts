@@ -16,7 +16,7 @@ export const no: TranslationLanguage = {
     search_results_count: '${1} resultater',
     search_scope_current_depth_single: '${1}',
     search_scope_current_depth_full: 'Alt innhold',
-    search_scope_all_depth_single: 'Mest relevant',
+    search_scope_all_depth_single: 'Beste treff',
     search_scope_all_depth_full: 'Alt',
     ask: 'Spør',
     search_ask: 'Spør "${1}"',

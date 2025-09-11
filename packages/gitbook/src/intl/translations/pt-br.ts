@@ -14,7 +14,7 @@ export const pt_br = {
     search_results_count: '${1} resultados',
     search_scope_current_depth_single: '${1}',
     search_scope_current_depth_full: 'Todo o conteúdo',
-    search_scope_all_depth_single: 'Mais relevante',
+    search_scope_all_depth_single: 'Melhor match',
     search_scope_all_depth_full: 'Tudo',
     ask: 'Perguntar',
     search_ask: 'Perguntar "${1}"',
