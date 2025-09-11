@@ -1,3 +1,4 @@
+import { it } from 'bun:test';
 import psi from 'psi';
 
 import { getContentTestURL } from './utils';
@@ -25,10 +26,16 @@ const tests: Array<Test> = [
 ];
 
 for (const test of tests) {
-    const url = getContentTestURL(test.url);
-    await psi.output(url, {
-        strategy: test.strategy,
-        threshold: test.threshold,
-        key: process.env.PAGESPEED_API_KEY,
+    if (!process.env.PAGESPEED_API_KEY && !process.env.CI) {
+        continue;
+    }
+
+    it(`${test.url} - ${test.strategy}`, async () => {
+        const url = getContentTestURL(test.url);
+        await psi.output(url, {
+            strategy: test.strategy,
+            threshold: test.threshold,
+            key: process.env.PAGESPEED_API_KEY,
+        });
     });
 }

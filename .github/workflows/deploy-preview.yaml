@@ -182,9 +182,9 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
-    pagespeed-testing-v2:
+    browserless-testing-v2:
         runs-on: ubuntu-latest
-        name: PageSpeed Testing v1
+        name: Browserless Testing
         needs: deploy-v2-vercel
         steps:
             - name: Checkout
@@ -195,8 +195,8 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
-            - name: Run pagespeed tests
-              run: bun ./packages/gitbook/tests/pagespeed-testing.ts
+            - name: Run integration tests
+              run: cd ./packages/gitbook && bun e2e-browserless
               env:
                   BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url}}
                   PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}

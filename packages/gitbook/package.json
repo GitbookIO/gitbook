@@ -116,6 +116,7 @@
         "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts --project=chromium",
         "e2e-customers": "playwright test e2e/customers.spec.ts --project=chromium",
         "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
+        "e2e-browserless": "bun test ./tests/",
         "typecheck": "tsc --noEmit"
     },
     "browserslist": [
