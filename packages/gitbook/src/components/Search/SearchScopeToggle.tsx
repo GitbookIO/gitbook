@@ -1,52 +1,77 @@
-import { tString, useLanguage } from '@/intl/client';
-import { Button } from '../primitives';
+'use client';
+
+import type { SiteSection } from '@gitbook/api';
+import { SegmentedControl, SegmentedControlItem } from '../primitives/SegmentedControl';
 import { useSearch } from './useSearch';
 
 /**
  * Toolbar to toggle between search modes (global or scoped to a space).
  * Only visible when the space is in a collection.
  */
-export function SearchScopeToggle(props: { spaceTitle: string }) {
-    const { spaceTitle } = props;
+export function SearchScopeToggle(props: {
+    spaceTitle: string;
+    section?: Pick<SiteSection, 'title' | 'icon'>;
+    withVariants: boolean;
+    withSiteVariants: boolean;
+    withSections: boolean;
+}) {
+    const { spaceTitle, section, withVariants, withSections, withSiteVariants } = props;
     const [state, setSearchState] = useSearch();
-    const language = useLanguage();
 
     if (!state) {
         return null;
     }
 
     return (
-        <div
-            role="toolbar"
-            aria-orientation="horizontal"
-            className="mb-2 flex flex-row flex-wrap gap-1 circular-corners:rounded-3xl rounded-corners:rounded-lg bg-tint-subtle p-1"
-        >
-            <Button
-                variant="blank"
-                size="medium"
-                className="shrink grow justify-center whitespace-normal"
-                active={!state.global}
-                label={tString(language, 'search_scope_space', spaceTitle)}
-                onClick={() => {
-                    setSearchState({
-                        ...state,
-                        global: false,
-                    });
-                }}
-            />
-            <Button
-                variant="blank"
-                size="medium"
-                className="shrink grow justify-center whitespace-normal"
-                active={state.global}
-                label={tString(language, 'search_scope_all')}
-                onClick={() => {
-                    setSearchState({
-                        ...state,
-                        global: true,
-                    });
-                }}
-            />
-        </div>
+        <>
+            {withSections ? (
+                <SegmentedControl className="animate-scale-in @max-md:flex-col">
+                    <SegmentedControlItem
+                        active={state.scope === 'current'}
+                        icon={section?.icon}
+                        label={section?.title}
+                        onClick={() =>
+                            setSearchState({ ...state, scope: 'current', depth: 'single' })
+                        }
+                    />
+                    <SegmentedControlItem
+                        active={state.scope === 'all' && state.depth === 'single'}
+                        label={withSiteVariants ? 'Most relevant' : 'Entire site'}
+                        icon={withSiteVariants ? 'bullseye-arrow' : 'infinity'}
+                        onClick={() => setSearchState({ ...state, scope: 'all', depth: 'single' })}
+                    />
+                    {withSiteVariants ? (
+                        <SegmentedControlItem
+                            active={state.scope === 'all' && state.depth === 'full'}
+                            label="Entire site"
+                            icon="infinity"
+                            onClick={() =>
+                                setSearchState({ ...state, scope: 'all', depth: 'full' })
+                            }
+                        />
+                    ) : null}
+                </SegmentedControl>
+            ) : null}
+            {withVariants && (!withSections || state.scope === 'current') ? (
+                <SegmentedControl className="animate-scale-in">
+                    <SegmentedControlItem
+                        size={state.scope === 'current' ? 'small' : 'medium'}
+                        active={state.depth === 'single'}
+                        className="py-1"
+                        label={spaceTitle}
+                        icon="crosshairs"
+                        onClick={() => setSearchState({ ...state, depth: 'single' })}
+                    />
+                    <SegmentedControlItem
+                        size={state.scope === 'current' ? 'small' : 'medium'}
+                        active={state.depth === 'full'}
+                        className="py-1"
+                        label="All content"
+                        icon="rectangle-vertical-history"
+                        onClick={() => setSearchState({ ...state, depth: 'full' })}
+                    />
+                </SegmentedControl>
+            ) : null}
+        </>
     );
 }

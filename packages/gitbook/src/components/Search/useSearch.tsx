@@ -1,14 +1,29 @@
 'use client';
 
-import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
+import { parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import React from 'react';
 import type { LinkProps } from '../primitives';
+
+/** How "wide" to search on the site. Determines section scope. */
+export type SearchScope =
+    /** Search all available sections */
+    | 'all'
+    /** Search only the current section */
+    | 'current';
+
+/** How "deep" to search within the scope. This determines the variant scope within sections. */
+export type SearchDepth =
+    /** Search only a single variant — either the current variant or default variant */
+    | 'single'
+    /** Search all variants within the scope */
+    | 'full';
 
 export interface SearchState {
     // URL-backed state
     query: string | null;
     ask: string | null;
-    global: boolean;
+    scope: SearchScope;
+    depth: SearchDepth;
 
     // Local UI state
     open: boolean;
@@ -18,7 +33,8 @@ export interface SearchState {
 const keyMap = {
     q: parseAsString,
     ask: parseAsString,
-    global: parseAsBoolean,
+    scope: parseAsStringLiteral(['current', 'all']).withDefault('all'),
+    depth: parseAsStringLiteral(['single', 'full']).withDefault('single'),
 };
 
 export type UpdateSearchState = (
@@ -48,7 +64,6 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
             setRawState({
                 q: null,
                 ask: rawState.q,
-                global: rawState.global,
             });
         }
     }, [rawState, setRawState]);
@@ -65,7 +80,8 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         return {
             query: rawState.q,
             ask: rawState.ask,
-            global: !!rawState.global,
+            scope: rawState.scope,
+            depth: rawState.depth,
             open,
         };
     }, [rawState, open]);
@@ -85,14 +101,15 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
 
             if (update === null) {
                 setIsOpen(false);
-                return setRawState({ q: null, ask: null, global: null });
+                return setRawState({ q: null, ask: null, scope: 'all', depth: 'single' });
             }
 
             setIsOpen(update.open);
             return setRawState({
                 q: update.query,
                 ask: update.ask,
-                global: update.global ? true : null,
+                scope: update.scope,
+                depth: update.depth,
             });
         },
         [setRawState]
@@ -126,7 +143,12 @@ export function useSearchLink(): (
             const searchParams = new URLSearchParams();
             params.query ? searchParams.set('q', params.query) : searchParams.delete('q');
             params.ask ? searchParams.set('ask', params.ask) : searchParams.delete('ask');
-            params.global ? searchParams.set('global', 'true') : searchParams.delete('global');
+            params.scope
+                ? searchParams.set('sections', params.scope)
+                : searchParams.delete('scope');
+            params.depth
+                ? searchParams.set('variants', params.depth)
+                : searchParams.delete('depth');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -137,7 +159,8 @@ export function useSearchLink(): (
                         ...prev,
                         query: params.query !== undefined ? params.query : null,
                         ask: params.ask !== undefined ? params.ask : null,
-                        global: params.global !== undefined ? params.global : false,
+                        scope: params.scope !== undefined ? params.scope : 'all',
+                        depth: params.depth !== undefined ? params.depth : 'single',
                         open: params.open !== undefined ? params.open : false,
                     }));
                 },

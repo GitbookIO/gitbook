@@ -17,9 +17,11 @@ import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
     type OrderedComputedResult,
     searchAllSiteContent,
-    searchSiteSpaceContent,
+    searchCurrentSiteSpaceContent,
+    searchSpecificSiteSpaceContent,
     streamRecommendedQuestions,
 } from './server-actions';
+import type { SearchDepth, SearchScope } from './useSearch';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -50,12 +52,14 @@ export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         children?: React.ReactNode;
         query: string;
-        global: boolean;
+        scope: SearchScope;
+        depth: SearchDepth;
         siteSpaceId: string;
+        siteSpaceIds: string[];
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, global, siteSpaceId } = props;
+    const { children, query, scope, depth, siteSpaceId, siteSpaceIds } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -133,9 +137,23 @@ export const SearchResults = React.forwardRef(function SearchResults(
         setResultsState((prev) => ({ results: prev.results, fetching: true }));
         let cancelled = false;
         const timeout = setTimeout(async () => {
-            const results = await (global
-                ? searchAllSiteContent(query)
-                : searchSiteSpaceContent(query));
+            const results = await (() => {
+                if (scope === 'all' && depth === 'single') {
+                    return searchCurrentSiteSpaceContent(query, siteSpaceId);
+                }
+                if (scope === 'all' && depth === 'full') {
+                    return searchAllSiteContent(query);
+                }
+                if (scope === 'current' && depth === 'single') {
+                    return searchSpecificSiteSpaceContent(query, [siteSpaceId]);
+                }
+                if (scope === 'current' && depth === 'full') {
+                    return searchSpecificSiteSpaceContent(query, siteSpaceIds);
+                }
+                throw new Error(
+                    `Unhandled search scope/depth combination: scope=${scope}, depth=${depth}`
+                );
+            })();
 
             if (cancelled) {
                 return;
@@ -158,7 +176,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, global, trackEvent, withAI, siteSpaceId]);
+    }, [query, scope, depth, trackEvent, withAI, siteSpaceId]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAI) {
