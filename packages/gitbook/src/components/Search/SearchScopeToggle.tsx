@@ -1,5 +1,6 @@
 'use client';
 
+import { tString, useLanguage } from '@/intl/client';
 import type { SiteSection } from '@gitbook/api';
 import { SegmentedControl, SegmentedControlItem } from '../primitives/SegmentedControl';
 import { useSearch } from './useSearch';
@@ -17,6 +18,7 @@ export function SearchScopeToggle(props: {
 }) {
     const { spaceTitle, section, withVariants, withSections, withSiteVariants } = props;
     const [state, setSearchState] = useSearch();
+    const language = useLanguage();
 
     if (!state) {
         return null;
@@ -28,22 +30,30 @@ export function SearchScopeToggle(props: {
                 <SegmentedControl className="animate-scale-in @max-md:flex-col">
                     <SegmentedControlItem
                         active={state.scope === 'current'}
-                        icon={section?.icon}
-                        label={section?.title}
+                        icon={section?.icon ?? 'crosshairs'}
+                        label={tString(
+                            language,
+                            'search_scope_current_depth_single',
+                            section?.title
+                        )}
                         onClick={() =>
                             setSearchState({ ...state, scope: 'current', depth: 'single' })
                         }
                     />
                     <SegmentedControlItem
                         active={state.scope === 'all' && state.depth === 'single'}
-                        label={withSiteVariants ? 'Most relevant' : 'Entire site'}
+                        label={
+                            withSiteVariants
+                                ? tString(language, 'search_scope_all_depth_single')
+                                : tString(language, 'search_scope_all_depth_full')
+                        }
                         icon={withSiteVariants ? 'bullseye-arrow' : 'infinity'}
                         onClick={() => setSearchState({ ...state, scope: 'all', depth: 'single' })}
                     />
                     {withSiteVariants ? (
                         <SegmentedControlItem
                             active={state.scope === 'all' && state.depth === 'full'}
-                            label="Entire site"
+                            label={tString(language, 'search_scope_all_depth_full')}
                             icon="infinity"
                             onClick={() =>
                                 setSearchState({ ...state, scope: 'all', depth: 'full' })
@@ -58,16 +68,16 @@ export function SearchScopeToggle(props: {
                         size={state.scope === 'current' ? 'small' : 'medium'}
                         active={state.depth === 'single'}
                         className="py-1"
-                        label={spaceTitle}
-                        icon="crosshairs"
+                        label={tString(language, 'search_scope_current_depth_single', spaceTitle)}
+                        // icon="crosshairs"
                         onClick={() => setSearchState({ ...state, depth: 'single' })}
                     />
                     <SegmentedControlItem
                         size={state.scope === 'current' ? 'small' : 'medium'}
                         active={state.depth === 'full'}
                         className="py-1"
-                        label="All content"
-                        icon="rectangle-vertical-history"
+                        label={tString(language, 'search_scope_current_depth_full', section?.title)}
+                        // icon="rectangle-vertical-history"
                         onClick={() => setSearchState({ ...state, depth: 'full' })}
                     />
                 </SegmentedControl>
