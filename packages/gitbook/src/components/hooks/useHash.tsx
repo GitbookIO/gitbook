@@ -1,15 +1,16 @@
 'use client';
+
 import { usePathname } from 'next/navigation';
 import React from 'react';
 
-export const HashContext = React.createContext<{
+export const NavigationStatusContext = React.createContext<{
     hash: string | null;
     /**
      * Updates the hash value from the URL provided here.
      * It will then be used by the `useHash` hook.
      * URL can be relative or absolute.
      */
-    updateHashFromUrl: (href: string) => void;
+    onNavigationClick: (href: string) => void;
     /**
      * Indicates if a link has been clicked recently.
      * Becomes true after a click and resets to false when pathname changes.
@@ -19,7 +20,7 @@ export const HashContext = React.createContext<{
     isNavigating: boolean;
 }>({
     hash: null,
-    updateHashFromUrl: () => {},
+    onNavigationClick: () => {},
     isNavigating: false,
 });
 
@@ -30,7 +31,7 @@ function getHash(): string | null {
     return window.location.hash.slice(1);
 }
 
-export const HashProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [hash, setHash] = React.useState<string | null>(getHash);
     const [isNavigating, setIsNavigating] = React.useState(false);
     const timeoutRef = React.useRef<number | null>(null);
@@ -58,7 +59,7 @@ export const HashProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
         };
     }, []);
 
-    const updateHashFromUrl = React.useCallback((href: string) => {
+    const onNavigationClick = React.useCallback((href: string) => {
         const url = new URL(
             href,
             typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
@@ -78,10 +79,14 @@ export const HashProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     }, []);
 
     const memoizedValue = React.useMemo(
-        () => ({ hash, updateHashFromUrl, isNavigating }),
-        [hash, updateHashFromUrl, isNavigating]
+        () => ({ hash, onNavigationClick, isNavigating }),
+        [hash, onNavigationClick, isNavigating]
     );
-    return <HashContext.Provider value={memoizedValue}>{children}</HashContext.Provider>;
+    return (
+        <NavigationStatusContext.Provider value={memoizedValue}>
+            {children}
+        </NavigationStatusContext.Provider>
+    );
 };
 
 /**
@@ -92,12 +97,12 @@ export const HashProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
  * Since we have a single Link component that handles all links, we can use a context to share the hash.
  */
 export function useHash() {
-    const { hash } = React.useContext(HashContext);
+    const { hash } = React.useContext(NavigationStatusContext);
 
     return hash;
 }
 
 export function useIsNavigating() {
-    const { isNavigating: hasBeenClicked } = React.useContext(HashContext);
+    const { isNavigating: hasBeenClicked } = React.useContext(NavigationStatusContext);
     return hasBeenClicked;
 }
