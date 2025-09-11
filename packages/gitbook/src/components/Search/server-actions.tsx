@@ -123,8 +123,7 @@ export async function streamAskQuestion({
                     },
                     scope: {
                         mode: 'default',
-                        // Include the current site space regardless.
-                        includedSiteSpaces: [context.siteSpace.id],
+                        currentSiteSpace: context.siteSpace.id,
                     },
                 },
                 { format: 'document' }
