@@ -199,7 +199,6 @@ jobs:
               run: cd ./packages/gitbook && bun e2e-browserless
               env:
                   BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url}}
-                  PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
     browserless-testing-v2-cloudflare:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Cloudflare)
@@ -217,4 +216,3 @@ jobs:
               run: cd ./packages/gitbook && bun e2e-browserless
               env:
                   BASE_URL: ${{needs.deploy-v2-cloudflare.outputs.deployment-url}}
-                  PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
