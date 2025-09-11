@@ -1,5 +1,16 @@
 # gitbook
 
+## 0.17.1
+
+### Patch Changes
+
+- 24f601d: Small optim in resolveTryItPrefillForOperation
+- aea5eb1: Persist language choice across sections if possible
+- 1165a81: Language selector edge cases
+- f9a2977: Better handling for external link "mailto:" in Hovered Card in GBO
+- Updated dependencies [24f601d]
+  - @gitbook/react-openapi@1.4.1
+
 ## 0.17.0
 
 ### Minor Changes
