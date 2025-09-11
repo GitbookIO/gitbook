@@ -176,7 +176,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, scope, depth, trackEvent, withAI, siteSpaceId]);
+    }, [query, scope, depth, trackEvent, withAI, siteSpaceId, siteSpaceIds]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAI) {
