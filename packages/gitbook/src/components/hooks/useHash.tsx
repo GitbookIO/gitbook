@@ -1,4 +1,5 @@
 'use client';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 export const HashContext = React.createContext<{
@@ -9,9 +10,17 @@ export const HashContext = React.createContext<{
      * URL can be relative or absolute.
      */
     updateHashFromUrl: (href: string) => void;
+    /**
+     * Indicates if a link has been clicked recently.
+     * Becomes true after a click and resets to false when pathname changes.
+     * It is debounced to avoid flickering on fast navigations.
+     * Debounce time is 400ms (= doherty threshold for responsiveness).
+     */
+    isNavigating: boolean;
 }>({
     hash: null,
     updateHashFromUrl: () => {},
+    isNavigating: false,
 });
 
 function getHash(): string | null {
@@ -21,32 +30,74 @@ function getHash(): string | null {
     return window.location.hash.slice(1);
 }
 
-export const HashProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+export const HashProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [hash, setHash] = React.useState<string | null>(getHash);
+    const [isNavigating, setIsNavigating] = React.useState(false);
+    const timeoutRef = React.useRef<number | null>(null);
+    const pathname = usePathname();
+    const pathnameRef = React.useRef(pathname);
+
+    // Reset isNavigating when pathname changes
+    React.useEffect(() => {
+        if (pathnameRef.current !== pathname) {
+            setIsNavigating(false);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+            pathnameRef.current = pathname;
+        }
+    }, [pathname]);
+
+    // Cleanup timeout on unmount
+    React.useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
     const updateHashFromUrl = React.useCallback((href: string) => {
         const url = new URL(
             href,
             typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
         );
         setHash(url.hash.slice(1));
+
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        if (pathnameRef.current !== url.pathname) {
+            timeoutRef.current = window.setTimeout(() => {
+                setIsNavigating(true);
+                timeoutRef.current = null;
+                return;
+            }, 400); // 400ms timeout - doherty threshold for responsiveness
+        }
     }, []);
+
     const memoizedValue = React.useMemo(
-        () => ({ hash, updateHashFromUrl }),
-        [hash, updateHashFromUrl]
+        () => ({ hash, updateHashFromUrl, isNavigating }),
+        [hash, updateHashFromUrl, isNavigating]
     );
     return <HashContext.Provider value={memoizedValue}>{children}</HashContext.Provider>;
 };
 
 /**
- * Hook to get the current hash from the URL.
+ * Hook to get the current hash from the URL and click state.
  * @see https://github.com/vercel/next.js/discussions/49465
  * We use a different hack than this one, because for same page link it don't work
  * We can't use the `hashChange` event because it doesn't fire for `replaceState` and `pushState` which are used by Next.js.
  * Since we have a single Link component that handles all links, we can use a context to share the hash.
  */
 export function useHash() {
-    // const params = useParams();
     const { hash } = React.useContext(HashContext);
 
     return hash;
+}
+
+export function useIsNavigating() {
+    const { isNavigating: hasBeenClicked } = React.useContext(HashContext);
+    return hasBeenClicked;
 }
