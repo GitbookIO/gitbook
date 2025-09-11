@@ -71,7 +71,10 @@
         "url-join": "^5.0.0",
         "usehooks-ts": "^3.1.0",
         "warn-once": "^0.1.1",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "mcp-handler": "^1.0.2",
+        "@modelcontextprotocol/sdk": "^1.17.5",
+        "zod": "^3"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
