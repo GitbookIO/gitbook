@@ -145,10 +145,10 @@ export function useSearchLink(): (
             params.ask ? searchParams.set('ask', params.ask) : searchParams.delete('ask');
             params.scope
                 ? searchParams.set('sections', params.scope)
-                : searchParams.delete('scope');
+                : searchParams.delete('sections');
             params.depth
                 ? searchParams.set('variants', params.depth)
-                : searchParams.delete('depth');
+                : searchParams.delete('variants');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
