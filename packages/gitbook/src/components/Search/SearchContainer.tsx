@@ -212,7 +212,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
-                                    scope={state?.scope ?? 'auto'}
+                                    scope={state?.scope ?? 'all'}
                                     depth={state?.depth ?? 'single'}
                                     siteSpaceId={siteSpaceId}
                                     siteSpaceIds={siteSpaceIds}
