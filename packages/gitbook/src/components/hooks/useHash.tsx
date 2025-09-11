@@ -6,8 +6,7 @@ import React from 'react';
 export const NavigationStatusContext = React.createContext<{
     hash: string | null;
     /**
-     * Updates the hash value from the URL provided here.
-     * It will then be used by the `useHash` hook.
+     * Updates the navigation state from the URL provided here.
      * URL can be relative or absolute.
      */
     onNavigationClick: (href: string) => void;
@@ -90,7 +89,7 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
 };
 
 /**
- * Hook to get the current hash from the URL and click state.
+ * Hook to get the current hash from the URL.
  * @see https://github.com/vercel/next.js/discussions/49465
  * We use a different hack than this one, because for same page link it don't work
  * We can't use the `hashChange` event because it doesn't fire for `replaceState` and `pushState` which are used by Next.js.
@@ -102,6 +101,10 @@ export function useHash() {
     return hash;
 }
 
+/**
+ * Hook to get the current navigation state.
+ * @returns True if a navigation has been triggered recently. False otherwise, it also resets to false when the navigation is complete.
+ */
 export function useIsNavigating() {
     const { isNavigating: hasBeenClicked } = React.useContext(NavigationStatusContext);
     return hasBeenClicked;
