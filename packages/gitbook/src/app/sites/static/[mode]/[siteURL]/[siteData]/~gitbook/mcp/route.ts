@@ -13,10 +13,6 @@ async function handler(
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
 
-    console.log(
-        `mcpHandler url=${nextRequest.url} pathname=${nextRequest.nextUrl.pathname} basePath=${context.linker.toPathInSite('~gitbook/')}`
-    );
-
     const mcpHandler = createMcpHandler(
         (server) => {
             server.tool(
@@ -73,9 +69,7 @@ async function handler(
                 }
             );
         },
-        {
-            // Optional server options
-        },
+        {},
         {
             basePath: context.linker.toPathInSite('~gitbook/'),
             streamableHttpEndpoint: '/mcp',
@@ -90,7 +84,6 @@ async function handler(
         context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp')),
         nextRequest
     );
-
     return mcpHandler(request);
 }
 
