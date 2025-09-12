@@ -82,7 +82,7 @@ export function DropdownMenu(props: {
                         onMouseLeave={() => setHovered(false)}
                         align={align}
                         side={side}
-                        className="z-50 animate-scale-in border-tint pt-2"
+                        className="z-40 animate-scale-in border-tint pt-2"
                     >
                         <div
                             className={tcls(
