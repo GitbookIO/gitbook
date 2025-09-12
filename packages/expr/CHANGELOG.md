@@ -1,5 +1,11 @@
 # @gitbook/expr
 
+## 1.1.1
+
+### Patch Changes
+
+- 3548fa6: Fix eval-estree-expr named import
+
 ## 1.1.0
 
 ### Minor Changes
