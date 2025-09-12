@@ -5,7 +5,7 @@ import type React from 'react';
 import { TranslateContext } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-import { HashProvider } from '../hooks';
+import { NavigationStatusProvider } from '../hooks';
 import { LoadingStateProvider } from '../primitives/LoadingStateProvider';
 
 /**
@@ -20,9 +20,9 @@ export function RootLayoutClientContexts(props: {
     return (
         <TranslateContext.Provider value={language}>
             <TooltipProvider delayDuration={200}>
-                <HashProvider>
+                <NavigationStatusProvider>
                     <LoadingStateProvider>{children}</LoadingStateProvider>
-                </HashProvider>
+                </NavigationStatusProvider>
             </TooltipProvider>
         </TranslateContext.Provider>
     );
