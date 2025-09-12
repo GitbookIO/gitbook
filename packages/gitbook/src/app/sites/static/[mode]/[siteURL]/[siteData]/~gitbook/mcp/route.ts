@@ -6,12 +6,15 @@ import { createMcpHandler } from 'mcp-handler';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-async function handler(request: NextRequest, { params }: { params: Promise<RouteLayoutParams> }) {
+async function handler(
+    nextRequest: NextRequest,
+    { params }: { params: Promise<RouteLayoutParams> }
+) {
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
 
     console.log(
-        `mcpHandler url=${request.url} pathname=${request.nextUrl.pathname} basePath=${context.linker.toPathInSite('~gitbook/')}`
+        `mcpHandler url=${nextRequest.url} pathname=${nextRequest.nextUrl.pathname} basePath=${context.linker.toPathInSite('~gitbook/')}`
     );
 
     const mcpHandler = createMcpHandler(
@@ -80,6 +83,12 @@ async function handler(request: NextRequest, { params }: { params: Promise<Route
             verboseLogs: true,
             disableSse: true,
         }
+    );
+
+    const request = new Request(
+        // Next.js request.url is the original URL and not the rewritten one from the middleware
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp')),
+        nextRequest
     );
 
     return mcpHandler(request);
