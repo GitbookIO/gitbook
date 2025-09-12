@@ -1,7 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
-import type { RevisionPageDocument } from '@gitbook/api';
+import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
 import { getPDFURLSearchParams } from '../PDF';
@@ -39,7 +39,7 @@ export async function PageHeader(props: {
             {page.layout.tableOfContents ? (
                 // Show page actions if *any* of the actions are enabled
                 <PageActionsDropdown
-                    markdownPageUrl={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
+                    markdownPageURL={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
                     editOnGit={
                         context.customization.git.showEditLink &&
                         context.space.gitSync?.url &&
@@ -50,7 +50,7 @@ export async function PageHeader(props: {
                               }
                             : undefined
                     }
-                    pdfUrl={
+                    pdfURL={
                         context.customization.pdf.enabled
                             ? context.linker.toPathInSpace(
                                   `~gitbook/pdf?${getPDFURLSearchParams({
@@ -59,6 +59,11 @@ export async function PageHeader(props: {
                                       limit: 100,
                                   }).toString()}`
                               )
+                            : undefined
+                    }
+                    mcpURL={
+                        context.site.visibility !== SiteVisibility.VisitorAuth
+                            ? context.linker.toPathInSpace('~gitbook/mcp')
                             : undefined
                     }
                     actions={context.customization.pageActions}

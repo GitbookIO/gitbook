@@ -209,7 +209,7 @@
         "typescript": "^5.5.3",
       },
       "optionalDependencies": {
-        "@gitbook/fontawesome-pro": "1.0.11",
+        "@gitbook/fontawesome-pro": "1.0.15",
       },
       "peerDependencies": {
         "react": "*",
@@ -688,7 +688,7 @@
 
     "@gitbook/expr": ["@gitbook/expr@workspace:packages/expr"],
 
-    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.11", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.7.2" } }, "sha512-P+GZ/X7b2Uj4uxxFX6xez+QceK211SXgMBj54lXzgo3Py34QhOuYrh/2F3ChB1iK5SXDwjn2xAuQXI7HuM66Mg=="],
+    "@gitbook/fontawesome-pro": ["@gitbook/fontawesome-pro@1.0.15", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "^6.7.2" } }, "sha512-iiXDkwzvaRrRF853Vwjt8kWrd6yRJFb7BfhFyBNYvVmjVmxRfrvmstiOPUIdHS7jPaAWCWLzirhokwh8BFBTHw=="],
 
     "@gitbook/fonts": ["@gitbook/fonts@workspace:packages/fonts"],
 
