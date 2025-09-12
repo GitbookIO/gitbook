@@ -1,5 +1,21 @@
 # @gitbook/react-openapi
 
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies [3548fa6]
+  - @gitbook/expr@1.1.1
+
+## 1.4.1
+
+### Patch Changes
+
+- 24f601d: Small optim in resolveTryItPrefillForOperation
+- Updated dependencies [e1ff17e]
+- Updated dependencies [8ff1e3b]
+  - @gitbook/expr@1.1.0
+
 ## 1.4.0
 
 ### Minor Changes
