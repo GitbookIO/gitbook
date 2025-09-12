@@ -8,15 +8,18 @@ import { Icon } from '@gitbook/icons';
 import { useRef } from 'react';
 import { useAI } from '../AI';
 import {
+    ActionCopyMCPURL,
     ActionCopyMarkdown,
     ActionOpenAssistant,
     ActionOpenEditOnGit,
     ActionOpenInLLM,
+    ActionOpenMCP,
     ActionViewAsMarkdown,
     ActionViewAsPDF,
 } from './PageActions';
 
 interface PageActionsDropdownProps {
+    siteTitle: string;
     markdownPageURL: string;
     mcpURL?: string;
     pdfURL?: string;
@@ -80,7 +83,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
  * The content of the dropdown menu.
  */
 function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
-    const { markdownPageURL, actions } = props;
+    const { siteTitle, markdownPageURL, mcpURL, actions } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
@@ -125,6 +128,22 @@ function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
                     />
                 </>
             ) : null}
+
+            {
+                // @ts-expect-error - actions.mcp will be defined in the next release
+                actions.mcp && mcpURL ? (
+                    <>
+                        <DropdownMenuSeparator className="first:hidden" />
+                        <ActionCopyMCPURL mcpURL={mcpURL} type="dropdown-menu-item" />
+                        <ActionOpenMCP
+                            provider="vscode"
+                            mcpURL={mcpURL}
+                            siteTitle={siteTitle}
+                            type="dropdown-menu-item"
+                        />
+                    </>
+                ) : null
+            }
 
             {props.editOnGit || props.pdfURL ? (
                 <>

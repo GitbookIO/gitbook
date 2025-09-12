@@ -39,6 +39,7 @@ export async function PageHeader(props: {
             {page.layout.tableOfContents ? (
                 // Show page actions if *any* of the actions are enabled
                 <PageActionsDropdown
+                    siteTitle={context.site.title}
                     markdownPageURL={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
                     editOnGit={
                         context.customization.git.showEditLink &&
@@ -63,7 +64,9 @@ export async function PageHeader(props: {
                     }
                     mcpURL={
                         context.site.visibility !== SiteVisibility.VisitorAuth
-                            ? context.linker.toPathInSpace('~gitbook/mcp')
+                            ? context.linker.toAbsoluteURL(
+                                  context.linker.toPathInSpace('~gitbook/mcp')
+                              )
                             : undefined
                     }
                     actions={context.customization.pageActions}
