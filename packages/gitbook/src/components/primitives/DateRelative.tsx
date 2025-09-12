@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useLanguage } from '@/intl/client';
+import { Tooltip } from './Tooltip';
 
 /**
  * Display a date as a relative time.
@@ -28,14 +29,11 @@ export function DateRelative(props: { value: string }) {
     const date = new Date(value);
     const diff = now - date.getTime();
     return (
-        <time
-            data-visual-test="transparent"
-            suppressHydrationWarning={true}
-            dateTime={value}
-            title={date.toLocaleString()}
-        >
-            {formatDiff(language.locale, diff)}
-        </time>
+        <Tooltip label={date.toLocaleString()}>
+            <time data-visual-test="transparent" suppressHydrationWarning={true} dateTime={value}>
+                {formatDiff(language.locale, diff)}
+            </time>
+        </Tooltip>
     );
 }
 
