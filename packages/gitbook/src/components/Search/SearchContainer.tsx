@@ -1,5 +1,6 @@
 'use client';
 
+import { t, useLanguage } from '@/intl/client';
 import { CustomizationSearchStyle } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
@@ -16,6 +17,8 @@ import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
+import { useSearchResults } from './useSearchResults';
+import { useSearchResultsCursor } from './useSearchResultsCursor';
 
 interface SearchContainerProps {
     siteSpaceId: string;
@@ -131,19 +134,6 @@ export function SearchContainer(props: SearchContainerProps) {
         };
     }, [onClose]);
 
-    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'ArrowUp') {
-            event.preventDefault();
-            resultsRef.current?.moveUp();
-        } else if (event.key === 'ArrowDown') {
-            event.preventDefault();
-            resultsRef.current?.moveDown();
-        } else if (event.key === 'Enter') {
-            event.preventDefault();
-            resultsRef.current?.select();
-        }
-    };
-
     const onChange = (value: string) => {
         setSearchState((prev) => ({
             ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null, // When typing, we reset ask to get back to normal search (unless non-search assistants are defined)
@@ -157,9 +147,36 @@ export function SearchContainer(props: SearchContainerProps) {
     const normalizedQuery = state?.query?.trim() ?? '';
     const normalizedAsk = state?.ask?.trim() ?? '';
 
-    const showAsk = withSearchAI && normalizedAsk; // withSearchAI && normalizedAsk;
+    const showAsk = withSearchAI && normalizedAsk;
 
     const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
+
+    const searchResultsId = `search-results-${React.useId()}`;
+    const { results, fetching } = useSearchResults({
+        disabled: !(state?.query || withAI),
+        query: normalizedQuery,
+        siteSpaceId,
+        global: state?.global ?? false,
+        withAI: withAI,
+    });
+    const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
+
+    const { cursor, moveBy: moveCursorBy } = useSearchResultsCursor({
+        query: normalizedQuery,
+        results,
+    });
+    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            moveCursorBy(-1);
+        } else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            moveCursorBy(1);
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            resultsRef.current?.select();
+        }
+    };
 
     return (
         <SearchAskProvider value={searchAsk}>
@@ -175,8 +192,10 @@ export function SearchContainer(props: SearchContainerProps) {
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
-                                    global={state?.global ?? false}
-                                    siteSpaceId={siteSpaceId}
+                                    id={searchResultsId}
+                                    fetching={fetching}
+                                    results={results}
+                                    cursor={cursor}
                                 />
                             ) : null}
                             {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
@@ -184,10 +203,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     ) : null
                 }
                 rootProps={{
-                    open: visible && (state?.open ?? false),
-                    onOpenChange: (open) => {
-                        open ? onOpen() : onClose();
-                    },
+                    open: Boolean(visible && (state?.open ?? false)),
                     modal: isMobile,
                 }}
                 contentProps={{
@@ -198,8 +214,10 @@ export function SearchContainer(props: SearchContainerProps) {
                     onInteractOutside: (event) => {
                         // Don't close if clicking on the search input itself
                         if (searchInputRef.current?.contains(event.target as Node)) {
+                            event.preventDefault();
                             return;
                         }
+                        onClose();
                     },
                     sideOffset: 8,
                     collisionPadding: {
@@ -216,14 +234,23 @@ export function SearchContainer(props: SearchContainerProps) {
             >
                 <SearchInput
                     ref={searchInputRef}
-                    value={state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? ''}
+                    value={searchValue}
                     onFocus={onOpen}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
                     withAI={withSearchAI}
                     isOpen={state?.open ?? false}
                     className={className}
-                />
+                    aria-controls={searchResultsId}
+                    aria-activedescendant={
+                        cursor !== null ? `${searchResultsId}-${cursor}` : undefined
+                    }
+                >
+                    <LiveResultsAnnouncer
+                        count={results.length}
+                        showing={Boolean(searchValue) && !fetching}
+                    />
+                </SearchInput>
             </Popover>
             {assistants
                 .filter((assistant) => assistant.ui === true)
@@ -239,5 +266,23 @@ export function SearchContainer(props: SearchContainerProps) {
                     />
                 ))}
         </SearchAskProvider>
+    );
+}
+
+/*
+ *  Screen reader announcement for search results.
+ *  Without it there is no feedback for screen reader users when a search returns no results.
+ */
+function LiveResultsAnnouncer(props: { count: number; showing: boolean }) {
+    const { count, showing } = props;
+    const language = useLanguage();
+    return (
+        <div className="sr-only" aria-live="assertive" role="alert" aria-relevant="all">
+            {showing
+                ? count > 0
+                    ? t(language, 'search_results_count', count)
+                    : t(language, 'search_no_results')
+                : ''}
+        </div>
     );
 }
