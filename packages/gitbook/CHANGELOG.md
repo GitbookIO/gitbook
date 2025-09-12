@@ -1,5 +1,11 @@
 # gitbook
 
+## 0.17.2
+
+### Patch Changes
+
+- @gitbook/react-openapi@1.4.2
+
 ## 0.17.1
 
 ### Patch Changes
