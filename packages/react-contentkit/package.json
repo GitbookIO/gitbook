@@ -1,6 +1,6 @@
 {
     "name": "@gitbook/react-contentkit",
-    "version": "0.7.4",
+    "version": "0.7.5",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
