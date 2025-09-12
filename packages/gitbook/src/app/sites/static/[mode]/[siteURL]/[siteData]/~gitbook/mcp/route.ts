@@ -10,6 +10,10 @@ async function handler(request: NextRequest, { params }: { params: Promise<Route
     const { context } = await getStaticSiteContext(await params);
     const { dataFetcher, linker, site } = context;
 
+    console.log(
+        `mcpHandler pathname=${request.nextUrl.pathname} basePath=${context.linker.toPathInSite('~gitbook/')}`
+    );
+
     const mcpHandler = createMcpHandler(
         (server) => {
             server.tool(
