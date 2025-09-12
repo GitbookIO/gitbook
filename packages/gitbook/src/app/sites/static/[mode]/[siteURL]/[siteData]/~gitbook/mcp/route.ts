@@ -79,11 +79,13 @@ async function handler(
         }
     );
 
-    const request = new Request(
-        // Next.js request.url is the original URL and not the rewritten one from the middleware
-        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp')),
-        nextRequest
+    // Next.js request.url is the original URL and not the rewritten one from the middleware
+    const requestURL = new URL(
+        context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/mcp'))
     );
+    requestURL.search = nextRequest.nextUrl.search;
+
+    const request = new Request(requestURL, nextRequest);
     return mcpHandler(request);
 }
 
