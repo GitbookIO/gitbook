@@ -10,7 +10,8 @@ import {
 } from 'acorn';
 import { parse as parseLoose } from 'acorn-loose';
 import escodegen from 'escodegen';
-import { evaluate } from 'eval-estree-expression';
+import evalESTreeExpr from 'eval-estree-expression';
+const { evaluate } = evalESTreeExpr;
 
 import { AutoComplete } from './autocomplete';
 import { ExpressionError } from './errors';
