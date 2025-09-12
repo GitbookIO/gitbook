@@ -67,7 +67,7 @@ export function RefreshChangeRequestButton(props: {
             disabled={loading || coolingDown}
             motionValues={motionValues}
             icon="rotate"
-            iconClassName={tcls(loading ? 'animate-spin' : null)}
+            iconClassName={loading ? 'animate-spin' : undefined}
         />
     );
 }

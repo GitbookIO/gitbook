@@ -130,7 +130,7 @@ export function useMagnificationEffect(
         const container = containerRef.current;
         if (!container) return;
 
-        const buttons = Array.from(container.querySelectorAll('#toolbar-button')) as HTMLElement[];
+        const buttons = Array.from(container.querySelectorAll('.toolbar-button')) as HTMLElement[];
 
         // Initialize motion values if button count changed
         if (buttonMotionValues.length !== buttons.length) {
@@ -139,7 +139,7 @@ export function useMagnificationEffect(
 
         const handleMouseMove = (event: MouseEvent) => {
             const buttons = Array.from(
-                container.querySelectorAll('#toolbar-button')
+                container.querySelectorAll('.toolbar-button')
             ) as HTMLElement[];
 
             // Capture positions if needed

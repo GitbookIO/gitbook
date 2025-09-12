@@ -1,5 +1,6 @@
 'use client';
-import { useReducedMotion } from 'framer-motion';
+import { Icon } from '@gitbook/icons';
+import { MotionConfig } from 'motion/react';
 import * as motion from 'motion/react-client';
 import { DateRelative } from '../primitives';
 import type { AdminToolbarClientProps } from './AdminToolbar';
@@ -20,7 +21,9 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     if (context.changeRequest) {
         return (
             <IframeWrapper>
-                <ChangeRequestToolbar context={context} />
+                <MotionConfig reducedMotion="user">
+                    <ChangeRequestToolbar context={context} />
+                </MotionConfig>
             </IframeWrapper>
         );
     }
@@ -28,7 +31,9 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     if (context.revisionId !== context.space.revision) {
         return (
             <IframeWrapper>
-                <RevisionToolbar context={context} />
+                <MotionConfig reducedMotion="user">
+                    <RevisionToolbar context={context} />
+                </MotionConfig>
             </IframeWrapper>
         );
     }
@@ -39,38 +44,25 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
 function ChangeRequestToolbar(props: AdminToolbarClientProps) {
     const { context } = props;
     const { space, changeRequest, site } = context;
-    const reduceMotion = Boolean(useReducedMotion());
 
     if (!changeRequest) {
         return null;
     }
 
-    const crLabel = changeRequest.subject || 'Untitled change request';
+    const crLabel = changeRequest.subject || 'Untitled';
     const author = changeRequest.createdBy.displayName;
 
     return (
         <Toolbar>
             <ToolbarBody>
-                <div className="flex items-center gap-1 text-xs">
-                    <motion.span
-                        {...(reduceMotion ? undefined : { ...getCopyVariants(0) })}
-                        className="font-light text-neutral-7 dark:text-neutral-3"
-                    >
-                        #{changeRequest.number}
-                    </motion.span>
-                    <motion.span
-                        {...(reduceMotion ? undefined : { ...getCopyVariants(1) })}
-                        className="max-w-[24ch] truncate font-semibold text-neutral-3 dark:text-neutral-2"
-                    >
-                        {crLabel}
-                    </motion.span>
-                </div>
-                <motion.span
-                    {...(reduceMotion ? undefined : { ...getCopyVariants(2) })}
-                    className="text-[10px] text-neutral-7 text-xs dark:text-neutral-2"
-                >
-                    <DateRelative value={changeRequest.updatedAt} /> by {author}
-                </motion.span>
+                <ToolbarTitle prefix="Change request" suffix={crLabel} />
+                <ToolbarSubtitle
+                    subtitle={
+                        <>
+                            <DateRelative value={changeRequest.updatedAt} /> by {author}
+                        </>
+                    }
+                />
             </ToolbarBody>
 
             <ToolbarSeparator />
@@ -95,7 +87,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                 {/* Open production site */}
                 <ToolbarButton
                     title="Open production site"
-                    href={`${site.urls.published}`}
+                    href={site.urls.published}
                     key="open-production-site-button"
                     icon="globe"
                 />
@@ -103,7 +95,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                 {/* Open CR in GitBook */}
                 <ToolbarButton
                     title="View CR in GitBook"
-                    href={`${changeRequest.urls.app}`}
+                    href={changeRequest.urls.app}
                     key="view-change-request-button"
                     icon="code-branch"
                 />
@@ -115,7 +107,6 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 function RevisionToolbar(props: AdminToolbarClientProps) {
     const { context } = props;
     const { revision, site } = context;
-    const reduceMotion = Boolean(useReducedMotion());
 
     if (!revision) {
         return null;
@@ -126,51 +117,98 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
     return (
         <Toolbar>
             <ToolbarBody>
-                <div className="flex items-center gap-1 text-xs">
-                    <motion.span
-                        {...(reduceMotion ? undefined : { ...getCopyVariants(0) })}
-                        className="font-light text-neutral-7 dark:text-neutral-3"
-                    >
-                        Site revision
-                    </motion.span>
-                    <motion.span
-                        {...(reduceMotion ? undefined : { ...getCopyVariants(1) })}
-                        className="max-w-[24ch] truncate font-semibold text-neutral-3 dark:text-neutral-2"
-                    >
-                        {context.site.title}
-                    </motion.span>
-                </div>
-                <motion.span
-                    {...(reduceMotion ? undefined : { ...getCopyVariants(2) })}
-                    className="text-[10px] text-neutral-7 text-xs dark:text-neutral-2"
-                >
-                    Created <DateRelative value={revision.createdAt} />
-                </motion.span>
+                <ToolbarTitle prefix="Site version" suffix={context.site.title} />
+                <ToolbarSubtitle
+                    subtitle={
+                        <>
+                            Created <DateRelative value={revision.createdAt} />
+                        </>
+                    }
+                />
             </ToolbarBody>
+            <ToolbarSeparator />
             <ToolbarButtonGroup>
                 {/* Open commit in Git client */}
                 <ToolbarButton
-                    title={gitURL ? 'Open commit in Git client' : 'Setup GitSync to edit using git'}
+                    title={
+                        gitURL ? (
+                            'Open commit in Git client'
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                Setup GitSync to edit using Git{' '}
+                                <div className="flex items-center gap-1 text-neutral-8 text-xs hover:text-neutral-6 hover:underline dark:text-neutral-3">
+                                    <a
+                                        href="https://gitbook.com/docs/getting-started/git-sync"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className=""
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        Learn more
+                                    </a>
+                                    <Icon icon="arrow-up-right" className="size-3" />
+                                </div>
+                            </div>
+                        )
+                    }
                     href={gitURL}
                     disabled={!gitURL}
                     icon={gitURL ? (gitURL.includes('github.com') ? 'github' : 'gitlab') : 'github'}
                 />
-
-                {/* Open production site */}
                 <ToolbarButton
                     title="Open production site"
-                    href={`${site.urls.published}`}
+                    href={site.urls.published}
                     key="open-production-site-button"
                     icon="globe"
                 />
-
-                {/* Open revision in GitBook */}
                 <ToolbarButton
-                    title="View revision in GitBook"
+                    title="View this version in GitBook"
                     href={revision.urls.app}
                     icon="code-commit"
                 />
             </ToolbarButtonGroup>
         </Toolbar>
+    );
+}
+
+function ToolbarTitle(props: { prefix: string; suffix: string }) {
+    return (
+        <div className="flex items-center gap-1 text-xs ">
+            <ToolbarTitlePrefix title={props.prefix} />
+            <ToolbarTitleSuffix title={props.suffix} />
+        </div>
+    );
+}
+
+function ToolbarTitlePrefix(props: { title: string }) {
+    return (
+        <motion.span
+            {...getCopyVariants(0)}
+            className="font-light text-neutral-7 dark:text-neutral-3"
+        >
+            {props.title}
+        </motion.span>
+    );
+}
+
+function ToolbarTitleSuffix(props: { title: string }) {
+    return (
+        <motion.span
+            {...getCopyVariants(1)}
+            className="max-w-[24ch] truncate font-semibold text-neutral-3 dark:text-neutral-2"
+        >
+            {props.title}
+        </motion.span>
+    );
+}
+
+function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
+    return (
+        <motion.span
+            {...getCopyVariants(1)}
+            className="text-neutral-7 text-xxs dark:text-neutral-2"
+        >
+            {props.subtitle}
+        </motion.span>
     );
 }

@@ -14,6 +14,7 @@
   --seg-A-color: #19537d;
   --seg-B-color: #2782c4;
   --seg-C-color: #43b7f2;
+  --trace-color: #46474c;
 }
 
 /* Base segment animation */
@@ -45,11 +46,11 @@
 @keyframes traceFill {
   0% {
     fill: transparent;
-    stroke:#46474c;
+    stroke:var(--trace-color);
   }
   95% {
     fill: transparent;
-    stroke:#46474c;
+    stroke:var(--trace-color);
   }
   100% {
     fill: var(--logo-fill);
