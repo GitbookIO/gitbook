@@ -129,21 +129,18 @@ function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
                 </>
             ) : null}
 
-            {
-                // @ts-expect-error - actions.mcp will be defined in the next release
-                actions.mcp && mcpURL ? (
-                    <>
-                        <DropdownMenuSeparator className="first:hidden" />
-                        <ActionCopyMCPURL mcpURL={mcpURL} type="dropdown-menu-item" />
-                        <ActionOpenMCP
-                            provider="vscode"
-                            mcpURL={mcpURL}
-                            siteTitle={siteTitle}
-                            type="dropdown-menu-item"
-                        />
-                    </>
-                ) : null
-            }
+            {actions.mcp && mcpURL ? (
+                <>
+                    <DropdownMenuSeparator className="first:hidden" />
+                    <ActionCopyMCPURL mcpURL={mcpURL} type="dropdown-menu-item" />
+                    <ActionOpenMCP
+                        provider="vscode"
+                        mcpURL={mcpURL}
+                        siteTitle={siteTitle}
+                        type="dropdown-menu-item"
+                    />
+                </>
+            ) : null}
 
             {props.editOnGit || props.pdfURL ? (
                 <>
