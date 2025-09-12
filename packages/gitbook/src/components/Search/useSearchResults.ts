@@ -46,7 +46,9 @@ export function useSearchResults(props: {
     const withAI = assistants.length > 0;
 
     React.useEffect(() => {
-        if (disabled) { return; }
+        if (disabled) {
+            return;
+        }
         if (!query) {
             if (!withAI) {
                 setResultsState({ results: [], fetching: false });

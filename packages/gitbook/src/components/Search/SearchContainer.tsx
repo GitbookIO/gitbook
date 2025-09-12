@@ -19,7 +19,6 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
-import { on } from 'events';
 
 interface SearchContainerProps {
     siteSpaceId: string;
@@ -65,8 +64,6 @@ export function SearchContainer(props: SearchContainerProps) {
 
     const onClose = React.useCallback(
         async (to?: string) => {
-            console.log('Closing search', state);
-            console.trace();
             setSearchState((prev) =>
                 prev
                     ? {
@@ -109,7 +106,6 @@ export function SearchContainer(props: SearchContainerProps) {
     );
 
     const onOpen = React.useCallback(() => {
-        console.log("Opening search", state);
         if (state?.open) {
             return;
         }
@@ -207,11 +203,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     ) : null
                 }
                 rootProps={{
-                    defaultOpen: Boolean(visible && (state?.open ?? false)),
-                    onOpenChange: (open) => {
-                        if (open) { onOpen(); }
-                        else { onClose(); }
-                    },
+                    open: Boolean(visible && (state?.open ?? false)),
                     modal: isMobile,
                 }}
                 contentProps={{
@@ -222,8 +214,10 @@ export function SearchContainer(props: SearchContainerProps) {
                     onInteractOutside: (event) => {
                         // Don't close if clicking on the search input itself
                         if (searchInputRef.current?.contains(event.target as Node)) {
+                            event.preventDefault();
                             return;
                         }
+                        onClose();
                     },
                     sideOffset: 8,
                     collisionPadding: {
