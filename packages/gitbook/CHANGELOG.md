@@ -1,5 +1,18 @@
 # gitbook
 
+## 0.18.0
+
+### Minor Changes
+
+- 262afa3: Expose a MCP server for the docs site under /~gitbook/mcp
+
+### Patch Changes
+
+- Updated dependencies [262afa3]
+  - @gitbook/icons@0.3.1
+  - @gitbook/react-openapi@1.4.3
+  - @gitbook/react-contentkit@0.7.5
+
 ## 0.17.2
 
 ### Patch Changes

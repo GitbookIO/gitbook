@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.3.1
+
+### Patch Changes
+
+- 262afa3: Fix types for custom icons and update list of icons
+
 ## 0.3.0
 
 ### Minor Changes
