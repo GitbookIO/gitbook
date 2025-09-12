@@ -17,9 +17,11 @@ import { SearchSectionResultItem } from './SearchSectionResultItem';
 import {
     type OrderedComputedResult,
     searchAllSiteContent,
-    searchSiteSpaceContent,
+    searchCurrentSiteSpaceContent,
+    searchSpecificSiteSpaceContent,
     streamRecommendedQuestions,
 } from './server-actions';
+import type { SearchScope } from './useSearch';
 
 export interface SearchResultsRef {
     moveUp(): void;
@@ -50,12 +52,13 @@ export const SearchResults = React.forwardRef(function SearchResults(
     props: {
         children?: React.ReactNode;
         query: string;
-        global: boolean;
+        scope: SearchScope;
         siteSpaceId: string;
+        siteSpaceIds: string[];
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, query, global, siteSpaceId } = props;
+    const { children, query, scope, siteSpaceId, siteSpaceIds } = props;
 
     const language = useLanguage();
     const trackEvent = useTrackEvent();
@@ -133,9 +136,25 @@ export const SearchResults = React.forwardRef(function SearchResults(
         setResultsState((prev) => ({ results: prev.results, fetching: true }));
         let cancelled = false;
         const timeout = setTimeout(async () => {
-            const results = await (global
-                ? searchAllSiteContent(query)
-                : searchSiteSpaceContent(query));
+            const results = await (() => {
+                if (scope === 'all') {
+                    // Search all content on the site
+                    return searchAllSiteContent(query);
+                }
+                if (scope === 'default') {
+                    // Search the current section's variant + matched/default variant for other sections
+                    return searchCurrentSiteSpaceContent(query, siteSpaceId);
+                }
+                if (scope === 'extended') {
+                    // Search all variants of the current section
+                    return searchSpecificSiteSpaceContent(query, siteSpaceIds);
+                }
+                if (scope === 'current') {
+                    // Search only the current section's current variant
+                    return searchSpecificSiteSpaceContent(query, [siteSpaceId]);
+                }
+                throw new Error(`Unhandled search scope: ${scope}`);
+            })();
 
             if (cancelled) {
                 return;
@@ -158,7 +177,7 @@ export const SearchResults = React.forwardRef(function SearchResults(
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, global, trackEvent, withAI, siteSpaceId]);
+    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds]);
 
     const results: ResultType[] = React.useMemo(() => {
         if (!withAI) {

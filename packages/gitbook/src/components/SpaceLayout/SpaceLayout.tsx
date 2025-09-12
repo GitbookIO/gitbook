@@ -180,9 +180,29 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     <div className="flex gap-2">
                                         <SearchContainer
                                             style={CustomizationSearchStyle.Subtle}
-                                            isMultiVariants={siteSpaces.length > 1}
+                                            withVariants={withVariants === 'generic'}
+                                            withSiteVariants={
+                                                sections?.list.some(
+                                                    (s) =>
+                                                        s.object === 'site-section' &&
+                                                        s.siteSpaces.filter(
+                                                            (s) =>
+                                                                s.space.language ===
+                                                                siteSpace.space.language
+                                                        ).length > 1
+                                                ) ?? false
+                                            }
+                                            withSections={withSections}
+                                            section={sections?.current}
                                             spaceTitle={siteSpace.title}
                                             siteSpaceId={siteSpace.id}
+                                            siteSpaceIds={siteSpaces
+                                                .filter(
+                                                    (s) =>
+                                                        s.space.language ===
+                                                        siteSpace.space.language
+                                                )
+                                                .map((s) => s.id)}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />
