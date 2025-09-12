@@ -137,8 +137,7 @@ export function useAI(): AIContext {
                     setSearchState((prev) => ({
                         ask: null, // Reset ask as we assume the assistant will handle it
                         query: prev?.query ?? null,
-                        scope: prev?.scope ?? 'all',
-                        depth: prev?.depth ?? 'single',
+                        scope: prev?.scope ?? 'default',
                         open: false,
                     }));
                     assistant.open(query);

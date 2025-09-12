@@ -137,8 +137,7 @@ export function SearchContainer(props: SearchContainerProps) {
         }
         setSearchState((prev) => ({
             ask: withAI ? (prev?.ask ?? null) : null,
-            scope: prev?.scope ?? 'all',
-            depth: prev?.depth ?? 'single',
+            scope: prev?.scope ?? 'default',
             query: prev?.query ?? (withSearchAI || !withAI ? prev?.ask : null) ?? '',
             open: true,
         }));
@@ -178,8 +177,7 @@ export function SearchContainer(props: SearchContainerProps) {
         setSearchState((prev) => ({
             ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null, // When typing, we reset ask to get back to normal search (unless non-search assistants are defined)
             query: value,
-            scope: prev?.scope ?? 'all',
-            depth: prev?.depth ?? 'single',
+            scope: prev?.scope ?? 'default',
             open: true,
         }));
     };
@@ -212,8 +210,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
-                                    scope={state?.scope ?? 'all'}
-                                    depth={state?.depth ?? 'single'}
+                                    scope={state?.scope ?? 'default'}
                                     siteSpaceId={siteSpaceId}
                                     siteSpaceIds={siteSpaceIds}
                                 />

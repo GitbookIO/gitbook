@@ -1,29 +1,24 @@
 'use client';
 
-import { parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
+import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import React from 'react';
 import type { LinkProps } from '../primitives';
 
-/** How "wide" to search on the site. Determines section scope. */
 export type SearchScope =
-    /** Search all available sections */
+    /** Search all content on the site */
     | 'all'
-    /** Search only the current section */
+    /** Search the current section's variant + matched/default variant for other sections */
+    | 'default'
+    /** Search all variants of the current section */
+    | 'extended'
+    /** Search only the current section's current variant */
     | 'current';
-
-/** How "deep" to search within the scope. This determines the variant scope within sections. */
-export type SearchDepth =
-    /** Search only a single variant — either the current variant or default variant */
-    | 'single'
-    /** Search all variants within the scope */
-    | 'full';
 
 export interface SearchState {
     // URL-backed state
     query: string | null;
     ask: string | null;
     scope: SearchScope;
-    depth: SearchDepth;
 
     // Local UI state
     open: boolean;
@@ -33,8 +28,8 @@ export interface SearchState {
 const keyMap = {
     q: parseAsString,
     ask: parseAsString,
-    scope: parseAsStringLiteral(['current', 'all']).withDefault('all'),
-    depth: parseAsStringLiteral(['single', 'full']).withDefault('single'),
+    scope: parseAsStringLiteral(['all', 'default', 'extended', 'current']).withDefault('default'),
+    global: parseAsBoolean, // Legacy support for global=true
 };
 
 export type UpdateSearchState = (
@@ -57,13 +52,21 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         history: 'replace',
     });
 
-    // Handle legacy ask=true format by converting it to the new format
     React.useEffect(() => {
+        // Handle legacy ask=true format by converting it to the new format
         if (rawState?.ask === 'true' && rawState?.q) {
             // Convert legacy format: q=query&ask=true -> ask=query&q=null
             setRawState({
                 q: null,
                 ask: rawState.q,
+            });
+        }
+
+        // Handle legacy global=true
+        if (rawState?.global === true) {
+            setRawState({
+                scope: 'all',
+                global: null, // Remove the legacy parameter
             });
         }
     }, [rawState, setRawState]);
@@ -81,7 +84,6 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
             query: rawState.q,
             ask: rawState.ask,
             scope: rawState.scope,
-            depth: rawState.depth,
             open,
         };
     }, [rawState, open]);
@@ -101,7 +103,7 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
 
             if (update === null) {
                 setIsOpen(false);
-                return setRawState({ q: null, ask: null, scope: 'all', depth: 'single' });
+                return setRawState({ q: null, ask: null, scope: 'default' });
             }
 
             setIsOpen(update.open);
@@ -109,7 +111,6 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
                 q: update.query,
                 ask: update.ask,
                 scope: update.scope,
-                depth: update.depth,
             });
         },
         [setRawState]
@@ -143,12 +144,7 @@ export function useSearchLink(): (
             const searchParams = new URLSearchParams();
             params.query ? searchParams.set('q', params.query) : searchParams.delete('q');
             params.ask ? searchParams.set('ask', params.ask) : searchParams.delete('ask');
-            params.scope
-                ? searchParams.set('sections', params.scope)
-                : searchParams.delete('sections');
-            params.depth
-                ? searchParams.set('variants', params.depth)
-                : searchParams.delete('variants');
+            params.scope ? searchParams.set('scope', params.scope) : searchParams.delete('scope');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -159,8 +155,7 @@ export function useSearchLink(): (
                         ...prev,
                         query: params.query !== undefined ? params.query : null,
                         ask: params.ask !== undefined ? params.ask : null,
-                        scope: params.scope !== undefined ? params.scope : 'all',
-                        depth: params.depth !== undefined ? params.depth : 'single',
+                        scope: params.scope !== undefined ? params.scope : 'default',
                         open: params.open !== undefined ? params.open : false,
                     }));
                 },

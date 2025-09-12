@@ -28,56 +28,76 @@ export function SearchScopeToggle(props: {
         <>
             {withSections ? (
                 <SegmentedControl className="animate-scale-in">
+                    {/* `Default` scope = current section's current variant + best match in other sections */}
                     <SegmentedControlItem
-                        active={state.scope === 'all' && state.depth === 'single'}
+                        active={
+                            withSiteVariants
+                                ? state.scope === 'default'
+                                : ['default', 'all'].includes(state.scope)
+                        }
                         label={
                             withSiteVariants
-                                ? tString(language, 'search_scope_all_depth_single')
-                                : tString(language, 'search_scope_all_depth_full')
+                                ? tString(language, 'search_scope_default')
+                                : tString(language, 'search_scope_all')
                         }
                         className={withSiteVariants ? '@max-md:basis-full' : ''}
                         icon={withSiteVariants ? 'bullseye-arrow' : 'infinity'}
-                        onClick={() => setSearchState({ ...state, scope: 'all', depth: 'single' })}
+                        onClick={() => setSearchState({ ...state, scope: 'default' })}
                     />
+
+                    {/* `Current` scope = current section's current variant (with further variant scope selection if necessary) */}
                     <SegmentedControlItem
-                        active={state.scope === 'current'}
+                        active={state.scope === 'current' || state.scope === 'extended'}
                         icon={section?.icon ?? 'crosshairs'}
-                        label={tString(
-                            language,
-                            'search_scope_current_depth_single',
-                            section?.title
-                        )}
-                        onClick={() =>
-                            setSearchState({ ...state, scope: 'current', depth: 'single' })
-                        }
+                        label={tString(language, 'search_scope_current', section?.title)}
+                        onClick={() => setSearchState({ ...state, scope: 'current' })}
                     />
+
+                    {/* `All` scope = all content on the site. Only visible if site has variants, otherwise it's the same as default */}
                     {withSiteVariants ? (
                         <SegmentedControlItem
-                            active={state.scope === 'all' && state.depth === 'full'}
-                            label={tString(language, 'search_scope_all_depth_full')}
+                            active={state.scope === 'all'}
+                            label={tString(language, 'search_scope_all')}
                             icon="infinity"
-                            onClick={() =>
-                                setSearchState({ ...state, scope: 'all', depth: 'full' })
-                            }
+                            onClick={() => setSearchState({ ...state, scope: 'all' })}
                         />
                     ) : null}
                 </SegmentedControl>
             ) : null}
-            {withVariants && (!withSections || state.scope === 'current') ? (
+            {withVariants &&
+            (!withSections || state.scope === 'current' || state.scope === 'extended') ? (
                 <SegmentedControl className="animate-scale-in">
+                    {/* `Current` scope = current section's current variant. `Default` on sites without sections. */}
                     <SegmentedControlItem
-                        size={state.scope === 'current' ? 'small' : 'medium'}
-                        active={state.depth === 'single'}
+                        size={withSections ? 'small' : 'medium'}
+                        active={
+                            withSections
+                                ? state.scope === 'current'
+                                : ['default', 'current'].includes(state.scope)
+                        }
                         className="py-1"
-                        label={tString(language, 'search_scope_current_depth_single', spaceTitle)}
-                        onClick={() => setSearchState({ ...state, depth: 'single' })}
+                        label={tString(language, 'search_scope_current', spaceTitle)}
+                        onClick={() =>
+                            setSearchState({
+                                ...state,
+                                scope: withSections ? 'current' : 'default',
+                            })
+                        }
                     />
+
+                    {/* `Extended` scope = all variants of the current section. `All` on sites without sections. */}
                     <SegmentedControlItem
-                        size={state.scope === 'current' ? 'small' : 'medium'}
-                        active={state.depth === 'full'}
+                        size={withSections ? 'small' : 'medium'}
+                        active={
+                            withSections
+                                ? state.scope === 'extended'
+                                : ['extended', 'all'].includes(state.scope)
+                        }
                         className="py-1"
-                        label={tString(language, 'search_scope_current_depth_full')}
-                        onClick={() => setSearchState({ ...state, depth: 'full' })}
+                        label={tString(language, 'search_scope_extended')}
+                        onClick={() =>
+                            setSearchState({ ...state, scope: withSections ? 'extended' : 'all' })
+                        }
                     />
                 </SegmentedControl>
             ) : null}
