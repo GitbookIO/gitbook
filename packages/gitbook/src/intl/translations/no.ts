@@ -112,6 +112,10 @@ export const no: TranslationLanguage = {
     view_page_plaintext: 'Vis denne siden som ren tekst',
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
+    connect_mcp_to: 'Koble til ${1}',
+    install_mcp_on: 'Installer MCP-server på ${1}',
+    connect_with_mcp: 'Koble til MCP',
+    copy_mcp_url: 'Kopier MCP-server URL',
     press_to_confirm: 'Trykk ${1} for å bekrefte',
     tool_call_skipped: 'Hoppet over "${1}"',
 };

@@ -67,6 +67,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         pageActions: {
             externalAI: true,
             markdown: true,
+            mcp: true,
         },
         trademark: {
             enabled: true,
