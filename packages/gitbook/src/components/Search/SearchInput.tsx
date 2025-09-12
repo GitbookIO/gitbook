@@ -2,7 +2,7 @@
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import { t, tString, useLanguage } from '@/intl/client';
+import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
@@ -16,10 +16,7 @@ interface SearchInputProps {
     withAI: boolean;
     isOpen: boolean;
     className?: string;
-    resultsCount: number;
-    cursor: number | null;
-    resultsShowing: boolean;
-    controlsId: string;
+    children?: React.ReactNode;
 }
 
 // Size classes for medium size button
@@ -34,14 +31,12 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
             onChange,
             onKeyDown,
             onFocus,
-            resultsCount,
-            resultsShowing,
-            cursor,
             value,
             withAI,
             isOpen,
             className,
-            controlsId,
+            children,
+            ...rest
         } = props;
         const inputRef = useRef<HTMLInputElement>(null);
 
@@ -100,16 +95,10 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             className="size-4 shrink-0 animate-scale-in"
                         />
                     )}
-                    <div className="sr-only" aria-live="assertive" role="alert" aria-relevant="all">
-                        {resultsShowing
-                            ? resultsCount > 0
-                                ? t(language, 'search_results_count', resultsCount)
-                                : t(language, 'search_no_results')
-                            : ''}
-                    </div>
+                    {children}
                     <input
+                        {...rest}
                         type="text"
-                        role="combobox"
                         onFocus={onFocus}
                         onKeyDown={onKeyDown}
                         onChange={(event) => onChange(event.target.value)}
@@ -123,14 +112,11 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-hidden transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             isOpen ? '' : 'max-md:opacity-0'
                         )}
-                        aria-haspopup="listbox"
-                        aria-controls={controlsId}
+                        role="combobox"
                         autoComplete="off"
                         aria-autocomplete="list"
+                        aria-haspopup="listbox"
                         aria-expanded={value && isOpen ? 'true' : 'false'}
-                        aria-activedescendant={
-                            cursor !== null ? `${controlsId}-${cursor}` : undefined
-                        }
                         // Forward
                         ref={inputRef}
                     />
