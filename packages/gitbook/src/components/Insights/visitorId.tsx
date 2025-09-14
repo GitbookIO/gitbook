@@ -12,6 +12,8 @@ const VISITORID_COOKIE = '__session';
 
 type SessionVisitorResponse = {
     deviceId: string;
+    userId?: undefined;
+    organizationId?: undefined;
 };
 
 type SessionUserResponse = SessionVisitorResponse & {

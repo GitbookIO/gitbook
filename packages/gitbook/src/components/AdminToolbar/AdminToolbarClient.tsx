@@ -2,6 +2,8 @@
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
 import * as motion from 'motion/react-client';
+import { useVisitorSession } from '../Insights';
+import { useCurrentPagePath } from '../hooks';
 import { DateRelative } from '../primitives';
 import type { AdminToolbarClientProps } from './AdminToolbar';
 import { IframeWrapper } from './IframeWrapper';
@@ -17,7 +19,9 @@ import { getCopyVariants } from './transitions';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const { context } = props;
+    const visitorSession = useVisitorSession();
 
+    // If there is a change request, show the change request toolbar
     if (context.changeRequest) {
         return (
             <IframeWrapper>
@@ -28,6 +32,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         );
     }
 
+    // If the revision is not the current revision, the user is looking at a previous version of the site, so show the revision toolbar
     if (context.revisionId !== context.space.revision) {
         return (
             <IframeWrapper>
@@ -38,7 +43,16 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         );
     }
 
-    return null;
+    // If the user is authenticated and part of the organization owning this site, show the authenticated user toolbar
+    if (visitorSession?.organizationId === context.organizationId || 1) {
+        return (
+            <IframeWrapper>
+                <MotionConfig reducedMotion="user">
+                    <AuthenticatedUserToolbar context={context} />
+                </MotionConfig>
+            </IframeWrapper>
+        );
+    }
 }
 
 function ChangeRequestToolbar(props: AdminToolbarClientProps) {
@@ -165,6 +179,45 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                     title="View this version in GitBook"
                     href={revision.urls.app}
                     icon="code-commit"
+                />
+            </ToolbarButtonGroup>
+        </Toolbar>
+    );
+}
+
+function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
+    const { context } = props;
+    const { revision, space, site } = context;
+    const pagePath = useCurrentPagePath();
+    return (
+        <Toolbar>
+            <ToolbarBody>
+                <ToolbarTitle prefix="Site" suffix={context.site.title} />
+                <ToolbarSubtitle
+                    subtitle={
+                        <>
+                            Updated <DateRelative value={revision.createdAt} />
+                        </>
+                    }
+                />
+            </ToolbarBody>
+            <ToolbarSeparator />
+            <ToolbarButtonGroup>
+                <ToolbarButton title="Open site in GitBook" href={site.urls.app} icon="gear" />
+                <ToolbarButton
+                    title="Customize in GitBook"
+                    href={`${site.urls.app}/customization/general`}
+                    icon="palette"
+                />
+                <ToolbarButton
+                    title="Open insights in GitBook"
+                    href={`${site.urls.app}/insights`}
+                    icon="chart-simple"
+                />
+                <ToolbarButton
+                    title="Edit in GitBook"
+                    href={`${space.urls.app}${pagePath.startsWith('/') ? pagePath.slice(1) : pagePath}`}
+                    icon="pencil"
                 />
             </ToolbarButtonGroup>
         </Toolbar>

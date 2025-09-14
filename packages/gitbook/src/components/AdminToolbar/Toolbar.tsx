@@ -122,17 +122,11 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
             animate="show"
             className="flex items-center gap-1 overflow-visible pr-2 pl-4"
         >
-            {React.Children.toArray(props.children).map((child, index) => {
+            {React.Children.map(props.children, (child, index) => {
                 const motionValues = buttonMotionValues[index];
                 const childEl = child as React.ReactElement;
-                const key =
-                    childEl.key ||
-                    childEl.props.icon ||
-                    childEl.props.href ||
-                    `toolbar-button-${index}`;
                 return React.cloneElement(childEl, {
                     motionValues,
-                    key,
                 });
             })}
         </motion.div>

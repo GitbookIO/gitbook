@@ -31,16 +31,21 @@ export type MinimalRevision = {
 };
 
 export type AdminToolbarContext = {
+    organizationId: string;
+    revisionId: string;
     space: {
         id: string;
         revision: string;
+        urls: {
+            app: string;
+        };
     };
     changeRequest: MinimalChangeRequest | null;
     revision: MinimalRevision;
-    revisionId: string;
     site: {
         title: string;
         urls: {
+            app: string;
             published: string | undefined;
         };
     };
@@ -56,48 +61,51 @@ export interface AdminToolbarClientProps {
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
 
-    if (context.changeRequest || context.revisionId !== context.space.revision) {
-        // Create a minimal context with only the fields needed for AdminToolbar
-        const minimalContext: AdminToolbarContext = {
-            space: {
-                id: context.space.id,
-                revision: context.space.revision,
+    // Create a minimal context with only the fields needed for AdminToolbar
+    const minimalContext: AdminToolbarContext = {
+        organizationId: context.organizationId,
+        revisionId: context.revisionId,
+        space: {
+            id: context.space.id,
+            revision: context.space.revision,
+            urls: {
+                app: context.space.urls.app,
             },
-            changeRequest: context.changeRequest
+        },
+        changeRequest: context.changeRequest
+            ? {
+                  id: context.changeRequest.id,
+                  number: context.changeRequest.number,
+                  subject: context.changeRequest.subject,
+                  revision: context.changeRequest.revision,
+                  updatedAt: context.changeRequest.updatedAt,
+                  createdBy: {
+                      displayName: context.changeRequest.createdBy.displayName,
+                  },
+                  urls: {
+                      app: context.changeRequest.urls.app,
+                  },
+              }
+            : null,
+        revision: {
+            createdAt: context.revision.createdAt,
+            urls: {
+                app: context.revision.urls.app,
+            },
+            git: context.revision.git
                 ? {
-                      id: context.changeRequest.id,
-                      number: context.changeRequest.number,
-                      subject: context.changeRequest.subject,
-                      revision: context.changeRequest.revision,
-                      updatedAt: context.changeRequest.updatedAt,
-                      createdBy: {
-                          displayName: context.changeRequest.createdBy.displayName,
-                      },
-                      urls: {
-                          app: context.changeRequest.urls.app,
-                      },
+                      url: context.revision.git.url,
                   }
                 : null,
-            revision: {
-                createdAt: context.revision.createdAt,
-                urls: {
-                    app: context.revision.urls.app,
-                },
-                git: context.revision.git
-                    ? {
-                          url: context.revision.git.url,
-                      }
-                    : null,
+        },
+        site: {
+            title: context.site.title,
+            urls: {
+                app: context.site.urls.app,
+                published: context.site.urls.published,
             },
-            revisionId: context.revisionId,
-            site: {
-                title: context.site.title,
-                urls: {
-                    published: context.site.urls.published,
-                },
-            },
-        };
+        },
+    };
 
-        return <AdminToolbarClient context={minimalContext} />;
-    }
+    return <AdminToolbarClient context={minimalContext} />;
 }
