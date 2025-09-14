@@ -4,7 +4,6 @@ import { createStore, useStore } from 'zustand';
 
 import { getBrowserCookie } from '@/lib/browser';
 
-import { GITBOOK_APP_URL } from '@/lib/env';
 import React from 'react';
 import { isCookiesTrackingDisabled } from './cookies';
 import { generateRandomId } from './utils';
@@ -35,10 +34,11 @@ const visitorSessionStore = createStore<{
  */
 export function VisitorSessionProvider(
     props: React.PropsWithChildren<{
+        appURL: string;
         visitorCookieTrackingEnabled: boolean;
     }>
 ) {
-    const { visitorCookieTrackingEnabled, children } = props;
+    const { appURL, visitorCookieTrackingEnabled, children } = props;
 
     React.useEffect(() => {
         const state = visitorSessionStore.getState();
@@ -46,12 +46,12 @@ export function VisitorSessionProvider(
             return;
         }
 
-        const pendingSession = fetchSession({ visitorCookieTrackingEnabled });
+        const pendingSession = fetchSession({ appURL, visitorCookieTrackingEnabled });
         visitorSessionStore.setState({ pendingSession, session: null });
         pendingSession.then((session) => {
             visitorSessionStore.setState({ pendingSession: null, session });
         });
-    }, [visitorCookieTrackingEnabled]);
+    }, [appURL, visitorCookieTrackingEnabled]);
 
     return <>{children}</>;
 }
@@ -67,8 +67,10 @@ export function useVisitorSession() {
  * Propose a visitor identifier to the GitBook.com server and get the devideId back.
  */
 async function fetchSession({
+    appURL,
     visitorCookieTrackingEnabled,
 }: {
+    appURL: string;
     visitorCookieTrackingEnabled: boolean;
 }): Promise<SessionResponse> {
     const withoutCookies = isCookiesTrackingDisabled();
@@ -88,7 +90,7 @@ async function fetchSession({
     // No tracking deviceId set, we'll need to consolidate with the server.
     const proposed = generateRandomId();
 
-    const url = new URL(GITBOOK_APP_URL);
+    const url = new URL(appURL);
     url.pathname = '/__session/2/';
     url.searchParams.set('proposed', proposed);
 

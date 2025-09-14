@@ -87,7 +87,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
     const flushEventsSync = useEventCallback(() => {
         const session = getSession();
         if (!visitorSession) {
-            throw new Error('Visitor ID should be set before flushing events');
+            return;
         }
 
         const allEvents: api.SiteInsightsEvent[] = [];
@@ -130,11 +130,16 @@ export function InsightsProvider(props: InsightsProviderProps) {
         }
     });
 
-    const flushBatchedEvents = useDebounceCallback(async () => {
-        // TODO: find a way to wait for the visitor session to be set
-
+    const flushBatchedEvents = useDebounceCallback(() => {
         flushEventsSync();
     }, 1500);
+
+    // Flush events once the visitor session is set
+    React.useEffect(() => {
+        if (visitorSession) {
+            flushEventsSync();
+        }
+    }, [visitorSession, flushEventsSync]);
 
     const trackEvent: TrackEventCallback = useEventCallback(
         (

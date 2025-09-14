@@ -14,6 +14,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { getSpaceLanguage } from '@/intl/server';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
+import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
@@ -78,6 +79,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     visitorAuthClaims={visitorAuthClaims}
                 >
                     <VisitorSessionProvider
+                        appURL={GITBOOK_APP_URL}
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
                         <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
