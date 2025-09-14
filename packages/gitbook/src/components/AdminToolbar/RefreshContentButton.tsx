@@ -12,19 +12,19 @@ const minInterval = 1000 * 30;
 /**
  * Button to refresh the page if the content has been updated.
  */
-export function RefreshChangeRequestButton(props: {
+export function RefreshContentButton(props: {
     className?: string;
-    spaceId: string;
-    changeRequestId: string;
     revisionId: string;
     updatedAt: number;
     motionValues?: ToolbarButtonProps['motionValues'];
 }) {
-    const { updatedAt, className, motionValues } = props;
+    const { revisionId, updatedAt, className, motionValues } = props;
 
     const [coolingDown, setCoolingDown] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
-    const checkForUpdates = useCheckForContentUpdate(props);
+    const checkForUpdates = useCheckForContentUpdate({
+        revisionId,
+    });
 
     const refresh = React.useCallback(async () => {
         setLoading(true);
