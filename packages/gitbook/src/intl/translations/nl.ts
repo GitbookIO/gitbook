@@ -111,6 +111,10 @@ export const nl: TranslationLanguage = {
     view_page_plaintext: 'Bekijk deze pagina als platte tekst',
     open_in: 'Open in ${1}',
     open_in_llms_pre_prompt: 'Lees ${1} en beantwoord vragen over de inhoud.',
+    connect_mcp_to: 'Verbind met ${1}',
+    install_mcp_on: 'Installeer MCP-server op ${1}',
+    connect_with_mcp: 'Verbind met MCP',
+    copy_mcp_url: 'Kopieer MCP-server URL',
     press_to_confirm: 'Druk op ${1} om te bevestigen',
     tool_call_skipped: '"${1}" overgeslagen',
 };

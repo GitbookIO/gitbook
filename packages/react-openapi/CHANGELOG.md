@@ -1,5 +1,19 @@
 # @gitbook/react-openapi
 
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies [6da3655]
+  - @gitbook/expr@1.2.0
+
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies [3548fa6]
+  - @gitbook/expr@1.1.1
+
 ## 1.4.1
 
 ### Patch Changes

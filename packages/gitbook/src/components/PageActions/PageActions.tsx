@@ -2,9 +2,6 @@
 
 import { useAIChatState } from '@/components/AI';
 import type { Assistant } from '@/components/AI';
-import { ChatGPTIcon } from '@/components/PageActions/assets/ChatGPTIcon';
-import { ClaudeIcon } from '@/components/PageActions/assets/ClaudeIcon';
-import { MarkdownIcon } from '@/components/PageActions/assets/MarkdownIcon';
 import { Button } from '@/components/primitives/Button';
 import { DropdownMenuItem, useDropdownMenuClose } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
@@ -13,15 +10,15 @@ import type { GitSyncState } from '@gitbook/api';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import QuickLRU from 'quick-lru';
-import type React from 'react';
+import React from 'react';
 import { create } from 'zustand';
 
 type PageActionType = 'button' | 'dropdown-menu-item';
 
 /**
- * Opens our AI Docs Assistant.
+ * Action to open the GitBook Assistant.
  */
-export function OpenAIAssistant(props: { assistant: Assistant; type: PageActionType }) {
+export function ActionOpenAssistant(props: { assistant: Assistant; type: PageActionType }) {
     const { assistant, type } = props;
     const chat = useAIChatState();
     const language = useLanguage();
@@ -87,14 +84,14 @@ const useCopiedStore = create<
 const markdownCache = new QuickLRU<string, string>({ maxSize: 10 });
 
 /**
- * Copies the markdown version of the page to the clipboard.
+ * Action to copy the markdown version of the page to the clipboard.
  */
-export function CopyMarkdown(props: {
-    markdownPageUrl: string;
+export function ActionCopyMarkdown(props: {
+    markdownPageURL: string;
     type: PageActionType;
     isDefaultAction?: boolean;
 }) {
-    const { markdownPageUrl, type, isDefaultAction } = props;
+    const { markdownPageURL, type, isDefaultAction } = props;
     const language = useLanguage();
 
     const closeDropdown = useDropdownMenuClose();
@@ -105,8 +102,8 @@ export function CopyMarkdown(props: {
     const fetchMarkdown = async () => {
         setLoading(true);
 
-        const result = await fetch(markdownPageUrl).then((res) => res.text());
-        markdownCache.set(markdownPageUrl, result);
+        const result = await fetch(markdownPageURL).then((res) => res.text());
+        markdownCache.set(markdownPageURL, result);
 
         setLoading(false);
 
@@ -120,7 +117,7 @@ export function CopyMarkdown(props: {
             e.preventDefault();
         }
 
-        copy(markdownCache.get(markdownPageUrl) || (await fetchMarkdown()), {
+        copy(markdownCache.get(markdownPageURL) || (await fetchMarkdown()), {
             onSuccess: () => {
                 // We close the dropdown menu if the action is a dropdown menu item and not the default action.
                 if (type === 'dropdown-menu-item' && !isDefaultAction) {
@@ -146,17 +143,17 @@ export function CopyMarkdown(props: {
 /**
  * Redirects to the markdown version of the page.
  */
-export function ViewAsMarkdown(props: { markdownPageUrl: string; type: PageActionType }) {
-    const { markdownPageUrl, type } = props;
+export function ActionViewAsMarkdown(props: { markdownPageURL: string; type: PageActionType }) {
+    const { markdownPageURL, type } = props;
     const language = useLanguage();
 
     return (
         <PageActionWrapper
             type={type}
-            icon={<MarkdownIcon className="size-4 fill-current" />}
+            icon="markdown"
             label={tString(language, 'view_page_markdown')}
             description={tString(language, 'view_page_plaintext')}
-            href={markdownPageUrl}
+            href={markdownPageURL}
         />
     );
 }
@@ -164,7 +161,7 @@ export function ViewAsMarkdown(props: { markdownPageUrl: string; type: PageActio
 /**
  * Open the page in a LLM with a pre-filled prompt. Either ChatGPT or Claude.
  */
-export function OpenInLLM(props: {
+export function ActionOpenInLLM(props: {
     provider: 'chatgpt' | 'claude';
     url: string;
     type: PageActionType;
@@ -177,13 +174,7 @@ export function OpenInLLM(props: {
     return (
         <PageActionWrapper
             type={type}
-            icon={
-                provider === 'chatgpt' ? (
-                    <ChatGPTIcon className="size-3.5 fill-current" />
-                ) : (
-                    <ClaudeIcon className="size-3.5 fill-current" />
-                )
-            }
+            icon={provider}
             label={tString(language, 'open_in', providerLabel)}
             shortLabel={providerLabel}
             description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
@@ -192,7 +183,10 @@ export function OpenInLLM(props: {
     );
 }
 
-export function GitEditLink(props: {
+/**
+ * Action to open the page in the associated Git repository.
+ */
+export function ActionOpenEditOnGit(props: {
     type: PageActionType;
     provider: GitSyncState['installationProvider'];
     url: string;
@@ -214,7 +208,66 @@ export function GitEditLink(props: {
     );
 }
 
-export function ViewAsPDF(props: { url: string; type: PageActionType }) {
+/**
+ * Action to copy the MCP URL to the clipboard.
+ */
+export function ActionCopyMCPURL(props: { mcpURL: string; type: PageActionType }) {
+    const { mcpURL, type } = props;
+    const language = useLanguage();
+
+    return (
+        <CopyToClipboard
+            type={type}
+            data={mcpURL}
+            label={tString(language, 'connect_with_mcp')}
+            description={tString(language, 'copy_mcp_url')}
+            icon="mcp"
+        />
+    );
+}
+
+/**
+ * Action to open the MCP server in a specific editor.
+ */
+export function ActionOpenMCP(props: {
+    siteTitle: string;
+    mcpURL: string;
+    provider: 'vscode';
+    type: PageActionType;
+}) {
+    const { siteTitle, provider, mcpURL, type } = props;
+    const language = useLanguage();
+
+    const providerInfo = React.useMemo<{ label: string; icon: IconName; url: string }>(() => {
+        switch (provider) {
+            case 'vscode': {
+                const vscodeConfig = { name: siteTitle, url: mcpURL };
+                return {
+                    label: 'VSCode',
+                    icon: 'vscode',
+                    url: `vscode:mcp/install?${encodeURIComponent(JSON.stringify(vscodeConfig))}`,
+                };
+            }
+            default:
+                assertNever(provider);
+        }
+    }, [provider, mcpURL, siteTitle]);
+
+    return (
+        <PageActionWrapper
+            type={type}
+            href={providerInfo.url}
+            label={tString(language, 'connect_mcp_to', providerInfo.label)}
+            description={tString(language, 'install_mcp_on', providerInfo.label)}
+            icon={providerInfo.icon}
+        />
+    );
+}
+
+/**
+ * Action to view the page as a PDF.
+ */
+export function ActionViewAsPDF(props: { url: string; type: PageActionType }) {
     const { url, type } = props;
     const language = useLanguage();
 
@@ -225,6 +278,30 @@ export function ViewAsPDF(props: { url: string; type: PageActionType }) {
             label={tString(language, 'pdf_download')}
             href={url}
             target="_self"
+        />
+    );
+}
+
+/**
+ * Action to copy a string to the clipboard.
+ */
+export function CopyToClipboard(props: {
+    type: PageActionType;
+    data: string;
+    label: string;
+    description: string;
+    icon: IconName;
+}) {
+    const { type, data, label, description, icon } = props;
+    return (
+        <PageActionWrapper
+            type={type}
+            icon={icon}
+            label={label}
+            description={description}
+            onClick={() => {
+                navigator.clipboard.writeText(data);
+            }}
         />
     );
 }

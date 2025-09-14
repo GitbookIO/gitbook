@@ -17,7 +17,8 @@
         "dev": {
             "vars": {
                 "STAGE": "dev",
-                "OPEN_NEXT_REQUEST_ID_HEADER": "true"
+                "OPEN_NEXT_REQUEST_ID_HEADER": "true",
+                "GITBOOK_URL": "http://localhost:8771"
             },
             "r2_buckets": [
                 {

@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.17.1",
+    "version": "0.18.0",
     "private": true,
     "dependencies": {
         "@gitbook/api": "catalog:",
@@ -47,7 +47,7 @@
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.12",
-        "next": "15.3.5",
+        "next": "15.4.0",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -72,7 +72,10 @@
         "url-join": "^5.0.0",
         "usehooks-ts": "^3.1.0",
         "warn-once": "^0.1.1",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "mcp-handler": "^1.0.2",
+        "@modelcontextprotocol/sdk": "^1.17.5",
+        "zod": "^3"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
@@ -85,7 +88,6 @@
         "@types/node": "^20",
         "@types/object-hash": "^3.0.6",
         "@types/parse-cache-control": "^1.0.4",
-        "@types/psi": "^4.1.6",
         "@types/react": "18.3.13",
         "@types/react-dom": "18.3.1",
         "@types/rison": "^0.0.9",
@@ -93,7 +95,6 @@
         "env-cmd": "^10.1.0",
         "jsonwebtoken": "^9.0.2",
         "postcss": "^8",
-        "psi": "^4.1.0",
         "stylelint": "^16.16.0",
         "tailwindcss": "^4.1.11",
         "ts-essentials": "^10.0.1",
@@ -114,6 +115,7 @@
         "e2e": "playwright test e2e/internal.spec.ts e2e/pdf.spec.ts --project=chromium",
         "e2e-customers": "playwright test e2e/customers.spec.ts --project=chromium",
         "unit": "bun test {src,packages} --preload ./tests/preload-bun.ts",
+        "e2e-browserless": "bun test ./tests/",
         "typecheck": "tsc --noEmit"
     },
     "browserslist": [

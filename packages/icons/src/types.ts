@@ -18,6 +18,13 @@ export enum IconStyle {
     SharpThin = 'sharp-thin',
 }
 
-type CustomIconName = 'gitbook';
+type CustomIconName =
+    | 'gitbook'
+    | 'gitbook-assistant'
+    | 'cursor'
+    | 'vscode'
+    | 'mcp'
+    | 'chatgpt'
+    | 'claude';
 
 export type IconName = BasicIconName | CustomIconName;
