@@ -1,23 +1,29 @@
 'use client';
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
-import * as motion from 'motion/react-client';
+import { useCheckForContentUpdate } from '../AutoRefreshContent';
+import { useVisitorSession } from '../Insights';
+import { useCurrentPagePath } from '../hooks';
 import { DateRelative } from '../primitives';
-import type { AdminToolbarClientProps } from './AdminToolbar';
 import { IframeWrapper } from './IframeWrapper';
-import { RefreshChangeRequestButton } from './RefreshChangeRequestButton';
+import { RefreshContentButton } from './RefreshContentButton';
 import {
     Toolbar,
     ToolbarBody,
     ToolbarButton,
     ToolbarButtonGroup,
+    type ToolbarButtonProps,
     ToolbarSeparator,
+    ToolbarSubtitle,
+    ToolbarTitle,
 } from './Toolbar';
-import { getCopyVariants } from './transitions';
+import type { AdminToolbarClientProps } from './types';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const { context } = props;
+    const visitorSession = useVisitorSession();
 
+    // If there is a change request, show the change request toolbar
     if (context.changeRequest) {
         return (
             <IframeWrapper>
@@ -28,6 +34,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         );
     }
 
+    // If the revision is not the current revision, the user is looking at a previous version of the site, so show the revision toolbar
     if (context.revisionId !== context.space.revision) {
         return (
             <IframeWrapper>
@@ -38,24 +45,38 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         );
     }
 
-    return null;
+    // If the user is authenticated and part of the organization owning this site, show the authenticated user toolbar
+    if (visitorSession?.organizationId === context.organizationId) {
+        return (
+            <IframeWrapper>
+                <MotionConfig reducedMotion="user">
+                    <AuthenticatedUserToolbar context={context} />
+                </MotionConfig>
+            </IframeWrapper>
+        );
+    }
 }
 
 function ChangeRequestToolbar(props: AdminToolbarClientProps) {
     const { context } = props;
-    const { space, changeRequest, site } = context;
-
+    const { changeRequest, site } = context;
     if (!changeRequest) {
-        return null;
+        throw new Error('Change request is not set');
     }
 
-    const crLabel = changeRequest.subject || 'Untitled';
     const author = changeRequest.createdBy.displayName;
+
+    const { refreshForUpdates, updated } = useCheckForContentUpdate({
+        revisionId: changeRequest.revision,
+    });
 
     return (
         <Toolbar>
             <ToolbarBody>
-                <ToolbarTitle prefix="Change request" suffix={crLabel} />
+                <ToolbarTitle
+                    prefix="Change request"
+                    suffix={`#${changeRequest.number} ${changeRequest.subject || 'Untitled'}`}
+                />
                 <ToolbarSubtitle
                     subtitle={
                         <>
@@ -69,15 +90,10 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 
             <ToolbarButtonGroup>
                 {/* Refresh to retrieve latest changes */}
-                <RefreshChangeRequestButton
-                    spaceId={space.id}
-                    changeRequestId={changeRequest.id}
-                    revisionId={changeRequest.revision}
-                    updatedAt={new Date(changeRequest.updatedAt).getTime()}
-                />
+                {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
                 {/* Comment in app */}
                 <ToolbarButton
-                    title="Comment in app"
+                    title="Comment in a GitBook"
                     href={`${changeRequest.urls.app}~/comments`}
                     icon="comment"
                 />
@@ -91,10 +107,13 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 
                 {/* Open CR in GitBook */}
                 <ToolbarButton
-                    title="View CR in GitBook"
+                    title="View change request in GitBook"
                     href={changeRequest.urls.app}
-                    icon="code-branch"
+                    icon="code-pull-request"
                 />
+
+                {/* Edit in GitBook */}
+                <EditPageButton href={changeRequest.urls.app} />
             </ToolbarButtonGroup>
         </Toolbar>
     );
@@ -103,12 +122,13 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 function RevisionToolbar(props: AdminToolbarClientProps) {
     const { context } = props;
     const { revision, site } = context;
-
     if (!revision) {
-        return null;
+        throw new Error('Revision is not set');
     }
 
     const gitURL = revision.git?.url;
+    const isGitHub = gitURL?.includes('github.com');
+    const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
         <Toolbar>
@@ -128,7 +148,7 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                 <ToolbarButton
                     title={
                         gitURL ? (
-                            'Open commit in Git client'
+                            `Open commit in ${gitProvider}`
                         ) : (
                             <div className="flex items-center gap-2">
                                 Setup GitSync to edit using Git{' '}
@@ -149,7 +169,7 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                     }
                     href={gitURL}
                     disabled={!gitURL}
-                    icon={gitURL ? (gitURL.includes('github.com') ? 'github' : 'gitlab') : 'github'}
+                    icon={gitURL ? (isGitHub ? 'github' : 'gitlab') : 'github'}
                 />
                 <ToolbarButton
                     title="Open production site"
@@ -157,7 +177,7 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                     icon="globe"
                 />
                 <ToolbarButton
-                    title="View this version in GitBook"
+                    title="View this revision in GitBook"
                     href={revision.urls.app}
                     icon="code-commit"
                 />
@@ -166,44 +186,59 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
     );
 }
 
-function ToolbarTitle(props: { prefix: string; suffix: string }) {
+function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
+    const { context } = props;
+    const { revision, space, site } = context;
+    const { refreshForUpdates, updated } = useCheckForContentUpdate({
+        revisionId: space.revision,
+    });
+
     return (
-        <div className="flex items-center gap-1 text-xs ">
-            <ToolbarTitlePrefix title={props.prefix} />
-            <ToolbarTitleSuffix title={props.suffix} />
-        </div>
+        <Toolbar>
+            <ToolbarBody>
+                <ToolbarTitle prefix="Site" suffix={context.site.title} />
+                <ToolbarSubtitle
+                    subtitle={
+                        <>
+                            Updated <DateRelative value={revision.createdAt} />
+                        </>
+                    }
+                />
+            </ToolbarBody>
+            <ToolbarSeparator />
+            <ToolbarButtonGroup>
+                {/* Refresh to retrieve latest changes */}
+                {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
+                <ToolbarButton title="Open site in GitBook" href={site.urls.app} icon="gear" />
+                <ToolbarButton
+                    title="Customize in GitBook"
+                    href={`${site.urls.app}/customization/general`}
+                    icon="palette"
+                />
+                <ToolbarButton
+                    title="Open insights in GitBook"
+                    href={`${site.urls.app}/insights`}
+                    icon="chart-simple"
+                />
+                <EditPageButton href={space.urls.app} />
+            </ToolbarButtonGroup>
+        </Toolbar>
     );
 }
 
-function ToolbarTitlePrefix(props: { title: string }) {
-    return (
-        <motion.span
-            {...getCopyVariants(0)}
-            className="font-light text-neutral-7 dark:text-neutral-3"
-        >
-            {props.title}
-        </motion.span>
-    );
-}
+function EditPageButton(props: {
+    href: string;
+    motionValues?: ToolbarButtonProps['motionValues'];
+}) {
+    const { href, motionValues } = props;
+    const pagePath = useCurrentPagePath();
 
-function ToolbarTitleSuffix(props: { title: string }) {
     return (
-        <motion.span
-            {...getCopyVariants(1)}
-            className="max-w-[24ch] truncate font-semibold text-neutral-3 dark:text-neutral-2"
-        >
-            {props.title}
-        </motion.span>
-    );
-}
-
-function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
-    return (
-        <motion.span
-            {...getCopyVariants(1)}
-            className="text-neutral-7 text-xxs dark:text-neutral-2"
-        >
-            {props.subtitle}
-        </motion.span>
+        <ToolbarButton
+            title="Edit in GitBook"
+            href={`${href}${pagePath.startsWith('/') ? pagePath.slice(1) : pagePath}`}
+            icon="pencil"
+            motionValues={motionValues}
+        />
     );
 }

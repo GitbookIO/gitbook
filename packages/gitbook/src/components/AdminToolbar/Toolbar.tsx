@@ -6,7 +6,7 @@ import { AnimatedLogo } from './AnimatedLogo';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import { Tooltip } from '../primitives';
-import { minifyButtonAnimation, toolbarEasings } from './transitions';
+import { getCopyVariants, minifyButtonAnimation, toolbarEasings } from './transitions';
 import { useMagnificationEffect } from './useMagnificationEffect';
 
 const DURATION_LOGO_APPEARANCE = 2000;
@@ -111,8 +111,14 @@ export function ToolbarBody(props: { children: React.ReactNode }) {
 }
 
 export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
+    const { children } = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const { buttonMotionValues } = useMagnificationEffect(containerRef);
+
+    const buttonChildren = React.Children.toArray(children).filter((child) => !!child);
+    const { buttonMotionValues } = useMagnificationEffect({
+        childrenCount: buttonChildren.length,
+        containerRef,
+    });
 
     return (
         <motion.div
@@ -122,17 +128,12 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
             animate="show"
             className="flex items-center gap-1 overflow-visible pr-2 pl-4"
         >
-            {React.Children.toArray(props.children).map((child, index) => {
+            {buttonChildren.map((child, index) => {
                 const motionValues = buttonMotionValues[index];
                 const childEl = child as React.ReactElement;
-                const key =
-                    childEl.key ||
-                    childEl.props.icon ||
-                    childEl.props.href ||
-                    `toolbar-button-${index}`;
                 return React.cloneElement(childEl, {
+                    key: index,
                     motionValues,
-                    key,
                 });
             })}
         </motion.div>
@@ -144,7 +145,7 @@ export interface ToolbarButtonProps extends Omit<React.HTMLProps<HTMLAnchorEleme
         scale: MotionValue<number>;
         x: MotionValue<number>;
     };
-    icon?: IconName;
+    icon: IconName;
     iconClassName?: string;
     title?: React.ReactNode;
 }
@@ -206,7 +207,7 @@ export function ToolbarButton(props: ToolbarButtonProps) {
                         'shadow-1xs'
                     )}
                 >
-                    {icon && <Icon icon={icon} className={tcls('size-4', iconClassName)} />}
+                    <Icon icon={icon} className={tcls('size-4', iconClassName)} />
                 </motion.a>
             </Tooltip>
         </motion.div>
@@ -215,6 +216,48 @@ export function ToolbarButton(props: ToolbarButtonProps) {
 
 export function ToolbarSeparator() {
     return <div className="h-5 w-px bg-tint-1/3" />;
+}
+
+export function ToolbarTitle(props: { prefix: string; suffix: string }) {
+    return (
+        <div className="flex items-center gap-1 text-xs ">
+            <ToolbarTitlePrefix title={props.prefix} />
+            <ToolbarTitleSuffix title={props.suffix} />
+        </div>
+    );
+}
+
+function ToolbarTitlePrefix(props: { title: string }) {
+    return (
+        <motion.span
+            {...getCopyVariants(0)}
+            className="font-light text-neutral-7 dark:text-neutral-3"
+        >
+            {props.title}
+        </motion.span>
+    );
+}
+
+function ToolbarTitleSuffix(props: { title: string }) {
+    return (
+        <motion.span
+            {...getCopyVariants(1)}
+            className="max-w-[24ch] truncate font-semibold text-neutral-3 dark:text-neutral-2"
+        >
+            {props.title}
+        </motion.span>
+    );
+}
+
+export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
+    return (
+        <motion.span
+            {...getCopyVariants(1)}
+            className="text-neutral-7 text-xxs dark:text-neutral-2"
+        >
+            {props.subtitle}
+        </motion.span>
+    );
 }
 
 function MinifyButton(props: { setMinified: (minified: boolean) => void }) {
