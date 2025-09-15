@@ -74,13 +74,11 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                     changeRequestId={changeRequest.id}
                     revisionId={changeRequest.revision}
                     updatedAt={new Date(changeRequest.updatedAt).getTime()}
-                    key="refresh-button"
                 />
                 {/* Comment in app */}
                 <ToolbarButton
                     title="Comment in app"
                     href={`${changeRequest.urls.app}~/comments`}
-                    key="comment-button"
                     icon="comment"
                 />
 
@@ -88,7 +86,6 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                 <ToolbarButton
                     title="Open production site"
                     href={site.urls.published}
-                    key="open-production-site-button"
                     icon="globe"
                 />
 
@@ -96,7 +93,6 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                 <ToolbarButton
                     title="View CR in GitBook"
                     href={changeRequest.urls.app}
-                    key="view-change-request-button"
                     icon="code-branch"
                 />
             </ToolbarButtonGroup>
@@ -158,7 +154,6 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                 <ToolbarButton
                     title="Open production site"
                     href={site.urls.published}
-                    key="open-production-site-button"
                     icon="globe"
                 />
                 <ToolbarButton
