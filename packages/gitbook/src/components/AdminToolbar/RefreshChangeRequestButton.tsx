@@ -1,27 +1,28 @@
 'use client';
-import { Icon } from '@gitbook/icons';
 import React from 'react';
 
 import { useCheckForContentUpdate } from '@/components/AutoRefreshContent';
 import { tcls } from '@/lib/tailwind';
 
-import { ToolbarButton } from './Toolbar';
+import { ToolbarButton, type ToolbarButtonProps } from './Toolbar';
 
 // We don't show the button if the content has been updated 30s ago or less.
-const minInterval = 1000 * 30; // 5 minutes
+const minInterval = 1000 * 30;
 
 /**
  * Button to refresh the page if the content has been updated.
  */
 export function RefreshChangeRequestButton(props: {
+    className?: string;
     spaceId: string;
     changeRequestId: string;
     revisionId: string;
     updatedAt: number;
+    motionValues?: ToolbarButtonProps['motionValues'];
 }) {
-    const { updatedAt } = props;
+    const { updatedAt, className, motionValues } = props;
 
-    const [visible, setVisible] = React.useState(false);
+    const [coolingDown, setCoolingDown] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const checkForUpdates = useCheckForContentUpdate(props);
 
@@ -31,40 +32,42 @@ export function RefreshChangeRequestButton(props: {
             await checkForUpdates();
         } finally {
             setLoading(false);
-            setVisible(false);
+            setCoolingDown(true);
         }
     }, [checkForUpdates]);
 
     // Show the button if the content has been updated more than 30s ago.
     React.useEffect(() => {
         if (updatedAt < Date.now() - minInterval) {
-            setVisible(true);
+            setCoolingDown(false);
         }
     }, [updatedAt]);
 
     // 30sec after being hidden, we show the button again
     React.useEffect(() => {
-        if (!visible) {
+        if (!coolingDown) {
             const timeout = setTimeout(() => {
-                setVisible(true);
+                setCoolingDown(false);
             }, minInterval);
             return () => clearTimeout(timeout);
         }
-    }, [visible]);
-
-    if (!visible) {
-        return null;
-    }
+    }, [coolingDown]);
 
     return (
         <ToolbarButton
-            title="Refresh"
+            title={coolingDown ? 'Changes already refreshed recently' : 'Refresh changes'}
             onClick={(event) => {
+                if (coolingDown) {
+                    return;
+                }
                 event.preventDefault();
                 refresh();
             }}
-        >
-            <Icon icon="rotate" className={tcls('size-4', loading ? 'animate-spin' : null)} />
-        </ToolbarButton>
+            className={tcls(className, 'overflow-visible')}
+            disabled={loading || coolingDown}
+            motionValues={motionValues}
+            icon="rotate"
+            iconClassName={loading ? 'animate-spin' : undefined}
+        />
     );
 }

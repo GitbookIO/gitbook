@@ -81,6 +81,9 @@ const config: Config = {
                 ],
                 var: ['var(--font-family)'],
             },
+            fontSize: {
+                xxs: ['0.625rem', { lineHeight: '0.75rem' }],
+            },
             colors: {
                 // Dynamic colors matching the customization settings
 
