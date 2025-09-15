@@ -18,9 +18,9 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
         'Disallow: /*?*ask=*',
         // Allow dynamic assets (may include ?)
         'Allow: /~gitbook/image?*',
-        'Allow: /~gitbook/icon?*',
-        'Allow: /favicon.ico',
-        'Allow: /',
+        'Allow: /~gitbook/icon?*', 
+        'Allow: /favicon.ico', 
+        'Allow: /', 
         `Sitemap: ${sitemapUrl}`,
       ]
     : ['User-agent: *', 'Disallow: /'];
