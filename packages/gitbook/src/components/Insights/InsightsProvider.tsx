@@ -119,14 +119,11 @@ export function InsightsProvider(props: InsightsProviderProps) {
             };
         }
 
-        if (allEvents.length > 0) {
-            if (enabled) {
-                sendEvents({
-                    eventUrl,
-                    events: allEvents,
-                });
-            } else {
-            }
+        if (allEvents.length > 0 && enabled) {
+            sendEvents({
+                eventUrl,
+                events: allEvents,
+            });
         }
     });
 
@@ -134,7 +131,7 @@ export function InsightsProvider(props: InsightsProviderProps) {
         flushEventsSync();
     }, 1500);
 
-    // Flush events once the visitor session is set
+    // Flush pending events once the visitor session has been fetched
     React.useEffect(() => {
         if (visitorSession) {
             flushEventsSync();

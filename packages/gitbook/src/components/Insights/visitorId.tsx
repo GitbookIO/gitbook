@@ -32,7 +32,7 @@ const visitorSessionStore = createStore<{
 }));
 
 /**
- * Fetch and provide the visitor session.
+ * Fetch, synchronize the visitor sesion with GitBook.
  */
 export function VisitorSessionProvider(
     props: React.PropsWithChildren<{
