@@ -83,18 +83,16 @@ async function fetchSession({
         };
     }
 
-    const existingTrackingCookie = getSessionCookie();
+    const { existing, proposedId } = getSessionCookie();
 
-    if (existingTrackingCookie) {
+    if (existing) {
         // If the cookie already exists, we'll just use that. Avoids a server request.
-        return existingTrackingCookie;
+        return existing;
     }
-    // No tracking deviceId set, we'll need to consolidate with the server.
-    const proposed = generateRandomId();
 
     const url = new URL(appURL);
     url.pathname = '/__session/2/';
-    url.searchParams.set('proposed', proposed);
+    url.searchParams.set('proposed', proposedId);
 
     try {
         const resp = await fetch(url, {
@@ -109,21 +107,24 @@ async function fetchSession({
     } catch (error) {
         console.error('Failed to fetch visitor session ID', error);
         return {
-            deviceId: proposed,
+            deviceId: proposedId,
         };
     }
 }
 
-function getSessionCookie(): SessionResponse | null {
+function getSessionCookie(): { existing: SessionResponse | null; proposedId: string } {
+    const proposed = generateRandomId();
     const value = getBrowserCookie(VISITORID_COOKIE);
     if (!(value && typeof value === 'string')) {
-        return null;
+        return { existing: null, proposedId: proposed };
     }
 
     try {
         const parsed = JSON.parse(value) as SessionResponse;
-        return parsed;
+        return { existing: parsed, proposedId: proposed };
     } catch {
-        return { deviceId: value };
+        // Ignore legacy __session cookie format
+        // and we'll renew it with the server using the previous one as a proposed ID
+        return { existing: null, proposedId: proposed };
     }
 }
