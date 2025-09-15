@@ -46,7 +46,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     }
 
     // If the user is authenticated and part of the organization owning this site, show the authenticated user toolbar
-    if (visitorSession?.organizationId === context.organizationId || 1) {
+    if (visitorSession?.organizationId === context.organizationId) {
         return (
             <IframeWrapper>
                 <MotionConfig reducedMotion="user">
