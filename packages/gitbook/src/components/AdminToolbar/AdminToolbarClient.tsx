@@ -127,14 +127,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                 />
 
                 {/* Edit in GitBook */}
-                <EditPageButton
-                    href={getToolbarHref({
-                        href: changeRequest.urls.app,
-                        siteId: site.id,
-                        buttonId: 'edit',
-                    })}
-                    siteId={site.id}
-                />
+                <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
             </ToolbarButtonGroup>
         </Toolbar>
     );
@@ -267,14 +260,7 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="chart-simple"
                 />
-                <EditPageButton
-                    href={getToolbarHref({
-                        href: space.urls.app,
-                        siteId: site.id,
-                        buttonId: 'edit',
-                    })}
-                    siteId={site.id}
-                />
+                <EditPageButton href={space.urls.app} siteId={site.id} />
             </ToolbarButtonGroup>
         </Toolbar>
     );
