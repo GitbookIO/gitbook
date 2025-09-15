@@ -14,27 +14,34 @@ const minInterval = 1000 * 30;
  */
 export function RefreshContentButton(props: {
     className?: string;
+
+    /** ID of the revision of the content currently being displayed. */
     revisionId: string;
+
+    /** When the content was last updated. */
     updatedAt: number;
+
+    /** How long after content was last  */
+
     motionValues?: ToolbarButtonProps['motionValues'];
 }) {
     const { revisionId, updatedAt, className, motionValues } = props;
 
     const [coolingDown, setCoolingDown] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
-    const checkForUpdates = useCheckForContentUpdate({
+    const { refreshForUpdates, updated } = useCheckForContentUpdate({
         revisionId,
     });
 
     const refresh = React.useCallback(async () => {
         setLoading(true);
         try {
-            await checkForUpdates();
+            await refreshForUpdates();
         } finally {
             setLoading(false);
             setCoolingDown(true);
         }
-    }, [checkForUpdates]);
+    }, [refreshForUpdates]);
 
     // Show the button if the content has been updated more than 30s ago.
     React.useEffect(() => {
@@ -53,9 +60,13 @@ export function RefreshContentButton(props: {
         }
     }, [coolingDown]);
 
+    if (!updated) {
+        return null;
+    }
+
     return (
         <ToolbarButton
-            title={coolingDown ? 'Changes already refreshed recently' : 'Refresh changes'}
+            title="Refresh for latest changes"
             onClick={(event) => {
                 if (coolingDown) {
                     return;
@@ -64,7 +75,7 @@ export function RefreshContentButton(props: {
                 refresh();
             }}
             className={tcls(className, 'overflow-visible')}
-            disabled={loading || coolingDown}
+            disabled={loading}
             motionValues={motionValues}
             icon="rotate"
             iconClassName={loading ? 'animate-spin' : undefined}
