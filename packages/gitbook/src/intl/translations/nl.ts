@@ -67,6 +67,7 @@ export const nl: TranslationLanguage = {
     pdf_limit_reached_continue: "Verleng met ${1} extra pagina's.",
     more: 'Meer',
     link_tooltip_external_link: 'Externe link naar',
+    link_tooltip_email: 'E-mail versturen naar',
     link_tooltip_page_anchor: 'Spring naar sectie',
     open_in_new_tab: 'Open in nieuw tabblad',
     ai_chat_assistant_name: 'GitBook Assistent',
@@ -110,6 +111,10 @@ export const nl: TranslationLanguage = {
     view_page_plaintext: 'Bekijk deze pagina als platte tekst',
     open_in: 'Open in ${1}',
     open_in_llms_pre_prompt: 'Lees ${1} en beantwoord vragen over de inhoud.',
+    connect_mcp_to: 'Verbind met ${1}',
+    install_mcp_on: 'Installeer MCP-server op ${1}',
+    connect_with_mcp: 'Verbind met MCP',
+    copy_mcp_url: 'Kopieer MCP-server URL',
     press_to_confirm: 'Druk op ${1} om te bevestigen',
     tool_call_skipped: '"${1}" overgeslagen',
 };

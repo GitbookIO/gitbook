@@ -68,6 +68,7 @@ export const no: TranslationLanguage = {
     pdf_limit_reached_continue: 'Utvid med ${1} flere sider.',
     more: 'Mer',
     link_tooltip_external_link: 'Ekstern lenke til',
+    link_tooltip_email: 'Send e-post til',
     link_tooltip_page_anchor: 'Hopp til seksjon',
     open_in_new_tab: 'Åpne i ny fane',
     ai_chat_assistant_name: 'GitBook-assistent',
@@ -111,6 +112,10 @@ export const no: TranslationLanguage = {
     view_page_plaintext: 'Vis denne siden som ren tekst',
     open_in: 'Åpne i ${1}',
     open_in_llms_pre_prompt: 'Les ${1} og besvar spørsmål om innholdet.',
+    connect_mcp_to: 'Koble til ${1}',
+    install_mcp_on: 'Installer MCP-server på ${1}',
+    connect_with_mcp: 'Koble til MCP',
+    copy_mcp_url: 'Kopier MCP-server URL',
     press_to_confirm: 'Trykk ${1} for å bekrefte',
     tool_call_skipped: 'Hoppet over "${1}"',
 };

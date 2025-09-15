@@ -67,6 +67,7 @@ export const ja: TranslationLanguage = {
     pdf_limit_reached_continue: 'さらに${1}ページで拡張',
     more: '詳細',
     link_tooltip_external_link: '外部リンク先',
+    link_tooltip_email: 'メールを送信',
     link_tooltip_page_anchor: 'ページ内リンク先',
     open_in_new_tab: '新しいタブで開く',
     ai_chat_assistant_name: 'GitBookアシスタント',
@@ -110,6 +111,10 @@ export const ja: TranslationLanguage = {
     view_page_plaintext: 'このページをプレーンテキストで表示',
     open_in: '${1} で開く',
     open_in_llms_pre_prompt: '${1} を読んで内容に関する質問に答えてください。',
+    connect_mcp_to: '${1} に接続',
+    install_mcp_on: '${1} にMCPサーバーをインストール',
+    connect_with_mcp: 'MCPに接続',
+    copy_mcp_url: 'MCPサーバーのURLをコピー',
     press_to_confirm: '確認するには${1}を押してください',
     tool_call_skipped: '"${1}" をスキップしました',
 };

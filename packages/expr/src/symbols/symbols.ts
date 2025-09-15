@@ -259,6 +259,60 @@ const StandardLibrary: Partial<
                         'true if the value searchElement is found within the array (or the part of the array indicated by the index fromIndex, if specified).',
                 }),
             }),
+            SymbolFunction({
+                name: 'some',
+                description:
+                    'Tests whether at least one element in the array passes the test implemented by the provided function.',
+                link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some',
+                args: [
+                    SymbolFunction({
+                        name: 'callback',
+                        description: 'A function that tests each element of the array.',
+                        args: [
+                            {
+                                ...arraySymbolDef.items,
+                                name: 'element',
+                                description: 'The current element being processed in the array.',
+                            },
+                        ],
+                        returns: SymbolBoolean({
+                            description:
+                                'true if the callback function returns a truthy value for at least one element in the array.',
+                        }),
+                    }),
+                ],
+                returns: SymbolBoolean({
+                    description:
+                        'true if the callback function returns a truthy value for at least one element in the array.',
+                }),
+            }),
+            SymbolFunction({
+                name: 'every',
+                description:
+                    'Tests whether all elements in the array pass the test implemented by the provided function.',
+                link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every',
+                args: [
+                    SymbolFunction({
+                        name: 'callback',
+                        description: 'A function that tests each element of the array.',
+                        args: [
+                            {
+                                ...arraySymbolDef.items,
+                                name: 'element',
+                                description: 'The current element being processed in the array.',
+                            },
+                        ],
+                        returns: SymbolBoolean({
+                            description:
+                                'true if the callback function returns a truthy value for all elements in the array.',
+                        }),
+                    }),
+                ],
+                returns: SymbolBoolean({
+                    description:
+                        'true if the callback function returns a truthy value for all elements in the array.',
+                }),
+            }),
         ],
     }),
 };

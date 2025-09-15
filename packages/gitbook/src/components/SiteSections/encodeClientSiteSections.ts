@@ -30,9 +30,7 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
     for (const item of list) {
         switch (item.object) {
             case 'site-section-group': {
-                const sections = item.sections
-                    .filter((section) => shouldIncludeSection(context, section))
-                    .map((section) => encodeSection(context, section));
+                const sections = item.sections.map((section) => encodeSection(context, section));
 
                 // Skip empty groups
                 if (sections.length === 0) {
@@ -75,37 +73,12 @@ function encodeSection(context: GitBookSiteContext, section: SiteSection) {
 }
 
 /**
- * Test if a section should be included in the list of sections.
- */
-function shouldIncludeSection(context: GitBookSiteContext, section: SiteSection) {
-    if (context.site.id !== 'site_JOVzv') {
-        return true;
-    }
-
-    // Testing for a new mode of navigation where the multi-variants section are hidden
-    // if they do not include an equivalent of the current site space.
-
-    // TODO: replace with a proper flag on the section
-    const withNavigateOnlyIfEquivalent = section.id === 'sitesc_4jvEm';
-
-    if (!withNavigateOnlyIfEquivalent) {
-        return true;
-    }
-
-    const { siteSpace: currentSiteSpace } = context;
-    if (section.siteSpaces.length === 1) {
-        return true;
-    }
-    return section.siteSpaces.some((siteSpace) =>
-        areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
-    );
-}
-
-/**
  * Find the best default site space to navigate to for a givent section:
  * 1. If we are on the default, continue on the default.
- * 2. If a site space has the same path as the current one, return it.
- * 3. Otherwise, return the default one.
+ * 2. If there are site spaces with the same language as the current, filter by language.
+ * 3. If a site space has the same path as the current one, return it.
+ * 4. Otherwise, return the default first language match.
+ * 5. Otherwise, return the default one.
  */
 function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
     const { siteSpace: currentSiteSpace } = context;
@@ -114,9 +87,15 @@ function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
         return getSectionURL(context, section);
     }
 
-    const bestMatch = section.siteSpaces.find((siteSpace) =>
-        areSiteSpacesEquivalent(siteSpace, currentSiteSpace)
-    );
+    const possibleMatches =
+        section.siteSpaces.filter((siteSpace) =>
+            areSiteSpacesSameLanguage(siteSpace, currentSiteSpace)
+        ) ?? section.siteSpaces;
+
+    const bestMatch =
+        possibleMatches.find((siteSpace) => areSiteSpacesEquivalent(siteSpace, currentSiteSpace)) ??
+        possibleMatches[0];
+
     if (bestMatch) {
         return getSiteSpaceURL(context, bestMatch);
     }
@@ -129,4 +108,8 @@ function findBestTargetURL(context: GitBookSiteContext, section: SiteSection) {
  */
 function areSiteSpacesEquivalent(siteSpace1: SiteSpace, siteSpace2: SiteSpace) {
     return siteSpace1.path === siteSpace2.path;
+}
+
+function areSiteSpacesSameLanguage(siteSpace1: SiteSpace, siteSpace2: SiteSpace) {
+    return siteSpace1.space.language === siteSpace2.space.language;
 }

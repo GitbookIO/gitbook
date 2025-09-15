@@ -1,5 +1,5 @@
+import type { Plugin } from '@scalar/json-magic/bundle';
 import { normalize } from '@scalar/openapi-parser';
-import type { ParsePlugin } from '../parse';
 
 export const fetchUrlsDefaultConfiguration = {
     limit: 40,
@@ -15,7 +15,7 @@ export const fetchURLs = (customConfiguration: {
      * Limit the number of requests. Set to `false` to disable the limit.
      */
     limit?: number | false;
-}): ParsePlugin => {
+}): Plugin => {
     // State
     let numberOfRequests = 0;
 
@@ -26,6 +26,7 @@ export const fetchURLs = (customConfiguration: {
     };
 
     return {
+        type: 'loader',
         validate(value) {
             // Not a string
             if (typeof value !== 'string') {

@@ -81,6 +81,9 @@ const config: Config = {
                 ],
                 var: ['var(--font-family)'],
             },
+            fontSize: {
+                xxs: ['0.625rem', { lineHeight: '0.75rem' }],
+            },
             colors: {
                 // Dynamic colors matching the customization settings
 
@@ -544,7 +547,7 @@ const config: Config = {
             addVariant('site-header', 'body:has(#site-header:not(.mobile-only)) &');
             addVariant('site-header-sections', [
                 'body:has(#site-header:not(.mobile-only) #sections) &',
-                'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
+                // 'body:has(.page-no-toc):has(#site-header:not(.mobile-only) #variants) &',
             ]);
             addVariant(
                 'announcement',

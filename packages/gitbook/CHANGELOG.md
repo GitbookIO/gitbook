@@ -1,5 +1,74 @@
 # gitbook
 
+## 0.18.0
+
+### Minor Changes
+
+- 262afa3: Expose a MCP server for the docs site under /~gitbook/mcp
+
+### Patch Changes
+
+- Updated dependencies [262afa3]
+  - @gitbook/icons@0.3.1
+  - @gitbook/react-openapi@1.4.3
+  - @gitbook/react-contentkit@0.7.5
+
+## 0.17.2
+
+### Patch Changes
+
+- @gitbook/react-openapi@1.4.2
+
+## 0.17.1
+
+### Patch Changes
+
+- 24f601d: Small optim in resolveTryItPrefillForOperation
+- aea5eb1: Persist language choice across sections if possible
+- 1165a81: Language selector edge cases
+- f9a2977: Better handling for external link "mailto:" in Hovered Card in GBO
+- Updated dependencies [24f601d]
+  - @gitbook/react-openapi@1.4.1
+
+## 0.17.0
+
+### Minor Changes
+
+- 12c9d76: Adapt OpenAPI blocks to eval adaptive exprs & prefill TryIt config
+- 7911350: Add language selector to site header
+- 659be55: Track insight event when embedded assistant is displayed.
+
+### Patch Changes
+
+- 2e0d706: Fix corner radius of active section on "Line" sidebar style
+- 78a632b: Fix edit on GitHub button doesn't take you to GitHub
+- 1edc5d6: Add "hold message" to Assistant
+- 4520728: Support bold in headings
+- 61b8507: OpenAPI: Make responses without objects clickable
+- d1fdc13: Remove ligatures from Lato font
+- a8fca0e: Fix custom assistant keyboard shortcut
+- 262a9b1: Fix embed script and assets being cached for too long
+- c890e01: Fix order in robots.txt preventing indexation of images by Google.
+- 1839ea2: Fix content min-height with sections
+- 9201e2c: Adds vertical align to column block
+- 193d591: Use space language as source of truth for UI locale
+- f08dd29: Fix Search results are not clickable on sites without header
+- 17dd382: Add `original` background color step
+- 4f35882: Fix event ask_question not being tracked
+- d51b79e: Fix Search bar is broken on site with sections when header is disabled
+- 6f368b5: Fix embed assistant window width on small screens
+- Updated dependencies [193d591]
+- Updated dependencies [12c9d76]
+- Updated dependencies [4927e96]
+- Updated dependencies [61b8507]
+- Updated dependencies [7fefe49]
+- Updated dependencies [360aa1c]
+- Updated dependencies [98e42cf]
+- Updated dependencies [17dd382]
+  - @gitbook/colors@0.4.0
+  - @gitbook/react-openapi@1.4.0
+  - @gitbook/openapi-parser@3.0.2
+
 ## 0.16.0
 
 ### Minor Changes

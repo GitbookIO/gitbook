@@ -69,6 +69,7 @@ export const es: TranslationLanguage = {
     pdf_limit_reached_continue: 'Extender con ${1} páginas más.',
     more: 'Más',
     link_tooltip_external_link: 'Enlace externo a',
+    link_tooltip_email: 'Enviar un correo electrónico a',
     link_tooltip_page_anchor: 'Saltar a la sección',
     open_in_new_tab: 'Abrir en una nueva pestaña',
     ai_chat_assistant_name: 'Asistente de GitBook',
@@ -112,6 +113,10 @@ export const es: TranslationLanguage = {
     view_page_plaintext: 'Ver esta página como texto plano',
     open_in: 'Abrir en ${1}',
     open_in_llms_pre_prompt: 'Lee ${1} y responde preguntas sobre el contenido.',
+    connect_mcp_to: 'Conectar a ${1}',
+    install_mcp_on: 'Instalar servidor MCP en ${1}',
+    connect_with_mcp: 'Conectar con MCP',
+    copy_mcp_url: 'Copiar URL del servidor MCP',
     press_to_confirm: 'Presiona ${1} para confirmar',
     tool_call_skipped: 'Omitido "${1}"',
 };

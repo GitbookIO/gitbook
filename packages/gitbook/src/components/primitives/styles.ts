@@ -28,6 +28,7 @@ export const ButtonStyles = [
 
     'hover:depth-subtle:-translate-y-px',
     'focus-visible:depth-subtle:-translate-y-px',
+    'data-[state=open]:depth-subtle:-translate-y-px',
     'active:depth-subtle:translate-y-0',
     'transition-all',
 

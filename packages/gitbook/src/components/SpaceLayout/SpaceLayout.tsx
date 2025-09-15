@@ -12,14 +12,16 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
+import { getSpaceLanguage } from '@/intl/server';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
+import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
-import { SpacesDropdown } from '../Header/SpacesDropdown';
-import { InsightsProvider } from '../Insights';
+import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
+import { InsightsProvider, VisitorSessionProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
@@ -56,29 +58,38 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
     eventUrl.searchParams.set('o', context.organizationId);
     eventUrl.searchParams.set('s', context.site.id);
 
+    const getVisitorClaimsUrl = context.linker.toAbsoluteURL(
+        context.linker.toPathInSite('/~gitbook/visitor')
+    );
+
     return (
         <SpaceLayoutContextProvider basePath={context.linker.toPathInSpace('')}>
-            <CurrentContentProvider
-                organizationId={context.organizationId}
-                siteId={context.site.id}
-                siteSectionId={context.sections?.current?.id ?? null}
-                siteSpaceId={context.siteSpace.id}
-                siteShareKey={context.shareKey ?? null}
-                spaceId={context.space.id}
-                revisionId={context.revisionId}
-                visitorAuthClaims={visitorAuthClaims}
+            <AdaptiveVisitorContextProvider
+                contextId={context.contextId}
+                visitorClaimsURL={getVisitorClaimsUrl}
             >
-                <InsightsProvider
-                    enabled={withTracking}
-                    appURL={GITBOOK_APP_URL}
-                    eventUrl={eventUrl.toString()}
-                    visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
+                <CurrentContentProvider
+                    organizationId={context.organizationId}
+                    siteId={context.site.id}
+                    siteSectionId={context.sections?.current?.id ?? null}
+                    siteSpaceId={context.siteSpace.id}
+                    siteShareKey={context.shareKey ?? null}
+                    spaceId={context.space.id}
+                    revisionId={context.revisionId}
+                    visitorAuthClaims={visitorAuthClaims}
                 >
-                    <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
-                        {children}
-                    </AIChatProvider>
-                </InsightsProvider>
-            </CurrentContentProvider>
+                    <VisitorSessionProvider
+                        appURL={GITBOOK_APP_URL}
+                        visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
+                    >
+                        <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
+                            <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
+                                {children}
+                            </AIChatProvider>
+                        </InsightsProvider>
+                    </VisitorSessionProvider>
+                </CurrentContentProvider>
+            </AdaptiveVisitorContextProvider>
         </SpaceLayoutContextProvider>
     );
 }
@@ -93,7 +104,16 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const withSections = Boolean(sections && sections.list.length > 1);
-    const isMultiVariants = Boolean(siteSpaces.length > 1);
+
+    const currentLanguage = getSpaceLanguage(context);
+    const withVariants: 'generic' | 'translations' | undefined =
+        siteSpaces.length > 1
+            ? siteSpaces.some(
+                  (space) => space.space.language && space.space.language !== currentLanguage.locale
+              )
+                ? 'translations'
+                : 'generic'
+            : undefined;
 
     const withFooter =
         customization.themes.toggeable ||
@@ -104,7 +124,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     return (
         <SpaceLayoutServerContext {...props}>
             <Announcement context={context} />
-            <Header withTopHeader={withTopHeader} context={context} />
+            <Header withTopHeader={withTopHeader} withVariants={withVariants} context={context} />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                 <AIChat trademark={customization.trademark.enabled} />
             ) : null}
@@ -136,12 +156,20 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         'pr-4',
                                         'lg:flex',
                                         'grow-0',
-                                        'flex-wrap',
                                         'dark:shadow-light/1',
-                                        'text-base/tight'
+                                        'text-base/tight',
+                                        'items-center'
                                     )}
                                 >
                                     <HeaderLogo context={context} />
+                                    {withVariants === 'translations' ? (
+                                        <TranslationsDropdown
+                                            context={context}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={siteSpaces}
+                                            className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                        />
+                                    ) : null}
                                 </div>
                             )
                         }
@@ -149,14 +177,16 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                             <>
                                 {!withTopHeader && (
-                                    <SearchContainer
-                                        style={CustomizationSearchStyle.Subtle}
-                                        isMultiVariants={siteSpaces.length > 1}
-                                        spaceTitle={siteSpace.title}
-                                        siteSpaceId={siteSpace.id}
-                                        className="max-lg:hidden"
-                                        viewport="desktop"
-                                    />
+                                    <div className="flex gap-2">
+                                        <SearchContainer
+                                            style={CustomizationSearchStyle.Subtle}
+                                            isMultiVariants={siteSpaces.length > 1}
+                                            spaceTitle={siteSpace.title}
+                                            siteSpaceId={siteSpace.id}
+                                            className="max-lg:hidden"
+                                            viewport="desktop"
+                                        />
+                                    </div>
                                 )}
                                 {!withTopHeader && withSections && sections && (
                                     <SiteSectionList
@@ -164,16 +194,12 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         sections={encodeClientSiteSections(context, sections)}
                                     />
                                 )}
-                                {isMultiVariants && !sections && (
+                                {withVariants === 'generic' && (
                                     <SpacesDropdown
                                         context={context}
                                         siteSpace={siteSpace}
                                         siteSpaces={siteSpaces}
-                                        className={tcls(
-                                            'w-full',
-                                            'page-no-toc:hidden',
-                                            'page-no-toc:site-header-none:flex'
-                                        )}
+                                        className="w-full px-3 py-2"
                                     />
                                 )}
                             </>

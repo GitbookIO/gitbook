@@ -66,6 +66,7 @@ export const ru = {
     pdf_limit_reached_continue: 'Расширьте ещё на ${1} страниц.',
     more: 'Ещё',
     link_tooltip_external_link: 'Внешняя ссылка на',
+    link_tooltip_email: 'Отправить письмо на',
     link_tooltip_page_anchor: 'Перейти к разделу',
     open_in_new_tab: 'Открыть в новой вкладке',
     ai_chat_assistant_name: 'GitBook-помощник',
@@ -109,6 +110,10 @@ export const ru = {
     view_page_plaintext: 'Посмотреть как текст без форматирования',
     open_in: 'Открыть в ${1}',
     open_in_llms_pre_prompt: 'Прочитай ${1} и ответь на вопросы о содержимом.',
+    connect_mcp_to: 'Подключиться к ${1}',
+    install_mcp_on: 'Установить MCP-сервер на ${1}',
+    connect_with_mcp: 'Подключиться к MCP',
+    copy_mcp_url: 'Скопировать URL MCP-сервера',
     press_to_confirm: 'Нажмите ${1} для подтверждения',
     tool_call_skipped: 'Пропущен "${1}"',
 };

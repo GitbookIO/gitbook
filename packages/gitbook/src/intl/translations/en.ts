@@ -65,6 +65,7 @@ export const en = {
     pdf_limit_reached_continue: 'Extend with ${1} more pages.',
     more: 'More',
     link_tooltip_external_link: 'External link to',
+    link_tooltip_email: 'Send an email to',
     link_tooltip_page_anchor: 'Jump to section',
     open_in_new_tab: 'Open in new tab',
     ai_chat_assistant_name: 'GitBook Assistant',
@@ -108,6 +109,10 @@ export const en = {
     view_page_plaintext: 'View this page as plain text',
     open_in: 'Open in ${1}',
     open_in_llms_pre_prompt: 'Read ${1} and answer questions about the content.',
+    connect_mcp_to: 'Connect to ${1}',
+    install_mcp_on: 'Install MCP Server on ${1}',
+    connect_with_mcp: 'Connect with MCP',
+    copy_mcp_url: 'Copy the MCP Server URL',
     press_to_confirm: 'Press ${1} to confirm',
     tool_call_skipped: 'Skipped "${1}"',
 };

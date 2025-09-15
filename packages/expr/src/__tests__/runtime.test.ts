@@ -42,11 +42,29 @@ describe('ExpressionRuntime', () => {
                 },
                 expectedResult: true,
             },
+            {
+                scenario: 'array method',
+                condition: 'reviews.every(review => !!review.status)',
+                inputs: { reviews: [{ status: 'approved' }, { status: 'approved' }] },
+                expectedResult: true,
+            },
+            {
+                scenario: 'array every',
+                condition: 'reviews.every(review => review.status === "approved")',
+                inputs: { reviews: [{ status: 'approved' }, { status: 'approved' }] },
+                expectedResult: true,
+            },
+            {
+                scenario: 'array map',
+                condition: '[1, 2, 3].map(n => n * x)',
+                inputs: { x: 2 },
+                expectedResult: [2, 4, 6],
+            },
         ])(
             'should properly evaluate/safeEvaluate a valid conditional expression: $scenario',
             ({ condition, inputs, expectedResult }) => {
-                expect(runtime.evaluate(condition, inputs)).toBe(expectedResult);
-                expect(runtime.safeEvaluate(condition, inputs).value).toBe(expectedResult);
+                expect(runtime.evaluate(condition, inputs)).toEqual(expectedResult);
+                expect(runtime.safeEvaluate(condition, inputs).value).toEqual(expectedResult);
             }
         );
 

@@ -1,18 +1,29 @@
 import type { SiteSpace } from '@gitbook/api';
+import { useMemo } from 'react';
 
 import type { GitBookSiteContext } from '@/lib/context';
 import { getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
+import { Button, type ButtonProps } from '../primitives';
 import { DropdownChevron, DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
+
+// Memoized regex for checking if a string starts with an emoji
+const EMOJI_REGEX = /^\p{Emoji}/u;
+
+function startsWithEmoji(text: string): boolean {
+    return EMOJI_REGEX.test(text);
+}
 
 export function SpacesDropdown(props: {
     context: GitBookSiteContext;
     siteSpace: SiteSpace;
     siteSpaces: SiteSpace[];
     className?: string;
+    variant?: ButtonProps['variant'];
+    icon?: ButtonProps['icon'];
 }) {
-    const { context, siteSpace, siteSpaces, className } = props;
+    const { context, siteSpace, siteSpaces, className, variant = 'secondary', icon } = props;
 
     return (
         <DropdownMenu
@@ -21,48 +32,16 @@ export function SpacesDropdown(props: {
                 'group-focus-within/dropdown:group-hover/dropdown:visible' // When the dropdown is already open, it should remain visible when hovered
             )}
             button={
-                <div
+                <Button
+                    icon={icon}
                     data-testid="space-dropdown-button"
-                    className={tcls(
-                        'flex',
-                        'flex-row',
-                        'items-center',
-                        'transition-all',
-                        'hover:cursor-pointer',
-
-                        'px-3',
-                        'py-2',
-                        'gap-2',
-
-                        'rounded-md',
-                        'straight-corners:rounded-none',
-
-                        'bg-tint-base',
-
-                        'text-sm',
-                        'text-tint',
-                        'hover:text-tint-strong',
-                        'data-[state=open]:text-tint-strong',
-
-                        'ring-1',
-                        'ring-tint-subtle',
-                        'hover:ring-tint-hover',
-                        'data-[state=open]:ring-tint-hover',
-
-                        'contrast-more:bg-tint-base',
-                        'contrast-more:ring-1',
-                        'contrast-more:hover:ring-2',
-                        'contrast-more:data-[state=open]:ring-2',
-                        'contrast-more:ring-tint',
-                        'contrast-more:hover:ring-tint-hover',
-                        'contrast-more:data-[state=open]:ring-tint-hover',
-
-                        className
-                    )}
+                    size="medium"
+                    variant={variant}
+                    trailing={<DropdownChevron />}
+                    className={tcls('bg-tint-base', className)}
                 >
-                    <span className={tcls('truncate', 'grow')}>{siteSpace.title}</span>
-                    <DropdownChevron />
-                </div>
+                    <span className="button-content">{siteSpace.title}</span>
+                </Button>
             }
         >
             <SpacesDropdownMenuItems
@@ -75,5 +54,34 @@ export function SpacesDropdown(props: {
                 curPath={siteSpace.path}
             />
         </DropdownMenu>
+    );
+}
+
+export function TranslationsDropdown(props: {
+    context: GitBookSiteContext;
+    siteSpace: SiteSpace;
+    siteSpaces: SiteSpace[];
+    className?: string;
+}) {
+    const { context, siteSpace, siteSpaces, className } = props;
+
+    // Memoize the emoji check to avoid repeated regex execution
+    const hasEmojiPrefix = useMemo(() => startsWithEmoji(siteSpace.title), [siteSpace.title]);
+
+    return (
+        <SpacesDropdown
+            icon="globe"
+            context={context}
+            siteSpace={siteSpace}
+            siteSpaces={siteSpaces}
+            variant="blank"
+            className={tcls(
+                '-mx-2 bg-transparent px-2 py-1 lg:max-w-64 max-md:[&_.button-content]:hidden',
+                hasEmojiPrefix
+                    ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
+                    : '',
+                className
+            )}
+        />
     );
 }

@@ -9,7 +9,9 @@ import {
     tokenizer,
 } from 'acorn';
 import { parse as parseLoose } from 'acorn-loose';
-import { evaluate } from 'eval-estree-expression';
+import escodegen from 'escodegen';
+import evalESTreeExpr from 'eval-estree-expression';
+const { evaluate } = evalESTreeExpr;
 
 import { AutoComplete } from './autocomplete';
 import { ExpressionError } from './errors';
@@ -49,6 +51,7 @@ export class ExpressionRuntime {
             return evaluate.sync<Expression>(parsed.result, inputs, {
                 functions: true,
                 withMembers: true,
+                generate: escodegen.generate,
             });
         } catch (error) {
             throw error instanceof Error
