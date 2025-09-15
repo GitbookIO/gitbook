@@ -112,6 +112,10 @@ export const zh: TranslationLanguage = {
     view_page_plaintext: '以纯文本查看此页面',
     open_in: '在 ${1} 中打开',
     open_in_llms_pre_prompt: '阅读 ${1} 并回答内容相关的问题。',
+    connect_mcp_to: '连接到 ${1}',
+    install_mcp_on: '在 ${1} 上安装 MCP 服务器',
+    connect_with_mcp: '连接 MCP',
+    copy_mcp_url: '复制 MCP 服务器 URL',
     press_to_confirm: '按 ${1} 确认',
     tool_call_skipped: '已跳过 "${1}"',
 };

@@ -336,6 +336,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         pageActions: {
             externalAI: true,
             markdown: true,
+            mcp: true,
         },
         trademark: {
             enabled: true,

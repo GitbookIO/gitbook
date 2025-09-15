@@ -114,6 +114,10 @@ export const ru = {
     view_page_plaintext: 'Посмотреть как текст без форматирования',
     open_in: 'Открыть в ${1}',
     open_in_llms_pre_prompt: 'Прочитай ${1} и ответь на вопросы о содержимом.',
+    connect_mcp_to: 'Подключиться к ${1}',
+    install_mcp_on: 'Установить MCP-сервер на ${1}',
+    connect_with_mcp: 'Подключиться к MCP',
+    copy_mcp_url: 'Скопировать URL MCP-сервера',
     press_to_confirm: 'Нажмите ${1} для подтверждения',
     tool_call_skipped: 'Пропущен "${1}"',
 };

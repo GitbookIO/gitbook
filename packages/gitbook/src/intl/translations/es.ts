@@ -117,6 +117,10 @@ export const es: TranslationLanguage = {
     view_page_plaintext: 'Ver esta página como texto plano',
     open_in: 'Abrir en ${1}',
     open_in_llms_pre_prompt: 'Lee ${1} y responde preguntas sobre el contenido.',
+    connect_mcp_to: 'Conectar a ${1}',
+    install_mcp_on: 'Instalar servidor MCP en ${1}',
+    connect_with_mcp: 'Conectar con MCP',
+    copy_mcp_url: 'Copiar URL del servidor MCP',
     press_to_confirm: 'Presiona ${1} para confirmar',
     tool_call_skipped: 'Omitido "${1}"',
 };
