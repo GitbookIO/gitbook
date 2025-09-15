@@ -1,10 +1,10 @@
 'use client';
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
+import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
 import { DateRelative } from '../primitives';
-import type { AdminToolbarClientProps } from './AdminToolbar';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
 import {
@@ -17,6 +17,7 @@ import {
     ToolbarSubtitle,
     ToolbarTitle,
 } from './Toolbar';
+import type { AdminToolbarClientProps } from './types';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const { context } = props;
@@ -65,6 +66,10 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 
     const author = changeRequest.createdBy.displayName;
 
+    const { refreshForUpdates, updated } = useCheckForContentUpdate({
+        revisionId: changeRequest.revision,
+    });
+
     return (
         <Toolbar>
             <ToolbarBody>
@@ -85,10 +90,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 
             <ToolbarButtonGroup>
                 {/* Refresh to retrieve latest changes */}
-                <RefreshContentButton
-                    revisionId={changeRequest.revision}
-                    updatedAt={new Date(changeRequest.updatedAt).getTime()}
-                />
+                {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
                 {/* Comment in app */}
                 <ToolbarButton
                     title="Comment in a GitBook"
@@ -187,6 +189,10 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
 function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
     const { context } = props;
     const { revision, space, site } = context;
+    const { refreshForUpdates, updated } = useCheckForContentUpdate({
+        revisionId: space.revision,
+    });
+
     return (
         <Toolbar>
             <ToolbarBody>
@@ -202,10 +208,7 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
             <ToolbarSeparator />
             <ToolbarButtonGroup>
                 {/* Refresh to retrieve latest changes */}
-                <RefreshContentButton
-                    revisionId={space.revision}
-                    updatedAt={new Date(revision.createdAt).getTime()}
-                />
+                {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
                 <ToolbarButton title="Open site in GitBook" href={site.urls.app} icon="gear" />
                 <ToolbarButton
                     title="Customize in GitBook"

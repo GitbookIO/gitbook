@@ -1,58 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { AdminToolbarClient } from './AdminToolbarClient';
+import type { AdminToolbarContext } from './types';
 
 export interface AdminToolbarProps {
     context: GitBookSiteContext;
-}
-
-// Minimal types containing only the fields needed for AdminToolbar to restrict what gets serialized
-export type MinimalChangeRequest = {
-    id: string;
-    number: number;
-    subject: string | null;
-    revision: string;
-    updatedAt: string;
-    createdBy: {
-        displayName: string;
-    };
-    urls: {
-        app: string;
-    };
-};
-
-export type MinimalRevision = {
-    createdAt: string;
-    urls: {
-        app: string;
-    };
-    git?: {
-        url: string | undefined;
-    } | null;
-};
-
-export type AdminToolbarContext = {
-    organizationId: string;
-    revisionId: string;
-    space: {
-        id: string;
-        revision: string;
-        urls: {
-            app: string;
-        };
-    };
-    changeRequest: MinimalChangeRequest | null;
-    revision: MinimalRevision;
-    site: {
-        title: string;
-        urls: {
-            app: string;
-            published: string | undefined;
-        };
-    };
-};
-
-export interface AdminToolbarClientProps {
-    context: AdminToolbarContext;
 }
 
 /**
@@ -61,7 +12,7 @@ export interface AdminToolbarClientProps {
 export async function AdminToolbar(props: AdminToolbarProps) {
     const { context } = props;
 
-    // Create a minimal context with only the fields needed for AdminToolbar
+    // Create a minimal context to avoid serializing and passing too many data to the client
     const minimalContext: AdminToolbarContext = {
         organizationId: context.organizationId,
         revisionId: context.revisionId,

@@ -111,8 +111,14 @@ export function ToolbarBody(props: { children: React.ReactNode }) {
 }
 
 export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
+    const { children } = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const { buttonMotionValues } = useMagnificationEffect(containerRef);
+
+    const buttonChildren = React.Children.toArray(children).filter((child) => !!child);
+    const { buttonMotionValues } = useMagnificationEffect({
+        childrenCount: buttonChildren.length,
+        containerRef,
+    });
 
     return (
         <motion.div
@@ -122,10 +128,11 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
             animate="show"
             className="flex items-center gap-1 overflow-visible pr-2 pl-4"
         >
-            {React.Children.map(props.children, (child, index) => {
+            {buttonChildren.map((child, index) => {
                 const motionValues = buttonMotionValues[index];
                 const childEl = child as React.ReactElement;
                 return React.cloneElement(childEl, {
+                    key: index,
                     motionValues,
                 });
             })}
@@ -138,7 +145,7 @@ export interface ToolbarButtonProps extends Omit<React.HTMLProps<HTMLAnchorEleme
         scale: MotionValue<number>;
         x: MotionValue<number>;
     };
-    icon?: IconName;
+    icon: IconName;
     iconClassName?: string;
     title?: React.ReactNode;
 }
@@ -200,7 +207,7 @@ export function ToolbarButton(props: ToolbarButtonProps) {
                         'shadow-1xs'
                     )}
                 >
-                    {icon && <Icon icon={icon} className={tcls('size-4', iconClassName)} />}
+                    <Icon icon={icon} className={tcls('size-4', iconClassName)} />
                 </motion.a>
             </Tooltip>
         </motion.div>

@@ -117,10 +117,12 @@ const calculateSpacing = (
     return rightPush - leftPush;
 };
 
-export function useMagnificationEffect(
-    containerRef: React.RefObject<HTMLElement>,
-    config: MagnificationConfig = {}
-) {
+export function useMagnificationEffect(props: {
+    childrenCount: number;
+    containerRef: React.RefObject<HTMLElement>;
+    config?: MagnificationConfig;
+}) {
+    const { childrenCount, containerRef, config } = props;
     const [buttonMotionValues, setButtonMotionValues] = React.useState<ButtonMotionValues[]>([]);
     const originalPositionsRef = React.useRef<Array<{ left: number; width: number }>>([]);
 
@@ -131,6 +133,13 @@ export function useMagnificationEffect(
         if (!container) return;
 
         const buttons = Array.from(container.querySelectorAll('.toolbar-button')) as HTMLElement[];
+
+        if (buttons.length !== childrenCount) {
+            console.error(
+                `Button count (${buttons.length}) does not match children count (${childrenCount})`
+            );
+            return;
+        }
 
         // Initialize motion values if button count changed
         if (buttonMotionValues.length !== buttons.length) {
@@ -210,6 +219,7 @@ export function useMagnificationEffect(
         finalConfig.padding,
         containerRef,
         buttonMotionValues,
+        childrenCount,
     ]);
 
     return { buttonMotionValues };

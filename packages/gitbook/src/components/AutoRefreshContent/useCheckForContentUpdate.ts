@@ -8,9 +8,17 @@ import { hasContentBeenUpdated } from './server-actions';
  * Return a callback to check if a content has been updated and to refresh the page if it has.
  */
 export function useCheckForContentUpdate(props: {
+    /**
+     * ID of the revision of the content currently being displayed.
+     */
     revisionId: string;
+    /**
+     * How long after page load to check for updates.
+     * @default 5min
+     */
+    checkAfterLoad?: number;
 }) {
-    const { revisionId } = props;
+    const { revisionId, checkAfterLoad = 5 * 60 * 1000 } = props;
     const [updated, setUpdated] = React.useState(false);
 
     const checkForUpdates = React.useCallback(async () => {
@@ -29,6 +37,20 @@ export function useCheckForContentUpdate(props: {
             window.location.reload();
         }
     }, [checkForUpdates]);
+
+    // Check for updates after the page has loaded
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (document.visibilityState === 'visible') {
+                // We check only if the tab is visible; otherwise we'll check when the tab is focus again
+                checkForUpdates();
+            }
+        }, checkAfterLoad);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [checkForUpdates, checkAfterLoad]);
 
     // Check for updates when the tab is becoming visible
     React.useEffect(() => {

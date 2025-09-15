@@ -7,6 +7,7 @@ import { traceErrorOnly } from '@/lib/tracing';
 
 /**
  * Return true if the content has been updated.
+ * It compares the revision ID displayed on the client side with the latest revision ID from the server/cache.
  */
 export async function hasContentBeenUpdated(props: {
     revisionId: string;
