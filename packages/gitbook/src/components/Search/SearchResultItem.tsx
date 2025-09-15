@@ -51,6 +51,7 @@ export const SearchResultItem = React.forwardRef(function SearchResultItem(
                     : null,
                 className
             )}
+            role="option"
             {...rest}
         >
             <div className="size-4 shrink-0 text-tint-subtle">
