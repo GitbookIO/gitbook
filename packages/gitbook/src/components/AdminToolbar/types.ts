@@ -35,6 +35,7 @@ export type MinimalSpace = {
 };
 
 export type MinimalSite = {
+    id: string;
     title: string;
     urls: {
         app: string;

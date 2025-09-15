@@ -50,6 +50,7 @@ export async function AdminToolbar(props: AdminToolbarProps) {
                 : null,
         },
         site: {
+            id: context.site.id,
             title: context.site.title,
             urls: {
                 app: context.site.urls.app,

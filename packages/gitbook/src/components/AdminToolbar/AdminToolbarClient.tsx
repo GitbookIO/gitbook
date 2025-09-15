@@ -94,26 +94,40 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                 {/* Comment in app */}
                 <ToolbarButton
                     title="Comment in a GitBook"
-                    href={`${changeRequest.urls.app}~/comments`}
+                    href={getToolbarHref({
+                        href: `${changeRequest.urls.app}~/comments`,
+                        siteId: site.id,
+                        buttonId: 'comment',
+                    })}
                     icon="comment"
                 />
 
                 {/* Open production site */}
-                <ToolbarButton
-                    title="Open production site"
-                    href={site.urls.published}
-                    icon="globe"
-                />
+                {site.urls.published ? (
+                    <ToolbarButton
+                        title="Open production site"
+                        href={getToolbarHref({
+                            href: site.urls.published,
+                            siteId: site.id,
+                            buttonId: 'production-site',
+                        })}
+                        icon="globe"
+                    />
+                ) : null}
 
                 {/* Open CR in GitBook */}
                 <ToolbarButton
                     title="View change request in GitBook"
-                    href={changeRequest.urls.app}
+                    href={getToolbarHref({
+                        href: changeRequest.urls.app,
+                        siteId: site.id,
+                        buttonId: 'change-request',
+                    })}
                     icon="code-pull-request"
                 />
 
                 {/* Edit in GitBook */}
-                <EditPageButton href={changeRequest.urls.app} />
+                <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
             </ToolbarButtonGroup>
         </Toolbar>
     );
@@ -171,14 +185,24 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                     disabled={!gitURL}
                     icon={gitURL ? (isGitHub ? 'github' : 'gitlab') : 'github'}
                 />
-                <ToolbarButton
-                    title="Open production site"
-                    href={site.urls.published}
-                    icon="globe"
-                />
+                {site.urls.published ? (
+                    <ToolbarButton
+                        title="Open production site"
+                        href={getToolbarHref({
+                            href: site.urls.published,
+                            siteId: site.id,
+                            buttonId: 'production-site',
+                        })}
+                        icon="globe"
+                    />
+                ) : null}
                 <ToolbarButton
                     title="View this revision in GitBook"
-                    href={revision.urls.app}
+                    href={getToolbarHref({
+                        href: revision.urls.app,
+                        siteId: site.id,
+                        buttonId: 'revision',
+                    })}
                     icon="code-commit"
                 />
             </ToolbarButtonGroup>
@@ -209,18 +233,34 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
             <ToolbarButtonGroup>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
-                <ToolbarButton title="Open site in GitBook" href={site.urls.app} icon="gear" />
+                <ToolbarButton
+                    title="Open site in GitBook"
+                    href={getToolbarHref({
+                        href: site.urls.app,
+                        siteId: site.id,
+                        buttonId: 'site',
+                    })}
+                    icon="gear"
+                />
                 <ToolbarButton
                     title="Customize in GitBook"
-                    href={`${site.urls.app}/customization/general`}
+                    href={getToolbarHref({
+                        href: `${site.urls.app}/customization/general`,
+                        siteId: site.id,
+                        buttonId: 'customize',
+                    })}
                     icon="palette"
                 />
                 <ToolbarButton
                     title="Open insights in GitBook"
-                    href={`${site.urls.app}/insights`}
+                    href={getToolbarHref({
+                        href: `${site.urls.app}/insights`,
+                        siteId: site.id,
+                        buttonId: 'insights',
+                    })}
                     icon="chart-simple"
                 />
-                <EditPageButton href={space.urls.app} />
+                <EditPageButton href={space.urls.app} siteId={site.id} />
             </ToolbarButtonGroup>
         </Toolbar>
     );
@@ -228,17 +268,39 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
 
 function EditPageButton(props: {
     href: string;
+    siteId: string;
     motionValues?: ToolbarButtonProps['motionValues'];
 }) {
-    const { href, motionValues } = props;
+    const { href, motionValues, siteId } = props;
     const pagePath = useCurrentPagePath();
 
     return (
         <ToolbarButton
             title="Edit in GitBook"
-            href={`${href}${pagePath.startsWith('/') ? pagePath.slice(1) : pagePath}`}
+            href={getToolbarHref({
+                href: `${href}${pagePath.startsWith('/') ? pagePath.slice(1) : pagePath}`,
+                siteId,
+                buttonId: 'edit',
+            })}
             icon="pencil"
             motionValues={motionValues}
         />
     );
+}
+
+/**
+ * Append utm parameters to a URL to track usage of the toolbar.
+ */
+function getToolbarHref({
+    href,
+    siteId,
+    buttonId,
+}: { href: string; siteId: string; buttonId: string }) {
+    const url = new URL(href);
+    url.searchParams.set('utm_source', 'content');
+    url.searchParams.set('utm_medium', 'toolbar');
+    url.searchParams.set('utm_campaign', siteId);
+    url.searchParams.set('utm_content', buttonId);
+
+    return url.toString();
 }
