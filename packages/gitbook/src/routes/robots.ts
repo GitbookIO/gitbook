@@ -6,10 +6,13 @@ import { isSiteIndexable } from '@/lib/seo';
  */
 export async function serveRobotsTxt(context: GitBookSiteContext) {
     const { linker } = context;
+
     const isRoot = checkIsRootSiteContext(context);
     const isIndexable = await isSiteIndexable(context);
+
     const sitemapPath = linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml');
     const sitemapUrl = linker.toAbsoluteURL(sitemapPath);
+
     const lines = isIndexable
         ? [
               'User-agent: *',
@@ -24,5 +27,6 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
               `Sitemap: ${sitemapUrl}`,
           ]
         : ['User-agent: *', 'Disallow: /'];
+
     return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain' } });
 }
