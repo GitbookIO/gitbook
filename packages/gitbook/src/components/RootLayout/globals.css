@@ -217,6 +217,7 @@
         ::-webkit-scrollbar {
             background: transparent;
             max-width: 8px;
+            max-height: 6px;
         }
 
         ::-webkit-scrollbar-thumb {

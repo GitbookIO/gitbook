@@ -163,42 +163,18 @@ export function Header(props: {
             </div>
 
             {sections ? (
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
-                    <div
-                        className={tcls(
-                            'w-full',
-                            'overflow-x-auto',
-                            'no-scrollbar',
-                            '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
-                            !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
-                        )}
-                    >
-                        <div
-                            className={tcls(
-                                CONTAINER_STYLE,
-                                'grow',
-                                'flex',
-                                'items-end',
-                                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
-                            )}
-                        >
-                            {sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
-                            sections.list.length > 1 ? ( // Otherwise, show the tabs if there's more than one section
-                                <SiteSectionTabs
-                                    sections={encodeClientSiteSections(context, sections)}
+                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
+                        {withVariants === 'translations' ? (
+                            <div className="before:contents[] after:-z-1 after:contents[] gutter-stable sticky inset-y-0 right-0 z-10 flex self-start py-2 before:mr-4 before:border-tint before:border-l">
+                                <TranslationsDropdown
+                                    context={context}
+                                    siteSpace={siteSpace}
+                                    siteSpaces={siteSpaces}
                                 />
-                            ) : null}
-                            {withVariants === 'translations' ? (
-                                <div className="site-background before:contents[] -mr-4 sm:-mr-6 md:-mr-8 sticky inset-y-0 right-0 z-10 ml-6 flex h-full items-center py-2 pr-4 before:mr-4 before:h-full before:border-tint before:border-l sm:pr-6 md:pr-8">
-                                    <TranslationsDropdown
-                                        context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
-                                    />
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
+                            </div>
+                        ) : null}
+                    </SiteSectionTabs>
                 </div>
             ) : null}
         </header>
