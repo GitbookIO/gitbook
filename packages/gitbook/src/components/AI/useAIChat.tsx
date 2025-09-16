@@ -21,6 +21,7 @@ export type AIChatMessage = {
     role: AIMessageRole;
     content: React.ReactNode;
     query?: string;
+    note?: string;
 };
 
 export type AIChatPendingTool = {
@@ -391,11 +392,11 @@ export function AIChatProvider(props: {
                 return {
                     ...state,
                     messages: [
-                        ...state.messages,
                         {
                             role: AIMessageRole.User,
                             content: input.message,
                             query: input.message,
+                            note: state.messages.length > 0 ? 'Starting a new chat' : undefined,
                         },
                     ],
                     query: input.message,
