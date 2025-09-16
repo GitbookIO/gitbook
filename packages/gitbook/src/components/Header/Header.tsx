@@ -120,9 +120,28 @@ export function Header(props: {
                         >
                             <SearchContainer
                                 style={customization.styling.search}
-                                isMultiVariants={siteSpaces.length > 1}
+                                withVariants={withVariants === 'generic'}
+                                withSiteVariants={
+                                    sections?.list.some(
+                                        (s) =>
+                                            s.object === 'site-section' &&
+                                            s.siteSpaces.filter(
+                                                (s) => s.space.language === siteSpace.space.language
+                                            ).length > 1
+                                    ) ?? false
+                                }
+                                withSections={!!sections}
+                                section={
+                                    sections
+                                        ? // Client-encode to avoid a serialisation issue that was causing the language selector to disappear
+                                          encodeClientSiteSections(context, sections).current
+                                        : undefined
+                                }
                                 spaceTitle={siteSpace.title}
                                 siteSpaceId={siteSpace.id}
+                                siteSpaceIds={siteSpaces
+                                    .filter((s) => s.space.language === siteSpace.space.language)
+                                    .map((s) => s.id)}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                             />
                         </div>

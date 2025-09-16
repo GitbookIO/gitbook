@@ -1,14 +1,24 @@
 'use client';
 
-import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
+import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import React from 'react';
 import type { LinkProps } from '../primitives';
+
+export type SearchScope =
+    /** Search all content on the site */
+    | 'all'
+    /** Search the current section's variant + matched/default variant for other sections */
+    | 'default'
+    /** Search all variants of the current section */
+    | 'extended'
+    /** Search only the current section's current variant */
+    | 'current';
 
 export interface SearchState {
     // URL-backed state
     query: string | null;
     ask: string | null;
-    global: boolean;
+    scope: SearchScope;
 
     // Local UI state
     open: boolean;
@@ -18,7 +28,8 @@ export interface SearchState {
 const keyMap = {
     q: parseAsString,
     ask: parseAsString,
-    global: parseAsBoolean,
+    scope: parseAsStringLiteral(['all', 'default', 'extended', 'current']).withDefault('default'),
+    global: parseAsBoolean, // Legacy support for global=true
 };
 
 export type UpdateSearchState = (
@@ -41,14 +52,21 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         history: 'replace',
     });
 
-    // Handle legacy ask=true format by converting it to the new format
     React.useEffect(() => {
+        // Handle legacy ask=true format by converting it to the new format
         if (rawState?.ask === 'true' && rawState?.q) {
             // Convert legacy format: q=query&ask=true -> ask=query&q=null
             setRawState({
                 q: null,
                 ask: rawState.q,
-                global: rawState.global,
+            });
+        }
+
+        // Handle legacy global=true
+        if (rawState?.global === true) {
+            setRawState({
+                scope: 'all',
+                global: null, // Remove the legacy parameter
             });
         }
     }, [rawState, setRawState]);
@@ -65,7 +83,7 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         return {
             query: rawState.q,
             ask: rawState.ask,
-            global: !!rawState.global,
+            scope: rawState.scope,
             open,
         };
     }, [rawState, open]);
@@ -85,14 +103,14 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
 
             if (update === null) {
                 setIsOpen(false);
-                return setRawState({ q: null, ask: null, global: null });
+                return setRawState({ q: null, ask: null, scope: 'default' });
             }
 
             setIsOpen(update.open);
             return setRawState({
                 q: update.query,
                 ask: update.ask,
-                global: update.global ? true : null,
+                scope: update.scope,
             });
         },
         [setRawState]
@@ -126,7 +144,7 @@ export function useSearchLink(): (
             const searchParams = new URLSearchParams();
             params.query ? searchParams.set('q', params.query) : searchParams.delete('q');
             params.ask ? searchParams.set('ask', params.ask) : searchParams.delete('ask');
-            params.global ? searchParams.set('global', 'true') : searchParams.delete('global');
+            params.scope ? searchParams.set('scope', params.scope) : searchParams.delete('scope');
             return {
                 href: `?${searchParams.toString()}`,
                 prefetch: false,
@@ -137,7 +155,7 @@ export function useSearchLink(): (
                         ...prev,
                         query: params.query !== undefined ? params.query : null,
                         ask: params.ask !== undefined ? params.ask : null,
-                        global: params.global !== undefined ? params.global : false,
+                        scope: params.scope !== undefined ? params.scope : 'default',
                         open: params.open !== undefined ? params.open : false,
                     }));
                 },
