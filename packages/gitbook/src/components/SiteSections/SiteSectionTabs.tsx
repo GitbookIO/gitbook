@@ -47,91 +47,85 @@ export function SiteSectionTabs(props: {
 
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
-            className="relative"
+            className={tcls(
+                CONTAINER_STYLE,
+                'relative z-10 flex w-full flex-nowrap items-end',
+                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
+                className
+            )}
             value={value}
             onValueChange={setValue}
             skipDelayDuration={500}
         >
             <div
                 className={tcls(
-                    CONTAINER_STYLE,
-                    'z-10 flex w-full flex-nowrap items-center',
-                    'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
-                    className
+                    'md:-ml-8 -ml-4 sm:-ml-6 no-scrollbar relative flex grow list-none items-end overflow-x-auto pl-4 sm:pl-6 md:pl-8',
+                    !children ? 'md:-mr-8 -mr-4 sm:-mr-6 pr-4 sm:pr-6 md:pr-8' : ''
                 )}
             >
-                <div
-                    className={tcls(
-                        'md:-ml-8 -ml-4 sm:-ml-6 flex grow list-none items-end overflow-x-auto pl-4 sm:pl-6 md:pl-8',
-                        !children ? 'md:-mr-8 -mr-4 sm:-mr-6 pr-4 sm:pr-6 md:pr-8' : ''
-                    )}
+                <NavigationMenu.List
+                    className="-mx-3 flex grow gap-2 bg-transparent"
+                    aria-label="Sections"
+                    id="sections"
                 >
-                    <NavigationMenu.List
-                        className="-mx-3 flex grow gap-2 bg-transparent"
-                        aria-label="Sections"
-                        id="sections"
-                    >
-                        {sectionsAndGroups.map((sectionOrGroup) => {
-                            const { id, title, icon } = sectionOrGroup;
-                            const isGroup = sectionOrGroup.object === 'site-section-group';
-                            const isActiveGroup =
-                                isGroup &&
-                                Boolean(
-                                    sectionOrGroup.sections.find((s) => s.id === currentSection.id)
-                                );
-                            const isActive = isActiveGroup || id === currentSection.id;
-                            return (
-                                <NavigationMenu.Item key={id} value={id} id={id}>
-                                    {isGroup ? (
-                                        sectionOrGroup.sections.length > 0 ? (
-                                            <>
-                                                <NavigationMenu.Trigger
-                                                    asChild
-                                                    ref={
-                                                        value === id ? currentTriggerRef : undefined
-                                                    }
-                                                    onClick={(e) => {
-                                                        // Prevent clicking the trigger from closing when the viewport is open
-                                                        if (value === id) {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                        }
-                                                    }}
-                                                >
-                                                    <SectionTab
-                                                        isActive={isActive}
-                                                        title={title}
-                                                        icon={icon as IconName}
-                                                    />
-                                                </NavigationMenu.Trigger>
-                                                <NavigationMenu.Content
-                                                    style={{ padding: `${VIEWPORT_PADDING}px` }}
-                                                >
-                                                    <SectionGroupTileList
-                                                        sections={sectionOrGroup.sections}
-                                                        currentSection={currentSection}
-                                                    />
-                                                </NavigationMenu.Content>
-                                            </>
-                                        ) : null
-                                    ) : (
-                                        <NavigationMenu.Link asChild>
-                                            <SectionTab
-                                                url={sectionOrGroup.url}
-                                                isActive={isActive}
-                                                title={title}
-                                                icon={icon ? (icon as IconName) : undefined}
-                                            />
-                                        </NavigationMenu.Link>
-                                    )}
-                                </NavigationMenu.Item>
+                    {sectionsAndGroups.map((sectionOrGroup) => {
+                        const { id, title, icon } = sectionOrGroup;
+                        const isGroup = sectionOrGroup.object === 'site-section-group';
+                        const isActiveGroup =
+                            isGroup &&
+                            Boolean(
+                                sectionOrGroup.sections.find((s) => s.id === currentSection.id)
                             );
-                        })}
-                    </NavigationMenu.List>
-                </div>
-
-                {children}
+                        const isActive = isActiveGroup || id === currentSection.id;
+                        return (
+                            <NavigationMenu.Item key={id} value={id} id={id}>
+                                {isGroup ? (
+                                    sectionOrGroup.sections.length > 0 ? (
+                                        <>
+                                            <NavigationMenu.Trigger
+                                                asChild
+                                                ref={value === id ? currentTriggerRef : undefined}
+                                                onClick={(e) => {
+                                                    // Prevent clicking the trigger from closing when the viewport is open
+                                                    if (value === id) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }
+                                                }}
+                                            >
+                                                <SectionTab
+                                                    isActive={isActive}
+                                                    title={title}
+                                                    icon={icon as IconName}
+                                                />
+                                            </NavigationMenu.Trigger>
+                                            <NavigationMenu.Content
+                                                style={{ padding: `${VIEWPORT_PADDING}px` }}
+                                            >
+                                                <SectionGroupTileList
+                                                    sections={sectionOrGroup.sections}
+                                                    currentSection={currentSection}
+                                                />
+                                            </NavigationMenu.Content>
+                                        </>
+                                    ) : null
+                                ) : (
+                                    <NavigationMenu.Link asChild>
+                                        <SectionTab
+                                            url={sectionOrGroup.url}
+                                            isActive={isActive}
+                                            title={title}
+                                            icon={icon ? (icon as IconName) : undefined}
+                                        />
+                                    </NavigationMenu.Link>
+                                )}
+                            </NavigationMenu.Item>
+                        );
+                    })}
+                </NavigationMenu.List>
             </div>
+
+            {children}
 
             <div
                 className="absolute top-full left-0 z-20 flex w-full"
@@ -167,6 +161,7 @@ const SectionTab = React.forwardRef(function SectionTab(
     ref: React.Ref<HTMLAnchorElement>
 ) {
     const { isActive, title, icon, url, ...rest } = props;
+    const isGroup = url === undefined;
     return (
         <Button
             ref={ref}
@@ -175,7 +170,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             {...rest}
             icon={icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
             label={title}
-            trailing={!url ? <DropdownChevron /> : null}
+            trailing={isGroup ? <DropdownChevron /> : null}
             active={isActive}
             className={tcls(
                 'group/dropdown relative my-2 overflow-visible px-3 py-1',
