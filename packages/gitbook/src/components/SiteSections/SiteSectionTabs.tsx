@@ -36,14 +36,14 @@ export function SiteSectionTabs(props: {
 
     React.useEffect(() => {
         const trigger = currentTriggerRef.current;
-        if (!trigger) {
+        if (!value || !trigger) {
             return;
         }
 
         const triggerWidth = trigger.getBoundingClientRect().width;
         const triggerLeft = trigger.getBoundingClientRect().left;
         setOffset(triggerLeft + triggerWidth / 2);
-    });
+    }, [value]);
 
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
