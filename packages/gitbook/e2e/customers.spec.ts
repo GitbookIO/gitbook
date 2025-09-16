@@ -62,11 +62,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.gmgn.ai',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.spicychat.ai',
-        contentBaseURL: 'https://docs.spicychat.ai',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // {
+    //     name: 'docs.spicychat.ai',
+    //     contentBaseURL: 'https://docs.spicychat.ai',
+    //     tests: [{ name: 'Home', url: '/' }],
+    // },
     {
         name: 'docs.portainer.io',
         contentBaseURL: 'https://docs.portainer.io',

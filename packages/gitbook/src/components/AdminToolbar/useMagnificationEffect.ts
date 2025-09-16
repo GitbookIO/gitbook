@@ -23,7 +23,7 @@ interface MagnificationConfig {
 
 const defaultConfig: Required<MagnificationConfig> = {
     buttonSize: 32, // Standard button size for 32px (size-8) buttons
-    maxScale: 1.3, // 30% scale increase - noticeable but not overwhelming
+    maxScale: 1.25, // 25% scale increase - noticeable but not overwhelming
     influenceRadius: 80, // ~2.5 button widths of influence
     spacingMultiplier: 1.3, // Creates proportional spacing to scale increase
     scaleExponent: 2.5, // Exponential curve for dramatic close-range scaling
@@ -46,39 +46,71 @@ const resetMotionValues = (motionValues: ButtonMotionValues[]) => {
 
 const captureButtonPositions = (buttons: HTMLElement[]) => {
     // Reset transforms to get original positions
-    buttons.forEach((button) => (button.style.transform = ''));
+    buttons.forEach((button) => {
+        button.style.transform = '';
+    });
     return buttons.map((button) => {
         const rect = button.getBoundingClientRect();
-        return { left: rect.left, width: rect.width };
+        return {
+            left: rect.left,
+            width: rect.width,
+            top: rect.top,
+            height: rect.height,
+        };
     });
 };
 
 const calculateScale = (
     mouseX: number,
+    mouseY: number,
     buttonCenterX: number,
+    buttonCenterY: number,
     containerRect: DOMRect,
     config: Required<MagnificationConfig>
 ) => {
-    const distance = Math.abs(mouseX - buttonCenterX);
+    // Calculate 2D distance from mouse to button center
+    const deltaX = mouseX - buttonCenterX;
+    const deltaY = mouseY - buttonCenterY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
     if (distance > config.influenceRadius) return 1;
 
-    // Edge influence to reduce scaling near container edges
-    const distanceFromEdge = Math.min(mouseX - containerRect.left, containerRect.right - mouseX);
-    const edgeInfluence = Math.min(distanceFromEdge / 20, 1);
+    // Calculate distance from container edge
+    const distanceFromEdgeX = Math.min(mouseX - containerRect.left, containerRect.right - mouseX);
+    const distanceFromEdgeY = Math.min(mouseY - containerRect.top, containerRect.bottom - mouseY);
+    const distanceFromEdge = Math.min(distanceFromEdgeX, distanceFromEdgeY);
 
-    // Exponential scaling curve
-    const progress = distance / config.influenceRadius;
-    const exponentialProgress = (1 - progress) ** config.scaleExponent;
-    const baseScale = 1 + (config.maxScale - 1) * exponentialProgress;
+    // Define the "heart" zone - 8px from center (16x16px total area)
+    const heartZoneRadius = 8;
 
-    return 1 + (baseScale - 1) * edgeInfluence;
+    let baseScale: number;
+
+    if (distance <= heartZoneRadius) {
+        // Within the heart zone - always at max scale
+        baseScale = config.maxScale;
+    } else {
+        // Outside heart zone - scale from max to 1 based on distance
+        const outerRadius = config.influenceRadius - heartZoneRadius;
+        const outerDistance = distance - heartZoneRadius;
+        const progress = Math.min(outerDistance / outerRadius, 1);
+        const exponentialProgress = (1 - progress) ** config.scaleExponent;
+        baseScale = 1 + (config.maxScale - 1) * exponentialProgress;
+    }
+
+    // Only apply entry transition if we're very close to the edge (within 10px)
+    // This prevents the entry logic from interfering with normal scaling
+    if (distanceFromEdge < 10) {
+        const entryProgress = distanceFromEdge / 10;
+        return 1 + (baseScale - 1) * entryProgress;
+    }
+
+    return baseScale;
 };
 
 const calculateSpacing = (
     buttonIndex: number,
     buttonEffects: Array<{ scale: number; translateX: number }>,
-    positions: Array<{ left: number; width: number }>,
+    positions: Array<{ left: number; width: number; top: number; height: number }>,
     config: Required<MagnificationConfig>
 ) => {
     const currentPos = positions[buttonIndex];
@@ -124,9 +156,11 @@ export function useMagnificationEffect(props: {
 }) {
     const { childrenCount, containerRef, config } = props;
     const [buttonMotionValues, setButtonMotionValues] = React.useState<ButtonMotionValues[]>([]);
-    const originalPositionsRef = React.useRef<Array<{ left: number; width: number }>>([]);
+    const originalPositionsRef = React.useRef<
+        Array<{ left: number; width: number; top: number; height: number }>
+    >([]);
 
-    const finalConfig = { ...defaultConfig, ...config };
+    const finalConfig = React.useMemo(() => ({ ...defaultConfig, ...config }), [config]);
 
     React.useEffect(() => {
         const container = containerRef.current;
@@ -177,7 +211,15 @@ export function useMagnificationEffect(props: {
                 if (!pos) return { scale: 1, translateX: 0 };
 
                 const buttonCenterX = pos.left + pos.width / 2;
-                const scale = calculateScale(mouseX, buttonCenterX, containerRect, finalConfig);
+                const buttonCenterY = pos.top + pos.height / 2;
+                const scale = calculateScale(
+                    mouseX,
+                    mouseY,
+                    buttonCenterX,
+                    buttonCenterY,
+                    containerRect,
+                    finalConfig
+                );
                 return { scale, translateX: 0 };
             });
 
@@ -210,17 +252,7 @@ export function useMagnificationEffect(props: {
             container.removeEventListener('mousemove', handleMouseMove);
             container.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [
-        finalConfig.buttonSize,
-        finalConfig.maxScale,
-        finalConfig.influenceRadius,
-        finalConfig.spacingMultiplier,
-        finalConfig.scaleExponent,
-        finalConfig.padding,
-        containerRef,
-        buttonMotionValues,
-        childrenCount,
-    ]);
+    }, [finalConfig, containerRef, buttonMotionValues, childrenCount]);
 
     return { buttonMotionValues };
 }
