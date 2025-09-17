@@ -20,10 +20,10 @@ export type ScrollContainerProps = {
 
     /** The ID of the active item to scroll to. */
     activeId?: string;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 export function ScrollContainer(props: ScrollContainerProps) {
-    const { children, className, orientation, activeId } = props;
+    const { children, className, orientation, activeId, ...rest } = props;
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -67,7 +67,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
             container.removeEventListener('scroll', scrollListener);
             resizeObserver.disconnect();
         };
-    }, []);
+    }, [orientation]);
 
     // Scroll to the active item
     React.useEffect(() => {
@@ -75,10 +75,11 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!container || !activeId) {
             return;
         }
-        const activeItem = container.querySelector(`#${activeId}`);
+        const activeItem = container.querySelector(`#${CSS.escape(activeId)}`);
         if (activeItem) {
             activeItem.scrollIntoView({
                 inline: 'center',
+                block: 'center',
             });
         }
     }, [activeId]);
@@ -108,11 +109,15 @@ export function ScrollContainer(props: ScrollContainerProps) {
     };
 
     return (
-        <div className={tcls('group/scroll-container relative flex overflow-hidden', className)}>
+        <div
+            className={tcls('group/scroll-container relative flex overflow-hidden', className)}
+            {...rest}
+        >
             {/* Scrollable content */}
             <div
                 className={tcls(
-                    'no-scrollbar flex shrink grow',
+                    'flex shrink grow',
+                    orientation === 'horizontal' ? 'no-scrollbar' : 'hide-scrollbar',
                     orientation === 'horizontal' ? 'overflow-x-scroll' : 'overflow-y-auto',
                     scrollPosition > 0
                         ? orientation === 'horizontal'
@@ -158,7 +163,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                 className={tcls(
                     orientation === 'horizontal'
                         ? '-translate-y-1/2! top-1/2 right-0 mr-2'
-                        : '-translate-x-1/2! bottom-0 left-1/2 mt-2',
+                        : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
                     'absolute not-pointer-none:block hidden scale-0 transition-[scale,opacity]',
                     scrollPosition < scrollSize
                         ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'

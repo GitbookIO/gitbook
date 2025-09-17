@@ -5,10 +5,9 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
-import { useIsMounted, useToggleAnimation } from '../hooks';
+import { useToggleAnimation } from '../hooks';
 import { Link } from '../primitives';
+import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
 import type {
     ClientSiteSection,
@@ -36,30 +35,34 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                     className
                 )}
             >
-                <TOCScrollContainer
+                <ScrollContainer
+                    orientation="vertical"
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
-                    className="overflow-y-auto px-2 pb-4"
+                    className="pb-4"
+                    activeId={currentSection.id}
                 >
-                    {sectionsAndGroups.map((item) => {
-                        if (item.object === 'site-section-group') {
+                    <div className="flex w-full flex-col px-2">
+                        {sectionsAndGroups.map((item) => {
+                            if (item.object === 'site-section-group') {
+                                return (
+                                    <SiteSectionGroupItem
+                                        key={item.id}
+                                        group={item}
+                                        currentSection={currentSection}
+                                    />
+                                );
+                            }
+
                             return (
-                                <SiteSectionGroupItem
+                                <SiteSectionListItem
+                                    section={item}
+                                    isActive={item.id === currentSection.id}
                                     key={item.id}
-                                    group={item}
-                                    currentSection={currentSection}
                                 />
                             );
-                        }
-
-                        return (
-                            <SiteSectionListItem
-                                section={item}
-                                isActive={item.id === currentSection.id}
-                                key={item.id}
-                            />
-                        );
-                    })}
-                </TOCScrollContainer>
+                        })}
+                    </div>
+                </ScrollContainer>
             </nav>
         )
     );
@@ -72,17 +75,11 @@ export function SiteSectionListItem(props: {
 }) {
     const { section, isActive, className, ...otherProps } = props;
 
-    const isMounted = useIsMounted();
-    React.useEffect(() => {}, [isMounted]); // This updates the useScrollToActiveTOCItem hook once we're mounted, so we can actually scroll to the this item
-
-    const anchorRef = React.createRef<HTMLAnchorElement>();
-    useScrollToActiveTOCItem({ anchorRef, isActive });
-
     return (
         <Link
-            ref={anchorRef}
             href={section.url}
             aria-current={isActive && 'page'}
+            id={section.id}
             className={tcls(
                 'group/section-link',
                 'flex',
