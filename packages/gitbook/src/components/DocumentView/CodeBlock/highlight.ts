@@ -64,7 +64,10 @@ export async function preloadHighlight(block: DocumentBlockCode) {
  */
 export async function highlight(
     block: DocumentBlockCode,
-    inlines: RenderedInline[]
+    inlines: RenderedInline[],
+    options?: {
+        evaluateInlineExpression?: (expr: string) => string;
+    }
 ): Promise<HighlightLine[]> {
     const langName = getBlockLang(block);
 
@@ -74,10 +77,10 @@ export async function highlight(
         // - TEMP : language is PowerShell or C++ and browser is Safari:
         //   RegExp#[Symbol.search] throws TypeError when `lastIndex` isn’t writable
         //   Fixed in upcoming Safari 18.6, remove when it'll be released - RND-7772
-        return plainHighlight(block, inlines);
+        return plainHighlight(block, inlines, options);
     }
 
-    const code = getPlainCodeBlock(block);
+    const code = getPlainCodeBlock(block, undefined, options);
 
     const highlighter = await getSingletonHighlighter({
         langs: [langName],
@@ -255,11 +258,17 @@ function matchTokenAndInlines(
     return result;
 }
 
-function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): string {
+function getPlainCodeBlock(
+    code: DocumentBlockCode,
+    inlines?: InlineIndexed[],
+    options?: {
+        evaluateInlineExpression?: (expr: string) => string;
+    }
+): string {
     let content = '';
 
     code.nodes.forEach((node, index) => {
-        const lineContent = getPlainCodeBlockLine(node, content.length, inlines);
+        const lineContent = getPlainCodeBlockLine(node, content.length, inlines, options);
         content += lineContent;
 
         if (index < code.nodes.length - 1) {
@@ -273,7 +282,10 @@ function getPlainCodeBlock(code: DocumentBlockCode, inlines?: InlineIndexed[]): 
 function getPlainCodeBlockLine(
     parent: DocumentBlockCodeLine | DocumentInlineAnnotation,
     index: number,
-    inlines?: InlineIndexed[]
+    inlines?: InlineIndexed[],
+    options?: {
+        evaluateInlineExpression?: (expr: string) => string;
+    }
 ): string {
     let content = '';
 
@@ -282,10 +294,13 @@ function getPlainCodeBlockLine(
             content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
         } else {
             switch (node.type) {
-                case 'annotation': {
+                case 'expression': {
                     const start = index + content.length;
-                    content += getPlainCodeBlockLine(node, index + content.length, inlines);
-                    const end = index + content.length;
+                    const exprValue = String(
+                        options?.evaluateInlineExpression?.(node.data.expression) ?? ''
+                    );
+                    content += exprValue;
+                    const end = start + exprValue.length;
 
                     if (inlines) {
                         inlines.push({
@@ -296,7 +311,23 @@ function getPlainCodeBlockLine(
                     }
                     break;
                 }
-                case 'expression': {
+                case 'annotation': {
+                    const start = index + content.length;
+                    content += getPlainCodeBlockLine(
+                        node,
+                        index + content.length,
+                        inlines,
+                        options
+                    );
+                    const end = index + content.length;
+
+                    if (inlines) {
+                        inlines.push({
+                            inline: node,
+                            start,
+                            end,
+                        });
+                    }
                     break;
                 }
                 default: {

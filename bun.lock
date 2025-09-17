@@ -102,6 +102,7 @@
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
+        "@gitbook/expr": "workspace:*",
         "@gitbook/fonts": "workspace:*",
         "@gitbook/icons": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",

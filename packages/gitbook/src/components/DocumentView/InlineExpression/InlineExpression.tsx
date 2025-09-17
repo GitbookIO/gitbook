@@ -1,0 +1,21 @@
+import type { DocumentInlineExpression } from '@gitbook/api';
+import type { InlineProps } from '../Inline';
+import { InlineExpressionValue } from './InlineExpressionValue';
+
+export function InlineExpression(props: InlineProps<DocumentInlineExpression>) {
+    const { context, inline } = props;
+
+    const { data } = inline;
+
+    const variables = context.contentContext
+        ? {
+              space: context.contentContext?.revision.variables,
+              page:
+                  'page' in context.contentContext
+                      ? context.contentContext.page.variables
+                      : undefined,
+          }
+        : {};
+
+    return <InlineExpressionValue expression={data.expression} variables={variables} />;
+}
