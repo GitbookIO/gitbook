@@ -128,7 +128,7 @@ export function SiteSectionTabs(props: {
             {children}
 
             <div
-                className="absolute top-full left-0 z-20 flex w-full"
+                className="fixed top-full left-0 z-20 flex w-full"
                 style={{
                     padding: `0 ${SCREEN_OFFSET}px 0 ${SCREEN_OFFSET}px`,
                 }}
