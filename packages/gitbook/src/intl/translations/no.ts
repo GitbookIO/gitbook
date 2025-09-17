@@ -120,4 +120,6 @@ export const no: TranslationLanguage = {
     copy_mcp_url: 'Kopier MCP-server URL',
     press_to_confirm: 'Trykk ${1} for å bekrefte',
     tool_call_skipped: 'Hoppet over "${1}"',
+    scroll_back: 'Rull tilbake',
+    scroll_further: 'Rull videre',
 };

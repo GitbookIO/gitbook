@@ -117,4 +117,6 @@ export const en = {
     copy_mcp_url: 'Copy the MCP Server URL',
     press_to_confirm: 'Press ${1} to confirm',
     tool_call_skipped: 'Skipped "${1}"',
+    scroll_back: 'Scroll back',
+    scroll_further: 'Scroll further',
 };

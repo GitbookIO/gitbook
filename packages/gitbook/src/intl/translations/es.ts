@@ -121,4 +121,6 @@ export const es: TranslationLanguage = {
     copy_mcp_url: 'Copiar URL del servidor MCP',
     press_to_confirm: 'Presiona ${1} para confirmar',
     tool_call_skipped: 'Omitido "${1}"',
+    scroll_back: 'Desplazar hacia atrás',
+    scroll_further: 'Desplazar más',
 };
