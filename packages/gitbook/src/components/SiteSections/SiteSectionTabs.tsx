@@ -1,65 +1,73 @@
 'use client';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import type { IconName } from '@gitbook/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
-import { Link } from '@/components/primitives';
+import { Button, DropdownChevron, Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { CONTAINER_STYLE } from '../layout';
 import { SectionIcon } from './SectionIcon';
 import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
 
-const VIEWPORT_ITEM_WIDTH = 240; /* width of the tile (w-60) */
+const SCREEN_OFFSET = 16; // 1rem
+const VIEWPORT_PADDING = 8; // 0.5rem
 const MIN_ITEMS_FOR_COLS = 4; /* number of items to switch to 2 columns */
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
-export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
+export function SiteSectionTabs(props: {
+    sections: ClientSiteSections;
+    className?: string;
+    children?: React.ReactNode;
+}) {
     const {
         sections: { list: sectionsAndGroups, current: currentSection },
+        className,
+        children,
     } = props;
-    const [value, setValue] = React.useState<string | null>();
+
+    const currentTriggerRef = React.useRef<HTMLButtonElement | null>(null);
     const [offset, setOffset] = React.useState<number | null>(null);
-    const menuContainerRef = React.useRef<HTMLDivElement>(null);
+    const [value, setValue] = React.useState<string | undefined>(undefined);
 
-    const onNodeUpdate = (trigger: HTMLButtonElement | null, itemValue: string, size = 0) => {
-        const padding = 16;
-        const margin = -12; // Offsetting the menu container's negative margin
-        const windowWidth = document.documentElement.clientWidth;
-        const windowBuffer = 16; // constrain to within the window with some buffer on the left and right we don't want the menu to enter
-        const viewportWidth =
-            size < MIN_ITEMS_FOR_COLS
-                ? VIEWPORT_ITEM_WIDTH + padding
-                : VIEWPORT_ITEM_WIDTH * 2 + padding;
-        const minOffset = 0 - (menuContainerRef.current?.offsetLeft ?? 0) + margin;
-        const maxOffset = minOffset + windowWidth - viewportWidth;
+    const isMobile = useIsMobile(768);
 
-        if (windowWidth < 768) {
-            // if the screen is small don't offset the menu
-            setOffset(minOffset + windowBuffer);
-        } else if (trigger && value === itemValue) {
-            const position = minOffset + trigger?.getBoundingClientRect().left;
-            setOffset(
-                Math.min(maxOffset - windowBuffer, Math.max(minOffset + windowBuffer, position))
-            );
-        } else if (!value) {
-            setOffset(null);
+    React.useEffect(() => {
+        const trigger = currentTriggerRef.current;
+        if (!value || !trigger) {
+            return;
         }
-    };
+
+        const triggerWidth = trigger.getBoundingClientRect().width;
+        const triggerLeft = trigger.getBoundingClientRect().left;
+        setOffset(triggerLeft + triggerWidth / 2);
+    }, [value]);
 
     return sectionsAndGroups.length > 0 ? (
         <NavigationMenu.Root
-            aria-label="Sections"
-            id="sections"
+            className={tcls(
+                CONTAINER_STYLE,
+                'relative z-10 flex w-full flex-nowrap items-end',
+                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
+                className
+            )}
+            value={value}
             onValueChange={setValue}
-            className="z-10 flex w-full flex-nowrap items-center"
+            skipDelayDuration={500}
         >
             <div
-                ref={menuContainerRef}
-                className="-mx-3"
-                // className="-mb-4 pb-4" /* Positive padding / negative margin allows the navigation menu indicator to show in a scroll view */
+                className={tcls(
+                    'md:-ml-8 -ml-4 sm:-ml-6 no-scrollbar relative flex grow list-none items-end overflow-x-auto pl-4 sm:pl-6 md:pl-8',
+                    !children ? 'md:-mr-8 -mr-4 sm:-mr-6 pr-4 sm:pr-6 md:pr-8' : ''
+                )}
             >
-                <NavigationMenu.List className="center m-0 flex list-none gap-2 bg-transparent">
+                <NavigationMenu.List
+                    className="-mx-3 flex grow gap-2 bg-transparent"
+                    aria-label="Sections"
+                    id="sections"
+                >
                     {sectionsAndGroups.map((sectionOrGroup) => {
                         const { id, title, icon } = sectionOrGroup;
                         const isGroup = sectionOrGroup.object === 'site-section-group';
@@ -70,33 +78,30 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                             );
                         const isActive = isActiveGroup || id === currentSection.id;
                         return (
-                            <NavigationMenu.Item key={id} value={id}>
+                            <NavigationMenu.Item key={id} value={id} id={id}>
                                 {isGroup ? (
                                     sectionOrGroup.sections.length > 0 ? (
                                         <>
                                             <NavigationMenu.Trigger
-                                                ref={(node) =>
-                                                    onNodeUpdate(
-                                                        node,
-                                                        id,
-                                                        sectionOrGroup.sections.length
-                                                    )
-                                                }
                                                 asChild
+                                                ref={value === id ? currentTriggerRef : undefined}
                                                 onClick={(e) => {
-                                                    if (value) {
+                                                    // Prevent clicking the trigger from closing when the viewport is open
+                                                    if (value === id) {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                     }
                                                 }}
                                             >
-                                                <SectionGroupTab
+                                                <SectionTab
                                                     isActive={isActive}
                                                     title={title}
                                                     icon={icon as IconName}
                                                 />
                                             </NavigationMenu.Trigger>
-                                            <NavigationMenu.Content className="absolute top-0 left-0 z-20 w-full motion-safe:data-[motion=from-end]:animate-enter-from-right motion-safe:data-[motion=from-start]:animate-enter-from-left motion-safe:data-[motion=to-end]:animate-exit-to-right motion-safe:data-[motion=to-start]:animate-exit-to-left md:w-max">
+                                            <NavigationMenu.Content
+                                                style={{ padding: `${VIEWPORT_PADDING}px` }}
+                                            >
                                                 <SectionGroupTileList
                                                     sections={sectionOrGroup.sections}
                                                     currentSection={currentSection}
@@ -117,26 +122,30 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
                             </NavigationMenu.Item>
                         );
                     })}
-                    <NavigationMenu.Indicator
-                        className="fixed top-full z-50 flex h-3 items-end justify-center duration-150 motion-safe:transition-[width,transform] motion-safe:data-[state=hidden]:animate-fade-out motion-safe:data-[state=visible]:animate-fade-in"
-                        aria-hidden
-                    >
-                        <div className="relative top-1/2 size-3 rotate-45 rounded-tl-sm border-tint-subtle border-t border-l bg-tint-base" />
-                    </NavigationMenu.Indicator>
                 </NavigationMenu.List>
             </div>
+
+            {children}
+
             <div
-                className="absolute top-full flex transition-transform duration-200 ease-in-out"
+                className="absolute top-full left-0 z-20 flex w-full"
                 style={{
-                    display: offset === null ? 'none' : undefined,
-                    transform: offset ? `translateX(${offset}px) translateZ(0)` : 'translateZ(0)', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
+                    padding: `0 ${SCREEN_OFFSET}px 0 ${SCREEN_OFFSET}px`,
                 }}
             >
                 <NavigationMenu.Viewport
-                    className="relative mt-3 h-(--radix-navigation-menu-viewport-height) w-[calc(100vw-2rem)] origin-[top_center] overflow-hidden rounded-lg straight-corners:rounded-xs bg-tint-base depth-flat:shadow-none shadow-lg shadow-tint-10/6 ring-1 ring-tint-subtle duration-250 data-[state=closed]:duration-150 motion-safe:transition-[width,height,transform] motion-safe:data-[state=closed]:animate-scale-out motion-safe:data-[state=open]:animate-scale-in md:mx-0 md:w-(--radix-navigation-menu-viewport-width) dark:shadow-tint-1/6"
+                    className={tcls(
+                        'relative origin-top overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg transition-transform duration-250 ease-in-out',
+                        '-mt-0.5 w-full md:w-max',
+                        'data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
+                        "[&:not([style*='--radix-navigation-menu-viewport-width'])]:hidden" // The viewport width is only calculated once it's triggered, and can take a while. We hide the viewport until it's ready.
+                    )}
                     style={{
                         translate:
-                            undefined /* don't move this to a Tailwind class as Radix renders viewport incorrectly for a few frames */,
+                            !isMobile && offset
+                                ? `clamp(0px, calc(${offset}px - ${SCREEN_OFFSET}px - 50%), calc(100vw - var(--radix-navigation-menu-viewport-width, 0px) - ${VIEWPORT_PADDING * 2}px - ${SCREEN_OFFSET * 2}px)) 0 0`
+                                : '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
+                        display: offset === null ? 'none' : undefined,
                     }}
                 />
             </div>
@@ -145,75 +154,34 @@ export function SiteSectionTabs(props: { sections: ClientSiteSections }) {
 }
 
 /**
- * A tab representing a section
+ * A tab representing a section or section group
  */
 const SectionTab = React.forwardRef(function SectionTab(
-    props: { isActive: boolean; title: string; icon?: IconName; url: string },
+    props: { isActive: boolean; title: string; icon?: IconName; url?: string },
     ref: React.Ref<HTMLAnchorElement>
 ) {
     const { isActive, title, icon, url, ...rest } = props;
+    const isGroup = url === undefined;
     return (
-        <Link
+        <Button
             ref={ref}
+            size="medium"
+            variant="blank"
             {...rest}
+            icon={icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
+            label={title}
+            trailing={isGroup ? <DropdownChevron /> : null}
+            active={isActive}
             className={tcls(
-                'group relative my-2 flex select-none items-center justify-between circular-corners:rounded-full rounded-corners:rounded-xs px-3 py-1',
+                'group/dropdown relative my-2 overflow-visible px-3 py-1',
                 isActive
-                    ? 'text-primary-subtle'
-                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
+                    ? 'after:contents-[] after:-bottom-2 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9'
+                    : ''
             )}
             href={url}
-        >
-            <span className="flex w-full items-center gap-2 truncate">
-                {icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
-                {title}
-            </span>
-            {isActive ? <ActiveTabIndicator /> : null}
-        </Link>
+        />
     );
 });
-
-/**
- * A tab representing a section group
- */
-const SectionGroupTab = React.forwardRef(function SectionGroupTab(
-    props: { isActive: boolean; title: string; icon?: IconName },
-    ref: React.Ref<HTMLButtonElement>
-) {
-    const { isActive, title, icon, ...rest } = props;
-    return (
-        <button
-            ref={ref}
-            {...rest}
-            className={tcls(
-                'group relative my-2 flex select-none items-center justify-between circular-corners:rounded-full rounded-sm straight-corners:rounded-none px-3 py-1 transition-colors hover:cursor-default',
-                isActive
-                    ? 'text-primary-subtle'
-                    : 'text-tint hover:bg-tint-hover hover:text-tint-strong'
-            )}
-        >
-            <span className="flex w-full items-center gap-2 truncate">
-                {icon ? <SectionIcon isActive={isActive} icon={icon as IconName} /> : null}
-                {title}
-            </span>
-            {isActive ? <ActiveTabIndicator /> : null}
-            <Icon
-                aria-hidden
-                icon="chevron-down"
-                className="ms-1 size-3 shrink-0 opacity-6 transition-all group-data-[state=open]:rotate-180"
-            />
-        </button>
-    );
-});
-
-/**
- * Horizontal line indicating the active tab
- */
-function ActiveTabIndicator() {
-    return (
-        <span className="-bottom-2 absolute inset-x-3 h-0.5 bg-primary-9 contrast-more:bg-primary-11" />
-    );
-}
 
 /**
  * A list of section tiles grouped in the dropdown for a section group
@@ -226,7 +194,7 @@ function SectionGroupTileList(props: {
     return (
         <ul
             className={tcls(
-                'grid w-full gap-1 p-2 sm:grid-cols-1 md:w-max',
+                'grid w-full gap-1 sm:grid-cols-1 md:w-max',
                 sections.length < MIN_ITEMS_FOR_COLS ? 'md:grid-cols-1' : 'md:grid-cols-2'
             )}
         >
