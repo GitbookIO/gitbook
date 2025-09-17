@@ -57,7 +57,7 @@ export function Header(props: {
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         className={tcls(
                             'gap-4',
