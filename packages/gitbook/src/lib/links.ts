@@ -5,7 +5,6 @@ import type { RevisionPage, RevisionPageDocument, RevisionPageGroup } from '@git
 import type { Link, Root } from 'mdast';
 import { visit } from 'unist-util-visit';
 import warnOnce from 'warn-once';
-import type { GitBookSiteContext } from './context';
 import { checkIsAnchor, checkIsExternalURL } from './urls';
 
 /**
@@ -55,6 +54,21 @@ export interface GitBookLinker {
      * Generate a link (URL or path) for a GitBook content URL (url of another site)
      */
     toLinkForContent(url: string): string;
+
+    /**
+     * Create a new linker that overrides some options of the current one.
+     */
+    fork(override: { spaceBasePath: string }): GitBookLinker;
+
+    /**
+     * Site base path used to create this linker.
+     */
+    siteBasePath: string;
+
+    /**
+     * Space base path used to create this linker.
+     */
+    spaceBasePath: string;
 }
 
 /**
@@ -79,6 +93,23 @@ export function createLinker(
     const spaceBasePath = withTrailingSlash(withLeadingSlash(servedOn.spaceBasePath));
 
     const linker: GitBookLinker = {
+        get siteBasePath() {
+            return siteBasePath;
+        },
+
+        get spaceBasePath() {
+            return spaceBasePath;
+        },
+
+        fork(override: {
+            spaceBasePath: string;
+        }) {
+            return createLinker({
+                ...servedOn,
+                spaceBasePath: override.spaceBasePath,
+            });
+        },
+
         toPathInSpace(relativePath: string): string {
             return joinPaths(spaceBasePath, relativePath);
         },
@@ -217,12 +248,10 @@ function removeTrailingSlash(path: string): string {
  * Re-writes the URL of every relative <a> link so it is expressed from the site-root.
  */
 export function relativeToAbsoluteLinks(
-    context: GitBookSiteContext,
+    linker: GitBookLinker,
     tree: Root,
-    options: { currentPagePath: string; basePath: string }
+    currentPagePath: string
 ): Root {
-    const { linker } = context;
-    const { currentPagePath, basePath } = options;
     const currentDir = path.posix.dirname(currentPagePath);
 
     visit(tree, 'link', (node: Link) => {
@@ -233,12 +262,14 @@ export function relativeToAbsoluteLinks(
             return;
         }
 
-        // Resolve against the current page’s directory and strip any leading “/”
-        const pathInSite = path.posix
-            .normalize(path.posix.join(basePath, currentDir, original))
-            .replace(/^\/+/, '');
+        // Resolve against the current page’s directory and strip any leading “/” or "../"
+        // Sometimes the path can be "../" if we are on the default section
+        // but it means we are just at the root of the site.
+        const pathInPage = path.posix
+            .normalize(path.posix.join(currentDir, original))
+            .replace(/^[\/\.]+/, '');
 
-        node.url = linker.toPathInSite(pathInSite);
+        node.url = linker.toAbsoluteURL(linker.toPathInSpace(pathInPage));
     });
 
     return tree;

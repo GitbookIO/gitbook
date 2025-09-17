@@ -12,7 +12,7 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { gfm } from 'micromark-extension-gfm';
 import { remove } from 'unist-util-remove';
-import { relativeToAbsoluteLinks } from './links';
+import { type GitBookLinker, relativeToAbsoluteLinks } from './links';
 
 type MarkdownResult = DataFetcherResponse<string>;
 
@@ -68,11 +68,9 @@ export async function getMarkdownForPage(
     }
 
     const tree = fromPageMarkdown({
-        // @TODO not sure how to get the basePath here
-        basePath: '/',
-        context,
+        linker: context.linker,
         markdown: rawMarkdown,
-        page,
+        pagePath: page.path,
     });
 
     // Handle empty document pages which have children
@@ -88,10 +86,9 @@ export async function getMarkdownForPage(
  * Returns the markdown AST that can be further processed or converted back to markdown using `toPageMarkdown`.
  */
 export function fromPageMarkdown(args: {
-    context: GitBookSiteContext;
+    linker: GitBookLinker;
     markdown: string;
-    page: RevisionPageDocument;
-    basePath: string;
+    pagePath: string;
 }): Root {
     const tree = fromMarkdown(args.markdown, {
         extensions: [frontmatter(['yaml']), gfm()],
@@ -101,10 +98,7 @@ export function fromPageMarkdown(args: {
     // Remove frontmatter
     remove(tree, 'yaml');
 
-    relativeToAbsoluteLinks(args.context, tree, {
-        currentPagePath: args.page.path,
-        basePath: args.basePath,
-    });
+    relativeToAbsoluteLinks(args.linker, tree, args.pagePath);
 
     return tree;
 }
