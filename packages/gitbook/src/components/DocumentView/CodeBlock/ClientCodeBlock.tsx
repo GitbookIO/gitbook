@@ -1,9 +1,9 @@
 'use client';
 
 import type { DocumentBlockCode } from '@gitbook/api';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { type AdaptiveVisitorClaims, useAdaptiveVisitor } from '@/components/Adaptive';
+import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -18,29 +18,18 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> &
     inlineExprVariables: InlineExpressionVariables;
 };
 
-export function ClientCodeBlock(props: ClientBlockProps) {
-    const getAdaptiveVisitorClaims = useAdaptiveVisitor();
-    const visitorClaims = getAdaptiveVisitorClaims();
-
-    return (
-        <Suspense fallback={null}>
-            <ClientCodeBlockWithVisitorClaims {...props} visitorClaims={visitorClaims} />
-        </Suspense>
-    );
-}
-
 /**
  * Render a code-block client-side by loading the highlighter asynchronously.
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
-export function ClientCodeBlockWithVisitorClaims(
-    props: ClientBlockProps & { visitorClaims: AdaptiveVisitorClaims | null }
-) {
-    const { block, style, inlines, inlineExprVariables, visitorClaims } = props;
+export function ClientCodeBlock(props: ClientBlockProps) {
+    const { block, style, inlines, inlineExprVariables } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
 
+    const getAdaptiveVisitorClaims = useAdaptiveVisitor();
+    const visitorClaims = getAdaptiveVisitorClaims();
     const evaluateInlineExpression = useEvaluateInlineExpression({
         visitorClaims,
         variables: inlineExprVariables,

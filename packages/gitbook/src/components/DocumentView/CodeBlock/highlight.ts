@@ -315,9 +315,8 @@ function getPlainCodeBlockLine(
                 }
                 case 'expression': {
                     const start = index + content.length;
-                    const exprValue = String(
-                        options?.evaluateInlineExpression?.(node.data.expression) ?? ''
-                    );
+                    const exprValue =
+                        options?.evaluateInlineExpression?.(node.data.expression) ?? '';
                     content += exprValue;
                     const end = start + exprValue.length;
 

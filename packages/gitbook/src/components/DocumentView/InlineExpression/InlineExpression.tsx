@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { DocumentInlineExpression } from '@gitbook/api';
 import type { InlineProps } from '../Inline';
 import { InlineExpressionValue } from './InlineExpressionValue';
@@ -17,5 +19,9 @@ export function InlineExpression(props: InlineProps<DocumentInlineExpression>) {
           }
         : {};
 
-    return <InlineExpressionValue expression={data.expression} variables={variables} />;
+    return (
+        <React.Suspense fallback={null}>
+            <InlineExpressionValue expression={data.expression} variables={variables} />
+        </React.Suspense>
+    );
 }

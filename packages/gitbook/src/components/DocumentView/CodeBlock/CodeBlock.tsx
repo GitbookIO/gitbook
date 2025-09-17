@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import type { DocumentBlockCode } from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
@@ -65,11 +67,13 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
         : {};
 
     return (
-        <ClientCodeBlock
-            block={block}
-            style={style}
-            inlines={richInlines}
-            inlineExprVariables={variables}
-        />
+        <React.Suspense fallback={null}>
+            <ClientCodeBlock
+                block={block}
+                style={style}
+                inlines={richInlines}
+                inlineExprVariables={variables}
+            />
+        </React.Suspense>
     );
 }
