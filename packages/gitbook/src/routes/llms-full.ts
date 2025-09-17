@@ -1,22 +1,13 @@
-import path from 'node:path';
 import { type GitBookSiteContext, checkIsRootSiteContext } from '@/lib/context';
 import { throwIfDataError } from '@/lib/data';
+import { fromPageMarkdown, toPageMarkdown } from '@/lib/markdownPage';
 import { joinPath } from '@/lib/paths';
 import { getIndexablePages } from '@/lib/sitemap';
 import { getSiteStructureSections } from '@/lib/sites';
-import { checkIsAnchor, checkIsExternalURL } from '@/lib/urls';
 import type { RevisionPageDocument, SiteSection, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
-import type { Link, Paragraph, Root } from 'mdast';
-import { fromMarkdown } from 'mdast-util-from-markdown';
-import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
-import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
-import { toMarkdown } from 'mdast-util-to-markdown';
-import { frontmatter } from 'micromark-extension-frontmatter';
-import { gfm } from 'micromark-extension-gfm';
+import type { Paragraph } from 'mdast';
 import { pMapIterable } from 'p-map';
-import { remove } from 'unist-util-remove';
-import { visit } from 'unist-util-visit';
 
 // We limit the concurrency to 100 to avoid reaching limit with concurrent requests
 // or file descriptor limits.
@@ -201,13 +192,7 @@ async function getMarkdownForPage(
         })
     );
 
-    const tree = fromMarkdown(pageMarkdown, {
-        extensions: [frontmatter(['yaml']), gfm()],
-        mdastExtensions: [frontmatterFromMarkdown(['yaml']), gfmFromMarkdown()],
-    });
-
-    // Remove frontmatter
-    remove(tree, 'yaml');
+    const tree = fromPageMarkdown({ context, markdown: pageMarkdown, page, basePath });
 
     if (page.description) {
         // The first node is the page title as a H1, we insert the description as a paragraph
@@ -219,40 +204,7 @@ async function getMarkdownForPage(
         tree.children.splice(1, 0, descriptionNode);
     }
 
-    // Rewrite relative links to absolute links
-    transformLinks(context, tree, { currentPagePath: page.path, basePath });
+    const markdown = toPageMarkdown(tree);
 
-    const markdown = toMarkdown(tree, { extensions: [gfmToMarkdown()] });
     return `${markdown}\n\n`;
-}
-
-/**
- * Re-writes the URL of every relative <a> link so it is expressed from the site-root.
- */
-export function transformLinks(
-    context: GitBookSiteContext,
-    tree: Root,
-    options: { currentPagePath: string; basePath: string }
-): Root {
-    const { linker } = context;
-    const { currentPagePath, basePath } = options;
-    const currentDir = path.posix.dirname(currentPagePath);
-
-    visit(tree, 'link', (node: Link) => {
-        const original = node.url;
-
-        // Skip anchors, mailto:, http(s):, protocol-like, or already-rooted paths
-        if (checkIsExternalURL(original) || checkIsAnchor(original) || original.startsWith('/')) {
-            return;
-        }
-
-        // Resolve against the current page’s directory and strip any leading “/”
-        const pathInSite = path.posix
-            .normalize(path.posix.join(basePath, currentDir, original))
-            .replace(/^\/+/, '');
-
-        node.url = linker.toPathInSite(pathInSite);
-    });
-
-    return tree;
 }

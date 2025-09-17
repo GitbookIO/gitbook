@@ -5,9 +5,14 @@ import { getIndexablePages } from '@/lib/sitemap';
 import { getMarkdownForPagesTree } from '@/routes/llms';
 import { type RevisionPageDocument, type RevisionPageGroup, RevisionPageType } from '@gitbook/api';
 import type { Root } from 'mdast';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import remarkParse from 'remark-parse';
-import { unified } from 'unified';
+import { frontmatter } from 'micromark-extension-frontmatter';
+import { gfm } from 'micromark-extension-gfm';
+import { remove } from 'unist-util-remove';
+import { relativeToAbsoluteLinks } from './links';
 
 type MarkdownResult = DataFetcherResponse<string>;
 
@@ -47,7 +52,7 @@ export async function getMarkdownForPage(
         return servePageGroup(context, page);
     }
 
-    const { data: markdown, error } = await context.dataFetcher.getRevisionPageMarkdown({
+    const { data: rawMarkdown, error } = await context.dataFetcher.getRevisionPageMarkdown({
         spaceId: context.space.id,
         revisionId: context.revisionId,
         pageId: page.id,
@@ -62,39 +67,60 @@ export async function getMarkdownForPage(
         };
     }
 
+    const tree = fromPageMarkdown({
+        // @TODO not sure how to get the basePath here
+        basePath: '/',
+        context,
+        markdown: rawMarkdown,
+        page,
+    });
+
     // Handle empty document pages which have children
-    if (isEmptyMarkdownPage(markdown) && page.pages.length > 0) {
+    if (isEmptyMarkdownPage(tree) && page.pages.length > 0) {
         return servePageGroup(context, page);
     }
 
-    return {
-        data: markdown,
-    };
+    return { data: toPageMarkdown(tree) };
+}
+
+/**
+ * Parse markdown from a page, removing frontmatter and rewriting relative links to absolute links.
+ * Returns the markdown AST that can be further processed or converted back to markdown using `toPageMarkdown`.
+ */
+export function fromPageMarkdown(args: {
+    context: GitBookSiteContext;
+    markdown: string;
+    page: RevisionPageDocument;
+    basePath: string;
+}): Root {
+    const tree = fromMarkdown(args.markdown, {
+        extensions: [frontmatter(['yaml']), gfm()],
+        mdastExtensions: [frontmatterFromMarkdown(['yaml']), gfmFromMarkdown()],
+    });
+
+    // Remove frontmatter
+    remove(tree, 'yaml');
+
+    relativeToAbsoluteLinks(args.context, tree, {
+        currentPagePath: args.page.path,
+        basePath: args.basePath,
+    });
+
+    return tree;
+}
+
+/**
+ * Convert a markdown AST back to markdown.
+ */
+export function toPageMarkdown(tree: Root): string {
+    return toMarkdown(tree, { extensions: [gfmToMarkdown()] });
 }
 
 /**
  * Determine if a page is empty.
  * A page is empty if it has no content or only a title.
  */
-function isEmptyMarkdownPage(markdown: string): boolean {
-    // Remove frontmatter
-    const stripped = markdown
-        .trim()
-        .replace(/^---\n[\s\S]*?\n---\n?/g, '')
-        .trim();
-
-    // Fast path: try to quickly detect obvious matches
-    if (/^[ \t]*# .+$/m.test(stripped)) {
-        // If there's a single heading line or empty lines, and no other content
-        return (
-            /^#{1,6} .+\s*$/.test(stripped) &&
-            !/\n\S+/g.test(stripped.split('\n').slice(1).join('\n'))
-        );
-    }
-
-    // Fallback: parse with remark for safety
-    const tree = unified().use(remarkParse).parse(stripped) as Root;
-
+function isEmptyMarkdownPage(tree: Root): boolean {
     let seenHeading = false;
 
     for (const node of tree.children) {
