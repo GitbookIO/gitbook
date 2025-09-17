@@ -294,13 +294,15 @@ function getPlainCodeBlockLine(
             content += cleanupLine(node.leaves.map((leaf) => leaf.text).join(''));
         } else {
             switch (node.type) {
-                case 'expression': {
+                case 'annotation': {
                     const start = index + content.length;
-                    const exprValue = String(
-                        options?.evaluateInlineExpression?.(node.data.expression) ?? ''
+                    content += getPlainCodeBlockLine(
+                        node,
+                        index + content.length,
+                        inlines,
+                        options
                     );
-                    content += exprValue;
-                    const end = start + exprValue.length;
+                    const end = index + content.length;
 
                     if (inlines) {
                         inlines.push({
@@ -311,15 +313,13 @@ function getPlainCodeBlockLine(
                     }
                     break;
                 }
-                case 'annotation': {
+                case 'expression': {
                     const start = index + content.length;
-                    content += getPlainCodeBlockLine(
-                        node,
-                        index + content.length,
-                        inlines,
-                        options
+                    const exprValue = String(
+                        options?.evaluateInlineExpression?.(node.data.expression) ?? ''
                     );
-                    const end = index + content.length;
+                    content += exprValue;
+                    const end = start + exprValue.length;
 
                     if (inlines) {
                         inlines.push({
