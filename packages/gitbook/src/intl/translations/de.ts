@@ -120,4 +120,6 @@ export const de = {
     copy_mcp_url: 'MCP-Server-URL kopieren',
     press_to_confirm: 'Drücke ${1} zum Bestätigen',
     tool_call_skipped: 'Übersprungen "${1}"',
+    scroll_back: 'Zurück scrollen',
+    scroll_further: 'Weiter scrollen',
 };

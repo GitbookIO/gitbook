@@ -119,4 +119,6 @@ export const ja: TranslationLanguage = {
     copy_mcp_url: 'MCPサーバーのURLをコピー',
     press_to_confirm: '確認するには${1}を押してください',
     tool_call_skipped: '"${1}" をスキップしました',
+    scroll_back: '戻る',
+    scroll_further: '進む',
 };

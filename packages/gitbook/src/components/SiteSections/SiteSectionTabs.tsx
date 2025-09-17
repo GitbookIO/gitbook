@@ -8,6 +8,7 @@ import { Button, DropdownChevron, Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { CONTAINER_STYLE } from '../layout';
+import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
 import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
 
@@ -57,14 +58,21 @@ export function SiteSectionTabs(props: {
             onValueChange={setValue}
             skipDelayDuration={500}
         >
-            <div
+            <ScrollContainer
+                orientation="horizontal"
                 className={tcls(
-                    'md:-ml-8 -ml-4 sm:-ml-6 no-scrollbar relative flex grow list-none items-end overflow-x-auto pl-4 sm:pl-6 md:pl-8',
-                    !children ? 'md:-mr-8 -mr-4 sm:-mr-6 pr-4 sm:pr-6 md:pr-8' : ''
+                    'grow',
+                    'md:-ml-8 -ml-4 sm:-ml-6',
+                    !children ? 'md:-mr-8 -mr-4 sm:-mr-6' : ''
                 )}
+                activeId={currentSection.id}
             >
                 <NavigationMenu.List
-                    className="-mx-3 flex grow gap-2 bg-transparent"
+                    className={tcls(
+                        '-mx-3 flex grow gap-2 bg-transparent',
+                        'pl-4 sm:pl-6 md:pl-8',
+                        !children ? 'pr-4 sm:pr-6 md:pr-8' : ''
+                    )}
                     aria-label="Sections"
                     id="sections"
                 >
@@ -123,7 +131,7 @@ export function SiteSectionTabs(props: {
                         );
                     })}
                 </NavigationMenu.List>
-            </div>
+            </ScrollContainer>
 
             {children}
 

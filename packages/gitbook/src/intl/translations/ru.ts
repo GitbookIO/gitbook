@@ -118,4 +118,6 @@ export const ru = {
     copy_mcp_url: 'Скопировать URL MCP-сервера',
     press_to_confirm: 'Нажмите ${1} для подтверждения',
     tool_call_skipped: 'Пропущен "${1}"',
+    scroll_back: 'Прокрутить назад',
+    scroll_further: 'Прокрутить дальше',
 };
