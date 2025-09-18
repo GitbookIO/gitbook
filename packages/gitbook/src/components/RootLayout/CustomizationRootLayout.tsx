@@ -1,4 +1,5 @@
 import {
+    CustomizationHeaderPreset,
     CustomizationIconsStyle,
     CustomizationSidebarBackgroundStyle,
     CustomizationSidebarListStyle,
@@ -79,6 +80,8 @@ export async function CustomizationRootLayout(props: {
               type: 'default' as const,
               variable: fonts.IBMPlexMono.variable,
           };
+
+    customization.header.preset = CustomizationHeaderPreset.None;
 
     // Preconnect and preload custom fonts if needed
     preloadFont(fontData);

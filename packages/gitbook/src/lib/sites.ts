@@ -3,6 +3,23 @@ import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@g
 import { joinPath } from './paths';
 
 /**
+ * Recursively flatten all sections from nested groups
+ */
+function flattenGroupChildren(children: (SiteSection | SiteSectionGroup)[]): SiteSection[] {
+    const sections: SiteSection[] = [];
+
+    for (const child of children) {
+        if (child.object === 'site-section') {
+            sections.push(child);
+        } else if (child.object === 'site-section-group') {
+            sections.push(...flattenGroupChildren(child.children));
+        }
+    }
+
+    return sections;
+}
+
+/**
  * Get all sections from a site structure.
  * Set the `ignoreGroups` option to true to flatten the list to only include SiteSection and to not include SiteSectionGroups.
  */
@@ -22,7 +39,7 @@ export function getSiteStructureSections(
     return siteStructure.type === 'sections'
         ? ignoreGroups
             ? siteStructure.structure.flatMap((item) =>
-                  item.object === 'site-section-group' ? item.sections : item
+                  item.object === 'site-section-group' ? flattenGroupChildren(item.children) : item
               )
             : siteStructure.structure
         : [];
@@ -41,7 +58,9 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
             return section.siteSpaces;
         }
 
-        return section.sections.flatMap((subSection) => subSection.siteSpaces);
+        return flattenGroupChildren(section.children).flatMap(
+            (subSection) => subSection.siteSpaces
+        );
     });
 }
 
@@ -80,13 +99,13 @@ export function findSiteSpaceBy(
                 };
             }
         } else {
-            const found = findSiteSpaceByIdInSections(sectionOrGroup.sections, predicate);
+            const found = findSiteSpaceByIdInGroupChildren(
+                sectionOrGroup.children,
+                predicate,
+                sectionOrGroup
+            );
             if (found) {
-                return {
-                    siteSpace: found.siteSpace,
-                    siteSection: found.siteSection,
-                    siteSectionGroup: sectionOrGroup,
-                };
+                return found;
             }
         }
     }
@@ -136,14 +155,30 @@ export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace:
     return siteSpacePath;
 }
 
-function findSiteSpaceByIdInSections(
-    sections: SiteSection[],
-    predicate: (siteSpace: SiteSpace) => boolean
-): { siteSpace: SiteSpace; siteSection: SiteSection } | null {
-    for (const siteSection of sections) {
-        const siteSpace = siteSection.siteSpaces.find(predicate) ?? null;
-        if (siteSpace) {
-            return { siteSpace, siteSection };
+function findSiteSpaceByIdInGroupChildren(
+    children: (SiteSection | SiteSectionGroup)[],
+    predicate: (siteSpace: SiteSpace) => boolean,
+    parentGroup: SiteSectionGroup
+): {
+    siteSpace: SiteSpace;
+    siteSection: SiteSection;
+    siteSectionGroup: SiteSectionGroup;
+} | null {
+    for (const child of children) {
+        if (child.object === 'site-section') {
+            const siteSpace = child.siteSpaces.find(predicate) ?? null;
+            if (siteSpace) {
+                return {
+                    siteSpace,
+                    siteSection: child,
+                    siteSectionGroup: parentGroup,
+                };
+            }
+        } else if (child.object === 'site-section-group') {
+            const found = findSiteSpaceByIdInGroupChildren(child.children, predicate, child);
+            if (found) {
+                return found;
+            }
         }
     }
 

@@ -10,11 +10,14 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
-import type { ClientSiteSection, ClientSiteSections } from './encodeClientSiteSections';
+import type {
+    ClientSiteSection,
+    ClientSiteSectionGroup,
+    ClientSiteSections,
+} from './encodeClientSiteSections';
 
 const SCREEN_OFFSET = 16; // 1rem
-const VIEWPORT_PADDING = 8; // 0.5rem
-const MIN_ITEMS_FOR_COLS = 4; /* number of items to switch to 2 columns */
+const MAX_ITEMS_PER_COLUMN = 5; // number of items per column
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
@@ -24,14 +27,14 @@ export function SiteSectionTabs(props: {
     children?: React.ReactNode;
 }) {
     const {
-        sections: { list: sectionsAndGroups, current: currentSection },
+        sections: { list: structure, current: currentSection },
         className,
         children,
     } = props;
 
     const currentTriggerRef = React.useRef<HTMLButtonElement | null>(null);
     const [offset, setOffset] = React.useState<number | null>(null);
-    const [value, setValue] = React.useState<string | undefined>(undefined);
+    const [value, setValue] = React.useState<string | undefined>();
 
     const isMobile = useIsMobile(768);
 
@@ -46,7 +49,7 @@ export function SiteSectionTabs(props: {
         setOffset(triggerLeft + triggerWidth / 2);
     }, [value]);
 
-    return sectionsAndGroups.length > 0 ? (
+    return structure.length > 0 ? (
         <NavigationMenu.Root
             className={tcls(
                 CONTAINER_STYLE,
@@ -76,51 +79,49 @@ export function SiteSectionTabs(props: {
                     aria-label="Sections"
                     id="sections"
                 >
-                    {sectionsAndGroups.map((sectionOrGroup) => {
-                        const { id, title, icon } = sectionOrGroup;
-                        const isGroup = sectionOrGroup.object === 'site-section-group';
+                    {structure.map((structureItem) => {
+                        const { id, title, icon } = structureItem;
+                        const isGroup = structureItem.object === 'site-section-group';
                         const isActiveGroup =
                             isGroup &&
-                            Boolean(
-                                sectionOrGroup.sections.find((s) => s.id === currentSection.id)
-                            );
+                            Boolean(findSectionInGroup(structureItem, currentSection.id));
                         const isActive = isActiveGroup || id === currentSection.id;
                         return (
                             <NavigationMenu.Item key={id} value={id} id={id}>
-                                {isGroup ? (
-                                    sectionOrGroup.sections.length > 0 ? (
-                                        <>
-                                            <NavigationMenu.Trigger
-                                                asChild
-                                                ref={value === id ? currentTriggerRef : undefined}
-                                                onClick={(e) => {
-                                                    // Prevent clicking the trigger from closing when the viewport is open
-                                                    if (value === id) {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                    }
-                                                }}
-                                            >
-                                                <SectionTab
-                                                    isActive={isActive}
-                                                    title={title}
-                                                    icon={icon as IconName}
-                                                />
-                                            </NavigationMenu.Trigger>
-                                            <NavigationMenu.Content
-                                                style={{ padding: `${VIEWPORT_PADDING}px` }}
-                                            >
-                                                <SectionGroupTileList
-                                                    sections={sectionOrGroup.sections}
-                                                    currentSection={currentSection}
-                                                />
-                                            </NavigationMenu.Content>
-                                        </>
-                                    ) : null
+                                {isGroup && structureItem.children.length > 0 ? (
+                                    <>
+                                        <NavigationMenu.Trigger
+                                            asChild
+                                            ref={value === id ? currentTriggerRef : undefined}
+                                            onClick={(e) => {
+                                                // Prevent clicking the trigger from closing when the viewport is open
+                                                if (value === id) {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                }
+                                            }}
+                                        >
+                                            <SectionTab
+                                                isActive={isActive}
+                                                title={title}
+                                                icon={icon as IconName}
+                                            />
+                                        </NavigationMenu.Trigger>
+                                        <NavigationMenu.Content>
+                                            <SectionGroupTileList
+                                                items={structureItem.children}
+                                                currentSection={currentSection}
+                                            />
+                                        </NavigationMenu.Content>
+                                    </>
                                 ) : (
                                     <NavigationMenu.Link asChild>
                                         <SectionTab
-                                            url={sectionOrGroup.url}
+                                            url={
+                                                structureItem.object === 'site-section'
+                                                    ? structureItem.url
+                                                    : undefined
+                                            }
                                             isActive={isActive}
                                             title={title}
                                             icon={icon ? (icon as IconName) : undefined}
@@ -143,15 +144,15 @@ export function SiteSectionTabs(props: {
             >
                 <NavigationMenu.Viewport
                     className={tcls(
-                        'relative origin-top overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg transition-transform duration-250 ease-in-out',
+                        'relative origin-top overflow-auto circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg transition-transform duration-250 ease-in-out',
                         '-mt-0.5 w-full md:w-max',
-                        'data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
+                        'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
                         "[&:not([style*='--radix-navigation-menu-viewport-width'])]:hidden" // The viewport width is only calculated once it's triggered, and can take a while. We hide the viewport until it's ready.
                     )}
                     style={{
                         translate:
                             !isMobile && offset
-                                ? `clamp(0px, calc(${offset}px - ${SCREEN_OFFSET}px - 50%), calc(100vw - var(--radix-navigation-menu-viewport-width, 0px) - ${VIEWPORT_PADDING * 2}px - ${SCREEN_OFFSET * 2}px)) 0 0`
+                                ? `clamp(0px, calc(${offset}px - ${SCREEN_OFFSET}px - 50%), calc(100vw - var(--radix-navigation-menu-viewport-width, 0px) - ${SCREEN_OFFSET * 3}px)) 0 0`
                                 : '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
                         display: offset === null ? 'none' : undefined,
                     }}
@@ -195,57 +196,155 @@ const SectionTab = React.forwardRef(function SectionTab(
  * A list of section tiles grouped in the dropdown for a section group
  */
 function SectionGroupTileList(props: {
-    sections: ClientSiteSection[];
+    items: (ClientSiteSection | ClientSiteSectionGroup)[];
     currentSection: ClientSiteSection;
 }) {
-    const { sections, currentSection } = props;
+    const { items, currentSection } = props;
+
+    // Separate non-grouped sections from grouped sections
+    const sections = items.filter((item) => item.object === 'site-section');
+    const groups = items.filter((item) => item.object === 'site-section-group');
+
+    const hasSections = sections.length > 0;
+    const hasGroups = groups.length > 0;
+
     return (
-        <ul
-            className={tcls(
-                'grid w-full gap-1 sm:grid-cols-1 md:w-max',
-                sections.length < MIN_ITEMS_FOR_COLS ? 'md:grid-cols-1' : 'md:grid-cols-2'
+        <div className="flex flex-col md:flex-row md:items-start">
+            {/* Non-grouped sections */}
+            {hasSections && (
+                <ul
+                    className={tcls(
+                        'flex grid-flow-row flex-col gap-x-2 gap-y-1 p-2 md:grid',
+                        hasGroups ? 'bg-tint-base' : ''
+                    )}
+                    style={{
+                        gridTemplateColumns: `repeat(${Math.ceil(sections.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                    }}
+                >
+                    {sections.map((section) => (
+                        <SectionGroupTile
+                            key={section.id}
+                            child={section}
+                            currentSection={currentSection}
+                        />
+                    ))}
+                </ul>
             )}
-        >
-            {sections.map((section) => (
-                <SectionGroupTile
-                    key={section.id}
-                    section={section}
-                    isActive={section.id === currentSection.id}
-                />
-            ))}
-        </ul>
+
+            {/* Grouped sections */}
+            {hasGroups && (
+                <ul
+                    className={tcls(
+                        'flex grid-flow-col flex-col items-start gap-x-2 gap-y-4 p-2 md:grid md:gap-y-1',
+                        hasSections
+                            ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
+                            : ''
+                    )}
+                >
+                    {groups.map((group) => (
+                        <SectionGroupTile
+                            key={group.id}
+                            child={group}
+                            currentSection={currentSection}
+                        />
+                    ))}
+                </ul>
+            )}
+        </div>
     );
 }
 
 /**
  * A section tile shown in the dropdown for a section group
  */
-function SectionGroupTile(props: { section: ClientSiteSection; isActive: boolean }) {
-    const { section, isActive } = props;
-    const { url, icon, title } = section;
+function SectionGroupTile(props: {
+    child: ClientSiteSection | ClientSiteSectionGroup;
+    currentSection: ClientSiteSection;
+}) {
+    const { child, currentSection } = props;
+
+    if (child.object === 'site-section') {
+        const { url, icon, title, description } = child;
+        const isActive = child.id === currentSection.id;
+        return (
+            <li className="group/section-tile flex w-full shrink grow md:w-68">
+                <Link
+                    href={url}
+                    className={tcls(
+                        'grow circular-corners:rounded-2xl rounded-corners:rounded-lg px-3 py-2 transition-colors',
+                        isActive
+                            ? 'bg-primary-active text-primary-strong'
+                            : 'text-tint-strong hover:bg-tint-hover'
+                    )}
+                >
+                    <div className="mb-auto flex grow items-center gap-2">
+                        {icon && (
+                            <div
+                                className={tcls(
+                                    '-ml-1 self-start circular-corners:rounded-2xl rounded-corners:rounded-lg p-2 transition-colors',
+                                    isActive
+                                        ? 'bg-primary-base text-primary-subtle'
+                                        : 'bg-tint text-tint-strong group-hover/section-tile:bg-tint-base'
+                                )}
+                            >
+                                <SectionIcon isActive={isActive} icon={icon as IconName} />
+                            </div>
+                        )}
+                        <div className="flex flex-col gap-1">
+                            {title}
+                            {description && (
+                                <p className={isActive ? 'text-primary' : 'text-tint'}>
+                                    {description}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </Link>
+            </li>
+        );
+    }
+
+    // Handle nested section group
+    const { title, icon, children } = child;
+
     return (
-        <li className="flex w-full md:w-60">
-            <Link
-                href={url}
-                className={tcls(
-                    'flex w-full select-none flex-col gap-1 rounded-sm straight-corners:rounded-none px-3 py-2 transition-colors hover:bg-tint-hover',
-                    isActive ? 'text-primary' : 'text-tint-strong'
+        <li className="flex w-full shrink grow flex-col gap-1 md:w-68">
+            <div className="mt-3 mb-2 flex gap-2.5 px-3 font-semibold text-tint-subtle text-xs uppercase tracking-wider">
+                {icon && (
+                    <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}
-            >
-                <div className="flex w-full gap-2">
-                    {icon ? (
-                        <SectionIcon
-                            className="mt-[3px]"
-                            isActive={false}
-                            icon={icon as IconName}
-                        />
-                    ) : null}
-                    {title}
-                </div>
-                {section.description ? (
-                    <p className="text-tint-subtle">{section.description}</p>
-                ) : null}
-            </Link>
+                {title}
+            </div>
+            <ul className="contents">
+                {children.map((nestedChild: ClientSiteSection | ClientSiteSectionGroup) => (
+                    <SectionGroupTile
+                        key={nestedChild.id}
+                        child={nestedChild}
+                        currentSection={currentSection}
+                    />
+                ))}
+            </ul>
         </li>
     );
+}
+
+/**
+ * Recursively find a section by ID within a group and its nested children
+ */
+function findSectionInGroup(
+    group: ClientSiteSectionGroup,
+    sectionId: string
+): ClientSiteSection | null {
+    for (const child of group.children) {
+        if (child.object === 'site-section' && child.id === sectionId) {
+            return child;
+        }
+        if (child.object === 'site-section-group') {
+            const found = findSectionInGroup(child, sectionId);
+            if (found) {
+                return found;
+            }
+        }
+    }
+    return null;
 }
