@@ -28,6 +28,13 @@ export function shouldTrackEvents(headers?: Awaited<ReturnType<typeof nextHeader
 export async function serveProxyAnalyticsEvent(req: Request) {
     const requestURL = new URL(req.url);
 
+    // Fill geolocation data from request headers either from OpenNext or Vercel
+    const country = req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
+    const latitude = req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
+    const longitude = req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
+    // OpenNext doesn't provide continent info, we add it manually in our custom worker
+    const continent = req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
+
     const org = requestURL.searchParams.get('o');
     const site = requestURL.searchParams.get('s');
     if (!org || !site) {
@@ -39,11 +46,25 @@ export async function serveProxyAnalyticsEvent(req: Request) {
 
     // We make the request to the public API URL to ensure the request is properly enriched by the router..
     const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
-    return await fetch(url.toString(), {
+    const result = await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-location-country': country || '',
+            'x-location-latitude': latitude || '',
+            'x-location-longitude': longitude || '',
+            'x-location-continent': continent || '',
         },
         body: req.body,
+    });
+    //TODO: remove this, just for debugging
+    const resultHeaders = new Headers(result.headers);
+    resultHeaders.set('x-location-country', country || '');
+    resultHeaders.set('x-location-latitude', latitude || '');
+    resultHeaders.set('x-location-longitude', longitude || '');
+    resultHeaders.set('x-location-continent', continent || '');
+    return new Response(result.body, {
+        status: result.status,
+        headers: resultHeaders,
     });
 }
