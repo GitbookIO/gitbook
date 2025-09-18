@@ -119,4 +119,6 @@ export const nl: TranslationLanguage = {
     copy_mcp_url: 'Kopieer MCP-server URL',
     press_to_confirm: 'Druk op ${1} om te bevestigen',
     tool_call_skipped: '"${1}" overgeslagen',
+    scroll_back: 'Terug scrollen',
+    scroll_further: 'Verder scrollen',
 };

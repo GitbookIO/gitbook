@@ -116,4 +116,6 @@ export const zh: TranslationLanguage = {
     copy_mcp_url: '复制 MCP 服务器 URL',
     press_to_confirm: '按 ${1} 确认',
     tool_call_skipped: '已跳过 "${1}"',
+    scroll_back: '向后滚动',
+    scroll_further: '向前滚动',
 };

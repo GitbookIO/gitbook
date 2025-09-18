@@ -119,4 +119,6 @@ export const pt_br = {
     copy_mcp_url: 'Copiar URL do servidor MCP',
     press_to_confirm: 'Pressione ${1} para confirmar',
     tool_call_skipped: 'Pulado "${1}"',
+    scroll_back: 'Rolar para trás',
+    scroll_further: 'Rolar para frente',
 };
