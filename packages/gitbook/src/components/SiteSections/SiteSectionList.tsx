@@ -226,7 +226,6 @@ export function SiteSectionGroupItem(props: {
                                     section={child}
                                     isActive={child.id === currentSection.id}
                                     key={child.id}
-                                    // className="pl-5"
                                 />
                             );
                         }

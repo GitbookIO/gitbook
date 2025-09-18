@@ -321,7 +321,7 @@ function SectionGroupTile(props: {
                     gridTemplateColumns: `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
                 }}
             >
-                {children.map((nestedChild: ClientSiteSection | ClientSiteSectionGroup) => (
+                {children.map((nestedChild) => (
                     <SectionGroupTile
                         key={nestedChild.id}
                         child={nestedChild}
