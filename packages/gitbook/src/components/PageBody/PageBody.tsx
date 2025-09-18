@@ -81,7 +81,10 @@ export function PageBody(props: {
                             blockStyle="page-api-block:ml-0"
                             context={{
                                 mode: 'default',
-                                contentContext: context,
+                                contentContext: {
+                                    ...context,
+                                    page,
+                                },
                                 withLinkPreviews,
                             }}
                         />

@@ -4,6 +4,7 @@
     "private": true,
     "dependencies": {
         "@gitbook/api": "catalog:",
+        "@gitbook/expr": "workspace:*",
         "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
