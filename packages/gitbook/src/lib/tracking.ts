@@ -1,5 +1,5 @@
 import type { headers as nextHeaders } from 'next/headers';
-import { GITBOOK_API_URL, GITBOOK_DISABLE_TRACKING } from './env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_DISABLE_TRACKING } from './env';
 
 /**
  * Return true if events should be tracked on the site.
@@ -36,7 +36,9 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             headers: { 'content-type': 'text/plain' },
         });
     }
-    const url = new URL(`${GITBOOK_API_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
+
+    // We make the request to the public API URL to ensure the request is properly enriched by the router..
+    const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
     return await fetch(url.toString(), {
         method: 'POST',
         headers: {
