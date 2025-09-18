@@ -28,6 +28,17 @@ export function shouldTrackEvents(headers?: Awaited<ReturnType<typeof nextHeader
 export async function serveProxyAnalyticsEvent(req: Request) {
     const requestURL = new URL(req.url);
 
+    // Fill geolocation data from request headers either from OpenNext or Vercel
+    const country =
+        req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
+    const latitude =
+        req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
+    const longitude =
+        req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
+    // OpenNext doesn't provide continent info, we add it manually in our custom worker
+    const continent =
+        req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
+
     const org = requestURL.searchParams.get('o');
     const site = requestURL.searchParams.get('s');
     if (!org || !site) {
@@ -43,6 +54,10 @@ export async function serveProxyAnalyticsEvent(req: Request) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            ...(country ? { 'x-location-country': country } : {}),
+            ...(latitude ? { 'x-location-latitude': latitude } : {}),
+            ...(longitude ? { 'x-location-longitude': longitude } : {}),
+            ...(continent ? { 'x-location-continent': continent } : {}),
         },
         body: req.body,
     });

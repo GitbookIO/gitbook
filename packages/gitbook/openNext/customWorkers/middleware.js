@@ -26,8 +26,10 @@ export default class extends WorkerEntrypoint {
     async fetch(request) {
         return runWithCloudflareRequestContext(request, this.env, this.ctx, async () => {
             const startTime = Date.now();
+            const middlewareRequest = new Request(request.url, request);
+            middlewareRequest.headers.set('x-open-next-continent', request.cf?.continent || '');
             // - `Request`s are handled by the Next server
-            const reqOrResp = await middlewareHandler(request, this.env, this.ctx);
+            const reqOrResp = await middlewareHandler(middlewareRequest, this.env, this.ctx);
             if (reqOrResp instanceof Response) {
                 const duration = Date.now() - startTime;
                 const logMessage = formatLog(
