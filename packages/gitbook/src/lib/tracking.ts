@@ -46,7 +46,7 @@ export async function serveProxyAnalyticsEvent(req: Request) {
 
     // We make the request to the public API URL to ensure the request is properly enriched by the router..
     const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
-    const result = await fetch(url.toString(), {
+    return await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -56,15 +56,5 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             'x-location-continent': continent || '',
         },
         body: req.body,
-    });
-    //TODO: remove this, just for debugging
-    const resultHeaders = new Headers(result.headers);
-    resultHeaders.set('x-location-country', country || '');
-    resultHeaders.set('x-location-latitude', latitude || '');
-    resultHeaders.set('x-location-longitude', longitude || '');
-    resultHeaders.set('x-location-continent', continent || '');
-    return new Response(result.body, {
-        status: result.status,
-        headers: resultHeaders,
     });
 }
