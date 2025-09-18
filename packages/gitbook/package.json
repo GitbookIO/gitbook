@@ -14,7 +14,8 @@
         "@gitbook/react-contentkit": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
-        "@opennextjs/cloudflare": "^1.7.1",
+        "@modelcontextprotocol/sdk": "^1.17.5",
+        "@opennextjs/cloudflare": "^1.8.3",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dropdown-menu": "^2.1.12",
         "@radix-ui/react-hover-card": "^1.1.15",
@@ -39,6 +40,7 @@
         "jwt-decode": "^4.0.0",
         "katex": "^0.16.9",
         "mathjax": "^3.2.2",
+        "mcp-handler": "^1.0.2",
         "mdast-util-from-markdown": "^2.0.2",
         "mdast-util-frontmatter": "^2.0.1",
         "mdast-util-gfm": "^3.1.0",
@@ -72,10 +74,8 @@
         "url-join": "^5.0.0",
         "usehooks-ts": "^3.1.0",
         "warn-once": "^0.1.1",
-        "zustand": "^5.0.3",
-        "mcp-handler": "^1.0.2",
-        "@modelcontextprotocol/sdk": "^1.17.5",
-        "zod": "^3"
+        "zod": "^3",
+        "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
