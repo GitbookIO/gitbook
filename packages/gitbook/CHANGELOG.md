@@ -1,5 +1,24 @@
 # gitbook
 
+## 0.19.0
+
+### Minor Changes
+
+- ed7d47d: Show a toolbar for authenticated users with access to the current site.
+- b932e4e: Scope search across sections and variants
+
+### Patch Changes
+
+- 9344431: Fix missing geo data in site insights because of incorrect proxying of events.
+- 2b8a2d2: Add stable scroll gutter to search container
+- b498521: Fix robots.txt preventing favicon from being indexed.
+- e434442: Support nested site section groups
+- 469b332: Add support for inline expressions rendering with visitor data on GBO side
+- b8388e5: Add scrollcontainer component
+- b85eccd: Refactor section tabs
+- Updated dependencies [d7948e3]
+  - @gitbook/react-openapi@1.4.4
+
 ## 0.18.0
 
 ### Minor Changes

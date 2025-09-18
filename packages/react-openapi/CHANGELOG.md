@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.4.4
+
+### Patch Changes
+
+- d7948e3: Fix OpenAPI response showing as JSON instead of YAML when it should
+
 ## 1.4.3
 
 ### Patch Changes
