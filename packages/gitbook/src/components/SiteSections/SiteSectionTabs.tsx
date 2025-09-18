@@ -308,14 +308,19 @@ function SectionGroupTile(props: {
     const { title, icon, children } = child;
 
     return (
-        <li className="flex w-full shrink grow flex-col gap-1 md:w-68">
+        <li className="flex w-full shrink grow flex-col gap-1">
             <div className="mt-3 mb-2 flex gap-2.5 px-3 font-semibold text-tint-subtle text-xs uppercase tracking-wider">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}
                 {title}
             </div>
-            <ul className="contents">
+            <ul
+                className="flex grid-flow-row flex-col gap-x-2 gap-y-1 md:grid"
+                style={{
+                    gridTemplateColumns: `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                }}
+            >
                 {children.map((nestedChild: ClientSiteSection | ClientSiteSectionGroup) => (
                     <SectionGroupTile
                         key={nestedChild.id}
