@@ -5,7 +5,6 @@ import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
-import { NavigationLoader } from '../SpaceLayout/NavigationLoader';
 import { HeaderLink } from './HeaderLink';
 import { HeaderLinkMore } from './HeaderLinkMore';
 import { HeaderLinks } from './HeaderLinks';
@@ -197,7 +196,6 @@ export function Header(props: {
                     </SiteSectionTabs>
                 </div>
             ) : null}
-            <NavigationLoader />
         </header>
     );
 }

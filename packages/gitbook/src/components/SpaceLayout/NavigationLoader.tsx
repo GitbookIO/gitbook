@@ -3,35 +3,42 @@
 import { tcls } from '@/lib/tailwind';
 import { useIsNavigating } from '../hooks';
 
-export function NavigationLoader() {
+interface NavigationLoaderProps {
+    children: React.ReactNode;
+    className?: string;
+}
+
+export function NavigationLoader({ children, className }: NavigationLoaderProps) {
     const isNavigating = useIsNavigating();
-    if (!isNavigating) {
-        return null;
-    }
+    
     return (
-        <div
-            className={tcls(
-                'w-full',
-                'h-1',
-                'relative',
-                'inline-block',
-                'overflow-hidden',
-                'bg-info'
-            )}
-        >
-            <span
+        <div className={tcls("relative", className)}>
+            {/* Children content */}
+            {children}
+            
+            {/* Animated loading overlay */}
+            {isNavigating && (
+                <div
                 className={tcls(
-                    'w-24',
-                    'h-1',
                     'absolute',
-                    'bg-primary-original',
-                    'top-0',
-                    'left-0',
-                    'box-border',
-                    'rounded-md',
-                    'animate-progress-loader'
+                    'inset-0',
+                    '-m-0.5', // Make it a few px bigger than children
+                    'rounded-lg',
+                    'overflow-hidden',
+                    'pointer-events-none'
                 )}
-            />
+            >
+                {/* Animated circular gradient background */}
+                <div
+                    className={tcls(
+                        'absolute',
+                        'inset-0',
+                        'bg-primary-original',
+                        'animate-spin',
+                    )}
+                    style={{animationDuration: '2s'}}
+                />
+            </div>)}
         </div>
     );
 }

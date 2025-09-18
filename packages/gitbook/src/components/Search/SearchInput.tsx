@@ -7,6 +7,7 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
 import { useClassnames } from '../primitives/StyleProvider';
+import { NavigationLoader } from '../SpaceLayout/NavigationLoader';
 
 interface SearchInputProps {
     onChange: (value: string) => void;
@@ -46,7 +47,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
         }, [isOpen, value]);
 
         return (
-            <div className={tcls('relative flex size-9 grow', className)}>
+            <NavigationLoader className={tcls('relative flex size-9 grow', className)}>
                 {/* biome-ignore lint/a11y/useKeyWithClickEvents: this div needs an onClick to show the input on mobile, where it's normally hidden.
                 Normally you'd also need to add a keyboard trigger to do the same without a pointer, but in this case the input already be focused on its own. */}
                 <div
@@ -104,7 +105,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     />
                     {!isOpen ? <Shortcut /> : null}
                 </div>
-            </div>
+            </NavigationLoader>
         );
     }
 );
