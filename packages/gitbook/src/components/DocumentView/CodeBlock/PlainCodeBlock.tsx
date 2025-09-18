@@ -1,7 +1,8 @@
-import type { DocumentBlockCode, JSONDocument } from '@gitbook/api';
+import type { JSONDocument } from '@gitbook/api';
 import { useId } from 'react';
 
 import { CodeBlock } from './CodeBlock';
+import { convertCodeStringToBlock } from './utils';
 
 /**
  * Plain code block with syntax highlighting.
@@ -11,31 +12,7 @@ export function PlainCodeBlock(props: { code: string; syntax: string }) {
     const { code, syntax } = props;
     const id = useId();
 
-    const block: DocumentBlockCode = {
-        key: id,
-        object: 'block',
-        type: 'code',
-        data: {
-            syntax,
-        },
-        nodes: code.split('\n').map((line) => ({
-            object: 'block',
-            type: 'code-line',
-            data: {},
-            nodes: [
-                {
-                    object: 'text',
-                    leaves: [
-                        {
-                            object: 'leaf',
-                            text: line,
-                            marks: [],
-                        },
-                    ],
-                },
-            ],
-        })),
-    };
+    const block = convertCodeStringToBlock({ key: id, code, syntax });
 
     const document: JSONDocument = {
         object: 'document',
