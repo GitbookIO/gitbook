@@ -29,11 +29,15 @@ export async function serveProxyAnalyticsEvent(req: Request) {
     const requestURL = new URL(req.url);
 
     // Fill geolocation data from request headers either from OpenNext or Vercel
-    const country = req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
-    const latitude = req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
-    const longitude = req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
+    const country =
+        req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
+    const latitude =
+        req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
+    const longitude =
+        req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
     // OpenNext doesn't provide continent info, we add it manually in our custom worker
-    const continent = req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
+    const continent =
+        req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
 
     const org = requestURL.searchParams.get('o');
     const site = requestURL.searchParams.get('s');
