@@ -1,23 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
 import { joinPath } from './paths';
-
-/**
- * Recursively flatten all sections from nested groups
- */
-function flattenSectionsFromGroup(children: (SiteSection | SiteSectionGroup)[]): SiteSection[] {
-    const sections: SiteSection[] = [];
-
-    for (const child of children) {
-        if (child.object === 'site-section') {
-            sections.push(child);
-        } else if (child.object === 'site-section-group') {
-            sections.push(...flattenSectionsFromGroup(child.children));
-        }
-    }
-
-    return sections;
-}
+import { flattenSectionsFromGroup } from './utils';
 
 /**
  * Get all sections from a site structure.
@@ -40,7 +24,7 @@ export function getSiteStructureSections(
         ? ignoreGroups
             ? siteStructure.structure.flatMap((item) =>
                   item.object === 'site-section-group'
-                      ? flattenSectionsFromGroup(item.children)
+                      ? flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(item.children)
                       : item
               )
             : siteStructure.structure
@@ -60,9 +44,9 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
             return section.siteSpaces;
         }
 
-        return flattenSectionsFromGroup(section.children).flatMap(
-            (subSection) => subSection.siteSpaces
-        );
+        return flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(section.children)
+            .filter((subSection): subSection is SiteSection => subSection.object === 'site-section')
+            .flatMap((subSection) => subSection.siteSpaces);
     });
 }
 

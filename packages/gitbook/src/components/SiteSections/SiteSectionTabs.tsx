@@ -6,6 +6,7 @@ import React from 'react';
 
 import { Button, DropdownChevron, Link } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
+import { findSectionInGroup } from '@/lib/utils';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { CONTAINER_STYLE } from '../layout';
 import { ScrollContainer } from '../primitives/ScrollContainer';
@@ -331,25 +332,4 @@ function SectionGroupTile(props: {
             </ul>
         </li>
     );
-}
-
-/**
- * Recursively find a section by ID within a group and its nested children
- */
-function findSectionInGroup(
-    group: ClientSiteSectionGroup,
-    sectionId: string
-): ClientSiteSection | null {
-    for (const child of group.children) {
-        if (child.object === 'site-section' && child.id === sectionId) {
-            return child;
-        }
-        if (child.object === 'site-section-group') {
-            const found = findSectionInGroup(child, sectionId);
-            if (found) {
-                return found;
-            }
-        }
-    }
-    return null;
 }

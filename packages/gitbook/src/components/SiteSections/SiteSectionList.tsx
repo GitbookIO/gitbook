@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
+import { findSectionInGroup } from '@/lib/utils';
 import { useToggleAnimation } from '../hooks';
 import { Link } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
@@ -260,25 +261,4 @@ function Descendants(props: {
             {children}
         </motion.div>
     );
-}
-
-/**
- * Recursively find a section by ID within a group and its nested children
- */
-function findSectionInGroup(
-    group: ClientSiteSectionGroup,
-    sectionId: string
-): ClientSiteSection | null {
-    for (const child of group.children) {
-        if (child.object === 'site-section' && child.id === sectionId) {
-            return child;
-        }
-        if (child.object === 'site-section-group') {
-            const found = findSectionInGroup(child, sectionId);
-            if (found) {
-                return found;
-            }
-        }
-    }
-    return null;
 }
