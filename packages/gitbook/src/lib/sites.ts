@@ -5,14 +5,14 @@ import { joinPath } from './paths';
 /**
  * Recursively flatten all sections from nested groups
  */
-function flattenGroupChildren(children: (SiteSection | SiteSectionGroup)[]): SiteSection[] {
+function flattenSectionsFromGroup(children: (SiteSection | SiteSectionGroup)[]): SiteSection[] {
     const sections: SiteSection[] = [];
 
     for (const child of children) {
         if (child.object === 'site-section') {
             sections.push(child);
         } else if (child.object === 'site-section-group') {
-            sections.push(...flattenGroupChildren(child.children));
+            sections.push(...flattenSectionsFromGroup(child.children));
         }
     }
 
@@ -39,7 +39,9 @@ export function getSiteStructureSections(
     return siteStructure.type === 'sections'
         ? ignoreGroups
             ? siteStructure.structure.flatMap((item) =>
-                  item.object === 'site-section-group' ? flattenGroupChildren(item.children) : item
+                  item.object === 'site-section-group'
+                      ? flattenSectionsFromGroup(item.children)
+                      : item
               )
             : siteStructure.structure
         : [];
@@ -58,7 +60,7 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
             return section.siteSpaces;
         }
 
-        return flattenGroupChildren(section.children).flatMap(
+        return flattenSectionsFromGroup(section.children).flatMap(
             (subSection) => subSection.siteSpaces
         );
     });
