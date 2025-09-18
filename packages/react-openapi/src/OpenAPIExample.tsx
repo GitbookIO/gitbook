@@ -1,3 +1,5 @@
+import yaml from 'js-yaml';
+
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type { OpenAPIContext, OpenAPIUniversalContext } from './context';
 import { json2xml } from './json2xml';
@@ -13,7 +15,7 @@ export function OpenAPIExample(props: {
     syntax: string;
 }) {
     const { example, context, syntax } = props;
-    const code = stringifyExample({ example, xml: syntax === 'xml' });
+    const code = stringifyExample({ example, syntax });
 
     if (code === null) {
         return <OpenAPIEmptyExample context={context} />;
@@ -22,8 +24,10 @@ export function OpenAPIExample(props: {
     return context.renderCodeBlock({ code, syntax });
 }
 
-function stringifyExample(args: { example: OpenAPIV3.ExampleObject; xml: boolean }): string | null {
-    const { example, xml } = args;
+function stringifyExample(args: { example: OpenAPIV3.ExampleObject; syntax: string }):
+    | string
+    | null {
+    const { example, syntax } = args;
 
     if (!example.value) {
         return null;
@@ -33,8 +37,12 @@ function stringifyExample(args: { example: OpenAPIV3.ExampleObject; xml: boolean
         return example.value;
     }
 
-    if (xml) {
+    if (syntax === 'xml') {
         return json2xml(example.value);
+    }
+
+    if (syntax === 'yaml') {
+        return yaml.dump(example.value).replace(/'/g, '').replace(/\\n/g, '\n');
     }
 
     return stringifyOpenAPI(example.value, null, 2);
