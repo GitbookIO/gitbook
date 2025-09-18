@@ -54,10 +54,10 @@ export async function serveProxyAnalyticsEvent(req: Request) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-location-country': country || '',
-            'x-location-latitude': latitude || '',
-            'x-location-longitude': longitude || '',
-            'x-location-continent': continent || '',
+            ...(country ? { 'x-location-country': country } : {}),
+            ...(latitude ? { 'x-location-latitude': latitude } : {}),
+            ...(longitude ? { 'x-location-longitude': longitude } : {}),
+            ...(continent ? { 'x-location-continent': continent } : {}),
         },
         body: req.body,
     });
