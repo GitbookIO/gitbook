@@ -4,6 +4,9 @@ import type { DocumentInlineExpression } from '@gitbook/api';
 import type { InlineProps } from '../Inline';
 import { InlineExpressionValue } from './InlineExpressionValue';
 
+/**
+ * Render an inline expression.
+ */
 export function InlineExpression(props: InlineProps<DocumentInlineExpression>) {
     const { context, inline } = props;
 

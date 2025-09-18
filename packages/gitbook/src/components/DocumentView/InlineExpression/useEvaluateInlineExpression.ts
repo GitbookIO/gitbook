@@ -7,6 +7,10 @@ import {
 import type { Variables } from '@gitbook/api';
 import { ExpressionRuntime, formatExpressionResult } from '@gitbook/expr';
 
+/**
+ * Hook that returns a callback to evaluate an inline expression with visitor data
+ * and space/page variables as context.
+ */
 export function useEvaluateInlineExpression(args: {
     visitorClaims: AdaptiveVisitorClaims | null;
     variables: {
