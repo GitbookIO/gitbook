@@ -26,7 +26,12 @@ export function OpenAPISpec(props: {
     return (
         <>
             {securities.length > 0 ? (
-                <OpenAPISecurities key="securities" securities={securities} context={context} />
+                <OpenAPISecurities
+                    key="securities"
+                    securityRequirement={operation.security}
+                    securities={securities}
+                    context={context}
+                />
             ) : null}
 
             {parameterGroups.map((group) => {
