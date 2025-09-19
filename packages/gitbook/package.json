@@ -50,7 +50,7 @@
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.12",
-        "next": "15.4.0",
+        "next": "15.4.7",
         "next-themes": "^0.2.1",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
