@@ -185,11 +185,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                                 sections?.list.some(
                                                     (s) =>
                                                         s.object === 'site-section' &&
-                                                        s.siteSpaces.filter(
-                                                            (s) =>
-                                                                s.space.language ===
-                                                                siteSpace.space.language
-                                                        ).length > 1
+                                                        s.siteSpaces.length > 1
                                                 ) ?? false
                                             }
                                             withSections={withSections}
