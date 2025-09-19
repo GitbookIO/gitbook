@@ -15,6 +15,8 @@ import { tcls } from '@/lib/tailwind';
 import { getSpaceLanguage } from '@/intl/server';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
+import { hasIndexableSpaces } from '@/lib/seo';
+import { flattenSectionsFromGroup } from '@/lib/utils';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
@@ -103,7 +105,12 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(sections && sections.list.length > 1);
+    const withSections = Boolean(
+        sections &&
+            flattenSectionsFromGroup(sections?.list ?? []).filter(
+                (s) => s.object === 'site-section' && hasIndexableSpaces(s)
+            ).length > 1
+    );
 
     const currentLanguage = getSpaceLanguage(context);
     const withVariants: 'generic' | 'translations' | undefined =

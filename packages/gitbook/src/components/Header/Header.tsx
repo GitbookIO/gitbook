@@ -2,7 +2,9 @@ import type { GitBookSiteContext } from '@/lib/context';
 
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
+import { filterSectionsWithIndexableSpaces } from '@/lib/seo';
 import { tcls } from '@/lib/tailwind';
+import { flattenSectionsFromGroup } from '@/lib/utils';
 import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -15,13 +17,21 @@ import { TranslationsDropdown } from './SpacesDropdown';
 /**
  * Render the header for the space.
  */
-export function Header(props: {
+export async function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
     withVariants?: 'generic' | 'translations';
 }) {
     const { context, withTopHeader, withVariants } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
+
+    // Filter sections to only include those with indexable spaces
+    const filteredSections = sections?.list
+        ? await filterSectionsWithIndexableSpaces(
+              context,
+              flattenSectionsFromGroup(sections.list).filter((s) => s.object === 'site-section')
+          )
+        : [];
 
     return (
         <header
@@ -92,7 +102,6 @@ export function Header(props: {
                             />
                             <HeaderLogo context={context} />
                         </div>
-
                         <div
                             className={tcls(
                                 'flex',
@@ -130,7 +139,7 @@ export function Header(props: {
                                             ).length > 1
                                     ) ?? false
                                 }
-                                withSections={!!sections}
+                                withSections={filteredSections.length > 1}
                                 section={
                                     sections
                                         ? // Client-encode to avoid a serialisation issue that was causing the language selector to disappear
