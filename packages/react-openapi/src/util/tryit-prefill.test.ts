@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
 import type { OpenAPIOperationData } from '../types';
-import { resolveTryItPrefillForOperation } from './tryit-prefill';
+import {
+    resolvePrefillCodePlaceholderFromSecurityScheme,
+    resolveTryItPrefillForOperation,
+} from './tryit-prefill';
 
 describe('resolveTryItPrefillForOperation', () => {
     describe('prefill authentication info', () => {
@@ -307,5 +310,108 @@ describe('resolveTryItPrefillForOperation', () => {
                 ],
             });
         });
+    });
+});
+
+describe('resolvePrefillCodePlaceholderFromSecurityScheme (integration style)', () => {
+    it('should return placeholder for bearer token scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+                'x-gitbook-prefill': '{{ visitor.claims.apiToken }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.apiToken)]__$$');
+    });
+
+    it('should return placeholder for basic auth scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'basic',
+                'x-gitbook-prefill': '{{ visitor.claims.basicAuth }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.basicAuth)]__$$');
+    });
+
+    it('should build placeholder for apiKey scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'apiKey',
+                in: 'header',
+                name: 'X-API-KEY',
+                'x-gitbook-prefill': '{{ visitor.claims.apiKey }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.apiKey)]__$$');
+    });
+
+    it('should return placeholder with default value if provided', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+                'x-gitbook-prefill': '{{ visitor.claims.missing }}',
+            },
+            defaultPlaceholderValue: 'YOUR_API_TOKEN',
+        });
+
+        expect(result).toBe(
+            '$$__X-GITBOOK-PREFILL[(visitor.claims.missing) ?? "YOUR_API_TOKEN"]__$$'
+        );
+    });
+
+    it('should concatenate text and expression in prefill', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+                'x-gitbook-prefill': 'Bearer {{ visitor.claims.apiToken }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[("Bearer " + visitor.claims.apiToken)]__$$');
+    });
+
+    it('should handle multiple expressions in prefill', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'basic',
+                'x-gitbook-prefill': '{{ visitor.claims.username }}:{{ visitor.claims.password }}',
+            },
+        });
+
+        expect(result).toBe(
+            '$$__X-GITBOOK-PREFILL[(visitor.claims.username + ":" + visitor.claims.password)]__$$'
+        );
+    });
+
+    it('should return empty default value if no prefill property exists', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+            },
+            defaultPlaceholderValue: 'YOUR_API_TOKEN',
+        });
+
+        expect(result).toBe('YOUR_API_TOKEN');
+    });
+
+    it('should return empty string if no prefill property exists', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+            },
+        });
+
+        expect(result).toBe('');
     });
 });

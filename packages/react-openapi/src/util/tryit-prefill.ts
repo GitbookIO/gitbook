@@ -1,13 +1,15 @@
-import { ExpressionRuntime, parseTemplate } from '@gitbook/expr';
+import { ExpressionRuntime, type TemplatePart, parseTemplate } from '@gitbook/expr';
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type { ApiClientConfiguration } from '@scalar/types';
 import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
-import type { OpenAPIOperationData } from '../types';
+import type { OpenAPIOperationData, OpenAPISecuritySchemeWithRequired } from '../types';
 
 export interface TryItPrefillConfiguration {
     authentication?: ApiClientConfiguration['authentication'];
     servers?: ApiClientConfiguration['servers'];
 }
+
+export const PREFILL_CUSTOM_PROPERTY = 'x-gitbook-prefill';
 
 /**
  * Resolve the Scalar API client prefill configuration for a given OpenAPI operation.
@@ -68,8 +70,8 @@ function resolveTryItPrefillAuthForOperationSecurities(args: {
     const prefillAuthConfig: ApiClientConfiguration['authentication']['securitySchemes'] = {};
 
     for (const [schemeName, security] of Object.values(securities)) {
-        const tryitPrefillAuthValue = security['x-gitbook-prefill']
-            ? resolveTryItPrefillExpression(security['x-gitbook-prefill'])
+        const tryitPrefillAuthValue = security[PREFILL_CUSTOM_PROPERTY]
+            ? resolveTryItPrefillExpression(security[PREFILL_CUSTOM_PROPERTY])
             : undefined;
 
         if (!tryitPrefillAuthValue) {
@@ -121,7 +123,7 @@ function resolveTryItPrefillServersForOperationServers(args: {
 
     for (const server of servers) {
         // Url-level prefill
-        const tryItPrefillServerUrlExpr = server['x-gitbook-prefill'];
+        const tryItPrefillServerUrlExpr = server[PREFILL_CUSTOM_PROPERTY];
         const tryItPrefillServerUrlValue = tryItPrefillServerUrlExpr
             ? resolveTryItPrefillExpression(tryItPrefillServerUrlExpr)
             : undefined;
@@ -133,7 +135,8 @@ function resolveTryItPrefillServersForOperationServers(args: {
         // Variable-level prefill
         if (server.variables) {
             for (const [varName, variable] of Object.entries(server.variables)) {
-                const { 'x-gitbook-prefill': tryItPrefillVarExpr, ...variableProps } = variable;
+                const { [PREFILL_CUSTOM_PROPERTY]: tryItPrefillVarExpr, ...variableProps } =
+                    variable;
 
                 const tryItPrefillVarValue = tryItPrefillVarExpr
                     ? resolveTryItPrefillExpression(tryItPrefillVarExpr)
@@ -157,4 +160,49 @@ function resolveTryItPrefillServersForOperationServers(args: {
     }
 
     return resolvedServers.length > 0 ? resolvedServers : undefined;
+}
+
+/**
+ * Return a X-GITBOOK-PREFILL placeholder based on the prefill custom property in the provided security scheme.
+ */
+export function resolvePrefillCodePlaceholderFromSecurityScheme(args: {
+    security: OpenAPISecuritySchemeWithRequired;
+    defaultPlaceholderValue?: string;
+}) {
+    const { security, defaultPlaceholderValue } = args;
+    const prefillExprParts = extractPrefillExpressionPartsFromSecurityScheme(security);
+
+    if (prefillExprParts.length === 0) {
+        return defaultPlaceholderValue ?? '';
+    }
+    const prefillExpr = prefillExprParts
+        .map((part) => {
+            switch (part.type) {
+                case 'text':
+                    return `"${part.value}"`;
+                case 'expression':
+                    return part.value;
+                default:
+                    return '';
+            }
+        })
+        .join(' + ');
+
+    return toPrefillCodePlaceholder(prefillExpr, defaultPlaceholderValue);
+}
+
+function extractPrefillExpressionPartsFromSecurityScheme(
+    security: OpenAPISecuritySchemeWithRequired
+): TemplatePart[] {
+    const expression = security[PREFILL_CUSTOM_PROPERTY];
+
+    if (!expression || expression.length === 0) {
+        return [];
+    }
+
+    return parseTemplate(expression);
+}
+
+function toPrefillCodePlaceholder(expression: string, defaultValue?: string) {
+    return `$$__X-GITBOOK-PREFILL[(${expression})${defaultValue ? ` ?? "${defaultValue}"` : ''}]__$$`;
 }

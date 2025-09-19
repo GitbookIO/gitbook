@@ -5,7 +5,7 @@ import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import type { OpenAPIOperationData, OpenAPISecurityWithRequired } from './types';
+import type { OpenAPIOperationData, OpenAPISecuritySchemeWithRequired } from './types';
 import { createStateKey, resolveDescription } from './utils';
 
 /**
@@ -55,7 +55,10 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPIClientContext) {
+function getLabelForType(
+    security: OpenAPISecuritySchemeWithRequired,
+    context: OpenAPIClientContext
+) {
     switch (security.type) {
         case 'apiKey':
             return (
