@@ -15,6 +15,8 @@ import { tcls } from '@/lib/tailwind';
 import { getSpaceLanguage } from '@/intl/server';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
+import { filterSectionsWithIndexableSpaces } from '@/lib/seo';
+import { flattenSectionsFromGroup } from '@/lib/utils';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
@@ -97,13 +99,21 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
 /**
  * Render the entire layout of the space (header, table of contents, footer).
  */
-export function SpaceLayout(props: SpaceLayoutProps) {
+export async function SpaceLayout(props: SpaceLayoutProps) {
     const { context, children } = props;
     const { siteSpace, customization, sections, siteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(sections && sections.list.length > 1);
+    // Filter sections to only include those with indexable spaces
+    const withSections = Boolean(
+        sections?.list
+            ? await filterSectionsWithIndexableSpaces(
+                  context,
+                  flattenSectionsFromGroup(sections.list).filter((s) => s.object === 'site-section')
+              )
+            : []
+    );
 
     const currentLanguage = getSpaceLanguage(context);
     const withVariants: 'generic' | 'translations' | undefined =
