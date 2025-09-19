@@ -11,6 +11,7 @@ import { generateMediaTypeExamples, generateSchemaExample } from './generateSche
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
+import { resolvePrefillCodePlaceholderFromSecurityScheme } from './util/tryit-prefill';
 import { checkIsReference } from './utils';
 
 const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
@@ -290,13 +291,17 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
     switch (security[1].type) {
         case 'http': {
             let scheme = security[1].scheme;
-            let format = security[1].bearerFormat ?? 'YOUR_SECRET_TOKEN';
+            const format = resolvePrefillCodePlaceholderFromSecurityScheme({
+                security: security[1],
+                defaultPlaceholderValue: scheme?.includes('basic')
+                    ? 'username:password'
+                    : 'YOUR_SECRET_TOKEN',
+            });
 
             if (scheme?.includes('bearer')) {
                 scheme = 'Bearer';
             } else if (scheme?.includes('basic')) {
                 scheme = 'Basic';
-                format = 'username:password';
             } else if (scheme?.includes('token')) {
                 scheme = 'Token';
             }
@@ -311,17 +316,22 @@ function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
             const name = security[1].name ?? 'Authorization';
 
             return {
-                [name]: 'YOUR_API_KEY',
+                [name]: resolvePrefillCodePlaceholderFromSecurityScheme({
+                    security: security[1],
+                    defaultPlaceholderValue: 'YOUR_API_KEY',
+                }),
             };
         }
         case 'oauth2': {
             return {
-                Authorization: 'Bearer YOUR_OAUTH2_TOKEN',
+                Authorization: `Bearer ${resolvePrefillCodePlaceholderFromSecurityScheme({
+                    security: security[1],
+                    defaultPlaceholderValue: 'YOUR_OAUTH2_TOKEN',
+                })}`,
             };
         }
-        default: {
+        default:
             return {};
-        }
     }
 }
 
