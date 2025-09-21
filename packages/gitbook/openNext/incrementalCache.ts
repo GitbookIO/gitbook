@@ -7,6 +7,8 @@ import type {
 } from '@opennextjs/aws/types/overrides.js';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
+import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache"
+
 import type { DurableObjectNamespace, Rpc } from '@cloudflare/workers-types';
 
 export const BINDING_NAME = 'NEXT_INC_CACHE_R2_BUCKET';
@@ -18,14 +20,11 @@ export type KeyOptions = {
 
 /**
  *
- * It is very similar to the `R2IncrementalCache` in the `@opennextjs/cloudflare` package, but it allow us to trace
- * the cache operations. It also integrates both R2 and Cache API in a single class.
- * Having our own, will allow us to customize it in the future if needed.
+ * It is very similar to the `R2IncrementalCache` in the `@opennextjs/cloudflare` package, but it has an additional 
+ * R2WriteBuffer Durable Object to handle writes to R2. Given how we set up cache, we often end up writing to the same key too fast.
  */
 class GitbookIncrementalCache implements IncrementalCache {
     name = 'GitbookIncrementalCache';
-
-    protected localCache: Cache | undefined;
 
     async get<CacheType extends CacheEntryType = 'cache'>(
         key: string,
@@ -34,7 +33,6 @@ class GitbookIncrementalCache implements IncrementalCache {
         const cacheKey = this.getR2Key(key, cacheType);
 
         const r2 = getCloudflareContext().env[BINDING_NAME];
-        const localCache = await this.getCacheInstance();
         if (!r2) throw new Error('No R2 bucket');
         if (process.env.SHOULD_BYPASS_CACHE === 'true') {
             // We are in a local middleware environment, we should bypass the cache
@@ -42,27 +40,18 @@ class GitbookIncrementalCache implements IncrementalCache {
             return null;
         }
         try {
-            // Check local cache first if available
-            const localCacheEntry = await localCache.match(this.getCacheUrlKey(cacheKey));
-            if (localCacheEntry) {
-                const result = (await localCacheEntry.json()) as WithLastModified<
-                    CacheValue<CacheType>
-                >;
-                return this.returnNullOn404({
-                    ...result,
-                    // Because we use tag cache and also invalidate them every time,
-                    // if we get a cache hit, we don't need to check the tag cache as we already know it's not been revalidated
-                    // this should improve performance even further, and reduce costs
-                    shouldBypassTagCache: true,
-                });
-            }
 
             const r2Object = await r2.get(cacheKey);
             if (!r2Object) return null;
 
+            const json = (await r2Object.json()) as CacheValue<CacheType>;
+            const lastModified = r2Object.uploaded.getTime();
+
+            if(!json) return null;
+
             return this.returnNullOn404({
-                value: await r2Object.json(),
-                lastModified: r2Object.uploaded.getTime(),
+                value: json,
+                lastModified
             });
         } catch (e) {
             console.error('Failed to get from cache', e);
@@ -89,39 +78,8 @@ class GitbookIncrementalCache implements IncrementalCache {
     ): Promise<void> {
         const cacheKey = this.getR2Key(key, cacheType);
 
-        const localCache = await this.getCacheInstance();
-
         try {
             await this.writeToR2(cacheKey, JSON.stringify(value));
-
-            //TODO: Check if there is any places where we don't have tags
-            // Ideally we should always have tags, but in case we don't, we need to decide how to handle it
-            // For now we default to a build ID tag, which allow us to invalidate the cache in case something is wrong in this deployment
-            const tags = this.getTagsFromCacheEntry(value) ?? [
-                `build_id/${process.env.NEXT_BUILD_ID}`,
-            ];
-
-            // We consider R2 as the source of truth, so we update the local cache
-            // only after a successful R2 write
-            await localCache.put(
-                this.getCacheUrlKey(cacheKey),
-                new Response(
-                    JSON.stringify({
-                        value,
-                        // Note: `Date.now()` returns the time of the last IO rather than the actual time.
-                        //       See https://developers.cloudflare.com/workers/reference/security-model/
-                        lastModified: Date.now(),
-                    }),
-                    {
-                        headers: {
-                            // Cache-Control default to 30 minutes, will be overridden by `revalidate`
-                            // In theory we should always get the `revalidate` value
-                            'cache-control': `max-age=${value.revalidate ?? 60 * 30}`,
-                            'cache-tag': tags.join(','),
-                        },
-                    }
-                )
-            );
         } catch (e) {
             console.error('Failed to set to cache', e);
         }
@@ -131,14 +89,10 @@ class GitbookIncrementalCache implements IncrementalCache {
         const cacheKey = this.getR2Key(key);
 
         const r2 = getCloudflareContext().env[BINDING_NAME];
-        const localCache = await this.getCacheInstance();
         if (!r2) throw new Error('No R2 bucket');
 
         try {
             await r2.delete(cacheKey);
-
-            // Here again R2 is the source of truth, so we delete from local cache first
-            await localCache.delete(this.getCacheUrlKey(cacheKey));
         } catch (e) {
             console.error('Failed to delete from cache', e);
         }
@@ -168,12 +122,6 @@ class GitbookIncrementalCache implements IncrementalCache {
         }
     }
 
-    async getCacheInstance(): Promise<Cache> {
-        if (this.localCache) return this.localCache;
-        this.localCache = await caches.open('incremental-cache');
-        return this.localCache;
-    }
-
     // Utility function to generate keys for R2/Cache API
     getR2Key(initialKey: string, cacheType: CacheEntryType = 'cache'): string {
         let key = initialKey;
@@ -189,28 +137,13 @@ class GitbookIncrementalCache implements IncrementalCache {
             '/'
         );
     }
-
-    getCacheUrlKey(cacheKey: string): string {
-        return `http://cache.local/${cacheKey}`;
-    }
-
-    getTagsFromCacheEntry<CacheType extends CacheEntryType>(
-        entry: CacheValue<CacheType>
-    ): string[] | undefined {
-        if ('tags' in entry && entry.tags) {
-            return entry.tags;
-        }
-
-        if ('meta' in entry && entry.meta && 'headers' in entry.meta && entry.meta.headers) {
-            const rawTags = entry.meta.headers['x-next-cache-tags'];
-            if (typeof rawTags === 'string') {
-                return rawTags.split(',');
-            }
-        }
-        if ('value' in entry) {
-            return entry.tags;
-        }
-    }
 }
 
-export default new GitbookIncrementalCache();
+export default withRegionalCache(new GitbookIncrementalCache(), {
+    mode: 'long-lived',
+    // We can do it because we use our own logic to invalidate the cache
+    bypassTagCacheOnCacheHit: true,
+    defaultLongLivedTtlSec: 60 * 60 * 24 /* 24 hours */,
+    // We don't want to update the cache entry on every cache hit
+    shouldLazilyUpdateOnCacheHit: false
+});
