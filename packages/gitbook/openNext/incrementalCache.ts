@@ -7,7 +7,7 @@ import type {
 } from '@opennextjs/aws/types/overrides.js';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache"
+import { withRegionalCache } from '@opennextjs/cloudflare/overrides/incremental-cache/regional-cache';
 
 import type { DurableObjectNamespace, Rpc } from '@cloudflare/workers-types';
 
@@ -20,7 +20,7 @@ export type KeyOptions = {
 
 /**
  *
- * It is very similar to the `R2IncrementalCache` in the `@opennextjs/cloudflare` package, but it has an additional 
+ * It is very similar to the `R2IncrementalCache` in the `@opennextjs/cloudflare` package, but it has an additional
  * R2WriteBuffer Durable Object to handle writes to R2. Given how we set up cache, we often end up writing to the same key too fast.
  */
 class GitbookIncrementalCache implements IncrementalCache {
@@ -40,18 +40,17 @@ class GitbookIncrementalCache implements IncrementalCache {
             return null;
         }
         try {
-
             const r2Object = await r2.get(cacheKey);
             if (!r2Object) return null;
 
             const json = (await r2Object.json()) as CacheValue<CacheType>;
             const lastModified = r2Object.uploaded.getTime();
 
-            if(!json) return null;
+            if (!json) return null;
 
             return this.returnNullOn404({
                 value: json,
-                lastModified
+                lastModified,
             });
         } catch (e) {
             console.error('Failed to get from cache', e);
@@ -145,5 +144,5 @@ export default withRegionalCache(new GitbookIncrementalCache(), {
     bypassTagCacheOnCacheHit: true,
     defaultLongLivedTtlSec: 60 * 60 * 24 /* 24 hours */,
     // We don't want to update the cache entry on every cache hit
-    shouldLazilyUpdateOnCacheHit: false
+    shouldLazilyUpdateOnCacheHit: false,
 });
