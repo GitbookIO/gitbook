@@ -1,44 +1,32 @@
 'use client';
 
+import React from 'react';
 import { tcls } from '@/lib/tailwind';
 import { useIsNavigating } from '../hooks';
 
-interface NavigationLoaderProps {
+interface NavigationLoaderProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
-    className?: string;
 }
 
-export function NavigationLoader({ children, className }: NavigationLoaderProps) {
-    const isNavigating = useIsNavigating();
-    
-    return (
-        <div className={tcls("relative", className)}>
-            {/* Children content */}
-            {children}
-            
-            {/* Animated loading overlay */}
-            {isNavigating && (
-                <div
+export const NavigationLoader = React.forwardRef<HTMLDivElement, NavigationLoaderProps>(
+    ({ children, className, ...props }, ref) => {
+        const isNavigating = useIsNavigating();
+        
+        return (
+            <div 
+                ref={ref}
                 className={tcls(
-                    'absolute',
-                    'inset-0',
-                    '-m-0.5', // Make it a few px bigger than children
-                    'rounded-lg',
-                    'overflow-hidden',
-                    'pointer-events-none'
+                    className,
+                    'outline-0',
+                    isNavigating ? 'animate-animate-outline' : ''
                 )}
+                {...props}
             >
-                {/* Animated circular gradient background */}
-                <div
-                    className={tcls(
-                        'absolute',
-                        'inset-0',
-                        'bg-primary-original',
-                        'animate-spin',
-                    )}
-                    style={{animationDuration: '2s'}}
-                />
-            </div>)}
-        </div>
-    );
-}
+                {/* Children content */}
+                {children}
+            </div>
+        );
+    }
+);
+
+NavigationLoader.displayName = 'NavigationLoader';

@@ -330,6 +330,7 @@ const config: Config = {
 
                 heightIn: 'heightIn 200ms ease both',
                 progressLoader: 'progressLoader 1.5s ease-in-out infinite alternate',
+                animateOutline: 'animateOutline 1s ease-in-out infinite',
             },
             keyframes: {
                 bounceSmall: {
@@ -502,6 +503,26 @@ const config: Config = {
                 progressLoader: {
                     from: { transform: 'translateX(-1%)', left: 0 },
                     to: { transform: 'translateX(-99%)', left: '100%' },
+                },
+                animateOutline: {
+                    '0%': {
+                        outlineWidth: '1px',
+                        outlineOffset: '0',
+                        outlineColor: 'rgb(var(--primary-original) / 0)',
+                    },
+                    '10%': {
+                        outlineColor: 'rgb(var(--primary-original) / 0.75)',
+                    },
+                    '50%': {
+                        outlineWidth: '7px',
+                        outlineOffset: '4px',
+                        outlineColor: 'rgb(var(--primary-original) / 0)',
+                    },
+                    '100%': {
+                        outlineWidth: '7px',
+                        outlineOffset: '4px',
+                        outlineColor: 'rgb(var(--primary-original) / 0)',
+                    },
                 },
             },
             boxShadow: {
