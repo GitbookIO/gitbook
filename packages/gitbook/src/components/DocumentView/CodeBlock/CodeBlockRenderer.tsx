@@ -32,7 +32,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
         <div
             ref={ref}
             aria-busy={ariaBusy}
-            className={tcls('group/codeblock grid grid-flow-col', style)}
+            className={tcls('group/codeblock grid shrink grid-flow-col overflow-hidden', style)}
         >
             <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
                 {title ? (
