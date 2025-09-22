@@ -95,7 +95,11 @@ export async function RecordCard(
                     }}
                     sizes={[
                         {
+                            media: '(max-width: 640px)',
                             width: view.cardSize === 'medium' ? 245 : 376,
+                        },
+                        {
+                            width: view.cardSize === 'medium' ? 490 : 752,
                         },
                     ]}
                     resize={context.contentContext?.imageResizer}

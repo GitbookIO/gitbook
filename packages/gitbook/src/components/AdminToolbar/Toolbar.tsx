@@ -12,7 +12,13 @@ import { useMagnificationEffect } from './useMagnificationEffect';
 const DURATION_LOGO_APPEARANCE = 2000;
 const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
 
-export function Toolbar(props: { children: React.ReactNode }) {
+interface ToolbarProps {
+    children: React.ReactNode;
+    label: React.ReactNode;
+}
+
+export function Toolbar(props: ToolbarProps) {
+    const { children, label } = props;
     const [minified, setMinified] = React.useState(true);
     const [showToolbarControls, setShowToolbarControls] = React.useState(false);
     const [isReady, setIsReady] = React.useState(false);
@@ -48,61 +54,65 @@ export function Toolbar(props: { children: React.ReactNode }) {
     }
 
     return (
-        <motion.div
-            onMouseEnter={() => setShowToolbarControls(true)}
-            onMouseLeave={() => setShowToolbarControls(false)}
-            className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4"
-        >
-            <AnimatePresence mode="wait">
-                <motion.div
-                    onClick={() => {
-                        if (minified) {
-                            setMinified((prev) => !prev);
-                        }
-                    }}
-                    layout
-                    transition={toolbarEasings.spring}
-                    className={tcls(
-                        minified ? 'cursor-pointer px-2' : 'pr-2 pl-3.5',
-                        'flex',
-                        'items-center',
-                        'justify-center',
-                        'min-h-11',
-                        'min-w-12',
-                        'h-12',
-                        'py-2',
-                        'border-tint-1/3',
-                        'backdrop-blur-sm',
-                        'origin-center',
-                        'bg-[linear-gradient(110deg,rgba(20,23,28,0.90)_0%,rgba(20,23,28,0.80)_100%)]',
-                        'dark:bg-[linear-gradient(110deg,rgba(256,256,256,0.90)_0%,rgba(256,256,256,0.80)_100%)]'
-                    )}
-                    initial={{
-                        scale: 1,
-                        opacity: 1,
-                    }}
-                    animate={{
-                        scale: 1,
-                        opacity: 1,
-                        boxShadow: minified
-                            ? '0 4px 40px 8px rgba(0, 0, 0, .2), 0 0 0 .5px rgba(0, 0, 0, .4), inset 0 .5px 0 0 hsla(0, 0%, 100%, .15)'
-                            : '0 4px 40px 8px rgba(0, 0, 0, .4), 0 0 0 .5px rgba(0, 0, 0, .8), inset 0 .5px 0 0 hsla(0, 0%, 100%, .3)',
-                    }}
-                    style={{
-                        borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
-                    }}
-                >
-                    {/* Logo with stroke segments animation in blue-tints */}
-                    <motion.div layout>
-                        <AnimatedLogo />
+        <Tooltip label={label}>
+            <motion.div
+                onMouseEnter={() => setShowToolbarControls(true)}
+                onMouseLeave={() => setShowToolbarControls(false)}
+                className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4"
+            >
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        onClick={() => {
+                            if (minified) {
+                                setMinified((prev) => !prev);
+                            }
+                        }}
+                        layout
+                        transition={toolbarEasings.spring}
+                        className={tcls(
+                            minified ? 'cursor-pointer px-2' : 'pr-2 pl-3.5',
+                            'flex',
+                            'items-center',
+                            'justify-center',
+                            'min-h-11',
+                            'min-w-12',
+                            'h-12',
+                            'py-2',
+                            'border-tint-1/3',
+                            'backdrop-blur-sm',
+                            'origin-center',
+                            'bg-[linear-gradient(110deg,rgba(20,23,28,0.90)_0%,rgba(20,23,28,0.80)_100%)]',
+                            'dark:bg-[linear-gradient(110deg,rgba(256,256,256,0.90)_0%,rgba(256,256,256,0.80)_100%)]'
+                        )}
+                        initial={{
+                            scale: 1,
+                            opacity: 1,
+                        }}
+                        animate={{
+                            scale: 1,
+                            opacity: 1,
+                            boxShadow: minified
+                                ? '0 4px 40px 8px rgba(0, 0, 0, .2), 0 0 0 .5px rgba(0, 0, 0, .4), inset 0 .5px 0 0 hsla(0, 0%, 100%, .15)'
+                                : '0 4px 40px 8px rgba(0, 0, 0, .4), 0 0 0 .5px rgba(0, 0, 0, .8), inset 0 .5px 0 0 hsla(0, 0%, 100%, .3)',
+                        }}
+                        style={{
+                            borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
+                        }}
+                    >
+                        {/* Logo with stroke segments animation in blue-tints */}
+                        <motion.div layout>
+                            <AnimatedLogo />
+                        </motion.div>
+
+                        {!minified ? children : null}
+
+                        {!minified && showToolbarControls && (
+                            <MinifyButton setMinified={setMinified} />
+                        )}
                     </motion.div>
-
-                    {!minified ? props.children : null}
-
-                    {!minified && showToolbarControls && <MinifyButton setMinified={setMinified} />}
-                </motion.div>
-            </AnimatePresence>
-        </motion.div>
+                </AnimatePresence>
+            </motion.div>
+        </Tooltip>
     );
 }
 

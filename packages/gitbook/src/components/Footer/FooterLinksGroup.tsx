@@ -36,13 +36,9 @@ async function FooterLink(props: { link: CustomizationContentLink; context: GitB
     const { link, context } = props;
     const resolved = await resolveContentRef(link.to, context);
 
-    if (!resolved) {
-        return null;
-    }
-
     return (
         <Link
-            href={resolved.href}
+            href={resolved?.href ?? '#'}
             className={tcls(
                 'font-normal',
                 'text-tint',

@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { TOCScrollContainer, useScrollToActiveTOCItem } from '../TableOfContents/TOCScroller';
-import { useIsMounted, useToggleAnimation } from '../hooks';
+import { findSectionInGroup } from '@/lib/utils';
+import { useToggleAnimation } from '../hooks';
 import { Link } from '../primitives';
+import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
 import type {
     ClientSiteSection,
@@ -16,7 +16,7 @@ import type {
     ClientSiteSections,
 } from './encodeClientSiteSections';
 
-const MAX_ITEMS = 5; // If there are more sections than this, they'll be shown below the fold in a scrollview.
+const MAX_ITEMS = 6; // If there are more sections than this, they'll be shown below the fold in a scrollview.
 
 /**
  * A list of items representing site sections for multi-section sites
@@ -36,30 +36,34 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                     className
                 )}
             >
-                <TOCScrollContainer
+                <ScrollContainer
+                    orientation="vertical"
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
-                    className="overflow-y-auto px-2 pb-4"
+                    className="pb-4"
+                    activeId={currentSection.id}
                 >
-                    {sectionsAndGroups.map((item) => {
-                        if (item.object === 'site-section-group') {
+                    <div className="flex w-full flex-col px-2">
+                        {sectionsAndGroups.map((item) => {
+                            if (item.object === 'site-section-group') {
+                                return (
+                                    <SiteSectionGroupItem
+                                        key={item.id}
+                                        group={item}
+                                        currentSection={currentSection}
+                                    />
+                                );
+                            }
+
                             return (
-                                <SiteSectionGroupItem
+                                <SiteSectionListItem
+                                    section={item}
+                                    isActive={item.id === currentSection.id}
                                     key={item.id}
-                                    group={item}
-                                    currentSection={currentSection}
                                 />
                             );
-                        }
-
-                        return (
-                            <SiteSectionListItem
-                                section={item}
-                                isActive={item.id === currentSection.id}
-                                key={item.id}
-                            />
-                        );
-                    })}
-                </TOCScrollContainer>
+                        })}
+                    </div>
+                </ScrollContainer>
             </nav>
         )
     );
@@ -69,20 +73,15 @@ export function SiteSectionListItem(props: {
     section: ClientSiteSection;
     isActive: boolean;
     className?: string;
+    style?: React.CSSProperties;
 }) {
-    const { section, isActive, className, ...otherProps } = props;
-
-    const isMounted = useIsMounted();
-    React.useEffect(() => {}, [isMounted]); // This updates the useScrollToActiveTOCItem hook once we're mounted, so we can actually scroll to the this item
-
-    const anchorRef = React.createRef<HTMLAnchorElement>();
-    useScrollToActiveTOCItem({ anchorRef, isActive });
+    const { section, isActive, className, style, ...otherProps } = props;
 
     return (
         <Link
-            ref={anchorRef}
             href={section.url}
             aria-current={isActive && 'page'}
+            id={section.id}
             className={tcls(
                 'group/section-link',
                 'flex',
@@ -104,6 +103,7 @@ export function SiteSectionListItem(props: {
                     : null,
                 className
             )}
+            style={style}
             {...otherProps}
         >
             <div
@@ -130,11 +130,12 @@ export function SiteSectionListItem(props: {
 export function SiteSectionGroupItem(props: {
     group: ClientSiteSectionGroup;
     currentSection: ClientSiteSection;
+    level?: number;
 }) {
-    const { group, currentSection } = props;
+    const { group, currentSection, level = 0 } = props;
 
-    const hasDescendants = group.sections.length > 0;
-    const isActiveGroup = group.sections.some((section) => section.id === currentSection.id);
+    const hasDescendants = group.children.length > 0;
+    const isActiveGroup = Boolean(findSectionInGroup(group, currentSection.id));
     const shouldOpen = hasDescendants && isActiveGroup;
     const [isOpen, setIsOpen] = React.useState(shouldOpen);
 
@@ -164,7 +165,7 @@ export function SiteSectionGroupItem(props: {
                     className={tcls(
                         'flex size-8 shrink-0 items-center justify-center rounded-md straight-corners:rounded-none bg-tint-subtle text-lg text-tint leading-none shadow-tint shadow-xs ring-1 ring-tint-subtle transition-transform group-hover/section-link:scale-110 group-hover/section-link:ring-tint-hover group-active/section-link:scale-90 group-active/section-link:shadow-none contrast-more:text-tint-strong dark:shadow-none',
                         isActiveGroup
-                            ? 'bg-primary tint:bg-primary-solid text-primary tint:text-contrast-primary-solid shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary-strong contrast-more:ring-2 contrast-more:ring-primary'
+                            ? 'bg-primary text-primary shadow-md shadow-primary ring-primary group-hover/section-link:ring-primary-hover, contrast-more:text-primary-strong contrast-more:ring-2 contrast-more:ring-primary'
                             : null
                     )}
                 >
@@ -219,14 +220,26 @@ export function SiteSectionGroupItem(props: {
             </button>
             {hasDescendants ? (
                 <Descendants isVisible={isOpen}>
-                    {group.sections.map((section) => (
-                        <SiteSectionListItem
-                            section={section}
-                            isActive={section.id === currentSection.id}
-                            key={section.id}
-                            className="pl-5"
-                        />
-                    ))}
+                    {group.children.map((child) => {
+                        if (child.object === 'site-section') {
+                            return (
+                                <SiteSectionListItem
+                                    section={child}
+                                    isActive={child.id === currentSection.id}
+                                    key={child.id}
+                                />
+                            );
+                        }
+
+                        return (
+                            <SiteSectionGroupItem
+                                group={child}
+                                currentSection={currentSection}
+                                key={child.id}
+                                level={level + 1}
+                            />
+                        );
+                    })}
                 </Descendants>
             ) : null}
         </>
@@ -242,7 +255,7 @@ function Descendants(props: {
     return (
         <motion.div
             ref={scope}
-            className={isVisible ? undefined : '[&_ul>li]:opacity-1'}
+            className={isVisible ? 'pl-3' : 'pl-3 [&_ul>li]:opacity-1'}
             initial={isVisible ? show : hide}
         >
             {children}

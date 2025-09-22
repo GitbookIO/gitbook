@@ -4,6 +4,14 @@ import type { SiteSpace } from '@gitbook/api';
 
 import { streamMarkdownFromSiteSpaces } from './llms-full';
 
+function createMockLinker(args?: { spaceBasePath?: string }) {
+    return {
+        toAbsoluteURL: mock((path: string) => `https://example.com${path}`),
+        toPathInSite: mock((path: string) => `/site/${args?.spaceBasePath ?? ''}${path}`),
+        fork: (args: { spaceBasePath: string }) => createMockLinker(args),
+    };
+}
+
 describe('streamMarkdownFromSiteSpaces', () => {
     // Test with real mocks of the dependencies
     it('processes pages correctly with pagination', async () => {
@@ -65,13 +73,9 @@ describe('streamMarkdownFromSiteSpaces', () => {
             ),
         };
 
-        const mockLinker = {
-            toPathInSite: mock((path: string) => `/test/${path}`),
-        };
-
         const mockContext: GitBookSiteContext = {
             dataFetcher: mockDataFetcher,
-            linker: mockLinker,
+            linker: createMockLinker(),
         } as unknown as GitBookSiteContext;
 
         const mockSiteSpace: SiteSpace = {
@@ -132,7 +136,7 @@ describe('streamMarkdownFromSiteSpaces', () => {
 
         const mockContext: GitBookSiteContext = {
             dataFetcher: mockDataFetcher,
-            linker: { toPathInSite: mock((path: string) => `/${path}`) },
+            linker: createMockLinker(),
         } as unknown as GitBookSiteContext;
 
         const mockSiteSpace: SiteSpace = {
@@ -181,13 +185,9 @@ describe('streamMarkdownFromSiteSpaces', () => {
             getRevisionPageMarkdown: mock(() => Promise.resolve({ data: 'content\n' })),
         };
 
-        const mockLinker = {
-            toPathInSite: mock((path: string) => `/site/${path}`),
-        };
-
         const mockContext: GitBookSiteContext = {
             dataFetcher: mockDataFetcher,
-            linker: mockLinker,
+            linker: createMockLinker(),
         } as unknown as GitBookSiteContext;
 
         const mockSiteSpace: SiteSpace = {
@@ -287,7 +287,7 @@ describe('streamMarkdownFromSiteSpaces', () => {
 
         const mockContext: GitBookSiteContext = {
             dataFetcher: mockDataFetcher,
-            linker: { toPathInSite: mock((path: string) => `/${path}`) },
+            linker: createMockLinker(),
         } as unknown as GitBookSiteContext;
 
         const mockSiteSpaces: SiteSpace[] = [
@@ -336,7 +336,7 @@ describe('streamMarkdownFromSiteSpaces', () => {
 
         const mockContext: GitBookSiteContext = {
             dataFetcher: mockDataFetcher,
-            linker: { toPathInSite: mock((path: string) => `/${path}`) },
+            linker: createMockLinker(),
         } as unknown as GitBookSiteContext;
 
         const mockSiteSpace: SiteSpace = {
@@ -411,7 +411,7 @@ describe('streamMarkdownFromSiteSpaces', () => {
 
         const mockContext: GitBookSiteContext = {
             dataFetcher: mockDataFetcher,
-            linker: { toPathInSite: mock((path: string) => `/${path}`) },
+            linker: createMockLinker(),
         } as unknown as GitBookSiteContext;
 
         const mockSiteSpace: SiteSpace = {
