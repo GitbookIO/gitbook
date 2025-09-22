@@ -14,6 +14,7 @@ import type {
     SearchSpaceResult,
     SiteSection,
     SiteSectionGroup,
+    SiteSpace,
     Space,
 } from '@gitbook/api';
 import { createStreamableValue } from 'ai/rsc';
@@ -296,6 +297,7 @@ async function searchSiteContent(
                         transformSitePageResult(context, {
                             pageItem,
                             spaceItem,
+                            siteSpace: found?.siteSpace,
                             space: found?.siteSpace.space,
                             spaceURL: found?.siteSpace.urls.published,
                             siteSection: siteSection ?? undefined,
@@ -384,12 +386,13 @@ async function transformSitePageResult(
         pageItem: SearchPageResult;
         spaceItem: SearchSpaceResult;
         space?: Space;
+        siteSpace?: SiteSpace;
         spaceURL?: string;
         siteSection?: SiteSection;
         siteSectionGroup?: SiteSectionGroup;
     }
 ): Promise<OrderedComputedResult[]> {
-    const { pageItem, spaceItem, space, spaceURL, siteSection, siteSectionGroup } = args;
+    const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
     const { linker } = context;
 
     const page: ComputedPageResult = {
@@ -410,9 +413,9 @@ async function transformSitePageResult(
                 icon: siteSection?.icon as IconName,
                 label: siteSection.title,
             },
-            (!siteSection || siteSection?.siteSpaces.length > 1) && space
+            (!siteSection || siteSection?.siteSpaces.length > 1) && siteSpace
                 ? {
-                      label: space?.title,
+                      label: siteSpace.title,
                   }
                 : undefined,
         ].filter((item) => item !== undefined),
