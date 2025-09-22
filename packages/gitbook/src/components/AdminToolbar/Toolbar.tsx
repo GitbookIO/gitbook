@@ -12,7 +12,13 @@ import { useMagnificationEffect } from './useMagnificationEffect';
 const DURATION_LOGO_APPEARANCE = 2000;
 const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
 
-export function Toolbar(props: { children: React.ReactNode }) {
+interface ToolbarProps {
+    children: React.ReactNode;
+    label: React.ReactNode;
+}
+
+export function Toolbar(props: ToolbarProps) {
+    const { children, label } = props;
     const [minified, setMinified] = React.useState(true);
     const [showToolbarControls, setShowToolbarControls] = React.useState(false);
     const [isReady, setIsReady] = React.useState(false);
@@ -48,7 +54,7 @@ export function Toolbar(props: { children: React.ReactNode }) {
     }
 
     return (
-        <Tooltip label="Only visible to you">
+        <Tooltip label={label}>
             <motion.div
                 onMouseEnter={() => setShowToolbarControls(true)}
                 onMouseLeave={() => setShowToolbarControls(false)}
@@ -98,7 +104,7 @@ export function Toolbar(props: { children: React.ReactNode }) {
                             <AnimatedLogo />
                         </motion.div>
 
-                        {!minified ? props.children : null}
+                        {!minified ? children : null}
 
                         {!minified && showToolbarControls && (
                             <MinifyButton setMinified={setMinified} />
