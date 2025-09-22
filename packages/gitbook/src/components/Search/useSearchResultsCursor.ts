@@ -6,14 +6,18 @@ export function useSearchResultsCursor(props: { query: string; results: ResultTy
     const { query, results } = props;
 
     React.useEffect(() => {
-        if (!props.query) {
+        if (!query) {
             // Reset the cursor when there's no query
             setCursor(null);
-        } else if (results.length > 0) {
+        }
+    }, [query]);
+
+    React.useEffect(() => {
+        if (results.length > 0) {
             // Auto-focus the first result
             setCursor(0);
         }
-    }, [results, query]);
+    }, [results]);
 
     const moveBy = React.useCallback(
         (delta: number) => {

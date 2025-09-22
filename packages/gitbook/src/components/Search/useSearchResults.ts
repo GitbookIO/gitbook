@@ -163,7 +163,7 @@ export function useSearchResults(props: {
             return resultsState.results;
         }
         return withAskTriggers(resultsState.results, query, assistants);
-    }, [resultsState.results, query, withAI, assistants]);
+    }, [resultsState.results, query, withAI]);
 
     return { ...resultsState, results: aiEnrichedResults };
 }
