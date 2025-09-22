@@ -4,11 +4,11 @@ import React from 'react';
 import { tcls } from '@/lib/tailwind';
 import { useIsNavigating } from '../hooks';
 
-interface NavigationLoaderProps extends React.HTMLAttributes<HTMLDivElement> {
+interface NavigationOutlineIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
 }
 
-export const NavigationLoader = React.forwardRef<HTMLDivElement, NavigationLoaderProps>(
+export const NavigationOutlineInndicator = React.forwardRef<HTMLDivElement, NavigationOutlineIndicatorProps>(
     ({ children, className, ...props }, ref) => {
         const isNavigating = useIsNavigating();
         
@@ -29,4 +29,4 @@ export const NavigationLoader = React.forwardRef<HTMLDivElement, NavigationLoade
     }
 );
 
-NavigationLoader.displayName = 'NavigationLoader';
+NavigationOutlineInndicator.displayName = 'NavigationLoader';
