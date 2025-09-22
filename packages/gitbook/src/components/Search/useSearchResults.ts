@@ -6,12 +6,14 @@ import { assert } from 'ts-essentials';
 import {
     type OrderedComputedResult,
     searchAllSiteContent,
-    searchSiteSpaceContent,
+    searchCurrentSiteSpaceContent,
+    searchSpecificSiteSpaceContent,
     streamRecommendedQuestions,
 } from './server-actions';
 
 import { type Assistant, useAI } from '@/components/AI';
 import { useTrackEvent } from '../Insights';
+import type { SearchScope } from './useSearch';
 
 export type ResultType =
     | OrderedComputedResult
@@ -30,10 +32,11 @@ export function useSearchResults(props: {
     disabled: boolean;
     query: string;
     siteSpaceId: string;
-    global: boolean;
+    siteSpaceIds: string[];
+    scope: SearchScope;
     withAI: boolean;
 }) {
-    const { disabled, query, siteSpaceId, global } = props;
+    const { disabled, query, siteSpaceId, siteSpaceIds, scope } = props;
 
     const trackEvent = useTrackEvent();
 
@@ -112,9 +115,25 @@ export function useSearchResults(props: {
         setResultsState((prev) => ({ results: prev.results, fetching: true }));
         let cancelled = false;
         const timeout = setTimeout(async () => {
-            const results = await (global
-                ? searchAllSiteContent(query)
-                : searchSiteSpaceContent(query));
+            const results = await (() => {
+                if (scope === 'all') {
+                    // Search all content on the site
+                    return searchAllSiteContent(query);
+                }
+                if (scope === 'default') {
+                    // Search the current section's variant + matched/default variant for other sections
+                    return searchCurrentSiteSpaceContent(query, siteSpaceId);
+                }
+                if (scope === 'extended') {
+                    // Search all variants of the current section
+                    return searchSpecificSiteSpaceContent(query, siteSpaceIds);
+                }
+                if (scope === 'current') {
+                    // Search only the current section's current variant
+                    return searchSpecificSiteSpaceContent(query, [siteSpaceId]);
+                }
+                throw new Error(`Unhandled search scope: ${scope}`);
+            })();
 
             if (cancelled) {
                 return;
@@ -137,14 +156,14 @@ export function useSearchResults(props: {
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [disabled, query, global, trackEvent, withAI, siteSpaceId]);
+    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled]);
 
     const aiEnrichedResults: ResultType[] = React.useMemo(() => {
         if (!withAI) {
             return resultsState.results;
         }
         return withAskTriggers(resultsState.results, query, assistants);
-    }, [resultsState.results, query, withAI]);
+    }, [resultsState.results, query, withAI, assistants]);
 
     return { ...resultsState, results: aiEnrichedResults };
 }
