@@ -11,7 +11,7 @@ import { generateMediaTypeExamples, generateSchemaExample } from './generateSche
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
-import { checkIsReference } from './utils';
+import { checkIsReference, extractOperationSecurityInfo } from './utils';
 
 const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
 
@@ -106,7 +106,10 @@ function generateCodeSamples(props: {
         (searchParams.size ? `?${searchParams.toString()}` : '');
 
     const genericHeaders = {
-        ...getSecurityHeaders(data.securities),
+        ...getSecurityHeaders({
+            securityRequirement: data.operation.security,
+            securities: data.securities,
+        }),
         ...headersObject,
     };
 
@@ -278,51 +281,66 @@ function getCustomCodeSamples(props: {
     return customCodeSamples;
 }
 
-function getSecurityHeaders(securities: OpenAPIOperationData['securities']): {
+function getSecurityHeaders(args: {
+    securityRequirement: OpenAPIV3.OperationObject['security'];
+    securities: OpenAPIOperationData['securities'];
+}): {
     [key: string]: string;
 } {
-    const security = securities[0];
+    const { securityRequirement, securities } = args;
+    const operationSecurityInfo = extractOperationSecurityInfo({ securityRequirement, securities });
 
-    if (!security) {
+    if (operationSecurityInfo.length === 0) {
         return {};
     }
 
-    switch (security[1].type) {
-        case 'http': {
-            let scheme = security[1].scheme;
-            let format = security[1].bearerFormat ?? 'YOUR_SECRET_TOKEN';
+    const selectedSecurity = operationSecurityInfo.at(0);
 
-            if (scheme?.includes('bearer')) {
-                scheme = 'Bearer';
-            } else if (scheme?.includes('basic')) {
-                scheme = 'Basic';
-                format = 'username:password';
-            } else if (scheme?.includes('token')) {
-                scheme = 'Token';
+    if (!selectedSecurity) {
+        return {};
+    }
+
+    const headers: { [key: string]: string } = {};
+
+    for (const security of selectedSecurity.schemes) {
+        switch (security.type) {
+            case 'http': {
+                let scheme = security.scheme;
+                let format = security.bearerFormat ?? 'YOUR_SECRET_TOKEN';
+
+                if (scheme?.includes('bearer')) {
+                    scheme = 'Bearer';
+                } else if (scheme?.includes('basic')) {
+                    scheme = 'Basic';
+                    format = 'username:password';
+                } else if (scheme?.includes('token')) {
+                    scheme = 'Token';
+                }
+
+                headers.Authorization = `${scheme} ${format}`;
+                break;
             }
+            case 'apiKey': {
+                if (security.in !== 'header') {
+                    break;
+                }
 
-            return {
-                Authorization: `${scheme} ${format}`,
-            };
-        }
-        case 'apiKey': {
-            if (security[1].in !== 'header') return {};
+                const name = security.name ?? 'Authorization';
+                headers[name] = 'YOUR_API_KEY';
 
-            const name = security[1].name ?? 'Authorization';
-
-            return {
-                [name]: 'YOUR_API_KEY',
-            };
-        }
-        case 'oauth2': {
-            return {
-                Authorization: 'Bearer YOUR_OAUTH2_TOKEN',
-            };
-        }
-        default: {
-            return {};
+                break;
+            }
+            case 'oauth2': {
+                headers.Authorization = 'Bearer YOUR_OAUTH2_TOKEN';
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
+
+    return headers;
 }
 
 function validateHttpMethod(method: string): method is OpenAPIV3.HttpMethods {
