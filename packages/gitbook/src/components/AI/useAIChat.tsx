@@ -146,7 +146,7 @@ export function AIChatProvider(props: {
         setSearchState((prev) => ({
             ask: prev?.ask ?? initialQuery ?? '',
             query: prev?.query ?? null,
-            global: prev?.global ?? false,
+            scope: prev?.scope ?? 'default',
             open: false, // Close search popover when opening chat
         }));
     }, [setSearchState]);
@@ -159,7 +159,7 @@ export function AIChatProvider(props: {
         setSearchState((prev) => ({
             ask: null,
             query: prev?.query ?? null,
-            global: prev?.global ?? false,
+            scope: prev?.scope ?? 'default',
             open: false,
         }));
     }, [setSearchState]);
@@ -374,7 +374,7 @@ export function AIChatProvider(props: {
                 setSearchState((prev) => ({
                     ask: input.message,
                     query: prev?.query ?? null,
-                    global: prev?.global ?? false,
+                    scope: prev?.scope ?? 'default',
                     open: false,
                 }));
             }
@@ -435,7 +435,7 @@ export function AIChatProvider(props: {
         setSearchState((prev) => ({
             ask: '',
             query: prev?.query ?? null,
-            global: prev?.global ?? false,
+            scope: prev?.scope ?? 'default',
             open: false,
         }));
     }, [setSearchState]);

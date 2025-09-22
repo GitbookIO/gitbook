@@ -40,11 +40,16 @@ export const variantClasses = {
         'bg-transparent',
         'text-tint',
         'border-0',
+        'contrast-more:border',
         'shadow-none!',
+        'translate-y-0!',
         'hover:bg-tint-hover',
         'hover:text-tint-strong',
+        'focus-visible:bg-tint-hover',
+        'focus-visible:text-tint-strong',
+        'data-[state=open]:bg-tint-hover',
+        'data-[state=open]:text-tint-strong',
         'contrast-more:bg-tint-subtle',
-        'hover:depth-subtle:translate-y-0',
         'disabled:text-tint/8',
         'disabled:bg-transparent',
     ],
@@ -80,9 +85,9 @@ export const variantClasses = {
     ],
 };
 
-const activeClasses = {
+export const activeClasses = {
     primary: 'bg-primary-solid-hover',
-    blank: 'bg-primary-active disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active',
+    blank: 'bg-primary-active contrast-more:bg-primary-12 contrast-more:text-contrast-primary-12 disabled:bg-primary-active text-primary-strong font-medium hover:text-primary-strong disabled:text-primary-strong hover:bg-primary-active focus-visible:bg-primary-active focus-visible:text-primary-strong data-[state=open]:bg-primary-active data-[state=open]:text-primary-strong',
     secondary: 'bg-tint-active disabled:bg-tint-active',
     header: 'bg-header-link/3',
 };
@@ -134,7 +139,7 @@ export const Button = React.forwardRef<
                     typeof icon === 'string' ? (
                         <Icon
                             icon={icon as IconName}
-                            className={tcls('button-leading-icon size-[1em]')}
+                            className={tcls('button-leading-icon size-[1em] shrink-0')}
                         />
                     ) : (
                         icon
@@ -154,6 +159,7 @@ export const Button = React.forwardRef<
                 aria-label={label?.toString()}
                 aria-pressed={active}
                 target={target}
+                data-active={active}
                 {...rest}
             >
                 {content}
@@ -166,6 +172,7 @@ export const Button = React.forwardRef<
                 aria-label={label?.toString()}
                 aria-pressed={active}
                 disabled={disabled}
+                data-active={active}
                 {...rest}
             >
                 {content}

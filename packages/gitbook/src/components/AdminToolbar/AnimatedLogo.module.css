@@ -1,0 +1,179 @@
+.svgLogo {
+  --logo-fill: var(--color-neutral-100);
+  --seg-A-color: #2782c4;
+  --seg-B-color: #43b7f2;
+  --seg-C-color: #8be2ff;
+  --trace-color: #46474c;
+
+
+  --T: 2s;
+  shape-rendering: geometricPrecision;
+  vector-effect: non-scaling-stroke;
+}
+
+:global(html.dark) .svgLogo {
+  --logo-fill: var(--color-neutral-800);
+  --trace-color: #dedfe3;
+}
+
+/* Base segment animation */
+.seg {
+  opacity: 0;
+  animation: segFade var(--T) ease both 0.06s, segAMove var(--T) linear,
+    segALen var(--T) linear;
+    animation-delay: 0.06s;
+  animation-fill-mode: forwards;
+}
+
+.segA {
+  animation-name: segFade, segAMove, segALen;
+}
+
+.segB {
+  animation-name: segFade, segBMove, segBLen;
+}
+
+.segC {
+  animation-name: segFade, segCMove, segCLen;
+}
+
+.trace {
+  animation: traceFill var(--T) ease both 0.06s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes traceFill {
+  0% {
+    fill: transparent;
+    stroke:var(--trace-color);
+  }
+  95% {
+    fill: transparent;
+    stroke:var(--trace-color);
+  }
+  100% {
+    fill: var(--logo-fill);
+    stroke:none;
+  }
+}
+
+
+/* Segment A animation */
+@keyframes segAMove {
+  0% {
+    stroke-dashoffset: 0;
+    stroke: var(--seg-A-color);
+  }
+  50% {
+    stroke-dashoffset: -0.5;
+    stroke: var(--seg-A-color);
+  }
+  95% {
+    stroke-dashoffset: -1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    stroke: none;
+  }
+}
+
+@keyframes segALen {
+  0% {
+    stroke-dasharray: 0.18 0.82;
+  }
+  95% {
+    stroke-dasharray: 0.22 0.78;
+  }
+  100% {
+    stroke-dasharray: 1;
+  }
+}
+
+/* Segment B animation */
+@keyframes segBMove {
+  0% {
+    stroke-dashoffset: -0.18;
+    stroke: var(--seg-B-color);
+  }
+  50% {
+    stroke-dashoffset: -0.72;
+    stroke: var(--seg-B-color);
+  }
+  95% {
+    stroke-dashoffset: -1.18;
+    stroke: var(--seg-B-color);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    stroke: none;
+  }
+}
+
+@keyframes segBLen {
+  0%,
+  50%,
+  95% {
+    stroke-dasharray: 0.2 0.8;
+  }
+  100% {
+    stroke-dasharray: 1;
+  }
+}
+
+/* Segment C animation */
+@keyframes segCMove {
+  0% {
+    stroke-dashoffset: -0.38;
+    stroke: var(--seg-C-color);
+  }
+  50% {
+    stroke-dashoffset: -0.92;
+    stroke: var(--seg-C-color);
+  }
+  95% {
+    stroke-dashoffset: -1.38;
+    stroke: var(--seg-C-color);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    stroke: none;
+  }
+}
+
+@keyframes segCLen {
+  0% {
+    stroke-dasharray: 0.22 0.78;
+  }
+  95% {
+    stroke-dasharray: 0.18 0.82;
+  }
+  100% {
+    stroke-dasharray: 1;
+  }
+}
+
+/* Segment fade animation - stays visible at end */
+@keyframes segFade {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .seg {
+    animation: none;
+    opacity: 0;
+  }
+  .trace {
+    animation: none;
+    fill: var(--logo-fill);
+    stroke:none;
+  }
+}

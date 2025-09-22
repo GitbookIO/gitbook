@@ -16,7 +16,7 @@ export type ClientSiteSection = Pick<
 };
 
 export type ClientSiteSectionGroup = Pick<SiteSectionGroup, 'id' | 'title' | 'icon' | 'object'> & {
-    sections: ClientSiteSection[];
+    children: (ClientSiteSection | ClientSiteSectionGroup)[];
 };
 
 /**
@@ -30,10 +30,10 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
     for (const item of list) {
         switch (item.object) {
             case 'site-section-group': {
-                const sections = item.sections.map((section) => encodeSection(context, section));
+                const children = encodeChildren(context, item.children);
 
                 // Skip empty groups
-                if (sections.length === 0) {
+                if (children.length === 0) {
                     continue;
                 }
 
@@ -42,7 +42,7 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
                     title: item.title,
                     icon: item.icon,
                     object: item.object,
-                    sections,
+                    children,
                 });
                 continue;
             }
@@ -59,6 +59,43 @@ export function encodeClientSiteSections(context: GitBookSiteContext, sections: 
         list: clientSections,
         current: encodeSection(context, current),
     };
+}
+
+function encodeChildren(
+    context: GitBookSiteContext,
+    children: (SiteSection | SiteSectionGroup)[]
+): (ClientSiteSection | ClientSiteSectionGroup)[] {
+    const clientChildren: (ClientSiteSection | ClientSiteSectionGroup)[] = [];
+
+    for (const child of children) {
+        switch (child.object) {
+            case 'site-section': {
+                clientChildren.push(encodeSection(context, child));
+                break;
+            }
+            case 'site-section-group': {
+                const nestedChildren = encodeChildren(context, child.children);
+
+                // Skip empty groups
+                if (nestedChildren.length === 0) {
+                    continue;
+                }
+
+                clientChildren.push({
+                    id: child.id,
+                    title: child.title,
+                    icon: child.icon,
+                    object: child.object,
+                    children: nestedChildren,
+                });
+                break;
+            }
+            default:
+                assertNever(child, 'Unknown site section object type');
+        }
+    }
+
+    return clientChildren;
 }
 
 function encodeSection(context: GitBookSiteContext, section: SiteSection) {

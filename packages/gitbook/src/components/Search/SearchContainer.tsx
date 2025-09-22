@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomizationSearchStyle } from '@gitbook/api';
+import { CustomizationSearchStyle, type SiteSection } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -18,9 +18,27 @@ import { SearchScopeToggle } from './SearchScopeToggle';
 import { useSearch } from './useSearch';
 
 interface SearchContainerProps {
+    /** The current site space id. */
     siteSpaceId: string;
+
+    /** The title of the current space. */
     spaceTitle: string;
-    isMultiVariants: boolean;
+
+    /** The ids of all spaces in the current section. */
+    siteSpaceIds: string[];
+
+    /** Whether there are sections on the site. */
+    withSections: boolean;
+
+    /** The current section, displayed in search scope toggle. */
+    section?: Pick<SiteSection, 'title' | 'icon'>;
+
+    /** Whether the current section has variants. */
+    withVariants: boolean;
+
+    /** Whether any section on the site has variants. */
+    withSiteVariants: boolean;
+
     style: CustomizationSearchStyle;
     className?: string;
     viewport?: 'desktop' | 'mobile';
@@ -30,7 +48,18 @@ interface SearchContainerProps {
  * Client component to render the search input and results.
  */
 export function SearchContainer(props: SearchContainerProps) {
-    const { siteSpaceId, spaceTitle, isMultiVariants, style, className, viewport } = props;
+    const {
+        siteSpaceId,
+        spaceTitle,
+        section,
+        withVariants,
+        withSiteVariants,
+        withSections,
+        style,
+        className,
+        viewport,
+        siteSpaceIds,
+    } = props;
 
     const { assistants } = useAI();
 
@@ -108,7 +137,7 @@ export function SearchContainer(props: SearchContainerProps) {
         }
         setSearchState((prev) => ({
             ask: withAI ? (prev?.ask ?? null) : null,
-            global: prev?.global ?? false,
+            scope: prev?.scope ?? 'default',
             query: prev?.query ?? (withSearchAI || !withAI ? prev?.ask : null) ?? '',
             open: true,
         }));
@@ -148,7 +177,7 @@ export function SearchContainer(props: SearchContainerProps) {
         setSearchState((prev) => ({
             ask: withAI && !withSearchAI ? (prev?.ask ?? null) : null, // When typing, we reset ask to get back to normal search (unless non-search assistants are defined)
             query: value,
-            global: prev?.global ?? false,
+            scope: prev?.scope ?? 'default',
             open: true,
         }));
     };
@@ -168,15 +197,22 @@ export function SearchContainer(props: SearchContainerProps) {
                     // Only show content if there's a query or Ask is enabled
                     state?.query || withAI ? (
                         <React.Suspense fallback={null}>
-                            {isMultiVariants && !showAsk ? (
-                                <SearchScopeToggle spaceTitle={spaceTitle} />
+                            {(withVariants || withSections) && !showAsk ? (
+                                <SearchScopeToggle
+                                    section={section}
+                                    spaceTitle={spaceTitle}
+                                    withVariants={withVariants}
+                                    withSiteVariants={withSiteVariants}
+                                    withSections={withSections}
+                                />
                             ) : null}
                             {state !== null && !showAsk ? (
                                 <SearchResults
                                     ref={resultsRef}
                                     query={normalizedQuery}
-                                    global={state?.global ?? false}
+                                    scope={state?.scope ?? 'default'}
                                     siteSpaceId={siteSpaceId}
+                                    siteSpaceIds={siteSpaceIds}
                                 />
                             ) : null}
                             {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
@@ -194,7 +230,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        'bg-tint-base has-[.empty]:hidden gutter-stable scroll-py-2 w-128 p-2 pr-1 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        '@container overflow-y-scroll bg-tint-base has-[.empty]:hidden scroll-py-2 w-128 p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: (event) => {
                         // Don't close if clicking on the search input itself
                         if (searchInputRef.current?.contains(event.target as Node)) {

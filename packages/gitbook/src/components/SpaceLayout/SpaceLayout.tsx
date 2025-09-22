@@ -21,7 +21,7 @@ import { AIChat } from '../AIChat';
 import { AdaptiveVisitorContextProvider } from '../Adaptive';
 import { Announcement } from '../Announcement';
 import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
-import { InsightsProvider } from '../Insights';
+import { InsightsProvider, VisitorSessionProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
@@ -78,16 +78,16 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     revisionId={context.revisionId}
                     visitorAuthClaims={visitorAuthClaims}
                 >
-                    <InsightsProvider
-                        enabled={withTracking}
+                    <VisitorSessionProvider
                         appURL={GITBOOK_APP_URL}
-                        eventUrl={eventUrl.toString()}
                         visitorCookieTrackingEnabled={customization.insights?.trackingCookie}
                     >
-                        <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
-                            {children}
-                        </AIChatProvider>
-                    </InsightsProvider>
+                        <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
+                            <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
+                                {children}
+                            </AIChatProvider>
+                        </InsightsProvider>
+                    </VisitorSessionProvider>
                 </CurrentContentProvider>
             </AdaptiveVisitorContextProvider>
         </SpaceLayoutContextProvider>
@@ -180,9 +180,29 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     <div className="flex gap-2">
                                         <SearchContainer
                                             style={CustomizationSearchStyle.Subtle}
-                                            isMultiVariants={siteSpaces.length > 1}
+                                            withVariants={withVariants === 'generic'}
+                                            withSiteVariants={
+                                                sections?.list.some(
+                                                    (s) =>
+                                                        s.object === 'site-section' &&
+                                                        s.siteSpaces.filter(
+                                                            (s) =>
+                                                                s.space.language ===
+                                                                siteSpace.space.language
+                                                        ).length > 1
+                                                ) ?? false
+                                            }
+                                            withSections={withSections}
+                                            section={sections?.current}
                                             spaceTitle={siteSpace.title}
                                             siteSpaceId={siteSpace.id}
+                                            siteSpaceIds={siteSpaces
+                                                .filter(
+                                                    (s) =>
+                                                        s.space.language ===
+                                                        siteSpace.space.language
+                                                )
+                                                .map((s) => s.id)}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />
