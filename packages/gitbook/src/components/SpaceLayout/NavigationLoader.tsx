@@ -18,7 +18,7 @@ export const NavigationLoader = React.forwardRef<HTMLDivElement, NavigationLoade
                 className={tcls(
                     className,
                     'outline-0',
-                    isNavigating ? 'animate-animate-outline' : ''
+                    isNavigating ? 'animate-outline' : ''
                 )}
                 {...props}
             >

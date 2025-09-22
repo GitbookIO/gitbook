@@ -329,8 +329,7 @@ const config: Config = {
                 exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
                 heightIn: 'heightIn 200ms ease both',
-                progressLoader: 'progressLoader 1.5s ease-in-out infinite alternate',
-                animateOutline: 'animateOutline 1s ease-in-out infinite',
+                outline: 'animateOutline 1s ease-in-out infinite',
             },
             keyframes: {
                 bounceSmall: {
@@ -499,10 +498,6 @@ const config: Config = {
                 heightIn: {
                     from: { height: '0' },
                     to: { height: 'max-content' },
-                },
-                progressLoader: {
-                    from: { transform: 'translateX(-1%)', left: 0 },
-                    to: { transform: 'translateX(-99%)', left: '100%' },
                 },
                 animateOutline: {
                     '0%': {
