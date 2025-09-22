@@ -6,8 +6,8 @@ import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
-import { useClassnames } from '../primitives/StyleProvider';
 import { NavigationOutlineInndicator } from '../primitives/NavigationOutlineIndicator';
+import { useClassnames } from '../primitives/StyleProvider';
 
 interface SearchInputProps {
     onChange: (value: string) => void;
