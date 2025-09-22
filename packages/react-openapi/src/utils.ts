@@ -2,6 +2,7 @@ import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser'
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
+import type { OpenAPIOperationData, OpenAPISecurityWithRequired } from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
@@ -252,4 +253,42 @@ export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
     }
 
     return type;
+}
+
+export type OperationSecurityInfo = {
+    key: string;
+    label: string;
+    schemes: OpenAPISecurityWithRequired[];
+};
+
+/**
+ * Extract security information for an operation based on its security requirements and the spec security schemes.
+ */
+export function extractOperationSecurityInfo(args: {
+    securityRequirement: OpenAPIV3.OperationObject['security'];
+    securities: OpenAPIOperationData['securities'];
+}): OperationSecurityInfo[] {
+    const { securityRequirement, securities } = args;
+    const securitiesMap = new Map(securities);
+
+    // When no security requirement include every schemes
+    if (!securityRequirement || securityRequirement.length === 0) {
+        return securities.map(([key, security]) => ({
+            key,
+            label: key,
+            schemes: [security],
+        }));
+    }
+
+    return securityRequirement.map((requirement, idx) => {
+        const schemeKeys = Object.keys(requirement);
+
+        return {
+            key: `security-${idx}`,
+            label: schemeKeys.join(' & '),
+            schemes: schemeKeys
+                .map((schemeKey) => securitiesMap.get(schemeKey))
+                .filter((s) => s !== undefined),
+        };
+    });
 }

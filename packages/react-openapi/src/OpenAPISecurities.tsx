@@ -5,21 +5,25 @@ import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import type { OpenAPIOperationData, OpenAPISecuritySchemeWithRequired } from './types';
-import { createStateKey, resolveDescription } from './utils';
+import type { OpenAPISecuritySchemeWithRequired } from './types';
+import type { OpenAPIOperationData } from './types';
+import { createStateKey, extractOperationSecurityInfo, resolveDescription } from './utils';
 
 /**
  * Present securities authorization that can be used for this operation.
  */
 export function OpenAPISecurities(props: {
+    securityRequirement: OpenAPIV3.OperationObject['security'];
     securities: OpenAPIOperationData['securities'];
     context: OpenAPIClientContext;
 }) {
-    const { securities, context } = props;
+    const { securityRequirement, securities, context } = props;
 
-    if (securities.length === 0) {
+    if (!securities || securities.length === 0) {
         return null;
     }
+
+    const tabsData = extractOperationSecurityInfo({ securityRequirement, securities });
 
     return (
         <InteractiveSection
@@ -30,27 +34,31 @@ export function OpenAPISecurities(props: {
             toggleIcon={context.icons.chevronRight}
             selectIcon={context.icons.chevronDown}
             className="openapi-securities"
-            tabs={securities.map(([key, security]) => {
-                const description = resolveDescription(security);
-                return {
-                    key: key,
-                    label: key,
-                    body: (
-                        <div className="openapi-schema">
-                            <div className="openapi-schema-presentation">
-                                {getLabelForType(security, context)}
-
-                                {description ? (
-                                    <Markdown
-                                        source={description}
-                                        className="openapi-securities-description"
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
-                    ),
-                };
-            })}
+            tabs={tabsData.map(({ key, label, schemes }) => ({
+                key,
+                label,
+                body: (
+                    <div className="openapi-schema">
+                        {schemes.map((security, index) => {
+                            const description = resolveDescription(security);
+                            return (
+                                <div
+                                    key={`${key}-${index}`}
+                                    className="openapi-schema-presentation"
+                                >
+                                    {getLabelForType(security, context)}
+                                    {description ? (
+                                        <Markdown
+                                            source={description}
+                                            className="openapi-securities-description"
+                                        />
+                                    ) : null}
+                                </div>
+                            );
+                        })}
+                    </div>
+                ),
+            }))}
         />
     );
 }

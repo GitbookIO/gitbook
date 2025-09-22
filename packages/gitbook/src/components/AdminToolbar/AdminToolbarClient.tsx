@@ -71,7 +71,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
     });
 
     return (
-        <Toolbar>
+        <Toolbar label="Site preview">
             <ToolbarBody>
                 <ToolbarTitle
                     prefix="Change request"
@@ -145,7 +145,7 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
     const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
-        <Toolbar>
+        <Toolbar label="Site preview">
             <ToolbarBody>
                 <ToolbarTitle prefix="Site version" suffix={context.site.title} />
                 <ToolbarSubtitle
@@ -218,7 +218,7 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
     });
 
     return (
-        <Toolbar>
+        <Toolbar label="Only visible to your GitBook organization">
             <ToolbarBody>
                 <ToolbarTitle prefix="Site" suffix={context.site.title} />
                 <ToolbarSubtitle
