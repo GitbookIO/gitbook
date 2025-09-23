@@ -362,7 +362,7 @@ describe('resolvePrefillCodePlaceholderFromSecurityScheme (integration style)', 
         });
 
         expect(result).toBe(
-            '$$__X-GITBOOK-PREFILL[(visitor.claims.missing) ?? "YOUR_API_TOKEN"]__$$'
+            `$$__X-GITBOOK-PREFILL[(visitor.claims.missing) ?? 'YOUR_API_TOKEN']__$$`
         );
     });
 

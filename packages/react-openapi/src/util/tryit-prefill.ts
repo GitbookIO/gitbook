@@ -204,5 +204,5 @@ function extractPrefillExpressionPartsFromSecurityScheme(
 }
 
 function toPrefillCodePlaceholder(expression: string, defaultValue?: string) {
-    return `$$__X-GITBOOK-PREFILL[(${expression})${defaultValue ? ` ?? "${defaultValue}"` : ''}]__$$`;
+    return `$$__X-GITBOOK-PREFILL[(${expression})${defaultValue ? ` ?? '${defaultValue}'` : ''}]__$$`;
 }
