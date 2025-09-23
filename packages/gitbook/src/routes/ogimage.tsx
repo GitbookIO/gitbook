@@ -135,6 +135,7 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
                 options={{
                     size: 'small',
                     theme,
+                    border: true,
                 }}
                 style={faviconSize}
             />
