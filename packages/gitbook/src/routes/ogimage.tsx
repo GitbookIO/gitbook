@@ -1,15 +1,14 @@
-import { CustomizationDefaultFont, CustomizationHeaderPreset } from '@gitbook/api';
+import { CustomizationHeaderPreset } from '@gitbook/api';
 import { colorContrast } from '@gitbook/colors';
-import { type FontWeight, getDefaultFont } from '@gitbook/fonts';
 import { direction } from 'direction';
 import { imageSize } from 'image-size';
 import { redirect } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 
 import { type PageParams, fetchPageData } from '@/components/SitePage';
-import { getFontSourcesToPreload } from '@/fonts/custom';
 import { getAssetURL } from '@/lib/assets';
 import type { GitBookSiteContext } from '@/lib/context';
+import { computeImageFonts } from '@/lib/imageFonts';
 import {
     type ResizeImageOptions,
     SizableImageAction,
@@ -18,7 +17,6 @@ import {
     resizeImage,
 } from '@/lib/images';
 import { getExtension } from '@/lib/paths';
-import { filterOutNullable } from '@/lib/typescript';
 import { getCacheTag } from '@gitbook/cache-tags';
 import { SiteDefaultIcon } from './icon';
 
@@ -54,47 +52,11 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             : '';
 
     // Load the fonts
-    const fontLoader = async () => {
-        // google fonts
-        if (typeof customization.styling.font === 'string') {
-            const fontFamily = customization.styling.font ?? CustomizationDefaultFont.Inter;
-
-            const regularText = pageDescription;
-            const boldText = `${site.title} ${pageTitle}`;
-
-            const fonts = (
-                await Promise.all([
-                    loadGoogleFont({ font: fontFamily, text: regularText, weight: 400 }),
-                    loadGoogleFont({ font: fontFamily, text: boldText, weight: 700 }),
-                ])
-            ).filter(filterOutNullable);
-
-            return { fontFamily, fonts };
-        }
-
-        // custom fonts
-        // We only load the primary font weights for now
-        const primaryFontWeights = getFontSourcesToPreload(customization.styling.font);
-
-        const fonts = (
-            await Promise.all(
-                primaryFontWeights.map((face) => {
-                    const { weight, sources } = face;
-                    const source = sources[0];
-
-                    // Satori doesn't support WOFF2, so we skip it
-                    // https://github.com/vercel/satori?tab=readme-ov-file#fonts
-                    if (!source || source.format === 'woff2' || source.url.endsWith('.woff2')) {
-                        return null;
-                    }
-
-                    return loadCustomFont({ url: source.url, weight });
-                })
-            )
-        ).filter(filterOutNullable);
-
-        return { fontFamily: 'CustomFont', fonts };
-    };
+    const fontLoader = async () =>
+        computeImageFonts(customization, {
+            regularText: pageDescription,
+            boldText: `${site.title} ${pageTitle}`,
+        });
 
     const theme = customization.themes.default;
     const useLightTheme = theme === 'light';
@@ -267,54 +229,6 @@ export async function serveOGImage(baseContext: GitBookSiteContext, params: Page
             },
         }
     );
-}
-
-async function loadGoogleFont(input: {
-    font: CustomizationDefaultFont;
-    text: string;
-    weight: FontWeight;
-}) {
-    const lookup = getDefaultFont({
-        font: input.font,
-        text: input.text,
-        weight: input.weight,
-    });
-
-    // If we found a font file, load it
-    if (lookup) {
-        return getWithCache(`google-font-files:${lookup.url}`, async () => {
-            const response = await fetch(lookup.url);
-            if (response.ok) {
-                const data = await response.arrayBuffer();
-                return {
-                    name: lookup.font,
-                    data,
-                    style: 'normal' as const,
-                    weight: input.weight,
-                };
-            }
-        });
-    }
-
-    // If for some reason we can't load the font, we'll just use the default one
-    return null;
-}
-
-async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
-    const { url, weight } = input;
-    const response = await fetch(url);
-    if (!response.ok) {
-        return null;
-    }
-
-    const data = await response.arrayBuffer();
-
-    return {
-        name: 'CustomFont',
-        data,
-        style: 'normal' as const,
-        weight,
-    };
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
