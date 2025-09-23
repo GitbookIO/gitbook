@@ -508,10 +508,6 @@ const config: Config = {
                         scale: '1 1',
                         translate: '100% 0',
                     },
-                    // '60%': {
-                    //     scale: '1 1',
-                    //     translate: '0 0',
-                    // },
                     '100%': {
                         scale: '0 1',
                         translate: '100% 0',
