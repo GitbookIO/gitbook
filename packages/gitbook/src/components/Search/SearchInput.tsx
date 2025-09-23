@@ -16,6 +16,7 @@ interface SearchInputProps {
     withAI: boolean;
     isOpen: boolean;
     className?: string;
+    children?: React.ReactNode;
 }
 
 // Size classes for medium size button
@@ -26,7 +27,17 @@ const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'md:circular-corners:px-4'];
  */
 export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
     function SearchInput(props, ref) {
-        const { onChange, onKeyDown, onFocus, value, withAI, isOpen, className } = props;
+        const {
+            onChange,
+            onKeyDown,
+            onFocus,
+            value,
+            withAI,
+            isOpen,
+            className,
+            children,
+            ...rest
+        } = props;
         const inputRef = useRef<HTMLInputElement>(null);
 
         const language = useLanguage();
@@ -84,8 +95,9 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             className="size-4 shrink-0 animate-scale-in"
                         />
                     )}
-
+                    {children}
                     <input
+                        {...rest}
                         type="text"
                         onFocus={onFocus}
                         onKeyDown={onKeyDown}
@@ -100,6 +112,12 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-hidden transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
                             isOpen ? '' : 'max-md:opacity-0'
                         )}
+                        role="combobox"
+                        autoComplete="off"
+                        aria-autocomplete="list"
+                        aria-haspopup="listbox"
+                        aria-expanded={value && isOpen ? 'true' : 'false'}
+                        // Forward
                         ref={inputRef}
                     />
                     {!isOpen ? <Shortcut /> : null}
