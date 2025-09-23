@@ -329,6 +329,7 @@ const config: Config = {
                 exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
                 heightIn: 'heightIn 200ms ease both',
+                crawl: 'crawl 2s ease-in-out infinite',
             },
             keyframes: {
                 bounceSmall: {
@@ -497,6 +498,20 @@ const config: Config = {
                 heightIn: {
                     from: { height: '0' },
                     to: { height: 'max-content' },
+                },
+                crawl: {
+                    '0%': {
+                        scale: '0 1',
+                        translate: '0 0',
+                    },
+                    '40%': {
+                        scale: '1 1',
+                        translate: '100% 0',
+                    },
+                    '100%': {
+                        scale: '0 1',
+                        translate: '100% 0',
+                    },
                 },
             },
             boxShadow: {
