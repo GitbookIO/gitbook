@@ -124,4 +124,8 @@ export const ru = {
     tool_call_skipped: 'Пропущен "${1}"',
     scroll_back: 'Прокрутить назад',
     scroll_further: 'Прокрутить дальше',
+    hint_info: 'Информация',
+    hint_warning: 'Предупреждение',
+    hint_danger: 'Опасность',
+    hint_success: 'Успех',
 };
