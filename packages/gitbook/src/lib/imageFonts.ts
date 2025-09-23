@@ -104,12 +104,20 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
 const staticCache = new Map<string, any>();
 
 async function getWithCache<T>(key: string, fn: () => Promise<T>) {
-    const cached = staticCache.get(key) as T;
+    const cached = staticCache.get(key) as Promise<T>;
     if (cached) {
-        return Promise.resolve(cached);
+        return cached;
     }
 
-    const result = await fn();
-    staticCache.set(key, result);
-    return result;
+    const promise = fn();
+    staticCache.set(key, promise);
+
+    try {
+        const result = await promise;
+        return result;
+    } catch (error) {
+        // Remove the failed promise from cache so it can be retried
+        staticCache.delete(key);
+        throw error;
+    }
 }
