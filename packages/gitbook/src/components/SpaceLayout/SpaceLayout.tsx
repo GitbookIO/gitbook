@@ -25,6 +25,7 @@ import { InsightsProvider, VisitorSessionProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
+import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 
 type SpaceLayoutProps = {
@@ -125,6 +126,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
         <SpaceLayoutServerContext {...props}>
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} withVariants={withVariants} context={context} />
+            <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                 <AIChat trademark={customization.trademark.enabled} />
             ) : null}

@@ -329,7 +329,7 @@ const config: Config = {
                 exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
                 heightIn: 'heightIn 200ms ease both',
-                outline: 'animateOutline 1s ease-in-out infinite',
+                crawl: 'crawl 2s ease-in-out infinite',
             },
             keyframes: {
                 bounceSmall: {
@@ -499,24 +499,22 @@ const config: Config = {
                     from: { height: '0' },
                     to: { height: 'max-content' },
                 },
-                animateOutline: {
+                crawl: {
                     '0%': {
-                        outlineWidth: '1px',
-                        outlineOffset: '0',
-                        outlineColor: 'rgb(var(--primary-original) / 0)',
+                        scale: '0 1',
+                        translate: '0 0',
                     },
-                    '10%': {
-                        outlineColor: 'rgb(var(--primary-original) / 0.75)',
+                    '40%': {
+                        scale: '1 1',
+                        translate: '100% 0',
                     },
-                    '50%': {
-                        outlineWidth: '7px',
-                        outlineOffset: '4px',
-                        outlineColor: 'rgb(var(--primary-original) / 0)',
-                    },
+                    // '60%': {
+                    //     scale: '1 1',
+                    //     translate: '0 0',
+                    // },
                     '100%': {
-                        outlineWidth: '7px',
-                        outlineOffset: '4px',
-                        outlineColor: 'rgb(var(--primary-original) / 0)',
+                        scale: '0 1',
+                        translate: '100% 0',
                     },
                 },
             },
