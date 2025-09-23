@@ -17,9 +17,7 @@ export const en = {
     search_section_result_content: 'Section with content ${1}',
     search_section_result_default: 'Section',
     search_scope_current: '${1}',
-    search_scope_extended: 'All content',
-    search_scope_default: 'Best match',
-    search_scope_all: 'Everything',
+    search_scope_all: 'Everywhere',
     ask: 'Ask',
     search_ask: 'Ask "${1}"',
     search_ask_description: 'Find the answer with ${1}',
@@ -123,4 +121,5 @@ export const en = {
     tool_call_skipped: 'Skipped "${1}"',
     scroll_back: 'Scroll back',
     scroll_further: 'Scroll further',
+    filter: 'Filter',
 };
