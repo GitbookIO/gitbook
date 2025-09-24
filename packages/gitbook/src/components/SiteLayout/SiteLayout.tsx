@@ -108,6 +108,8 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
     const customIcon = 'icon' in customization.favicon ? customization.favicon.icon : null;
 
     const faviconSize = 48;
+    const appIconSize = 180;
+
     const icons = await Promise.all(
         [
             {
@@ -140,12 +142,44 @@ export async function generateSiteLayoutMetadata(context: GitBookSiteContext): P
         }))
     );
 
+    const appIcons = await Promise.all(
+        [
+            {
+                url: customIcon?.light
+                    ? getResizedImageURL(imageResizer, customIcon.light, {
+                          width: appIconSize,
+                          height: appIconSize,
+                      })
+                    : linker.toAbsoluteURL(
+                          linker.toPathInSpace('~gitbook/icon?size=medium&theme=light&border=false')
+                      ),
+                type: 'image/png',
+                media: '(prefers-color-scheme: light)',
+            },
+            {
+                url: customIcon?.dark
+                    ? getResizedImageURL(imageResizer, customIcon.dark, {
+                          width: appIconSize,
+                          height: appIconSize,
+                      })
+                    : linker.toAbsoluteURL(
+                          linker.toPathInSpace('~gitbook/icon?size=medium&theme=dark&border=false')
+                      ),
+                type: 'image/png',
+                media: '(prefers-color-scheme: dark)',
+            },
+        ].map(async (icon) => ({
+            ...icon,
+            url: await icon.url,
+        }))
+    );
+
     return {
         title: site.title,
         generator: `GitBook (${buildVersion()})`,
         icons: {
             icon: icons,
-            apple: icons,
+            apple: appIcons,
         },
         appleWebApp: {
             capable: true,

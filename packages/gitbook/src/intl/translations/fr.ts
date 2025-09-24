@@ -122,4 +122,8 @@ export const fr = {
     tool_call_skipped: 'Ignoré "${1}"',
     scroll_back: "Défiler vers l'arrière",
     scroll_further: 'Défiler plus loin',
+    hint_info: 'Information',
+    hint_warning: 'Avertissement',
+    hint_danger: 'Danger',
+    hint_success: 'Succès',
 };

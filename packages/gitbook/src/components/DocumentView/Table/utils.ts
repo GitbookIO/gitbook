@@ -71,16 +71,18 @@ function processCoverValue(value: DocumentTableImageRecord | string[] | null | u
         }
     }
 
+    const imageValue = value as DocumentTableImageRecord | null | undefined;
+
     // Check if it's the new schema with objectFit
-    if (value && typeof value === 'object' && 'ref' in value && 'objectFit' in value) {
+    if (imageValue && typeof imageValue === 'object' && 'ref' in imageValue) {
         return {
-            contentRef: value.ref,
-            objectFit: value.objectFit,
+            contentRef: imageValue.ref,
+            objectFit: imageValue.objectFit,
         };
     }
 
     // It's a direct ContentRef
-    return { contentRef: value as ContentRefFile | ContentRefURL };
+    return { contentRef: imageValue || null };
 }
 
 /**

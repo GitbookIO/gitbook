@@ -122,4 +122,8 @@ export const zh: TranslationLanguage = {
     tool_call_skipped: '已跳过 "${1}"',
     scroll_back: '向后滚动',
     scroll_further: '向前滚动',
+    hint_info: '信息',
+    hint_warning: '警告',
+    hint_danger: '危险',
+    hint_success: '成功',
 };
