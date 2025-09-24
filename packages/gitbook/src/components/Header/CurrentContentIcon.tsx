@@ -42,11 +42,11 @@ export function CurrentContentIcon(
                       }
                     : {
                           light: {
-                              src: linker.toPathInSpace('~gitbook/icon?size=medium&theme=light'),
+                              src: linker.toPathInSpace('~gitbook/icon?size=large&theme=light'),
                               size: { width: 256, height: 256 },
                           },
                           dark: {
-                              src: linker.toPathInSpace('~gitbook/icon?size=medium&theme=dark'),
+                              src: linker.toPathInSpace('~gitbook/icon?size=large&theme=dark'),
                               size: { width: 256, height: 256 },
                           },
                       }
