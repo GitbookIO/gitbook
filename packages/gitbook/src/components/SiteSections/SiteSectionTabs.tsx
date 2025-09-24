@@ -210,7 +210,7 @@ function SectionGroupTileList(props: {
     const hasGroups = groups.length > 0;
 
     return (
-        <div className="flex flex-col md:flex-row md:items-start">
+        <div className="flex flex-col md:flex-row">
             {/* Non-grouped sections */}
             {hasSections && (
                 <ul
