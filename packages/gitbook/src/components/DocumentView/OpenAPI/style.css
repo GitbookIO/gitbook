@@ -143,11 +143,11 @@
 }
 
 .openapi-column-preview {
-    @apply flex flex-col flex-1;
+    @apply flex flex-col flex-1 xl:max-2xl:pt-20 lg:py-6 sticky max-h-[calc(100vh-var(--toc-top-offset))] top-(--toc-top-offset);
 }
 
 .openapi-column-preview-body {
-    @apply flex flex-col gap-4 sticky top-[calc(var(--toc-top-offset)+5rem)] print-mode:static;
+    @apply flex flex-col shrink overflow-hidden gap-4 print-mode:static;
 }
 
 .openapi-column-preview pre {
@@ -510,13 +510,21 @@
 .openapi-panel,
 .openapi-codesample,
 .openapi-response-examples {
-    @apply border rounded-md straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
+    @apply border shrink min-h-40 overflow-hidden rounded-md straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
+}
+
+.openapi-response-examples-panel {
+    @apply flex flex-col shrink overflow-hidden;
+}
+
+.openapi-codesample-panel {
+    @apply flex flex-col shrink overflow-hidden;
 }
 
 .openapi-panel pre,
 .openapi-codesample pre,
 .openapi-response-examples pre {
-    @apply bg-transparent border-none rounded-none shadow-none;
+    @apply bg-transparent border-none rounded-none shrink shadow-none;
 }
 
 .openapi-panel-heading {
@@ -579,7 +587,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button {
-    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 text-tint-strong max-w-32 rounded text-xs p-1.5 leading-none border border-tint-subtle bg-tint;
+    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 text-tint-strong rounded text-xs p-1.5 leading-none border border-tint-subtle bg-tint;
     @apply hover:bg-tint-hover transition-all;
 }
 
@@ -613,7 +621,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-item {
-    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 *:truncate text-tint ring-0 border-none rounded !outline-none;
+    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded !outline-none;
     @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
 }
 
@@ -638,6 +646,14 @@ body:has(.openapi-select-popover) {
 }
 
 /* Section Components */
+.openapi-section {
+    @apply flex flex-col overflow-hidden;
+}
+
+.openapi-section-body {
+    @apply flex flex-col shrink overflow-hidden;
+}
+
 .openapi-section-header {
     @apply flex flex-row items-center;
 }
