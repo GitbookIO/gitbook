@@ -67,15 +67,16 @@ async function loadGoogleFont(input: {
     if (lookup) {
         return getWithCache(`google-font-files:${lookup.url}`, async () => {
             const response = await fetch(lookup.url);
-            if (response.ok) {
-                const data = await response.arrayBuffer();
-                return {
-                    name: lookup.font,
-                    data,
-                    style: 'normal' as const,
-                    weight: input.weight,
-                };
+            if (!response.ok) {
+                throw new Error(`Failed to load font from ${lookup.url}: ${response.statusText}`);
             }
+            const data = await response.arrayBuffer();
+            return {
+                name: lookup.font,
+                data,
+                style: 'normal' as const,
+                weight: input.weight,
+            };
         });
     }
 
@@ -85,39 +86,40 @@ async function loadGoogleFont(input: {
 
 async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
     const { url, weight } = input;
-    const response = await fetch(url);
-    if (!response.ok) {
-        return null;
-    }
+    return getWithCache(`custom-font-files:${url}:${weight}`, async () => {
+        const response = await fetch(url);
 
-    const data = await response.arrayBuffer();
+        if (!response.ok) {
+            throw new Error(`Failed to load custom font from ${url}: ${response.statusText}`);
+        }
 
-    return {
-        name: 'CustomFont',
-        data,
-        style: 'normal' as const,
-        weight,
-    } as const;
+        const data = await response.arrayBuffer();
+
+        return {
+            name: 'CustomFont',
+            data,
+            style: 'normal' as const,
+            weight,
+        } as const;
+    });
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const staticCache = new Map<string, any>();
+const staticCache = new Map<string, unknown>();
 
-async function getWithCache<T>(key: string, fn: () => Promise<T>) {
-    const cached = staticCache.get(key) as Promise<T>;
+/**
+ * Simple in-memory cache to avoid loading the same font multiple times.
+ */
+function getWithCache<T>(key: string, fn: () => Promise<T>): Promise<T> {
+    const cached = staticCache.get(key);
     if (cached) {
-        return cached;
+        return cached as Promise<T>;
     }
 
-    const promise = fn();
-    staticCache.set(key, promise);
-
-    try {
-        const result = await promise;
-        return result;
-    } catch (error) {
+    const promise = fn().catch((error) => {
         // Remove the failed promise from cache so it can be retried
         staticCache.delete(key);
         throw error;
-    }
+    });
+    staticCache.set(key, promise);
+    return promise;
 }
