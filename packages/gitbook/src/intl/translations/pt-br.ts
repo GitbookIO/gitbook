@@ -125,4 +125,8 @@ export const pt_br = {
     tool_call_skipped: 'Pulado "${1}"',
     scroll_back: 'Rolar para trás',
     scroll_further: 'Rolar para frente',
+    hint_info: 'Informação',
+    hint_warning: 'Aviso',
+    hint_danger: 'Perigo',
+    hint_success: 'Sucesso',
 };

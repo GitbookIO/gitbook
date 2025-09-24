@@ -126,4 +126,8 @@ export const no: TranslationLanguage = {
     tool_call_skipped: 'Hoppet over "${1}"',
     scroll_back: 'Rull tilbake',
     scroll_further: 'Rull videre',
+    hint_info: 'Informasjon',
+    hint_warning: 'Advarsel',
+    hint_danger: 'Fare',
+    hint_success: 'Suksess',
 };

@@ -3,6 +3,8 @@ import { Icon, type IconName } from '@gitbook/icons';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { languages } from '@/intl/translations';
 import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
@@ -17,6 +19,12 @@ export function Hint({
     const firstNode = block.nodes[0]!;
     const firstLine = getBlockTextStyle(firstNode);
     const hasHeading = ['heading-1', 'heading-2', 'heading-3'].includes(firstNode.type);
+
+    const language = contextProps.context.contentContext
+        ? getSpaceLanguage(contextProps.context.contentContext)
+        : languages.en;
+
+    const label = tString(language, `hint_${block.data.style}`);
 
     return (
         <div
@@ -38,6 +46,8 @@ export function Hint({
 
                 style
             )}
+            aria-label={label}
+            role="note"
         >
             <div
                 className={tcls(

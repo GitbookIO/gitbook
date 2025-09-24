@@ -127,4 +127,8 @@ export const es: TranslationLanguage = {
     tool_call_skipped: 'Omitido "${1}"',
     scroll_back: 'Desplazar hacia atrás',
     scroll_further: 'Desplazar más',
+    hint_info: 'Información',
+    hint_warning: 'Advertencia',
+    hint_danger: 'Peligro',
+    hint_success: 'Éxito',
 };
