@@ -12,7 +12,11 @@ export const NavigationLoader = () => {
                 isNavigating ? 'block' : 'hidden animate-fade-out-slow'
             )}
         >
-            <div className={tcls('h-full w-full origin-left animate-crawl bg-primary-solid theme-bold:bg-header-link')} />
+            <div
+                className={tcls(
+                    'h-full w-full origin-left animate-crawl bg-primary-solid theme-bold:bg-header-link'
+                )}
+            />
         </div>
     );
 };
