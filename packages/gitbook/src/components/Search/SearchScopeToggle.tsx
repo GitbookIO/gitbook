@@ -122,7 +122,7 @@ export function SearchScopeToggle(props: {
                         size={withSections ? 'small' : 'medium'}
                         active={scopeIsExtended}
                         className="py-1"
-                        icon={'infinity'}
+                        icon='infinity'
                         label={tString(language, 'search_scope_all')}
                         onClick={() => setSearchState({ ...state, scope: 'all' })}
                     />
