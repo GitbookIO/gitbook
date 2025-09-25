@@ -82,7 +82,7 @@ export function DropdownMenu(props: {
                         onMouseLeave={() => setHovered(false)}
                         align={align}
                         side={side}
-                        className="z-40 animate-scale-in border-tint pt-2"
+                        className="z-50 animate-scale-in border-tint pt-2"
                     >
                         <div
                             className={tcls(
@@ -214,7 +214,7 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
                 <RadixDropdownMenu.SubContent
                     hideWhenDetached
                     collisionPadding={8}
-                    className="z-40 animate-present"
+                    className="z-50 animate-present"
                 >
                     <div className="flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
                         {children}

@@ -9,7 +9,7 @@ export function SegmentedControl(props: { children: React.ReactNode; className?:
             role="toolbar"
             aria-orientation="horizontal"
             className={tcls(
-                'mb-2 flex flex-wrap gap-1 circular-corners:rounded-3xl rounded-corners:rounded-lg bg-tint p-1',
+                'flex flex-wrap gap-1 circular-corners:rounded-3xl rounded-corners:rounded-lg bg-tint p-1',
                 className
             )}
         >
