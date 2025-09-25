@@ -18,6 +18,8 @@ export const fr = {
     search_section_result_default: 'Section',
     search_scope_current: '${1}',
     search_scope_all: 'Partout',
+    search_scope_include_all_title: 'Inclure toutes les variantes',
+    search_scope_include_all_description: 'Rechercher le contenu dans toutes les langues/versions',
     ask: 'Poser une question',
     search_ask: 'Demander « ${1} »',
     search_ask_description: 'Trouvez la réponse avec ${1}',

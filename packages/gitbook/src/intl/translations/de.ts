@@ -18,6 +18,8 @@ export const de = {
     search_section_result_default: 'Abschnitt',
     search_scope_current: '${1}',
     search_scope_all: 'Überall',
+    search_scope_include_all_title: 'Alle Varianten einschließen',
+    search_scope_include_all_description: 'Inhalt in jeder Sprache/Version durchsuchen',
     ask: 'Fragen',
     search_ask: 'Fragen "${1}"',
     search_ask_description: 'Finden Sie die Antwort mit ${1}',

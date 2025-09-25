@@ -20,6 +20,8 @@ export const no: TranslationLanguage = {
     search_section_result_default: 'Seksjon',
     search_scope_current: '${1}',
     search_scope_all: 'Overalt',
+    search_scope_include_all_title: 'Inkluder alle varianter',
+    search_scope_include_all_description: 'Søk innhold på alle språk/versjoner',
     ask: 'Spør',
     search_ask: 'Spør "${1}"',
     search_ask_description: 'Finn svaret med ${1}',

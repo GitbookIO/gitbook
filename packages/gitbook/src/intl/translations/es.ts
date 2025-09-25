@@ -20,6 +20,8 @@ export const es: TranslationLanguage = {
     search_section_result_default: 'Sección',
     search_scope_current: '${1}',
     search_scope_all: 'En todas partes',
+    search_scope_include_all_title: 'Incluir todas las variantes',
+    search_scope_include_all_description: 'Buscar contenido en todos los idiomas/versiones',
     ask: 'Preguntar',
     search_ask: 'Preguntar "${1}"',
     search_ask_description: 'Encuentra la respuesta con ${1}',

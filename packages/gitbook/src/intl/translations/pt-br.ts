@@ -18,6 +18,8 @@ export const pt_br = {
     search_section_result_default: 'Seção',
     search_scope_current: '${1}',
     search_scope_all: 'Em todos os lugares',
+    search_scope_include_all_title: 'Incluir todas as variantes',
+    search_scope_include_all_description: 'Buscar conteúdo em todos os idiomas/versões',
     ask: 'Perguntar',
     search_ask: 'Perguntar "${1}"',
     search_ask_description: 'Encontre a resposta com ${1}',

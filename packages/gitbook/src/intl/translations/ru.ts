@@ -18,6 +18,8 @@ export const ru = {
     search_section_result_default: 'Раздел',
     search_scope_current: '${1}',
     search_scope_all: 'Везде',
+    search_scope_include_all_title: 'Включить все варианты',
+    search_scope_include_all_description: 'Искать контент на всех языках/версиях',
     ask: 'Спросить',
     search_ask: 'Спросить "${1}"',
     search_ask_description: 'Найти ответ с помощью ${1}',

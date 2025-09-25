@@ -20,6 +20,8 @@ export const ja: TranslationLanguage = {
     search_section_result_default: 'セクション',
     search_scope_current: '${1}',
     search_scope_all: 'どこでも',
+    search_scope_include_all_title: 'すべてのバリエーションを含める',
+    search_scope_include_all_description: 'すべての言語/バージョンでコンテンツを検索',
     ask: '質問する',
     search_ask: '"${1}" を質問する',
     search_ask_description: '${1}で答えを見つける',
