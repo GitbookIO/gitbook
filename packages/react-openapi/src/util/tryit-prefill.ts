@@ -2,7 +2,11 @@ import { ExpressionRuntime, type TemplatePart, parseTemplate } from '@gitbook/ex
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type { ApiClientConfiguration } from '@scalar/types';
 import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
-import type { OpenAPIOperationData, OpenAPISecuritySchemeWithRequired } from '../types';
+import type {
+    OpenAPIOperationData,
+    OpenAPISecuritySchemeWithRequired,
+    OpenAPIServerWithCustomProperties,
+} from '../types';
 
 export interface TryItPrefillConfiguration {
     authentication?: ApiClientConfiguration['authentication'];
@@ -175,18 +179,7 @@ export function resolvePrefillCodePlaceholderFromSecurityScheme(args: {
     if (prefillExprParts.length === 0) {
         return defaultPlaceholderValue ?? '';
     }
-    const prefillExpr = prefillExprParts
-        .map((part) => {
-            switch (part.type) {
-                case 'text':
-                    return `"${part.value}"`;
-                case 'expression':
-                    return part.value;
-                default:
-                    return '';
-            }
-        })
-        .join(' + ');
+    const prefillExpr = templatePartsToExpression(prefillExprParts);
 
     return toPrefillCodePlaceholder(prefillExpr, defaultPlaceholderValue);
 }
@@ -201,6 +194,71 @@ function extractPrefillExpressionPartsFromSecurityScheme(
     }
 
     return parseTemplate(expression);
+}
+
+/**
+ * Return a server URL with X-GITBOOK-PREFILL placeholders based on the prefill custom properties in the provided security scheme.
+ */
+export function resolveURLWithPrefillCodePlaceholdersFromServer(
+    server: OpenAPIServerWithCustomProperties,
+    defaultServerUrl?: string
+): string {
+    const serverVariables = server.variables ?? {};
+    const variableExprs: Record<string, string> = {};
+    let hasVariablePrefill = false;
+
+    for (const [name, variable] of Object.entries(serverVariables ?? {})) {
+        if (variable[PREFILL_CUSTOM_PROPERTY]) {
+            hasVariablePrefill = true;
+            const exprString = templatePartsToExpression(
+                parseTemplate(variable[PREFILL_CUSTOM_PROPERTY])
+            );
+            variableExprs[name] = `(${exprString} ?? '${variable.default ?? ''}')`;
+        } else {
+            variableExprs[name] = String(variable.default) ?? '';
+        }
+    }
+
+    let interpolatedUrl = server.url ?? '';
+    interpolatedUrl = interpolatedUrl.replace(/{([^}]+)}/g, (_, varName: string) => {
+        const expr = variableExprs[varName];
+        if (serverVariables[varName]?.[PREFILL_CUSTOM_PROPERTY]) {
+            return `\${${expr ?? `'${varName}'`}}`;
+        }
+        return expr ?? `{${varName}}`;
+    });
+
+    const interpolatedUrlTemplate = hasVariablePrefill ? `\`${interpolatedUrl}\`` : interpolatedUrl;
+
+    const urlLevelExpr = server[PREFILL_CUSTOM_PROPERTY];
+    if (urlLevelExpr) {
+        const exprString = templatePartsToExpression(parseTemplate(urlLevelExpr));
+        const defaultValue = hasVariablePrefill
+            ? interpolatedUrlTemplate
+            : `'${interpolatedUrlTemplate}'`;
+        return toPrefillCodePlaceholder(`${exprString} ?? ${defaultValue}`, defaultServerUrl);
+    }
+
+    if (hasVariablePrefill) {
+        return toPrefillCodePlaceholder(interpolatedUrlTemplate, defaultServerUrl);
+    }
+
+    return interpolatedUrl;
+}
+
+function templatePartsToExpression(parts: ReturnType<typeof parseTemplate>) {
+    return parts
+        .map((part) => {
+            switch (part.type) {
+                case 'text':
+                    return `"${part.value}"`;
+                case 'expression':
+                    return part.value;
+                default:
+                    return '';
+            }
+        })
+        .join(' + ');
 }
 
 function toPrefillCodePlaceholder(expression: string, defaultValue?: string) {

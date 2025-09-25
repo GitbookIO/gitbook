@@ -5,13 +5,16 @@ import {
 } from './OpenAPICodeSampleInteractive';
 import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
-import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
+import { type CodeSampleGenerator, codeSampleGenerators, parseHostAndPath } from './code-samples';
 import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
-import { resolvePrefillCodePlaceholderFromSecurityScheme } from './util/tryit-prefill';
+import {
+    resolvePrefillCodePlaceholderFromSecurityScheme,
+    resolveURLWithPrefillCodePlaceholdersFromServer,
+} from './util/tryit-prefill';
 import { checkIsReference, extractOperationSecurityInfo } from './utils';
 
 const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
@@ -101,10 +104,14 @@ function generateCodeSamples(props: {
         ? data.operation.requestBody
         : undefined;
 
-    const url =
-        getDefaultServerURL(data.servers) +
-        data.path +
-        (searchParams.size ? `?${searchParams.toString()}` : '');
+    const defaultServerUrl = getDefaultServerURL(data.servers);
+    const serverUrlPath = defaultServerUrl ? parseHostAndPath(defaultServerUrl).path : '';
+    const serverUrl = data.servers[0]
+        ? resolveURLWithPrefillCodePlaceholdersFromServer(data.servers[0], defaultServerUrl)
+        : defaultServerUrl;
+    const serverUrlOrigin = serverUrl.replaceAll(serverUrlPath, '');
+    const path =
+        serverUrlPath + data.path + (searchParams.size ? `?${searchParams.toString()}` : '');
 
     const genericHeaders = {
         ...getSecurityHeaders({
@@ -125,7 +132,7 @@ function generateCodeSamples(props: {
                     mediaType,
                     element: context.renderCodeBlock({
                         code: generator.generate({
-                            url,
+                            url: { origin: serverUrlOrigin, path },
                             method: data.method,
                             body: undefined,
                             headers: mediaTypeHeaders,
@@ -138,7 +145,7 @@ function generateCodeSamples(props: {
                         example,
                         element: context.renderCodeBlock({
                             code: generator.generate({
-                                url,
+                                url: { origin: serverUrlOrigin, path },
                                 method: data.method,
                                 body: example.value,
                                 headers: mediaTypeHeaders,
@@ -175,7 +182,7 @@ function generateCodeSamples(props: {
             label: generator.label,
             body: context.renderCodeBlock({
                 code: generator.generate({
-                    url,
+                    url: { origin: serverUrlOrigin, path },
                     method: data.method,
                     body: undefined,
                     headers: genericHeaders,

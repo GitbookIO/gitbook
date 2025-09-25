@@ -4,6 +4,7 @@ import type { OpenAPIOperationData } from '../types';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
     resolveTryItPrefillForOperation,
+    resolveURLWithPrefillCodePlaceholdersFromServer,
 } from './tryit-prefill';
 
 describe('resolveTryItPrefillForOperation', () => {
@@ -413,5 +414,65 @@ describe('resolvePrefillCodePlaceholderFromSecurityScheme (integration style)', 
         });
 
         expect(result).toBe('');
+    });
+});
+
+describe('resolveURLWithPrefillCodePlaceholdersFromServer', () => {
+    it('should return a simple URL when no prefills are present', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://api.example.com/v1',
+        });
+
+        expect(result).toBe('https://api.example.com/v1');
+    });
+
+    it('should replace a variable with its default when no prefill is set', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://{region}.example.com',
+            variables: {
+                region: { default: 'us-east-1' },
+            },
+        });
+
+        expect(result).toBe('https://us-east-1.example.com');
+    });
+
+    it('should return a placeholder for variable-level prefill only', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://{region}.example.com',
+            variables: {
+                region: { default: 'us-east-1', 'x-gitbook-prefill': '{{ user.region }}' },
+            },
+        });
+
+        expect(result).toBe(
+            `$$__X-GITBOOK-PREFILL[(\`https://\${(user.region ?? 'us-east-1')}.example.com\`)]__$$`
+        );
+    });
+
+    it('should wrap full URL when URL-level prefill exists', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://api.example.com/v1',
+            'x-gitbook-prefill': '{{ user.baseUrl }}',
+        });
+
+        expect(result).toBe(
+            "$$__X-GITBOOK-PREFILL[(user.baseUrl ?? 'https://api.example.com/v1')]__$$"
+        );
+    });
+
+    it('should combine variable-level and URL-level prefills correctly', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://{region}.example.com/{version}',
+            'x-gitbook-prefill': '{{ user.baseUrl }}',
+            variables: {
+                region: { default: 'us-east-1', 'x-gitbook-prefill': '{{ user.region }}' },
+                version: { default: 'v1' },
+            },
+        });
+
+        expect(result).toBe(
+            "$$__X-GITBOOK-PREFILL[(user.baseUrl ?? `https://${(user.region ?? 'us-east-1')}.example.com/v1`)]__$$"
+        );
     });
 });
