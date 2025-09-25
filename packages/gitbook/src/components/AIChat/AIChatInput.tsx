@@ -140,7 +140,7 @@ export function AIChatInput(props: {
                             <span className="leading-none">
                                 {t(language, 'ai_chat_context_title')}
                             </span>
-                            <Icon icon="question-circle" className="size-3" />
+                            <Icon icon="question-circle" className="size-3 shrink-0" />
                         </div>
                     </HoverCardTrigger>
                 </HoverCardRoot>
