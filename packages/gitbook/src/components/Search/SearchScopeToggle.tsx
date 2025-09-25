@@ -36,7 +36,7 @@ export function SearchScopeToggle(props: {
                         <SegmentedControlItem
                             active={['default', 'all'].includes(state.scope)}
                             label={tString(language, 'search_scope_all')}
-                            icon={'infinity'}
+                            icon='infinity'
                             onClick={() =>
                                 setSearchState({
                                     ...state,
