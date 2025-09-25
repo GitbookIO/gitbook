@@ -121,5 +121,4 @@ export const en = {
     tool_call_skipped: 'Skipped "${1}"',
     scroll_back: 'Scroll back',
     scroll_further: 'Scroll further',
-    filter: 'Filter',
 };
