@@ -125,4 +125,8 @@ export const nl: TranslationLanguage = {
     tool_call_skipped: '"${1}" overgeslagen',
     scroll_back: 'Terug scrollen',
     scroll_further: 'Verder scrollen',
+    hint_info: 'Informatie',
+    hint_warning: 'Waarschuwing',
+    hint_danger: 'Gevaar',
+    hint_success: 'Succes',
 };

@@ -126,4 +126,8 @@ export const de = {
     tool_call_skipped: 'Übersprungen "${1}"',
     scroll_back: 'Zurück scrollen',
     scroll_further: 'Weiter scrollen',
+    hint_info: 'Information',
+    hint_warning: 'Warnung',
+    hint_danger: 'Gefahr',
+    hint_success: 'Erfolg',
 };

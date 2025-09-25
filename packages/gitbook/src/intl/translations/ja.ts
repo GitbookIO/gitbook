@@ -125,4 +125,8 @@ export const ja: TranslationLanguage = {
     tool_call_skipped: '"${1}" をスキップしました',
     scroll_back: '戻る',
     scroll_further: '進む',
+    hint_info: '情報',
+    hint_warning: '警告',
+    hint_danger: '危険',
+    hint_success: '成功',
 };
