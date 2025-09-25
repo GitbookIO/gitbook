@@ -4,11 +4,18 @@ import { type FontWeight, getDefaultFont } from '@gitbook/fonts';
 import { getFontSourcesToPreload } from '@/fonts/custom';
 import type { GitBookSiteContext } from '@/lib/context';
 import { filterOutNullable } from '@/lib/typescript';
+import QuickLRU from 'quick-lru';
 
 type ComputeFontsInput = {
     regularText: string;
     boldText: string;
 };
+
+// Google fonts are more likely to be reused, so we keep a larger cache
+const googleFontsCache = new QuickLRU<string, unknown>({ maxSize: 50 });
+
+// Custom fonts are less likely to be reused, so we keep a smaller cache
+const customFontsCache = new QuickLRU<string, unknown>({ maxSize: 10 });
 
 export async function computeImageFonts(
     customization: GitBookSiteContext['customization'],
@@ -65,7 +72,7 @@ async function loadGoogleFont(input: {
 
     // If we found a font file, load it
     if (lookup) {
-        return getWithCache(`google-font-files:${lookup.url}`, async () => {
+        return getWithCache(googleFontsCache, lookup.url, async () => {
             const response = await fetch(lookup.url);
             if (!response.ok) {
                 throw new Error(`Failed to load font from ${lookup.url}: ${response.statusText}`);
@@ -86,7 +93,7 @@ async function loadGoogleFont(input: {
 
 async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
     const { url, weight } = input;
-    return getWithCache(`custom-font-files:${url}:${weight}`, async () => {
+    return getWithCache(customFontsCache, `${url}:${weight}`, async () => {
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -104,22 +111,24 @@ async function loadCustomFont(input: { url: string; weight: 400 | 700 }) {
     });
 }
 
-const staticCache = new Map<string, unknown>();
-
 /**
  * Simple in-memory cache to avoid loading the same font multiple times.
  */
-function getWithCache<T>(key: string, fn: () => Promise<T>): Promise<T> {
-    const cached = staticCache.get(key);
+function getWithCache<T>(
+    cache: QuickLRU<string, unknown>,
+    key: string,
+    fn: () => Promise<T>
+): Promise<T> {
+    const cached = cache.get(key);
     if (cached) {
         return cached as Promise<T>;
     }
 
     const promise = fn().catch((error) => {
         // Remove the failed promise from cache so it can be retried
-        staticCache.delete(key);
+        cache.delete(key);
         throw error;
     });
-    staticCache.set(key, promise);
+    cache.set(key, promise);
     return promise;
 }
