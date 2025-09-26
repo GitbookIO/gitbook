@@ -16,7 +16,9 @@ export async function GET(
     return new Response(
         `
 <html>
-    <head></head>
+    <head>
+        <meta name="color-scheme" content="light dark">
+    </head>
     <body>
         <svg style="position: absolute; bottom: 6rem; right: 4rem;" width="719" height="644" viewBox="0 0 719 644" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect opacity="0.1" x="0.566895" y="208" width="529.567" height="228" rx="16" fill="#A4A7B0"/>
@@ -66,7 +68,7 @@ export async function GET(
                 <line x1="179.457" y1="172" x2="4.56689" y2="172" stroke="#A4A7B0" stroke-width="8" stroke-linecap="round"/>
                 <line x1="329.569" y1="172" x2="203.457" y2="172" stroke="#A4A7B0" stroke-width="8" stroke-linecap="round"/>
             </g>
-                <rect x="563" y="208" width="156" height="256" rx="16" fill="#FBFBFB"/>
+                <rect x="563" y="208" width="156" height="256" rx="16" fill="#A4A7B0" opacity="0.05"/>
             <g opacity="0.2">
                 <line x1="682.214" y1="228" x2="583" y2="228" stroke="#656973" stroke-width="8" stroke-linecap="round"/>
             </g>
@@ -105,6 +107,16 @@ export async function GET(
         </svg>
     </body>
     <script src="${context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/embed/script.js'))}"></script>
+    <script>
+    window.GitBook('configure', {
+        suggestions: [
+            'Help me get started',
+            'What can I ask you?',
+            'Show me tips and tricks',
+        ],
+    });
+        window.GitBook('open');
+    </script>
 </html>
 `,
         {

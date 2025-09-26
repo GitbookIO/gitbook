@@ -80,7 +80,8 @@ export const Link = React.forwardRef(function Link(
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         const isExternalWithOrigin = isExternalLink(href, window.location.origin);
-        if (!isExternal) {
+        // Only trigger navigation context for internal links without modifier keys (i.e. open in new tab).
+        if (!isExternal && !event.ctrlKey && !event.metaKey) {
             onNavigationClick(href);
         }
 

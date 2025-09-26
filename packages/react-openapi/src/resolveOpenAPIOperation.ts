@@ -71,7 +71,7 @@ export async function resolveOpenAPIOperation(
 
     return {
         servers,
-        operation,
+        operation: { ...operation, security },
         method,
         path,
         securities,

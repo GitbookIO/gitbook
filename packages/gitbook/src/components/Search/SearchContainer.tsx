@@ -240,7 +240,7 @@ export function SearchContainer(props: SearchContainerProps) {
                 }
                 rootProps={{
                     open: Boolean(visible && (state?.open ?? false)),
-                    modal: isMobile,
+                    modal: false,
                 }}
                 contentProps={{
                     onOpenAutoFocus: (event) => event.preventDefault(),
