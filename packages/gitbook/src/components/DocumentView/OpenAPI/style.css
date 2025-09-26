@@ -207,6 +207,10 @@
     @apply line-through opacity-9;
 }
 
+.openapi-schema-discriminator {
+    @apply text-primary-subtle/9 text-[0.813rem] lowercase;
+}
+
 .openapi-schema-required {
     @apply text-warning-subtle text-[0.813rem] lowercase;
 }
