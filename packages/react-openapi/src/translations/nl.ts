@@ -5,6 +5,7 @@ export const nl = {
     stability_experimental: 'Experimenteel',
     stability_alpha: 'Alfa',
     stability_beta: 'Bèta',
+    discriminator: 'Discriminator',
     copy_to_clipboard: 'Kopiëren naar klembord',
     copied: 'Gekopieerd',
     no_content: 'Geen inhoud',

@@ -23,6 +23,7 @@ type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 export interface OpenAPISchemaPropertyEntry {
     propertyName?: string;
     required?: boolean | null;
+    isDiscriminatorProperty?: boolean;
     schema: OpenAPIV3.SchemaObject;
 }
 
@@ -69,17 +70,19 @@ function OpenAPISchemaProperty(
             );
         }
 
-        if (alternatives) {
+        if (alternatives?.schemas) {
+            const { schemas, discriminator } = alternatives;
             return (
                 <div className="openapi-schema-alternatives">
-                    {alternatives.map((alternativeSchema, index) => (
+                    {schemas.map((alternativeSchema, index) => (
                         <div key={index} className="openapi-schema-alternative">
                             <OpenAPISchemaAlternative
                                 schema={alternativeSchema}
+                                discriminator={discriminator}
                                 circularRefs={circularRefs}
                                 context={context}
                             />
-                            {index < alternatives.length - 1 ? (
+                            {index < schemas.length - 1 ? (
                                 <OpenAPISchemaAlternativeSeparator
                                     schema={schema}
                                     context={context}
@@ -228,11 +231,12 @@ export function OpenAPIRootSchemaFromServer(props: {
  */
 function OpenAPISchemaAlternative(props: {
     schema: OpenAPIV3.SchemaObject;
+    discriminator: OpenAPIV3.DiscriminatorObject | undefined;
     circularRefs: CircularRefsIds;
     context: OpenAPIClientContext;
 }) {
-    const { schema, circularRefs, context } = props;
-    const properties = getSchemaProperties(schema);
+    const { schema, discriminator, circularRefs, context } = props;
+    const properties = getSchemaProperties(schema, discriminator);
 
     return properties?.length ? (
         <OpenAPIDisclosure
@@ -359,7 +363,7 @@ export function OpenAPISchemaPresentation(props: {
     context: OpenAPIClientContext;
 }) {
     const {
-        property: { schema, propertyName, required },
+        property: { schema, propertyName, required, isDiscriminatorProperty },
         context,
     } = props;
 
@@ -372,6 +376,7 @@ export function OpenAPISchemaPresentation(props: {
                 schema={schema}
                 type={getSchemaTitle(schema)}
                 propertyName={propertyName}
+                isDiscriminatorProperty={isDiscriminatorProperty}
                 required={required}
                 context={context}
             />
@@ -414,13 +419,19 @@ export function OpenAPISchemaPresentation(props: {
 /**
  * Get the sub-properties of a schema.
  */
-function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISchemaPropertyEntry[] {
+function getSchemaProperties(
+    schema: OpenAPIV3.SchemaObject,
+    discriminator?: OpenAPIV3.DiscriminatorObject | undefined
+): null | OpenAPISchemaPropertyEntry[] {
     // check array AND schema.items as this is sometimes null despite what the type indicates
     if (schema.type === 'array' && schema.items && !checkIsReference(schema.items)) {
         const items = schema.items;
         const itemProperties = getSchemaProperties(items);
         if (itemProperties) {
-            return itemProperties;
+            return itemProperties.map((prop) => ({
+                ...prop,
+                isDiscriminatorProperty: discriminator?.propertyName === prop.propertyName,
+            }));
         }
 
         // If the items are a primitive type, we don't need to display them
@@ -451,6 +462,7 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
                     required: Array.isArray(schema.required)
                         ? schema.required.includes(propertyName)
                         : undefined,
+                    isDiscriminatorProperty: discriminator?.propertyName === propertyName,
                     schema: propertySchema,
                 });
             });
@@ -471,14 +483,20 @@ function getSchemaProperties(schema: OpenAPIV3.SchemaObject): null | OpenAPISche
 
 type AlternativeType = 'oneOf' | 'allOf' | 'anyOf';
 
+type SchemaAlternatives = {
+    type: AlternativeType;
+    schemas: OpenAPIV3.SchemaObject[];
+    discriminator?: OpenAPIV3.DiscriminatorObject;
+} | null;
+
 /**
  * Get the alternatives to display for a schema.
  */
 export function getSchemaAlternatives(
     schema: OpenAPIV3.SchemaObject,
     ancestors: Set<OpenAPIV3.SchemaObject> = new Set()
-): OpenAPIV3.SchemaObject[] | null {
-    // Search for alternatives in the items property if it exists
+): SchemaAlternatives {
+    // Check for nested alternatives in `items`
     if (
         schema.items &&
         ('oneOf' in schema.items || 'allOf' in schema.items || 'anyOf' in schema.items)
@@ -487,20 +505,21 @@ export function getSchemaAlternatives(
     }
 
     const alternatives:
-        | [AlternativeType, (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[]]
+        | [
+              AlternativeType,
+              (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
+              OpenAPIV3.DiscriminatorObject?,
+          ]
         | null = (() => {
         if (schema.anyOf) {
-            return ['anyOf', schema.anyOf];
+            return ['anyOf', schema.anyOf, schema.discriminator];
         }
-
         if (schema.oneOf) {
-            return ['oneOf', schema.oneOf];
+            return ['oneOf', schema.oneOf, schema.discriminator];
         }
-
         if (schema.allOf) {
-            return ['allOf', schema.allOf];
+            return ['allOf', schema.allOf, schema.discriminator];
         }
-
         return null;
     })();
 
@@ -508,11 +527,17 @@ export function getSchemaAlternatives(
         return null;
     }
 
-    const [type, schemas] = alternatives;
-    return mergeAlternatives(
+    const [type, schemas, discriminator] = alternatives;
+
+    return {
         type,
-        flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
-    );
+        schemas:
+            mergeAlternatives(
+                type,
+                flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
+            ) ?? [],
+        discriminator,
+    };
 }
 
 /**
@@ -610,10 +635,10 @@ function flattenAlternatives(
         }
 
         if (schemaOrRef[alternativeType] && !ancestors.has(schemaOrRef)) {
-            const schemas = getSchemaAlternatives(schemaOrRef, ancestors);
-            if (schemas) {
+            const alternatives = getSchemaAlternatives(schemaOrRef, ancestors);
+            if (alternatives?.schemas) {
                 acc.push(
-                    ...schemas.map((schema) => ({
+                    ...alternatives.schemas.map((schema) => ({
                         ...schema,
                         required: mergeRequiredFields(schema, latestAncestor),
                     }))

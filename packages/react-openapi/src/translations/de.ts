@@ -5,6 +5,7 @@ export const de = {
     stability_experimental: 'Experimentell',
     stability_alpha: 'Alpha',
     stability_beta: 'Beta',
+    discriminator: 'Diskriminator',
     copy_to_clipboard: 'In die Zwischenablage kopieren',
     copied: 'Kopiert',
     no_content: 'Kein Inhalt',

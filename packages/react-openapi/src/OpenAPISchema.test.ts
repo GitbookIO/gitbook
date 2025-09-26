@@ -22,17 +22,20 @@ describe('getSchemaAlternatives', () => {
                     },
                 ],
             })
-        ).toEqual([
-            {
-                type: 'number',
-            },
-            {
-                type: 'boolean',
-            },
-            {
-                type: 'string',
-            },
-        ]);
+        ).toEqual({
+            type: 'oneOf',
+            schemas: [
+                {
+                    type: 'number',
+                },
+                {
+                    type: 'boolean',
+                },
+                {
+                    type: 'string',
+                },
+            ],
+        });
     });
 
     it('merges string enum', () => {
@@ -54,13 +57,16 @@ describe('getSchemaAlternatives', () => {
                     },
                 ],
             })
-        ).toEqual([
-            {
-                type: 'string',
-                enum: ['a', 'b', 'c', 'd'],
-                nullable: true,
-            },
-        ]);
+        ).toEqual({
+            type: 'oneOf',
+            schemas: [
+                {
+                    type: 'string',
+                    enum: ['a', 'b', 'c', 'd'],
+                    nullable: true,
+                },
+            ],
+        });
     });
 
     it('merges objects with allOf', () => {
@@ -93,26 +99,29 @@ describe('getSchemaAlternatives', () => {
                     },
                 ],
             })
-        ).toEqual([
-            {
-                type: 'object',
-                properties: {
-                    name: {
-                        type: 'string',
+        ).toEqual({
+            type: 'allOf',
+            schemas: [
+                {
+                    type: 'object',
+                    properties: {
+                        name: {
+                            type: 'string',
+                        },
+                        map: {
+                            type: 'string',
+                        },
+                        description: {
+                            type: 'string',
+                        },
+                        externalId: {
+                            type: 'string',
+                        },
                     },
-                    map: {
-                        type: 'string',
-                    },
-                    description: {
-                        type: 'string',
-                    },
-                    externalId: {
-                        type: 'string',
-                    },
+                    required: ['name', 'map', 'externalId'],
                 },
-                required: ['name', 'map', 'externalId'],
-            },
-        ]);
+            ],
+        });
     });
 
     it('should not flatten oneOf and allOf', () => {
@@ -134,21 +143,24 @@ describe('getSchemaAlternatives', () => {
                     },
                 ],
             })
-        ).toEqual([
-            {
-                allOf: [
-                    {
-                        type: 'number',
-                    },
-                    {
-                        type: 'boolean',
-                    },
-                ],
-            },
-            {
-                type: 'string',
-            },
-        ]);
+        ).toEqual({
+            type: 'oneOf',
+            schemas: [
+                {
+                    allOf: [
+                        {
+                            type: 'number',
+                        },
+                        {
+                            type: 'boolean',
+                        },
+                    ],
+                },
+                {
+                    type: 'string',
+                },
+            ],
+        });
     });
 
     it('should stop at circular references', () => {
@@ -162,11 +174,14 @@ describe('getSchemaAlternatives', () => {
 
         a.anyOf?.push(a);
 
-        expect(getSchemaAlternatives(a)).toEqual([
-            {
-                type: 'string',
-            },
-            a,
-        ]);
+        expect(getSchemaAlternatives(a)).toEqual({
+            type: 'anyOf',
+            schemas: [
+                {
+                    type: 'string',
+                },
+                a,
+            ],
+        });
     });
 });

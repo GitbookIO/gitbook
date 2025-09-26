@@ -5,6 +5,7 @@ export const no = {
     stability_experimental: 'Eksperimentell',
     stability_alpha: 'Alfa',
     stability_beta: 'Beta',
+    discriminator: 'Diskriminator',
     copy_to_clipboard: 'Kopier til utklippstavle',
     copied: 'Kopiert',
     no_content: 'Ingen innhold',
