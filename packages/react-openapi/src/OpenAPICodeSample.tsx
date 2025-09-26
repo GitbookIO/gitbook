@@ -105,7 +105,8 @@ function generateCodeSamples(props: {
         : undefined;
 
     const defaultServerUrl = getDefaultServerURL(data.servers);
-    const serverUrlPath = defaultServerUrl ? parseHostAndPath(defaultServerUrl).path : '';
+    let serverUrlPath = defaultServerUrl ? parseHostAndPath(defaultServerUrl).path : '';
+    serverUrlPath = serverUrlPath === '/' ? '' : serverUrlPath;
     const serverUrl = data.servers[0]
         ? resolveURLWithPrefillCodePlaceholdersFromServer(data.servers[0], defaultServerUrl)
         : defaultServerUrl;
