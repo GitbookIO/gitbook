@@ -16,7 +16,10 @@ import { stringifyOpenAPI } from './stringifyOpenAPI';
 
 export interface CodeSampleInput {
     method: string;
-    url: string;
+    url: {
+        origin: string;
+        path: string;
+    };
     headers?: Record<string, string>;
     body?: any;
 }
@@ -33,9 +36,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
         id: 'http',
         label: 'HTTP',
         syntax: 'http',
-        generate: ({ method, url, headers = {}, body }: CodeSampleInput) => {
-            const { host, path } = parseHostAndPath(url);
-
+        generate: ({ method, url: { origin, path }, headers = {}, body }: CodeSampleInput) => {
             if (body) {
                 // if we had a body add a content length header
                 const bodyContent = body ? stringifyOpenAPI(body) : '';
@@ -69,7 +70,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             const bodyString = body ? `\n${body}` : '';
 
             const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${host}
+Host: ${origin.replaceAll(/https*:\/\//g, '')}
 ${headerString}${bodyString}`;
 
             return httpRequest;
@@ -79,7 +80,7 @@ ${headerString}${bodyString}`;
         id: 'curl',
         label: 'cURL',
         syntax: 'bash',
-        generate: ({ method, url, headers, body }) => {
+        generate: ({ method, url: { origin, path }, headers, body }) => {
             const separator = ' \\\n';
 
             const lines: string[] = ['curl -L'];
@@ -88,7 +89,7 @@ ${headerString}${bodyString}`;
                 lines.push(`--request ${method.toUpperCase()}`);
             }
 
-            lines.push(`--url '${url}'`);
+            lines.push(`--url '${origin}${path}'`);
 
             if (body) {
                 const bodyContent = BodyGenerators.getCurlBody(body, headers);
@@ -120,7 +121,7 @@ ${headerString}${bodyString}`;
         id: 'javascript',
         label: 'JavaScript',
         syntax: 'javascript',
-        generate: ({ method, url, headers, body }) => {
+        generate: ({ method, url: { origin, path }, headers, body }) => {
             let code = '';
 
             if (body) {
@@ -134,7 +135,7 @@ ${headerString}${bodyString}`;
                 }
             }
 
-            code += `const response = await fetch('${url}', {
+            code += `const response = await fetch('${origin}${path}', {
     method: '${method.toUpperCase()}',\n`;
 
             if (headers && Object.keys(headers).length > 0) {
@@ -155,7 +156,7 @@ ${headerString}${bodyString}`;
         id: 'python',
         label: 'Python',
         syntax: 'python',
-        generate: ({ method, url, headers, body }) => {
+        generate: ({ method, url: { origin, path }, headers, body }) => {
             const contentType = headers?.['Content-Type'];
             let code = `${isJSON(contentType) ? 'import json\n' : ''}import requests\n\n`;
 
@@ -171,7 +172,7 @@ ${headerString}${bodyString}`;
             }
 
             code += `response = requests.${method.toLowerCase()}(\n`;
-            code += indent(`"${url}",\n`, 4);
+            code += indent(`"${origin}${path}",\n`, 4);
 
             if (headers && Object.keys(headers).length > 0) {
                 code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
