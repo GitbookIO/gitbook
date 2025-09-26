@@ -35,6 +35,7 @@ export function PageAside(props: {
         <aside
             className={tcls(
                 'group/aside',
+                'order-last',
                 'hidden',
                 'pt-8',
                 'pb-4',
