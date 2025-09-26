@@ -1,5 +1,36 @@
 # gitbook
 
+## 0.19.0
+
+### Minor Changes
+
+- ed7d47d: Show a toolbar for authenticated users with access to the current site.
+- 50c1be3: Move inline expression evaluation from API to GBO
+- b932e4e: Scope search across sections and variants
+
+### Patch Changes
+
+- 9344431: Fix missing geo data in site insights because of incorrect proxying of events.
+- 2b8a2d2: Add stable scroll gutter to search container
+- b498521: Fix robots.txt preventing favicon from being indexed.
+- ceb32b1: Redo search scope UI
+- 2fc2127: Make search accessible
+- c06b3dd: Improve default site icon
+- cba583a: Use sitespace title instead of space title in search
+- e434442: Support nested site section groups
+- 469b332: Add support for inline expressions rendering with visitor data on GBO side
+- 0ef5dc8: Update to column width sizing
+- 379d486: Expose "Best match" when site has translations
+- c21693f: Improve screen reader accessibility for hints
+- c23d4ef: Fix crash for card cover defined without objectFit
+- b8388e5: Add scrollcontainer component
+- b85eccd: Refactor section tabs
+- 7a504b7: Fix OpenAPI response dropdown & vertical overflow
+- Updated dependencies [319a1e5]
+- Updated dependencies [529f940]
+- Updated dependencies [d7948e3]
+  - @gitbook/react-openapi@1.5.0
+
 ## 0.18.0
 
 ### Minor Changes
