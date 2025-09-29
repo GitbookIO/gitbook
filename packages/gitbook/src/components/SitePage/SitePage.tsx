@@ -52,7 +52,7 @@ export async function SitePage(props: SitePageProps) {
 
                 <div
                     className={tcls(
-                        withFullPageCover && page.cover ? 'flex flex-row' : 'contents',
+                        withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
                         withSections
                             ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
                             : '[--content-scroll-margin:calc(var(--spacing)*16)]'
