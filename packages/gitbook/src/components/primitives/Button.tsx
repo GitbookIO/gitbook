@@ -146,7 +146,7 @@ export const Button = React.forwardRef<
                     )
                 ) : null}
                 {iconOnly || (!children && !label) ? null : (
-                    <span className="button-content shrink grow truncate">{children ?? label}</span>
+                    <span className="button-content truncate">{children ?? label}</span>
                 )}
             </>
         );

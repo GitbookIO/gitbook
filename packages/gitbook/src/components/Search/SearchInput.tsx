@@ -72,7 +72,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         'has-[input:focus]:-translate-y-px h-9 grow cursor-pointer px-2.5 has-[input:focus]:bg-tint-base has-[input:focus]:depth-subtle:shadow-lg has-[input:focus]:depth-subtle:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
                         'theme-bold:border-header-link/3 has-[input:focus-visible]:theme-bold:border-header-link/5 has-[input:focus-visible]:theme-bold:bg-header-link/3 has-[input:focus-visible]:theme-bold:ring-header-link/5',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
-                        'relative z-30 shrink grow justify-start max-md:absolute max-md:right-0',
+                        'relative z-30 max-w-none shrink grow justify-start max-md:absolute max-md:right-0',
                         isOpen ? 'max-md:w-56' : 'max-md:w-[38px]'
                     )}
                 >
