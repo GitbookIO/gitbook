@@ -5,6 +5,7 @@ export const pt_br = {
     stability_experimental: 'Experimental',
     stability_alpha: 'Alfa',
     stability_beta: 'Beta',
+    discriminator: 'Discriminador',
     copy_to_clipboard: 'Copiar para a área de transferência',
     copied: 'Copiado',
     no_content: 'Sem conteúdo',

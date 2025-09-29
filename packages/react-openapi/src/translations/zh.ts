@@ -5,6 +5,7 @@ export const zh = {
     stability_experimental: '实验性',
     stability_alpha: 'Alpha',
     stability_beta: 'Beta',
+    discriminator: '判别器',
     copy_to_clipboard: '复制到剪贴板',
     copied: '已复制',
     no_content: '无内容',
