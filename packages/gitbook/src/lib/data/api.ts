@@ -344,7 +344,7 @@ const getRevisionPageDocument = cache(
                         params.revisionId,
                         params.pageId,
                         {
-                            evaluated: true,
+                            evaluated: 'deterministic-only',
                         },
                         {
                             ...noCacheFetchOptions,
@@ -377,7 +377,7 @@ const getRevisionReusableContentDocument = cache(
                         params.revisionId,
                         params.reusableContentId,
                         {
-                            evaluated: true,
+                            evaluated: 'deterministic-only',
                         },
                         {
                             ...noCacheFetchOptions,
