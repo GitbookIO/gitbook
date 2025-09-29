@@ -192,7 +192,7 @@
 .openapi-schema-name {
     /* To make double click on the property name select only the name,
     we disable selection on the parent and re-enable it on the children. */
-    @apply select-none text-sm text-balance *:whitespace-nowrap flex flex-wrap gap-y-1.5 gap-x-2.5;
+    @apply select-none text-sm text-balance *:whitespace-nowrap flex flex-wrap gap-y-1.5 gap-x-2.5 items-center;
 }
 
 .openapi-schema-name .openapi-deprecated {
