@@ -137,7 +137,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'flex',
                         'flex-col',
                         'lg:flex-row',
-                        'justify-center',
+                        'lg:justify-center',
                         CONTAINER_STYLE,
                         'site-width-wide:max-w-full',
 
