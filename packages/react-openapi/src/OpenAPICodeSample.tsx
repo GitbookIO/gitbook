@@ -5,12 +5,16 @@ import {
 } from './OpenAPICodeSampleInteractive';
 import { OpenAPICodeSampleBody } from './OpenAPICodeSampleSelector';
 import { ScalarApiButton } from './ScalarApiButton';
-import { type CodeSampleGenerator, codeSampleGenerators } from './code-samples';
+import { type CodeSampleGenerator, codeSampleGenerators, parseHostAndPath } from './code-samples';
 import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
+import {
+    resolvePrefillCodePlaceholderFromSecurityScheme,
+    resolveURLWithPrefillCodePlaceholdersFromServer,
+} from './util/tryit-prefill';
 import { checkIsReference, extractOperationSecurityInfo } from './utils';
 
 const CUSTOM_CODE_SAMPLES_KEYS = ['x-custom-examples', 'x-code-samples', 'x-codeSamples'] as const;
@@ -100,10 +104,15 @@ function generateCodeSamples(props: {
         ? data.operation.requestBody
         : undefined;
 
-    const url =
-        getDefaultServerURL(data.servers) +
-        data.path +
-        (searchParams.size ? `?${searchParams.toString()}` : '');
+    const defaultServerUrl = getDefaultServerURL(data.servers);
+    let serverUrlPath = defaultServerUrl ? parseHostAndPath(defaultServerUrl).path : '';
+    serverUrlPath = serverUrlPath === '/' ? '' : serverUrlPath;
+    const serverUrl = data.servers[0]
+        ? resolveURLWithPrefillCodePlaceholdersFromServer(data.servers[0], defaultServerUrl)
+        : defaultServerUrl;
+    const serverUrlOrigin = serverUrl.replaceAll(serverUrlPath, '');
+    const path =
+        serverUrlPath + data.path + (searchParams.size ? `?${searchParams.toString()}` : '');
 
     const genericHeaders = {
         ...getSecurityHeaders({
@@ -124,7 +133,7 @@ function generateCodeSamples(props: {
                     mediaType,
                     element: context.renderCodeBlock({
                         code: generator.generate({
-                            url,
+                            url: { origin: serverUrlOrigin, path },
                             method: data.method,
                             body: undefined,
                             headers: mediaTypeHeaders,
@@ -137,7 +146,7 @@ function generateCodeSamples(props: {
                         example,
                         element: context.renderCodeBlock({
                             code: generator.generate({
-                                url,
+                                url: { origin: serverUrlOrigin, path },
                                 method: data.method,
                                 body: example.value,
                                 headers: mediaTypeHeaders,
@@ -174,7 +183,7 @@ function generateCodeSamples(props: {
             label: generator.label,
             body: context.renderCodeBlock({
                 code: generator.generate({
-                    url,
+                    url: { origin: serverUrlOrigin, path },
                     method: data.method,
                     body: undefined,
                     headers: genericHeaders,
@@ -306,13 +315,17 @@ function getSecurityHeaders(args: {
         switch (security.type) {
             case 'http': {
                 let scheme = security.scheme;
-                let format = security.bearerFormat ?? 'YOUR_SECRET_TOKEN';
+                const format = resolvePrefillCodePlaceholderFromSecurityScheme({
+                    security: security,
+                    defaultPlaceholderValue: scheme?.includes('basic')
+                        ? 'username:password'
+                        : 'YOUR_SECRET_TOKEN',
+                });
 
                 if (scheme?.includes('bearer')) {
                     scheme = 'Bearer';
                 } else if (scheme?.includes('basic')) {
                     scheme = 'Basic';
-                    format = 'username:password';
                 } else if (scheme?.includes('token')) {
                     scheme = 'Token';
                 }
@@ -324,14 +337,18 @@ function getSecurityHeaders(args: {
                 if (security.in !== 'header') {
                     break;
                 }
-
                 const name = security.name ?? 'Authorization';
-                headers[name] = 'YOUR_API_KEY';
-
+                headers[name] = resolvePrefillCodePlaceholderFromSecurityScheme({
+                    security: security,
+                    defaultPlaceholderValue: 'YOUR_API_KEY',
+                });
                 break;
             }
             case 'oauth2': {
-                headers.Authorization = 'Bearer YOUR_OAUTH2_TOKEN';
+                headers.Authorization = `Bearer ${resolvePrefillCodePlaceholderFromSecurityScheme({
+                    security: security,
+                    defaultPlaceholderValue: 'YOUR_OAUTH2_TOKEN',
+                })}`;
                 break;
             }
             default: {
@@ -339,7 +356,6 @@ function getSecurityHeaders(args: {
             }
         }
     }
-
     return headers;
 }
 
