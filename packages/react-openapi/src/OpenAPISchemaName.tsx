@@ -7,6 +7,7 @@ interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
     propertyName?: string | React.JSX.Element;
     required?: boolean | null;
+    isDiscriminatorProperty?: boolean;
     type?: string;
     context: OpenAPIClientContext;
 }
@@ -16,7 +17,7 @@ interface OpenAPISchemaNameProps {
  * It includes the property name, type, required and deprecated status.
  */
 export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
-    const { schema, type, propertyName, required, context } = props;
+    const { schema, type, propertyName, required, isDiscriminatorProperty, context } = props;
 
     const additionalItems = schema && getAdditionalItems(schema, context);
 
@@ -27,9 +28,18 @@ export function OpenAPISchemaName(props: OpenAPISchemaNameProps) {
                     {propertyName}
                 </span>
             ) : null}
+            {isDiscriminatorProperty ? (
+                <span className="openapi-schema-discriminator">
+                    {t(context.translation, 'discriminator')}
+                </span>
+            ) : null}
             {type || additionalItems ? (
                 <span>
-                    {type ? <span className="openapi-schema-type">{type}</span> : null}
+                    {schema?.const ? (
+                        <span className="openapi-schema-type">const: {schema?.const}</span>
+                    ) : type ? (
+                        <span className="openapi-schema-type">{type}</span>
+                    ) : null}
                     {additionalItems ? (
                         <span className="openapi-schema-type">{additionalItems}</span>
                     ) : null}
