@@ -25,7 +25,13 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 align === 'right' && 'justify-end',
                 align === 'left' && 'justify-start',
                 hasMultipleImages && ['grid', 'grid-flow-col'],
-                withFrame && ['rounded-2xl', 'border', 'border-neutral']
+                withFrame && [
+                    'rounded-2xl',
+                    'border',
+                    'border-neutral',
+                    'relative',
+                    'overflow-hidden',
+                ]
             )}
         >
             {block.nodes.map((node: any, _i: number) => (
@@ -85,13 +91,16 @@ async function ImageBlock(props: {
             {withFrame && (
                 <div
                     className={tcls(
+                        'absolute',
                         '-top-0.5',
                         '-left-0.5',
-                        'absolute',
-                        'inset-px',
+                        'right-px',
+                        'bottom-px',
                         'opacity-50',
+                        'dark:opacity-20',
                         'bg-[length:24px_24px,24px_24px]',
                         'bg-[linear-gradient(to_right,_rgb(234,235,238)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(234,235,238)_1px,_transparent_1px)]',
+                        'dark:bg-[linear-gradient(to_right,_rgb(122,128,139)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(122,128,139)_1px,_transparent_1px)]',
                         'bg-repeat'
                     )}
                 />
@@ -102,8 +111,8 @@ async function ImageBlock(props: {
                 <div
                     className={tcls(
                         'pointer-events-none absolute inset-0 rounded-2xl',
-                        'shadow-[inset_0_0_10px_7px_rgba(255,255,255,0.9)]',
-                        'dark:shadow-[inset_0_0_10px_7px_rgba(21,23,28,0.9)]'
+                        'shadow-[inset_0_0_10px_10px_rgb(255,255,255)]',
+                        'dark:shadow-[inset_0_0_10px_10px_rgb(21,23,28)]'
                     )}
                 />
             )}
