@@ -110,7 +110,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                                 'opacity-8',
                                 'contrast-more:opacity-11',
 
-                                'sidebar-list-default:rounded-l-none',
+                                'sidebar-list-default:rounded-l-none!',
                                 'sidebar-list-default:border-l',
                                 'sidebar-list-default:border-tint',
                             ],
