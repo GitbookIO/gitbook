@@ -28,7 +28,8 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 withFrame && [
                     'rounded-2xl',
                     'border',
-                    'border-neutral',
+                    'border-[rgb(234,235,238)]',
+                    'dark:border-[rgb(45,50,58)]',
                     'relative',
                     'overflow-hidden',
                 ]
@@ -96,8 +97,8 @@ async function ImageBlock(props: {
                         '-left-0.5',
                         'right-px',
                         'bottom-px',
-                        'opacity-50',
-                        'dark:opacity-20',
+                        'opacity-40',
+                        'dark:opacity-[0.1]',
                         'bg-[length:24px_24px,24px_24px]',
                         'bg-[linear-gradient(to_right,_rgb(234,235,238)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(234,235,238)_1px,_transparent_1px)]',
                         'dark:bg-[linear-gradient(to_right,_rgb(122,128,139)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(122,128,139)_1px,_transparent_1px)]',
@@ -111,8 +112,8 @@ async function ImageBlock(props: {
                 <div
                     className={tcls(
                         'pointer-events-none absolute inset-0 rounded-2xl',
-                        'shadow-[inset_0_0_10px_10px_rgb(255,255,255)]',
-                        'dark:shadow-[inset_0_0_10px_10px_rgb(21,23,28)]'
+                        'shadow-[inset_0_0_10px_10px_rgba(255,255,255,0.9)]',
+                        'dark:shadow-[inset_0_0_10px_10px_rgb(29,29,29)]'
                     )}
                 />
             )}
