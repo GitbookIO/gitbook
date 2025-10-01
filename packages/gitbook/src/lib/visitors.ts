@@ -454,7 +454,7 @@ export function serveVisitorClaimsDataRequest(request: NextRequest, siteRequestU
     });
 
     if (!visitorToken && !Object.keys(unsignedClaims).length) {
-        return NextResponse.json({});
+        return NextResponse.json({ visitor: { claims: { unsigned: {} } } });
     }
 
     const visitorClaims = {
