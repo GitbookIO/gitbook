@@ -11,8 +11,8 @@ import type { DocumentContext } from './DocumentView';
 export function Images(props: BlockProps<DocumentBlockImages>) {
     const { document, block, style, context, isEstimatedOffscreen } = props;
 
-    const isMultipleImages = block.nodes.length > 1;
-    const { align = 'center' } = block.data;
+    const hasMultipleImages = block.nodes.length > 1;
+    const { align = 'center', withFrame } = block.data;
 
     return (
         <div
@@ -24,7 +24,15 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                 align === 'center' && 'justify-center',
                 align === 'right' && 'justify-end',
                 align === 'left' && 'justify-start',
-                isMultipleImages && ['grid', 'grid-flow-col']
+                hasMultipleImages && ['grid', 'grid-flow-col'],
+                withFrame && [
+                    'rounded-2xl',
+                    'border',
+                    'border-[rgb(234,235,238)]',
+                    'dark:border-[rgb(45,50,58)]',
+                    'relative',
+                    'overflow-hidden',
+                ]
             )}
         >
             {block.nodes.map((node: any, _i: number) => (
@@ -36,6 +44,7 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
                     siblings={block.nodes.length}
                     context={context}
                     isEstimatedOffscreen={isEstimatedOffscreen}
+                    withFrame={withFrame}
                 />
             ))}
         </div>
@@ -62,8 +71,9 @@ async function ImageBlock(props: {
     context: DocumentContext;
     siblings: number;
     isEstimatedOffscreen: boolean;
+    withFrame?: boolean;
 }) {
-    const { block, context, isEstimatedOffscreen } = props;
+    const { block, context, isEstimatedOffscreen, withFrame } = props;
 
     const [src, darkSrc] = await Promise.all([
         context.contentContext ? resolveContentRef(block.data.ref, context.contentContext) : null,
@@ -77,33 +87,66 @@ async function ImageBlock(props: {
     }
 
     return (
-        <Caption {...props} fit>
-            <Image
-                alt={block.data.alt ?? ''}
-                sizes={imageBlockSizes}
-                resize={context.contentContext?.imageResizer}
-                sources={{
-                    light: {
-                        src: src.href,
-                        size: src.file?.dimensions,
-                    },
-                    dark: darkSrc
-                        ? {
-                              src: darkSrc.href,
-                              size: darkSrc.file?.dimensions,
-                          }
-                        : null,
-                }}
-                priority={isEstimatedOffscreen ? 'lazy' : 'high'}
-                preload
-                zoom
-                inlineStyle={{
-                    maxWidth: '100%',
-                    width: getImageDimension(block.data.width, undefined),
-                    height: getImageDimension(block.data.height, 'auto'),
-                }}
-            />
-        </Caption>
+        <div className={tcls('relative', 'overflow-hidden')}>
+            {/* Frame grid */}
+            {withFrame && (
+                <div
+                    className={tcls(
+                        'absolute',
+                        '-top-0.5',
+                        '-left-0.5',
+                        'right-px',
+                        'bottom-px',
+                        'opacity-40',
+                        'dark:opacity-[0.1]',
+                        'bg-[length:24px_24px,24px_24px]',
+                        'bg-[linear-gradient(to_right,_rgb(234,235,238)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(234,235,238)_1px,_transparent_1px)]',
+                        'dark:bg-[linear-gradient(to_right,_rgb(122,128,139)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(122,128,139)_1px,_transparent_1px)]',
+                        'bg-repeat'
+                    )}
+                />
+            )}
+
+            {/* Shadow overlay */}
+            {withFrame && (
+                <div
+                    className={tcls(
+                        'pointer-events-none absolute inset-0 rounded-2xl',
+                        'shadow-[inset_0_0_10px_10px_rgba(255,255,255,0.9)]',
+                        'dark:shadow-[inset_0_0_10px_10px_rgb(29,29,29)]'
+                    )}
+                />
+            )}
+
+            <Caption {...props} fit>
+                <Image
+                    alt={block.data.alt ?? ''}
+                    sizes={imageBlockSizes}
+                    resize={context.contentContext?.imageResizer}
+                    sources={{
+                        light: {
+                            src: src.href,
+                            size: src.file?.dimensions,
+                        },
+                        dark: darkSrc
+                            ? {
+                                  src: darkSrc.href,
+                                  size: darkSrc.file?.dimensions,
+                              }
+                            : null,
+                    }}
+                    priority={isEstimatedOffscreen ? 'lazy' : 'high'}
+                    preload
+                    zoom
+                    inlineStyle={{
+                        maxWidth: '100%',
+                        width: getImageDimension(block.data.width, undefined),
+                        height: getImageDimension(block.data.height, 'auto'),
+                    }}
+                    style={withFrame ? 'rounded-xl' : undefined}
+                />
+            </Caption>
+        </div>
     );
 }
 
