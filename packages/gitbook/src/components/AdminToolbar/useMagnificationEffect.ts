@@ -37,7 +37,9 @@ const createMotionValues = (count: number): ButtonMotionValues[] =>
         x: motionValue(0),
     }));
 
-const resetMotionValues = (motionValues: ButtonMotionValues[]) => {
+const resetMotionValues = (
+    motionValues: Array<{ scale: MotionValue<number>; x: MotionValue<number> }>
+) => {
     motionValues.forEach(({ scale, x }) => {
         scale.set(1);
         x.set(0);
@@ -68,17 +70,14 @@ const calculateScale = (
     containerRect: DOMRect,
     config: Required<MagnificationConfig>
 ) => {
-    // Calculate 2D distance from mouse to button center
-    const deltaX = mouseX - buttonCenterX;
-    const deltaY = mouseY - buttonCenterY;
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    // Calculate only X-axis distance from mouse to button center
+    const distance = Math.abs(mouseX - buttonCenterX);
 
     if (distance > config.influenceRadius) return 1;
 
-    // Calculate distance from container edge
+    // Calculate distance from container edge (X-axis only)
     const distanceFromEdgeX = Math.min(mouseX - containerRect.left, containerRect.right - mouseX);
-    const distanceFromEdgeY = Math.min(mouseY - containerRect.top, containerRect.bottom - mouseY);
-    const distanceFromEdge = Math.min(distanceFromEdgeX, distanceFromEdgeY);
+    const distanceFromEdge = distanceFromEdgeX;
 
     // Define the "heart" zone - 8px from center (16x16px total area)
     const heartZoneRadius = 8;
@@ -155,12 +154,19 @@ export function useMagnificationEffect(props: {
     config?: MagnificationConfig;
 }) {
     const { childrenCount, containerRef, config } = props;
-    const [buttonMotionValues, setButtonMotionValues] = React.useState<ButtonMotionValues[]>([]);
     const originalPositionsRef = React.useRef<
         Array<{ left: number; width: number; top: number; height: number }>
     >([]);
 
     const finalConfig = React.useMemo(() => ({ ...defaultConfig, ...config }), [config]);
+
+    // Create basic motion values that will be consumed by springs in the components
+    const buttonMotionValues = React.useMemo(() => {
+        return Array.from({ length: childrenCount }, () => ({
+            scale: motionValue(1),
+            x: motionValue(0),
+        }));
+    }, [childrenCount]);
 
     React.useEffect(() => {
         const container = containerRef.current;
@@ -173,11 +179,6 @@ export function useMagnificationEffect(props: {
                 `Button count (${buttons.length}) does not match children count (${childrenCount})`
             );
             return;
-        }
-
-        // Initialize motion values if button count changed
-        if (buttonMotionValues.length !== buttons.length) {
-            setButtonMotionValues(createMotionValues(buttons.length));
         }
 
         const handleMouseMove = (event: MouseEvent) => {
@@ -233,7 +234,7 @@ export function useMagnificationEffect(props: {
                 );
             });
 
-            // Update motion values
+            // Update motion values - springs in components will animate to these values
             buttonEffects.forEach((effect, index) => {
                 const motionValue = buttonMotionValues[index];
                 if (motionValue) {

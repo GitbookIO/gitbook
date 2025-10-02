@@ -5,6 +5,7 @@
         "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.27.12",
         "turbo": "^2.5.0",
+        "tweakpane": "^4.0.4",
         "vercel": "^39.3.0"
     },
     "packageManager": "bun@1.2.15",

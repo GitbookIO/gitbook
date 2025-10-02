@@ -17,5 +17,7 @@
     },
     "[typescript]": {
         "editor.defaultFormatter": "biomejs.biome"
-    }
+    },
+    "chatgpt.openOnStartup": true,
+    "chatgpt.commentCodeLensEnabled": false
 }

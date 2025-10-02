@@ -1,10 +1,13 @@
 'use client';
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React from 'react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
 import { DateRelative } from '../primitives';
+import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
 import {
@@ -21,7 +24,50 @@ import type { AdminToolbarClientProps } from './types';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const { context } = props;
+    const [minified, setMinified] = React.useState(true);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
     const visitorSession = useVisitorSession();
+    const [sessionClosed, setSessionClosed] = React.useState(false);
+    const [shouldHide, setShouldHide] = React.useState(false);
+
+    React.useEffect(() => {
+        const uiParam = searchParams?.get('ui');
+        const STORAGE_KEY = 'gitbook_toolbar_closed';
+
+        if (uiParam === 'true' || uiParam === '1') {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch {}
+
+            try {
+                const params = new URLSearchParams(searchParams?.toString() || '');
+                params.delete('ui');
+                const qs = params.toString();
+                router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+            } catch {}
+
+            setShouldHide(false);
+            return;
+        }
+
+        if (uiParam === 'false' || uiParam === '0') {
+            setShouldHide(true);
+            return;
+        }
+
+        try {
+            const hidden = !!localStorage.getItem(STORAGE_KEY);
+            setShouldHide(hidden);
+        } catch {
+            setShouldHide(false);
+        }
+    }, [pathname, router, searchParams]);
+
+    if (shouldHide || sessionClosed) {
+        return null;
+    }
 
     // If there is a change request, show the change request toolbar
     if (context.changeRequest) {
@@ -50,7 +96,17 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         return (
             <IframeWrapper>
                 <MotionConfig reducedMotion="user">
-                    <AuthenticatedUserToolbar context={context} />
+                    <AuthenticatedUserToolbar
+                        context={context}
+                        onSessionClose={() => setSessionClosed(true)}
+                        onPersistentClose={() => {
+                            try {
+                                localStorage.setItem('gitbook_toolbar_closed', '1');
+                            } catch {}
+                            setSessionClosed(true);
+                        }}
+                        onToggleMinify={() => setMinified((prev) => !prev)}
+                    />
                 </MotionConfig>
             </IframeWrapper>
         );
@@ -74,8 +130,8 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
         <Toolbar label="Site preview">
             <ToolbarBody>
                 <ToolbarTitle
-                    prefix="Change request"
-                    suffix={`#${changeRequest.number} ${changeRequest.subject || 'Untitled'}`}
+                    prefix={`Change #${changeRequest.number}:`}
+                    suffix={`${changeRequest.subject || 'Untitled'}`}
                 />
                 <ToolbarSubtitle
                     subtitle={
@@ -91,6 +147,10 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
             <ToolbarButtonGroup>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
+
+                {/* Edit in GitBook */}
+                <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
+
                 {/* Comment in app */}
                 <ToolbarButton
                     title="Comment in a GitBook"
@@ -125,9 +185,6 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="code-pull-request"
                 />
-
-                {/* Edit in GitBook */}
-                <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
             </ToolbarButtonGroup>
         </Toolbar>
     );
@@ -220,7 +277,7 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
     return (
         <Toolbar label="Only visible to your GitBook organization">
             <ToolbarBody>
-                <ToolbarTitle prefix="Site" suffix={context.site.title} />
+                <ToolbarTitle suffix={context.site.title} />
                 <ToolbarSubtitle
                     subtitle={
                         <>
@@ -233,6 +290,11 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
             <ToolbarButtonGroup>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
+
+                {/* Edit in GitBook */}
+                <EditPageButton href={space.urls.app} siteId={site.id} />
+
+                {/* Open site in GitBook */}
                 <ToolbarButton
                     title="Open site in GitBook"
                     href={getToolbarHref({
@@ -240,8 +302,10 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                         siteId: site.id,
                         buttonId: 'site',
                     })}
-                    icon="gear"
+                    icon="gears"
                 />
+
+                {/* Customize in GitBook */}
                 <ToolbarButton
                     title="Customize in GitBook"
                     href={getToolbarHref({
@@ -251,6 +315,8 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="palette"
                 />
+
+                {/* Open insights in GitBook */}
                 <ToolbarButton
                     title="Open insights in GitBook"
                     href={getToolbarHref({
@@ -260,7 +326,19 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="chart-simple"
                 />
-                <EditPageButton href={space.urls.app} siteId={site.id} />
+
+                {/* Toolbar settings */}
+                <HideToolbarButton
+                    onSessionClose={() => {
+                        props.onSessionClose?.();
+                    }}
+                    onPersistentClose={() => {
+                        props.onPersistentClose?.();
+                    }}
+                    onMinify={() => {
+                        props.onToggleMinify?.();
+                    }}
+                />
             </ToolbarButtonGroup>
         </Toolbar>
     );

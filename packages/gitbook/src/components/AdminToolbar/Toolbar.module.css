@@ -1,0 +1,50 @@
+.arcMenu {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.arcMenuPath {
+    position: absolute;
+    bottom: calc(var(--arc-height) / -2);
+    left: 0;
+    width: var(--arc-width);
+    height: var(--arc-height);
+    border-radius: var(--arc-radius);
+    transform: translate(0%, 0%);
+    pointer-events: none;
+    overflow: visible;
+}
+
+.arcMenuItem {
+    animation-name: hide-toolbar-arc-enter;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: forwards;
+    animation-duration: var(--arc-duration, 0.4s);
+    animation-delay: var(--arc-delay, 0s);
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: center left;
+    opacity: 0;
+    offset-path: border-box;
+    offset-anchor: 0% 0%;
+    offset-rotate: auto var(--rotation-offset, 0deg);
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@keyframes hide-toolbar-arc-enter {
+    from {
+        offset-distance: var(--start-distance);
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        offset-distance: var(--target-offset-distance);
+        transform: scale(1);
+        opacity: 1;
+    }
+}
