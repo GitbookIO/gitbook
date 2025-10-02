@@ -70,7 +70,7 @@ export function Caption(
                     'text-xs',
                     'text-center',
                     'text-tint',
-                    withFrame ? 'mt-0.5 mb-2.5' : 'mt-2.5'
+                    withFrame ? 'mt-0.5 mb-2.5' : 'mt-2'
                 )}
             >
                 <Inlines
