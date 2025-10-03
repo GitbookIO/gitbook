@@ -1,19 +1,17 @@
 .arcMenu {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+    --arc-width: 505px;
+    --arc-height: 400px;
+    --arc-radius: 34%;
+    --start-distance: -240px;
+    --spread-distance: 45px;
 }
 
 .arcMenuPath {
-    position: absolute;
     bottom: calc(var(--arc-height) / -2);
-    left: 0;
     width: var(--arc-width);
     height: var(--arc-height);
     border-radius: var(--arc-radius);
     transform: translate(0%, 0%);
-    pointer-events: none;
-    overflow: visible;
 }
 
 .arcMenuItem {
@@ -22,18 +20,10 @@
     animation-fill-mode: forwards;
     animation-duration: var(--arc-duration, 0.4s);
     animation-delay: var(--arc-delay, 0s);
-    position: absolute;
-    top: 0;
-    left: 0;
     transform-origin: center left;
-    opacity: 0;
     offset-path: border-box;
     offset-anchor: 0% 0%;
     offset-rotate: auto var(--rotation-offset, 0deg);
-    pointer-events: auto;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 @keyframes hide-toolbar-arc-enter {

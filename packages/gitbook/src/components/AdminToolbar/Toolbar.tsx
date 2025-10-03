@@ -20,14 +20,12 @@ const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
 
 interface ToolbarProps {
     children: React.ReactNode;
-    label: React.ReactNode;
+    minified: boolean;
+    onMinifiedChange: (value: boolean) => void;
 }
 
 export function Toolbar(props: ToolbarProps) {
-    const { children, label } = props;
-    const [minified, setMinified] = React.useState(true);
-    const [closed, setClosed] = React.useState(false);
-    const [showToolbarControls, setShowToolbarControls] = React.useState(false);
+    const { children, minified, onMinifiedChange } = props;
     const [isReady, setIsReady] = React.useState(false);
 
     // Wait for page to be ready, then show the toolbar
@@ -46,31 +44,29 @@ export function Toolbar(props: ToolbarProps) {
 
     // After toolbar appears, wait then show the full content
     React.useEffect(() => {
-        if (isReady) {
-            const expandAfterTimeout = setTimeout(() => {
-                setMinified(false);
-            }, DURATION_LOGO_APPEARANCE + DELAY_BETWEEN_LOGO_AND_CONTENT);
-
-            return () => clearTimeout(expandAfterTimeout);
+        if (!isReady) {
+            return;
         }
-    }, [isReady]);
+
+        const expandAfterTimeout = setTimeout(() => {
+            onMinifiedChange(false);
+        }, DURATION_LOGO_APPEARANCE + DELAY_BETWEEN_LOGO_AND_CONTENT);
+
+        return () => clearTimeout(expandAfterTimeout);
+    }, [isReady, onMinifiedChange]);
 
     // Don't render anything until page is ready
-    if (!isReady || closed) {
+    if (!isReady) {
         return null;
     }
 
     return (
-        <motion.div
-            onMouseEnter={() => setShowToolbarControls(true)}
-            onMouseLeave={() => setShowToolbarControls(false)}
-            className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4"
-        >
+        <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
             <AnimatePresence mode="wait">
                 <motion.div
                     onClick={() => {
                         if (minified) {
-                            setMinified((prev) => !prev);
+                            onMinifiedChange(false);
                         }
                     }}
                     layout
@@ -84,11 +80,10 @@ export function Toolbar(props: ToolbarProps) {
                         'min-w-12',
                         'h-12',
                         'py-2',
-                        'border-tint-1/3',
                         'backdrop-blur-sm',
                         'origin-center',
-                        'bg-[linear-gradient(110deg,rgba(20,23,28,0.90)_0%,rgba(20,23,28,0.89)_100%)]',
-                        'dark:bg-[linear-gradient(110deg,rgba(256,256,256,0.90)_0%,rgba(256,256,256,0.80)_100%)]'
+                        'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
+                        'bg-[linear-gradient(45deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.2)_100%)]'
                     )}
                     initial={{
                         scale: 1,
@@ -97,9 +92,6 @@ export function Toolbar(props: ToolbarProps) {
                     animate={{
                         scale: 1,
                         opacity: 1,
-                        boxShadow: minified
-                            ? '0 4px 40px 8px rgba(0, 0, 0, .2), 0 0 0 .5px rgba(0, 0, 0, .4), inset 0 .5px 0 0 hsla(0, 0%, 100%, .15)'
-                            : '0 4px 40px 8px rgba(0, 0, 0, .4), 0 0 0 .5px rgba(0, 0, 0, .8), inset 0 .5px 0 0 hsla(0, 0%, 100%, .3)',
                     }}
                     style={{
                         borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
@@ -165,7 +157,7 @@ export interface ToolbarButtonProps extends Omit<React.HTMLProps<HTMLAnchorEleme
     children?: React.ReactNode;
 }
 
-export function ToolbarButton(props: ToolbarButtonProps) {
+export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps>((props, ref) => {
     const {
         title,
         disabled,
@@ -181,7 +173,7 @@ export function ToolbarButton(props: ToolbarButtonProps) {
     const reduceMotion = useReducedMotion();
 
     return (
-        <motion.div variants={toolbarEasings.staggeringChild} className="relative">
+        <motion.div variants={toolbarEasings.staggeringChild} className="relative" ref={ref}>
             {children ? children : null}
             <Tooltip label={title}>
                 <motion.a
@@ -200,7 +192,6 @@ export function ToolbarButton(props: ToolbarButtonProps) {
                                   ...style,
                                   background: 'linear-gradient(rgb(51, 53, 57), rgb(50, 52, 56))',
                                   boxShadow: 'rgba(255, 255, 255, 0.15) 0px 1px 1px 0px inset',
-                                  outline: 'unset',
                                   border: '1px solid rgba(0, 0, 0, 0.06)',
                               }
                     }
@@ -219,35 +210,30 @@ export function ToolbarButton(props: ToolbarButtonProps) {
                         'gap-1',
                         'text-sm',
                         'rounded-full',
-                        'border-neutral-500',
-                        'outline-neutral-800',
-                        'outline-1',
-                        'border',
                         'truncate',
                         'text-tint-1',
                         'dark:text-tint-12',
                         'cursor-pointer',
                         'transition-colors',
                         'size-8',
-                        disabled ? 'cursor-not-allowed opacity-50' : '',
-                        'shadow-1xs'
+                        disabled ? 'cursor-not-allowed opacity-50' : ''
                     )}
                 >
-                    <div
-                        className="flex items-center justify-center rounded-full p-1"
-                        style={{ background: 'linear-gradient(rgb(50, 52, 56), rgb(51, 53, 57))' }}
-                    >
-                        <Icon
-                            icon={icon}
-                            iconStyle={IconStyle.Solid}
-                            className={tcls('size-4', iconClassName)}
-                        />
-                    </div>
+                    <Icon
+                        icon={icon}
+                        iconStyle={IconStyle.Solid}
+                        className={tcls(
+                            'size-4 shrink-0 group-hover:scale-110 group-hover:text-tint-3',
+                            iconClassName
+                        )}
+                    />
                 </motion.a>
             </Tooltip>
         </motion.div>
     );
-}
+});
+
+ToolbarButton.displayName = 'ToolbarButton';
 
 function ToolbarButtonWrapper(props: {
     child: React.ReactElement;
@@ -300,10 +286,7 @@ export function ToolbarTitle(props: { prefix?: string; suffix: string }) {
 
 function ToolbarTitlePrefix(props: { title: string }) {
     return (
-        <motion.span
-            {...getCopyVariants(0)}
-            className="truncate font-medium text-neutral-3 dark:text-neutral-2"
-        >
+        <motion.span {...getCopyVariants(0)} className="truncate font-medium text-neutral-12">
             {props.title}
         </motion.span>
     );
@@ -311,10 +294,7 @@ function ToolbarTitlePrefix(props: { title: string }) {
 
 function ToolbarTitleSuffix(props: { title: string }) {
     return (
-        <motion.span
-            {...getCopyVariants(1)}
-            className="max-w-[20ch] truncate text-neutral-3 dark:text-neutral-2"
-        >
+        <motion.span {...getCopyVariants(1)} className="max-w-[20ch] truncate text-neutral-12">
             {props.title}
         </motion.span>
     );
@@ -322,10 +302,7 @@ function ToolbarTitleSuffix(props: { title: string }) {
 
 export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
     return (
-        <motion.span
-            {...getCopyVariants(1)}
-            className="text-neutral-7 text-xxs dark:text-neutral-2"
-        >
+        <motion.span {...getCopyVariants(1)} className="text-neutral-12/90 text-xxs">
             {props.subtitle}
         </motion.span>
     );

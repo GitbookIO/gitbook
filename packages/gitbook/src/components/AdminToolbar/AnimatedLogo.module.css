@@ -1,9 +1,9 @@
 .svgLogo {
-  --logo-fill: var(--color-neutral-100);
+  --logo-fill: var(--color-neutral-900);
   --seg-A-color: #2782c4;
   --seg-B-color: #43b7f2;
   --seg-C-color: #8be2ff;
-  --trace-color: #46474c;
+  --trace-color: #dedfe3;
 
 
   --T: 2s;
@@ -12,8 +12,8 @@
 }
 
 :global(html.dark) .svgLogo {
-  --logo-fill: var(--color-neutral-800);
-  --trace-color: #dedfe3;
+  --logo-fill: var(--color-neutral-100);
+  --trace-color: #46474c;
 }
 
 /* Base segment animation */

@@ -1,12 +1,11 @@
 'use client';
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
-import { DateRelative } from '../primitives';
+import { DateRelative, Tooltip } from '../primitives';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
@@ -20,42 +19,18 @@ import {
     ToolbarSubtitle,
     ToolbarTitle,
 } from './Toolbar';
-import type { AdminToolbarClientProps } from './types';
+import { ToolbarControlsProvider } from './ToolbarControlsContext';
+import type { AdminToolbarClientProps, AdminToolbarContext } from './types';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
-    const { context } = props;
+    const { context, onPersistentClose, onSessionClose, onToggleMinify } = props;
     const [minified, setMinified] = React.useState(true);
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const pathname = usePathname();
     const visitorSession = useVisitorSession();
     const [sessionClosed, setSessionClosed] = React.useState(false);
     const [shouldHide, setShouldHide] = React.useState(false);
 
     React.useEffect(() => {
-        const uiParam = searchParams?.get('ui');
         const STORAGE_KEY = 'gitbook_toolbar_closed';
-
-        if (uiParam === 'true' || uiParam === '1') {
-            try {
-                localStorage.removeItem(STORAGE_KEY);
-            } catch {}
-
-            try {
-                const params = new URLSearchParams(searchParams?.toString() || '');
-                params.delete('ui');
-                const qs = params.toString();
-                router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-            } catch {}
-
-            setShouldHide(false);
-            return;
-        }
-
-        if (uiParam === 'false' || uiParam === '0') {
-            setShouldHide(true);
-            return;
-        }
 
         try {
             const hidden = !!localStorage.getItem(STORAGE_KEY);
@@ -63,7 +38,39 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
         } catch {
             setShouldHide(false);
         }
-    }, [pathname, router, searchParams]);
+    }, []);
+
+    const handleSessionClose = React.useCallback(() => {
+        setSessionClosed(true);
+        onSessionClose?.();
+    }, [onSessionClose]);
+
+    const handlePersistentClose = React.useCallback(() => {
+        try {
+            localStorage.setItem('gitbook_toolbar_closed', '1');
+        } catch {
+            console.error('Failed to close toolbar using local storage');
+        }
+        setSessionClosed(true);
+        onPersistentClose?.();
+    }, [onPersistentClose]);
+
+    const handleMinifiedChange = React.useCallback(
+        (value: boolean) => {
+            setMinified(value);
+            onToggleMinify?.();
+        },
+        [onToggleMinify]
+    );
+
+    const toolbarControls = React.useMemo(
+        () => ({
+            minimize: () => handleMinifiedChange(true),
+            closeSession: handleSessionClose,
+            closePersistent: handlePersistentClose,
+        }),
+        [handleMinifiedChange, handleSessionClose, handlePersistentClose]
+    );
 
     if (shouldHide || sessionClosed) {
         return null;
@@ -72,49 +79,63 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     // If there is a change request, show the change request toolbar
     if (context.changeRequest) {
         return (
-            <IframeWrapper>
-                <MotionConfig reducedMotion="user">
-                    <ChangeRequestToolbar context={context} />
-                </MotionConfig>
-            </IframeWrapper>
+            <ToolbarControlsProvider value={toolbarControls}>
+                <IframeWrapper>
+                    <MotionConfig reducedMotion="user">
+                        <ChangeRequestToolbar
+                            context={context}
+                            minified={minified}
+                            onMinifiedChange={handleMinifiedChange}
+                        />
+                    </MotionConfig>
+                </IframeWrapper>
+            </ToolbarControlsProvider>
         );
     }
 
     // If the revision is not the current revision, the user is looking at a previous version of the site, so show the revision toolbar
     if (context.revisionId !== context.space.revision) {
         return (
-            <IframeWrapper>
-                <MotionConfig reducedMotion="user">
-                    <RevisionToolbar context={context} />
-                </MotionConfig>
-            </IframeWrapper>
+            <ToolbarControlsProvider value={toolbarControls}>
+                <IframeWrapper>
+                    <MotionConfig reducedMotion="user">
+                        <RevisionToolbar
+                            context={context}
+                            minified={minified}
+                            onMinifiedChange={handleMinifiedChange}
+                        />
+                    </MotionConfig>
+                </IframeWrapper>
+            </ToolbarControlsProvider>
         );
     }
 
     // If the user is authenticated and part of the organization owning this site, show the authenticated user toolbar
     if (visitorSession?.organizationId === context.organizationId) {
         return (
-            <IframeWrapper>
-                <MotionConfig reducedMotion="user">
-                    <AuthenticatedUserToolbar
-                        context={context}
-                        onSessionClose={() => setSessionClosed(true)}
-                        onPersistentClose={() => {
-                            try {
-                                localStorage.setItem('gitbook_toolbar_closed', '1');
-                            } catch {}
-                            setSessionClosed(true);
-                        }}
-                        onToggleMinify={() => setMinified((prev) => !prev)}
-                    />
-                </MotionConfig>
-            </IframeWrapper>
+            <ToolbarControlsProvider value={toolbarControls}>
+                <IframeWrapper>
+                    <MotionConfig reducedMotion="user">
+                        <AuthenticatedUserToolbar
+                            context={context}
+                            minified={minified}
+                            onMinifiedChange={handleMinifiedChange}
+                        />
+                    </MotionConfig>
+                </IframeWrapper>
+            </ToolbarControlsProvider>
         );
     }
 }
 
-function ChangeRequestToolbar(props: AdminToolbarClientProps) {
-    const { context } = props;
+interface ToolbarViewProps {
+    context: AdminToolbarContext;
+    minified: boolean;
+    onMinifiedChange: (value: boolean) => void;
+}
+
+function ChangeRequestToolbar(props: ToolbarViewProps) {
+    const { context, minified, onMinifiedChange } = props;
     const { changeRequest, site } = context;
     if (!changeRequest) {
         throw new Error('Change request is not set');
@@ -127,7 +148,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
     });
 
     return (
-        <Toolbar label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
             <ToolbarBody>
                 <ToolbarTitle
                     prefix={`Change #${changeRequest.number}:`}
@@ -144,7 +165,7 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 
             <ToolbarSeparator />
 
-            <ToolbarButtonGroup>
+            <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
 
@@ -185,13 +206,13 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="code-pull-request"
                 />
-            </ToolbarButtonGroup>
+            </ToolbarActions>
         </Toolbar>
     );
 }
 
-function RevisionToolbar(props: AdminToolbarClientProps) {
-    const { context } = props;
+function RevisionToolbar(props: ToolbarViewProps) {
+    const { context, minified, onMinifiedChange } = props;
     const { revision, site } = context;
     if (!revision) {
         throw new Error('Revision is not set');
@@ -202,19 +223,21 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
     const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
-        <Toolbar label="Site preview">
-            <ToolbarBody>
-                <ToolbarTitle prefix="Site version" suffix={context.site.title} />
-                <ToolbarSubtitle
-                    subtitle={
-                        <>
-                            Created <DateRelative value={revision.createdAt} />
-                        </>
-                    }
-                />
-            </ToolbarBody>
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
+            <Tooltip label="Site preview">
+                <ToolbarBody>
+                    <ToolbarTitle prefix="Site version" suffix={context.site.title} />
+                    <ToolbarSubtitle
+                        subtitle={
+                            <>
+                                Created <DateRelative value={revision.createdAt} />
+                            </>
+                        }
+                    />
+                </ToolbarBody>
+            </Tooltip>
             <ToolbarSeparator />
-            <ToolbarButtonGroup>
+            <ToolbarActions>
                 {/* Open commit in Git client */}
                 <ToolbarButton
                     title={
@@ -262,32 +285,34 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="code-commit"
                 />
-            </ToolbarButtonGroup>
+            </ToolbarActions>
         </Toolbar>
     );
 }
 
-function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
-    const { context } = props;
+function AuthenticatedUserToolbar(props: ToolbarViewProps) {
+    const { context, minified, onMinifiedChange } = props;
     const { revision, space, site } = context;
     const { refreshForUpdates, updated } = useCheckForContentUpdate({
         revisionId: space.revision,
     });
 
     return (
-        <Toolbar label="Only visible to your GitBook organization">
-            <ToolbarBody>
-                <ToolbarTitle suffix={context.site.title} />
-                <ToolbarSubtitle
-                    subtitle={
-                        <>
-                            Updated <DateRelative value={revision.createdAt} />
-                        </>
-                    }
-                />
-            </ToolbarBody>
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
+            <Tooltip label="Site preview">
+                <ToolbarBody>
+                    <ToolbarTitle suffix={context.site.title} />
+                    <ToolbarSubtitle
+                        subtitle={
+                            <>
+                                Updated <DateRelative value={revision.createdAt} />
+                            </>
+                        }
+                    />
+                </ToolbarBody>
+            </Tooltip>
             <ToolbarSeparator />
-            <ToolbarButtonGroup>
+            <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
 
@@ -326,21 +351,19 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="chart-simple"
                 />
-
-                {/* Toolbar settings */}
-                <HideToolbarButton
-                    onSessionClose={() => {
-                        props.onSessionClose?.();
-                    }}
-                    onPersistentClose={() => {
-                        props.onPersistentClose?.();
-                    }}
-                    onMinify={() => {
-                        props.onToggleMinify?.();
-                    }}
-                />
-            </ToolbarButtonGroup>
+            </ToolbarActions>
         </Toolbar>
+    );
+}
+
+function ToolbarActions(props: { children: React.ReactNode }) {
+    const { children } = props;
+
+    return (
+        <ToolbarButtonGroup>
+            {children}
+            <HideToolbarButton />
+        </ToolbarButtonGroup>
     );
 }
 

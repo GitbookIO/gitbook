@@ -1,10 +1,5 @@
-import { type MotionValue, motionValue } from 'framer-motion';
+import { type MotionValue, motionValue } from 'motion/react';
 import React from 'react';
-
-interface ButtonMotionValues {
-    scale: MotionValue<number>;
-    x: MotionValue<number>;
-}
 
 interface MagnificationConfig {
     /** Size of each button in pixels - used for spacing calculations */
@@ -29,13 +24,6 @@ const defaultConfig: Required<MagnificationConfig> = {
     scaleExponent: 2.5, // Exponential curve for dramatic close-range scaling
     padding: 10, // Small buffer zone around container edges
 };
-
-// Helper functions for cleaner code
-const createMotionValues = (count: number): ButtonMotionValues[] =>
-    Array.from({ length: count }, () => ({
-        scale: motionValue(1),
-        x: motionValue(0),
-    }));
 
 const resetMotionValues = (
     motionValues: Array<{ scale: MotionValue<number>; x: MotionValue<number> }>
@@ -64,9 +52,7 @@ const captureButtonPositions = (buttons: HTMLElement[]) => {
 
 const calculateScale = (
     mouseX: number,
-    mouseY: number,
     buttonCenterX: number,
-    buttonCenterY: number,
     containerRect: DOMRect,
     config: Required<MagnificationConfig>
 ) => {
@@ -212,15 +198,7 @@ export function useMagnificationEffect(props: {
                 if (!pos) return { scale: 1, translateX: 0 };
 
                 const buttonCenterX = pos.left + pos.width / 2;
-                const buttonCenterY = pos.top + pos.height / 2;
-                const scale = calculateScale(
-                    mouseX,
-                    mouseY,
-                    buttonCenterX,
-                    buttonCenterY,
-                    containerRect,
-                    finalConfig
-                );
+                const scale = calculateScale(mouseX, buttonCenterX, containerRect, finalConfig);
                 return { scale, translateX: 0 };
             });
 
