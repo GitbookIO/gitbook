@@ -16,7 +16,7 @@
     },
     "private": true,
     "scripts": {
-        "dev": "turbo run dev",
+        "dev": "turbo run dev --concurrency 20",
         "build": "turbo run build",
         "clean-deps": "rm -rf node_modules && rm -rf packages/*/node_modules",
         "typecheck": "turbo run typecheck",
