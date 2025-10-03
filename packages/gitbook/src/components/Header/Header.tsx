@@ -178,7 +178,9 @@ export function Header(props: {
                 </div>
             </div>
 
-            {sections ? (
+            {sections &&
+            (sections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
+                sections.list.some((s) => s.object === 'site-section-group')) ? (
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
                         {withVariants === 'translations' ? (
