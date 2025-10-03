@@ -840,7 +840,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger-label {
-    @apply absolute right-3 px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
+    @apply absolute right-[calc(0.75rem+1px)] px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
 }
 
 .openapi-disclosure-trigger-label span {
