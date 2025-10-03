@@ -137,6 +137,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'flex',
                         'flex-col',
                         'lg:flex-row',
+                        'lg:justify-center',
                         CONTAINER_STYLE,
                         'site-width-wide:max-w-full',
 
@@ -223,7 +224,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             </>
                         }
                     />
-                    <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+                    {children}
                 </div>
             </div>
 

@@ -43,38 +43,42 @@ export async function SitePage(props: SitePageProps) {
 
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
-            {withFullPageCover && page.cover ? (
-                <PageCover as="full" page={page} cover={page.cover} context={context} />
-            ) : null}
-            {/* We use a flex row reverse to render the aside first because the page is streamed. */}
-            <div
-                className={tcls(
-                    'flex grow flex-row-reverse justify-end',
-                    withSections
-                        ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
-                        : '[--content-scroll-margin:calc(var(--spacing)*16)]'
-                )}
-            >
-                <PageAside
-                    page={page}
-                    document={document}
-                    withHeaderOffset={headerOffset}
-                    withFullPageCover={withFullPageCover}
-                    withPageFeedback={withPageFeedback}
-                    context={context}
-                />
-                <PageBody
-                    context={context}
-                    page={page}
-                    ancestors={ancestors}
-                    document={document}
-                    withPageFeedback={withPageFeedback}
-                    insightsDisplayContext={SiteInsightsDisplayContext.Site}
-                />
+            {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
+            If there's a page cover, we use `flex flex-col` to lay out the PageCover above the PageBody + PageAside instead. */}
+            <div className={withFullPageCover && page.cover ? 'flex grow flex-col' : 'contents'}>
+                {withFullPageCover && page.cover ? (
+                    <PageCover as="full" page={page} cover={page.cover} context={context} />
+                ) : null}
+
+                <div
+                    className={tcls(
+                        withFullPageCover && page.cover ? 'flex grow flex-row' : 'contents',
+                        withSections
+                            ? '[--content-scroll-margin:calc(var(--spacing)*27)]'
+                            : '[--content-scroll-margin:calc(var(--spacing)*16)]'
+                    )}
+                >
+                    <PageAside
+                        page={page}
+                        document={document}
+                        withHeaderOffset={headerOffset}
+                        withFullPageCover={withFullPageCover}
+                        withPageFeedback={withPageFeedback}
+                        context={context}
+                    />
+                    <PageBody
+                        context={context}
+                        page={page}
+                        ancestors={ancestors}
+                        document={document}
+                        withPageFeedback={withPageFeedback}
+                        insightsDisplayContext={SiteInsightsDisplayContext.Site}
+                    />
+                </div>
+                <React.Suspense fallback={null}>
+                    <PageClientLayout />
+                </React.Suspense>
             </div>
-            <React.Suspense fallback={null}>
-                <PageClientLayout />
-            </React.Suspense>
         </PageContextProvider>
     );
 }
