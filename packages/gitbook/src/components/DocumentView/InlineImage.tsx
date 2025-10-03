@@ -34,7 +34,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
             )}
         >
             <Image
-                alt={inline.data.caption ?? ''}
+                alt={inline.data.alt ?? inline.data.caption ?? ''}
                 sizes={sizes}
                 resize={context.contentContext?.imageResizer}
                 sources={{
