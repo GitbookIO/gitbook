@@ -31,7 +31,8 @@
         "build": "tsdown --project tsconfig.build.json",
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
-        "clean": "rm -rf ./dist"
+        "clean": "rm -rf ./dist",
+        "dev": "bun run build -- --watch"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"]
 }

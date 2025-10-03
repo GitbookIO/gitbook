@@ -60,16 +60,6 @@ function OpenAPISchemaProperty(
 
     const header = <OpenAPISchemaPresentation context={context} property={property} />;
     const content = (() => {
-        if (properties?.length) {
-            return (
-                <OpenAPISchemaProperties
-                    properties={properties}
-                    circularRefs={circularRefs}
-                    context={context}
-                />
-            );
-        }
-
         if (alternatives?.schemas) {
             const { schemas, discriminator } = alternatives;
             return (
@@ -91,6 +81,16 @@ function OpenAPISchemaProperty(
                         </div>
                     ))}
                 </div>
+            );
+        }
+
+        if (properties?.length) {
+            return (
+                <OpenAPISchemaProperties
+                    properties={properties}
+                    circularRefs={circularRefs}
+                    context={context}
+                />
             );
         }
 
