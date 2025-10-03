@@ -19,13 +19,14 @@ const DURATION_LOGO_APPEARANCE = 2000;
 const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
 
 interface ToolbarProps {
+    label: React.ReactNode;
     children: React.ReactNode;
     minified: boolean;
     onMinifiedChange: (value: boolean) => void;
 }
 
 export function Toolbar(props: ToolbarProps) {
-    const { children, minified, onMinifiedChange } = props;
+    const { children, label, minified, onMinifiedChange } = props;
     const [isReady, setIsReady] = React.useState(false);
 
     // Wait for page to be ready, then show the toolbar
@@ -61,43 +62,46 @@ export function Toolbar(props: ToolbarProps) {
     }
 
     return (
-        <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    onClick={() => {
-                        if (minified) {
-                            onMinifiedChange(false);
-                        }
-                    }}
-                    layout
-                    transition={toolbarEasings.spring}
-                    className={tcls(
-                        minified ? 'cursor-pointer px-2' : 'pr-2 pl-3.5',
-                        'flex',
-                        'items-center',
-                        'justify-center',
-                        'min-h-11',
-                        'min-w-12',
-                        'h-12',
-                        'py-2',
-                        'backdrop-blur-sm',
-                        'origin-center',
-                        'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
-                        'bg-[linear-gradient(45deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.2)_100%)]'
-                    )}
-                    style={{
-                        borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
-                    }}
-                >
-                    {/* Logo with stroke segments animation in blue-tints */}
-                    <motion.div layout>
-                        <AnimatedLogo />
-                    </motion.div>
+        <Tooltip label={label}>
+            <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        onClick={() => {
+                            if (minified) {
+                                onMinifiedChange(false);
+                            }
+                        }}
+                        layout
+                        transition={toolbarEasings.spring}
+                        className={tcls(
+                            minified ? 'cursor-pointer px-2' : 'pr-2 pl-3.5',
+                            'flex',
+                            'items-center',
+                            'justify-center',
+                            'min-h-11',
+                            'min-w-12',
+                            'h-12',
+                            'py-2',
+                            'backdrop-blur-sm',
+                            'origin-center',
+                            'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
+                            'bg-[linear-gradient(45deg,rgba(39,39,39,0.8)_100%,rgba(39,39,39,0.4)_80%)]',
+                            'dark:bg-[linear-gradient(45deg,rgba(39,39,39,0.5)_100%,rgba(39,39,39,0.3)_80%)]'
+                        )}
+                        style={{
+                            borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
+                        }}
+                    >
+                        {/* Logo with stroke segments animation in blue-tints */}
+                        <motion.div layout>
+                            <AnimatedLogo />
+                        </motion.div>
 
-                    {!minified ? children : null}
-                </motion.div>
-            </AnimatePresence>
-        </motion.div>
+                        {!minified ? children : null}
+                    </motion.div>
+                </AnimatePresence>
+            </motion.div>
+        </Tooltip>
     );
 }
 
@@ -182,7 +186,6 @@ export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps
                                   transformOrigin: 'bottom center',
                                   zIndex: motionValues?.scale ? 10 : 'auto',
                                   ...style,
-                                  boxShadow: 'rgba(255, 255, 255, 0.15) 0px 1px 1px 0px inset',
                               }
                     }
                     transition={{
@@ -207,7 +210,7 @@ export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps
                         'transition-colors',
                         'size-8',
                         disabled ? 'cursor-not-allowed opacity-50' : '',
-                        'border border-[rgba(0,_0,_0,_0.06)] border-solid',
+                        'border border-[rgba(256,_256,_256,_0.06)] border-solid',
                         'bg-[linear-gradient(45deg,rgba(51,53,57,1)_0%,rgba(50,52,56,1)_100%)]'
                     )}
                 >
@@ -278,7 +281,10 @@ export function ToolbarTitle(props: { prefix?: string; suffix: string }) {
 
 function ToolbarTitlePrefix(props: { title: string }) {
     return (
-        <motion.span {...getCopyVariants(0)} className="truncate font-medium text-neutral-12">
+        <motion.span
+            {...getCopyVariants(0)}
+            className="truncate font-medium text-neutral-1 dark:text-neutral-12"
+        >
             {props.title}
         </motion.span>
     );
@@ -286,7 +292,10 @@ function ToolbarTitlePrefix(props: { title: string }) {
 
 function ToolbarTitleSuffix(props: { title: string }) {
     return (
-        <motion.span {...getCopyVariants(1)} className="max-w-[20ch] truncate text-neutral-12">
+        <motion.span
+            {...getCopyVariants(1)}
+            className="max-w-[20ch] truncate text-neutral-1 dark:text-neutral-12"
+        >
             {props.title}
         </motion.span>
     );
@@ -294,7 +303,10 @@ function ToolbarTitleSuffix(props: { title: string }) {
 
 export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
     return (
-        <motion.span {...getCopyVariants(1)} className="text-neutral-12/90 text-xxs">
+        <motion.span
+            {...getCopyVariants(1)}
+            className="text-neutral-1/80 text-xxs dark:text-neutral-12/80"
+        >
             {props.subtitle}
         </motion.span>
     );

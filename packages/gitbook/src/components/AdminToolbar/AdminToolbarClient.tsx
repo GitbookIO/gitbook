@@ -5,7 +5,7 @@ import React from 'react';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
-import { DateRelative, Tooltip } from '../primitives';
+import { DateRelative } from '../primitives';
 import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
@@ -155,7 +155,7 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
     });
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
             <ToolbarBody>
                 <ToolbarTitle
                     prefix={`Change #${changeRequest.number}:`}
@@ -230,19 +230,17 @@ function RevisionToolbar(props: ToolbarViewProps) {
     const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
-            <Tooltip label="Site preview">
-                <ToolbarBody>
-                    <ToolbarTitle prefix="Site version" suffix={context.site.title} />
-                    <ToolbarSubtitle
-                        subtitle={
-                            <>
-                                Created <DateRelative value={revision.createdAt} />
-                            </>
-                        }
-                    />
-                </ToolbarBody>
-            </Tooltip>
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
+            <ToolbarBody>
+                <ToolbarTitle prefix="Site version" suffix={context.site.title} />
+                <ToolbarSubtitle
+                    subtitle={
+                        <>
+                            Created <DateRelative value={revision.createdAt} />
+                        </>
+                    }
+                />
+            </ToolbarBody>
             <ToolbarSeparator />
             <ToolbarActions>
                 {/* Open commit in Git client */}
@@ -305,19 +303,21 @@ function AuthenticatedUserToolbar(props: ToolbarViewProps) {
     });
 
     return (
-        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange}>
-            <Tooltip label="Site preview">
-                <ToolbarBody>
-                    <ToolbarTitle suffix={context.site.title} />
-                    <ToolbarSubtitle
-                        subtitle={
-                            <>
-                                Updated <DateRelative value={revision.createdAt} />
-                            </>
-                        }
-                    />
-                </ToolbarBody>
-            </Tooltip>
+        <Toolbar
+            minified={minified}
+            onMinifiedChange={onMinifiedChange}
+            label="Only visible to your GitBook organization"
+        >
+            <ToolbarBody>
+                <ToolbarTitle suffix={context.site.title} />
+                <ToolbarSubtitle
+                    subtitle={
+                        <>
+                            Updated <DateRelative value={revision.createdAt} />
+                        </>
+                    }
+                />
+            </ToolbarBody>
             <ToolbarSeparator />
             <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}

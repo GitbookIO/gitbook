@@ -1,19 +1,14 @@
 .svgLogo {
-  --logo-fill: var(--color-neutral-900);
+  --logo-fill: var(--color-neutral-100);
   --seg-A-color: #2782c4;
   --seg-B-color: #43b7f2;
   --seg-C-color: #8be2ff;
-  --trace-color: #dedfe3;
+  --trace-color: #46474c;
 
 
   --T: 2s;
   shape-rendering: geometricPrecision;
   vector-effect: non-scaling-stroke;
-}
-
-:global(html.dark) .svgLogo {
-  --logo-fill: var(--color-neutral-100);
-  --trace-color: #46474c;
 }
 
 /* Base segment animation */

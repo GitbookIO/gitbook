@@ -208,12 +208,10 @@ export function ArcToolbarButton(props: ArcToolbarButtonProps) {
                         'text-tint-1 dark:text-tint-12',
                         'bg-[linear-gradient(110deg,rgba(51,53,57,1)_0%,rgba(50,52,56,1)_100%)]',
                         'dark:[background:linear-gradient(110deg,rgba(255,255,255,1)_0%,rgba(240,246,248,1)_100%)]',
-                        'border border-solid dark:border-[rgb(255_255_255_/_40%)]'
+                        'border border-solid dark:border-[rgba(256,_256,_256,_0.06)]'
                     )}
                     style={{
                         background: 'linear-gradient(rgb(51, 53, 57), rgb(50, 52, 56))',
-                        border: '1px solid rgba(0, 0, 0, 0.06)',
-                        boxShadow: 'rgba(255, 255, 255, 0.15) 0px 1px 1px 0px inset',
                     }}
                 >
                     <Icon
