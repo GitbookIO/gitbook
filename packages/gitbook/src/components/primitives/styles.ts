@@ -35,6 +35,7 @@ export const ButtonStyles = [
     'grow-0',
     'shrink-0',
     'truncate',
+    'max-w-full',
 
     'disabled:cursor-not-allowed',
     'disabled:translate-y-0!',
