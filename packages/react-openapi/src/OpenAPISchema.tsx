@@ -540,6 +540,18 @@ export function getSchemaAlternatives(
     };
 }
 
+// These extensions are safe to merge
+const safeExtensions = [
+    'description',
+    'title',
+    'example',
+    'examples',
+    'default',
+    'readOnly',
+    'writeOnly',
+    'deprecated',
+];
+
 /**
  * Determine if a schema is safe to merge based on its properties
  */
@@ -547,16 +559,6 @@ function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
     const keys = Object.keys(schema);
 
     const coreProperties = ['type', 'properties', 'required', 'nullable'];
-    const safeExtensions = [
-        'description',
-        'title',
-        'example',
-        'examples',
-        'default',
-        'readOnly',
-        'writeOnly',
-        'deprecated',
-    ];
 
     const coreKeys = keys.filter((key) => coreProperties.includes(key));
     const unknownKeys = keys.filter(
@@ -564,12 +566,7 @@ function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
             !coreProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
     );
 
-    // If there are no core properties or unknown properties, the schema is not safe to merge
-    if (coreKeys.length === 0 || unknownKeys.length > 0) {
-        return false;
-    }
-
-    return true;
+    return coreKeys.length > 0 && unknownKeys.length === 0;
 }
 
 /**
@@ -625,16 +622,6 @@ function mergeAlternatives(
                     const keys = Object.keys(schemaOrRef);
 
                     if (isSafeToMerge(schemaOrRef)) {
-                        const safeExtensions = [
-                            'description',
-                            'title',
-                            'example',
-                            'examples',
-                            'default',
-                            'readOnly',
-                            'writeOnly',
-                            'deprecated',
-                        ];
                         const safeKeys = keys.filter((key) => safeExtensions.includes(key));
                         const vendorKeys = keys.filter((key) => key.startsWith('x-'));
 
