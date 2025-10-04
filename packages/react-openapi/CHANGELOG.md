@@ -1,5 +1,21 @@
 # @gitbook/react-openapi
 
+## 1.5.0
+
+### Minor Changes
+
+- 529f940: Fix OpenAPISecurities and code sample not using operation security requirements
+
+### Patch Changes
+
+- 8e99871: Highlight discriminator properties in oneOf, allOf, anyOf objects
+- f3e4041: Adapt OpenAPI code samples to prefill API key using visitor data
+- 319a1e5: Ensure operation security requirements inherits from spec-level when not defined
+- d7948e3: Fix OpenAPI response showing as JSON instead of YAML when it should
+- a4c3399: Fix OpenAPI alternatives not showing
+- Updated dependencies [a629900]
+  - @gitbook/expr@1.2.1
+
 ## 1.4.3
 
 ### Patch Changes
