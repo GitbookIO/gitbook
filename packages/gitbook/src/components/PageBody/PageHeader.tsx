@@ -40,7 +40,7 @@ export async function PageHeader(props: {
                 // Show page actions if *any* of the actions are enabled
                 <PageActionsDropdown
                     siteTitle={context.site.title}
-                    markdownPageURL={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}`}
+                    markdownPageURL={`${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`}
                     editOnGit={
                         context.customization.git.showEditLink &&
                         context.space.gitSync?.url &&
