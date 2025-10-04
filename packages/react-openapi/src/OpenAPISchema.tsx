@@ -540,9 +540,39 @@ export function getSchemaAlternatives(
     };
 }
 
+// These extensions are safe to merge
+const safeExtensions = [
+    'description',
+    'title',
+    'example',
+    'examples',
+    'default',
+    'readOnly',
+    'writeOnly',
+    'deprecated',
+];
+
+/**
+ * Determine if a schema is safe to merge based on its properties
+ */
+function isSafeToMerge(schema: OpenAPIV3.SchemaObject): boolean {
+    const keys = Object.keys(schema);
+
+    const coreProperties = ['type', 'properties', 'required', 'nullable'];
+
+    const coreKeys = keys.filter((key) => coreProperties.includes(key));
+    const unknownKeys = keys.filter(
+        (key) =>
+            !coreProperties.includes(key) && !safeExtensions.includes(key) && !key.startsWith('x-')
+    );
+
+    return coreKeys.length > 0 && unknownKeys.length === 0;
+}
+
 /**
  * Merge alternatives of the same type into a single schema.
  * - Merge string enums
+ * - Safely merge object schemas with compatible properties
  */
 function mergeAlternatives(
     alternativeType: AlternativeType,
@@ -590,24 +620,40 @@ function mergeAlternatives(
 
                 if (latest && latest.type === 'object' && schemaOrRef.type === 'object') {
                     const keys = Object.keys(schemaOrRef);
-                    if (
-                        keys.every((key) =>
-                            ['type', 'properties', 'required', 'nullable'].includes(key)
-                        )
-                    ) {
+
+                    if (isSafeToMerge(schemaOrRef)) {
+                        const safeKeys = keys.filter((key) => safeExtensions.includes(key));
+                        const vendorKeys = keys.filter((key) => key.startsWith('x-'));
+
                         latest.properties = {
-                            ...latest.properties,
-                            ...schemaOrRef.properties,
+                            ...(latest.properties || {}),
+                            ...(schemaOrRef.properties || {}),
                         };
                         latest.required = Array.from(
                             new Set([
-                                ...(Array.isArray(latest.required) ? latest.required : []),
-                                ...(Array.isArray(schemaOrRef.required)
+                                ...(latest.required && Array.isArray(latest.required)
+                                    ? latest.required
+                                    : []),
+                                ...(schemaOrRef.required && Array.isArray(schemaOrRef.required)
                                     ? schemaOrRef.required
                                     : []),
                             ])
                         );
                         latest.nullable = latest.nullable || schemaOrRef.nullable;
+
+                        // Preserve safe extensions and vendor extensions
+                        // Always overwrite (last schema has priority)
+                        [...vendorKeys, ...safeKeys].forEach((key) => {
+                            if (
+                                typeof latest[key] === 'object' &&
+                                typeof schemaOrRef[key] === 'object'
+                            ) {
+                                latest[key] = { ...latest[key], ...schemaOrRef[key] };
+                            } else {
+                                latest[key] = schemaOrRef[key];
+                            }
+                        });
+
                         return acc;
                     }
                 }

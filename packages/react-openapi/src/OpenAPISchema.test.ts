@@ -184,4 +184,203 @@ describe('getSchemaAlternatives', () => {
             ],
         });
     });
+
+    describe('safe merging with allOf', () => {
+        it('should merge objects with safe extensions', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                name: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['name'],
+                            description: 'Base schema',
+                            title: 'Base',
+                        },
+                        {
+                            type: 'object',
+                            properties: {
+                                email: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['email'],
+                            description: 'Extended schema',
+                            example: { email: 'test@example.com' },
+                            deprecated: true,
+                        },
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                            },
+                            email: {
+                                type: 'string',
+                            },
+                        },
+                        required: ['name', 'email'],
+                        description: 'Extended schema',
+                        title: 'Base',
+                        example: { email: 'test@example.com' },
+                        deprecated: true,
+                    },
+                ],
+            });
+        });
+
+        it('should merge objects with vendor extensions', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                id: {
+                                    type: 'string',
+                                },
+                            },
+                            'x-internal': true,
+                        },
+                        {
+                            type: 'object',
+                            properties: {
+                                name: {
+                                    type: 'string',
+                                },
+                            },
+                            'x-version': '1.0',
+                            'x-internal': false,
+                        },
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            id: {
+                                type: 'string',
+                            },
+                            name: {
+                                type: 'string',
+                            },
+                        },
+                        required: [],
+                        'x-internal': false,
+                        'x-version': '1.0',
+                    },
+                ],
+            });
+        });
+
+        it('should merge objects with nullable', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                field1: {
+                                    type: 'string',
+                                },
+                            },
+                        },
+                        {
+                            type: 'object',
+                            properties: {
+                                field2: {
+                                    type: 'string',
+                                },
+                            },
+                            nullable: true,
+                        },
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            field1: {
+                                type: 'string',
+                            },
+                            field2: {
+                                type: 'string',
+                            },
+                        },
+                        required: [],
+                        nullable: true,
+                    },
+                ],
+            });
+        });
+
+        it('should NOT merge objects with unsafe properties', () => {
+            expect(
+                getSchemaAlternatives({
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                name: {
+                                    type: 'string',
+                                },
+                            },
+                        },
+                        {
+                            type: 'object',
+                            properties: {
+                                value: {
+                                    type: 'string',
+                                },
+                            },
+                            // oneOf is not a safe property to merge
+                            oneOf: [
+                                {
+                                    type: 'string',
+                                },
+                            ],
+                        },
+                    ],
+                })
+            ).toEqual({
+                type: 'allOf',
+                schemas: [
+                    {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                            },
+                        },
+                    },
+                    {
+                        type: 'object',
+                        properties: {
+                            value: {
+                                type: 'string',
+                            },
+                        },
+                        oneOf: [
+                            {
+                                type: 'string',
+                            },
+                        ],
+                    },
+                ],
+            });
+        });
+    });
 });
