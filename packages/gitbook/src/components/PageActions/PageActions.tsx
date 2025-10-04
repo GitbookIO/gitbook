@@ -171,6 +171,9 @@ export function ActionOpenInLLM(props: {
 
     const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Claude';
 
+    // Remove the .md extension from the URL to avoid sending a bad request to the LLM.
+    const urlWithoutExtension = url.replace(/\.md$/, '');
+
     return (
         <PageActionWrapper
             type={type}
@@ -178,7 +181,7 @@ export function ActionOpenInLLM(props: {
             label={tString(language, 'open_in', providerLabel)}
             shortLabel={providerLabel}
             description={tString(language, 'ai_chat_ask_about_page', providerLabel)}
-            href={getLLMURL(provider, url, language)}
+            href={getLLMURL(provider, urlWithoutExtension, language)}
         />
     );
 }
