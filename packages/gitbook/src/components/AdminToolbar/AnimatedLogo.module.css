@@ -11,11 +11,6 @@
   vector-effect: non-scaling-stroke;
 }
 
-:global(html.dark) .svgLogo {
-  --logo-fill: var(--color-neutral-800);
-  --trace-color: #dedfe3;
-}
-
 /* Base segment animation */
 .seg {
   opacity: 0;

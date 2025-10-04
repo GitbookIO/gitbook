@@ -54,4 +54,7 @@ export type AdminToolbarContext = {
 
 export interface AdminToolbarClientProps {
     context: AdminToolbarContext;
+    onSessionClose?: () => void;
+    onPersistentClose?: () => void;
+    onToggleMinify?: () => void;
 }
