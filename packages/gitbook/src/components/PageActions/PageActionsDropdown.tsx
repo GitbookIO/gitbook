@@ -18,17 +18,22 @@ import {
     ActionViewAsPDF,
 } from './PageActions';
 
-interface PageActionsDropdownProps {
-    siteTitle: string;
-    markdownPageURL: string;
-    mcpURL?: string;
-    pdfURL?: string;
-    className?: string;
-    actions: SiteCustomizationSettings['pageActions'];
+export type PageActionsDropdownURLs = {
+    html: string;
+    markdown: string;
+    mcp?: string;
+    pdf?: string;
     editOnGit?: {
         provider: GitSyncState['installationProvider'];
         url: string;
     };
+};
+
+interface PageActionsDropdownProps {
+    siteTitle: string;
+    urls: PageActionsDropdownURLs;
+    className?: string;
+    actions: SiteCustomizationSettings['pageActions'];
 }
 
 /**
@@ -75,7 +80,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
  * Return the list of actions to show in the dropdown menu.
  */
 function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNode[] {
-    const { siteTitle, markdownPageURL, mcpURL, actions } = props;
+    const { siteTitle, urls, actions } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
@@ -94,55 +99,45 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
                 <DropdownMenuSeparator className="first:hidden" />
                 <ActionCopyMarkdown
                     isDefaultAction={!assistants.length}
-                    markdownPageURL={markdownPageURL}
+                    markdownPageURL={urls.markdown}
                     type="dropdown-menu-item"
                 />
-                <ActionViewAsMarkdown markdownPageURL={markdownPageURL} type="dropdown-menu-item" />
+                <ActionViewAsMarkdown markdownPageURL={urls.markdown} type="dropdown-menu-item" />
             </React.Fragment>
         ) : null,
 
         actions.externalAI ? (
             <React.Fragment key="externalAI">
                 <DropdownMenuSeparator className="first:hidden" />
-                <ActionOpenInLLM
-                    provider="chatgpt"
-                    url={markdownPageURL}
-                    type="dropdown-menu-item"
-                />
-                <ActionOpenInLLM
-                    provider="claude"
-                    url={markdownPageURL}
-                    type="dropdown-menu-item"
-                />
+                <ActionOpenInLLM provider="chatgpt" url={urls.html} type="dropdown-menu-item" />
+                <ActionOpenInLLM provider="claude" url={urls.html} type="dropdown-menu-item" />
             </React.Fragment>
         ) : null,
 
-        actions.mcp && mcpURL ? (
+        actions.mcp && urls.mcp ? (
             <React.Fragment key="mcp">
                 <DropdownMenuSeparator className="first:hidden" />
-                <ActionCopyMCPURL mcpURL={mcpURL} type="dropdown-menu-item" />
+                <ActionCopyMCPURL mcpURL={urls.mcp} type="dropdown-menu-item" />
                 <ActionOpenMCP
                     provider="vscode"
-                    mcpURL={mcpURL}
+                    mcpURL={urls.mcp}
                     siteTitle={siteTitle}
                     type="dropdown-menu-item"
                 />
             </React.Fragment>
         ) : null,
 
-        props.editOnGit || props.pdfURL ? (
+        urls.editOnGit || urls.pdf ? (
             <React.Fragment key="editOnGit">
                 <DropdownMenuSeparator className="first:hidden" />
-                {props.editOnGit ? (
+                {urls.editOnGit ? (
                     <ActionOpenEditOnGit
                         type="dropdown-menu-item"
-                        provider={props.editOnGit.provider}
-                        url={props.editOnGit.url}
+                        provider={urls.editOnGit.provider}
+                        url={urls.editOnGit.url}
                     />
                 ) : null}
-                {props.pdfURL ? (
-                    <ActionViewAsPDF url={props.pdfURL} type="dropdown-menu-item" />
-                ) : null}
+                {urls.pdf ? <ActionViewAsPDF url={urls.pdf} type="dropdown-menu-item" /> : null}
             </React.Fragment>
         ) : null,
     ].filter(Boolean);
@@ -152,7 +147,7 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
  * A default action shown as a quick-access button beside the dropdown menu
  */
 function getPageDefaultAction(props: PageActionsDropdownProps) {
-    const { markdownPageURL, actions } = props;
+    const { urls, actions } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
@@ -162,12 +157,12 @@ function getPageDefaultAction(props: PageActionsDropdownProps) {
         return <ActionOpenAssistant assistant={assistant} type="button" />;
     }
 
-    if (props.editOnGit) {
+    if (urls.editOnGit) {
         return (
             <ActionOpenEditOnGit
                 type="button"
-                provider={props.editOnGit.provider}
-                url={props.editOnGit.url}
+                provider={urls.editOnGit.provider}
+                url={urls.editOnGit.url}
             />
         );
     }
@@ -176,7 +171,7 @@ function getPageDefaultAction(props: PageActionsDropdownProps) {
         return (
             <ActionCopyMarkdown
                 isDefaultAction={!assistant}
-                markdownPageURL={markdownPageURL}
+                markdownPageURL={urls.markdown}
                 type="button"
             />
         );
