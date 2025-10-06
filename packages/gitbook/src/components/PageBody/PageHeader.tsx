@@ -129,10 +129,11 @@ function getPageActionsURLs(
     context: GitBookSiteContext,
     page: RevisionPageDocument
 ): PageActionsDropdownURLs {
-    const pageURL = context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path));
     return {
-        html: pageURL,
-        markdown: `${pageURL}.md`,
+        html: context.linker.toAbsoluteURL(
+            context.linker.toPathForPage({ pages: context.revision.pages, page })
+        ),
+        markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
         editOnGit:
             context.customization.git.showEditLink && context.space.gitSync?.url && page.git
                 ? {
