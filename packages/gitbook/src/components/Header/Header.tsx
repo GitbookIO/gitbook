@@ -184,7 +184,7 @@ export function Header(props: {
                 </div>
             </div>
 
-            {withSections ? (
+            {sections && withSections ? (
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
                         {withVariants === 'translations' ? (
