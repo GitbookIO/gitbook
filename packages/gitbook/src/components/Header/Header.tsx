@@ -150,7 +150,7 @@ export function Header(props: {
                         </div>
 
                         {customization.header.links.length > 0 ||
-                        (!sections && withVariants === 'translations') ? (
+                        (!withSections && withVariants === 'translations') ? (
                             <HeaderLinks>
                                 {customization.header.links.length > 0 ? (
                                     <>
