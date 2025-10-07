@@ -23,6 +23,12 @@ export function Header(props: {
     const { context, withTopHeader, withVariants } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
+    const withSections = Boolean(
+        sections &&
+            sections.list.length > 1 &&
+            sections.list.some((s) => s.object === 'site-section-group')
+    );
+
     return (
         <header
             id="site-header"
@@ -144,7 +150,7 @@ export function Header(props: {
                         </div>
 
                         {customization.header.links.length > 0 ||
-                        (!sections && withVariants === 'translations') ? (
+                        (!withSections && withVariants === 'translations') ? (
                             <HeaderLinks>
                                 {customization.header.links.length > 0 ? (
                                     <>
@@ -164,7 +170,7 @@ export function Header(props: {
                                         />
                                     </>
                                 ) : null}
-                                {!sections && withVariants === 'translations' ? (
+                                {!withSections && withVariants === 'translations' ? (
                                     <TranslationsDropdown
                                         context={context}
                                         siteSpace={siteSpace}
@@ -178,9 +184,7 @@ export function Header(props: {
                 </div>
             </div>
 
-            {sections &&
-            (sections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
-                sections.list.some((s) => s.object === 'site-section-group')) ? (
+            {withSections ? (
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
                         {withVariants === 'translations' ? (
