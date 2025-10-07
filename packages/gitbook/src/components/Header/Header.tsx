@@ -25,8 +25,8 @@ export function Header(props: {
 
     const withSections = Boolean(
         sections &&
-            sections.list.length > 1 &&
-            sections.list.some((s) => s.object === 'site-section-group')
+            (sections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
+                sections.list.some((s) => s.object === 'site-section-group'))
     );
 
     return (
@@ -150,7 +150,7 @@ export function Header(props: {
                         </div>
 
                         {customization.header.links.length > 0 ||
-                        (!withSections && withVariants === 'translations') ? (
+                        (!sections && withVariants === 'translations') ? (
                             <HeaderLinks>
                                 {customization.header.links.length > 0 ? (
                                     <>
