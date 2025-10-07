@@ -2,6 +2,7 @@
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
 import React from 'react';
+import { getLocalStorageItem, setLocalStorageItem } from '../../lib/browser/local-storage';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
@@ -25,6 +26,8 @@ import {
 } from './ToolbarControlsContext';
 import type { AdminToolbarClientProps, AdminToolbarContext } from './types';
 
+const STORAGE_KEY = 'gitbook_toolbar_closed';
+
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const { context, onPersistentClose, onSessionClose, onToggleMinify } = props;
     const [minified, setMinified] = React.useState(true);
@@ -33,14 +36,8 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const [shouldHide, setShouldHide] = React.useState(false);
 
     React.useEffect(() => {
-        const STORAGE_KEY = 'gitbook_toolbar_closed';
-
-        try {
-            const hidden = !!localStorage.getItem(STORAGE_KEY);
-            setShouldHide(hidden);
-        } catch {
-            setShouldHide(false);
-        }
+        const hidden = getLocalStorageItem(STORAGE_KEY, false);
+        setShouldHide(hidden);
     }, []);
 
     const handleSessionClose = React.useCallback(() => {
@@ -49,31 +46,21 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
     }, [onSessionClose]);
 
     const handlePersistentClose = React.useCallback(() => {
-        try {
-            localStorage.setItem('gitbook_toolbar_closed', '1');
-        } catch {
-            console.error('Failed to close toolbar using local storage');
-        }
+        setLocalStorageItem(STORAGE_KEY, true);
         setSessionClosed(true);
         onPersistentClose?.();
     }, [onPersistentClose]);
 
-    const handleMinifiedChange = React.useCallback(
-        (value: boolean) => {
-            setMinified(value);
-            onToggleMinify?.();
-        },
-        [onToggleMinify]
-    );
+    const handleMinifiedChange = (value: boolean) => {
+        setMinified(value);
+        onToggleMinify?.();
+    };
 
-    const toolbarControls = React.useMemo(
-        () => ({
-            minimize: () => handleMinifiedChange(true),
-            closeSession: handleSessionClose,
-            closePersistent: handlePersistentClose,
-        }),
-        [handleMinifiedChange, handleSessionClose, handlePersistentClose]
-    );
+    const toolbarControls = {
+        minimize: () => handleMinifiedChange(true),
+        closeSession: handleSessionClose,
+        closePersistent: handlePersistentClose,
+    };
 
     if (shouldHide || sessionClosed) {
         return null;

@@ -29,7 +29,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
     const buttonRef = useRef<HTMLDivElement>(null);
 
     const handleClickOutsideArcMenu = (event: Event) => {
-        // Don't close the arc if we are clicking  clicking on the button itself
+        // Don't close the arc if we are clicking on the button itself
         if (buttonRef.current?.contains(event.target as Node)) {
             return;
         }
@@ -47,36 +47,32 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [open]);
 
-    const items = React.useMemo(
-        () =>
-            [
-                controls?.minimize
-                    ? {
-                          id: 'minimize',
-                          icon: 'minus',
-                          label: 'Minimize',
-                          onClick: controls.minimize,
-                      }
-                    : null,
-                controls?.closeSession
-                    ? {
-                          id: 'session-close',
-                          icon: 'xmark',
-                          label: 'Close for one session',
-                          onClick: controls.closeSession,
-                      }
-                    : null,
-                controls?.closePersistent
-                    ? {
-                          id: 'persistent-close',
-                          icon: 'ban',
-                          label: "Don't show again",
-                          onClick: controls.closePersistent,
-                      }
-                    : null,
-            ].filter(Boolean) as Array<ArcMenuItem>,
-        [controls]
-    );
+    const items = [
+        controls?.minimize
+            ? {
+                  id: 'minimize',
+                  icon: 'minus',
+                  label: 'Minimize',
+                  onClick: controls.minimize,
+              }
+            : null,
+        controls?.closeSession
+            ? {
+                  id: 'session-close',
+                  icon: 'xmark',
+                  label: 'Close for one session',
+                  onClick: controls.closeSession,
+              }
+            : null,
+        controls?.closePersistent
+            ? {
+                  id: 'persistent-close',
+                  icon: 'ban',
+                  label: "Don't show again",
+                  onClick: controls.closePersistent,
+              }
+            : null,
+    ].filter(Boolean) as Array<ArcMenuItem>;
 
     const sharedMotionStyle = motionValues
         ? {
