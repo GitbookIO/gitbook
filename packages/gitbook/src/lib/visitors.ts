@@ -18,6 +18,7 @@ export type ResponseCookie = {
         sameSite: boolean | 'lax' | 'strict' | 'none' | undefined;
         secure: boolean;
         maxAge: number;
+        path: string;
     }>;
 };
 

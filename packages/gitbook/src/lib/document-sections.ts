@@ -1,9 +1,11 @@
 import type { GitBookAnyContext } from '@/lib/context';
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
+import { getDataOrNull } from './data';
 import { getNodeText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
 import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock';
+import { resolveContentRef } from './references';
 
 export interface DocumentSection {
     id: string;
@@ -28,10 +30,11 @@ export async function getDocumentSections(
  */
 async function getSectionsFromNodes(
     nodes: DocumentBlock[],
-    context: GitBookAnyContext
+    context: GitBookAnyContext,
+    initialDepth = 0
 ): Promise<DocumentSection[]> {
     const sections: DocumentSection[] = [];
-    let depth = 0;
+    let depth = initialDepth;
 
     for (const block of nodes) {
         switch (block.type) {
@@ -64,7 +67,9 @@ async function getSectionsFromNodes(
             }
             case 'stepper': {
                 const stepNodes = await Promise.all(
-                    block.nodes.map(async (step) => getSectionsFromNodes(step.nodes, context))
+                    block.nodes.map(async (step) =>
+                        getSectionsFromNodes(step.nodes, context, depth)
+                    )
                 );
                 for (const stepSections of stepNodes) {
                     sections.push(...stepSections);
@@ -115,6 +120,39 @@ async function getSectionsFromNodes(
                     });
                 }
                 continue;
+            }
+            case 'reusable-content': {
+                const dataFetcher = block.meta?.token
+                    ? context.dataFetcher.withToken({ apiToken: block.meta.token })
+                    : context.dataFetcher;
+
+                const resolved = await resolveContentRef(block.data.ref, {
+                    ...context,
+                    dataFetcher,
+                });
+                if (!resolved) {
+                    continue;
+                }
+                const { reusableContent } = resolved;
+                if (!reusableContent) {
+                    continue;
+                }
+                const document = await getDataOrNull(
+                    dataFetcher.getRevisionReusableContentDocument({
+                        spaceId: reusableContent.context.space.id,
+                        revisionId: reusableContent.context.revisionId,
+                        reusableContentId: reusableContent.revisionReusableContent.id,
+                    })
+                );
+                if (!document) {
+                    continue;
+                }
+                const reusableContentSections = await getSectionsFromNodes(
+                    document.nodes,
+                    reusableContent.context,
+                    depth
+                );
+                sections.push(...reusableContentSections);
             }
         }
     }

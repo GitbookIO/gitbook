@@ -296,16 +296,41 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
 
         // Preview of customization/theme
-        const customization = siteRequestURL.searchParams.get('customization');
+        const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
+        const customization =
+            siteRequestURL.searchParams.get('customization') ??
+            (customizationCookie ? decodeURIComponent(customizationCookie.value) : undefined);
         if (customization && validateSerializedCustomization(customization)) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
+            cookies.push({
+                name: MiddlewareHeaders.Customization,
+                value: encodeURIComponent(customization),
+                options: {
+                    httpOnly: true,
+                    sameSite: 'lax',
+                    maxAge: 10 * 60, // 10 minutes
+                    path: '/url/preview', // Only send the cookie to preview routes
+                },
+            });
         }
-        const theme = siteRequestURL.searchParams.get('theme');
+        const theme =
+            siteRequestURL.searchParams.get('theme') ??
+            request.cookies.get(MiddlewareHeaders.Theme)?.value;
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Theme, theme);
+            cookies.push({
+                name: MiddlewareHeaders.Theme,
+                value: theme,
+                options: {
+                    httpOnly: true,
+                    sameSite: 'lax',
+                    maxAge: 10 * 60, // 10 minutes
+                    path: '/url/preview', // Only send the cookie to preview routes
+                },
+            });
         }
 
         // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
