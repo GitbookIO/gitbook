@@ -1,27 +1,39 @@
 'use client';
-import { AnimatePresence, type MotionValue, motion, useReducedMotion } from 'motion/react';
+import {
+    AnimatePresence,
+    type MotionValue,
+    motion,
+    useReducedMotion,
+    useSpring,
+} from 'motion/react';
 import React from 'react';
 import { AnimatedLogo } from './AnimatedLogo';
+import { useToolbarControls } from './ToolbarControlsContext';
 
 import { tcls } from '@/lib/tailwind';
-import { Icon, type IconName } from '@gitbook/icons';
+import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import { Tooltip } from '../primitives';
-import { getCopyVariants, minifyButtonAnimation, toolbarEasings } from './transitions';
+import { getCopyVariants, toolbarEasings } from './transitions';
 import { useMagnificationEffect } from './useMagnificationEffect';
 
 const DURATION_LOGO_APPEARANCE = 2000;
 const DELAY_BETWEEN_LOGO_AND_CONTENT = 100;
 
 interface ToolbarProps {
-    children: React.ReactNode;
     label: React.ReactNode;
+    children: React.ReactNode;
+    minified: boolean;
+    onMinifiedChange: (value: boolean) => void;
 }
 
 export function Toolbar(props: ToolbarProps) {
-    const { children, label } = props;
-    const [minified, setMinified] = React.useState(true);
-    const [showToolbarControls, setShowToolbarControls] = React.useState(false);
+    const { children, label, minified, onMinifiedChange } = props;
+    const controls = useToolbarControls();
     const [isReady, setIsReady] = React.useState(false);
+    const autoExpandTriggeredRef = React.useRef(false);
+
+    const shouldAutoExpand = Boolean(controls?.shouldAutoExpand);
+    const [shouldAnimateLogo, setShouldAnimateLogo] = React.useState(shouldAutoExpand);
 
     // Wait for page to be ready, then show the toolbar
     React.useEffect(() => {
@@ -37,16 +49,41 @@ export function Toolbar(props: ToolbarProps) {
         }
     }, []);
 
-    // After toolbar appears, wait then show the full content
+    // After toolbar appears, wait, then show the full content
     React.useEffect(() => {
-        if (isReady) {
-            const expandAfterTimeout = setTimeout(() => {
-                setMinified(false);
-            }, DURATION_LOGO_APPEARANCE + DELAY_BETWEEN_LOGO_AND_CONTENT);
-
-            return () => clearTimeout(expandAfterTimeout);
+        if (!isReady || autoExpandTriggeredRef.current) {
+            return;
         }
-    }, [isReady]);
+
+        if (!shouldAutoExpand) {
+            // When we already know the toolbar should stay expanded (e.g. the user previously
+            // opened it this session) we short-circuit the auto-expand animation and immediately
+            // render the expanded state without replaying the logo animation.
+            autoExpandTriggeredRef.current = true;
+            setShouldAnimateLogo(false);
+            return;
+        }
+
+        autoExpandTriggeredRef.current = true;
+
+        // On a fresh session we let the toolbar appear in its compact form, play the logo
+        // animation, and only then expand the toolbar. The timeout mirrors the duration of the
+        // logo animation so both transitions feel connected.
+        const expandAfterTimeout = setTimeout(() => {
+            setShouldAnimateLogo(false);
+            onMinifiedChange(false);
+        }, DURATION_LOGO_APPEARANCE + DELAY_BETWEEN_LOGO_AND_CONTENT);
+
+        return () => clearTimeout(expandAfterTimeout);
+    }, [isReady, onMinifiedChange, shouldAutoExpand]);
+
+    React.useEffect(() => {
+        if (!minified) {
+            // Any manual expansion should stop the logo animation so the icon stays in its
+            // “settled” state once the toolbar is open.
+            setShouldAnimateLogo(false);
+        }
+    }, [minified]);
 
     // Don't render anything until page is ready
     if (!isReady) {
@@ -55,16 +92,13 @@ export function Toolbar(props: ToolbarProps) {
 
     return (
         <Tooltip label={label}>
-            <motion.div
-                onMouseEnter={() => setShowToolbarControls(true)}
-                onMouseLeave={() => setShowToolbarControls(false)}
-                className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4"
-            >
+            <motion.div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-40 w-auto max-w-xl transform px-4">
                 <AnimatePresence mode="wait">
                     <motion.div
                         onClick={() => {
                             if (minified) {
-                                setMinified((prev) => !prev);
+                                setShouldAnimateLogo(false);
+                                onMinifiedChange(false);
                             }
                         }}
                         layout
@@ -78,37 +112,22 @@ export function Toolbar(props: ToolbarProps) {
                             'min-w-12',
                             'h-12',
                             'py-2',
-                            'border-tint-1/3',
                             'backdrop-blur-sm',
                             'origin-center',
-                            'bg-[linear-gradient(110deg,rgba(20,23,28,0.90)_0%,rgba(20,23,28,0.80)_100%)]',
-                            'dark:bg-[linear-gradient(110deg,rgba(256,256,256,0.90)_0%,rgba(256,256,256,0.80)_100%)]'
+                            'border-[0.5px] border-neutral-5 border-solid dark:border-neutral-8',
+                            'bg-[linear-gradient(45deg,rgba(39,39,39,0.8)_100%,rgba(39,39,39,0.4)_80%)]',
+                            'dark:bg-[linear-gradient(45deg,rgba(39,39,39,0.5)_100%,rgba(39,39,39,0.3)_80%)]'
                         )}
-                        initial={{
-                            scale: 1,
-                            opacity: 1,
-                        }}
-                        animate={{
-                            scale: 1,
-                            opacity: 1,
-                            boxShadow: minified
-                                ? '0 4px 40px 8px rgba(0, 0, 0, .2), 0 0 0 .5px rgba(0, 0, 0, .4), inset 0 .5px 0 0 hsla(0, 0%, 100%, .15)'
-                                : '0 4px 40px 8px rgba(0, 0, 0, .4), 0 0 0 .5px rgba(0, 0, 0, .8), inset 0 .5px 0 0 hsla(0, 0%, 100%, .3)',
-                        }}
                         style={{
                             borderRadius: '100px', // This is set on `style` so Framer Motion can correct for distortions
                         }}
                     >
                         {/* Logo with stroke segments animation in blue-tints */}
                         <motion.div layout>
-                            <AnimatedLogo />
+                            <AnimatedLogo shouldAnimate={shouldAnimateLogo} />
                         </motion.div>
 
                         {!minified ? children : null}
-
-                        {!minified && showToolbarControls && (
-                            <MinifyButton setMinified={setMinified} />
-                        )}
                     </motion.div>
                 </AnimatePresence>
             </motion.div>
@@ -139,12 +158,15 @@ export function ToolbarButtonGroup(props: { children: React.ReactNode }) {
             className="flex items-center gap-1 overflow-visible pr-2 pl-4"
         >
             {buttonChildren.map((child, index) => {
-                const motionValues = buttonMotionValues[index];
                 const childEl = child as React.ReactElement;
-                return React.cloneElement(childEl, {
-                    key: index,
-                    motionValues,
-                });
+                const childKey = childEl.key ?? `toolbar-button-${index}`;
+                return (
+                    <ToolbarButtonWrapper
+                        key={childKey}
+                        child={childEl}
+                        rawMotionValues={buttonMotionValues[index]}
+                    />
+                );
             })}
         </motion.div>
     );
@@ -158,15 +180,27 @@ export interface ToolbarButtonProps extends Omit<React.HTMLProps<HTMLAnchorEleme
     icon: IconName;
     iconClassName?: string;
     title?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
-export function ToolbarButton(props: ToolbarButtonProps) {
-    const { title, disabled, motionValues, className, style, href, onClick, icon, iconClassName } =
-        props;
+export const ToolbarButton = React.forwardRef<HTMLDivElement, ToolbarButtonProps>((props, ref) => {
+    const {
+        title,
+        disabled,
+        motionValues,
+        className,
+        style,
+        href,
+        onClick,
+        icon,
+        iconClassName,
+        children,
+    } = props;
     const reduceMotion = useReducedMotion();
 
     return (
-        <motion.div variants={toolbarEasings.staggeringChild}>
+        <motion.div variants={toolbarEasings.staggeringChild} className="relative" ref={ref}>
+            {children ? children : null}
             <Tooltip label={title}>
                 <motion.a
                     href={href}
@@ -199,39 +233,77 @@ export function ToolbarButton(props: ToolbarButtonProps) {
                         'gap-1',
                         'text-sm',
                         'rounded-full',
-                        'border-neutral-500',
-                        'outline-neutral-800',
-                        'outline-1',
-                        'border',
                         'truncate',
                         'text-tint-1',
                         'dark:text-tint-12',
                         'cursor-pointer',
                         'transition-colors',
                         'size-8',
-                        'bg-tint-1/3',
-                        'hover:bg-tint-1/4',
-                        'dark:bg-tint-3',
-                        'dark:hover:bg-tint-1',
                         disabled ? 'cursor-not-allowed opacity-50' : '',
-                        'shadow-1xs'
+                        'border border-[rgba(256,_256,_256,_0.06)] border-solid',
+                        'bg-[linear-gradient(45deg,rgba(51,53,57,1)_0%,rgba(50,52,56,1)_100%)]'
                     )}
                 >
-                    <Icon icon={icon} className={tcls('size-4', iconClassName)} />
+                    <Icon
+                        icon={icon}
+                        iconStyle={IconStyle.Solid}
+                        className={tcls(
+                            'size-4 shrink-0 group-hover:scale-110 group-hover:text-tint-3',
+                            iconClassName
+                        )}
+                    />
                 </motion.a>
             </Tooltip>
         </motion.div>
     );
+});
+
+ToolbarButton.displayName = 'ToolbarButton';
+
+function ToolbarButtonWrapper(props: {
+    child: React.ReactElement;
+    rawMotionValues?: { scale: MotionValue<number>; x: MotionValue<number> };
+}) {
+    const { child, rawMotionValues } = props;
+
+    // Convert the raw motion values to smooth spring easings
+    const springScale = useSpring(rawMotionValues?.scale.get() ?? 1, {
+        stiffness: 400,
+        damping: 30,
+    });
+    const springX = useSpring(rawMotionValues?.x.get() ?? 0, { stiffness: 400, damping: 30 });
+
+    // Sync springs with raw motion values
+    React.useEffect(() => {
+        if (!rawMotionValues) return;
+
+        const unsubScale = rawMotionValues.scale.on('change', (v) => springScale.set(v));
+        const unsubX = rawMotionValues.x.on('change', (v) => springX.set(v));
+
+        return () => {
+            unsubScale();
+            unsubX();
+        };
+    }, [rawMotionValues, springScale, springX]);
+
+    const motionValues = {
+        scale: springScale,
+        x: springX,
+    };
+
+    return React.cloneElement(child, {
+        motionValues,
+    });
 }
 
 export function ToolbarSeparator() {
     return <div className="h-5 w-px bg-tint-1/3" />;
 }
 
-export function ToolbarTitle(props: { prefix: string; suffix: string }) {
+export function ToolbarTitle(props: { prefix?: string; suffix: string }) {
     return (
         <div className="flex items-center gap-1 text-xs ">
-            <ToolbarTitlePrefix title={props.prefix} />
+            {props.prefix ? <ToolbarTitlePrefix title={props.prefix} /> : null}
             <ToolbarTitleSuffix title={props.suffix} />
         </div>
     );
@@ -241,7 +313,7 @@ function ToolbarTitlePrefix(props: { title: string }) {
     return (
         <motion.span
             {...getCopyVariants(0)}
-            className="font-light text-neutral-7 dark:text-neutral-3"
+            className="truncate font-medium text-neutral-1 dark:text-neutral-12"
         >
             {props.title}
         </motion.span>
@@ -252,7 +324,7 @@ function ToolbarTitleSuffix(props: { title: string }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="max-w-[24ch] truncate font-semibold text-neutral-3 dark:text-neutral-2"
+            className="max-w-[20ch] truncate text-neutral-1 dark:text-neutral-12"
         >
             {props.title}
         </motion.span>
@@ -263,36 +335,9 @@ export function ToolbarSubtitle(props: { subtitle: React.ReactNode }) {
     return (
         <motion.span
             {...getCopyVariants(1)}
-            className="text-neutral-7 text-xxs dark:text-neutral-2"
+            className="text-neutral-1/80 text-xxs dark:text-neutral-12/80"
         >
             {props.subtitle}
         </motion.span>
-    );
-}
-
-function MinifyButton(props: { setMinified: (minified: boolean) => void }) {
-    return (
-        <Tooltip label="Minify">
-            <motion.div
-                {...minifyButtonAnimation}
-                transition={{
-                    duration: 0.2,
-                }}
-                whileHover={{
-                    scale: 1.05,
-                }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    props.setMinified(true);
-                }}
-                className={tcls(
-                    '-top-2 -right-4 absolute flex size-4 cursor-pointer items-center justify-center rounded-full border',
-                    'border-neutral-500 bg-neutral-700 hover:border-neutral-400 hover:bg-neutral-600',
-                    'dark:border-neutral-400 dark:bg-neutral-200 dark:hover:border-neutral-200 dark:hover:bg-neutral-100'
-                )}
-            >
-                <Icon icon="minus" className="size-2 text-neutral-1 dark:text-neutral-9" />
-            </motion.div>
-        </Tooltip>
     );
 }

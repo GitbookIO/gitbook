@@ -5,6 +5,7 @@ import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
 import { DateRelative } from '../primitives';
+import { HideToolbarButton } from './HideToolbarButton';
 import { IframeWrapper } from './IframeWrapper';
 import { RefreshContentButton } from './RefreshContentButton';
 import {
@@ -17,48 +18,108 @@ import {
     ToolbarSubtitle,
     ToolbarTitle,
 } from './Toolbar';
-import type { AdminToolbarClientProps } from './types';
+import {
+    type ToolbarControlsContextValue,
+    ToolbarControlsProvider,
+} from './ToolbarControlsContext';
+import type { AdminToolbarClientProps, AdminToolbarContext } from './types';
+import { useToolbarVisibility } from './utils';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
-    const { context } = props;
+    const { context, onPersistentClose, onSessionClose, onToggleMinify } = props;
+    const {
+        minified,
+        setMinified,
+        shouldAutoExpand,
+        hidden,
+        minimize,
+        closeSession,
+        closePersistent,
+    } = useToolbarVisibility({
+        onPersistentClose,
+        onSessionClose,
+        onToggleMinify,
+    });
+
     const visitorSession = useVisitorSession();
+
+    const toolbarControls: ToolbarControlsContextValue = {
+        minimize,
+        closeSession,
+        closePersistent,
+        shouldAutoExpand,
+    };
+
+    if (hidden) {
+        return null;
+    }
 
     // If there is a change request, show the change request toolbar
     if (context.changeRequest) {
         return (
-            <IframeWrapper>
-                <MotionConfig reducedMotion="user">
-                    <ChangeRequestToolbar context={context} />
-                </MotionConfig>
-            </IframeWrapper>
+            <ToolbarControlsWrapper value={toolbarControls}>
+                <ChangeRequestToolbar
+                    context={context}
+                    minified={minified}
+                    onMinifiedChange={setMinified}
+                />
+            </ToolbarControlsWrapper>
         );
     }
 
     // If the revision is not the current revision, the user is looking at a previous version of the site, so show the revision toolbar
     if (context.revisionId !== context.space.revision) {
         return (
-            <IframeWrapper>
-                <MotionConfig reducedMotion="user">
-                    <RevisionToolbar context={context} />
-                </MotionConfig>
-            </IframeWrapper>
+            <ToolbarControlsWrapper value={toolbarControls}>
+                <RevisionToolbar
+                    context={context}
+                    minified={minified}
+                    onMinifiedChange={setMinified}
+                />
+            </ToolbarControlsWrapper>
         );
     }
 
     // If the user is authenticated and part of the organization owning this site, show the authenticated user toolbar
     if (visitorSession?.organizationId === context.organizationId) {
         return (
-            <IframeWrapper>
-                <MotionConfig reducedMotion="user">
-                    <AuthenticatedUserToolbar context={context} />
-                </MotionConfig>
-            </IframeWrapper>
+            <ToolbarControlsWrapper value={toolbarControls}>
+                <AuthenticatedUserToolbar
+                    context={context}
+                    minified={minified}
+                    onMinifiedChange={setMinified}
+                />
+            </ToolbarControlsWrapper>
         );
     }
+
+    return null;
 }
 
-function ChangeRequestToolbar(props: AdminToolbarClientProps) {
-    const { context } = props;
+/**
+ * Reusable wrapper that provides tooling and containers that are used by all types of toolbar views.
+ */
+export function ToolbarControlsWrapper(
+    props: React.PropsWithChildren<{ value: ToolbarControlsContextValue | null }>
+) {
+    const { children, value } = props;
+    return (
+        <ToolbarControlsProvider value={value}>
+            <IframeWrapper>
+                <MotionConfig reducedMotion="user">{children}</MotionConfig>
+            </IframeWrapper>
+        </ToolbarControlsProvider>
+    );
+}
+
+interface ToolbarViewProps {
+    context: AdminToolbarContext;
+    minified: boolean;
+    onMinifiedChange: (value: boolean) => void;
+}
+
+function ChangeRequestToolbar(props: ToolbarViewProps) {
+    const { context, minified, onMinifiedChange } = props;
     const { changeRequest, site } = context;
     if (!changeRequest) {
         throw new Error('Change request is not set');
@@ -71,11 +132,11 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
     });
 
     return (
-        <Toolbar label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
             <ToolbarBody>
                 <ToolbarTitle
-                    prefix="Change request"
-                    suffix={`#${changeRequest.number} ${changeRequest.subject || 'Untitled'}`}
+                    prefix={`Change #${changeRequest.number}:`}
+                    suffix={`${changeRequest.subject || 'Untitled'}`}
                 />
                 <ToolbarSubtitle
                     subtitle={
@@ -88,9 +149,13 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
 
             <ToolbarSeparator />
 
-            <ToolbarButtonGroup>
+            <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
+
+                {/* Edit in GitBook */}
+                <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
+
                 {/* Comment in app */}
                 <ToolbarButton
                     title="Comment in a GitBook"
@@ -125,16 +190,13 @@ function ChangeRequestToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="code-pull-request"
                 />
-
-                {/* Edit in GitBook */}
-                <EditPageButton href={changeRequest.urls.app} siteId={site.id} />
-            </ToolbarButtonGroup>
+            </ToolbarActions>
         </Toolbar>
     );
 }
 
-function RevisionToolbar(props: AdminToolbarClientProps) {
-    const { context } = props;
+function RevisionToolbar(props: ToolbarViewProps) {
+    const { context, minified, onMinifiedChange } = props;
     const { revision, site } = context;
     if (!revision) {
         throw new Error('Revision is not set');
@@ -145,7 +207,7 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
     const gitProvider = isGitHub ? 'GitHub' : 'GitLab';
 
     return (
-        <Toolbar label="Site preview">
+        <Toolbar minified={minified} onMinifiedChange={onMinifiedChange} label="Site preview">
             <ToolbarBody>
                 <ToolbarTitle prefix="Site version" suffix={context.site.title} />
                 <ToolbarSubtitle
@@ -157,7 +219,7 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                 />
             </ToolbarBody>
             <ToolbarSeparator />
-            <ToolbarButtonGroup>
+            <ToolbarActions>
                 {/* Open commit in Git client */}
                 <ToolbarButton
                     title={
@@ -205,22 +267,26 @@ function RevisionToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="code-commit"
                 />
-            </ToolbarButtonGroup>
+            </ToolbarActions>
         </Toolbar>
     );
 }
 
-function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
-    const { context } = props;
+function AuthenticatedUserToolbar(props: ToolbarViewProps) {
+    const { context, minified, onMinifiedChange } = props;
     const { revision, space, site } = context;
     const { refreshForUpdates, updated } = useCheckForContentUpdate({
         revisionId: space.revision,
     });
 
     return (
-        <Toolbar label="Only visible to your GitBook organization">
+        <Toolbar
+            minified={minified}
+            onMinifiedChange={onMinifiedChange}
+            label="Only visible to your GitBook organization"
+        >
             <ToolbarBody>
-                <ToolbarTitle prefix="Site" suffix={context.site.title} />
+                <ToolbarTitle suffix={context.site.title} />
                 <ToolbarSubtitle
                     subtitle={
                         <>
@@ -230,9 +296,14 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                 />
             </ToolbarBody>
             <ToolbarSeparator />
-            <ToolbarButtonGroup>
+            <ToolbarActions>
                 {/* Refresh to retrieve latest changes */}
                 {updated ? <RefreshContentButton refreshForUpdates={refreshForUpdates} /> : null}
+
+                {/* Edit in GitBook */}
+                <EditPageButton href={space.urls.app} siteId={site.id} />
+
+                {/* Open site in GitBook */}
                 <ToolbarButton
                     title="Open site in GitBook"
                     href={getToolbarHref({
@@ -240,8 +311,10 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                         siteId: site.id,
                         buttonId: 'site',
                     })}
-                    icon="gear"
+                    icon="gears"
                 />
+
+                {/* Customize in GitBook */}
                 <ToolbarButton
                     title="Customize in GitBook"
                     href={getToolbarHref({
@@ -251,6 +324,8 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="palette"
                 />
+
+                {/* Open insights in GitBook */}
                 <ToolbarButton
                     title="Open insights in GitBook"
                     href={getToolbarHref({
@@ -260,9 +335,19 @@ function AuthenticatedUserToolbar(props: AdminToolbarClientProps) {
                     })}
                     icon="chart-simple"
                 />
-                <EditPageButton href={space.urls.app} siteId={site.id} />
-            </ToolbarButtonGroup>
+            </ToolbarActions>
         </Toolbar>
+    );
+}
+
+function ToolbarActions(props: { children: React.ReactNode }) {
+    const { children } = props;
+
+    return (
+        <ToolbarButtonGroup>
+            {children}
+            <HideToolbarButton />
+        </ToolbarButtonGroup>
     );
 }
 
