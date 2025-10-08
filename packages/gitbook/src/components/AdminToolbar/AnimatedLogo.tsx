@@ -2,10 +2,16 @@ import { tcls } from '@/lib/tailwind';
 import type React from 'react';
 import styles from './AnimatedLogo.module.css';
 
-export const AnimatedLogo: React.FC = () => {
+interface AnimatedLogoProps {
+    shouldAnimate?: boolean;
+}
+
+export const AnimatedLogo: React.FC<AnimatedLogoProps> = (props) => {
+    const { shouldAnimate = true } = props;
+
     return (
         <svg
-            className={styles.svgLogo}
+            className={tcls(styles.svgLogo, shouldAnimate ? undefined : styles.static)}
             width="28"
             height="28"
             viewBox="0 0 28 28"

@@ -5,6 +5,7 @@ export interface ToolbarControlsContextValue {
     minimize: () => void;
     closeSession?: () => void;
     closePersistent?: () => void;
+    shouldAutoExpand?: boolean;
 }
 
 const ToolbarControlsContext = React.createContext<ToolbarControlsContextValue | null>(null);

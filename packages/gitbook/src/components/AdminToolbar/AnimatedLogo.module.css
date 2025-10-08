@@ -11,6 +11,17 @@
   vector-effect: non-scaling-stroke;
 }
 
+.static .trace {
+  animation: none;
+  fill: var(--logo-fill);
+  stroke: none;
+}
+
+.static .seg {
+  animation: none;
+  opacity: 0;
+}
+
 /* Base segment animation */
 .seg {
   opacity: 0;

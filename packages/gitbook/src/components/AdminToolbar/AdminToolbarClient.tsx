@@ -1,8 +1,6 @@
 'use client';
 import { Icon } from '@gitbook/icons';
 import { MotionConfig } from 'motion/react';
-import React from 'react';
-import { getLocalStorageItem, setLocalStorageItem } from '../../lib/browser/local-storage';
 import { useCheckForContentUpdate } from '../AutoRefreshContent';
 import { useVisitorSession } from '../Insights';
 import { useCurrentPagePath } from '../hooks';
@@ -25,44 +23,34 @@ import {
     ToolbarControlsProvider,
 } from './ToolbarControlsContext';
 import type { AdminToolbarClientProps, AdminToolbarContext } from './types';
-
-const STORAGE_KEY = 'gitbook_toolbar_closed';
+import { useToolbarVisibility } from './utils';
 
 export function AdminToolbarClient(props: AdminToolbarClientProps) {
     const { context, onPersistentClose, onSessionClose, onToggleMinify } = props;
-    const [minified, setMinified] = React.useState(true);
+    const {
+        minified,
+        setMinified,
+        shouldAutoExpand,
+        hidden,
+        minimize,
+        closeSession,
+        closePersistent,
+    } = useToolbarVisibility({
+        onPersistentClose,
+        onSessionClose,
+        onToggleMinify,
+    });
+
     const visitorSession = useVisitorSession();
-    const [sessionClosed, setSessionClosed] = React.useState(false);
-    const [shouldHide, setShouldHide] = React.useState(false);
 
-    React.useEffect(() => {
-        const hidden = getLocalStorageItem(STORAGE_KEY, false);
-        setShouldHide(hidden);
-    }, []);
-
-    const handleSessionClose = React.useCallback(() => {
-        setSessionClosed(true);
-        onSessionClose?.();
-    }, [onSessionClose]);
-
-    const handlePersistentClose = React.useCallback(() => {
-        setLocalStorageItem(STORAGE_KEY, true);
-        setSessionClosed(true);
-        onPersistentClose?.();
-    }, [onPersistentClose]);
-
-    const handleMinifiedChange = (value: boolean) => {
-        setMinified(value);
-        onToggleMinify?.();
+    const toolbarControls: ToolbarControlsContextValue = {
+        minimize,
+        closeSession,
+        closePersistent,
+        shouldAutoExpand,
     };
 
-    const toolbarControls = {
-        minimize: () => handleMinifiedChange(true),
-        closeSession: handleSessionClose,
-        closePersistent: handlePersistentClose,
-    };
-
-    if (shouldHide || sessionClosed) {
+    if (hidden) {
         return null;
     }
 
@@ -73,7 +61,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
                 <ChangeRequestToolbar
                     context={context}
                     minified={minified}
-                    onMinifiedChange={handleMinifiedChange}
+                    onMinifiedChange={setMinified}
                 />
             </ToolbarControlsWrapper>
         );
@@ -86,7 +74,7 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
                 <RevisionToolbar
                     context={context}
                     minified={minified}
-                    onMinifiedChange={handleMinifiedChange}
+                    onMinifiedChange={setMinified}
                 />
             </ToolbarControlsWrapper>
         );
@@ -99,11 +87,13 @@ export function AdminToolbarClient(props: AdminToolbarClientProps) {
                 <AuthenticatedUserToolbar
                     context={context}
                     minified={minified}
-                    onMinifiedChange={handleMinifiedChange}
+                    onMinifiedChange={setMinified}
                 />
             </ToolbarControlsWrapper>
         );
     }
+
+    return null;
 }
 
 /**

@@ -8,6 +8,7 @@ import {
 } from 'motion/react';
 import React from 'react';
 import { AnimatedLogo } from './AnimatedLogo';
+import { useToolbarControls } from './ToolbarControlsContext';
 
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName, IconStyle } from '@gitbook/icons';
@@ -27,7 +28,12 @@ interface ToolbarProps {
 
 export function Toolbar(props: ToolbarProps) {
     const { children, label, minified, onMinifiedChange } = props;
+    const controls = useToolbarControls();
     const [isReady, setIsReady] = React.useState(false);
+    const autoExpandTriggeredRef = React.useRef(false);
+
+    const shouldAutoExpand = Boolean(controls?.shouldAutoExpand);
+    const [shouldAnimateLogo, setShouldAnimateLogo] = React.useState(shouldAutoExpand);
 
     // Wait for page to be ready, then show the toolbar
     React.useEffect(() => {
@@ -43,18 +49,41 @@ export function Toolbar(props: ToolbarProps) {
         }
     }, []);
 
-    // After toolbar appears, wait then show the full content
+    // After toolbar appears, wait, then show the full content
     React.useEffect(() => {
-        if (!isReady) {
+        if (!isReady || autoExpandTriggeredRef.current) {
             return;
         }
 
+        if (!shouldAutoExpand) {
+            // When we already know the toolbar should stay expanded (e.g. the user previously
+            // opened it this session) we short-circuit the auto-expand animation and immediately
+            // render the expanded state without replaying the logo animation.
+            autoExpandTriggeredRef.current = true;
+            setShouldAnimateLogo(false);
+            return;
+        }
+
+        autoExpandTriggeredRef.current = true;
+
+        // On a fresh session we let the toolbar appear in its compact form, play the logo
+        // animation, and only then expand the toolbar. The timeout mirrors the duration of the
+        // logo animation so both transitions feel connected.
         const expandAfterTimeout = setTimeout(() => {
+            setShouldAnimateLogo(false);
             onMinifiedChange(false);
         }, DURATION_LOGO_APPEARANCE + DELAY_BETWEEN_LOGO_AND_CONTENT);
 
         return () => clearTimeout(expandAfterTimeout);
-    }, [isReady, onMinifiedChange]);
+    }, [isReady, onMinifiedChange, shouldAutoExpand]);
+
+    React.useEffect(() => {
+        if (!minified) {
+            // Any manual expansion should stop the logo animation so the icon stays in its
+            // “settled” state once the toolbar is open.
+            setShouldAnimateLogo(false);
+        }
+    }, [minified]);
 
     // Don't render anything until page is ready
     if (!isReady) {
@@ -68,6 +97,7 @@ export function Toolbar(props: ToolbarProps) {
                     <motion.div
                         onClick={() => {
                             if (minified) {
+                                setShouldAnimateLogo(false);
                                 onMinifiedChange(false);
                             }
                         }}
@@ -94,7 +124,7 @@ export function Toolbar(props: ToolbarProps) {
                     >
                         {/* Logo with stroke segments animation in blue-tints */}
                         <motion.div layout>
-                            <AnimatedLogo />
+                            <AnimatedLogo shouldAnimate={shouldAnimateLogo} />
                         </motion.div>
 
                         {!minified ? children : null}
