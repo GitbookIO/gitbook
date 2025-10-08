@@ -11,7 +11,8 @@
     "dependencies": {
         "classnames": "^2.5.1",
         "@gitbook/api": "catalog:",
-        "@gitbook/icons": "workspace:*"
+        "@gitbook/icons": "workspace:*",
+        "usehooks-ts": "^3.1.0"
     },
     "peerDependencies": {
         "react": "*"

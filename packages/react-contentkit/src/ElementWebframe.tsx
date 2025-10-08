@@ -2,8 +2,8 @@
 
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
-
 import { useResizeObserver } from 'usehooks-ts';
+
 import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
@@ -14,8 +14,12 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const [mounted, setMounted] = React.useState(false);
     const renderer = useContentKitClientContext();
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
+    const { width: iframeWidth } = useResizeObserver<HTMLIFrameElement>({
+        ref: iframeRef,
+    });
     const [size, setSize] = React.useState<{
         height?: number;
+        originalWidth?: number;
         aspectRatio?: number;
     }>({});
 
@@ -90,6 +94,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                         setSize({
                             aspectRatio: width / height,
                             height: height,
+                            originalWidth: width,
                         });
                     }
                 } catch (_err) {
@@ -125,6 +130,11 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
                                 return size.height;
                             })(),
+
+                            originalWidth:
+                                typeof message.action.size.width !== 'undefined'
+                                    ? Number(message.action.size.width)
+                                    : size.originalWidth,
                         }));
                         break;
                     default:
@@ -162,32 +172,23 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
-    const iframeSize = useResizeObserver({
-        ref: iframeRef,
-        onResize: (size) => size.width ?? 0,
-    });
-    const iframeWidth = iframeSize.width ?? 0;
+    const aspectRatio = size.aspectRatio || element.aspectRatio;
+
+    const height = React.useMemo(() => {
+        if (size.originalWidth && aspectRatio && iframeWidth && size.originalWidth > iframeWidth) {
+            return Math.max(Math.round(iframeWidth / aspectRatio), 32);
+        }
+
+        if (typeof size.height === 'number') {
+            return Math.max(size.height, 32);
+        }
+
+        return '100%';
+    }, [aspectRatio, iframeWidth, size.height, size.originalWidth]);
 
     if (!mounted) {
         return null;
     }
-
-    const aspectRatio = size.aspectRatio || element.aspectRatio;
-
-    // Compute the original width based on the aspect ratio and height.
-    const originalWidth =
-        size.height && size.aspectRatio ? size.height * size.aspectRatio : undefined;
-
-    // Compute the height of the iframe:
-    // - If the iframe is shorter than the original width, we use the aspect ratio to compute the height.
-    // - If the iframe width is larger than the original width, we use the provided height
-    //   or default to '100%' if not specified.
-    const height =
-        originalWidth && aspectRatio && iframeSize && originalWidth > iframeWidth
-            ? Math.max(Math.round(iframeWidth / aspectRatio), 32)
-            : size.height
-              ? Math.max(size.height, 32)
-              : '100%';
 
     return (
         <iframe
