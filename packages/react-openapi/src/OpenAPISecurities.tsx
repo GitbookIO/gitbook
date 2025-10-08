@@ -1,4 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { Fragment } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
@@ -93,7 +94,6 @@ function getLabelForType(security: OpenAPICustomSecurityScheme, context: OpenAPI
             }
 
             if (security.scheme === 'bearer') {
-                const description = resolveDescription(security);
                 return (
                     <>
                         <OpenAPISchemaName
@@ -103,7 +103,7 @@ function getLabelForType(security: OpenAPICustomSecurityScheme, context: OpenAPI
                             required={security.required}
                         />
                         {/** Show a default description if none is provided */}
-                        {!description ? (
+                        {!security.description ? (
                             <Markdown
                                 source={`Bearer authentication header of the form Bearer ${'&lt;token&gt;'}.`}
                                 className="openapi-securities-description"
@@ -147,13 +147,15 @@ function OpenAPISchemaOAuth2Flows(props: {
     return (
         <div className="openapi-securities-oauth-flows">
             {flows.map(([name, flow], index) => (
-                <OpenAPISchemaOAuth2Item
-                    key={index}
-                    flow={flow}
-                    name={name}
-                    context={context}
-                    security={security}
-                />
+                <Fragment key={index}>
+                    <OpenAPISchemaOAuth2Item
+                        flow={flow}
+                        name={name}
+                        context={context}
+                        security={security}
+                    />
+                    {index < flows.length - 1 ? <hr /> : null}
+                </Fragment>
             ))}
         </div>
     );
@@ -172,6 +174,8 @@ function OpenAPISchemaOAuth2Item(props: {
     if (!flow) {
         return null;
     }
+
+    const scopes = Object.entries(flow.scopes ?? {});
 
     return (
         <div>
@@ -222,6 +226,7 @@ function OpenAPISchemaOAuth2Item(props: {
                         </OpenAPICopyButton>
                     </span>
                 ) : null}
+                {scopes.length ? <OpenAPISchemaScopes scopes={scopes} context={context} /> : null}
             </div>
         </div>
     );
@@ -241,11 +246,7 @@ function OpenAPISchemaScopes(props: {
             <span>{t(context.translation, 'available_scopes')}: </span>
             <ul>
                 {scopes.map((scope) => (
-                    <OpenAPIScopeItem
-                        key={Array.isArray(scope) ? scope[0] : scope}
-                        scope={scope}
-                        context={context}
-                    />
+                    <OpenAPIScopeItem key={scope[0]} scope={scope} context={context} />
                 ))}
             </ul>
         </div>

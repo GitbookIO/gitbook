@@ -317,7 +317,7 @@
 }
 
 .openapi-securities-oauth-flows {
-    @apply flex flex-col gap-2 divide-y divide-tint-subtle;
+    @apply flex flex-col gap-3;
 }
 
 .openapi-securities-oauth-content,

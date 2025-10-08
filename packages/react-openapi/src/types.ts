@@ -20,7 +20,10 @@ export type OpenAPIServerWithCustomProperties = Omit<OpenAPIV3.ServerObject, 'va
 export type OpenAPISecurityScope = [string, string | undefined];
 
 export type OpenAPICustomSecurityScheme = OpenAPIV3.SecuritySchemeObject &
-    OpenAPICustomPrefillProperties & { required?: boolean; scopes: OpenAPISecurityScope[] };
+    OpenAPICustomPrefillProperties & {
+        required?: boolean;
+        scopes?: OpenAPISecurityScope[] | null;
+    };
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;

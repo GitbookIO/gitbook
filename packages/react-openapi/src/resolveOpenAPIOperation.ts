@@ -159,47 +159,16 @@ function resolveSecurityScopes({
 }: {
     securityScheme?: OpenAPIV3.ReferenceObject | OpenAPIV3.SecuritySchemeObject;
     operationScopes?: string[];
-}): OpenAPISecurityScope[] {
-    if (!securityScheme || checkIsReference(securityScheme)) {
-        return [];
-    }
-
-    if (isOAuthSecurityScheme(securityScheme) && securityScheme.flows) {
-        return resolveOAuth2Scopes(securityScheme.flows, operationScopes);
+}): OpenAPISecurityScope[] | null {
+    if (
+        !securityScheme ||
+        checkIsReference(securityScheme) ||
+        isOAuthSecurityScheme(securityScheme)
+    ) {
+        return null;
     }
 
     return operationScopes?.map((scope) => [scope, undefined]) || [];
-}
-
-/**
- * Resolve the scopes for an OAuth2 security scheme.
- */
-function resolveOAuth2Scopes(
-    flows: NonNullable<OpenAPIV3.OAuth2SecurityScheme['flows']>,
-    operationScopes?: string[]
-): OpenAPISecurityScope[] {
-    const flowValues = Object.values(flows);
-
-    // Return all operation scopes if no flow scopes are provided
-    if (!flowValues.length) {
-        return operationScopes?.map((scope) => [scope, undefined]) || [];
-    }
-
-    // Return all flow scopes if no operation scopes are provided
-    if (!operationScopes?.length) {
-        return flowValues.flatMap((flow) => Object.entries(flow.scopes ?? {}));
-    }
-
-    // Merge the operation scopes with the flow scopes if both are provided
-    return flowValues.flatMap((flow): OpenAPISecurityScope[] => {
-        if (flow.scopes) {
-            return operationScopes.map((scope) => {
-                const flowScope = flow.scopes?.[scope];
-                return [scope, flowScope];
-            });
-        }
-        return [];
-    });
 }
 
 /**
