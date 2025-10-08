@@ -17,8 +17,10 @@ export type OpenAPIServerWithCustomProperties = Omit<OpenAPIV3.ServerObject, 'va
     };
 } & OpenAPICustomPrefillProperties;
 
-export type OpenAPISecuritySchemeWithRequired = OpenAPIV3.SecuritySchemeObject &
-    OpenAPICustomPrefillProperties & { required?: boolean };
+export type OpenAPISecurityScope = [string, string | undefined];
+
+export type OpenAPICustomSecurityScheme = OpenAPIV3.SecuritySchemeObject &
+    OpenAPICustomPrefillProperties & { required?: boolean; scopes: OpenAPISecurityScope[] };
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;
@@ -31,7 +33,7 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
 
     /** Securities that should be used for this operation */
-    securities: [string, OpenAPISecuritySchemeWithRequired][];
+    securities: [string, OpenAPICustomSecurityScheme][];
 }
 
 export interface OpenAPIWebhookData extends OpenAPICustomSpecProperties {

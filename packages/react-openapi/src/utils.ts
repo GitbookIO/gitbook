@@ -2,7 +2,7 @@ import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser'
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import type { OpenAPIOperationData, OpenAPISecuritySchemeWithRequired } from './types';
+import type { OpenAPICustomSecurityScheme, OpenAPIOperationData } from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
@@ -258,7 +258,7 @@ export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
 export type OperationSecurityInfo = {
     key: string;
     label: string;
-    schemes: OpenAPISecuritySchemeWithRequired[];
+    schemes: OpenAPICustomSecurityScheme[];
 };
 
 /**
@@ -288,7 +288,7 @@ export function extractOperationSecurityInfo(args: {
             label: schemeKeys.join(' & '),
             schemes: schemeKeys
                 .map((schemeKey) => securitiesMap.get(schemeKey))
-                .filter((s) => s !== undefined),
+                .filter((s): s is OpenAPICustomSecurityScheme => s !== undefined),
         };
     });
 }

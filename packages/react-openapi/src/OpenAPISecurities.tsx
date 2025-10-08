@@ -5,7 +5,7 @@ import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import type { OpenAPISecuritySchemeWithRequired } from './types';
+import type { OpenAPICustomSecurityScheme, OpenAPISecurityScope } from './types';
 import type { OpenAPIOperationData } from './types';
 import { createStateKey, extractOperationSecurityInfo, resolveDescription } from './utils';
 
@@ -53,6 +53,12 @@ export function OpenAPISecurities(props: {
                                             className="openapi-securities-description"
                                         />
                                     ) : null}
+                                    {security.scopes?.length ? (
+                                        <OpenAPISchemaScopes
+                                            scopes={security.scopes}
+                                            context={context}
+                                        />
+                                    ) : null}
                                 </div>
                             );
                         })}
@@ -63,10 +69,7 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(
-    security: OpenAPISecuritySchemeWithRequired,
-    context: OpenAPIClientContext
-) {
+function getLabelForType(security: OpenAPICustomSecurityScheme, context: OpenAPIClientContext) {
     switch (security.type) {
         case 'apiKey':
             return (
@@ -170,8 +173,6 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    const scopes = Object.entries(flow?.scopes ?? {});
-
     return (
         <div>
             <OpenAPISchemaName
@@ -221,22 +222,65 @@ function OpenAPISchemaOAuth2Item(props: {
                         </OpenAPICopyButton>
                     </span>
                 ) : null}
-                {scopes.length ? (
-                    <div>
-                        {t(context.translation, 'available_scopes')}:{' '}
-                        <ul>
-                            {scopes.map(([key, value]) => (
-                                <li key={key}>
-                                    <OpenAPICopyButton value={key} context={context} withTooltip>
-                                        <code>{key}</code>
-                                    </OpenAPICopyButton>
-                                    : {value}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ) : null}
             </div>
         </div>
+    );
+}
+
+/**
+ * Render a list of available scopes.
+ */
+function OpenAPISchemaScopes(props: {
+    scopes: OpenAPISecurityScope[];
+    context: OpenAPIClientContext;
+}) {
+    const { scopes, context } = props;
+
+    return (
+        <div className="openapi-securities-scopes openapi-markdown">
+            <span>{t(context.translation, 'available_scopes')}: </span>
+            <ul>
+                {scopes.map((scope) => (
+                    <OpenAPIScopeItem
+                        key={Array.isArray(scope) ? scope[0] : scope}
+                        scope={scope}
+                        context={context}
+                    />
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+/**
+ * Display a scope item. Either a key-value pair or a single string.
+ */
+function OpenAPIScopeItem(props: {
+    scope: OpenAPISecurityScope;
+    context: OpenAPIClientContext;
+}) {
+    const { scope, context } = props;
+
+    return (
+        <li>
+            {scope[0] ? <OpenAPIScopeItemKey name={scope[0]} context={context} /> : null}
+            {scope[1] ? `: ${scope[1]}` : null}
+        </li>
+    );
+}
+
+/**
+ * Displays the scope name within a copyable button.
+ */
+function OpenAPIScopeItemKey(props: {
+    name: string;
+    context: OpenAPIClientContext;
+}) {
+    const { name, context } = props;
+
+    return (
+        <OpenAPICopyButton value={name} context={context} withTooltip>
+            <code>{name}</code>
+        </OpenAPICopyButton>
     );
 }
