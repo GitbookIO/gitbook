@@ -157,12 +157,17 @@ export async function streamAskQuestion({
                         }
 
                         if (!spacePromises.has(source.space)) {
+                            // Extract the source revision ID if it's a computed revision.
+                            const revisionId = source.revision.startsWith('computed_')
+                                ? (source.revision.split('_')[1] ?? '')
+                                : source.revision;
+
                             spacePromises.set(
                                 source.space,
                                 throwIfDataError(
                                     context.dataFetcher.getRevision({
                                         spaceId: source.space,
-                                        revisionId: source.revision,
+                                        revisionId,
                                     })
                                 )
                             );
@@ -175,8 +180,15 @@ export async function streamAskQuestion({
                 // Get the pages for all spaces referenced by this answer.
                 const pages = await Promise.all(
                     spaces.map(async (space) => {
-                        const revision = await spacePromises.get(space);
-                        return { space, pages: revision?.pages };
+                        try {
+                            const revision = await spacePromises.get(space);
+                            return { space, pages: revision?.pages };
+                        } catch (err) {
+                            console.error('Error getting revision', err);
+                            // TODO: should we swallow the error as it's not essential to the answer?
+                            // return { space, pages: null };
+                            throw err;
+                        }
                     })
                 ).then((results) => {
                     return results.reduce((map, result) => {
