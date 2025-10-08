@@ -8,7 +8,7 @@ import {
     setSessionStorageItem,
 } from '@/lib/browser/local-storage';
 
-export const STORAGE_KEY = 'gitbook_toolbar_closed';
+const STORAGE_KEY = 'gitbook_toolbar_closed';
 const SESSION_STORAGE_KEY = 'gitbook_toolbar_session_closed';
 const SESSION_MINIFIED_KEY = 'gitbook_toolbar_minified';
 
@@ -140,7 +140,7 @@ export function useToolbarVisibility(options: UseToolbarVisibilityOptions = {}) 
         onPersistentClose?.();
     };
 
-    const hidden = persistentHidden || (!persistentHidden && sessionReason === 'session');
+    const hidden = persistentHidden || sessionReason === 'session';
 
     return {
         minified,
