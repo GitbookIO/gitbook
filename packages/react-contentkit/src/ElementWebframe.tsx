@@ -3,6 +3,7 @@
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
+import { useResizeObserver } from 'usehooks-ts';
 import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
@@ -161,11 +162,32 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
+    const iframeSize = useResizeObserver({
+        ref: iframeRef,
+        onResize: (size) => size.width ?? 0,
+    });
+    const iframeWidth = iframeSize.width ?? 0;
+
     if (!mounted) {
         return null;
     }
 
     const aspectRatio = size.aspectRatio || element.aspectRatio;
+
+    // Compute the original width based on the aspect ratio and height.
+    const originalWidth =
+        size.height && size.aspectRatio ? size.height * size.aspectRatio : undefined;
+
+    // Compute the height of the iframe:
+    // - If the iframe is shorter than the original width, we use the aspect ratio to compute the height.
+    // - If the iframe width is larger than the original width, we use the provided height
+    //   or default to '100%' if not specified.
+    const height =
+        originalWidth && aspectRatio && iframeSize && originalWidth > iframeWidth
+            ? Math.max(Math.round(iframeWidth / aspectRatio), 32)
+            : size.height
+              ? Math.max(size.height, 32)
+              : '100%';
 
     return (
         <iframe
@@ -179,7 +201,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                 width: '100%',
                 maxWidth: '100%',
                 aspectRatio,
-                height: size.height ? Math.max(size.height, 32) : '100%',
+                height,
                 border: 'none',
             }}
         />
