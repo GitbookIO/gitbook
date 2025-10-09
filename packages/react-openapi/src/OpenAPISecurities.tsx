@@ -243,7 +243,7 @@ function OpenAPISchemaScopes(props: {
 
     return (
         <div className="openapi-securities-scopes openapi-markdown">
-            <span>{t(context.translation, 'available_scopes')}: </span>
+            <span>{t(context.translation, 'required_scopes')}: </span>
             <ul>
                 {scopes.map((scope) => (
                     <OpenAPIScopeItem key={scope[0]} scope={scope} context={context} />
