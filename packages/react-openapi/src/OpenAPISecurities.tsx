@@ -142,7 +142,7 @@ function OpenAPISchemaOAuth2Flows(props: {
 }) {
     const { context, security } = props;
 
-    const flows = Object.entries(security.flows ?? {});
+    const flows = security.flows ? Object.entries(security.flows) : [];
 
     return (
         <div className="openapi-securities-oauth-flows">
@@ -175,7 +175,7 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    const scopes = Object.entries(flow.scopes ?? {});
+    const scopes = flow.scopes ? Object.entries(flow.scopes) : [];
 
     return (
         <div>
@@ -264,7 +264,7 @@ function OpenAPIScopeItem(props: {
 
     return (
         <li>
-            {scope[0] ? <OpenAPIScopeItemKey name={scope[0]} context={context} /> : null}
+            <OpenAPIScopeItemKey name={scope[0]} context={context} />
             {scope[1] ? `: ${scope[1]}` : null}
         </li>
     );
