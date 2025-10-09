@@ -36,7 +36,7 @@ export const zh = {
     show: '显示${1}',
     hide: '隐藏${1}',
     available_items: '可用项',
-    available_scopes: '可用范围',
+    required_scopes: '必需范围',
     properties: '属性',
     or: '或',
     and: '和',

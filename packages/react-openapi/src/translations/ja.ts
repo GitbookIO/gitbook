@@ -36,7 +36,7 @@ export const ja = {
     show: '${1}を表示',
     hide: '${1}を非表示',
     available_items: '利用可能なアイテム',
-    available_scopes: '利用可能なスコープ',
+    required_scopes: '必須スコープ',
     properties: 'プロパティ',
     or: 'または',
     and: 'かつ',

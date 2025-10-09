@@ -3,8 +3,8 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type { ApiClientConfiguration } from '@scalar/types';
 import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
 import type {
+    OpenAPICustomSecurityScheme,
     OpenAPIOperationData,
-    OpenAPISecuritySchemeWithRequired,
     OpenAPIServerWithCustomProperties,
 } from '../types';
 
@@ -170,7 +170,7 @@ function resolveTryItPrefillServersForOperationServers(args: {
  * Return a X-GITBOOK-PREFILL placeholder based on the prefill custom property in the provided security scheme.
  */
 export function resolvePrefillCodePlaceholderFromSecurityScheme(args: {
-    security: OpenAPISecuritySchemeWithRequired;
+    security: OpenAPICustomSecurityScheme;
     defaultPlaceholderValue?: string;
 }) {
     const { security, defaultPlaceholderValue } = args;
@@ -185,7 +185,7 @@ export function resolvePrefillCodePlaceholderFromSecurityScheme(args: {
 }
 
 function extractPrefillExpressionPartsFromSecurityScheme(
-    security: OpenAPISecuritySchemeWithRequired
+    security: OpenAPICustomSecurityScheme
 ): TemplatePart[] {
     const expression = security[PREFILL_CUSTOM_PROPERTY];
 
