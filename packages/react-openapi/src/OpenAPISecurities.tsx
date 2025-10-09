@@ -1,11 +1,12 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { Fragment } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import type { OpenAPISecuritySchemeWithRequired } from './types';
+import type { OpenAPICustomSecurityScheme, OpenAPISecurityScope } from './types';
 import type { OpenAPIOperationData } from './types';
 import { createStateKey, extractOperationSecurityInfo, resolveDescription } from './utils';
 
@@ -53,6 +54,12 @@ export function OpenAPISecurities(props: {
                                             className="openapi-securities-description"
                                         />
                                     ) : null}
+                                    {security.scopes?.length ? (
+                                        <OpenAPISchemaScopes
+                                            scopes={security.scopes}
+                                            context={context}
+                                        />
+                                    ) : null}
                                 </div>
                             );
                         })}
@@ -63,10 +70,7 @@ export function OpenAPISecurities(props: {
     );
 }
 
-function getLabelForType(
-    security: OpenAPISecuritySchemeWithRequired,
-    context: OpenAPIClientContext
-) {
+function getLabelForType(security: OpenAPICustomSecurityScheme, context: OpenAPIClientContext) {
     switch (security.type) {
         case 'apiKey':
             return (
@@ -90,7 +94,6 @@ function getLabelForType(
             }
 
             if (security.scheme === 'bearer') {
-                const description = resolveDescription(security);
                 return (
                     <>
                         <OpenAPISchemaName
@@ -100,7 +103,7 @@ function getLabelForType(
                             required={security.required}
                         />
                         {/** Show a default description if none is provided */}
-                        {!description ? (
+                        {!security.description ? (
                             <Markdown
                                 source={`Bearer authentication header of the form Bearer ${'&lt;token&gt;'}.`}
                                 className="openapi-securities-description"
@@ -139,18 +142,20 @@ function OpenAPISchemaOAuth2Flows(props: {
 }) {
     const { context, security } = props;
 
-    const flows = Object.entries(security.flows ?? {});
+    const flows = security.flows ? Object.entries(security.flows) : [];
 
     return (
         <div className="openapi-securities-oauth-flows">
             {flows.map(([name, flow], index) => (
-                <OpenAPISchemaOAuth2Item
-                    key={index}
-                    flow={flow}
-                    name={name}
-                    context={context}
-                    security={security}
-                />
+                <Fragment key={index}>
+                    <OpenAPISchemaOAuth2Item
+                        flow={flow}
+                        name={name}
+                        context={context}
+                        security={security}
+                    />
+                    {index < flows.length - 1 ? <hr /> : null}
+                </Fragment>
             ))}
         </div>
     );
@@ -170,7 +175,7 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    const scopes = Object.entries(flow?.scopes ?? {});
+    const scopes = flow.scopes ? Object.entries(flow.scopes) : [];
 
     return (
         <div>
@@ -221,22 +226,62 @@ function OpenAPISchemaOAuth2Item(props: {
                         </OpenAPICopyButton>
                     </span>
                 ) : null}
-                {scopes.length ? (
-                    <div>
-                        {t(context.translation, 'available_scopes')}:{' '}
-                        <ul>
-                            {scopes.map(([key, value]) => (
-                                <li key={key}>
-                                    <OpenAPICopyButton value={key} context={context} withTooltip>
-                                        <code>{key}</code>
-                                    </OpenAPICopyButton>
-                                    : {value}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ) : null}
+                {scopes.length ? <OpenAPISchemaScopes scopes={scopes} context={context} /> : null}
             </div>
         </div>
+    );
+}
+
+/**
+ * Render a list of available scopes.
+ */
+function OpenAPISchemaScopes(props: {
+    scopes: OpenAPISecurityScope[];
+    context: OpenAPIClientContext;
+}) {
+    const { scopes, context } = props;
+
+    return (
+        <div className="openapi-securities-scopes openapi-markdown">
+            <span>{t(context.translation, 'required_scopes')}: </span>
+            <ul>
+                {scopes.map((scope) => (
+                    <OpenAPIScopeItem key={scope[0]} scope={scope} context={context} />
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+/**
+ * Display a scope item. Either a key-value pair or a single string.
+ */
+function OpenAPIScopeItem(props: {
+    scope: OpenAPISecurityScope;
+    context: OpenAPIClientContext;
+}) {
+    const { scope, context } = props;
+
+    return (
+        <li>
+            <OpenAPIScopeItemKey name={scope[0]} context={context} />
+            {scope[1] ? `: ${scope[1]}` : null}
+        </li>
+    );
+}
+
+/**
+ * Displays the scope name within a copyable button.
+ */
+function OpenAPIScopeItemKey(props: {
+    name: string;
+    context: OpenAPIClientContext;
+}) {
+    const { name, context } = props;
+
+    return (
+        <OpenAPICopyButton value={name} context={context} withTooltip>
+            <code>{name}</code>
+        </OpenAPICopyButton>
     );
 }

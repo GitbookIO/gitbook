@@ -36,7 +36,7 @@ export const en = {
     show: 'Show ${1}',
     hide: 'Hide ${1}',
     available_items: 'Available items',
-    available_scopes: 'Available scopes',
+    required_scopes: 'Required scopes',
     possible_values: 'Possible values',
     properties: 'Properties',
     or: 'or',
