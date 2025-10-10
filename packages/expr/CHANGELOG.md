@@ -1,5 +1,11 @@
 # @gitbook/expr
 
+## 1.2.1
+
+### Patch Changes
+
+- a629900: Add dev script for @gitbook/expr
+
 ## 1.2.0
 
 ### Minor Changes
