@@ -31,7 +31,8 @@
         "build-lib": "tsdown",
         "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
         "clean": "rm -rf ./dist",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "dev": "bun run build -- --watch ./src"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {

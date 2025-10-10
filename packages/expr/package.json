@@ -32,7 +32,7 @@
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
         "clean": "rm -rf ./dist",
-        "dev": "bun run build -- --watch"
+        "dev": "bun run build -- --watch ./src"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
