@@ -5,9 +5,11 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "default": "./dist/index.js",
-            "standalone": "./dist/standalone/index.js",
-            "react": "./dist/react/index.js"
+            "default": "./dist/index.js"
+        },
+        "./react": {
+            "types": "./dist/react/index.d.ts",
+            "default": "./dist/react/index.js"
         }
     },
     "version": "0.1.1",
@@ -20,12 +22,16 @@
         "react": "^18.0.0"
     },
     "devDependencies": {
+        "tsdown": "catalog:",
         "typescript": "^5.5.3",
         "react": "^19.0.0"
     },
     "scripts": {
-        "build": "tsc && bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
+        "build": "bun run build-lib && bun run build-standalone",
+        "build-lib": "tsdown",
+        "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
+        "clean": "rm -rf ./dist",
         "typecheck": "tsc --noEmit"
     },
-    "files": ["dist", "README.md", "CHANGELOG.md", "standalone"]
+    "files": ["dist", "README.md", "CHANGELOG.md"]
 }

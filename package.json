@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@changesets/cli": "^2.27.12",
+        "@changesets/cli": "^2.29.7",
         "turbo": "^2.5.0",
         "vercel": "^39.3.0"
     },
@@ -26,8 +26,9 @@
         "e2e": "turbo run e2e",
         "e2e-customers": "turbo run e2e-customers",
         "changeset": "changeset",
-        "changeset-version": "changeset version && bun run format",
-        "release": "turbo run release && changeset publish",
+        "changeset-version": "changeset version && bun run format && bun update",
+        "release": "turbo run release && bun run publish-all-packages",
+        "publish-all-packages": "for dir in packages/*; do (cd \"$dir\" && bun publish || true); done && changeset tag",
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },
@@ -35,7 +36,8 @@
         "packages": ["packages/*"],
         "catalog": {
             "@gitbook/api": "0.143.2",
-            "bidc": "^0.0.2"
+            "bidc": "^0.0.2",
+            "tsdown": "^0.15.6"
         }
     },
     "patchedDependencies": {
