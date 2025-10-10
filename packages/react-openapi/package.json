@@ -40,5 +40,9 @@
         "dev": "bun run build -- --watch",
         "clean": "rm -rf ./dist"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "src", "README.md", "CHANGELOG.md"],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    }
 }
