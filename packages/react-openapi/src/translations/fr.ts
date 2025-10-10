@@ -36,7 +36,7 @@ export const fr = {
     show: 'Afficher ${1}',
     hide: 'Masquer ${1}',
     available_items: 'Éléments disponibles',
-    available_scopes: 'Scopes disponibles',
+    required_scopes: 'Scopes requis',
     properties: 'Propriétés',
     or: 'ou',
     and: 'et',

@@ -12,7 +12,8 @@ import type {
 } from '@gitbook/api';
 import React from 'react';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
+import { backgroundColorToStyle, textColorToStyle } from './utils/colors';
 
 export function Text(props: { text: DocumentText }) {
     const { text } = props;
@@ -121,51 +122,3 @@ function Color(props: MarkedLeafProps<DocumentMarkColor>) {
         </span>
     );
 }
-
-/**
- * @TODO replace by DocumentMarkColor['data']['text'] and DocumentMarkColor['data']['background']
- * once the API is updated.
- */
-type DocumentMarkColorValue =
-    | 'default'
-    | 'green'
-    | 'blue'
-    | 'red'
-    | 'orange'
-    | 'yellow'
-    | 'purple'
-    | '$primary'
-    | '$info'
-    | '$success'
-    | '$warning'
-    | '$danger';
-
-const textColorToStyle: { [color in DocumentMarkColorValue]: ClassValue } = {
-    default: [],
-    blue: ['text-blue-500'],
-    red: ['text-red-500'],
-    green: ['text-green-500'],
-    yellow: ['text-yellow-600'],
-    purple: ['text-purple-500'],
-    orange: ['text-orange-500'],
-    $primary: ['text-primary'],
-    $info: ['text-info'],
-    $success: ['text-success'],
-    $warning: ['text-warning'],
-    $danger: ['text-danger'],
-};
-
-const backgroundColorToStyle: { [color in DocumentMarkColorValue]: ClassValue } = {
-    default: [],
-    blue: ['bg-mark-blue'],
-    red: ['bg-mark-red'],
-    green: ['bg-mark-green'],
-    yellow: ['bg-mark-yellow'],
-    purple: ['bg-mark-purple'],
-    orange: ['bg-mark-orange'],
-    $primary: ['bg-primary'],
-    $info: ['bg-info'],
-    $success: ['bg-success'],
-    $warning: ['bg-warning'],
-    $danger: ['bg-danger'],
-};

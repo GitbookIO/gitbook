@@ -8,7 +8,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "1.4.3",
+    "version": "1.5.0",
     "sideEffects": false,
     "dependencies": {
         "@gitbook/expr": "workspace:*",
@@ -40,5 +40,9 @@
         "dev": "bun run build -- --watch",
         "clean": "rm -rf ./dist"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "src", "README.md", "CHANGELOG.md"],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    }
 }

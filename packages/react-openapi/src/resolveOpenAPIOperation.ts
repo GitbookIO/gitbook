@@ -7,7 +7,7 @@ import type {
     OpenAPIV3xDocument,
 } from '@gitbook/openapi-parser';
 import { dereferenceFilesystem } from './dereference';
-import type { OpenAPIOperationData } from './types';
+import type { OpenAPIOperationData, OpenAPISecurityScope } from './types';
 import { checkIsReference } from './utils';
 
 export { fromJSON, toJSON };
@@ -54,18 +54,21 @@ export async function resolveOpenAPIOperation(
     // Resolve securities
     const securities: OpenAPIOperationData['securities'] = [];
     for (const entry of flatSecurities) {
-        const securityKey = Object.keys(entry)[0];
+        const [securityKey, operationScopes] = Object.entries(entry)[0] ?? [];
         if (securityKey) {
             const securityScheme = schema.components?.securitySchemes?.[securityKey];
-            if (securityScheme && !checkIsReference(securityScheme)) {
-                securities.push([
-                    securityKey,
-                    {
-                        ...securityScheme,
-                        required: !isOptionalSecurity,
-                    },
-                ]);
-            }
+            const scopes = resolveSecurityScopes({
+                securityScheme,
+                operationScopes,
+            });
+            securities.push([
+                securityKey,
+                {
+                    ...securityScheme,
+                    required: !isOptionalSecurity,
+                    scopes,
+                },
+            ]);
         }
     }
 
@@ -91,10 +94,7 @@ function getPathObject(
     schema: OpenAPIV3.Document | OpenAPIV3_1.Document,
     path: string
 ): OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject | null {
-    if (schema.paths?.[path]) {
-        return schema.paths[path];
-    }
-    return null;
+    return schema.paths?.[path] || null;
 }
 
 /**
@@ -148,4 +148,34 @@ function flattenSecurities(security: OpenAPIV3.SecurityRequirementObject[]) {
             [authType]: config,
         }));
     });
+}
+
+/**
+ * Resolve the scopes for a security scheme.
+ */
+function resolveSecurityScopes({
+    securityScheme,
+    operationScopes,
+}: {
+    securityScheme?: OpenAPIV3.ReferenceObject | OpenAPIV3.SecuritySchemeObject;
+    operationScopes?: string[];
+}): OpenAPISecurityScope[] | null {
+    if (
+        !securityScheme ||
+        checkIsReference(securityScheme) ||
+        isOAuthSecurityScheme(securityScheme)
+    ) {
+        return null;
+    }
+
+    return operationScopes?.map((scope) => [scope, undefined]) || [];
+}
+
+/**
+ * Check if a security scheme is an OAuth or OpenID Connect security scheme.
+ */
+function isOAuthSecurityScheme(
+    securityScheme: OpenAPIV3.SecuritySchemeObject
+): securityScheme is OpenAPIV3.OAuth2SecurityScheme {
+    return securityScheme.type === 'oauth2';
 }

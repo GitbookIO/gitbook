@@ -36,7 +36,7 @@ export const es = {
     show: 'Mostrar ${1}',
     hide: 'Ocultar ${1}',
     available_items: 'Elementos disponibles',
-    available_scopes: 'Scopes disponibles',
+    required_scopes: 'Scopes requeridos',
     properties: 'Propiedades',
     or: 'o',
     and: 'y',

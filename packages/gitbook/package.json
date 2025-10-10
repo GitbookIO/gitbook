@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.18.0",
+    "version": "0.19.0",
     "private": true,
     "dependencies": {
         "@gitbook/api": "catalog:",
@@ -121,5 +121,9 @@
     },
     "browserslist": [
         ">0.3%, chrome >= 64, edge >= 79, firefox >= 67, opera >= 51, safari >= 12 and not dead"
-    ]
+    ],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    }
 }
