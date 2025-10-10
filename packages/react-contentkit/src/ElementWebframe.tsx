@@ -173,7 +173,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const height =
         width && aspectRatio && width > iframeWidth
             ? // Keeping smallest height to fit the content + buffer to avoid showing unnecessary scrollbars
-              Math.min(Math.round(width / aspectRatio), size.height || 32) + 16
+              Math.min(Math.round(width / aspectRatio), size.height || 32) + 4
             : 'auto';
 
     if (!mounted) {
