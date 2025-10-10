@@ -4,6 +4,7 @@ import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
+import { Icon } from '@gitbook/icons';
 import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
@@ -14,12 +15,8 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     const [mounted, setMounted] = React.useState(false);
     const renderer = useContentKitClientContext();
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
-    const { width: iframeWidth } = useResizeObserver<HTMLIFrameElement>({
-        ref: iframeRef,
-    });
     const [size, setSize] = React.useState<{
         height?: number;
-        originalWidth?: number;
         aspectRatio?: number;
     }>({});
 
@@ -52,9 +49,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         [renderer.security]
     );
 
-    //
-    // Listen to message coming from the webframe
-    //
+    // Listen to messages coming from the webframe
     React.useEffect(() => {
         const callback = (event: MessageEvent) => {
             if (!iframeRef.current) {
@@ -88,13 +83,12 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                     // https://docs.embed.ly/reference/provider-height-resizing
                     const parsed = JSON.parse(message);
                     if (parsed.context === 'iframe.resize' && typeof parsed.height === 'number') {
-                        const width = contentWindow.outerWidth;
+                        const width = iframeRef.current.clientWidth;
                         const height = parsed.height;
 
                         setSize({
                             aspectRatio: width / height,
                             height: height,
-                            originalWidth: width,
                         });
                     }
                 } catch (_err) {
@@ -130,11 +124,6 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
                                 return size.height;
                             })(),
-
-                            originalWidth:
-                                typeof message.action.size.width !== 'undefined'
-                                    ? Number(message.action.size.width)
-                                    : size.originalWidth,
                         }));
                         break;
                     default:
@@ -156,9 +145,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    //
     // Send data to the webframe
-    //
     React.useEffect(() => {
         if (!element.data) {
             return;
@@ -172,22 +159,32 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
+    const [iframeWidth, setIframeWidth] = React.useState<number>(0);
+    const { width: observedWidth } = useResizeObserver({ ref: iframeRef });
+
+    React.useEffect(() => {
+        if (observedWidth && observedWidth !== 0) {
+            setIframeWidth(observedWidth);
+        }
+    }, [observedWidth]);
+
     const aspectRatio = size.aspectRatio || element.aspectRatio;
 
-    const height = React.useMemo(() => {
-        if (size.originalWidth && aspectRatio && iframeWidth && size.originalWidth > iframeWidth) {
-            return Math.max(Math.round(iframeWidth / aspectRatio), 32);
-        }
+    const width = iframeRef.current?.clientWidth;
 
-        if (typeof size.height === 'number') {
-            return Math.max(size.height, 32);
-        }
-
-        return '100%';
-    }, [aspectRatio, iframeWidth, size.height, size.originalWidth]);
+    // Compute the height of the iframe:
+    // - If the iframe is shorter than the original width, we use the aspect ratio to compute the height.
+    // - If the iframe width is larger than the original width, we use the provided height
+    //   or default to '100%' if not specified.
+    const height =
+        width && aspectRatio && width > iframeWidth
+            ? // Taking the smallest height to fit the content as closely as possible + buffer to avoid showing unnecessary scrollbars
+              Math.min(Math.round(width / aspectRatio), size.height || 32) + 16
+            : 'auto';
+    console.log('claire', { width, height });
 
     if (!mounted) {
-        return null;
+        return <Icon icon="spinner" className="contentkit-button-loading" />;
     }
 
     return (
@@ -202,7 +199,8 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                 width: '100%',
                 maxWidth: '100%',
                 aspectRatio,
-                height,
+                maxHeight: height,
+                height: 'auto',
                 border: 'none',
             }}
         />
