@@ -11,5 +11,9 @@
     "scripts": {
         "generate": "bun ./build.ts",
         "clean": "rm -rf ./dist"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
     }
 }
