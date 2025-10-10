@@ -177,7 +177,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             : 'auto';
 
     if (!mounted) {
-        return <Icon icon="spinner" className="contentkit-button-loading" />;
+        return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
     }
 
     return (
