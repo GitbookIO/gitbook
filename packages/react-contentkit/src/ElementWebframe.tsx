@@ -159,21 +159,14 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
-    const [iframeWidth, setIframeWidth] = React.useState<number>(0);
-    const { width: observedWidth } = useResizeObserver({ ref: iframeRef });
-
-    React.useEffect(() => {
-        if (observedWidth && observedWidth !== 0) {
-            setIframeWidth(observedWidth);
-        }
-    }, [observedWidth]);
+    const { width: observedWidth = 0 } = useResizeObserver({ ref: iframeRef });
+    const liveWidth = observedWidth || iframeRef.current?.clientWidth || 0;
 
     const aspectRatio = size.aspectRatio || element.aspectRatio;
-    const width = iframeRef.current?.clientWidth;
+
     const height =
-        width && aspectRatio && width > iframeWidth
-            ? // Keeping smallest height to fit the content + buffer to avoid showing unnecessary scrollbars
-              Math.min(Math.round(width / aspectRatio), size.height || 32) + 4
+        liveWidth && aspectRatio && liveWidth > (size.height ?? 0)
+            ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? 32) + 6
             : 'auto';
 
     if (!mounted) {
