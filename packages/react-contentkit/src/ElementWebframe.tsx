@@ -166,7 +166,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
 
     const height =
         liveWidth && aspectRatio && liveWidth > (size.height ?? 0)
-            ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? 32) + 6
+            ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? 32)
             : 'auto';
 
     if (!mounted) {
@@ -186,7 +186,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                 maxWidth: '100%',
                 aspectRatio,
                 maxHeight: height,
-                height: 'auto',
+                height: 'fit-content',
                 border: 'none',
             }}
         />
