@@ -2,6 +2,7 @@
 
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
+import { useResizeObserver } from 'usehooks-ts';
 
 import { Icon } from '@gitbook/icons';
 import { useContentKitClientContext } from './context';
@@ -158,10 +159,19 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
+    const [iframeWidth, setIframeWidth] = React.useState<number>(0);
+    const { width: observedWidth } = useResizeObserver({ ref: iframeRef });
+
+    React.useEffect(() => {
+        if (observedWidth && observedWidth !== 0) {
+            setIframeWidth(observedWidth);
+        }
+    }, [observedWidth]);
+
     const aspectRatio = size.aspectRatio || element.aspectRatio;
     const width = iframeRef.current?.clientWidth;
     const height =
-        width && aspectRatio
+        width && aspectRatio && width > iframeWidth
             ? // Keeping smallest height to fit the content + buffer to avoid showing unnecessary scrollbars
               Math.min(Math.round(width / aspectRatio), size.height || 32) + 16
             : 'auto';
