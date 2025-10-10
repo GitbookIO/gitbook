@@ -2,7 +2,6 @@
 
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
-import { useResizeObserver } from 'usehooks-ts';
 
 import { Icon } from '@gitbook/icons';
 import { useContentKitClientContext } from './context';
@@ -159,29 +158,13 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
-    const [iframeWidth, setIframeWidth] = React.useState<number>(0);
-    const { width: observedWidth } = useResizeObserver({ ref: iframeRef });
-
-    React.useEffect(() => {
-        if (observedWidth && observedWidth !== 0) {
-            setIframeWidth(observedWidth);
-        }
-    }, [observedWidth]);
-
     const aspectRatio = size.aspectRatio || element.aspectRatio;
-
     const width = iframeRef.current?.clientWidth;
-
-    // Compute the height of the iframe:
-    // - If the iframe is shorter than the original width, we use the aspect ratio to compute the height.
-    // - If the iframe width is larger than the original width, we use the provided height
-    //   or default to '100%' if not specified.
     const height =
-        width && aspectRatio && width > iframeWidth
-            ? // Taking the smallest height to fit the content as closely as possible + buffer to avoid showing unnecessary scrollbars
+        width && aspectRatio
+            ? // Keeping smallest height to fit the content + buffer to avoid showing unnecessary scrollbars
               Math.min(Math.round(width / aspectRatio), size.height || 32) + 16
             : 'auto';
-    console.log('claire', { width, height });
 
     if (!mounted) {
         return <Icon icon="spinner" className="contentkit-button-loading" />;
