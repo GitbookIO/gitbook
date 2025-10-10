@@ -35,7 +35,8 @@
         "packages": ["packages/*"],
         "catalog": {
             "@gitbook/api": "0.143.2",
-            "bidc": "^0.0.2"
+            "bidc": "^0.0.2",
+            "tsdown": "^0.15.6"
         }
     },
     "patchedDependencies": {
