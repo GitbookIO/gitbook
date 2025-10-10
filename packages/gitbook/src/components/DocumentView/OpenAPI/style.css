@@ -317,10 +317,11 @@
 }
 
 .openapi-securities-oauth-flows {
-    @apply flex flex-col gap-2 divide-y divide-tint-subtle;
+    @apply flex flex-col gap-3;
 }
 
-.openapi-securities-oauth-content {
+.openapi-securities-oauth-content,
+.openapi-securities-scopes {
     @apply prose *:!prose-sm *:text-tint;
 }
 
@@ -328,7 +329,7 @@
     @apply text-xs;
 }
 
-.openapi-securities-oauth-content ul {
+.openapi-securities-scopes ul {
     @apply !my-0;
 }
 

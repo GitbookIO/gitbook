@@ -1,5 +1,55 @@
 # gitbook
 
+## 0.19.0
+
+### Minor Changes
+
+- ed7d47d: Show a toolbar for authenticated users with access to the current site.
+- 50c1be3: Move inline expression evaluation from API to GBO
+- 56e46ce: Add Italian translation
+- b932e4e: Scope search across sections and variants
+
+### Patch Changes
+
+- 162cfe4: Hide sections if only one is present
+- 1456251: Unify section display condition
+- 9344431: Fix missing geo data in site insights because of incorrect proxying of events.
+- eea8f1e: Enhance OpenAPI security scopes handling
+- 2b8a2d2: Add stable scroll gutter to search container
+- b498521: Fix robots.txt preventing favicon from being indexed.
+- ceb32b1: Redo search scope UI
+- 8e99871: Highlight discriminator properties in oneOf, allOf, anyOf objects
+- 2fc2127: Make search accessible
+- f3e4041: Adapt OpenAPI code samples to prefill API key using visitor data
+- 6815dd1: Fix markdownPageURL for PageActions
+- c06b3dd: Improve default site icon
+- cba583a: Use sitespace title instead of space title in search
+- e434442: Support nested site section groups
+- 469b332: Add support for inline expressions rendering with visitor data on GBO side
+- 0ef5dc8: Update to column width sizing
+- 1e4e54e: Fix rounded outline items
+- 379d486: Expose "Best match" when site has translations
+- c21693f: Improve screen reader accessibility for hints
+- badf3a9: Add alt text to inline image
+- c23d4ef: Fix crash for card cover defined without objectFit
+- d74f8a7: Improve wide page width layout
+- b8388e5: Add scrollcontainer component
+- b85eccd: Refactor section tabs
+- 1e53f46: Fix button content truncate
+- 7a504b7: Fix OpenAPI response dropdown & vertical overflow
+- a4c3399: Fix OpenAPI alternatives not showing
+- Updated dependencies [a629900]
+- Updated dependencies [eea8f1e]
+- Updated dependencies [8e99871]
+- Updated dependencies [f3e4041]
+- Updated dependencies [319a1e5]
+- Updated dependencies [529f940]
+- Updated dependencies [754cc11]
+- Updated dependencies [d7948e3]
+- Updated dependencies [a4c3399]
+  - @gitbook/expr@1.2.1
+  - @gitbook/react-openapi@1.5.0
+
 ## 0.18.0
 
 ### Minor Changes
