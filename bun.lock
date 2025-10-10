@@ -6,8 +6,8 @@
       "devDependencies": {
         "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.29.7",
-        "turbo": "^2.5.0",
-        "vercel": "^39.3.0",
+        "turbo": "^2.5.8",
+        "vercel": "^39.4.2",
       },
     },
     "packages/browser-types": {
@@ -241,6 +241,7 @@
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*",
         "classnames": "^2.5.1",
+        "usehooks-ts": "^3.1.0",
       },
       "devDependencies": {
         "typescript": "^5.5.3",
