@@ -1,5 +1,14 @@
 # @gitbook/react-contentkit
 
+## 0.7.6
+
+### Patch Changes
+
+- bdde392: Fix web frame height calculation
+- 295f03d: Republish packages
+- Updated dependencies [295f03d]
+  - @gitbook/icons@0.3.2
+
 ## 0.7.5
 
 ### Patch Changes

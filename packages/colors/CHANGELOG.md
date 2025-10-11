@@ -1,5 +1,11 @@
 # @gitbook/colors
 
+## 0.4.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 0.4.0
 
 ### Minor Changes

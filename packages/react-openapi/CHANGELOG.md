@@ -1,5 +1,14 @@
 # @gitbook/react-openapi
 
+## 1.5.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+- Updated dependencies [295f03d]
+  - @gitbook/expr@1.2.2
+  - @gitbook/openapi-parser@3.0.3
+
 ## 1.5.0
 
 ### Minor Changes
