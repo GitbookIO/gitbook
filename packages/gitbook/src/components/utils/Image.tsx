@@ -124,7 +124,7 @@ export function Image(
                     sources.dark ? 'dark:hidden' : null,
                     style
                 )}
-                alt={sources.light.alt ?? alt}
+                alt={sources.light.alt || alt}
             />
             {sources.dark ? (
                 <ImagePicture
@@ -140,7 +140,7 @@ export function Image(
                         inline ? 'dark:inline' : 'dark:block',
                         style
                     )}
-                    alt={sources.dark.alt ?? alt}
+                    alt={sources.dark.alt || sources.light.alt || alt}
                 />
             ) : null}
         </>
