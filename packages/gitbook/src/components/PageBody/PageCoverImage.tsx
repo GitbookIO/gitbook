@@ -48,9 +48,8 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                 sizes={imgs.light.sizes}
                 fetchPriority="high"
                 alt="Page cover"
-                className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
+                className={tcls('h-full', 'w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{
-                    aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                     objectPosition: `50% ${getTop(container, y, imgs.light)}`,
                 }}
             />
@@ -61,9 +60,8 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                     sizes={imgs.dark.sizes}
                     fetchPriority="low"
                     alt="Page cover"
-                    className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
+                    className={tcls('h-full', 'w-full', 'object-cover', 'dark:inline', 'hidden')}
                     style={{
-                        aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                         objectPosition: `50% ${getTop(container, y, imgs.dark)}`,
                     }}
                 />
