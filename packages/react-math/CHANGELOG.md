@@ -1,5 +1,11 @@
 # @gitbook/react-math
 
+## 0.6.2
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 0.6.1
 
 ### Patch Changes

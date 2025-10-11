@@ -1,5 +1,11 @@
 # @gitbook/expr
 
+## 1.2.2
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 1.2.1
 
 ### Patch Changes
