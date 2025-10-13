@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
     GetFrameURLOptions,
     GitBookEmbeddableConfiguration,
@@ -17,19 +19,19 @@ export type GitBookFrameProps = {
 export function GitBookFrame(props: GitBookFrameProps) {
     const { className, visitor, buttons, welcomeMessage, suggestions, tools } = props;
 
-    const frameRef = React.useRef<HTMLIFrameElement>(null);
+    const frameRef = useRef<HTMLIFrameElement>(null);
     const gitbook = useGitBook();
-    const [gitbookFrame, setGitbookFrame] = React.useState<GitBookFrameClient | null>(null);
+    const [gitbookFrame, setGitbookFrame] = useState<GitBookFrameClient | null>(null);
 
-    const frameURL = React.useMemo(() => gitbook.getFrameURL({ visitor }), [gitbook, visitor]);
+    const frameURL = useMemo(() => gitbook.getFrameURL({ visitor }), [gitbook, visitor]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (frameRef.current) {
             setGitbookFrame(gitbook.createFrame(frameRef.current));
         }
     }, [gitbook]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         gitbookFrame?.configure({
             buttons,
             welcomeMessage,

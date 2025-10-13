@@ -6,7 +6,7 @@ import type { OpenAPICustomOperationProperties, OpenAPIV3 } from '@gitbook/opena
 import { useId } from 'react';
 import type { ComponentPropsWithoutRef } from 'react';
 
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
 import { OpenAPIDisclosure } from './OpenAPIDisclosure';

@@ -3,9 +3,6 @@ import { defineConfig } from 'tsdown';
 export default defineConfig([
     {
         entry: 'src/index.ts',
-    },
-    {
-        entry: 'src/react/index.ts',
         unbundle: true,
     },
 ]);

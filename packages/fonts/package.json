@@ -4,27 +4,28 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "development": "./src/index.ts",
             "default": "./dist/index.js"
         }
     },
+    "sideEffects": false,
     "version": "0.1.1",
     "dependencies": {
         "@gitbook/api": "catalog:"
     },
     "devDependencies": {
-        "google-font-metadata": "^6.0.3",
-        "typescript": "^5.5.3"
+        "google-font-metadata": "^6.0.7",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
         "generate": "bun ./bin/generate.js",
-        "build": "tsc --project tsconfig.build.json",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
+        "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist && rm -rf ./src/data",
         "unit": "bun test"
     },
-    "files": ["dist", "src", "bin", "README.md", "CHANGELOG.md"],
+    "files": ["dist", "bin", "README.md", "CHANGELOG.md"],
     "engines": {
         "node": ">=20.0.0"
     },

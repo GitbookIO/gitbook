@@ -10,8 +10,8 @@
     "packageManager": "bun@1.2.15",
     "overrides": {
         "@codemirror/state": "6.4.1",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0",
+        "react": "catalog:",
+        "react-dom": "catalog:",
         "esbuild": "0.24.2"
     },
     "private": true,
@@ -36,8 +36,15 @@
         "packages": ["packages/*"],
         "catalog": {
             "@gitbook/api": "0.143.2",
+            "assert-never": "^1.4.0",
             "bidc": "^0.0.2",
-            "tsdown": "^0.15.6"
+            "bun-types": "^1.1.20",
+            "classnames": "^2.5.1",
+            "react": "^19.0.0",
+            "react-dom": "^19.0.0",
+            "tsdown": "^0.15.6",
+            "typescript": "^5.5.3",
+            "usehooks-ts": "^3.1.0"
         }
     },
     "patchedDependencies": {

@@ -1,5 +1,3 @@
-import { fromJSON, toJSON } from 'flatted';
-
 import type {
     Filesystem,
     OpenAPIV3,
@@ -9,7 +7,7 @@ import type {
 import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIWebhookData } from './types';
 
-export { fromJSON, toJSON };
+export { fromJSON, toJSON } from 'flatted';
 
 /**
  * Resolve an OpenAPI webhook in a file and compile it to a more usable format.

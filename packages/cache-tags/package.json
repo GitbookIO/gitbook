@@ -4,24 +4,25 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "development": "./src/index.ts",
             "default": "./dist/index.js"
         }
     },
+    "sideEffects": false,
     "version": "0.3.2",
     "dependencies": {
         "@gitbook/api": "catalog:",
-        "assert-never": "^1.2.1"
+        "assert-never": "catalog:"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w"
+        "dev": "bun run build -- --watch ./src"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"],
+    "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"

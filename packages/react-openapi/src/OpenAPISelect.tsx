@@ -1,6 +1,6 @@
 'use client';
 
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { useCallback } from 'react';
 import {
     Button,
@@ -61,8 +61,8 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
         <Select
             aria-label="OpenAPI Select"
             {...props}
-            selectedKey={selectedKey || selected?.key}
-            onSelectionChange={(key) => {
+            value={selectedKey || selected?.key}
+            onChange={(key) => {
                 onSelectionChange?.(key);
                 state.setKey(key);
             }}

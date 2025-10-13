@@ -1,5 +1,3 @@
-import { fromJSON, toJSON } from 'flatted';
-
 import type {
     Filesystem,
     OpenAPIV3,
@@ -10,7 +8,7 @@ import { dereferenceFilesystem } from './dereference';
 import type { OpenAPIOperationData, OpenAPISecurityScope } from './types';
 import { checkIsReference } from './utils';
 
-export { fromJSON, toJSON };
+export { fromJSON, toJSON } from 'flatted';
 
 /**
  * Resolve an OpenAPI operation in a file and compile it to a more usable format.

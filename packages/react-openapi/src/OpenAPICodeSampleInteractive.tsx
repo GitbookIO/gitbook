@@ -1,5 +1,5 @@
 'use client';
-import clsx from 'clsx';
+import clsx from 'classnames';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { createStateKey } from './utils';

@@ -8,17 +8,20 @@
             "default": "./dist/index.js"
         }
     },
+    "sideEffects": false,
     "version": "0.1.1",
     "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
-        "typecheck": "tsc --noEmit"
+        "build": "tsdown",
+        "typecheck": "tsc --noEmit",
+        "dev": "bun run build -- --watch ./src"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {

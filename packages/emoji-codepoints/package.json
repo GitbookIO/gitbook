@@ -4,16 +4,12 @@
     "version": "0.2.1",
     "private": true,
     "exports": "./dist/index.ts",
-    "dependencies": {},
+    "sideEffects": false,
     "devDependencies": {
-        "emoji-assets": "^8.0.0"
+        "emoji-assets": "^9.0.0"
     },
     "scripts": {
         "generate": "bun ./build.ts",
         "clean": "rm -rf ./dist"
-    },
-    "publishConfig": {
-        "access": "public",
-        "registry": "https://registry.npmjs.org/"
     }
 }
