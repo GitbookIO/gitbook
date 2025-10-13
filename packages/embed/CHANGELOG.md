@@ -1,5 +1,13 @@
 # @gitbook/embed
 
+## 0.1.3
+
+### Patch Changes
+
+- 295f03d: Republish packages
+- Updated dependencies [295f03d]
+  - @gitbook/icons@0.3.2
+
 ## 0.1.2
 
 ### Patch Changes

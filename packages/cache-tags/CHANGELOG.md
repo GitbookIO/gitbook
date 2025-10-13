@@ -1,5 +1,11 @@
 # @gitbook/cache-tags
 
+## 0.3.2
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 0.3.1
 
 ### Patch Changes

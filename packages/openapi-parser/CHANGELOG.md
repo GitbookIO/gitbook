@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.3
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 3.0.2
 
 ### Patch Changes
