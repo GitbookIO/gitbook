@@ -17,6 +17,7 @@ import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
+import { hasVisibleCover } from './coverHeight';
 
 const LINK_PREVIEW_MAX_COUNT = 100;
 
@@ -32,6 +33,7 @@ export function PageBody(props: {
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+    const visibleCover = hasVisibleCover(page.cover);
 
     // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
     const withLinkPreviews = document
@@ -60,7 +62,7 @@ export function PageBody(props: {
                 )}
             >
                 <PreservePageLayout siteWidthWide={siteWidthWide} />
-                {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
+                {visibleCover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
