@@ -1,5 +1,24 @@
 # gitbook
 
+## 0.19.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+- Updated dependencies [bdde392]
+- Updated dependencies [295f03d]
+  - @gitbook/react-contentkit@0.7.6
+  - @gitbook/browser-types@0.1.1
+  - @gitbook/cache-tags@0.3.2
+  - @gitbook/colors@0.4.1
+  - @gitbook/emoji-codepoints@0.2.1
+  - @gitbook/expr@1.2.2
+  - @gitbook/fonts@0.1.1
+  - @gitbook/icons@0.3.2
+  - @gitbook/openapi-parser@3.0.3
+  - @gitbook/react-math@0.6.2
+  - @gitbook/react-openapi@1.5.1
+
 ## 0.19.0
 
 ### Minor Changes
