@@ -25,7 +25,11 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     id = context.getId ? context.getId(id) : id;
 
     return (
-        <Details id={id} open={context.mode === 'print'} className={style}>
+        <Details
+            id={id}
+            open={context.mode === 'print'}
+            className={tcls('scroll-mt-(--content-scroll-margin)', style)}
+        >
             <summary
                 className={tcls(
                     'cursor-pointer',
