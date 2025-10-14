@@ -1,5 +1,11 @@
 # @gitbook/react-math
 
+## 0.6.3
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
 ## 0.6.2
 
 ### Patch Changes

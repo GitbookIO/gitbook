@@ -1,5 +1,25 @@
 # gitbook
 
+## 0.19.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+- 75543b1: Update minimum Node version in .npmrc
+- 511f1cf: Add scroll margin to Expandable
+- Updated dependencies [6142d6b]
+  - @gitbook/emoji-codepoints@0.2.2
+  - @gitbook/react-contentkit@0.7.7
+  - @gitbook/openapi-parser@3.0.4
+  - @gitbook/browser-types@0.1.2
+  - @gitbook/react-openapi@1.5.2
+  - @gitbook/cache-tags@0.3.3
+  - @gitbook/react-math@0.6.3
+  - @gitbook/colors@0.4.2
+  - @gitbook/fonts@0.1.2
+  - @gitbook/icons@0.3.3
+  - @gitbook/expr@1.2.3
+
 ## 0.19.1
 
 ### Patch Changes
