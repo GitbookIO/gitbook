@@ -1,5 +1,5 @@
 'use client';
-import clsx from 'clsx';
+import clsx from 'classnames';
 import type React from 'react';
 import { useState } from 'react';
 import { Button, Disclosure, DisclosurePanel } from 'react-aria-components';

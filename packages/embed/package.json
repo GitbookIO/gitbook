@@ -12,6 +12,7 @@
             "default": "./dist/react/index.js"
         }
     },
+    "sideEffects": false,
     "version": "0.1.3",
     "dependencies": {
         "@gitbook/api": "catalog:",
@@ -19,12 +20,12 @@
         "bidc": "catalog:"
     },
     "peerDependencies": {
-        "react": "^18.0.0"
+        "react": "*"
     },
     "devDependencies": {
         "tsdown": "catalog:",
-        "typescript": "^5.5.3",
-        "react": "^19.0.0"
+        "typescript": "catalog:",
+        "react": "catalog:"
     },
     "scripts": {
         "build": "bun run build-lib && bun run build-standalone",

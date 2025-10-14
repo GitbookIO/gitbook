@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { OpenAPICodeSample } from './OpenAPICodeSample';
 import { OpenAPIResponseExample } from './OpenAPIResponseExample';
 import { OpenAPIColumnSpec } from './common/OpenAPIColumnSpec';

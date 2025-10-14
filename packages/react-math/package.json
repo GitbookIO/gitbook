@@ -9,26 +9,28 @@
         }
     },
     "version": "0.6.2",
+    "sideEffects": false,
     "dependencies": {
+        "katex": "^0.16.25",
         "object-hash": "^3.0.0"
     },
     "peerDependencies": {
         "react": "*"
     },
     "devDependencies": {
-        "typescript": "^5.5.3",
-        "@types/katex": "^0.16.5"
+        "@types/katex": "^0.16.7",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
+        "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist"
     },
     "bin": {
         "gitbook-math": "./bin/gitbook-math.js"
     },
-    "files": ["dist", "src", "css", "README.md", "CHANGELOG.md"],
+    "files": ["dist", "bin", "css", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"

@@ -1,32 +1,34 @@
 {
     "name": "@gitbook/react-contentkit",
     "version": "0.7.6",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "development": "./src/index.ts",
             "default": "./dist/index.js"
         }
     },
+    "sideEffects": false,
     "dependencies": {
-        "classnames": "^2.5.1",
+        "classnames": "catalog:",
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*",
-        "usehooks-ts": "^3.1.0"
+        "usehooks-ts": "catalog:"
     },
     "peerDependencies": {
         "react": "*"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
+        "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"],
+    "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"

@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import clsx from 'classnames';
 
 export function Markdown(props: { source: string; className?: string }) {
     const { source, className } = props;

@@ -12,10 +12,9 @@
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
         },
-        "./style.css": {
-            "default": "./src/style.css"
-        }
+        "./style.css": "./src/style.css"
     },
+    "sideEffects": false,
     "version": "0.3.2",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -25,23 +24,25 @@
         "@gitbook/fontawesome-pro": "1.0.15"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "react": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "peerDependencies": {
         "react": "*"
     },
     "scripts": {
         "generate": "bun ./bin/gen-list.js",
-        "build": "tsc --project tsconfig.build.json",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
+        "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist && rm -rf ./src/data",
         "unit": "bun test"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
     },
-    "files": ["dist", "src", "bin", "README.md", "CHANGELOG.md"],
+    "files": ["dist", "bin", "README.md", "CHANGELOG.md"],
     "engines": {
         "node": ">=20.0.0"
     },

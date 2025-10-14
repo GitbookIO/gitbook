@@ -1,6 +1,6 @@
 'use client';
 
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing } from 'react-aria';
 import { useDisclosureState } from 'react-stately';

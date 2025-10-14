@@ -1,7 +1,7 @@
 'use client';
 
 import type { OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser';
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { Markdown } from './Markdown';
 import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { OpenAPIResponse } from './OpenAPIResponse';
