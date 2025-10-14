@@ -12,6 +12,7 @@ export type OpenAPIServerVariableWithCustomProperties = OpenAPIV3.ServerVariable
  * OpenAPI ServerObject type extended to provide x-gitbook prefill custom properties at the variable level.
  */
 export type OpenAPIServerWithCustomProperties = Omit<OpenAPIV3.ServerObject, 'variables'> & {
+    name?: string;
     variables?: {
         [variable: string]: OpenAPIServerVariableWithCustomProperties;
     };

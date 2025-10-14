@@ -13,6 +13,8 @@ export interface OpenAPIClientContext {
         chevronDown: React.ReactNode;
         chevronRight: React.ReactNode;
         plus: React.ReactNode;
+        copy: React.ReactNode;
+        check: React.ReactNode;
     };
 
     /**

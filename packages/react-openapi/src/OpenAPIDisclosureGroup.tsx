@@ -128,7 +128,7 @@ function DisclosureItem(props: {
                                 <OpenAPISelect
                                     icon={selectIcon}
                                     stateKey={selectStateKey}
-                                    onSelectionChange={() => {
+                                    onChange={() => {
                                         state.expand();
                                     }}
                                     items={group.tabs}

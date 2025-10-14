@@ -1,5 +1,4 @@
 'use client';
-import clsx from 'classnames';
 import type { MediaTypeRenderer } from './OpenAPICodeSample';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
 import { createStateKey } from './utils';
@@ -49,16 +48,7 @@ function MediaTypeSelector(props: {
     }));
 
     return (
-        <OpenAPISelect
-            className={clsx('openapi-select')}
-            items={renderers.map((renderer) => ({
-                key: renderer.mediaType,
-                label: renderer.mediaType,
-            }))}
-            icon={selectIcon}
-            stateKey={stateKey}
-            placement="bottom start"
-        >
+        <OpenAPISelect items={items} icon={selectIcon} stateKey={stateKey} placement="bottom start">
             {items.map((item) => (
                 <OpenAPISelectItem key={item.key} id={item.key} value={item}>
                     {item.label}
