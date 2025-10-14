@@ -54,7 +54,7 @@ After forking this repository, you'll want to [create a branch](https://docs.git
 #### 3. Install dependencies and run the project locally
 
 ##### Prerequisites:
-- Node.js (Version: >=20.16)
+- Node.js (Version: >= 22.3)
   - Use `nvm` for easy Node management
 - [Bun](https://bun.sh/) (Version: >=1.2.15)
   - We use a text-based lockfile which isn't supported below 1.2.15
