@@ -18,7 +18,7 @@ import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 
-const LINK_PREVIEW_MAX_COUNT = 100;
+const LINK_PREVIEW_MAX_COUNT = 500;
 
 export function PageBody(props: {
     context: GitBookSiteContext;

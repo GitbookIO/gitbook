@@ -130,7 +130,13 @@ export async function resolveContentRef(
             const ancestors =
                 resolvePageResult?.ancestors.map((ancestor) => ({
                     label: ancestor.title,
-                    icon: <PageIcon page={ancestor} style={iconStyle} />,
+                    icon:
+                        ancestor.emoji || ancestor.icon ? (
+                            <PageIcon
+                                page={{ emoji: ancestor.emoji, icon: ancestor.icon }}
+                                style={iconStyle}
+                            />
+                        ) : null,
                     href: linker.toPathForPage({ page: ancestor, pages: revision.pages }),
                 })) ?? [];
             if (!page) {
