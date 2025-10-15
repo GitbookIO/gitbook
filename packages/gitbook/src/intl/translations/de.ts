@@ -130,4 +130,6 @@ export const de = {
     hint_warning: 'Warnung',
     hint_danger: 'Gefahr',
     hint_success: 'Erfolg',
+    download: 'Herunterladen',
+    open: 'Öffnen',
 };

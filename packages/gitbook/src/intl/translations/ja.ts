@@ -129,4 +129,6 @@ export const ja: TranslationLanguage = {
     hint_warning: '警告',
     hint_danger: '危険',
     hint_success: '成功',
+    download: 'ダウンロード',
+    open: '開く',
 };

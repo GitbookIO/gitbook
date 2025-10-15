@@ -126,4 +126,6 @@ export const fr = {
     hint_warning: 'Avertissement',
     hint_danger: 'Danger',
     hint_success: 'Succès',
+    download: 'Télécharger',
+    open: 'Ouvrir',
 };
