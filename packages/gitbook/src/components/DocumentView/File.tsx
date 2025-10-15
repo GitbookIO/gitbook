@@ -42,8 +42,8 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                     <FileIcon contentType={contentType} className="size-5 text-primary" />
                     <div className="text-hint text-xs">{getHumanFileSize(file.size)}</div>
                 </div>
-                <div className="min-w-24 flex-1 overflow-hidden">
-                    <div className="truncate text-base">
+                <div className="min-w-24 flex-1">
+                    <div className="text-base">
                         <Link
                             href={file.downloadURL}
                             target="_blank"
@@ -53,7 +53,7 @@ export async function File(props: BlockProps<DocumentBlockFile>) {
                             {file.name}
                         </Link>
                     </div>
-                    <div className="truncate text-sm opacity-9 dark:opacity-8">{contentType}</div>
+                    <div className="text-sm opacity-9 dark:opacity-8">{contentType}</div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
                     <DownloadButton
