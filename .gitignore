@@ -25,3 +25,4 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
+.npmrc
