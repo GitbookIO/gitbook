@@ -130,4 +130,6 @@ export const it: TranslationLanguage = {
     hint_warning: 'Avviso',
     hint_danger: 'Pericolo',
     hint_success: 'Successo',
+    download: 'Scarica',
+    open: 'Apri',
 };

@@ -1,4 +1,4 @@
-export type SimplifiedFileType = 'image' | 'pdf' | 'archive';
+export type SimplifiedFileType = 'image' | 'PDF' | 'archive';
 
 /**
  * Get a simplified content type for the given mime type.
@@ -11,7 +11,7 @@ export function getSimplifiedContentType(mimeType: string): SimplifiedFileType |
     switch (mimeType) {
         case 'application/pdf':
         case 'application/x-pdf':
-            return 'pdf';
+            return 'PDF';
         case 'application/zip':
         case 'application/x-7z-compressed':
         case 'application/x-zip-compressed':

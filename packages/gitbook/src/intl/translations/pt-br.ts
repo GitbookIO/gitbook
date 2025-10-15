@@ -129,4 +129,6 @@ export const pt_br = {
     hint_warning: 'Aviso',
     hint_danger: 'Perigo',
     hint_success: 'Sucesso',
+    download: 'Baixar',
+    open: 'Abrir',
 };

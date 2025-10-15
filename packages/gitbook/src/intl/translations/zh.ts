@@ -126,4 +126,6 @@ export const zh: TranslationLanguage = {
     hint_warning: '警告',
     hint_danger: '危险',
     hint_success: '成功',
+    download: '下载',
+    open: '打开',
 };

@@ -131,4 +131,6 @@ export const es: TranslationLanguage = {
     hint_warning: 'Advertencia',
     hint_danger: 'Peligro',
     hint_success: 'Éxito',
+    download: 'Descargar',
+    open: 'Abrir',
 };

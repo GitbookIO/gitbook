@@ -128,4 +128,6 @@ export const ru = {
     hint_warning: 'Предупреждение',
     hint_danger: 'Опасность',
     hint_success: 'Успех',
+    download: 'Скачать',
+    open: 'Открыть',
 };

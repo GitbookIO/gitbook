@@ -130,4 +130,6 @@ export const no: TranslationLanguage = {
     hint_warning: 'Advarsel',
     hint_danger: 'Fare',
     hint_success: 'Suksess',
+    download: 'Last ned',
+    open: 'Åpne',
 };

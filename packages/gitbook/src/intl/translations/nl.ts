@@ -129,4 +129,6 @@ export const nl: TranslationLanguage = {
     hint_warning: 'Waarschuwing',
     hint_danger: 'Gevaar',
     hint_success: 'Succes',
+    download: 'Downloaden',
+    open: 'Openen',
 };

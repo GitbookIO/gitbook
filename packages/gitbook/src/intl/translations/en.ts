@@ -127,4 +127,6 @@ export const en = {
     hint_warning: 'Warning',
     hint_danger: 'Danger',
     hint_success: 'Success',
+    download: 'Download',
+    open: 'Open',
 };
