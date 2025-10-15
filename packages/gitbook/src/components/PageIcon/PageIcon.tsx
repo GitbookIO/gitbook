@@ -27,4 +27,6 @@ export function PageIcon(props: {
     if (page.icon) {
         return <Icon icon={page.icon as IconName} className={tcls('size-[1em]', style)} />;
     }
+
+    return null;
 }
