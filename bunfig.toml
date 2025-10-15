@@ -1,2 +1,2 @@
 [install.scopes]
-"gitbook" = { token = "$NPM_TOKEN_READONLY", url = "https://registry.npmjs.org" }
+"gitbook" = { token = "$BUN_NPM_TOKEN", url = "https://registry.npmjs.org" }

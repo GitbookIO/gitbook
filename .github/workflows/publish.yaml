@@ -6,7 +6,7 @@ on:
             - main
 
 env:
-    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
+    BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -22,8 +22,6 @@ jobs:
                   fetch-depth: 0
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
-            - name: Setup npmrc
-              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:

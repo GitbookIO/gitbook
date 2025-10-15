@@ -90,7 +90,7 @@ If you are GitBook staff, you'll need our NPM token in your local environment.
 ```
 .env.local
 
-NPM_TOKEN_READONLY=xxx
+BUN_NPM_TOKEN=xxx
 ```
 
 and then reinstall dependencies.
