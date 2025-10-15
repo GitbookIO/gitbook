@@ -15,7 +15,7 @@ export function formatPath(path: string) {
         }
         parts.push(
             <span key={`offset-${offset}`} className="openapi-path-variable">
-                {match.toLocaleLowerCase()}
+                {match}
             </span>
         );
         lastIndex = offset + match.length;
@@ -28,7 +28,7 @@ export function formatPath(path: string) {
 
     const formattedPath = parts.map((part, index) => {
         if (typeof part === 'string') {
-            return <span key={`part-${index}`}>{part.toLocaleLowerCase()}</span>;
+            return <span key={`part-${index}`}>{part}</span>;
         }
         return part;
     });

@@ -26,7 +26,7 @@ function OpenAPITooltipContent(props: TooltipProps) {
             offset={offset}
             className={classNames('openapi-tooltip', className)}
         >
-            {typeof children === 'function' ? children : children}
+            {children}
         </Tooltip>
     );
 }
