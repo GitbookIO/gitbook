@@ -1,5 +1,11 @@
 # @gitbook/expr
 
+## 1.2.3
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
 ## 1.2.2
 
 ### Patch Changes

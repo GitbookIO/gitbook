@@ -1,5 +1,11 @@
 # @gitbook/cache-tags
 
+## 0.3.3
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
 ## 0.3.2
 
 ### Patch Changes

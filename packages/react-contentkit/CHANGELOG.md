@@ -1,5 +1,13 @@
 # @gitbook/react-contentkit
 
+## 0.7.7
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+- Updated dependencies [6142d6b]
+  - @gitbook/icons@0.3.3
+
 ## 0.7.6
 
 ### Patch Changes

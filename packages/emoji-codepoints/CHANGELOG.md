@@ -1,5 +1,11 @@
 # @gitbook/emoji-codepoints
 
+## 0.2.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
 ## 0.2.1
 
 ### Patch Changes

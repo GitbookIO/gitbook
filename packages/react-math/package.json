@@ -8,7 +8,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.6.2",
+    "version": "0.6.3",
     "sideEffects": false,
     "dependencies": {
         "katex": "^0.16.25",

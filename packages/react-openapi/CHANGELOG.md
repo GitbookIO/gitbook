@@ -1,5 +1,14 @@
 # @gitbook/react-openapi
 
+## 1.5.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+- Updated dependencies [6142d6b]
+  - @gitbook/openapi-parser@3.0.4
+  - @gitbook/expr@1.2.3
+
 ## 1.5.1
 
 ### Patch Changes
