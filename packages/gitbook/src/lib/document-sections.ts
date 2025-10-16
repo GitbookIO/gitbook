@@ -1,8 +1,9 @@
 import type { GitBookAnyContext } from '@/lib/context';
 import type { DocumentBlock, JSONDocument } from '@gitbook/api';
 
+import type { ReactNode } from 'react';
 import { getDataOrNull } from './data';
-import { getNodeText } from './document';
+import { getNodeReactText } from './document';
 import { resolveOpenAPIOperationBlock } from './openapi/resolveOpenAPIOperationBlock';
 import { resolveOpenAPISchemasBlock } from './openapi/resolveOpenAPISchemasBlock';
 import { resolveContentRef } from './references';
@@ -10,7 +11,7 @@ import { resolveContentRef } from './references';
 export interface DocumentSection {
     id: string;
     tag?: string;
-    title: string;
+    title: ReactNode;
     depth: number;
     deprecated?: boolean;
 }
@@ -44,7 +45,7 @@ async function getSectionsFromNodes(
                     continue;
                 }
                 depth = 1;
-                const title = getNodeText(block);
+                const title = getNodeReactText(block);
                 sections.push({
                     id,
                     title,
@@ -57,7 +58,7 @@ async function getSectionsFromNodes(
                 if (!id) {
                     continue;
                 }
-                const title = getNodeText(block);
+                const title = getNodeReactText(block);
                 sections.push({
                     id,
                     title,
