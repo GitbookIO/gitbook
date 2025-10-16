@@ -486,8 +486,14 @@
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal flex items-center text-left font-mono text-tint-strong/10;
+    @apply flex-1 relative font-normal text-left overflow-x-auto font-mono text-tint-strong/10;
     @apply whitespace-nowrap md:whitespace-normal;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-path-title-row{
+    @apply flex flex-row items-center;
 }
 
 .openapi-path-title[data-deprecated="true"] {

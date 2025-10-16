@@ -62,7 +62,9 @@ export function OpenAPIPathMultipleServers(
                                 className="openapi-select-item-column"
                             >
                                 <Text slot="label">{item.label}</Text>
-                                <Text slot="description">{item.description}</Text>
+                                {item.description ? (
+                                    <Text slot="description">{item.description}</Text>
+                                ) : null}
                             </OpenAPISelectItem>
                         ))}
                     </OpenAPISelect>
