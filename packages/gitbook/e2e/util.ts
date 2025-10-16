@@ -143,7 +143,10 @@ export const headerLinks: CustomizationHeaderItem[] = [
 
 export async function waitForCookiesDialog(page: Page) {
     const dialog = page.getByTestId('cookies-dialog');
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({
+        // Cookies dialog may take some times to appear
+        timeout: 10_000,
+    });
 }
 
 export async function waitForNotFound(_page: Page, response: Response | null) {

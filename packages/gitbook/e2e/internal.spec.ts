@@ -1454,10 +1454,7 @@ const testCases: TestsCase[] = [
                     locale,
                 },
             }),
-            run: async (page) => {
-                const dialog = page.getByTestId('cookies-dialog');
-                await expect(dialog).toBeVisible();
-            },
+            run: waitForCookiesDialog,
         })),
     },
     {
