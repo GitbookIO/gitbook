@@ -12,6 +12,7 @@
     "sideEffects": false,
     "dependencies": {
         "katex": "^0.16.25",
+        "mathjax": "^3.2.2",
         "object-hash": "^3.0.0"
     },
     "peerDependencies": {

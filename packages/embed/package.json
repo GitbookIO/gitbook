@@ -23,6 +23,7 @@
         "react": "*"
     },
     "devDependencies": {
+        "@types/react": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:",
         "react": "catalog:"

@@ -38,7 +38,6 @@
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
         "jwt-decode": "^4.0.0",
-        "mathjax": "^3.2.2",
         "mcp-handler": "^1.0.2",
         "mdast-util-from-markdown": "^2.0.2",
         "mdast-util-frontmatter": "^2.0.1",
@@ -79,6 +78,7 @@
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
         "@playwright/test": "^1.54.2",
+        "@scalar/api-client-react": "catalog:",
         "@tailwindcss/postcss": "^4.1.11",
         "@types/js-cookie": "^3.0.6",
         "@types/jsontoxml": "^1.0.5",
@@ -87,8 +87,8 @@
         "@types/node": "^20",
         "@types/object-hash": "^3.0.6",
         "@types/parse-cache-control": "^1.0.4",
-        "@types/react": "18.3.13",
-        "@types/react-dom": "18.3.1",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
         "@types/rison": "^0.0.9",
         "bun-types": "catalog:",
         "deepmerge": "^4.3.1",
@@ -99,7 +99,8 @@
         "tailwindcss": "^4.1.11",
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
-        "vercel": "^39.3.0"
+        "vercel": "^39.3.0",
+        "wrangler": "^4.43.0"
     },
     "scripts": {
         "generate": "./scripts/generate.sh",

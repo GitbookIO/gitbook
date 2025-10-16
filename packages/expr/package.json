@@ -19,6 +19,8 @@
         "eval-estree-expression": "github:jonschlinkert/eval-estree-expression#9cf28d2"
     },
     "devDependencies": {
+        "@tsconfig/strictest": "catalog:",
+        "@tsconfig/node20": "catalog:",
         "@types/escodegen": "^0.0.10",
         "@types/estree": "^1.0.6",
         "@types/json-schema": "^7.0.15",
