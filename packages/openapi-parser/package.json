@@ -16,8 +16,8 @@
         "@scalar/openapi-types": "^0.3.7"
     },
     "devDependencies": {
-        "@tsconfig/strictest": "^2.0.6",
-        "@tsconfig/node20": "^20.1.6",
+        "@tsconfig/strictest": "catalog:",
+        "@tsconfig/node20": "catalog:",
         "@types/swagger2openapi": "^7.0.4",
         "bun-types": "catalog:",
         "tsdown": "catalog:",

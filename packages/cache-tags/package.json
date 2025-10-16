@@ -14,6 +14,7 @@
         "assert-never": "catalog:"
     },
     "devDependencies": {
+        "bun-types": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:"
     },

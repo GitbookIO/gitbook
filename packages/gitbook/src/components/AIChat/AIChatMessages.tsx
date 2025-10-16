@@ -11,7 +11,7 @@ import { AIChatFollowupSuggestions } from './AiChatFollowupSuggestions';
 export function AIChatMessages(props: {
     chat: AIChatState;
     chatController: AIChatController;
-    lastUserMessageRef?: React.RefObject<HTMLDivElement>;
+    lastUserMessageRef?: React.RefObject<HTMLDivElement | null>;
 }) {
     const { chat, chatController, lastUserMessageRef } = props;
 

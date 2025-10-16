@@ -37,6 +37,7 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const container = useResizeObserver({
+        // @ts-expect-error wrong types
         ref: containerRef,
     });
 

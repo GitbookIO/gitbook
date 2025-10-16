@@ -12,6 +12,7 @@
     "sideEffects": false,
     "dependencies": {
         "katex": "^0.16.25",
+        "mathjax": "^3.2.2",
         "object-hash": "^3.0.0"
     },
     "peerDependencies": {
@@ -19,6 +20,10 @@
     },
     "devDependencies": {
         "@types/katex": "^0.16.7",
+        "@types/react": "catalog:",
+        "bun-types": "catalog:",
+        "react": "catalog:",
+        "tsdown": "catalog:",
         "typescript": "catalog:"
     },
     "scripts": {

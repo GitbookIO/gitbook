@@ -63,7 +63,7 @@ const TOC_ITEM_OFFSET = 100;
  * Scrolls the table of contents container to the page item when it's initially active.
  */
 export function useScrollToActiveTOCItem(props: {
-    anchorRef: React.RefObject<HTMLAnchorElement>;
+    anchorRef: React.RefObject<HTMLAnchorElement | null>;
     isActive: boolean;
 }) {
     const { isActive, anchorRef } = props;

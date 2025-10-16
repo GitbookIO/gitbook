@@ -136,7 +136,7 @@ const calculateSpacing = (
 
 export function useMagnificationEffect(props: {
     childrenCount: number;
-    containerRef: React.RefObject<HTMLElement>;
+    containerRef: React.RefObject<HTMLElement | null>;
     config?: MagnificationConfig;
 }) {
     const { childrenCount, containerRef, config } = props;

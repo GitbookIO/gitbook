@@ -35,6 +35,7 @@ export function HideToolbarButton(props: HideToolbarButtonProps) {
         }
         setOpen(false);
     };
+    // @ts-expect-error wrong type for ref
     useOnClickOutside(ref, handleClickOutsideArcMenu);
 
     // Close arc menu on scroll

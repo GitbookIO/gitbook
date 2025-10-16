@@ -7,7 +7,7 @@ const HAS_INTERSECTION_OBSERVER = typeof IntersectionObserver !== 'undefined';
  * Watch an element to know when it is in the viewport.
  */
 export function useInViewportListener(
-    containerRef: React.RefObject<HTMLElement>,
+    containerRef: React.RefObject<HTMLElement | null>,
     listener: (isIntersecting: boolean, disconnect: () => void) => void,
     options?: Pick<IntersectionObserverInit, 'root' | 'rootMargin' | 'threshold'>
 ) {
