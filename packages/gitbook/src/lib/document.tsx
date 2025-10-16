@@ -1,3 +1,4 @@
+import { Emoji } from '@/components/primitives';
 import type {
     DocumentBlock,
     DocumentFragment,
@@ -6,6 +7,7 @@ import type {
     JSONDocument,
 } from '@gitbook/api';
 import assertNever from 'assert-never';
+import { Fragment } from 'react';
 
 export interface DocumentSection {
     id: string;
@@ -86,6 +88,29 @@ export function getNodeText(
         default:
             assertNever(node);
     }
+}
+
+/**
+ * Get the text of a block/inline as ReactNode.
+ */
+export function getNodeReactText(
+    node: JSONDocument | DocumentText | DocumentFragment | DocumentInline | DocumentBlock
+): React.ReactNode {
+    if (node.object === 'inline' && node.type === 'emoji') {
+        return <Emoji code={node.data.code} />;
+    }
+
+    if (node.object === 'text') {
+        return getNodeText(node);
+    }
+
+    if (!('nodes' in node)) {
+        return null;
+    }
+
+    return node.nodes.map((child, index) => {
+        return <Fragment key={child.key ?? `idx-${index}`}>{getNodeReactText(child)}</Fragment>;
+    });
 }
 
 /**
