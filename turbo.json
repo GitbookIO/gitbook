@@ -51,7 +51,7 @@
         "dev": {
             "persistent": true,
             "cache": false,
-            "dependsOn": ["generate"]
+            "dependsOn": ["generate", "^build"]
         },
         // Script run when the package is deployed
         "release": {
