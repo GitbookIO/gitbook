@@ -389,7 +389,7 @@ function TabItem(props: {
 }
 
 function TabButton(
-    props: ComponentPropsWithRef<'button'> & {
+    props: Omit<ComponentPropsWithRef<'button'>, 'type'> & {
         isActive?: boolean;
     }
 ) {
