@@ -202,6 +202,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Handle redirects
         //
         if ('redirect' in siteURLData) {
+            // When it is a server action, we cannot just return a redirect response as it may cause CORS issues on redirect.
+            // For these cases, we return a 303 response with an `X-Action-Redirect` header that the client can handle.
+            // This is what server actions do when returning a redirect response.
+            const isServerAction = request.headers.has('next-action') && request.method === 'POST';
+            const createRedirectResponse = (url: string) =>
+                isServerAction
+                    ? new NextResponse(null, {
+                          status: 303,
+                          headers: {
+                              'X-Action-Redirect': `${url};push`,
+                              'Content-Security-Policy': getContentSecurityPolicy(),
+                          },
+                      })
+                    : NextResponse.redirect(url);
             // biome-ignore lint/suspicious/noConsole: we want to log the redirect
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
@@ -221,10 +235,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 // as it might contain a VA token
                 contentRedirect.search = request.nextUrl.search;
 
-                return NextResponse.redirect(contentRedirect);
+                return createRedirectResponse(contentRedirect.toString());
             }
 
-            return NextResponse.redirect(siteURLData.redirect);
+            return createRedirectResponse(siteURLData.redirect);
         }
 
         cookies.push(

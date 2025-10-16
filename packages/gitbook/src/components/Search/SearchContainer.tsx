@@ -181,7 +181,7 @@ export function SearchContainer(props: SearchContainerProps) {
     const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
 
     const searchResultsId = `search-results-${React.useId()}`;
-    const { results, fetching } = useSearchResults({
+    const { results, fetching, error } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
         siteSpaceId,
@@ -232,6 +232,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                     fetching={fetching}
                                     results={results}
                                     cursor={cursor}
+                                    error={error}
                                 />
                             ) : null}
                             {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
