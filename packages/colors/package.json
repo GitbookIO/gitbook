@@ -10,6 +10,7 @@
     "sideEffects": false,
     "version": "0.4.2",
     "devDependencies": {
+        "bun-types": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:"
     },
