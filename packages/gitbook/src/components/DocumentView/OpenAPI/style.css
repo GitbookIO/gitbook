@@ -478,7 +478,7 @@
 }
 
 .openapi-path-server {
-    @apply text-tint hidden md:inline;
+    @apply text-tint inline;
 }
 
 .openapi-summary .openapi-path .openapi-method {
