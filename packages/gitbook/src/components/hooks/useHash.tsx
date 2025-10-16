@@ -61,7 +61,7 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
     const onNavigationClick = React.useCallback((href: string) => {
         // We need to skip it for search like params (i.e. ?ask= or ?q=) because they don't really trigger a navigation
         // Search may trigger a navigation whenn clicking on the ask ai for example, this is not something we want to track here
-        if (href.startsWith('?') || href.startsWith('#')) {
+        if (href.startsWith('?')) {
             return;
         }
         const url = new URL(
@@ -102,7 +102,6 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
  */
 export function useHash() {
     const { hash } = React.useContext(NavigationStatusContext);
-
     return hash;
 }
 

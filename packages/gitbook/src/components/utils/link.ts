@@ -2,6 +2,11 @@
  * Check if a link is external, compared to an origin.
  */
 export function isExternalLink(href: string, origin: string | null = null) {
+    // Anchor links are not external
+    if (href.startsWith('#')) {
+        return false;
+    }
+
     if (!URL.canParse) {
         // If URL.canParse is not available, we quickly check if it looks like a URL
         return href.startsWith('http');
