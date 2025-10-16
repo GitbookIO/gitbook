@@ -19,6 +19,7 @@
     },
     "devDependencies": {
         "@types/katex": "^0.16.7",
+        "tsdown": "catalog:",
         "typescript": "catalog:"
     },
     "scripts": {
