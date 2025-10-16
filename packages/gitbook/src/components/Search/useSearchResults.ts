@@ -43,7 +43,8 @@ export function useSearchResults(props: {
     const [resultsState, setResultsState] = React.useState<{
         results: ResultType[];
         fetching: boolean;
-    }>({ results: [], fetching: false });
+        error: boolean;
+    }>({ results: [], fetching: false, error: false });
 
     const { assistants } = useAI();
     const withAI = assistants.length > 0;
@@ -54,7 +55,7 @@ export function useSearchResults(props: {
         }
         if (!query) {
             if (!withAI) {
-                setResultsState({ results: [], fetching: false });
+                setResultsState({ results: [], fetching: false, error: false });
                 return;
             }
 
@@ -64,11 +65,11 @@ export function useSearchResults(props: {
                     results,
                     `Cached recommended questions should be set for site-space ${siteSpaceId}`
                 );
-                setResultsState({ results, fetching: false });
+                setResultsState({ results, fetching: false, error: false });
                 return;
             }
 
-            setResultsState({ results: [], fetching: false });
+            setResultsState({ results: [], fetching: false, error: false });
 
             let cancelled = false;
 
@@ -102,7 +103,7 @@ export function useSearchResults(props: {
                     cachedRecommendedQuestions.set(siteSpaceId, recommendedQuestions);
 
                     if (!cancelled) {
-                        setResultsState({ results: [...recommendedQuestions], fetching: false });
+                        setResultsState({ results: [...recommendedQuestions], fetching: false, error: false });
                     }
                 }
             }, 100);
@@ -112,17 +113,22 @@ export function useSearchResults(props: {
                 clearTimeout(timeout);
             };
         }
-        setResultsState((prev) => ({ results: prev.results, fetching: true }));
+        setResultsState((prev) => ({ results: prev.results, fetching: true, error: false }));
         let cancelled = false;
         const timeout = setTimeout(async () => {
-            const results = await (() => {
+            try {
+                const results = await (async () => {
+                console.log({ scope, siteSpaceId, siteSpaceIds });
                 if (scope === 'all') {
                     // Search all content on the site
                     return searchAllSiteContent(query);
                 }
                 if (scope === 'default') {
                     // Search the current section's variant + matched/default variant for other sections
-                    return searchCurrentSiteSpaceContent(query, siteSpaceId);
+                    const result = await searchCurrentSiteSpaceContent(query, siteSpaceId);
+                    console.log({ result });
+
+                    return result;
                 }
                 if (scope === 'extended') {
                     // Search all variants of the current section
@@ -140,16 +146,26 @@ export function useSearchResults(props: {
             }
 
             if (!results) {
-                setResultsState({ results: [], fetching: false });
+                // One time when this one returns undefined is when it cannot find the server action and returns the html from the page.
+                // In that case, we want to avoid being stuck in a loading state, but it is an error.
+                // We could potentially try to force reload the page here, but i'm not 100% sure it would be a better experience.
+                setResultsState({ results: [], fetching: false, error: true });
                 return;
             }
 
-            setResultsState({ results, fetching: false });
+            setResultsState({ results, fetching: false, error: false });
 
             trackEvent({
                 type: 'search_type_query',
                 query,
             });
+            }catch {
+                // If there is an error, we need to catch it to avoid infinite loading state.
+                if (cancelled) {
+                    return;
+                }
+                setResultsState({ results: [], fetching: false, error: true });
+            }
         }, 350);
 
         return () => {

@@ -7,7 +7,7 @@ import { type Assistant, useAI } from '@/components/AI';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 
-import { Loading } from '../primitives';
+import { Button, Loading } from '../primitives';
 import { SearchPageResultItem } from './SearchPageResultItem';
 import { SearchQuestionResultItem } from './SearchQuestionResultItem';
 import { SearchSectionResultItem } from './SearchSectionResultItem';
@@ -36,10 +36,11 @@ export const SearchResults = React.forwardRef(function SearchResults(
         results: ResultType[];
         fetching: boolean;
         cursor: number | null;
+        error: boolean;
     },
     ref: React.Ref<SearchResultsRef>
 ) {
-    const { children, id, query, results, fetching, cursor } = props;
+    const { children, id, query, results, fetching, cursor, error } = props;
 
     const language = useLanguage();
 
@@ -79,6 +80,32 @@ export const SearchResults = React.forwardRef(function SearchResults(
         return (
             <div className={tcls('flex', 'items-center', 'justify-center', 'py-8', 'h-full')}>
                 <Loading className={tcls('w-6', 'text-tint/6')} />
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-col',
+                    'items-center',
+                    'justify-center',
+                    'text-center',
+                    'py-8',
+                    'h-full',
+                    'gap-4'
+                )}
+            >
+                <div>{t(language, 'search_ask_error')}</div>
+                <Button
+                    variant="secondary"
+                    size="small"
+                    // We do a reload because in case of a new deployment, the action might have changed and it requires a full reload to work again.
+                    onClick={() => window.location.reload()}
+                >
+                    {t(language, 'unexpected_error_retry')}
+                </Button>
             </div>
         );
     }
