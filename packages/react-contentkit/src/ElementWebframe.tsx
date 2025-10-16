@@ -159,6 +159,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
+    // @ts-expect-error type definition is wrong for useResizeObserver
     const { width: observedWidth = 0 } = useResizeObserver({ ref: iframeRef });
     const liveWidth = observedWidth || iframeRef.current?.clientWidth || 0;
 

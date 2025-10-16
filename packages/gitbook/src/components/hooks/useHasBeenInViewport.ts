@@ -7,7 +7,7 @@ const HAS_INTERSECTION_OBSERVER = typeof IntersectionObserver !== 'undefined';
  * Return true if the element has been in the viewport once.
  */
 export function useHasBeenInViewport(
-    containerRef: React.RefObject<HTMLElement>,
+    containerRef: React.RefObject<HTMLElement | null>,
     options?: Pick<IntersectionObserverInit, 'root' | 'rootMargin' | 'threshold'>
 ) {
     const [visible, setVisible] = useState(false);

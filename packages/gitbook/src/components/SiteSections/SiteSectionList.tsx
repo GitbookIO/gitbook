@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon, type IconName } from '@gitbook/icons';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';

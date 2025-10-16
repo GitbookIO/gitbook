@@ -85,11 +85,17 @@ function ScalarModal(props: {
     return (
         <ApiClientModalProvider
             configuration={{ url: specUrl, ...prefillConfig }}
-            initialRequest={{ method, path }}
+            initialRequest={
+                method !== 'connect' ? { method: toScalarHttpMethod(method), path } : undefined
+            }
         >
             <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
         </ApiClientModalProvider>
     );
+}
+
+function toScalarHttpMethod<T extends OpenAPIV3_1.HttpMethods>(method: T): Uppercase<T> {
+    return method.toUpperCase() as Uppercase<T>;
 }
 
 type ScalarModalControllerRef = {
@@ -106,10 +112,10 @@ function ScalarModalController(props: {
     const openScalarClient = client?.open;
     const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
     const openClient = useMemo(() => {
-        if (openScalarClient) {
+        if (openScalarClient && method !== 'connect') {
             return () => {
                 openScalarClient({
-                    method,
+                    method: toScalarHttpMethod(method),
                     path,
                     _source: 'gitbook',
                 });

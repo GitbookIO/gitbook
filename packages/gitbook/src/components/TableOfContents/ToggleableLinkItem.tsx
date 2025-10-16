@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import React, { useRef } from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -196,9 +196,9 @@ function Descendants(props: {
     const { isVisible, children } = props;
     return (
         <motion.div
-            className="overflow-hidden"
             animate={isVisible ? show : hide}
             initial={isVisible ? show : hide}
+            style={{ overflow: 'hidden' }}
         >
             {children}
         </motion.div>

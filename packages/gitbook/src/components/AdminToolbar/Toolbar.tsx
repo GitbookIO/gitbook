@@ -6,7 +6,7 @@ import {
     useReducedMotion,
     useSpring,
 } from 'motion/react';
-import React from 'react';
+import React, { isValidElement } from 'react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { useToolbarControls } from './ToolbarControlsContext';
 
@@ -290,6 +290,10 @@ function ToolbarButtonWrapper(props: {
         scale: springScale,
         x: springX,
     };
+
+    if (!isValidElement<{ motionValues: typeof motionValues }>(child)) {
+        return null;
+    }
 
     return React.cloneElement(child, {
         motionValues,
