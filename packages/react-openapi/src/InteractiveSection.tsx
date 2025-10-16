@@ -116,7 +116,7 @@ export function InteractiveSection(props: {
                             <OpenAPISelect
                                 stateKey={stateKey}
                                 items={tabs}
-                                onSelectionChange={() => {
+                                onChange={() => {
                                     state.expand();
                                 }}
                                 icon={selectIcon}

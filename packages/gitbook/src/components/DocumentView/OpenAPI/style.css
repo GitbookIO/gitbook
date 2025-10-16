@@ -478,17 +478,22 @@
 }
 
 .openapi-path-server {
-    @apply text-tint hidden md:inline;
+    @apply text-tint inline;
 }
 
-.openapi-path .openapi-method {
-    @apply m-0 mt-0.5 items-center flex px-1;
+.openapi-summary .openapi-path .openapi-method {
+    @apply m-0 items-center flex px-2 py-1 h-6;
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal text-left font-mono text-tint-strong/10;
-    @apply py-0.5 px-1 rounded hover:bg-tint transition-colors;
+    @apply flex-1 relative font-normal text-left overflow-x-auto font-mono text-tint-strong/10;
     @apply whitespace-nowrap md:whitespace-normal;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.openapi-path-title-row{
+    @apply flex flex-row items-center;
 }
 
 .openapi-path-title[data-deprecated="true"] {
@@ -592,16 +597,28 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button {
-    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 text-tint-strong rounded text-xs p-1.5 leading-none border border-tint-subtle bg-tint;
+    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded leading-none;
     @apply hover:bg-tint-hover transition-all;
 }
 
+.openapi-select:not(.openapi-select-unstyled) > button {
+    @apply border border-tint-subtle bg-tint text-xs;
+}
+
+.openapi-select-unstyled > button {
+    @apply p-1;
+}
+
 .openapi-select > button[data-focused="true"] {
-    @apply outline-primary -outline-offset-1 outline outline-1;
+    @apply outline-primary -outline-offset-1 outline;
 }
 
 .openapi-select > button > span.react-aria-SelectValue {
     @apply shrink truncate flex items-center;
+}
+
+.openapi-select > button > .react-aria-SelectValue [slot="description"] {
+    display: none;
 }
 
 .openapi-select > button .openapi-markdown {
@@ -628,6 +645,14 @@ body:has(.openapi-select-popover) {
 .openapi-select-item {
     @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded !outline-none;
     @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
+}
+
+.openapi-select-item.openapi-select-item-column {
+    @apply flex flex-col gap-1 justify-start items-start;
+}
+
+.openapi-select-item [slot="description"] {
+    @apply text-xs text-tint-subtle;
 }
 
 .openapi-select button .openapi-markdown,
@@ -965,4 +990,21 @@ body:has(.openapi-select-popover) {
 
 .openapi-copy-button[data-disabled="true"] {
     @apply cursor-default;
+}
+
+.openapi-path-copy-button {
+    @apply p-1 flex rounded-md;
+    @apply hover:bg-tint;
+}
+
+.openapi-path-copy-button-icon {
+    @apply size-6 flex opacity-0 transition-all;
+}
+
+.openapi-path:hover .openapi-path-copy-button-icon {
+    @apply opacity-100;
+}
+
+.openapi-path-copy-button-icon svg {
+    @apply text-tint size-4;
 }

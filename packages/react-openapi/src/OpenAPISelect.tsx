@@ -30,7 +30,7 @@ interface OpenAPISelectProps<T extends OpenAPISelectItem> extends Omit<SelectPro
     /**
      * Icon to display in the select button.
      */
-    icon?: React.ReactNode;
+    icon?: React.ReactNode | null;
 }
 
 export function useSelectState(stateKey = 'select-state', initialKey: Key = 'default') {
@@ -42,18 +42,10 @@ export function useSelectState(stateKey = 'select-state', initialKey: Key = 'def
 }
 
 export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectProps<T>) {
-    const {
-        icon = '▼',
-        items,
-        children,
-        className,
-        placement,
-        stateKey,
-        selectedKey,
-        onSelectionChange,
-    } = props;
+    const { icon, items, children, className, placement, stateKey, value, onChange, defaultValue } =
+        props;
 
-    const state = useSelectState(stateKey, items[0]?.key);
+    const state = useSelectState(stateKey, defaultValue ?? items[0]?.key);
 
     const selected = items.find((item) => item.key === state.key) || items[0];
 
@@ -61,16 +53,16 @@ export function OpenAPISelect<T extends OpenAPISelectItem>(props: OpenAPISelectP
         <Select
             aria-label="OpenAPI Select"
             {...props}
-            value={selectedKey || selected?.key}
+            value={value ?? selected?.key}
             onChange={(key) => {
-                onSelectionChange?.(key);
+                onChange?.(key);
                 state.setKey(key);
             }}
             className={clsx('openapi-select', className)}
         >
             <Button>
                 <SelectValue />
-                {icon}
+                {icon !== null ? icon || '▼' : null}
             </Button>
             <Popover placement={placement} className="openapi-select-popover">
                 <ListBox className="openapi-select-listbox" items={items}>
@@ -86,10 +78,14 @@ export function OpenAPISelectItem(props: ListBoxItemProps) {
         <ListBoxItem
             {...props}
             className={({ isFocused, isSelected }) =>
-                clsx('openapi-select-item', {
-                    'openapi-select-item-focused': isFocused,
-                    'openapi-select-item-selected': isSelected,
-                })
+                clsx(
+                    'openapi-select-item',
+                    {
+                        'openapi-select-item-focused': isFocused,
+                        'openapi-select-item-selected': isSelected,
+                    },
+                    props.className
+                )
             }
         />
     );
