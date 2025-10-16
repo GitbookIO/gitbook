@@ -28,6 +28,7 @@
     "devDependencies": {
         "@types/js-yaml": "^4.0.9",
         "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
         "bun-types": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",

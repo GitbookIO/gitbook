@@ -13,6 +13,7 @@
         "@gitbook/api": "catalog:"
     },
     "devDependencies": {
+        "bun-types": "catalog:",
         "google-font-metadata": "^6.0.7",
         "tsdown": "catalog:",
         "typescript": "catalog:"

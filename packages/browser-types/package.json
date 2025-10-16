@@ -15,6 +15,7 @@
         "@gitbook/icons": "workspace:"
     },
     "devDependencies": {
+        "bun-types": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:"
     },

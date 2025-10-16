@@ -25,7 +25,8 @@
         "@types/estree": "^1.0.6",
         "@types/json-schema": "^7.0.15",
         "bun-types": "catalog:",
-        "tsdown": "catalog:"
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
         "build": "tsdown",

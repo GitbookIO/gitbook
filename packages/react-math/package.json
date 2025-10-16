@@ -20,6 +20,9 @@
     },
     "devDependencies": {
         "@types/katex": "^0.16.7",
+        "@types/react": "catalog:",
+        "bun-types": "catalog:",
+        "react": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:"
     },

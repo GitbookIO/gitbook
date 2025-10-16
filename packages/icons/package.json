@@ -24,6 +24,7 @@
         "@gitbook/fontawesome-pro": "1.0.15"
     },
     "devDependencies": {
+        "bun-types": "catalog:",
         "@types/react": "catalog:",
         "react": "catalog:",
         "tsdown": "catalog:",
