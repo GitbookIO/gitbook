@@ -167,10 +167,10 @@ function ChangeRequestToolbar(props: ToolbarViewProps) {
                     icon="comment"
                 />
 
-                {/* Open production site */}
+                {/* Open published/live site */}
                 {site.urls.published ? (
                     <ToolbarButton
-                        title="Open production site"
+                        title="Open live site"
                         href={getToolbarHref({
                             href: site.urls.published,
                             siteId: site.id,
@@ -249,7 +249,7 @@ function RevisionToolbar(props: ToolbarViewProps) {
                 />
                 {site.urls.published ? (
                     <ToolbarButton
-                        title="Open production site"
+                        title="Open live site"
                         href={getToolbarHref({
                             href: site.urls.published,
                             siteId: site.id,
