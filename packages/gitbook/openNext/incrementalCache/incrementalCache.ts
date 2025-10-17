@@ -7,7 +7,6 @@ import type {
 } from '@opennextjs/aws/types/overrides.js';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-
 import type { DurableObjectNamespace, Rpc } from '@cloudflare/workers-types';
 
 export const BINDING_NAME = 'NEXT_INC_CACHE_R2_BUCKET';
