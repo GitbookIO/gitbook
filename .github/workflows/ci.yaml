@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - main
+            - changeset-release/main
 env:
     BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
