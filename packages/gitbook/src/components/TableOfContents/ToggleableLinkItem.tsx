@@ -180,6 +180,7 @@ function Toggler(props: {
 const show = {
     opacity: 1,
     height: 'auto',
+    display: 'inherit'
 };
 const hide = {
     opacity: 0,
