@@ -162,7 +162,7 @@ export function DynamicTabs(props: {
                 'rounded-lg',
                 'straight-corners:rounded-xs',
                 'ring-1 ring-tint-subtle ring-inset',
-                'flex flex-col',
+                'flex min-w-0 flex-col',
                 className
             )}
         >
