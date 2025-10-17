@@ -19,6 +19,7 @@ export type ClientTOCPageDocument = {
     type: 'document';
     id: string;
     title: string;
+    sidebarTitle?: string;
     href: string;
     emoji?: string;
     icon?: string;
@@ -73,6 +74,7 @@ export async function encodeClientTableOfContents(
                     removeUndefined({
                         id: page.id,
                         title: page.title,
+                        sidebarTitle: page.sidebarTitle,
                         href,
                         emoji: page.emoji,
                         icon: page.icon,
