@@ -1,5 +1,11 @@
 # @gitbook/react-openapi
 
+## 1.5.3
+
+### Patch Changes
+
+- 8ce7322: Add OpenAPI servers selection
+
 ## 1.5.2
 
 ### Patch Changes
