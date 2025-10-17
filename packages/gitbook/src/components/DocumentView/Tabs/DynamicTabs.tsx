@@ -163,25 +163,33 @@ export function DynamicTabs(props: {
                 'straight-corners:rounded-xs',
                 'ring-1 ring-tint-subtle ring-inset',
                 'flex flex-col',
-                'overflow-hidden',
                 className
             )}
         >
             <TabItemList tabs={tabs} activeTabId={active?.id ?? null} onSelect={selectTab} />
             {tabs.map((tab) => (
-                <div
-                    key={tab.id}
-                    role="tabpanel"
-                    id={tab.id}
-                    aria-labelledby={getTabButtonId(tab.id)}
-                    className={tcls('p-4', tab.id !== active?.id ? 'hidden' : null)}
-                >
-                    {tab.body}
-                </div>
+                <TabPanel key={tab.id} tab={tab} isActive={tab.id === active?.id} />
             ))}
         </div>
     );
 }
+
+const TabPanel = memo(function TabPanel(props: {
+    tab: TabsItem;
+    isActive: boolean;
+}) {
+    const { tab, isActive } = props;
+    return (
+        <div
+            role="tabpanel"
+            id={tab.id}
+            aria-labelledby={getTabButtonId(tab.id)}
+            className={tcls('p-4', isActive ? null : 'hidden')}
+        >
+            {tab.body}
+        </div>
+    );
+});
 
 const TabItemList = memo(function TabItemList(props: {
     tabs: TabsItem[];
@@ -204,6 +212,9 @@ const TabItemList = memo(function TabItemList(props: {
             role="tablist"
             className={tcls(
                 'group/tabs',
+                'overflow-hidden',
+                'rounded-t-lg',
+                'straight-corners:rounded-t-xs',
                 'inline-flex',
                 'self-stretch',
                 'after:flex-1',

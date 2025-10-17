@@ -40,7 +40,7 @@ export function Tabs(props: BlockProps<DocumentBlockTabs>) {
     // When printing, we display the tab, one after the other
     if (context.mode === 'print') {
         return tabs.map((tab) => {
-            <DynamicTabs key={tab.id} id={id} tabs={[tab]} className={tcls(style)} />;
+            return <DynamicTabs key={tab.id} id={id} tabs={[tab]} className={tcls(style)} />;
         });
     }
 

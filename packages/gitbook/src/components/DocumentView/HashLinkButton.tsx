@@ -29,6 +29,8 @@ export function HashLinkButton(props: {
                 'h-[1em]',
                 'border-0',
                 'opacity-0',
+                'site-background',
+                'rounded',
                 'group-hover/hash:opacity-[0]',
                 'group-focus/hash:opacity-[0]',
                 'md:group-hover/hash:opacity-[1]',
