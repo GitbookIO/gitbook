@@ -10,16 +10,21 @@ import type { PolymorphicComponentProp } from './types';
 
 export type ImageSize = { width: number; height: number };
 
-type ImageSource = {
+type DefaultImageSource = {
     src: string;
-    size?: ImageSize;
     aspectRatio?: string;
+    /**
+     * Override the alt attribute.
+     */
+    alt?: string;
 };
 
-export type ImageSourceSized = {
-    src: string;
+type ImageSource = DefaultImageSource & {
+    size?: ImageSize;
+};
+
+export type ImageSourceSized = DefaultImageSource & {
     size: ImageSize | null;
-    aspectRatio?: string;
 };
 
 export type ImageResponsiveSize = {
@@ -117,7 +122,7 @@ export function Image(
         } & ImageCommonProps
     >
 ) {
-    const { sources, style, inline = false, ...rest } = props;
+    const { sources, style, inline = false, alt, ...rest } = props;
 
     return (
         <>
@@ -131,6 +136,7 @@ export function Image(
                     sources.dark ? 'dark:hidden' : null,
                     style
                 )}
+                alt={sources.light.alt || alt}
             />
             {sources.dark ? (
                 <ImagePicture
@@ -146,6 +152,7 @@ export function Image(
                         inline ? 'dark:inline' : 'dark:block',
                         style
                     )}
+                    alt={sources.dark.alt || sources.light.alt || alt}
                 />
             ) : null}
         </>
