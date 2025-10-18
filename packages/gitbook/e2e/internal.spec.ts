@@ -228,6 +228,59 @@ const testCases: TestsCase[] = [
                     );
                 },
             },
+            {
+                name: 'Expandable TOC navigation',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+
+                    // Verify "Navigation" link is not visible initially
+                    const navigationLink = page.getByRole('link', { name: 'Navigation' });
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Find and click the chevron element that is next to "Editor" in the TOC
+                    // It is a span inside the link
+                    const editorChevron = page
+                        .getByRole('link', { name: 'Editor' })
+                        .locator('span');
+                    await editorChevron.click();
+
+                    // Verify "Navigation" link becomes visible after expansion
+                    await expect(navigationLink).toBeVisible();
+                },
+            },
+            {
+                name: 'Expandable nested TOC navigation',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+
+                    // Verify "Spaces" link is not visible initially
+                    const navigationLink = page.getByRole('link', { name: 'Spaces' });
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Find and click the chevron element that is next to "Editor" in the TOC
+                    // It is a span inside the link
+                    const editorChevron = page
+                        .getByRole('link', { name: 'Editor' })
+                        .locator('span');
+                    await editorChevron.click();
+
+                    // At this stage the link should still not be visible
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Then we click 'Content Structure' chevron to expand further
+                    const contentStructureChevron = page
+                        .getByRole('link', { name: 'Content Structure' })
+                        .locator('span');
+                    await contentStructureChevron.click();
+
+                    // Verify "Spaces" link becomes visible after expansion
+                    await expect(navigationLink).toBeVisible();
+                },
+            },
             ...searchTestCases,
             {
                 name: 'Not found',
