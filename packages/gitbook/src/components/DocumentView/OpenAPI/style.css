@@ -486,7 +486,7 @@
 }
 
 .openapi-summary .openapi-path .openapi-method {
-    @apply m-0 items-center flex px-2 py-1 h-6 self-start md:self-center;
+    @apply m-0 items-center flex px-2 py-1 h-6;
 }
 
 .openapi-path-title {
