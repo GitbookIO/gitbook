@@ -454,6 +454,10 @@
     @apply flex items-center font-mono text-[0.813rem] gap-1 h-fit *:truncate overflow-x-auto min-w-0 max-w-full font-normal text-tint-strong;
 }
 
+.openapi-codesample-header-content .openapi-path-title {
+    @apply block;
+}
+
 .openapi-codesample-header-content .openapi-path .openapi-path-variable {
     @apply text-[0.813rem];
 }
@@ -486,7 +490,7 @@
 }
 
 .openapi-path-title {
-    @apply flex-1 relative font-normal text-left overflow-x-auto font-mono text-tint-strong/10;
+    @apply flex-1 relative font-normal items-center gap-y-1 flex flex-wrap text-left overflow-x-auto font-mono text-tint-strong/10;
     @apply whitespace-nowrap md:whitespace-normal;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -606,7 +610,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-unstyled > button {
-    @apply p-1;
+    @apply p-1 *:truncate max-w-full;
 }
 
 .openapi-select > button[data-focused="true"] {
@@ -998,7 +1002,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-path-copy-button-icon {
-    @apply size-6 flex opacity-0 transition-all;
+    @apply size-6 opacity-0 transition-all hidden sm:flex;
 }
 
 .openapi-path:hover .openapi-path-copy-button-icon {
