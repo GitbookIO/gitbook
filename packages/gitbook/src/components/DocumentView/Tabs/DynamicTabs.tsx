@@ -2,12 +2,7 @@
 
 import React, { memo, useCallback, useMemo, type ComponentPropsWithRef } from 'react';
 
-import {
-    NavigationStatusContext,
-    useHash,
-    useIsMounted,
-    useListOverflow,
-} from '@/components/hooks';
+import { useHash, useIsMounted, useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
@@ -74,7 +69,6 @@ export function DynamicTabs(props: {
 }) {
     const { id, tabs, className } = props;
     const router = useRouter();
-    const { onNavigationClick } = React.useContext(NavigationStatusContext);
 
     const hash = useHash();
     const [tabsState, setTabsState] = useTabsState();
@@ -106,8 +100,7 @@ export function DynamicTabs(props: {
 
             const href = `#${tab.id}`;
             if (window.location.hash !== href) {
-                router.replace(href);
-                onNavigationClick(href);
+                router.replace(href, { scroll: false });
             }
 
             setTabsState((prev) => {
@@ -128,7 +121,7 @@ export function DynamicTabs(props: {
                 };
             });
         },
-        [onNavigationClick, router, setTabsState, tabs, id]
+        [router, setTabsState, tabs, id]
     );
 
     // When the hash changes, we try to select the tab containing the targetted element.
@@ -184,7 +177,10 @@ const TabPanel = memo(function TabPanel(props: {
             role="tabpanel"
             id={tab.id}
             aria-labelledby={getTabButtonId(tab.id)}
-            className={tcls('p-4', isActive ? null : 'hidden')}
+            className={tcls(
+                'scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*12)] p-4',
+                isActive ? null : 'hidden'
+            )}
         >
             {tab.body}
         </div>

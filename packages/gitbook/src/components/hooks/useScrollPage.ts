@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { useHash } from './useHash';
+import { usePrevious } from './usePrevious';
 
 /**
  * Scroll the page to an anchor point or
@@ -12,8 +13,17 @@ import { useHash } from './useHash';
  */
 export function useScrollPage() {
     const hash = useHash();
+    const previousHash = usePrevious(hash);
     const pathname = usePathname();
+    const previousPathname = usePrevious(pathname);
     React.useLayoutEffect(() => {
+        // If there is no change in pathname or hash, do nothing
+        if (previousHash === hash && previousPathname === pathname) {
+            return;
+        }
+
+        // If there is a hash
+        // - Triggered by a change of hash or pathname
         if (hash) {
             const element = document.getElementById(hash);
             if (element) {
@@ -22,16 +32,12 @@ export function useScrollPage() {
                     behavior: 'smooth',
                 });
             }
-        } else {
+            return;
+        }
+
+        // If there was a hash but not anymore, scroll to top
+        if (previousHash && !hash) {
             window.scrollTo(0, 0);
         }
-        return () => {
-            if (hash) {
-                const element = document.getElementById(hash);
-                if (element) {
-                    element.style.scrollMarginTop = '';
-                }
-            }
-        };
-    }, [hash, pathname]);
+    }, [hash, previousHash, pathname, previousPathname]);
 }
