@@ -102,6 +102,9 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     });
 
     if (!pageTarget) {
+        if (context.isFallback) {
+            redirect(context.linker.toPathInSpace('/'));
+        }
         notFound();
     }
 
@@ -154,6 +157,10 @@ export async function getSitePageData(props: SitePageProps) {
             // before trying to resolve the page again
             redirect(context.linker.toPathInSpace(pathname));
         } else {
+            // If the page is not found and we are in fallback mode, return a redirect to the basepath
+            if (context.isFallback) {
+                redirect(context.linker.toPathInSpace('/'));
+            }
             notFound();
         }
     } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
