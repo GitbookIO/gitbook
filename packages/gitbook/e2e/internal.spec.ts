@@ -231,7 +231,6 @@ const testCases: TestsCase[] = [
             {
                 name: 'Expandable TOC navigation',
                 url: '',
-                screenshot: false,
                 run: async (page) => {
                     await waitForCookiesDialog(page);
 
