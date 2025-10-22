@@ -72,7 +72,7 @@ export function SiteSectionTabs(props: {
                         : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r'
                 )}
                 activeId={currentSection.id}
-                trailingEdgeClassName={children ? 'after:border-tint' : ''}
+                trailingEdgeScrollClassName={children ? 'after:border-tint' : ''}
             >
                 <NavigationMenu.List
                     className={tcls(

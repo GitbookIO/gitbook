@@ -15,11 +15,11 @@ export type ScrollContainerProps = {
     children: React.ReactNode;
     className?: string;
 
-    /** Optional class(es) to apply to the leading edge of the scroll container. Only rendered when there is more content than the container can display. */
-    leadingEdgeClassName?: string;
+    /** Optional class(es) to apply when there the container can be scrolled on the leading (left or top) edge */
+    leadingEdgeScrollClassName?: string;
 
-    /** Optional class(es) to apply to the trailing edge of the scroll container. Only rendered when there is more content than the container can display. */
-    trailingEdgeClassName?: string;
+    /** Optional class(es) to apply when there the container can be scrolled on the trailing (right or bottom) edge */
+    trailingEdgeScrollClassName?: string;
 
     /** The direction of the scroll container. */
     orientation: 'horizontal' | 'vertical';
@@ -34,8 +34,8 @@ export function ScrollContainer(props: ScrollContainerProps) {
         className,
         orientation,
         activeId,
-        leadingEdgeClassName,
-        trailingEdgeClassName,
+        leadingEdgeScrollClassName,
+        trailingEdgeScrollClassName,
         ...rest
     } = props;
 
@@ -127,8 +127,8 @@ export function ScrollContainer(props: ScrollContainerProps) {
             className={tcls(
                 'group/scroll-container relative flex overflow-hidden',
                 className,
-                scrollPosition > 0 ? leadingEdgeClassName : '',
-                scrollPosition < scrollSize ? trailingEdgeClassName : ''
+                scrollPosition > 0 ? leadingEdgeScrollClassName : '',
+                scrollPosition < scrollSize ? trailingEdgeScrollClassName : ''
             )}
             {...rest}
         >
