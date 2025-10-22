@@ -69,7 +69,7 @@ export function SiteSectionTabs(props: {
                     'md:-ml-8 -ml-4 sm:-ml-6',
                     !children
                         ? 'md:-mr-8 -mr-4 sm:-mr-6'
-                        : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r'
+                        : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r after:transition-colors'
                 )}
                 activeId={currentSection.id}
                 trailingEdgeScrollClassName={children ? 'after:border-tint' : ''}

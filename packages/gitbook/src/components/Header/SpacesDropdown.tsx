@@ -76,7 +76,7 @@ export function TranslationsDropdown(props: {
             siteSpaces={siteSpaces}
             variant="blank"
             className={tcls(
-                'bg-transparent px-2 md:py-1 lg:max-w-64 max-md:[&_.button-content]:hidden',
+                '-mx-2 bg-transparent px-2 md:py-1 lg:max-w-64 max-md:[&_.button-content]:hidden',
                 hasEmojiPrefix
                     ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
                     : '',
