@@ -46,7 +46,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                             width: 260,
                         },
                     ]}
-                    priority="high"
+                    preload
                     style={tcls(
                         'overflow-hidden',
                         'shrink',

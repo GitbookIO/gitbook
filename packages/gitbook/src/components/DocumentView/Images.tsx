@@ -135,8 +135,7 @@ async function ImageBlock(props: {
                               }
                             : null,
                     }}
-                    priority={isEstimatedOffscreen ? 'lazy' : 'high'}
-                    preload
+                    loading={isEstimatedOffscreen ? 'lazy' : 'eager'}
                     zoom
                     inlineStyle={{
                         maxWidth: '100%',
