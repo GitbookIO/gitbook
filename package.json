@@ -1,6 +1,9 @@
 {
     "name": "gitbook",
     "version": "0.1.0",
+    "engines": {
+        "node": "^22.3.0"
+    },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.29.7",
