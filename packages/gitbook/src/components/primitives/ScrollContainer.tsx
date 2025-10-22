@@ -15,6 +15,12 @@ export type ScrollContainerProps = {
     children: React.ReactNode;
     className?: string;
 
+    /** Optional class(es) to apply to the leading edge of the scroll container. Only rendered when there is more content than the container can display. */
+    leadingEdgeClassName?: string;
+
+    /** Optional class(es) to apply to the trailing edge of the scroll container. Only rendered when there is more content than the container can display. */
+    trailingEdgeClassName?: string;
+
     /** The direction of the scroll container. */
     orientation: 'horizontal' | 'vertical';
 
@@ -23,7 +29,15 @@ export type ScrollContainerProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function ScrollContainer(props: ScrollContainerProps) {
-    const { children, className, orientation, activeId, ...rest } = props;
+    const {
+        children,
+        className,
+        orientation,
+        activeId,
+        leadingEdgeClassName,
+        trailingEdgeClassName,
+        ...rest
+    } = props;
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -110,7 +124,12 @@ export function ScrollContainer(props: ScrollContainerProps) {
 
     return (
         <div
-            className={tcls('group/scroll-container relative flex overflow-hidden', className)}
+            className={tcls(
+                'group/scroll-container relative flex overflow-hidden',
+                className,
+                scrollPosition > 0 ? leadingEdgeClassName : '',
+                scrollPosition < scrollSize ? trailingEdgeClassName : ''
+            )}
             {...rest}
         >
             {/* Scrollable content */}
@@ -140,7 +159,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                 icon={orientation === 'horizontal' ? 'chevron-left' : 'chevron-up'}
                 iconOnly
                 size="xsmall"
-                variant="secondary"
+                variant="header"
                 tabIndex={-1}
                 className={tcls(
                     orientation === 'horizontal'
@@ -158,7 +177,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                 icon={orientation === 'horizontal' ? 'chevron-right' : 'chevron-down'}
                 iconOnly
                 size="xsmall"
-                variant="secondary"
+                variant="header"
                 tabIndex={-1}
                 className={tcls(
                     orientation === 'horizontal'
