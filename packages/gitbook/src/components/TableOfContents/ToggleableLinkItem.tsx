@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@gitbook/icons';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
 
 import { tcls } from '@/lib/tailwind';
@@ -180,14 +180,10 @@ function Toggler(props: {
 const show = {
     opacity: 1,
     height: 'auto',
-    display: 'inherit',
 };
 const hide = {
     opacity: 0,
     height: 0,
-    transitionEnd: {
-        display: 'none',
-    },
 };
 
 function Descendants(props: {
@@ -196,12 +192,17 @@ function Descendants(props: {
 }) {
     const { isVisible, children } = props;
     return (
-        <motion.div
-            animate={isVisible ? show : hide}
-            initial={isVisible ? show : hide}
-            style={{ overflow: 'hidden' }}
-        >
-            {children}
-        </motion.div>
+        <AnimatePresence>
+            {isVisible ? (
+                <motion.div
+                    initial={hide}
+                    animate={show}
+                    exit={hide}
+                    className="flex flex-col overflow-hidden"
+                >
+                    {children}
+                </motion.div>
+            ) : null}
+        </AnimatePresence>
     );
 }
