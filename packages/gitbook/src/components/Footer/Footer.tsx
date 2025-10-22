@@ -64,7 +64,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                               }
                                             : null,
                                     }}
-                                    priority="lazy"
+                                    loading="lazy"
                                     style={[
                                         'w-auto',
                                         'max-w-40',

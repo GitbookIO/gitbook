@@ -139,7 +139,7 @@ export function Image(
                     inline={inline}
                     // We don't want to preload the dark image, because it's not visible
                     // TODO: adapt based on the default theme
-                    priority="lazy"
+                    loading="lazy"
                     className={tcls(
                         rest.className,
                         'hidden',
