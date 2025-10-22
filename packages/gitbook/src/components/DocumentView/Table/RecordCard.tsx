@@ -120,8 +120,7 @@ export async function RecordCard(
                             : ['h-auto', 'aspect-video'],
                         objectFits
                     )}
-                    priority={isOffscreen ? 'lazy' : 'high'}
-                    preload
+                    loading={isOffscreen ? 'lazy' : 'eager'}
                 />
             ) : null}
             <div

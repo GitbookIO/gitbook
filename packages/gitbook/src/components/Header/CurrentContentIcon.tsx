@@ -51,6 +51,7 @@ export function CurrentContentIcon(
                           },
                       }
             }
+            preload
             {...imageProps}
         />
     );
