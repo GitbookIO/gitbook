@@ -7,7 +7,6 @@ import ReactDOM from 'react-dom';
 
 import { tcls } from '@/lib/tailwind';
 
-import { Preloader } from './Preloader';
 import styles from './ZoomImage.module.css';
 
 const PADDING = 32; // Padding around the image in the modal, in pixels
@@ -76,6 +75,12 @@ export function ZoomImage(
         };
     }, [imgRef, width]);
 
+    // Preload the image that will be displayed in the modal
+    if (zoomable) {
+        ReactDOM.preload(src, {
+            as: 'image',
+        });
+    }
     const preloadImage = React.useCallback(
         (onLoad?: () => void) => {
             const image = new Image();
@@ -104,7 +109,6 @@ export function ZoomImage(
         <>
             {opened ? (
                 <>
-                    {zoomable && <Preloader src={src} />}
                     {placeholderRect ? (
                         // Placeholder to keep the layout stable when the image is removed from the DOM
                         <span
