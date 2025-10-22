@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import type { ImageResizer } from '@/lib/images';
-import ReactDOM from 'react-dom';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import { checkIsHttpURL } from '@/lib/urls';
+import { Preloader } from './Preloader';
 import { ZoomImage } from './ZoomImage';
 import type { PolymorphicComponentProp } from './types';
 
@@ -218,16 +218,6 @@ async function ImagePictureSized(
     const aspectRatioStyle = source.aspectRatio ? { aspectRatio: source.aspectRatio } : {};
     const style = { ...aspectRatioStyle, ...inlineStyle };
 
-    // Preload the image if needed.
-    if (fetchPriority === 'high' || preload) {
-        ReactDOM.preload(attrs.src, {
-            as: 'image',
-            imageSrcSet: attrs.srcSet,
-            imageSizes: attrs.sizes,
-            fetchPriority,
-        });
-    }
-
     const imgProps: ImgDOMPropsWithSrc = {
         alt,
         style,
@@ -237,7 +227,19 @@ async function ImagePictureSized(
         ...attrs,
     };
 
-    return zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />;
+    return (
+        <>
+            {(fetchPriority === 'high' || preload) && (
+                <Preloader
+                    src={attrs.src}
+                    srcSet={attrs.srcSet}
+                    sizes={attrs.sizes}
+                    fetchPriority={fetchPriority}
+                />
+            )}
+            {zoom ? <ZoomImage {...imgProps} /> : <img {...imgProps} alt={imgProps.alt ?? ''} />}
+        </>
+    );
 }
 
 /**
