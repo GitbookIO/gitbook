@@ -188,13 +188,12 @@ export function Header(props: {
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
                         {withVariants === 'translations' ? (
-                            <div className="before:contents[] flex self-start py-2 before:mr-4 before:border-tint before:border-l">
-                                <TranslationsDropdown
-                                    context={context}
-                                    siteSpace={siteSpace}
-                                    siteSpaces={siteSpaces}
-                                />
-                            </div>
+                            <TranslationsDropdown
+                                context={context}
+                                siteSpace={siteSpace}
+                                siteSpaces={siteSpaces}
+                                className="my-2 ml-2 self-start"
+                            />
                         ) : null}
                     </SiteSectionTabs>
                 </div>
