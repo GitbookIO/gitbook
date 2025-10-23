@@ -2,7 +2,6 @@
 
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
-import { useResizeObserver } from 'usehooks-ts';
 
 import { Icon } from '@gitbook/icons';
 import { useContentKitClientContext } from './context';
@@ -160,15 +159,17 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
     }, [element.data, renderer.state, sendMessage]);
 
     // @ts-expect-error type definition is wrong for useResizeObserver
-    const { width: observedWidth = 0 } = useResizeObserver({ ref: iframeRef });
-    const liveWidth = observedWidth || iframeRef.current?.clientWidth || 0;
+    //const { width: observedWidth = 0 } = useResizeObserver({ ref: iframeRef });
+    //const liveWidth = observedWidth || iframeRef.current?.clientWidth || 0;
 
     const aspectRatio = size.aspectRatio || element.aspectRatio;
 
-    const height =
-        liveWidth && aspectRatio && liveWidth > (size.height ?? 0)
-            ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? 32)
-            : 'auto';
+    const MIN_HEIGHT = 32;
+
+    const height = size.height ? Math.max(size.height, MIN_HEIGHT) : 'auto';
+    // liveWidth && aspectRatio && liveWidth > (size.height ?? 0)
+    //     ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? MIN_HEIGHT)
+    //     : 'auto';
 
     if (!mounted) {
         return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
