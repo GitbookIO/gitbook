@@ -139,11 +139,13 @@ function CodeBlockExpandable(props: { children: React.ReactNode; lines: Highligh
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="relative">
+        <div className="group/codeblock-expandable relative">
             <div
                 className={tcls(
-                    isExpanded ? 'after:opacity-0' : 'h-60 overflow-y-hidden after:opacity-100',
-                    'after:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-0% after:from-tint-2 after:to-70% after:to-transparent after:content-[""] motion-safe:transition-[height] motion-safe:delay-100 motion-safe:duration-100'
+                    isExpanded
+                        ? '[&_pre]:after:opacity-0'
+                        : '[&_pre]:h-60 [&_pre]:after:overflow-y-hidden [&_pre]:after:opacity-100',
+                    '[&_pre]:after:pointer-events-none [&_pre]:after:z-0 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""] [&_pre]:after:[grid-area:2/1]'
                 )}
             >
                 {children}
@@ -155,7 +157,7 @@ function CodeBlockExpandable(props: { children: React.ReactNode; lines: Highligh
                     variant="blank"
                     type="button"
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="my-2 text-primary text-sm"
+                    className="my-2 text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
                 >
                     {isExpanded ? 'Show less' : `Show all ${lines.length} lines`}
                 </Button>
