@@ -8,6 +8,8 @@ import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
 
+const MIN_HEIGHT = 32; // minimum height for the iframe in pixels
+
 export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWebFrame>) {
     const { element } = props;
 
@@ -158,18 +160,9 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
-    // @ts-expect-error type definition is wrong for useResizeObserver
-    //const { width: observedWidth = 0 } = useResizeObserver({ ref: iframeRef });
-    //const liveWidth = observedWidth || iframeRef.current?.clientWidth || 0;
-
     const aspectRatio = size.aspectRatio || element.aspectRatio;
 
-    const MIN_HEIGHT = 32;
-
-    const height = size.height ? Math.max(size.height, MIN_HEIGHT) : 'auto';
-    // liveWidth && aspectRatio && liveWidth > (size.height ?? 0)
-    //     ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? MIN_HEIGHT)
-    //     : 'auto';
+    const height = size.height ? Math.max(size.height, MIN_HEIGHT) : undefined;
 
     if (!mounted) {
         return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
