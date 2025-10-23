@@ -215,27 +215,31 @@ export function SearchContainer(props: SearchContainerProps) {
                     // Only show content if there's a query or Ask is enabled
                     state?.query || withAI ? (
                         <React.Suspense fallback={null}>
+                            <div className="scroll-py-2 overflow-y-scroll p-2">
+                                {state !== null && !showAsk ? (
+                                    <SearchResults
+                                        ref={resultsRef}
+                                        query={normalizedQuery}
+                                        id={searchResultsId}
+                                        fetching={fetching}
+                                        results={results}
+                                        cursor={cursor}
+                                        error={error}
+                                    />
+                                ) : null}
+                                {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
+                            </div>
                             {(withVariants || withSections) && !showAsk ? (
-                                <SearchScopeToggle
-                                    section={section}
-                                    spaceTitle={spaceTitle}
-                                    withVariants={withVariants}
-                                    withSiteVariants={withSiteVariants}
-                                    withSections={withSections}
-                                />
+                                <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
+                                    <SearchScopeToggle
+                                        section={section}
+                                        spaceTitle={spaceTitle}
+                                        withVariants={withVariants}
+                                        withSiteVariants={withSiteVariants}
+                                        withSections={withSections}
+                                    />
+                                </div>
                             ) : null}
-                            {state !== null && !showAsk ? (
-                                <SearchResults
-                                    ref={resultsRef}
-                                    query={normalizedQuery}
-                                    id={searchResultsId}
-                                    fetching={fetching}
-                                    results={results}
-                                    cursor={cursor}
-                                    error={error}
-                                />
-                            ) : null}
-                            {showAsk ? <SearchAskAnswer query={normalizedAsk} /> : null}
                         </React.Suspense>
                     ) : null
                 }
@@ -247,7 +251,7 @@ export function SearchContainer(props: SearchContainerProps) {
                     onOpenAutoFocus: (event) => event.preventDefault(),
                     align: 'start',
                     className:
-                        '@container overflow-y-scroll bg-tint-base has-[.empty]:hidden scroll-py-2 w-128 p-2 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
+                        '@container flex flex-col bg-tint-base has-[.empty]:hidden w-128 p-0 max-h-[min(32rem,var(--radix-popover-content-available-height))] max-w-[min(var(--radix-popover-content-available-width),32rem)]',
                     onInteractOutside: (event) => {
                         // Don't close if clicking on the search input itself
                         if (searchInputRef.current?.contains(event.target as Node)) {

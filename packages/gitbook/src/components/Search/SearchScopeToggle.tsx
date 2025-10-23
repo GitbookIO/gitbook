@@ -1,9 +1,8 @@
 'use client';
 
-import { tString, useLanguage } from '@/intl/client';
+import { t, useLanguage } from '@/intl/client';
 import type { SiteSection } from '@gitbook/api';
-import { Button, Checkbox, DropdownMenu, DropdownMenuItem } from '../primitives';
-import { SegmentedControl, SegmentedControlItem } from '../primitives/SegmentedControl';
+import { Button, DropdownChevron, DropdownMenu, DropdownMenuItem } from '../primitives';
 import { useSearch } from './useSearch';
 
 /**
@@ -17,7 +16,7 @@ export function SearchScopeToggle(props: {
     withSiteVariants: boolean;
     withSections: boolean;
 }) {
-    const { spaceTitle, section, withVariants, withSections, withSiteVariants } = props;
+    const { spaceTitle, section, withVariants, withSections } = props;
     const [state, setSearchState] = useSearch();
     const language = useLanguage();
 
@@ -26,108 +25,121 @@ export function SearchScopeToggle(props: {
     }
 
     // Whether to include all variants in the search
-    const scopeIsExtended = ['extended', 'all'].includes(state.scope);
+    const sectionScopeIsExtended = ['default', 'all'].includes(state.scope);
+    const variantScopeIsExtended = ['extended', 'all'].includes(state.scope);
 
     return (
-        <>
+        <div className="flex items-center">
+            <span className="mr-2">{t(language, 'search_scope_title')}</span>
             {withSections ? (
-                <div className="mb-2 flex items-center gap-2">
-                    <SegmentedControl className="grow animate-scale-in">
-                        <SegmentedControlItem
-                            active={['default', 'all'].includes(state.scope)}
-                            label={tString(language, 'search_scope_all')}
-                            icon="infinity"
-                            onClick={() =>
-                                setSearchState({
-                                    ...state,
-                                    scope: scopeIsExtended ? 'all' : 'default',
-                                })
-                            }
-                        />
-                        <SegmentedControlItem
-                            active={['current', 'extended'].includes(state.scope)}
-                            icon={section?.icon}
-                            label={tString(language, 'search_scope_current', section?.title)}
-                            onClick={() =>
-                                setSearchState({
-                                    ...state,
-                                    scope: scopeIsExtended ? 'extended' : 'current',
-                                })
-                            }
-                        />
-                    </SegmentedControl>
-                    {withSiteVariants ? (
-                        <DropdownMenu
-                            button={
-                                <Button
-                                    icon="ellipsis"
-                                    iconOnly
-                                    size="default"
-                                    variant="blank"
-                                    label={tString(language, 'more')}
-                                    className="shrink-0"
-                                    active={scopeIsExtended}
-                                />
-                            }
+                <DropdownMenu
+                    button={
+                        <Button
+                            variant="blank"
+                            size="medium"
+                            className="px-2 text-tint-strong"
+                            icon={sectionScopeIsExtended ? undefined : section?.icon}
                         >
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    setSearchState({
-                                        ...state,
-                                        scope: (() => {
-                                            switch (state.scope) {
-                                                case 'extended':
-                                                    return 'current';
-                                                case 'current':
-                                                    return 'extended';
-                                                case 'all':
-                                                    return 'default';
-                                                default:
-                                                    return 'all';
-                                            }
-                                        })(),
-                                    })
-                                }
-                                active={scopeIsExtended}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Checkbox checked={scopeIsExtended} />
-                                    <div className="flex flex-col items-start">
-                                        Include all variants
-                                        <div className="text-tint-subtle text-xs">
-                                            Search content in every language/version
-                                        </div>
-                                    </div>
-                                </div>
-                            </DropdownMenuItem>
-                        </DropdownMenu>
-                    ) : null}
-                </div>
-            ) : withVariants ? (
-                <SegmentedControl className="mb-2 animate-scale-in">
-                    <SegmentedControlItem
-                        size={withSections ? 'small' : 'medium'}
-                        active={!scopeIsExtended}
-                        className="py-1"
-                        label={tString(language, 'search_scope_current', spaceTitle)}
+                            <div className="flex items-center gap-2">
+                                {t(
+                                    language,
+                                    sectionScopeIsExtended
+                                        ? 'search_scope_section_all'
+                                        : 'search_scope_section_current',
+                                    section?.title ?? ''
+                                )}
+                                <DropdownChevron />
+                            </div>
+                        </Button>
+                    }
+                >
+                    <DropdownMenuItem
+                        leadingIcon="infinity"
+                        className="gap-3"
+                        active={sectionScopeIsExtended}
+                        onClick={() => setSearchState({ ...state, scope: 'default' })}
+                    >
+                        <div className="flex flex-col">
+                            <span className="text-tint-strong">
+                                {t(language, 'search_scope_section_all')}
+                            </span>
+                            <span className="text-tint-subtle text-xs">
+                                {t(language, 'search_scope_section_all_description')}
+                            </span>
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        leadingIcon={section?.icon ?? 'crosshairs'}
+                        className="gap-3"
+                        active={!sectionScopeIsExtended}
+                        onClick={() => setSearchState({ ...state, scope: 'current' })}
+                    >
+                        <div className="flex flex-col">
+                            <span className="text-tint-strong">
+                                {t(language, 'search_scope_section_current', section?.title ?? '')}
+                            </span>
+                            <span className="text-tint-subtle text-xs">
+                                {t(language, 'search_scope_section_current_description')}
+                            </span>
+                        </div>
+                    </DropdownMenuItem>
+                </DropdownMenu>
+            ) : null}
+
+            {withVariants && (!withSections || !sectionScopeIsExtended) ? (
+                <DropdownMenu
+                    button={
+                        <Button variant="blank" size="medium" className="px-2">
+                            <div className="flex items-center gap-2">
+                                <span className="text-tint-strong">
+                                    {t(
+                                        language,
+                                        variantScopeIsExtended
+                                            ? 'search_scope_variant_all'
+                                            : 'search_scope_variant_current',
+                                        spaceTitle ?? ''
+                                    )}
+                                </span>
+                                <DropdownChevron />
+                            </div>
+                        </Button>
+                    }
+                >
+                    <DropdownMenuItem
+                        className="gap-3"
+                        active={!variantScopeIsExtended}
                         onClick={() =>
                             setSearchState({
                                 ...state,
-                                scope: 'default',
+                                scope: withSections ? 'current' : 'default',
                             })
                         }
-                    />
-
-                    <SegmentedControlItem
-                        size={withSections ? 'small' : 'medium'}
-                        active={scopeIsExtended}
-                        className="py-1"
-                        icon="infinity"
-                        label={tString(language, 'search_scope_all')}
-                        onClick={() => setSearchState({ ...state, scope: 'all' })}
-                    />
-                </SegmentedControl>
+                    >
+                        <div className="flex flex-col">
+                            <span className="text-tint-strong">
+                                {t(language, 'search_scope_variant_current', spaceTitle ?? '')}
+                            </span>
+                            <span className="text-tint-subtle text-xs">
+                                {t(language, 'search_scope_variant_current_description')}
+                            </span>
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        className="gap-3"
+                        active={variantScopeIsExtended}
+                        onClick={() => setSearchState({ ...state, scope: 'extended' })}
+                    >
+                        <div className="flex flex-col">
+                            <span className="text-tint-strong">
+                                {t(language, 'search_scope_variant_all')}
+                            </span>
+                            <span className="text-tint-subtle text-xs">
+                                {t(language, 'search_scope_variant_all_description')}
+                            </span>
+                        </div>
+                    </DropdownMenuItem>
+                </DropdownMenu>
             ) : null}
-        </>
+        </div>
     );
 }
