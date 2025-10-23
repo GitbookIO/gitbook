@@ -173,6 +173,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
     }
 
+    // only use height measurement if no aspect ratio is defined
     const useHeightMeasurement = !aspectRatio && height;
 
     return (
