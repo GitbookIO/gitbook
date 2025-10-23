@@ -168,7 +168,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
     }
 
-    const useHeightMeasurement = !aspectRatio && typeof height !== 'undefined';
+    const useHeightMeasurement = !aspectRatio && height;
 
     return (
         <iframe
@@ -177,10 +177,10 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             title={element.source.url}
             allowFullScreen
             allow="clipboard-write"
-            className="contentkit-webframe border-none"
+            className="contentkit-webframe w-full max-w-full border-none"
             style={{
                 aspectRatio,
-                height: useHeightMeasurement ? 'auto' : height,
+                height: useHeightMeasurement ? height : 'auto',
             }}
         />
     );
