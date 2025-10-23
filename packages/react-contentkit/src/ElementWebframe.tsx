@@ -160,9 +160,14 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
-    const aspectRatio = size.aspectRatio || element.aspectRatio;
-
     const height = size.height ? Math.max(size.height, MIN_HEIGHT) : undefined;
+
+    const aspectRatio =
+        size.aspectRatio ||
+        element.aspectRatio ||
+        (iframeRef.current?.clientWidth && height
+            ? iframeRef.current.clientWidth / height
+            : undefined);
 
     if (!mounted) {
         return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
@@ -177,10 +182,10 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             title={element.source.url}
             allowFullScreen
             allow="clipboard-write"
-            className="contentkit-webframe w-full max-w-full border-none"
+            className="contentkit-webframe size-full max-w-full border-none"
             style={{
                 aspectRatio,
-                height: useHeightMeasurement ? height : 'auto',
+                height: useHeightMeasurement ? height : undefined,
             }}
         />
     );
