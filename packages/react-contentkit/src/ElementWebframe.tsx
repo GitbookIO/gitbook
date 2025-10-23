@@ -186,6 +186,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             style={{
                 aspectRatio,
                 height: useHeightMeasurement ? height : undefined,
+                maxHeight: height,
             }}
         />
     );
