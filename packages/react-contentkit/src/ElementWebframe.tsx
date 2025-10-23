@@ -181,14 +181,10 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             title={element.source.url}
             allowFullScreen
             allow="clipboard-write"
-            className="contentkit-webframe"
+            className="contentkit-webframe h-fit w-full max-w-full border-none"
             style={{
-                width: '100%',
-                maxWidth: '100%',
                 aspectRatio,
-                maxHeight: height,
-                height: 'fit-content',
-                border: 'none',
+                height,
             }}
         />
     );
