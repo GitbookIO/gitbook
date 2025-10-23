@@ -6,6 +6,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
+import { Button } from '@/components/primitives';
+import { tcls } from '@/lib/tailwind';
 import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
@@ -113,7 +115,9 @@ export function ClientCodeBlock(props: ClientBlockProps) {
         setLines(null);
     }, [isInViewport, block, inlines, evaluateInlineExpression]);
 
-    return (
+    const expandable = block.data.expandable;
+
+    const renderer = (
         <CodeBlockRenderer
             ref={blockRef}
             aria-busy={highlighting}
@@ -121,5 +125,41 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             style={style}
             lines={lines ?? plainLines}
         />
+    );
+
+    return expandable ? (
+        <CodeBlockExpandable lines={lines ?? plainLines}>{renderer}</CodeBlockExpandable>
+    ) : (
+        <>{renderer}</>
+    );
+}
+
+function CodeBlockExpandable(props: { children: React.ReactNode; lines: HighlightLine[] }) {
+    const { children, lines = [] } = props;
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    return (
+        <div className="relative">
+            <div
+                className={tcls(
+                    isExpanded ? 'after:opacity-0' : 'h-60 overflow-y-hidden after:opacity-100',
+                    'after:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-0% after:from-tint-2 after:to-70% after:to-transparent after:content-[""] motion-safe:transition-[height] motion-safe:delay-100 motion-safe:duration-100'
+                )}
+            >
+                {children}
+            </div>
+            <div className="absolute bottom-0 flex w-full justify-center">
+                <Button
+                    icon={isExpanded ? 'chevron-up' : 'chevron-down'}
+                    size="xsmall"
+                    variant="blank"
+                    type="button"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="my-2 text-primary text-sm"
+                >
+                    {isExpanded ? 'Show less' : `Show all ${lines.length} lines`}
+                </Button>
+            </div>
+        </div>
     );
 }
