@@ -1,5 +1,5 @@
 import { tcls } from '@/lib/tailwind';
-import { Icon } from '@gitbook/icons';
+import { Icon, IconStyle } from '@gitbook/icons';
 import type React from 'react';
 
 interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
@@ -20,6 +20,7 @@ export const AIChatIcon = ({
         return (
             <Icon
                 icon="sparkle"
+                {...props}
                 className={tcls(
                     className,
                     (state === 'thinking' || state === 'working') &&
@@ -162,5 +163,37 @@ export const AIChatIcon = ({
                 />
             </g>
         </svg>
+    );
+};
+
+export const AISearchIcon = ({
+    className = 'size-4',
+    state = 'default',
+}: Pick<AIChatIconProps, 'className' | 'state'>): React.ReactElement => {
+    return (
+        <div
+            className={tcls(
+                'relative',
+                state === 'intro' && 'animate-[fadeIn_1s_both,orbit_1s_cubic-bezier(0.16,1,0.3,1)]',
+                state === 'thinking' || state === 'working'
+                    ? 'animate-[fadeIn_1s_both,orbit_1s_ease-out,orbit_2s_1s_infinite_forwards_linear]'
+                    : ''
+            )}
+        >
+            <Icon icon="search" className={className} />
+            <Icon
+                icon="sparkle"
+                iconStyle={IconStyle.Solid}
+                className={tcls(
+                    'absolute top-[15.7%] left-[15.6%] size-[50%]',
+                    state === 'thinking' || state === 'working'
+                        ? 'animate-[spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]'
+                        : '',
+                    state === 'intro'
+                        ? 'animate-[spin_2s_1s_forwards_cubic-bezier(0.16,1,0.3,1)]'
+                        : ''
+                )}
+            />
+        </div>
     );
 };

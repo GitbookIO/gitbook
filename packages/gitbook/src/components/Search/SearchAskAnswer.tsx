@@ -1,21 +1,20 @@
 'use client';
 
+import { useLanguage } from '@/intl/client';
+import { t, tString } from '@/intl/translate';
+import type { TranslationLanguage } from '@/intl/translations';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { readStreamableValue } from 'ai/rsc';
 import React from 'react';
 
-import { Loading } from '@/components/primitives';
-import { useLanguage } from '@/intl/client';
-import { t } from '@/intl/translate';
-import type { TranslationLanguage } from '@/intl/translations';
-import { tcls } from '@/lib/tailwind';
-
-import { AIResponseFeedback } from '../AIChat';
+import { AIResponseFeedback, AISearchIcon } from '../AIChat';
+import { HoldMessage } from '../AIChat/AIChatMessages';
 import { useTrackEvent } from '../Insights';
-import { Link } from '../primitives';
+import { Button, Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
 import { type AskAnswerResult, type AskAnswerSource, streamAskQuestion } from './server-actions';
-import { useSearchLink } from './useSearch';
+import { useSearch, useSearchLink } from './useSearch';
 
 export type SearchAskState =
     | {
@@ -84,8 +83,11 @@ export function SearchAskAnswer(props: { query: string }) {
     }, [setAskState]);
 
     const loading = (
-        <div className="flex grow items-center justify-center">
-            <Loading className={tcls('size-6', 'text-tint/6')} />
+        <div className="flex grow flex-col items-center justify-center">
+            <div className="relative">
+                <AISearchIcon state="thinking" className="size-6 text-tint/6" />
+            </div>
+            <HoldMessage breakLines={true} className="text-center" />
         </div>
     );
 
@@ -129,8 +131,30 @@ function TransitionAnswerBody(props: {
         });
     }, [answer]);
 
+    const language = useLanguage();
+    const [, setSearchState] = useSearch();
+
     return display ? (
-        <div className={tcls('w-full')}>
+        <div className={tcls('flex w-full flex-col gap-4')}>
+            <div className="-mt-2 -mr-2 relative flex items-center gap-2">
+                <Button
+                    icon="chevron-left"
+                    variant="blank"
+                    size="default"
+                    iconOnly
+                    label={tString(language, 'search_back')}
+                    className="-ml-2 animate-[fadeIn_.5s_2s_both]"
+                    onClick={() => {
+                        setSearchState((prev) =>
+                            prev ? { ...prev, query: prev.ask, ask: null } : null
+                        );
+                    }}
+                />
+                <AISearchIcon state="intro" className="size-4 text-tint/6" />
+                <span className="animate-[fadeIn_1s_.5s_both] font-semibold text-tint">
+                    {t(language, 'ai_answer')}
+                </span>
+            </div>
             <AnswerBody query={query} answer={display} />
         </div>
     ) : (
@@ -144,7 +168,7 @@ function AnswerBody(props: { query: string; answer: AskAnswerResult }) {
 
     return (
         <>
-            <div data-testid="search-ask-answer" className="text-tint-strong">
+            <div data-testid="search-ask-answer" className="animate-fade-in-slow text-tint-strong">
                 {answer.body ?? t(language, 'search_ask_no_answer')}
                 {answer.sources.length > 0 ? (
                     // @TODO: Add responseId once search uses new AI endpoint
