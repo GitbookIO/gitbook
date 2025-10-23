@@ -177,9 +177,8 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             allow="clipboard-write"
             className="contentkit-webframe w-full max-w-full border-none"
             style={{
-                objectFit: 'contain',
                 aspectRatio,
-                height: aspectRatio && !height ? 'auto' : height,
+                height: aspectRatio ? 'auto' : height,
             }}
         />
     );
