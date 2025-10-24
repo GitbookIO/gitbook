@@ -116,7 +116,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, context, contentRef);
+                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
             }
 
             const resolvePageResult =
@@ -165,7 +165,13 @@ export async function resolveContentRef(
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {
-                            text = getBlockTitle(block);
+                            // If the anchor points to the current page, we just resolve the text from the block.
+                            // This avoids showing the page title twice.
+                            if (isCurrentPage) {
+                                text = `#${getBlockTitle(block)}`;
+                            }else {
+                                text = `${page.title} #${getBlockTitle(block)}`;
+                            }
                         }
                     }
                 }
@@ -345,7 +351,8 @@ async function getBestTargetSpace(
 async function resolveContentRefInSpace(
     spaceId: string,
     context: GitBookAnyContext,
-    contentRef: ContentRef
+    contentRef: ContentRef,
+    options: ResolveContentRefOptions = {}
 ) {
     const ctx = await createContextForSpace(spaceId, context);
 
@@ -353,7 +360,7 @@ async function resolveContentRefInSpace(
         return null;
     }
 
-    const resolved = await resolveContentRef(contentRef, ctx.spaceContext);
+    const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
 
     if (!resolved) {
         return null;
