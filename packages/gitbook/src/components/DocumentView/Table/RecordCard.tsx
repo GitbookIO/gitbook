@@ -85,11 +85,13 @@ export async function RecordCard(
                         light: {
                             src: lightCover.href,
                             size: lightCover.file?.dimensions,
+                            alt: light.alt,
                         },
                         dark: darkCover
                             ? {
                                   src: darkCover.href,
                                   size: darkCover.file?.dimensions,
+                                  alt: dark.alt,
                               }
                             : null,
                     }}
