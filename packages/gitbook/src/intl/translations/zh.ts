@@ -46,6 +46,8 @@ export const zh: TranslationLanguage = {
     annotation_button_label: '打开批注',
     code_copied: '已复制！',
     code_copy: '复制',
+    code_block_collapsed: '显示全部 ${1} 行',
+    code_block_expanded: '收起',
     table_of_contents_button_label: '打开目录',
     cookies_title: 'Cookies',
     cookies_prompt: '本站使用 cookie 来提供服务并分析流量。浏览本站，即表示您接受${1}。',

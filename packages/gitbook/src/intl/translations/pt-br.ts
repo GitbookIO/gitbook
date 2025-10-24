@@ -45,6 +45,8 @@ export const pt_br = {
     annotation_button_label: 'Abrir anotação',
     code_copied: 'Copiado!',
     code_copy: 'Copiar',
+    code_block_collapsed: 'Mostrar todas as ${1} linhas',
+    code_block_expanded: 'Mostrar menos',
     table_of_contents_button_label: 'Abrir o índice',
     cookies_title: 'Cookies',
     cookies_prompt:

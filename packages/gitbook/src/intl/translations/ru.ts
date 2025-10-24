@@ -45,6 +45,8 @@ export const ru = {
     annotation_button_label: 'Открыть аннотацию',
     code_copied: 'Скопировано!',
     code_copy: 'Копировать',
+    code_block_collapsed: 'Показать все ${1} строк',
+    code_block_expanded: 'Показать меньше',
     table_of_contents_button_label: 'Открыть оглавление',
     cookies_title: 'Файлы cookies',
     cookies_prompt:

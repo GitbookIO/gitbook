@@ -47,6 +47,8 @@ export const no: TranslationLanguage = {
     annotation_button_label: 'Åpne merknad',
     code_copied: 'Kopiert!',
     code_copy: 'Kopier',
+    code_block_collapsed: 'Vis alle ${1} linjer',
+    code_block_expanded: 'Vis færre',
     table_of_contents_button_label: 'Åpne innholdsfortegnelse',
     cookies_title: 'Informasjonskapsler',
     cookies_prompt:
