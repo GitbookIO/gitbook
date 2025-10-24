@@ -38,9 +38,7 @@
         "clean": "turbo run clean"
     },
     "workspaces": {
-        "packages": [
-            "packages/*"
-        ],
+        "packages": ["packages/*"],
         "catalog": {
             "@tsconfig/strictest": "^2.0.6",
             "@tsconfig/node20": "^20.1.6",
