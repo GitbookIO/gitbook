@@ -1,14 +1,14 @@
 'use client';
 
 import { CustomizationAIMode } from '@gitbook/api';
-import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
 import type { ReactNode } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import type { GitBookAssistant } from '@gitbook/browser-types';
 import { useAIChatController, useAIChatState } from '.';
-import { AIChatIcon, getAIChatName } from '../AIChat';
+import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
 import { useIntegrationAssistants } from '../Integrations';
 import { useSearch } from '../Search/useSearch';
 
@@ -104,16 +104,7 @@ export function useAI(): AIContext {
         assistants.push({
             id: 'gitbook-ai-search',
             label: tString(language, 'ai_chat_context_badge'),
-            icon: (
-                <div className="relative">
-                    <Icon icon="search" className="size-4" />
-                    <Icon
-                        icon="sparkle"
-                        iconStyle={IconStyle.Solid}
-                        className="absolute top-[2.5px] left-[2.6px] size-2"
-                    />
-                </div>
-            ),
+            icon: <AISearchIcon />,
             open: (query?: string) => {
                 if (query) {
                     setSearchState((prev) =>
