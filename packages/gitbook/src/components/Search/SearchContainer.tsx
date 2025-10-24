@@ -15,7 +15,7 @@ import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
 import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
-import { SearchScopeToggle } from './SearchScopeToggle';
+import { SearchScopeControl } from './SearchScopeControl';
 import { useSearch } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
@@ -231,7 +231,7 @@ export function SearchContainer(props: SearchContainerProps) {
                             </div>
                             {(withVariants || withSections) && !showAsk ? (
                                 <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
-                                    <SearchScopeToggle
+                                    <SearchScopeControl
                                         section={section}
                                         spaceTitle={spaceTitle}
                                         withVariants={withVariants}
