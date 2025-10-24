@@ -147,7 +147,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             {renderer}
         </CodeBlockExpandable>
     ) : (
-        <>{renderer}</>
+        renderer
     );
 }
 
