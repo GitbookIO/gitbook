@@ -513,6 +513,15 @@ const config: Config = {
                         translate: '100% 0',
                     },
                 },
+                orbit: {
+                    '0%': {
+                        transform: 'rotate(0deg) translateX(10%) rotate(0deg) translateX(-10%)',
+                    },
+                    '100%': {
+                        transform:
+                            'rotate(360deg) translateX(10%) rotate(-360deg) translateX(-10%)',
+                    },
+                },
             },
             boxShadow: {
                 thinbottom: '0px 1px 0px rgba(0, 0, 0, 0.05)',

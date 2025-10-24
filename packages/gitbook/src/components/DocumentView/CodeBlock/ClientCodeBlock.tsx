@@ -1,11 +1,14 @@
 'use client';
 
 import type { DocumentBlockCode } from '@gitbook/api';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
+import { Button } from '@/components/primitives';
+import { t, useLanguage } from '@/intl/client';
+import { tcls } from '@/lib/tailwind';
 import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
@@ -17,6 +20,8 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> &
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
 };
+
+export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
 
 /**
  * Render a code-block client-side by loading the highlighter asynchronously.
@@ -113,13 +118,82 @@ export function ClientCodeBlock(props: ClientBlockProps) {
         setLines(null);
     }, [isInViewport, block, inlines, evaluateInlineExpression]);
 
-    return (
+    const expandable = block.data.expandable;
+
+    const numberOfLinesOfCode = lines?.length ?? plainLines.length;
+    const collapsedLineCount =
+        block.data.collapsedLineCount || CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT;
+    const isExpandable = Boolean(expandable && numberOfLinesOfCode > collapsedLineCount);
+
+    const codeBlockBodyId = useId();
+
+    const renderer = (
         <CodeBlockRenderer
             ref={blockRef}
             aria-busy={highlighting}
             block={block}
             style={style}
             lines={lines ?? plainLines}
+            id={codeBlockBodyId}
         />
+    );
+
+    return isExpandable ? (
+        <CodeBlockExpandable
+            lines={lines ?? plainLines}
+            controls={codeBlockBodyId}
+            collapsedLineCount={collapsedLineCount}
+        >
+            {renderer}
+        </CodeBlockExpandable>
+    ) : (
+        renderer
+    );
+}
+
+function CodeBlockExpandable(props: {
+    children: React.ReactNode;
+    lines: HighlightLine[];
+    collapsedLineCount: number;
+    controls?: string;
+}) {
+    const { children, controls, lines = [], collapsedLineCount } = props;
+    const [isExpanded, setIsExpanded] = useState(false);
+    const language = useLanguage();
+    return (
+        <div className="group/codeblock-expandable relative">
+            <div
+                className={tcls(
+                    isExpanded
+                        ? '[&_pre]:after:opacity-0'
+                        : '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden [&_pre]:after:opacity-100',
+                    '[&_pre]:after:pointer-events-none [&_pre]:after:absolute [&_pre]:after:inset-0 [&_pre]:after:z-1 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""]'
+                )}
+                style={
+                    {
+                        '--line-count': collapsedLineCount,
+                        '--line-height': '1.25rem',
+                    } as React.CSSProperties
+                }
+            >
+                {children}
+            </div>
+            <div className="pointer-events-none absolute bottom-0 flex w-full justify-center">
+                <Button
+                    icon={isExpanded ? 'chevron-up' : 'chevron-down'}
+                    size="xsmall"
+                    variant="blank"
+                    type="button"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="pointer-events-auto z-1 my-2 text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
+                    aria-expanded={isExpanded}
+                    aria-controls={controls}
+                >
+                    {isExpanded
+                        ? t(language, 'code_block_expanded')
+                        : t(language, 'code_block_collapsed', lines.length)}
+                </Button>
+            </div>
+        </div>
     );
 }

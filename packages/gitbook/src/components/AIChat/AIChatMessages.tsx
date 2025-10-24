@@ -81,11 +81,19 @@ export function AIChatMessages(props: {
     );
 }
 
-function HoldMessage() {
+export function HoldMessage({
+    breakLines = false,
+    className = '',
+}: { breakLines?: boolean; className?: string }) {
     const language = useLanguage();
 
     return (
-        <div className="animate-[heightIn_500ms_4500ms_ease_both] py-2 text-tint-subtle">
+        <div
+            className={tcls(
+                'animate-[heightIn_500ms_4500ms_ease_both] overflow-hidden py-2 text-tint-subtle',
+                className
+            )}
+        >
             {tString(language, 'ai_chat_hold_message_1')
                 .split(' ')
                 .map((word, index) => (
@@ -99,6 +107,7 @@ function HoldMessage() {
                         {word}{' '}
                     </span>
                 ))}
+            {breakLines ? <br /> : null}
             {tString(language, 'ai_chat_hold_message_2')
                 .split(' ')
                 .map((word, index) => (
