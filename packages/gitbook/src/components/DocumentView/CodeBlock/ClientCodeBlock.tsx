@@ -1,7 +1,7 @@
 'use client';
 
 import type { DocumentBlockCode } from '@gitbook/api';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
@@ -19,6 +19,8 @@ type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> &
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
 };
+
+export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
 
 /**
  * Render a code-block client-side by loading the highlighter asynchronously.
@@ -117,6 +119,13 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
     const expandable = block.data.expandable;
 
+    const numberOfLinesOfCode = lines?.length ?? plainLines.length;
+    const collapsedLineCount =
+        block.data.collapsedLineCount || CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT;
+    const isExpandable = Boolean(expandable && numberOfLinesOfCode > collapsedLineCount);
+
+    const codeBlockBodyId = useId();
+
     const renderer = (
         <CodeBlockRenderer
             ref={blockRef}
@@ -124,18 +133,30 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             block={block}
             style={style}
             lines={lines ?? plainLines}
+            id={codeBlockBodyId}
         />
     );
 
-    return expandable ? (
-        <CodeBlockExpandable lines={lines ?? plainLines}>{renderer}</CodeBlockExpandable>
+    return isExpandable ? (
+        <CodeBlockExpandable
+            lines={lines ?? plainLines}
+            controls={codeBlockBodyId}
+            collapsedLineCount={collapsedLineCount}
+        >
+            {renderer}
+        </CodeBlockExpandable>
     ) : (
         <>{renderer}</>
     );
 }
 
-function CodeBlockExpandable(props: { children: React.ReactNode; lines: HighlightLine[] }) {
-    const { children, lines = [] } = props;
+function CodeBlockExpandable(props: {
+    children: React.ReactNode;
+    lines: HighlightLine[];
+    collapsedLineCount: number;
+    controls?: string;
+}) {
+    const { children, controls, lines = [], collapsedLineCount } = props;
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
@@ -144,9 +165,15 @@ function CodeBlockExpandable(props: { children: React.ReactNode; lines: Highligh
                 className={tcls(
                     isExpanded
                         ? '[&_pre]:after:opacity-0'
-                        : '[&_pre]:h-60 [&_pre]:after:overflow-y-hidden [&_pre]:after:opacity-100',
-                    '[&_pre]:after:pointer-events-none [&_pre]:after:z-0 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""] [&_pre]:after:[grid-area:2/1]'
+                        : '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden [&_pre]:after:opacity-100',
+                    '[&_pre]:after:pointer-events-none [&_pre]:after:absolute [&_pre]:after:inset-0 [&_pre]:after:z-0 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""]'
                 )}
+                style={
+                    {
+                        '--line-count': collapsedLineCount,
+                        '--line-height': '1.25rem',
+                    } as React.CSSProperties
+                }
             >
                 {children}
             </div>
@@ -158,6 +185,8 @@ function CodeBlockExpandable(props: { children: React.ReactNode; lines: Highligh
                     type="button"
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="my-2 text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
+                    aria-expanded={isExpanded}
+                    aria-controls={controls}
                 >
                     {isExpanded ? 'Show less' : `Show all ${lines.length} lines`}
                 </Button>
