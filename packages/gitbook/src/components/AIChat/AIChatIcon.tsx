@@ -9,13 +9,13 @@ interface AIChatIconProps extends React.SVGProps<SVGSVGElement> {
     trademark?: boolean;
 }
 
-export const AIChatIcon = ({
+export function AIChatIcon({
     className = 'size-4',
     size,
     trademark = true,
     state = 'default',
     ...props
-}: AIChatIconProps) => {
+}: AIChatIconProps) {
     if (!trademark) {
         return (
             <Icon
@@ -164,12 +164,12 @@ export const AIChatIcon = ({
             </g>
         </svg>
     );
-};
+}
 
-export const AISearchIcon = ({
+export function AISearchIcon({
     className = 'size-4',
     state = 'default',
-}: Pick<AIChatIconProps, 'className' | 'state'>): React.ReactElement => {
+}: Pick<AIChatIconProps, 'className' | 'state'>) {
     return (
         <div
             className={tcls(
@@ -190,10 +190,10 @@ export const AISearchIcon = ({
                         ? 'animate-[spin_2s_infinite_forwards_cubic-bezier(0.16,1,0.3,1)]'
                         : '',
                     state === 'intro'
-                        ? 'animate-[spin_2s_1s_forwards_cubic-bezier(0.16,1,0.3,1)]'
+                        ? 'animate-[spin_2s_.5s_forwards_cubic-bezier(0.16,1,0.3,1)]'
                         : ''
                 )}
             />
         </div>
     );
-};
+}

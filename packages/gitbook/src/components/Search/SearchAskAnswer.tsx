@@ -140,10 +140,9 @@ function TransitionAnswerBody(props: {
                 <Button
                     icon="chevron-left"
                     variant="blank"
-                    size="default"
                     iconOnly
                     label={tString(language, 'search_back')}
-                    className="-ml-2 animate-[fadeIn_.5s_2s_both]"
+                    className="-ml-2 starting:-mr-2 starting:ml-0 starting:w-0 starting:px-0 starting:opacity-0 transition-[all,margin,padding,width,opacity] transition-discrete delay-[0s,2s,2s,2s,2.5s] duration-[.3s,1s,1s,1s,.5s]"
                     onClick={() => {
                         setSearchState((prev) =>
                             prev ? { ...prev, query: prev.ask, ask: null } : null
