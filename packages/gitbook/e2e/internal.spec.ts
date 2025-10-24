@@ -779,7 +779,10 @@ const testCases: TestsCase[] = [
                 url: 'blocks/integrations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    const mermaidIframe = page.locator('iframe[title*="mermaid"]').contentFrame();
+                    const mermaidIframe = page
+                        .locator('iframe[title*="mermaid"]')
+                        .first()
+                        .contentFrame();
                     await expect(mermaidIframe.getByText('Mermaid', { exact: true })).toBeVisible();
                     await expect(mermaidIframe.getByText('Diagram', { exact: true })).toBeVisible();
                 },
