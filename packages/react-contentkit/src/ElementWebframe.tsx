@@ -2,12 +2,13 @@
 
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
-import { useResizeObserver } from 'usehooks-ts';
 
 import { Icon } from '@gitbook/icons';
 import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
+
+const MIN_HEIGHT = 32; // minimum height for the iframe in pixels
 
 export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWebFrame>) {
     const { element } = props;
@@ -159,20 +160,21 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
-    // @ts-expect-error type definition is wrong for useResizeObserver
-    const { width: observedWidth = 0 } = useResizeObserver({ ref: iframeRef });
-    const liveWidth = observedWidth || iframeRef.current?.clientWidth || 0;
+    const height = size.height ? Math.max(size.height, MIN_HEIGHT) : undefined;
 
-    const aspectRatio = size.aspectRatio || element.aspectRatio;
-
-    const height =
-        liveWidth && aspectRatio && liveWidth > (size.height ?? 0)
-            ? Math.min(Math.round(liveWidth / aspectRatio), size.height ?? 32)
-            : 'auto';
+    const aspectRatio =
+        size.aspectRatio ||
+        element.aspectRatio ||
+        (iframeRef.current?.clientWidth && height
+            ? iframeRef.current.clientWidth / height
+            : undefined);
 
     if (!mounted) {
         return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
     }
+
+    // only use height measurement if no aspect ratio is defined
+    const useHeightMeasurement = !aspectRatio && height;
 
     return (
         <iframe
@@ -181,14 +183,11 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             title={element.source.url}
             allowFullScreen
             allow="clipboard-write"
-            className="contentkit-webframe"
+            className="contentkit-webframe h-full w-full max-w-full border-none"
             style={{
-                width: '100%',
-                maxWidth: '100%',
                 aspectRatio,
+                height: useHeightMeasurement ? height : undefined,
                 maxHeight: height,
-                height: 'fit-content',
-                border: 'none',
             }}
         />
     );
