@@ -7,6 +7,7 @@ import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { Button } from '@/components/primitives';
+import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
@@ -158,7 +159,7 @@ function CodeBlockExpandable(props: {
 }) {
     const { children, controls, lines = [], collapsedLineCount } = props;
     const [isExpanded, setIsExpanded] = useState(false);
-
+    const language = useLanguage();
     return (
         <div className="group/codeblock-expandable relative">
             <div
@@ -188,7 +189,11 @@ function CodeBlockExpandable(props: {
                     aria-expanded={isExpanded}
                     aria-controls={controls}
                 >
-                    {isExpanded ? 'Show less' : `Show all ${lines.length} lines`}
+                    {t(
+                        language,
+                        isExpanded ? 'code_block_expanded' : 'code_block_collapsed',
+                        lines.length
+                    )}
                 </Button>
             </div>
         </div>

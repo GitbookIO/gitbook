@@ -46,6 +46,8 @@ export const nl: TranslationLanguage = {
     annotation_button_label: 'Open annotatie',
     code_copied: 'Gekopieerd!',
     code_copy: 'Kopiëren',
+    code_block_collapsed: 'Toon alle ${1} regels',
+    code_block_expanded: 'Toon minder',
     table_of_contents_button_label: 'Open inhoudsopgave',
     cookies_title: 'Cookies',
     cookies_prompt:

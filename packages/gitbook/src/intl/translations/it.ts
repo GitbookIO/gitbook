@@ -46,6 +46,8 @@ export const it: TranslationLanguage = {
     annotation_button_label: 'Apri annotazione',
     code_copied: 'Copiato!',
     code_copy: 'Copia',
+    code_block_collapsed: 'Mostra tutte le ${1} righe',
+    code_block_expanded: 'Mostra meno',
     table_of_contents_button_label: 'Apri indice dei contenuti',
     cookies_title: 'Cookie',
     cookies_prompt:
