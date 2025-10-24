@@ -11,6 +11,7 @@ import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
+import { hasVisibleCover } from '@/components/PageBody/coverHeight';
 import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
@@ -169,10 +170,9 @@ export async function getSitePageData(props: SitePageProps) {
     const { page, ancestors } = pageTarget;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
-    const withFullPageCover = !!(
-        page.cover &&
-        page.layout.cover &&
-        page.layout.coverSize === 'full'
+    const visibleCover = hasVisibleCover(page.cover);
+    const withFullPageCover = Boolean(
+        visibleCover && page.layout.cover && page.layout.coverSize === 'full'
     );
     const withPageFeedback = customization.feedback.enabled;
 
