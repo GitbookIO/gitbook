@@ -189,11 +189,9 @@ function CodeBlockExpandable(props: {
                     aria-expanded={isExpanded}
                     aria-controls={controls}
                 >
-                    {t(
-                        language,
-                        isExpanded ? 'code_block_expanded' : 'code_block_collapsed',
-                        lines.length
-                    )}
+                    {isExpanded
+                        ? t(language, 'code_block_expanded')
+                        : t(language, 'code_block_collapsed', lines.length)}
                 </Button>
             </div>
         </div>
