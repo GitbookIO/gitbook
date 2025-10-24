@@ -13,6 +13,7 @@ import {
 
 import { type Assistant, useAI } from '@/components/AI';
 import { useTrackEvent } from '../Insights';
+import { isQuestion } from './isQuestion';
 import type { SearchScope } from './useSearch';
 
 export type ResultType =
@@ -198,13 +199,16 @@ function withAskTriggers(
         return without;
     }
 
+    const queryIsQuestion = isQuestion(query);
+
     return [
+        ...(queryIsQuestion ? [] : (without ?? [])),
         ...assistants.map((assistant, index) => ({
             type: 'question' as const,
             id: `question-${index}`,
             query,
             assistant,
         })),
-        ...(without ?? []),
+        ...(!queryIsQuestion ? [] : (without ?? [])),
     ];
 }
