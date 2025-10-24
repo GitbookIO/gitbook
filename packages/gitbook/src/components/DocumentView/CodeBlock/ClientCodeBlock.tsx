@@ -167,7 +167,7 @@ function CodeBlockExpandable(props: {
                     isExpanded
                         ? '[&_pre]:after:opacity-0'
                         : '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden [&_pre]:after:opacity-100',
-                    '[&_pre]:after:pointer-events-none [&_pre]:after:absolute [&_pre]:after:inset-0 [&_pre]:after:z-0 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""]'
+                    '[&_pre]:after:pointer-events-none [&_pre]:after:absolute [&_pre]:after:inset-0 [&_pre]:after:z-1 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""]'
                 )}
                 style={
                     {
@@ -178,14 +178,14 @@ function CodeBlockExpandable(props: {
             >
                 {children}
             </div>
-            <div className="absolute bottom-0 flex w-full justify-center">
+            <div className="pointer-events-none absolute bottom-0 flex w-full justify-center">
                 <Button
                     icon={isExpanded ? 'chevron-up' : 'chevron-down'}
                     size="xsmall"
                     variant="blank"
                     type="button"
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="my-2 text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
+                    className="pointer-events-auto z-1 my-2 text-primary text-sm opacity-0 focus:opacity-11 group-hover/codeblock-expandable:opacity-11"
                     aria-expanded={isExpanded}
                     aria-controls={controls}
                 >
