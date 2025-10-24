@@ -169,7 +169,7 @@ export async function resolveContentRef(
                             // This avoids showing the page title twice.
                             if (isCurrentPage) {
                                 text = `#${getBlockTitle(block)}`;
-                            }else {
+                            } else {
                                 text = `${page.title} #${getBlockTitle(block)}`;
                             }
                         }
