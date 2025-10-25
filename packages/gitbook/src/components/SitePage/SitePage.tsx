@@ -7,7 +7,6 @@ import {
 } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import React from 'react';
 
 import { PageAside } from '@/components/PageAside';
 import { PageBody, PageCover } from '@/components/PageBody';
@@ -75,9 +74,7 @@ export async function SitePage(props: SitePageProps) {
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
                     />
                 </div>
-                <React.Suspense fallback={null}>
-                    <PageClientLayout />
-                </React.Suspense>
+                <PageClientLayout />
             </div>
         </PageContextProvider>
     );
