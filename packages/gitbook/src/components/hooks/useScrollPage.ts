@@ -7,9 +7,8 @@ import { useHash } from './useHash';
 import { usePrevious } from './usePrevious';
 
 /**
- * Scroll the page to an anchor point or
- * to the top of the page when navigating between pages (pathname)
- * or sections of a page (hash).
+ * Scroll the page to the hash or reset scroll to the top.
+ * Only triggered while navigating in the app, not for initial load.
  */
 export function useScrollPage() {
     const hash = useHash();
@@ -17,6 +16,10 @@ export function useScrollPage() {
     const pathname = usePathname();
     const previousPathname = usePrevious(pathname);
     React.useLayoutEffect(() => {
+        if (!previousHash && !previousPathname) {
+            return;
+        }
+
         // If there is no change in pathname or hash, do nothing
         if (previousHash === hash && previousPathname === pathname) {
             return;
@@ -31,13 +34,10 @@ export function useScrollPage() {
                     block: 'start',
                     behavior: 'smooth',
                 });
+                return;
             }
-            return;
         }
 
-        // If there was a hash but not anymore, scroll to top
-        if (previousHash && !hash) {
-            window.scrollTo(0, 0);
-        }
+        window.scrollTo(0, 0);
     }, [hash, previousHash, pathname, previousPathname]);
 }
