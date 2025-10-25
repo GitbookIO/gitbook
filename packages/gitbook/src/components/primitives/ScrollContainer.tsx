@@ -3,6 +3,7 @@
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import * as React from 'react';
+import { useScrollListener } from '../hooks/useScrollListener';
 import { Button } from './Button';
 
 /**
@@ -32,56 +33,53 @@ export function ScrollContainer(props: ScrollContainerProps) {
 
     const language = useLanguage();
 
+    useScrollListener(() => {
+        const container = containerRef.current;
+        if (!container) {
+            return;
+        }
+
+        setScrollPosition(
+            orientation === 'horizontal' ? container.scrollLeft : container.scrollTop
+        );
+    }, containerRef);
+
     React.useEffect(() => {
         const container = containerRef.current;
         if (!container) {
             return;
         }
 
-        // Update scroll position on scroll using requestAnimationFrame
-        const scrollListener: EventListener = () => {
-            requestAnimationFrame(() => {
-                setScrollPosition(
-                    orientation === 'horizontal' ? container.scrollLeft : container.scrollTop
-                );
-            });
-        };
-        container.addEventListener('scroll', scrollListener);
-
         // Update max scroll position using resize observer
-        const resizeObserver = new ResizeObserver((entries) => {
-            const containerEntry = entries.find((i) => i.target === containerRef.current);
-            if (containerEntry) {
+        const ro = new ResizeObserver((entries) => {
+            const [entry] = entries;
+            if (entry) {
                 setScrollSize(
                     orientation === 'horizontal'
-                        ? containerEntry.target.scrollWidth - containerEntry.target.clientWidth - 1
-                        : containerEntry.target.scrollHeight -
-                              containerEntry.target.clientHeight -
-                              1
+                        ? entry.target.scrollWidth - entry.target.clientWidth - 1
+                        : entry.target.scrollHeight - entry.target.clientHeight - 1
                 );
             }
         });
-        resizeObserver.observe(container);
 
-        return () => {
-            container.removeEventListener('scroll', scrollListener);
-            resizeObserver.disconnect();
-        };
+        ro.observe(container);
+
+        return () => ro.disconnect();
     }, [orientation]);
 
-    // Scroll to the active item
     React.useEffect(() => {
         const container = containerRef.current;
-        if (!container || !activeId) {
+        if (!container) {
             return;
         }
-        const activeItem = container.querySelector(`#${CSS.escape(activeId)}`);
-        if (activeItem) {
-            activeItem.scrollIntoView({
-                inline: 'center',
-                block: 'center',
-            });
+        if (!activeId) {
+            return;
         }
+        const activeItem = document.getElementById(activeId);
+        if (!activeItem || !container.contains(activeItem)) {
+            return;
+        }
+        scrollToElementInContainer(activeItem, container);
     }, [activeId]);
 
     const scrollFurther = () => {
@@ -89,6 +87,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!container) {
             return;
         }
+
         container.scrollTo({
             top: orientation === 'vertical' ? scrollPosition + container.clientHeight : undefined,
             left: orientation === 'horizontal' ? scrollPosition + container.clientWidth : undefined,
@@ -101,6 +100,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!container) {
             return;
         }
+
         container.scrollTo({
             top: orientation === 'vertical' ? scrollPosition - container.clientHeight : undefined,
             left: orientation === 'horizontal' ? scrollPosition - container.clientWidth : undefined,
@@ -174,4 +174,26 @@ export function ScrollContainer(props: ScrollContainerProps) {
             />
         </div>
     );
+}
+
+/**
+ * Scroll to an element in a container.
+ */
+function scrollToElementInContainer(element: HTMLElement, container: HTMLElement) {
+    const containerRect = container.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
+
+    return container.scrollTo({
+        top:
+            container.scrollTop +
+            (rect.top - containerRect.top) -
+            container.clientHeight / 2 +
+            rect.height / 2,
+        left:
+            container.scrollLeft +
+            (rect.left - containerRect.left) -
+            container.clientWidth / 2 +
+            rect.width / 2,
+        behavior: 'smooth',
+    });
 }
