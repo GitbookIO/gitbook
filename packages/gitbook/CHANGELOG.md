@@ -1,5 +1,15 @@
 # gitbook
 
+## 0.19.3
+
+### Patch Changes
+
+- 3355960: Fix ToggeableLinkItem display
+- c32d449: Fix OpenAPI path display
+- 8ce7322: Add OpenAPI servers selection
+- Updated dependencies [8ce7322]
+  - @gitbook/react-openapi@1.5.3
+
 ## 0.19.2
 
 ### Patch Changes
