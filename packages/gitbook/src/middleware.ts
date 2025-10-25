@@ -298,6 +298,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
+            isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -382,7 +383,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         ].join('/');
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
-        rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
+        // Preserve the original search params but remove fallback=true if present
+        rewrittenURL.search = request.nextUrl.search;
+        if (rewrittenURL.searchParams.has('fallback')) {
+            rewrittenURL.searchParams.delete('fallback');
+        }
 
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
