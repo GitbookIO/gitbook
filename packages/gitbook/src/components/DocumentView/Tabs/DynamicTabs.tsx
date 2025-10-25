@@ -87,7 +87,7 @@ export function DynamicTabs(props: {
         );
     }, [id, tabs, tabsState]);
 
-    // Track is the tab has been touched by the user.
+    // Track if the tab has been touched by the user.
     const touchedRef = useRef(false);
 
     // To avoid issue with hydration, we only use the state from localStorage
@@ -133,13 +133,14 @@ export function DynamicTabs(props: {
                         : prev.activeTitles,
                 };
             });
-            setInitialized(true);
         },
         [router, setTabsState, tabs, id]
     );
 
     // When the hash changes, we try to select the tab containing the targetted element.
     React.useLayoutEffect(() => {
+        setInitialized(true);
+
         if (hash) {
             // First check if the hash matches a tab ID.
             const hashIsTab = tabs.some((tab) => tab.id === hash);
@@ -160,11 +161,6 @@ export function DynamicTabs(props: {
             }
 
             selectTab(tabPanel.id, false);
-        } else {
-            const firstTab = tabs[0];
-            if (firstTab) {
-                selectTab(firstTab.id, false);
-            }
         }
     }, [selectTab, tabs, hash]);
 
