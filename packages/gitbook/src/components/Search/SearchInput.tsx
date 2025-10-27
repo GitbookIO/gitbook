@@ -123,7 +123,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     />
                     <KeyboardShortcut
                         keys={isOpen ? ['esc'] : ['mod', 'k']}
-                        className="theme-bold:border-header-link/5 theme-bold:bg-header-background theme-bold:text-header-link"
+                        className="last:-mr-1 theme-bold:border-header-link/5 theme-bold:bg-header-background theme-bold:text-header-link"
                     />
                 </div>
             </div>
