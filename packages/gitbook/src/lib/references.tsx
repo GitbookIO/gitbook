@@ -366,11 +366,29 @@ async function resolveContentRefInSpace(
         return null;
     }
 
+    // Prefer the variant title when available, then the section title, then fallback to the space title.
+    const ancestorLabel = (() => {
+        if ('site' in context) {
+            const foundSiteSpace = findSiteSpaceBy(
+                context.structure,
+                (siteSpace) => siteSpace.space.id === spaceId
+            );
+
+            return (
+                foundSiteSpace?.siteSpace.title ??
+                foundSiteSpace?.siteSection?.title ??
+                ctx.spaceContext.space.title
+            );
+        }
+
+        return ctx.spaceContext.space.title;
+    })();
+
     return {
         ...resolved,
         ancestors: [
             {
-                label: ctx.spaceContext.space.title,
+                label: ancestorLabel,
                 href: ctx.baseURL.toString(),
             },
             ...(resolved.ancestors ?? []),
