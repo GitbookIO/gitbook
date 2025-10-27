@@ -16,10 +16,6 @@ export function useScrollPage() {
     const pathname = usePathname();
     const previousPathname = usePrevious(pathname);
     React.useLayoutEffect(() => {
-        if (!previousHash && !previousPathname) {
-            return;
-        }
-
         // If there is no change in pathname or hash, do nothing
         if (previousHash === hash && previousPathname === pathname) {
             return;
@@ -27,7 +23,7 @@ export function useScrollPage() {
 
         // If there is a hash
         // - Triggered by a change of hash or pathname
-        if (hash) {
+        if (previousHash !== undefined && hash) {
             const element = document.getElementById(hash);
             if (element) {
                 element.scrollIntoView({
