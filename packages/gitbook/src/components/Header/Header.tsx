@@ -133,7 +133,7 @@ export function Header(props: {
                                             s.object === 'site-section' && s.siteSpaces.length > 1
                                     ) ?? false
                                 }
-                                withSections={!!sections}
+                                withSections={sections ? sections.list.length > 1 : false}
                                 section={
                                     sections
                                         ? // Client-encode to avoid a serialisation issue that was causing the language selector to disappear
