@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
 interface ImageSize {
@@ -86,25 +86,20 @@ export function useCoverPosition(imgs: Images, y: number) {
             : 0;
 
     // Parse the position between the allowed min/max
-    const clampedObjectPositionY = useCallback(
-        (offset: number): number => {
-            if (!container.height || !imageDimensions) {
-                return 50;
-            }
+    const objectPositionY = useMemo(() => {
+        if (!container.height || !imageDimensions) {
+            return 50;
+        }
 
-            const scaled = imageDimensions.height * safeRatio;
-            if (scaled <= container.height || maxOffset === 0) {
-                return 50;
-            }
+        const scaled = imageDimensions.height * safeRatio;
+        if (scaled <= container.height || maxOffset === 0) {
+            return 50;
+        }
 
-            const clampedOffset = Math.max(-maxOffset, Math.min(maxOffset, offset));
-            const relative = (maxOffset - clampedOffset) / (2 * maxOffset);
-            return relative * 100;
-        },
-        [container.height, imageDimensions, maxOffset, safeRatio]
-    );
-
-    const objectPositionY = clampedObjectPositionY(y);
+        const clampedOffset = Math.max(-maxOffset, Math.min(maxOffset, y));
+        const relative = (maxOffset - clampedOffset) / (2 * maxOffset);
+        return relative * 100;
+    }, [container.height, imageDimensions, maxOffset, safeRatio, y]);
 
     return {
         containerRef,

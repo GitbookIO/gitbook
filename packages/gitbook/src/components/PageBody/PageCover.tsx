@@ -85,7 +85,7 @@ export async function PageCover(props: {
         <div
             id="page-cover"
             data-full={String(as === 'full')}
-            style={{ height: `${height}px` }}
+            style={{ height }}
             className={tcls(
                 'overflow-hidden',
                 // Negative margin to balance the container padding
