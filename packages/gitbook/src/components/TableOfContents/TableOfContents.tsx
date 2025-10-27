@@ -111,6 +111,7 @@ export async function TableOfContents(props: {
                     >
                         <PagesList
                             pages={pages}
+                            isRoot={true}
                             style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                         />
                         {customization.trademark.enabled ? (

@@ -9,11 +9,15 @@ import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
 
-export function PagesList(props: { pages: ClientTOCPage[]; style?: ClassValue }) {
-    const { pages, style } = props;
+export function PagesList(props: {
+    pages: ClientTOCPage[];
+    style?: ClassValue;
+    isRoot?: boolean;
+}) {
+    const { pages, style, isRoot = false } = props;
 
     return (
-        <ul className={tcls('flex flex-col gap-y-0.5', style)}>
+        <ul className={tcls('flex flex-col gap-y-0.5', isRoot && 'group/root-page-list', style)}>
             {pages.map((page) => {
                 switch (page.type) {
                     case 'document':
