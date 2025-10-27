@@ -41,13 +41,14 @@ export function ActionOpenAssistant(props: { assistant: Assistant; type: PageAct
 type CopiedStore = {
     copied: boolean;
     loading: boolean;
+    key?: string;
 };
 
 // We need to store everything in a store to share the state between every instance of the component.
 const useCopiedStore = create<
     CopiedStore & {
         setLoading: (loading: boolean) => void;
-        copy: (data: string, opts?: { onSuccess?: () => void }) => void;
+        copy: (data: string, opts?: { onSuccess?: () => void; key?: string }) => void;
     }
 >((set) => {
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
@@ -55,9 +56,10 @@ const useCopiedStore = create<
     return {
         copied: false,
         loading: false,
+        key: undefined,
         setLoading: (loading: boolean) => set({ loading }),
         copy: async (data, opts) => {
-            const { onSuccess } = opts || {};
+            const { onSuccess, key } = opts || {};
 
             if (timeoutRef) {
                 clearTimeout(timeoutRef);
@@ -65,7 +67,7 @@ const useCopiedStore = create<
 
             await navigator.clipboard.writeText(data);
 
-            set({ copied: true });
+            set({ copied: true, key: key });
 
             timeoutRef = setTimeout(() => {
                 set({ copied: false });
@@ -96,7 +98,7 @@ export function ActionCopyMarkdown(props: {
 
     const closeDropdown = useDropdownMenuClose();
 
-    const { copied, loading, setLoading, copy } = useCopiedStore();
+    const { copied, loading, setLoading, copy, key } = useCopiedStore();
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
@@ -118,6 +120,7 @@ export function ActionCopyMarkdown(props: {
         }
 
         copy(markdownCache.get(markdownPageURL) || (await fetchMarkdown()), {
+            key: 'markdown',
             onSuccess: () => {
                 // We close the dropdown menu if the action is a dropdown menu item and not the default action.
                 if (type === 'dropdown-menu-item' && !isDefaultAction) {
@@ -130,9 +133,17 @@ export function ActionCopyMarkdown(props: {
     return (
         <PageActionWrapper
             type={type}
-            icon={copied ? 'check' : 'copy'}
-            label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
-            shortLabel={copied ? tString(language, 'code_copied') : tString(language, 'code_copy')}
+            icon={copied && key === 'markdown' ? 'check' : 'copy'}
+            label={
+                copied && key === 'markdown'
+                    ? tString(language, 'code_copied')
+                    : tString(language, 'copy_page')
+            }
+            shortLabel={
+                copied && key === 'markdown'
+                    ? tString(language, 'code_copied')
+                    : tString(language, 'code_copy')
+            }
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
             loading={loading}
@@ -293,14 +304,29 @@ export function CopyToClipboard(props: {
     icon: IconName;
 }) {
     const { type, data, label, description, icon } = props;
+
+    const closeDropdown = useDropdownMenuClose();
+
+    const language = useLanguage();
+    const { copied, copy, key } = useCopiedStore();
+
     return (
         <PageActionWrapper
             type={type}
-            icon={icon}
-            label={label}
+            icon={copied && key === label ? 'check' : icon}
+            label={copied && key === label ? tString(language, 'code_copied') : label}
             description={description}
-            onClick={() => {
-                navigator.clipboard.writeText(data);
+            onClick={(e) => {
+                e.preventDefault();
+
+                copy(data, {
+                    key: label,
+                    onSuccess: () => {
+                        if (type === 'dropdown-menu-item') {
+                            closeDropdown();
+                        }
+                    },
+                });
             }}
         />
     );
