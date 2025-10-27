@@ -14,7 +14,7 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
               iconStyle: ['text-xl', 'text-tint'],
           })
         : null;
-    console.log({ block, resolved, context: context.contentContext });
+
     if (!resolved) {
         return null;
     }
