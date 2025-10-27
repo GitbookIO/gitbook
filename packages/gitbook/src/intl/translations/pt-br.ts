@@ -6,6 +6,7 @@ export const pt_br = {
     switch_to_light_theme: 'Mudar para modo claro',
     switch_to_system_theme: 'Mudar para configuração do sistema',
     search: 'Busca',
+    clear: 'Limpar',
     search_back: 'Voltar aos resultados da busca',
     search_or_ask: 'Perguntar ou buscar',
     search_input_placeholder: 'Buscar conteúdo',

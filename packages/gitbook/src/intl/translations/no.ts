@@ -8,6 +8,7 @@ export const no: TranslationLanguage = {
     switch_to_light_theme: 'Bytt til lyst tema',
     switch_to_system_theme: 'Bytt til systemtema',
     search: 'Søk',
+    clear: 'Tøm',
     search_back: 'Tilbake til søkeresultater',
     search_or_ask: 'Spør eller søk',
     search_input_placeholder: 'Søk i innhold',
