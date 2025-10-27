@@ -1,8 +1,15 @@
 'use client';
 
-import React, { memo, useCallback, useMemo, type ComponentPropsWithRef } from 'react';
+import React, {
+    memo,
+    useCallback,
+    useMemo,
+    useRef,
+    useState,
+    type ComponentPropsWithRef,
+} from 'react';
 
-import { useHash, useIsMounted, useListOverflow } from '@/components/hooks';
+import { useHash, useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
@@ -71,6 +78,7 @@ export function DynamicTabs(props: {
     const router = useRouter();
 
     const hash = useHash();
+    const [initialized, setInitialized] = useState(false);
     const [tabsState, setTabsState] = useTabsState();
     const activeState = useMemo(() => {
         const input = { id, tabs };
@@ -79,28 +87,33 @@ export function DynamicTabs(props: {
         );
     }, [id, tabs, tabsState]);
 
+    // Track if the tab has been touched by the user.
+    const touchedRef = useRef(false);
+
     // To avoid issue with hydration, we only use the state from localStorage
-    // once the component has been mounted.
+    // once the component has been initialized (=mounted).
     // Otherwise because of  the streaming/suspense approach, tabs can be first-rendered at different time
     // and get stuck into an inconsistent state.
-    const mounted = useIsMounted();
-    const active = mounted ? activeState : tabs[0];
+    const active = initialized ? activeState : tabs[0];
 
     // When clicking to select a tab, we:
     // - update the URL hash
     // - mark this specific ID as selected
     // - store the ID to auto-select other tabs with the same title
     const selectTab = useCallback(
-        (tabId: string) => {
+        (tabId: string, manual = true) => {
             const tab = tabs.find((tab) => tab.id === tabId);
 
             if (!tab) {
                 return;
             }
 
-            const href = `#${tab.id}`;
-            if (window.location.hash !== href) {
-                router.replace(href, { scroll: false });
+            if (manual) {
+                touchedRef.current = true;
+                const href = `#${tab.id}`;
+                if (window.location.hash !== href) {
+                    router.replace(href, { scroll: false });
+                }
             }
 
             setTabsState((prev) => {
@@ -125,12 +138,14 @@ export function DynamicTabs(props: {
     );
 
     // When the hash changes, we try to select the tab containing the targetted element.
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
+        setInitialized(true);
+
         if (hash) {
             // First check if the hash matches a tab ID.
             const hashIsTab = tabs.some((tab) => tab.id === hash);
             if (hashIsTab) {
-                selectTab(hash);
+                selectTab(hash, false);
                 return;
             }
 
@@ -145,9 +160,38 @@ export function DynamicTabs(props: {
                 return;
             }
 
-            selectTab(tabPanel.id);
+            selectTab(tabPanel.id, false);
         }
     }, [selectTab, tabs, hash]);
+
+    // Scroll to active element in the tab.
+    React.useLayoutEffect(() => {
+        // If there is no hash or active tab, nothing to scroll.
+        if (!hash || !active) {
+            return;
+        }
+
+        // If the tab is touched, we don't want to scroll.
+        if (touchedRef.current) {
+            return;
+        }
+
+        // If the hash matches a tab, then the scroll is already done.
+        const hashIsTab = tabs.some((tab) => tab.id === hash);
+        if (hashIsTab) {
+            return;
+        }
+
+        const activeElement = document.getElementById(hash);
+        if (!activeElement) {
+            return;
+        }
+
+        activeElement.scrollIntoView({
+            block: 'start',
+            behavior: 'instant',
+        });
+    }, [active, tabs, hash]);
 
     return (
         <div
@@ -177,12 +221,11 @@ const TabPanel = memo(function TabPanel(props: {
             role="tabpanel"
             id={tab.id}
             aria-labelledby={getTabButtonId(tab.id)}
-            className={tcls(
-                'scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*12)] p-4',
-                isActive ? null : 'hidden'
-            )}
+            className="scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*20)]"
         >
-            {tab.body}
+            <div className="p-4" hidden={!isActive}>
+                {tab.body}
+            </div>
         </div>
     );
 });

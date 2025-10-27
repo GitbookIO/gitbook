@@ -17,29 +17,34 @@ export function Details(props: {
 }) {
     const { children, id, className } = props;
 
-    const detailsRef = React.useRef<HTMLDetailsElement>(null);
+    const ref = React.useRef<HTMLDetailsElement>(null);
 
     const [openFromHash, setOpenFromHash] = React.useState(false);
 
     const hash = useHash();
+
     /**
      * Open the details element if the url hash refers to the id of the details element
      * or the id of some element contained within the details element.
      */
     React.useEffect(() => {
-        if (!hash || !detailsRef.current) {
+        if (!hash || !ref.current) {
             return;
         }
+
         if (hash === id) {
             setOpenFromHash(true);
+            return;
         }
+
         const activeElement = document.getElementById(hash);
-        setOpenFromHash(Boolean(activeElement && detailsRef.current?.contains(activeElement)));
+        const isOpen = Boolean(activeElement && ref.current.contains(activeElement));
+        setOpenFromHash(isOpen);
     }, [hash, id]);
 
     return (
         <details
-            ref={detailsRef}
+            ref={ref}
             id={id}
             open={props.open || openFromHash}
             className={tcls(
