@@ -11,7 +11,7 @@ import { Icon, type IconName, IconStyle } from '@gitbook/icons';
 import assertNever from 'assert-never';
 import QuickLRU from 'quick-lru';
 import React from 'react';
-import { create } from 'zustand';
+import { createStore, useStore } from 'zustand';
 
 type PageActionType = 'button' | 'dropdown-menu-item';
 
@@ -41,25 +41,18 @@ export function ActionOpenAssistant(props: { assistant: Assistant; type: PageAct
 type CopiedStore = {
     copied: boolean;
     loading: boolean;
-    key?: string;
+    setLoading: (loading: boolean) => void;
+    copy: (data: string, opts?: { onSuccess?: () => void }) => void;
 };
 
-// We need to store everything in a store to share the state between every instance of the component.
-const useCopiedStore = create<
-    CopiedStore & {
-        setLoading: (loading: boolean) => void;
-        copy: (data: string, opts?: { onSuccess?: () => void; key?: string }) => void;
-    }
->((set) => {
+const createCopiedStateStore = () => {
     let timeoutRef: ReturnType<typeof setTimeout> | null = null;
-
-    return {
+    return createStore<CopiedStore>()((set) => ({
         copied: false,
         loading: false,
-        key: undefined,
         setLoading: (loading: boolean) => set({ loading }),
         copy: async (data, opts) => {
-            const { onSuccess, key } = opts || {};
+            const { onSuccess } = opts || {};
 
             if (timeoutRef) {
                 clearTimeout(timeoutRef);
@@ -67,18 +60,30 @@ const useCopiedStore = create<
 
             await navigator.clipboard.writeText(data);
 
-            set({ copied: true, key: key });
+            set({ copied: true });
 
             timeoutRef = setTimeout(() => {
                 set({ copied: false });
                 onSuccess?.();
-
-                // Reset the timeout ref to avoid multiple timeouts
                 timeoutRef = null;
             }, 1500);
         },
-    };
-});
+    }));
+};
+
+const copiedStores = new Map<string, ReturnType<typeof createCopiedStateStore>>();
+
+const getOrCreateCopiedStoreByKey = (storeKey: string) => {
+    const existing = copiedStores.get(storeKey);
+    if (existing) return existing;
+    const created = createCopiedStateStore();
+    copiedStores.set(storeKey, created);
+    return created;
+};
+
+function useCopiedStore(stateKey: string) {
+    return useStore(getOrCreateCopiedStoreByKey(stateKey));
+}
 
 /**
  * Cache for the markdown versbion of the page.
@@ -98,7 +103,7 @@ export function ActionCopyMarkdown(props: {
 
     const closeDropdown = useDropdownMenuClose();
 
-    const { copied, loading, setLoading, copy, key } = useCopiedStore();
+    const { copied, loading, setLoading, copy } = useCopiedStore('markdown');
 
     // Fetch the markdown from the page
     const fetchMarkdown = async () => {
@@ -120,7 +125,6 @@ export function ActionCopyMarkdown(props: {
         }
 
         copy(markdownCache.get(markdownPageURL) || (await fetchMarkdown()), {
-            key: 'markdown',
             onSuccess: () => {
                 // We close the dropdown menu if the action is a dropdown menu item and not the default action.
                 if (type === 'dropdown-menu-item' && !isDefaultAction) {
@@ -133,17 +137,9 @@ export function ActionCopyMarkdown(props: {
     return (
         <PageActionWrapper
             type={type}
-            icon={copied && key === 'markdown' ? 'check' : 'copy'}
-            label={
-                copied && key === 'markdown'
-                    ? tString(language, 'code_copied')
-                    : tString(language, 'copy_page')
-            }
-            shortLabel={
-                copied && key === 'markdown'
-                    ? tString(language, 'code_copied')
-                    : tString(language, 'code_copy')
-            }
+            icon={copied ? 'check' : 'copy'}
+            label={copied ? tString(language, 'code_copied') : tString(language, 'copy_page')}
+            shortLabel={copied ? tString(language, 'code_copied') : tString(language, 'code_copy')}
             description={tString(language, 'copy_page_markdown')}
             onClick={onClick}
             loading={loading}
@@ -308,19 +304,18 @@ export function CopyToClipboard(props: {
     const closeDropdown = useDropdownMenuClose();
 
     const language = useLanguage();
-    const { copied, copy, key } = useCopiedStore();
+    const { copied, copy } = useCopiedStore('label');
 
     return (
         <PageActionWrapper
             type={type}
-            icon={copied && key === label ? 'check' : icon}
-            label={copied && key === label ? tString(language, 'code_copied') : label}
+            icon={copied ? 'check' : icon}
+            label={copied ? tString(language, 'code_copied') : label}
             description={description}
             onClick={(e) => {
                 e.preventDefault();
 
                 copy(data, {
-                    key: label,
                     onSuccess: () => {
                         if (type === 'dropdown-menu-item') {
                             closeDropdown();
