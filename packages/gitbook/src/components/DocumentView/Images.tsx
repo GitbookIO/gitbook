@@ -19,34 +19,42 @@ export function Images(props: BlockProps<DocumentBlockImages>) {
             className={tcls(
                 style,
                 'flex',
-                'flex-row',
-                'gap-3',
+                'w-full',
                 align === 'center' && 'justify-center',
                 align === 'right' && 'justify-end',
-                align === 'left' && 'justify-start',
-                hasMultipleImages && ['grid', 'grid-flow-col'],
-                withFrame && [
-                    'rounded-2xl',
-                    'border',
-                    'border-[rgb(234,235,238)]',
-                    'dark:border-[rgb(45,50,58)]',
-                    'relative',
-                    'overflow-hidden',
-                ]
+                align === 'left' && 'justify-start'
             )}
         >
-            {block.nodes.map((node: any, _i: number) => (
-                <ImageBlock
-                    key={node.key}
-                    block={node}
-                    document={document}
-                    style={[]}
-                    siblings={block.nodes.length}
-                    context={context}
-                    isEstimatedOffscreen={isEstimatedOffscreen}
-                    withFrame={withFrame}
-                />
-            ))}
+            <div
+                className={tcls(
+                    'flex',
+                    'flex-row',
+                    'gap-3',
+                    hasMultipleImages && ['grid', 'grid-flow-col'],
+                    withFrame && [
+                        'rounded-2xl',
+                        'border',
+                        'border-[rgb(234,235,238)]',
+                        'dark:border-[rgb(45,50,58)]',
+                        'relative',
+                        'overflow-hidden',
+                        'w-fit',
+                    ]
+                )}
+            >
+                {block.nodes.map((node: any, _i: number) => (
+                    <ImageBlock
+                        key={node.key}
+                        block={node}
+                        document={document}
+                        style={[]}
+                        siblings={block.nodes.length}
+                        context={context}
+                        isEstimatedOffscreen={isEstimatedOffscreen}
+                        withFrame={withFrame}
+                    />
+                ))}
+            </div>
         </div>
     );
 }

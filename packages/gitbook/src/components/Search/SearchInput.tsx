@@ -1,11 +1,12 @@
 'use client';
 import React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { useClassnames } from '../primitives/StyleProvider';
 
 interface SearchInputProps {
@@ -79,11 +80,11 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     {value && isOpen ? (
                         <Button
                             variant="blank"
-                            label="Clear"
+                            label={tString(language, 'clear')}
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-ml-1.5 -mr-1 animate-scale-in px-1.5"
+                            className="-ml-1.5 -mr-1 animate-scale-in px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
                                 onChange('');
                                 inputRef.current?.focus();
@@ -120,47 +121,12 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         // Forward
                         ref={inputRef}
                     />
-                    {!isOpen ? <Shortcut /> : null}
+                    <KeyboardShortcut
+                        keys={isOpen ? ['esc'] : ['mod', 'k']}
+                        className="last:-mr-1 theme-bold:border-header-link/5 theme-bold:bg-header-background theme-bold:text-header-link"
+                    />
                 </div>
             </div>
         );
     }
 );
-
-function getOperatingSystem() {
-    const platform = navigator.platform.toLowerCase();
-
-    if (platform.includes('mac')) return 'mac';
-    if (platform.includes('win')) return 'win';
-
-    return 'win';
-}
-
-function Shortcut() {
-    const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
-
-    useEffect(() => {
-        setOperatingSystem(getOperatingSystem());
-    }, []);
-
-    return (
-        <div
-            aria-busy={operatingSystem === null ? 'true' : undefined}
-            className={tcls(
-                `shortcut -mr-1 relative z-10 hidden justify-end gap-0.5 whitespace-nowrap text-xs [font-feature-settings:"calt","case"] after:absolute after:right-full after:z-20 after:h-full after:w-8 after:bg-linear-to-r after:from-transparent after:to-tint-base theme-bold:after:to-transparent after:content-[''] contrast-more:text-tint-strong md:flex`,
-                operatingSystem
-                    ? 'motion-safe:animate-fade-in motion-reduce:opacity-11'
-                    : 'opacity-0'
-            )}
-        >
-            <kbd
-                className={`flex h-5 min-w-5 items-center justify-center rounded-sm border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
-            >
-                {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
-            </kbd>
-            <kbd className="flex size-5 items-center justify-center rounded-sm border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1">
-                K
-            </kbd>
-        </div>
-    );
-}
