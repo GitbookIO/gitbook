@@ -92,6 +92,31 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
     };
 }
 
+/**
+ * A string concatenation of the site structure (sections and variants) titles.
+ */
+function getSiteStructureTitle(context: GitBookSiteContext): string | null {
+    const { sections, siteSpace, siteSpaces } = context;
+
+    const title = [];
+    if (
+        sections &&
+        sections.list.filter((section) => section.object === 'site-section').length > 1 && // Only if there are multiple sections
+        sections.current.default === false // Only if the current section is not the default one
+    ) {
+        title.push(sections.current.title);
+    }
+    if (
+        siteSpaces.length > 1 && // Only if there are multiple variants
+        siteSpaces.filter((space) => space.space.language === siteSpace.space.language).length >
+            1 && // Only if there are multiple variants *for the current language*. This filters out spaces that are "just" translations of each other, not versions.
+        siteSpace.default === false // Only if the variant is not the default one
+    ) {
+        title.push(siteSpace.title);
+    }
+    return title.join(' ');
+}
+
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
     const { context, pageTarget } = await getPageDataWithFallback({
         context: props.context,
@@ -104,9 +129,17 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 
     const { page, ancestors } = pageTarget;
     const { site, customization, revision, linker, imageResizer } = context;
+    const siteStructureTitle = getSiteStructureTitle(context);
 
     return {
-        title: [page.title, site.title].filter(Boolean).join(' | '),
+        title: [
+            page.title,
+            // Prevent duplicate titles by comparing against the page title.
+            page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
+            page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
+        ]
+            .filter(Boolean)
+            .join(' | '),
         description: page.description ?? '',
         alternates: {
             // Trim trailing slashes in canonical URL to match the redirect behavior
