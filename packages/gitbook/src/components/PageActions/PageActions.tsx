@@ -304,7 +304,8 @@ export function CopyToClipboard(props: {
     const closeDropdown = useDropdownMenuClose();
 
     const language = useLanguage();
-    const { copied, copy } = useCopiedStore('label');
+    const labelKey = label.toLowerCase().replace(/\s+/g, '_');
+    const { copied, copy } = useCopiedStore(labelKey);
 
     return (
         <PageActionWrapper
