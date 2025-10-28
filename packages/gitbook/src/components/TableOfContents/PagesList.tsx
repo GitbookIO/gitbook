@@ -17,8 +17,8 @@ export function PagesList(props: {
     const { pages, style, isRoot = false } = props;
 
     return (
-        <ul className={tcls('flex flex-col gap-y-0.5', isRoot && 'group/root-page-list', style)}>
-            {pages.map((page) => {
+        <ul className={tcls('flex flex-col gap-y-0.5', style)}>
+            {pages.map((page, idx) => {
                 switch (page.type) {
                     case 'document':
                         return <PageDocumentItem key={page.id} page={page} />;
@@ -27,7 +27,7 @@ export function PagesList(props: {
                         return <PageLinkItem key={page.id} page={page} />;
 
                     case 'group':
-                        return <PageGroupItem key={page.id} page={page} />;
+                        return <PageGroupItem key={page.id} page={page} isFirst={isRoot && idx === 0} />;
 
                     default:
                         assertNever(page);
