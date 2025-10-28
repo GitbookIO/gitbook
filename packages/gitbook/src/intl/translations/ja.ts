@@ -8,6 +8,7 @@ export const ja: TranslationLanguage = {
     switch_to_light_theme: 'ライトテーマに切り替え',
     switch_to_system_theme: 'システムのテーマに切り替え',
     search: '検索',
+    clear: 'クリア',
     search_back: '検索結果に戻る',
     search_or_ask: '質問または検索',
     search_input_placeholder: 'コンテンツを検索',
