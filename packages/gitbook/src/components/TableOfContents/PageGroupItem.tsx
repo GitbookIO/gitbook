@@ -7,7 +7,7 @@ import { tcls } from '@/lib/tailwind';
 import { PagesList } from './PagesList';
 import { TOCPageIcon } from './TOCPageIcon';
 
-export function PageGroupItem(props: { page: ClientTOCPageGroup, isFirst?: boolean }) {
+export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boolean }) {
     const { page, isFirst } = props;
 
     return (
@@ -27,7 +27,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup, isFirst?: boole
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
                     '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    isFirst ? "-mt-6": ""
+                    isFirst ? '-mt-6' : ''
                 )}
             >
                 <TOCPageIcon page={page} />

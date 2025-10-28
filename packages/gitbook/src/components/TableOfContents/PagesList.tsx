@@ -27,7 +27,13 @@ export function PagesList(props: {
                         return <PageLinkItem key={page.id} page={page} />;
 
                     case 'group':
-                        return <PageGroupItem key={page.id} page={page} isFirst={isRoot && idx === 0} />;
+                        return (
+                            <PageGroupItem
+                                key={page.id}
+                                page={page}
+                                isFirst={isRoot && idx === 0}
+                            />
+                        );
 
                     default:
                         assertNever(page);
