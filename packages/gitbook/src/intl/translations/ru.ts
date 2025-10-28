@@ -6,6 +6,7 @@ export const ru = {
     switch_to_light_theme: 'Переключиться на светлую тему',
     switch_to_system_theme: 'Переключиться на системную тему',
     search: 'Поиск',
+    clear: 'Очистить',
     search_back: 'Вернуться к результатам поиска',
     search_or_ask: 'Найти или спросить',
     search_input_placeholder: 'Поиск по содержимому',
