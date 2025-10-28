@@ -165,13 +165,7 @@ export async function resolveContentRef(
                     if (document) {
                         const block = getBlockById(document, anchor);
                         if (block) {
-                            // If the anchor points to the current page, we just resolve the text from the block.
-                            // This avoids showing the page title twice.
-                            if (isCurrentPage) {
-                                text = `#${getBlockTitle(block)}`;
-                            } else {
-                                text = `${page.title} #${getBlockTitle(block)}`;
-                            }
+                            text = getBlockTitle(block);
                         }
                     }
                 }
