@@ -1,6 +1,7 @@
 {
     "main": "default.js",
     "name": "gitbook-open-v2-server",
+    "keep_names": false,
     "compatibility_date": "2025-04-14",
     "compatibility_flags": [
         "nodejs_compat",
