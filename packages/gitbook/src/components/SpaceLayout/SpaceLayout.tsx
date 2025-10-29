@@ -3,6 +3,7 @@ import {
     CustomizationAIMode,
     CustomizationHeaderPreset,
     CustomizationSearchStyle,
+    type SiteSpace,
 } from '@gitbook/api';
 import type React from 'react';
 
@@ -106,15 +107,20 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     const withSections = Boolean(sections && sections.list.length > 1);
 
-    const currentLanguage = getSpaceLanguage(context);
-    const withVariants: 'generic' | 'translations' | undefined =
-        siteSpaces.length > 1
-            ? siteSpaces.some(
-                  (space) => space.space.language && space.space.language !== currentLanguage.locale
-              )
-                ? 'translations'
-                : 'generic'
-            : undefined;
+    const currentLanguage = getSpaceLanguage(context).locale;
+    const variants: Record<'generic' | 'translations', SiteSpace[]> = {
+        translations: siteSpaces.filter(
+            (space) =>
+                space === siteSpace ||
+                (space.space.language && space.space.language !== currentLanguage)
+        ),
+        generic: siteSpaces.filter(
+            (space) =>
+                space === siteSpace ||
+                !space.space.language ||
+                space.space.language === currentLanguage
+        ),
+    };
 
     const withFooter =
         customization.themes.toggeable ||
@@ -125,7 +131,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     return (
         <SpaceLayoutServerContext {...props}>
             <Announcement context={context} />
-            <Header withTopHeader={withTopHeader} withVariants={withVariants} context={context} />
+            <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                 <AIChat trademark={customization.trademark.enabled} />
@@ -165,11 +171,11 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     )}
                                 >
                                     <HeaderLogo context={context} />
-                                    {withVariants === 'translations' ? (
+                                    {variants.translations.length > 1 ? (
                                         <TranslationsDropdown
                                             context={context}
                                             siteSpace={siteSpace}
-                                            siteSpaces={siteSpaces}
+                                            siteSpaces={variants.translations}
                                             className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
                                         />
                                     ) : null}
@@ -183,7 +189,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     <div className="flex gap-2">
                                         <SearchContainer
                                             style={CustomizationSearchStyle.Subtle}
-                                            withVariants={withVariants === 'generic'}
+                                            withVariants={variants.generic.length > 1}
                                             withSiteVariants={
                                                 sections?.list.some(
                                                     (s) =>
@@ -213,14 +219,14 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         sections={encodeClientSiteSections(context, sections)}
                                     />
                                 )}
-                                {withVariants === 'generic' && (
+                                {variants.generic.length > 1 ? (
                                     <SpacesDropdown
                                         context={context}
                                         siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
+                                        siteSpaces={variants.generic}
                                         className="w-full px-3 py-2"
                                     />
-                                )}
+                                ) : null}
                             </>
                         }
                     />
