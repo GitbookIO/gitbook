@@ -154,13 +154,6 @@ export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response?.status()).toBe(404);
 }
 
-export async function waitForCoverImages(page: Page) {
-    // Wait for cover images to exist (not the shimmer placeholder)
-    await expect(page.locator('img[alt="Page cover"]').first()).toBeVisible({
-        timeout: 10_000,
-    });
-}
-
 /**
  * Transform test cases into Playwright tests and run it.
  */

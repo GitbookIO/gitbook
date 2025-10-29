@@ -8,7 +8,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { assert } from 'ts-essentials';
 import { PageCoverImage } from './PageCoverImage';
-import { getCoverHeight } from './coverHeight';
 import defaultPageCoverSVG from './default-page-cover.svg';
 
 const defaultPageCover = defaultPageCoverSVG as StaticImageData;
@@ -23,12 +22,6 @@ export async function PageCover(props: {
     context: GitBookSiteContext;
 }) {
     const { as, page, cover, context } = props;
-    const height = getCoverHeight(cover);
-
-    if (!height) {
-        return null;
-    }
-
     const [resolved, resolvedDark] = await Promise.all([
         cover.ref ? resolveContentRef(cover.ref, context) : null,
         cover.refDark ? resolveContentRef(cover.refDark, context) : null,
@@ -85,7 +78,6 @@ export async function PageCover(props: {
         <div
             id="page-cover"
             data-full={String(as === 'full')}
-            style={{ height }}
             className={tcls(
                 'overflow-hidden',
                 // Negative margin to balance the container padding
