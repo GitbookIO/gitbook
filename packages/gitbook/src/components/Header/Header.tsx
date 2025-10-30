@@ -177,7 +177,11 @@ export function Header(props: {
                                 {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
                                         context={context}
-                                        siteSpace={siteSpace}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
                                         siteSpaces={variants.translations}
                                         className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
                                     />
@@ -194,7 +198,11 @@ export function Header(props: {
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown
                                 context={context}
-                                siteSpace={siteSpace}
+                                siteSpace={
+                                    variants.translations.find(
+                                        (space) => space.id === siteSpace.id
+                                    ) ?? siteSpace
+                                }
                                 siteSpaces={variants.translations}
                                 className="my-2 ml-2 self-start"
                             />

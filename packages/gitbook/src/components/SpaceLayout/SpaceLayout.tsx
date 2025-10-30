@@ -14,6 +14,7 @@ import { CONTAINER_STYLE } from '@/components/layout';
 import { tcls } from '@/lib/tailwind';
 
 import { getSpaceLanguage } from '@/intl/server';
+import { languages } from '@/intl/translations';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
 import { AIChatProvider } from '../AI';
@@ -96,6 +97,44 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
     );
 }
 
+function getSpaceVariants(context: GitBookSiteContext) {
+    const currentLanguage = getSpaceLanguage(context).locale;
+    const { siteSpace, siteSpaces } = context;
+
+    const genericVariants = siteSpaces.filter(
+        (space) =>
+            space === siteSpace || !space.space.language || space.space.language === currentLanguage
+    );
+
+    let translationsVariants = siteSpaces.filter(
+        (space) => space === siteSpace || space.space.language !== currentLanguage
+    );
+
+    const variantLanguages = [...new Set(siteSpaces.map((space) => space.space.language))];
+
+    // If there is exactly 1 variant per language, use them as-is.
+    // Otherwise, use the first space per language with its language name in the dropdown
+    if (variantLanguages.length !== translationsVariants.length) {
+        translationsVariants = variantLanguages
+            .map((variantLanguage) => {
+                const firstVariantWithLanguage = translationsVariants.find(
+                    (space) => space.space.language === variantLanguage
+                );
+                const language = languages[variantLanguage as keyof typeof languages];
+                return {
+                    ...firstVariantWithLanguage,
+                    title: `${language.flag} ${language.language}`,
+                };
+            })
+            .filter((space) => space !== undefined) as SiteSpace[];
+    }
+
+    return {
+        generic: genericVariants,
+        translations: translationsVariants,
+    };
+}
+
 /**
  * Render the entire layout of the space (header, table of contents, footer).
  */
@@ -106,21 +145,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const withSections = Boolean(sections && sections.list.length > 1);
-
-    const currentLanguage = getSpaceLanguage(context).locale;
-    const variants: Record<'generic' | 'translations', SiteSpace[]> = {
-        translations: siteSpaces.filter(
-            (space) =>
-                space === siteSpace ||
-                (space.space.language && space.space.language !== currentLanguage)
-        ),
-        generic: siteSpaces.filter(
-            (space) =>
-                space === siteSpace ||
-                !space.space.language ||
-                space.space.language === currentLanguage
-        ),
-    };
+    const variants = getSpaceVariants(context);
 
     const withFooter =
         customization.themes.toggeable ||
@@ -174,7 +199,11 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     {variants.translations.length > 1 ? (
                                         <TranslationsDropdown
                                             context={context}
-                                            siteSpace={siteSpace}
+                                            siteSpace={
+                                                variants.translations.find(
+                                                    (space) => space.id === siteSpace.id
+                                                ) ?? siteSpace
+                                            }
                                             siteSpaces={variants.translations}
                                             className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
                                         />

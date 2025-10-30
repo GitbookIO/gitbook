@@ -2,6 +2,8 @@ import type { TranslationLanguage } from './types';
 
 export const ja: TranslationLanguage = {
     locale: 'ja',
+    language: '日本語',
+    flag: '🇯🇵',
     powered_by_gitbook: 'GitBook提供',
     sponsored_via_gitbook: 'GitBookスポンサー',
     switch_to_dark_theme: 'ダークテーマに切り替え',
