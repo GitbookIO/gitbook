@@ -34,7 +34,7 @@
 
 .openapi-deprecated,
 .openapi-stability {
-    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+    @apply py-0.5 px-1.5 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded straight-corners:rounded-none circular-corners:rounded-sm text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 .openapi-stability-alpha {
@@ -72,7 +72,7 @@
 }
 
 .openapi-markdown code {
-    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded   text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded straight-corners:rounded-none circular-corners:rounded-md text-sm leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 .openapi-markdown pre code {
@@ -95,7 +95,7 @@
 /* Method Tags */
 .openapi-method,
 .openapi-statuscode {
-    @apply rounded uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
+    @apply rounded straight-corners:rounded-none circular-corners:rounded-md uppercase font-mono items-center shrink-0 font-semibold text-[0.813rem] px-1 py-0.5 mr-2 text-tint-12/8 leading-tight align-middle inline-flex ring-1 ring-inset ring-tint-12/1 dark:ring-tint-1/1 whitespace-nowrap;
 }
 
 .openapi-method-get,
@@ -270,11 +270,11 @@
 }
 
 .openapi-schema-enum-value:first-child {
-    @apply rounded-l ml-0;
+    @apply rounded-l straight-corners:rounded-none circular-corners:rounded-l-md ml-0;
 }
 
 .openapi-schema-enum-value:last-child {
-    @apply rounded-r;
+    @apply rounded-r straight-corners:rounded-none circular-corners:rounded-r-md;
 }
 
 /* Schema Description */
@@ -308,7 +308,7 @@
 .openapi-schema-pattern code,
 .openapi-schema-enum-value code,
 .openapi-schema-default code {
-    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded text-xs leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
+    @apply py-px px-1 min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint-subtle bg-tint rounded straight-corners:rounded-none circular-corners:rounded-md text-xs leading-[calc(max(1.20em,1.25rem))] before:content-none! after:!content-none;
 }
 
 /* Authentication */
@@ -325,6 +325,10 @@
     @apply prose *:!prose-sm *:text-tint;
 }
 
+.openapi-securities-oauth-content {
+    @apply flex flex-col gap-1 mt-1;
+}
+
 .openapi-securities-oauth-content.openapi-markdown code {
     @apply text-xs;
 }
@@ -334,7 +338,7 @@
 }
 
 .openapi-securities-url {
-    @apply ml-0.5 px-0.5 rounded hover:bg-tint transition-colors;
+    @apply ml-0.5 px-0.5 rounded straight-corners:rounded-none circular-corners:rounded-md hover:bg-tint dark:hover:bg-tint-hover transition-colors;
 }
 
 .openapi-securities-body {
@@ -478,7 +482,7 @@
 }
 
 .openapi-path-variable {
-    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded text-sm leading-none before:content-none! after:!content-none;
+    @apply p-px min-w-[1.625rem] text-tint-strong font-normal w-fit justify-center items-center ring-1 ring-inset ring-tint bg-tint rounded straight-corners:rounded-none circular-corners:rounded-md text-sm leading-none before:content-none! after:!content-none;
 }
 
 .openapi-path-server {
@@ -601,8 +605,8 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select > button {
-    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded leading-none;
-    @apply hover:bg-tint-hover transition-all;
+    @apply flex items-center font-normal cursor-pointer *:truncate gap-1.5 p-1.5 border border-tint-subtle text-tint-strong rounded straight-corners:rounded-none circular-corners:rounded-md leading-none;
+    @apply hover:bg-tint dark:hover:bg-tint-hover transition-all;
 }
 
 .openapi-select:not(.openapi-select-unstyled) > button {
@@ -634,7 +638,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-popover {
-    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
+    @apply min-w-32 z-10 max-w-[max(20rem,var(--trigger-width))] overflow-x-hidden max-h-52 overflow-y-auto p-1.5 border border-tint-subtle bg-tint-base backdrop-blur-xl rounded-md straight-corners:rounded-none circular-corners:rounded-xl;
     @apply shadow-md shadow-tint-12/1 dark:shadow-tint-1/1;
 }
 
@@ -647,7 +651,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-select-item {
-    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded !outline-none;
+    @apply text-sm flex items-center cursor-pointer px-1.5 overflow-hidden py-1 text-tint ring-0 border-none rounded straight-corners:rounded-none circular-corners:rounded-md !outline-none;
     @apply hover:bg-tint-hover hover:theme-gradient:bg-tint-12/1 hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-inset contrast-more:hover:ring-current;
 }
 
@@ -743,7 +747,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-tabs-tab {
-    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded;
+    @apply hover:bg-primary-hover whitespace-nowrap font-mono font-normal tabular-nums hover:text-primary cursor-pointer transition-all relative text-[0.813rem] text-tint px-1 border border-transparent rounded straight-corners:rounded-none circular-corners:rounded-md;
 }
 
 .openapi-tabs-tab[aria-selected="true"] {
@@ -814,12 +818,12 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger {
-    @apply flex items-center font-mono transition-all font-normal text-tint-strong !text-sm hover:bg-tint-subtle relative flex-1 gap-2.5 p-5 truncate -outline-offset-1;
+    @apply flex items-center font-mono transition-all font-normal text-tint-strong !text-sm hover:bg-tint-subtle dark:hover:bg-tint-hover relative flex-1 gap-2.5 p-5 truncate -outline-offset-1;
 }
 
 .openapi-schemas-disclosure > .openapi-disclosure-trigger,
 .openapi-schemas-disclosure .openapi-disclosure-panel {
-    @apply straight-corners:!rounded-none;
+    @apply straight-corners:!rounded-none circular-corners:!rounded-md;
 }
 
 .openapi-disclosure-panel {
@@ -847,7 +851,7 @@ body:has(.openapi-select-popover) {
         .openapi-schema-alternatives .openapi-disclosure,
         .openapi-schemas-disclosure .openapi-schema.openapi-disclosure
     ) {
-    @apply rounded-xl;
+    @apply rounded-xl straight-corners:rounded-none;
 }
 
 .openapi-disclosure .openapi-schemas-disclosure .openapi-schema.openapi-disclosure {
@@ -997,8 +1001,8 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-path-copy-button {
-    @apply p-1 flex rounded-md;
-    @apply hover:bg-tint;
+    @apply p-1 flex rounded-md straight-corners:rounded-none;
+    @apply hover:bg-tint dark:hover:bg-tint-hover;
 }
 
 .openapi-path-copy-button-icon {

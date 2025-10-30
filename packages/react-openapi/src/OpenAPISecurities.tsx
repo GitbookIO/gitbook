@@ -167,7 +167,7 @@ function OpenAPISchemaOAuth2Item(props: {
     >];
     name: string;
     context: OpenAPIClientContext;
-    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean };
+    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean; scopes?: string[] };
 }) {
     const { flow, context, security, name } = props;
 
@@ -175,7 +175,8 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    const scopes = flow.scopes ? Object.entries(flow.scopes) : [];
+    // If the security scheme has scopes, we don't need to display the scopes from the flow
+    const scopes = !security.scopes?.length && flow.scopes ? Object.entries(flow.scopes) : [];
 
     return (
         <div>
