@@ -25,7 +25,7 @@ export const zh: TranslationLanguage = {
     search_scope_title: '过滤器',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: '仅当前章节',
-    search_scope_section_all: '任何地方',
+    search_scope_section_all: '整个文档',
     search_scope_section_all_description: '文档的所有章节',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: '仅当前变体',

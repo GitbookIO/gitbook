@@ -23,7 +23,7 @@ export const ru = {
     search_scope_title: 'Фильтр',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: 'Только текущий раздел',
-    search_scope_section_all: 'Везде',
+    search_scope_section_all: 'Вся документация',
     search_scope_section_all_description: 'Все разделы документации',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: 'Только текущий вариант',

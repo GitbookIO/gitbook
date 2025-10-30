@@ -25,7 +25,7 @@ export const no: TranslationLanguage = {
     search_scope_title: 'Filter',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: 'Kun den nåværende seksjonen',
-    search_scope_section_all: 'Overalt',
+    search_scope_section_all: 'Hele dokumentasjonen',
     search_scope_section_all_description: 'Alle seksjoner i dokumentasjonen',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: 'Kun den nåværende varianten',

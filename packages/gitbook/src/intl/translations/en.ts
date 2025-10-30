@@ -23,7 +23,7 @@ export const en = {
     search_scope_title: 'Filter',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: 'Only the current section',
-    search_scope_section_all: 'Everywhere',
+    search_scope_section_all: 'All docs',
     search_scope_section_all_description: 'All sections of the docs',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: 'Only the current variant',
