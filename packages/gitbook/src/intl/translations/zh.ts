@@ -2,6 +2,8 @@ import type { TranslationLanguage } from './types';
 
 export const zh: TranslationLanguage = {
     locale: 'zh',
+    language: '中文',
+    flag: '🇨🇳',
     powered_by_gitbook: '由 GitBook 提供支持',
     sponsored_via_gitbook: '通过 GitBook 赞助',
     switch_to_dark_theme: '切换到深色主题',

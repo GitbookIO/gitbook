@@ -2,6 +2,8 @@ import type { TranslationLanguage } from './types';
 
 export const no: TranslationLanguage = {
     locale: 'no',
+    language: 'Norsk',
+    flag: '🇳🇴',
     powered_by_gitbook: 'Drevet av GitBook',
     sponsored_via_gitbook: 'Sponset av GitBook',
     switch_to_dark_theme: 'Bytt til mørkt tema',

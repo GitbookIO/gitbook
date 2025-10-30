@@ -2,6 +2,8 @@ import type { TranslationLanguage } from './types';
 
 export const it: TranslationLanguage = {
     locale: 'it',
+    language: 'Italiano',
+    flag: '🇮🇹',
     powered_by_gitbook: 'Offerto da GitBook',
     sponsored_via_gitbook: 'Sponsorizzato tramite GitBook',
     switch_to_dark_theme: 'Passa al tema scuro',

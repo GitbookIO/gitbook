@@ -1,5 +1,7 @@
 export const fr = {
     locale: 'fr',
+    language: 'Français',
+    flag: '🇫🇷',
     powered_by_gitbook: 'Propulsé par GitBook',
     sponsored_via_gitbook: 'Sponsorisé via GitBook',
     switch_to_dark_theme: 'Activer le thème sombre',
