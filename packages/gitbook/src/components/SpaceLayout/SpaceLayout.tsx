@@ -98,20 +98,28 @@ function getSpaceVariants(context: GitBookSiteContext) {
     const { siteSpace, siteSpaces } = context;
     const currentLanguage = siteSpace.space.language;
 
-    // Generic variants are all spaces that have the same language as the current (can also be undefined).
-    const genericVariants = siteSpaces.filter(
-        (space) => space === siteSpace || space.space.language === currentLanguage
-    );
-
-    // Translation variants are all spaces that have a different language than the current.
-    let translationVariants = siteSpaces.filter(
-        (space) => space === siteSpace || space.space.language !== currentLanguage
-    );
-
     // Get all languages of the variants.
     const variantLanguages = [...new Set(siteSpaces.map((space) => space.space.language))];
 
-    // If there is exactly 1 variant per language, we will them as-is.
+    // We only show the language picker if there are at least 2 distinct languages, excluding undefined.
+    const isMultiLanguage =
+        variantLanguages.filter((language) => language !== undefined).length > 1;
+
+    // Generic variants are all spaces that have the same language as the current (can also be undefined).
+    const genericVariants = isMultiLanguage
+        ? siteSpaces.filter(
+              (space) => space === siteSpace || space.space.language === currentLanguage
+          )
+        : siteSpaces;
+
+    // Translation variants are all spaces that have a different language than the current.
+    let translationVariants = isMultiLanguage
+        ? siteSpaces.filter(
+              (space) => space === siteSpace || space.space.language !== currentLanguage
+          )
+        : [];
+
+    // If there is exactly 1 variant per language, we will use them as-is.
     // Otherwise, we will create a translation dropdown with the first space of each language.
     if (variantLanguages.length !== translationVariants.length) {
         translationVariants = variantLanguages
