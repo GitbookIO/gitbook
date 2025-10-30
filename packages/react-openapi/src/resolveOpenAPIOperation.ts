@@ -158,15 +158,22 @@ function resolveSecurityScopes({
     securityScheme?: OpenAPIV3.ReferenceObject | OpenAPIV3.SecuritySchemeObject;
     operationScopes?: string[];
 }): OpenAPISecurityScope[] | null {
-    if (
-        !securityScheme ||
-        checkIsReference(securityScheme) ||
-        isOAuthSecurityScheme(securityScheme)
-    ) {
+    if (!operationScopes?.length || !securityScheme || checkIsReference(securityScheme)) {
         return null;
     }
 
-    return operationScopes?.map((scope) => [scope, undefined]) || [];
+    // If the security scheme is an OAuth or OpenID Connect security scheme, we first check if the operation scopes are defined in the security scheme
+    if (isOAuthSecurityScheme(securityScheme)) {
+        const flows = securityScheme.flows ? Object.entries(securityScheme.flows) : [];
+
+        return flows.flatMap(([_, flow]) => {
+            return Object.entries(flow.scopes ?? {}).filter(([scope]) =>
+                operationScopes.includes(scope)
+            );
+        });
+    }
+
+    return operationScopes.map((scope) => [scope, undefined]);
 }
 
 /**

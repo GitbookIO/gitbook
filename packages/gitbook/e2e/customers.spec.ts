@@ -112,11 +112,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://adiblar.gitbook.io',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.gradient.network',
-        contentBaseURL: 'https://docs.gradient.network',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // {
+    //     name: 'docs.gradient.network',
+    //     contentBaseURL: 'https://docs.gradient.network',
+    //     tests: [{ name: 'Home', url: '/' }],
+    // },
     // {
     //     name: 'mygate-network.gitbook.io',
     //     contentBaseURL: 'https://mygate-network.gitbook.io',

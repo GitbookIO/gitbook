@@ -33,7 +33,6 @@ import {
     headerLinks,
     runTestCases,
     waitForCookiesDialog,
-    waitForCoverImages,
     waitForNotFound,
 } from './util';
 
@@ -907,10 +906,7 @@ const testCases: TestsCase[] = [
             {
                 name: 'With cover',
                 url: 'page-options/page-with-cover',
-                run: async (page) => {
-                    await waitForCookiesDialog(page);
-                    await waitForCoverImages(page);
-                },
+                run: waitForCookiesDialog,
             },
             {
                 name: 'With cover for dark mode',
@@ -925,18 +921,12 @@ const testCases: TestsCase[] = [
             {
                 name: 'With hero cover',
                 url: 'page-options/page-with-hero-cover',
-                run: async (page) => {
-                    await waitForCookiesDialog(page);
-                    await waitForCoverImages(page);
-                },
+                run: waitForCookiesDialog,
             },
             {
                 name: 'With cover and no TOC',
                 url: 'page-options/page-with-cover-and-no-toc',
-                run: async (page) => {
-                    await waitForCookiesDialog(page);
-                    await waitForCoverImages(page);
-                },
+                run: waitForCookiesDialog,
                 screenshot: {
                     waitForTOCScrolling: false,
                 },

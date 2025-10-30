@@ -1,5 +1,7 @@
 export const de = {
     locale: 'de',
+    language: 'Deutsch',
+    flag: '🇩🇪',
     powered_by_gitbook: 'Bereitgestellt von GitBook',
     sponsored_via_gitbook: 'Gesponsert von GitBook',
     switch_to_dark_theme: 'Zum dunklen Modus wechseln',

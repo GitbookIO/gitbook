@@ -3,6 +3,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+import type { SiteSpace } from '@gitbook/api';
 import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -18,9 +19,12 @@ import { TranslationsDropdown } from './SpacesDropdown';
 export function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
-    withVariants?: 'generic' | 'translations';
+    variants: {
+        generic: SiteSpace[];
+        translations: SiteSpace[];
+    };
 }) {
-    const { context, withTopHeader, withVariants } = props;
+    const { context, withTopHeader, variants } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
     const withSections = Boolean(
@@ -91,7 +95,7 @@ export function Header(props: {
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
-                                    withVariants === 'generic'
+                                    variants.generic.length > 1
                                         ? 'xl:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
                                 )}
@@ -126,7 +130,7 @@ export function Header(props: {
                         >
                             <SearchContainer
                                 style={customization.styling.search}
-                                withVariants={withVariants === 'generic'}
+                                withVariants={variants.generic.length > 1}
                                 withSiteVariants={
                                     sections?.list.some(
                                         (s) =>
@@ -150,7 +154,7 @@ export function Header(props: {
                         </div>
 
                         {customization.header.links.length > 0 ||
-                        (!withSections && withVariants === 'translations') ? (
+                        (!withSections && variants.translations.length > 1) ? (
                             <HeaderLinks>
                                 {customization.header.links.length > 0 ? (
                                     <>
@@ -170,11 +174,15 @@ export function Header(props: {
                                         />
                                     </>
                                 ) : null}
-                                {!withSections && withVariants === 'translations' ? (
+                                {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
                                         context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
                                         className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
                                     />
                                 ) : null}
@@ -187,11 +195,15 @@ export function Header(props: {
             {sections && withSections ? (
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
-                        {withVariants === 'translations' ? (
+                        {variants.translations.length > 1 ? (
                             <TranslationsDropdown
                                 context={context}
-                                siteSpace={siteSpace}
-                                siteSpaces={siteSpaces}
+                                siteSpace={
+                                    variants.translations.find(
+                                        (space) => space.id === siteSpace.id
+                                    ) ?? siteSpace
+                                }
+                                siteSpaces={variants.translations}
                                 className="my-2 ml-2 self-start"
                             />
                         ) : null}

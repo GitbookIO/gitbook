@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { useHash } from './useHash';
@@ -13,8 +12,7 @@ import { usePrevious } from './usePrevious';
 export function useScrollPage() {
     const hash = useHash();
     const previousHash = usePrevious(hash);
-    const pathname = usePathname();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: pathname should trigger it.
+
     React.useEffect(() => {
         if (hash) {
             if (previousHash !== undefined && previousHash !== hash) {
@@ -30,5 +28,5 @@ export function useScrollPage() {
         }
 
         window.scrollTo(0, 0);
-    }, [hash, previousHash, pathname]);
+    }, [hash, previousHash]);
 }

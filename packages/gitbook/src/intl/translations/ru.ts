@@ -1,5 +1,7 @@
 export const ru = {
     locale: 'ru',
+    language: 'Русский',
+    flag: '🇷🇺',
     powered_by_gitbook: 'Работает на GitBook',
     sponsored_via_gitbook: 'Спонсируется GitBook',
     switch_to_dark_theme: 'Переключиться на тёмную тему',
