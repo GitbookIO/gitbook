@@ -3,7 +3,6 @@ import {
     CustomizationAIMode,
     CustomizationHeaderPreset,
     CustomizationSearchStyle,
-    type SiteSpace,
 } from '@gitbook/api';
 import type React from 'react';
 
@@ -11,12 +10,10 @@ import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { tcls } from '@/lib/tailwind';
-
-import { getSpaceLanguage } from '@/intl/server';
 import { languages } from '@/intl/translations';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
+import { tcls } from '@/lib/tailwind';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
@@ -98,40 +95,45 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
 }
 
 function getSpaceVariants(context: GitBookSiteContext) {
-    const currentLanguage = getSpaceLanguage(context).locale;
     const { siteSpace, siteSpaces } = context;
+    const currentLanguage = siteSpace.space.language;
 
+    // Generic variants are all spaces that have the same language as the current (can also be undefined).
     const genericVariants = siteSpaces.filter(
-        (space) =>
-            space === siteSpace || !space.space.language || space.space.language === currentLanguage
+        (space) => space === siteSpace || space.space.language === currentLanguage
     );
 
-    let translationsVariants = siteSpaces.filter(
+    // Translation variants are all spaces that have a different language than the current.
+    let translationVariants = siteSpaces.filter(
         (space) => space === siteSpace || space.space.language !== currentLanguage
     );
 
+    // Get all languages of the variants.
     const variantLanguages = [...new Set(siteSpaces.map((space) => space.space.language))];
 
-    // If there is exactly 1 variant per language, use them as-is.
-    // Otherwise, use the first space per language with its language name in the dropdown
-    if (variantLanguages.length !== translationsVariants.length) {
-        translationsVariants = variantLanguages
-            .map((variantLanguage) => {
-                const firstVariantWithLanguage = translationsVariants.find(
-                    (space) => space.space.language === variantLanguage
-                );
-                const language = languages[variantLanguage as keyof typeof languages];
+    // If there is exactly 1 variant per language, we will them as-is.
+    // Otherwise, we will create a translation dropdown with the first space of each language.
+    if (variantLanguages.length !== translationVariants.length) {
+        translationVariants = variantLanguages
+            // Get the first space of each language.
+            .map((variantLanguage) =>
+                translationVariants.find((space) => space.space.language === variantLanguage)
+            )
+            // Filter out unmatched languages.
+            .filter((space) => space !== undefined)
+            // Transform the title to include the language name if we have a translation. Otherwise, use the original title.
+            .map((space) => {
+                const language = languages[space.space.language as keyof typeof languages];
                 return {
-                    ...firstVariantWithLanguage,
-                    title: `${language.flag} ${language.language}`,
+                    ...space,
+                    title: language ? language.language : space.title,
                 };
-            })
-            .filter((space) => space !== undefined) as SiteSpace[];
+            });
     }
 
     return {
         generic: genericVariants,
-        translations: translationsVariants,
+        translations: translationVariants,
     };
 }
 
