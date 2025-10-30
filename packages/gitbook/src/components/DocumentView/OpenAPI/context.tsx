@@ -83,5 +83,9 @@ export function getOpenAPIContext(args: {
         id: block.meta?.id,
         blockKey: block.key,
         locale,
+        hideSummaryAndDescription:
+            'hideSummaryAndDescription' in block.data
+                ? Boolean(block.data.hideSummaryAndDescription)
+                : false,
     };
 }

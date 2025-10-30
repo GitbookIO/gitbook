@@ -24,15 +24,18 @@ export function OpenAPISummary(props: {
 
     return (
         <div className="openapi-summary" id={operation.summary ? undefined : context.id}>
-            {(operation.deprecated || operation['x-stability']) && (
+            {(operation.deprecated && !context.hideSummaryAndDescription) ||
+            operation['x-stability'] ? (
                 <div className="openapi-summary-tags">
-                    {operation.deprecated && <div className="openapi-deprecated">Deprecated</div>}
+                    {operation.deprecated && !context.hideSummaryAndDescription && (
+                        <div className="openapi-deprecated">Deprecated</div>
+                    )}
                     {operation['x-stability'] && (
                         <OpenAPIStability stability={operation['x-stability']} />
                     )}
                 </div>
-            )}
-            {title
+            ) : null}
+            {title && !context.hideSummaryAndDescription
                 ? context.renderHeading({
                       deprecated: operation.deprecated ?? false,
                       stability: operation['x-stability'],

@@ -24,7 +24,7 @@ export function OpenAPIColumnSpec(props: {
                     ])}
                 </div>
             ) : null}
-            <OpenAPIOperationDescription operation={operation} context={context} />
+            {!context.hideSummaryAndDescription ? <OpenAPIOperationDescription operation={operation} context={context} /> : null}
             <OpenAPISpec data={data} context={clientContext} />
         </div>
     );

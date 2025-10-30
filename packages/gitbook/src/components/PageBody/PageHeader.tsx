@@ -113,6 +113,7 @@ export async function PageHeader(props: {
                 >
                     <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
                     {page.title}
+                    {'computed' in page && page.computed?.props.deprecated ? <span className="openapi-deprecated">Deprecated</span> : null}
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (

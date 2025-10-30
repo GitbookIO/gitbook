@@ -19,7 +19,13 @@ export function OpenAPIOperation(props: {
     const context = resolveOpenAPIContext(contextInput);
 
     return (
-        <div className={clsx('openapi-operation', className)}>
+        <div
+            className={clsx(
+                'openapi-operation',
+                context.hideSummaryAndDescription && 'openapi-operation-no-summary',
+                className
+            )}
+        >
             <OpenAPISummary data={data} context={context} />
             <div className="openapi-columns">
                 <OpenAPIColumnSpec data={data} context={context} />
