@@ -172,7 +172,7 @@ function getCanonicalAndLanguages(context: GitBookSiteContext, page: RevisionPag
                 linker.toLinkForContent(new URL(publishedURL).toString())
             );
 
-            // @ts-expect-error
+            // @ts-expect-error - Metadata.languages does not have all the language types that GitBook supports
             languages[language] = new URL(
                 getPagePath(revision.pages, page),
                 langSiteSpaceURL.endsWith('/') ? langSiteSpaceURL : `${langSiteSpaceURL}/`
