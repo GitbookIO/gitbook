@@ -3,6 +3,7 @@ import { getPageDocument } from '@/lib/data';
 import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
+    type RevisionPageDocument,
     SiteInsightsDisplayContext,
 } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
@@ -14,7 +15,9 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@/lib/images';
+import { removeTrailingSlash } from '@/lib/paths';
 import { tcls } from '@/lib/tailwind';
+import { assert } from 'ts-essentials';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
@@ -106,16 +109,15 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, revision, linker, imageResizer } = context;
+    const { site, customization, linker, imageResizer } = context;
+    const { canonical, languages } = getCanonicalAndLanguages(context, page);
 
     return {
         title: [page.title, site.title].filter(Boolean).join(' | '),
         description: page.description ?? '',
         alternates: {
-            // Trim trailing slashes in canonical URL to match the redirect behavior
-            canonical: linker
-                .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
-                .replace(/\/+$/, ''),
+            canonical,
+            languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
             },
@@ -135,6 +137,51 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
                 ? 'index, follow'
                 : 'noindex, nofollow',
     };
+}
+
+function getCanonicalAndLanguages(context: GitBookSiteContext, page: RevisionPageDocument) {
+    const { siteSpaces, siteSpace, revision } = context;
+
+    const linker =
+        siteSpace.default || typeof siteSpace.space.language !== 'undefined'
+            ? context.linker
+            : context.linker.fork({
+                  spaceBasePath: removeTrailingSlash(
+                      context.linker.spaceBasePath.split('/').filter(Boolean).slice(0, -1).join('/')
+                  ),
+              });
+
+    // Trim trailing slashes in canonical URL to match the redirect behavior
+    const canonical = linker
+        .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
+        .replace(/\/+$/, '');
+
+    // Get other language versions
+    const languages: NonNullable<Metadata['alternates']>['languages'] = {};
+    siteSpaces
+        .filter(
+            (sp) => sp.section === siteSpace.section && typeof sp.space.language !== 'undefined'
+        )
+        .forEach((langSiteSpace) => {
+            const publishedURL = langSiteSpace.urls.published;
+            const language = langSiteSpace.space.language;
+            assert(publishedURL, `Published URL must be defined for space in ${langSiteSpace.id}`);
+            assert(language, `Language must be defined for space in ${langSiteSpace.id}`);
+
+            const langSiteSpaceURL = linker.toAbsoluteURL(
+                linker.toLinkForContent(new URL(publishedURL).toString())
+            );
+
+            // @ts-expect-error
+            languages[language] = new URL(
+                getPagePath(revision.pages, page),
+                langSiteSpaceURL.endsWith('/') ? langSiteSpaceURL : `${langSiteSpaceURL}/`
+            )
+                .toString()
+                .replace(/\/+$/, '');
+        });
+
+    return { canonical, languages };
 }
 
 /**
