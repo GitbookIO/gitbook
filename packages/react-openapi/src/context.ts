@@ -63,6 +63,12 @@ export interface OpenAPIContext extends Omit<OpenAPIClientContext, '$$isClientCo
      * Specification URL.
      */
     specUrl: string;
+
+     /**
+     * Whether to hide the summary and description of the operation.
+     * @default false
+     */
+     hideSummaryAndDescription?: boolean;
 }
 
 export type OpenAPIUniversalContext = OpenAPIClientContext | OpenAPIContext;

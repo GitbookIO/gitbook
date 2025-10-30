@@ -2,7 +2,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { getPagePaths, hasPageVisibleDescendant } from '@/lib/pages';
 import { resolveContentRef } from '@/lib/references';
 import { removeUndefined } from '@/lib/typescript';
-import type { ContentRef, RevisionPage } from '@gitbook/api';
+import type { ComputedContentSource, ContentRef, RevisionPage } from '@gitbook/api';
 import assertNever from 'assert-never';
 
 export type ClientTOCPageLink = {
@@ -24,6 +24,7 @@ export type ClientTOCPageDocument = {
     icon?: string;
     pathnames: string[];
     descendants?: ClientTOCPage[];
+    computed?: ComputedContentSource
 };
 
 export type ClientTOCPageGroup = {
@@ -79,6 +80,7 @@ export async function encodeClientTableOfContents(
                         pathnames: getPagePaths(rootPages, page),
                         descendants,
                         type: 'document',
+                        computed: 'computed' in page && page.computed ? page.computed : undefined,
                     })
                 );
                 break;

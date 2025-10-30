@@ -124,7 +124,8 @@
 
 .openapi-method-head,
 .openapi-method-options,
-.openapi-method-trace {
+.openapi-method-trace,
+.openapi-method-hook {
     @apply bg-tint;
 }
 
@@ -1011,4 +1012,8 @@ body:has(.openapi-select-popover) {
 
 .openapi-path-copy-button-icon svg {
     @apply text-tint size-4;
+}
+
+.openapi-operation-no-summary .openapi-column-preview {
+    @apply pt-0;
 }

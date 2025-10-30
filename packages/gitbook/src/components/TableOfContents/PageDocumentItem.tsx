@@ -38,15 +38,38 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                     ) : null
                 }
             >
-                {page.emoji || page.icon ? (
+                {page.computed?.props.method ? (
+                    <span>
+                        <MethodTag method={page.computed.props.method} />
+                        {page.title}
+                    </span>
+                ) : page.emoji || page.icon ? (
                     <span className="flex items-center gap-3">
                         <TOCPageIcon page={page} />
                         {page.title}
                     </span>
-                ) : (
-                    page.title
-                )}
+                ) : page.title}
             </ToggleableLinkItem>
         </li>
     );
 }
+
+const MethodTag = ({ method }: { method: string }) => {
+
+    const formattedMethod = (() => {
+        switch (method) {
+            case 'delete':
+                return 'DEL';
+            case 'options':
+                return 'OPT';
+            default:
+                return method;
+        }
+    })();
+
+    return (
+        <span className={`openapi-method openapi-method-${method} text-xs!`}>
+            {formattedMethod}
+        </span>
+    );
+};
