@@ -25,7 +25,7 @@ export const ja: TranslationLanguage = {
     search_scope_title: 'フィルター',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: '現在のセクションのみ',
-    search_scope_section_all: 'どこでも',
+    search_scope_section_all: 'ドキュメント全体',
     search_scope_section_all_description: 'ドキュメントのすべてのセクション',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: '現在のバリエーションのみ',
