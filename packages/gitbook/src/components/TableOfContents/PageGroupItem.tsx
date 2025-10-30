@@ -14,7 +14,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
         <li className="flex flex-col">
             <div
                 className={tcls(
-                    '-top-6 sticky z-1 flex items-center gap-3 px-3 pt-6',
+                    '-top-4 sticky z-1 flex items-center gap-3 px-3 pt-6',
                     'font-semibold text-xs uppercase tracking-wide',
                     'pb-3', // Add extra padding to make the header fade a bit nicer
                     '-mb-1.5', // Then pull the page items a bit closer, effective bottom padding is 1.5 units / 6px.
@@ -27,7 +27,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
                     '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    isFirst ? '-mt-6' : ''
+                    isFirst ? '-mt-4' : ''
                 )}
             >
                 <TOCPageIcon page={page} />
