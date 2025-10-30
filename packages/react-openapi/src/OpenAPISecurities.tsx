@@ -138,7 +138,7 @@ function getLabelForType(security: OpenAPICustomSecurityScheme, context: OpenAPI
 
 function OpenAPISchemaOAuth2Flows(props: {
     context: OpenAPIClientContext;
-    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean };
+    security: OpenAPICustomSecurityScheme & { flows?: OpenAPIV3.OAuth2SecurityScheme['flows'] };
 }) {
     const { context, security } = props;
 
@@ -167,7 +167,7 @@ function OpenAPISchemaOAuth2Item(props: {
     >];
     name: string;
     context: OpenAPIClientContext;
-    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean; scopes?: string[] };
+    security: OpenAPICustomSecurityScheme & { flows?: OpenAPIV3.OAuth2SecurityScheme['flows'] };
 }) {
     const { flow, context, security, name } = props;
 
