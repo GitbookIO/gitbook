@@ -104,7 +104,7 @@ export async function TableOfContents(props: {
                     ) : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
                         className={tcls(
-                            'flex grow flex-col p-2',
+                            'flex grow flex-col p-2 sidebar-filled:pt-4',
                             customization.trademark.enabled && 'lg:pb-20',
                             'hide-scrollbar overflow-y-auto'
                         )}
