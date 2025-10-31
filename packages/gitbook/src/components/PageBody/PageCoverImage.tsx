@@ -1,8 +1,8 @@
 'use client';
 import { tcls } from '@/lib/tailwind';
-import { useRef } from 'react';
-import { useResizeObserver } from 'usehooks-ts';
 import type { ImageSize } from '../utils';
+import { getRecommendedCoverDimensions } from './coverDimensions';
+import { useCoverPosition } from './useCoverPosition';
 
 interface ImageAttributes {
     src: string;
@@ -18,31 +18,25 @@ interface Images {
     dark?: ImageAttributes;
 }
 
-const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
+export function PageCoverImage({ imgs, y, height }: { imgs: Images; y: number; height: number }) {
+    const { containerRef, objectPositionY, isLoading } = useCoverPosition(imgs, y);
 
-function getTop(container: { height?: number; width?: number }, y: number, img: ImageAttributes) {
-    // When the size of the image hasn't been determined, we fallback to the center position
-    if (!img.size || y === 0) return '50%';
-    const ratio =
-        container.height && container.width
-            ? Math.max(container.width / img.size.width, container.height / img.size.height)
-            : 1;
-    const scaledHeight = img.size ? img.size.height * ratio : PAGE_COVER_SIZE.height;
-    const top =
-        container.height && img.size ? (container.height - scaledHeight) / 2 + y * ratio : y;
-    return `${top}px`;
-}
+    // Calculate the recommended aspect ratio for this height
+    // This maintains the 4:1 ratio, allowing images to scale proportionally
+    // and adapt their height when container width doesn't match the ideal ratio
+    const recommendedDimensions = getRecommendedCoverDimensions(height);
+    const aspectRatio = recommendedDimensions.width / recommendedDimensions.height;
 
-export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const container = useResizeObserver({
-        // @ts-expect-error wrong types
-        ref: containerRef,
-    });
+    if (isLoading) {
+        return (
+            <div className="h-full w-full overflow-hidden" ref={containerRef}>
+                <div className="h-full w-full animate-pulse bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900" />
+            </div>
+        );
+    }
 
     return (
-        <div className="h-full w-full overflow-hidden" ref={containerRef}>
+        <div className="h-full w-full overflow-hidden" ref={containerRef} style={{ height }}>
             <img
                 src={imgs.light.src}
                 srcSet={imgs.light.srcSet}
@@ -51,8 +45,8 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                 alt="Page cover"
                 className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{
-                    aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                    objectPosition: `50% ${getTop(container, y, imgs.light)}`,
+                    aspectRatio: `${aspectRatio}`,
+                    objectPosition: `50% ${objectPositionY}%`,
                 }}
             />
             {imgs.dark && (
@@ -64,8 +58,8 @@ export function PageCoverImage({ imgs, y }: { imgs: Images; y: number }) {
                     alt="Page cover"
                     className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
                     style={{
-                        aspectRatio: `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
-                        objectPosition: `50% ${getTop(container, y, imgs.dark)}`,
+                        aspectRatio: `${aspectRatio}`,
+                        objectPosition: `50% ${objectPositionY}%`,
                     }}
                 />
             )}

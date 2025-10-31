@@ -8,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 
 import { assert } from 'ts-essentials';
 import { PageCoverImage } from './PageCoverImage';
+import { getCoverHeight } from './coverHeight';
 import defaultPageCoverSVG from './default-page-cover.svg';
 
 const defaultPageCover = defaultPageCoverSVG as StaticImageData;
@@ -22,23 +23,36 @@ export async function PageCover(props: {
     context: GitBookSiteContext;
 }) {
     const { as, page, cover, context } = props;
+    const height = getCoverHeight(cover);
+
+    if (!height) {
+        return null;
+    }
+
     const [resolved, resolvedDark] = await Promise.all([
         cover.ref ? resolveContentRef(cover.ref, context) : null,
         cover.refDark ? resolveContentRef(cover.refDark, context) : null,
     ]);
 
+    // Calculate sizes based on cover type and page layout
+    // Hero covers: max-w-3xl (768px) on regular pages, max-w-screen-2xl (1536px) on wide pages
+    // Full covers: Can expand to full viewport width with negative margins (up to ~1920px+ on large screens)
+    const isWidePage = page.layout.width === 'wide';
+    const maxWidth = as === 'full' ? 1920 : isWidePage ? 1536 : 768;
+
     const sizes = [
-        // Cover takes the full width on mobile/table
+        // Cover takes the full width on mobile
         {
             media: '(max-width: 768px)',
             width: 768,
         },
+        // Tablet sizes
         {
             media: '(max-width: 1024px)',
             width: 1024,
         },
-        // Maximum size of the cover
-        { width: 1248 },
+        // Maximum size based on cover type and page layout
+        { width: maxWidth },
     ];
 
     const getImage = async (resolved: ResolvedContentRef | null, returnNull = false) => {
@@ -108,6 +122,7 @@ export async function PageCover(props: {
                     dark,
                 }}
                 y={cover.yPos}
+                height={height}
             />
         </div>
     );
