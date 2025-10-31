@@ -67,7 +67,7 @@ export function Header(props: {
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         className={tcls(
                             'gap-4',
@@ -79,7 +79,9 @@ export function Header(props: {
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            CONTAINER_STYLE
+                            CONTAINER_STYLE,
+                            'transition-[max-width] duration-300',
+                            '@container/header'
                         )}
                     >
                         <div
@@ -96,7 +98,7 @@ export function Header(props: {
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
-                                        ? 'xl:hidden'
+                                        ? 'lg:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
                                 )}
                             />
@@ -108,22 +110,22 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                'md:basis-56',
+                                '@3xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          'md:grow-[0.8]',
-                                          'lg:basis-40',
-                                          'md:max-w-[40%]',
-                                          'lg:max-w-lg',
-                                          'lg:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'md:mr-auto',
+                                          '@3xl:grow-[0.8]',
+                                          '@4xl:basis-40',
+                                          '@3xl:max-w-[40%]',
+                                          '@4xl:max-w-lg',
+                                          '@4xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          '@7xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          '@3xl:mr-auto',
                                           'order-last',
-                                          'md:order-[unset]',
+                                          '@3xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
