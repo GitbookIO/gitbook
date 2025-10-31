@@ -543,6 +543,7 @@ const config: Config = {
             xl: '1280px',
             '2xl': '1536px',
             '3xl': '1920px',
+            '4xl': '2144px',
         },
     },
     plugins: [
@@ -562,7 +563,7 @@ const config: Config = {
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
-            addVariant('chat-open', 'body:has(.ai-chat) &');
+            addVariant('chat-open', 'body:has(.ai-chat:not(.hidden)) &');
 
             /**
              * Variant when a header is displayed.
@@ -577,6 +578,8 @@ const config: Config = {
                 'announcement',
                 'html:not(.announcement-hidden):has(#announcement-banner) &'
             );
+
+            addVariant('hydrated', 'html.hydrated:not(.route-change) &');
 
             // Variant to target first-of-type in a column
             addVariant('column-first-of-type', '.group\\/column > &:first-of-type'); // optional for group-based variants

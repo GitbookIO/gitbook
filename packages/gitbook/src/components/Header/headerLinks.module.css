@@ -1,4 +1,4 @@
-@media (max-width: 1279px) {
+@container header (width < 1280px) {
     .containerHeaderlinks {
         container-type: inline-size;
         container-name: headerlinks;
