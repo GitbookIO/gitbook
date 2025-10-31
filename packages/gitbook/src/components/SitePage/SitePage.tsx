@@ -139,6 +139,9 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     };
 }
 
+/**
+ * Generates the canonical URL and alternate language URLs for the given page.
+ */
 function getCanonicalAndLanguages(context: GitBookSiteContext, page: RevisionPageDocument) {
     const { siteSpaces, siteSpace, revision } = context;
 
@@ -152,10 +155,18 @@ function getCanonicalAndLanguages(context: GitBookSiteContext, page: RevisionPag
               });
 
     // Trim trailing slashes in canonical URL to match the redirect behavior
-    const canonical = linker
-        .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
-        .replace(/\/+$/, '');
+    const canonicalURL = new URL(
+        linker
+            .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
+            .replace(/\/+$/, '')
+    );
 
+    // For non-default site spaces, add a fallback query param so a page not found can still redirect to the home page
+    if (!siteSpace.default) {
+        canonicalURL.searchParams.set('fallback', 'true');
+    }
+
+    const canonical = canonicalURL.toString();
     // Get other language versions
     const languages: NonNullable<Metadata['alternates']>['languages'] = {};
     siteSpaces
