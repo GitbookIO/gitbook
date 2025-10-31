@@ -22,8 +22,9 @@ export async function PageCover(props: {
     cover: RevisionPageDocumentCover;
     context: GitBookSiteContext;
 }) {
-    const { as, page, cover, context } = props;
-    const height = getCoverHeight(cover);
+    const { as: coverType, page, cover, context } = props;
+
+    const height = getCoverHeight(cover, coverType);
 
     if (!height) {
         return null;
@@ -34,25 +35,18 @@ export async function PageCover(props: {
         cover.refDark ? resolveContentRef(cover.refDark, context) : null,
     ]);
 
-    // Calculate sizes based on cover type and page layout
-    // Hero covers: max-w-3xl (768px) on regular pages, max-w-screen-2xl (1536px) on wide pages
-    // Full covers: Can expand to full viewport width with negative margins (up to ~1920px+ on large screens)
-    const isWidePage = page.layout.width === 'wide';
-    const maxWidth = as === 'full' ? 1920 : isWidePage ? 1536 : 768;
-
     const sizes = [
-        // Cover takes the full width on mobile
+        // Cover takes the full width on mobile/table
         {
             media: '(max-width: 768px)',
             width: 768,
         },
-        // Tablet sizes
         {
             media: '(max-width: 1024px)',
             width: 1024,
         },
-        // Maximum size based on cover type and page layout
-        { width: maxWidth },
+        // Maximum size of the cover
+        { width: 1248 },
     ];
 
     const getImage = async (resolved: ResolvedContentRef | null, returnNull = false) => {
@@ -91,12 +85,12 @@ export async function PageCover(props: {
     return (
         <div
             id="page-cover"
-            data-full={String(as === 'full')}
+            data-full={String(coverType === 'full')}
             className={tcls(
                 'overflow-hidden',
                 // Negative margin to balance the container padding
                 '-mx-4',
-                as === 'full'
+                coverType === 'full'
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
@@ -123,6 +117,7 @@ export async function PageCover(props: {
                 }}
                 y={cover.yPos}
                 height={height}
+                coverType={coverType}
             />
         </div>
     );
