@@ -14,11 +14,16 @@ function clampCoverHeight(height: number | null | undefined): number {
 }
 
 export function getCoverHeight(
-    cover: RevisionPageDocumentCover | null | undefined
+    cover: RevisionPageDocumentCover | null | undefined,
+    as: 'hero' | 'full'
 ): number | undefined {
     // Cover (and thus height) is not defined
     if (!cover) {
         return undefined;
+    }
+
+    if (as === 'hero') {
+        return DEFAULT_COVER_HEIGHT;
     }
 
     return clampCoverHeight((cover as RevisionPageDocumentCover).height ?? DEFAULT_COVER_HEIGHT);
