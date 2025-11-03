@@ -21,19 +21,19 @@ export function getBlockTextStyle(block: DocumentBlock): {
             return {
                 textSize: 'text-xl @xs:text-2xl @lg:text-3xl font-semibold',
                 lineHeight: 'leading-tight',
-                marginTop: 'column-first-of-type:pt-0 pt-[1em] mb-[0.5em]',
+                marginTop: 'column-first-of-type:pt-0 pt-[1em]',
             };
         case 'heading-2':
             return {
                 textSize: 'text-lg @xs:text-xl @lg:text-2xl font-semibold',
                 lineHeight: 'leading-snug',
-                marginTop: 'column-first-of-type:pt-0 pt-[0.75em] mb-[0.5em]',
+                marginTop: 'column-first-of-type:pt-0 pt-[0.75em]',
             };
         case 'heading-3':
             return {
                 textSize: 'text-base @xs:text-lg @lg:text-xl font-semibold',
                 lineHeight: 'leading-snug',
-                marginTop: 'column-first-of-type:pt-0 pt-[0.5em] mb-[0.5em]',
+                marginTop: 'column-first-of-type:pt-0 pt-[0.5em]',
             };
         case 'divider':
             return {
