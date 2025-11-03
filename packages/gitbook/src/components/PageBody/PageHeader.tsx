@@ -104,7 +104,6 @@ export async function PageHeader(props: {
                         '@xs:text-3xl',
                         '@lg:text-4xl',
                         'leading-tight',
-                        '@sm:leading-normal',
                         'font-bold',
                         'flex',
                         'items-center',
