@@ -23,7 +23,7 @@ export const pt_br = {
     search_scope_title: 'Filtro',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: 'Apenas a seção atual',
-    search_scope_section_all: 'Em todos os lugares',
+    search_scope_section_all: 'Toda a documentação',
     search_scope_section_all_description: 'Todas as seções da documentação',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: 'Apenas a variante atual',

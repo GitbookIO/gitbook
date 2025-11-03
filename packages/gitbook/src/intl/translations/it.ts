@@ -25,7 +25,7 @@ export const it: TranslationLanguage = {
     search_scope_title: 'Filtro',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: 'Solo la sezione corrente',
-    search_scope_section_all: 'Ovunque',
+    search_scope_section_all: 'Tutta la documentazione',
     search_scope_section_all_description: 'Tutte le sezioni della documentazione',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: 'Solo la variante corrente',

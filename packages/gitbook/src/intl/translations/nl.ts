@@ -25,7 +25,7 @@ export const nl: TranslationLanguage = {
     search_scope_title: 'Filter',
     search_scope_section_current: '${1}',
     search_scope_section_current_description: 'Alleen de huidige sectie',
-    search_scope_section_all: 'Overal',
+    search_scope_section_all: 'Alle documentatie',
     search_scope_section_all_description: 'Alle secties van de documentatie',
     search_scope_variant_current: '${1}',
     search_scope_variant_current_description: 'Alleen de huidige variant',
