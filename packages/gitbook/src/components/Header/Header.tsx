@@ -86,8 +86,12 @@ export function Header(props: {
                     >
                         <div
                             className={tcls(
-                                'flex max-w-full lg:basis-72',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
+                                'flex max-w-full',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? 'lg:@3xl:basis-72'
+                                    : null
                             )}
                         >
                             <HeaderMobileMenu
@@ -121,8 +125,8 @@ export function Header(props: {
                                           '@4xl:basis-40',
                                           '@3xl:max-w-[40%]',
                                           '@4xl:max-w-lg',
-                                          '@4xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          '@7xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          'lg:@3xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
                                           '@3xl:mr-auto',
                                           'order-last',
                                           '@3xl:order-[unset]',

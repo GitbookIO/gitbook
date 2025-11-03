@@ -45,7 +45,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 >
                     <div
                         className={tcls(
-                            'mx-auto grid @4xl:max-w-none! max-w-3xl site-width-wide:max-w-screen-2xl justify-between gap-12',
+                            'mx-auto flex @xs:grid @4xl:max-w-none! max-w-3xl site-width-wide:max-w-screen-2xl flex-col justify-between gap-12',
                             'grid-cols-[auto_auto]',
                             '@4xl:grid-cols-[18rem_minmax(auto,48rem)_auto]',
                             '@7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
@@ -99,7 +99,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                         {
                             // Theme Toggle
                             customization.themes.toggeable ? (
-                                <div className="-col-start-2 row-start-1 flex items-start justify-end xl:hidden">
+                                <div className="-col-start-2 row-start-1 flex items-start @xs:justify-end xl:hidden">
                                     <React.Suspense fallback={null}>
                                         <ThemeToggler />
                                     </React.Suspense>
