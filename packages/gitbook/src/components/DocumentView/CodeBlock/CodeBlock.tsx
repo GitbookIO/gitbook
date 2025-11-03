@@ -73,6 +73,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                 style={style}
                 inlines={richInlines}
                 inlineExprVariables={variables}
+                mode={context.mode}
             />
         </React.Suspense>
     );
