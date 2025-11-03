@@ -21,7 +21,7 @@ interface SearchInputProps {
 }
 
 // Size classes for medium size button
-const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', '@3xl:circular-corners:px-4'];
+const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', '@2xl:circular-corners:px-4'];
 
 /**
  * Input to trigger search.
@@ -70,11 +70,11 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         variantClasses.header,
                         sizeClasses,
                         // Additional custom styles
-                        'has-[input:focus]:-translate-y-px h-9 grow @3xl:cursor-text cursor-pointer px-2.5 has-[input:focus]:bg-tint-base has-[input:focus]:depth-subtle:shadow-lg has-[input:focus]:depth-subtle:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
+                        'has-[input:focus]:-translate-y-px h-9 grow @2xl:cursor-text cursor-pointer px-2.5 has-[input:focus]:bg-tint-base has-[input:focus]:depth-subtle:shadow-lg has-[input:focus]:depth-subtle:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
                         'theme-bold:border-header-link/3 has-[input:focus-visible]:theme-bold:border-header-link/5 has-[input:focus-visible]:theme-bold:bg-header-link/3 has-[input:focus-visible]:theme-bold:ring-header-link/5',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
-                        '@max-3xl:absolute relative @max-3xl:right-0 z-30 max-w-none shrink grow justify-start',
-                        isOpen ? '@max-3xl:w-56' : '@max-3xl:w-[38px]'
+                        '@max-2xl:absolute relative @max-2xl:right-0 z-30 max-w-none shrink grow justify-start',
+                        isOpen ? '@max-2xl:w-56' : '@max-2xl:w-[38px]'
                     )}
                 >
                     {value && isOpen ? (
@@ -93,7 +93,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     ) : (
                         <Icon
                             icon="magnifying-glass"
-                            className="size-4 shrink-0 not-hydrated:animate-scale-in"
+                            className="size-4 shrink-0 animate-scale-in"
                         />
                     )}
                     {children}
@@ -111,7 +111,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         data-testid="search-input"
                         className={tcls(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-hidden transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                            isOpen ? '' : '@max-3xl:opacity-0'
+                            isOpen ? '' : '@max-2xl:opacity-0'
                         )}
                         role="combobox"
                         autoComplete="off"

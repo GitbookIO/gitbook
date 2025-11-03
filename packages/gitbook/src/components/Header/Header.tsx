@@ -90,7 +90,7 @@ export function Header(props: {
                                 'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
-                                    ? 'lg:@3xl:basis-72'
+                                    ? 'lg:@2xl:basis-72'
                                     : null
                             )}
                         >
@@ -114,7 +114,7 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                '@3xl:basis-56',
+                                '@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
@@ -122,15 +122,15 @@ export function Header(props: {
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          '@3xl:grow-[0.8]',
+                                          '@2xl:grow-[0.8]',
                                           '@4xl:basis-40',
-                                          '@3xl:max-w-[40%]',
+                                          '@2xl:max-w-[40%]',
                                           '@4xl:max-w-lg',
-                                          'lg:@3xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
                                           'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          '@3xl:mr-auto',
+                                          '@2xl:mr-auto',
                                           'order-last',
-                                          '@3xl:order-[unset]',
+                                          '@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
