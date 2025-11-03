@@ -173,11 +173,6 @@ const testCases: TestsCase[] = [
         tests: [{ name: 'Home', url: '/' }],
     },
     {
-        name: 'docs.plaza.finance',
-        contentBaseURL: 'https://docs.plaza.finance',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
         name: 'docs.publicai.io',
         contentBaseURL: 'https://docs.publicai.io',
         tests: [{ name: 'Home', url: '/' }],

@@ -147,6 +147,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     className={tcls(
                                         'hidden',
                                         'pr-4',
+                                        'mt-2',
                                         'lg:flex',
                                         'grow-0',
                                         'dark:shadow-light/1',
