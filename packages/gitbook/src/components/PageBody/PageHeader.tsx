@@ -101,7 +101,7 @@ export async function PageHeader(props: {
                 <h1
                     className={tcls(
                         'text-2xl',
-                        '@sm:text-3xl',
+                        '@xs:text-3xl',
                         '@lg:text-4xl',
                         'leading-tight',
                         '@sm:leading-normal',
