@@ -11,9 +11,6 @@
         "directory": ".open-next/assets",
         "binding": "ASSETS"
     },
-    "observability": {
-        "enabled": true
-    },
     "vars": {
         "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
         "IS_PREVIEW": "false"
