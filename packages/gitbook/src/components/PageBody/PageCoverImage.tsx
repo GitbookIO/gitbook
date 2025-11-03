@@ -1,7 +1,6 @@
 'use client';
 import { tcls } from '@/lib/tailwind';
 import type { ImageSize } from '../utils';
-import { getRecommendedCoverDimensions } from './coverDimensions';
 import { useCoverPosition } from './useCoverPosition';
 
 interface ImageAttributes {
@@ -18,14 +17,18 @@ interface Images {
     dark?: ImageAttributes;
 }
 
-export function PageCoverImage({ imgs, y, height }: { imgs: Images; y: number; height: number }) {
-    const { containerRef, objectPositionY, isLoading } = useCoverPosition(imgs, y);
+const PAGE_COVER_SIZE: ImageSize = { width: 1990, height: 480 };
 
-    // Calculate the recommended aspect ratio for this height
-    // This maintains the 4:1 ratio, allowing images to scale proportionally
-    // and adapt their height when container width doesn't match the ideal ratio
-    const recommendedDimensions = getRecommendedCoverDimensions(height);
-    const aspectRatio = recommendedDimensions.width / recommendedDimensions.height;
+interface PageCoverImageProps {
+    imgs: Images;
+    y: number;
+    // Only if the `height` was customized by the user (and thus defined), we use it to set the cover's height and skip the default behaviour of fixed aspect-ratio.
+    height: number | undefined;
+}
+
+export function PageCoverImage(props: PageCoverImageProps) {
+    const { imgs, y, height } = props;
+    const { containerRef, objectPositionY, isLoading } = useCoverPosition(imgs, y);
 
     if (isLoading) {
         return (
@@ -45,8 +48,11 @@ export function PageCoverImage({ imgs, y, height }: { imgs: Images; y: number; h
                 alt="Page cover"
                 className={tcls('w-full', 'object-cover', imgs.dark ? 'dark:hidden' : '')}
                 style={{
-                    aspectRatio: `${aspectRatio}`,
+                    aspectRatio: height
+                        ? undefined
+                        : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                     objectPosition: `50% ${objectPositionY}%`,
+                    height, // if no height is passed, no height will be set.
                 }}
             />
             {imgs.dark && (
@@ -58,8 +64,11 @@ export function PageCoverImage({ imgs, y, height }: { imgs: Images; y: number; h
                     alt="Page cover"
                     className={tcls('w-full', 'object-cover', 'dark:inline', 'hidden')}
                     style={{
-                        aspectRatio: `${aspectRatio}`,
+                        aspectRatio: height
+                            ? undefined
+                            : `${PAGE_COVER_SIZE.width}/${PAGE_COVER_SIZE.height}`,
                         objectPosition: `50% ${objectPositionY}%`,
+                        height, // if no height is passed, no height will be set.
                     }}
                 />
             )}
