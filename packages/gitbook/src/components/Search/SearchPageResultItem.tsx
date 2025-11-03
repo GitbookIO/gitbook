@@ -54,13 +54,13 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         'transition-colors',
                         'font-normal',
                         'uppercase',
-                        'leading-none',
+                        'leading-snug',
                         'tracking-wider',
                         'mb-1',
                         'flex',
                         'flex-wrap',
                         'gap-x-2',
-                        'gap-y-1',
+                        'gap-y-0',
                         'items-center'
                     )}
                 >
