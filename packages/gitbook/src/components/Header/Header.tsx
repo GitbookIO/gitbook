@@ -118,6 +118,7 @@ export function Header(props: {
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
+                                'transition-[margin] duration-300',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
