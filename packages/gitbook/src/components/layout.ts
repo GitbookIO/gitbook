@@ -13,9 +13,6 @@ export const CONTAINER_STYLE: ClassValue = [
     'sm:px-6',
     'md:px-8',
     'max-w-screen-2xl',
-    // '3xl:chat-open:max-w-screen-3xl',
-    // '3xl:site-width-wide:max-w-screen-3xl',
-    // '4xl:site-width-wide:max-w-screen-4xl',
     'mx-auto',
 ];
 
