@@ -334,7 +334,7 @@
 }
 
 .openapi-securities-scopes ul {
-    @apply !my-0;
+    @apply !my-0 !list-none !pl-0;
 }
 
 .openapi-securities-url {
@@ -398,15 +398,13 @@
     @apply text-left prose-sm text-sm leading-tight text-tint select-text prose-strong:font-semibold prose-strong:text-inherit;
 }
 
-.openapi-disclosure-group-trigger[aria-expanded="false"] {
-    .openapi-response-description.openapi-markdown {
-        @apply truncate;
-        @apply [&>*:not(:first-child)]:hidden *:truncate *:!p-0 *:!m-0;
-    }
+.openapi-disclosure-group-trigger[aria-expanded="false"] .openapi-response-description.openapi-markdown {
+    @apply truncate;
+    @apply [&>*:not(:first-child)]:hidden *:truncate *:!p-0 *:!m-0;
+}
 
-    .openapi-response-tab-content {
-        @apply basis-[60%]
-    }
+.openapi-disclosure-group-trigger[aria-expanded="false"] .openapi-response-tab-content {
+    @apply basis-[60%];
 }
 
 .openapi-response-body {
@@ -528,7 +526,7 @@
 .openapi-panel,
 .openapi-codesample,
 .openapi-response-examples {
-    @apply border shrink min-h-40 overflow-hidden rounded-md straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
+    @apply border shrink min-h-40 overflow-hidden rounded-lg straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
 }
 
 .openapi-response-examples-panel {
@@ -851,7 +849,7 @@ body:has(.openapi-select-popover) {
         .openapi-schema-alternatives .openapi-disclosure,
         .openapi-schemas-disclosure .openapi-schema.openapi-disclosure
     ) {
-    @apply rounded-xl straight-corners:rounded-none;
+    @apply rounded-md circular-corners:rounded-xl straight-corners:rounded-none;
 }
 
 .openapi-disclosure .openapi-schemas-disclosure .openapi-schema.openapi-disclosure {
@@ -866,10 +864,10 @@ body:has(.openapi-select-popover) {
     @apply ring-1 shadow-sm;
 }
 
-.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure):not(:first-child) {
+.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure,.openapi-required-scopes):not(:first-child) {
     @apply mt-2;
 }
-.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure):not(:last-child) {
+.openapi-disclosure[data-expanded="true"]:not(.openapi-schemas-disclosure,.openapi-required-scopes):not(:last-child) {
     @apply mb-2;
 }
 
@@ -1015,4 +1013,20 @@ body:has(.openapi-select-popover) {
 
 .openapi-path-copy-button-icon svg {
     @apply text-tint size-4;
+}
+
+.openapi-required-scopes {
+    @apply ring-1 ring-tint-subtle text-base font-medium mx-0;
+}
+
+.openapi-required-scopes .openapi-disclosure-trigger-label {
+    @apply top-1/2 -translate-y-1/2;
+}
+
+.openapi-required-scopes .openapi-required-scopes-header {
+    @apply flex items-center gap-3;
+}
+
+.openapi-required-scopes .openapi-required-scopes-header svg {
+    @apply size-3.5 text-tint-subtle rotate-none;
 }
