@@ -8,9 +8,6 @@
         "allow_importable_env",
         "global_fetch_strictly_public"
     ],
-    "observability": {
-        "enabled": true
-    },
     "env": {
         "preview": {
             "vars": {

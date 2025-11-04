@@ -413,11 +413,21 @@ async function transformSitePageResult(
                 icon: siteSection?.icon as IconName,
                 label: siteSection.title,
             },
-            (!siteSection || siteSection?.siteSpaces.length > 1) && siteSpace
+            (siteSection?.siteSpaces?.filter(
+                // If a space is the only one in its langauge, it's a translation variant and we don't want to show it.
+                (space) =>
+                    siteSection?.siteSpaces?.filter(
+                        // Check if there are other spaces in the same language within the section.
+                        (s) => s.space.language === space.space.language
+                    ).length > 1 // We only want to show the space if there are other spaces in the same language within the section.
+            ).length ?? 0) > 1 && siteSpace
                 ? {
                       label: siteSpace.title,
                   }
                 : undefined,
+            ...pageItem.ancestors.map((ancestor) => ({
+                label: ancestor.title,
+            })),
         ].filter((item) => item !== undefined),
     };
 

@@ -19,6 +19,7 @@ import { plainHighlight } from './plain-highlight';
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
+    mode: BlockProps<DocumentBlockCode>['context']['mode'];
 };
 
 export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
@@ -28,7 +29,7 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, style, inlines, inlineExprVariables } = props;
+    const { block, mode, style, inlines, inlineExprVariables } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
@@ -123,7 +124,9 @@ export function ClientCodeBlock(props: ClientBlockProps) {
     const numberOfLinesOfCode = lines?.length ?? plainLines.length;
     const collapsedLineCount =
         block.data.collapsedLineCount || CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT;
-    const isExpandable = Boolean(expandable && numberOfLinesOfCode > collapsedLineCount);
+    const isExpandable = Boolean(
+        expandable && mode !== 'print' && numberOfLinesOfCode > collapsedLineCount
+    );
 
     const codeBlockBodyId = useId();
 
