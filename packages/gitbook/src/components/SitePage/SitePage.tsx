@@ -101,16 +101,15 @@ function getSiteStructureTitle(context: GitBookSiteContext): string | null {
     const title = [];
     if (
         sections &&
-        sections.list.filter((section) => section.object === 'site-section').length > 1 && // Only if there are multiple sections
-        sections.current.default === false // Only if the current section is not the default one
+        sections.current.default === false && // Only if the current section is not the default one
+        sections.list.filter((section) => section.object === 'site-section').length > 1 // Only if there are multiple sections
     ) {
         title.push(sections.current.title);
     }
     if (
         siteSpaces.length > 1 && // Only if there are multiple variants
-        siteSpaces.filter((space) => space.space.language === siteSpace.space.language).length >
-            1 && // Only if there are multiple variants *for the current language*. This filters out spaces that are "just" translations of each other, not versions.
-        siteSpace.default === false // Only if the variant is not the default one
+        siteSpace.default === false && // Only if the variant is not the default one
+        siteSpaces.filter((space) => space.space.language === siteSpace.space.language).length > 1 // Only if there are multiple variants *for the current language*. This filters out spaces that are "just" translations of each other, not versions.
     ) {
         title.push(siteSpace.title);
     }
