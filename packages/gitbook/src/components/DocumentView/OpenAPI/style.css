@@ -334,7 +334,7 @@
 }
 
 .openapi-securities-scopes ul {
-    @apply !my-0 !list-none !pl-0;
+    @apply !my-0 ml-4 pl-0;
 }
 
 .openapi-securities-url {
@@ -1016,11 +1016,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-required-scopes {
-    @apply ring-1 ring-tint-subtle text-base font-medium mx-0;
-}
-
-.openapi-required-scopes .openapi-disclosure-trigger-label {
-    @apply top-1/2 -translate-y-1/2;
+    @apply border text-base rounded-md straight-corners:rounded-none circular-corners:rounded-md font-medium mx-0;
 }
 
 .openapi-required-scopes .openapi-required-scopes-header {
@@ -1029,4 +1025,15 @@ body:has(.openapi-select-popover) {
 
 .openapi-required-scopes .openapi-required-scopes-header svg {
     @apply size-3.5 text-tint-subtle rotate-none;
+}
+
+.openapi-required-scopes .openapi-disclosure-group-panel {
+    @apply px-3 pb-3;
+}
+.openapi-required-scopes .openapi-securities-scopes {
+    @apply ml-6;
+}
+
+.openapi-required-scopes .openapi-required-scopes-description {
+    @apply text-xs text-tint-subtle font-normal mb-2;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { OpenAPICopyButton } from './OpenAPICopyButton';
-import { OpenAPIDisclosure } from './OpenAPIDisclosure';
+import { OpenAPIDisclosureGroup } from './OpenAPIDisclosureGroup';
 import { useSelectState } from './OpenAPISelect';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
@@ -39,20 +39,30 @@ export function OpenAPIRequiredScopes(props: {
     }
 
     return (
-        <OpenAPIDisclosure
-            defaultExpanded
+        <OpenAPIDisclosureGroup
             className="openapi-required-scopes"
-            header={
-                <div className="openapi-required-scopes-header">
-                    {context.icons.lock}
-                    <span>{t(context.translation, 'required_scopes')}</span>
-                </div>
-            }
-            icon={context.icons.plus}
-            label=""
-        >
-            <OpenAPISchemaScopes scopes={scopes} context={context} />
-        </OpenAPIDisclosure>
+            icon={context.icons.chevronRight}
+            stateKey="required-scopes"
+            defaultExpandedKeys={['required-scopes']}
+            groups={[
+                {
+                    key: 'required-scopes',
+                    label: (
+                        <div className="openapi-required-scopes-header">
+                            {context.icons.lock}
+                            <span>{t(context.translation, 'required_scopes')}</span>
+                        </div>
+                    ),
+                    tabs: [
+                        {
+                            key: 'scopes',
+                            label: '',
+                            body: <OpenAPISchemaScopes scopes={scopes} context={context} />,
+                        },
+                    ],
+                },
+            ]}
+        />
     );
 }
 
@@ -64,6 +74,9 @@ function OpenAPISchemaScopes(props: {
 
     return (
         <div className="openapi-securities-scopes openapi-markdown">
+            <div className="openapi-required-scopes-description">
+                This endpoint requires the following scopes:
+            </div>
             <ul>
                 {scopes.map((scope) => (
                     <OpenAPIScopeItem key={scope[0]} scope={scope} context={context} />

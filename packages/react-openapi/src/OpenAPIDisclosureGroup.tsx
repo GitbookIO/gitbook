@@ -1,22 +1,29 @@
 'use client';
 
+import clsx from 'classnames';
 import { createContext, useContext, useRef } from 'react';
 import { mergeProps, useButton, useDisclosure, useFocusRing, useId } from 'react-aria';
+import type { Key } from 'react-aria';
 import {
     type DisclosureGroupProps,
     type DisclosureGroupState,
     useDisclosureGroupState,
     useDisclosureState,
 } from 'react-stately';
+import { useStore } from 'zustand';
 import { OpenAPISelect, OpenAPISelectItem, useSelectState } from './OpenAPISelect';
+import { getOrCreateDisclosureStoreByKey } from './getOrCreateDisclosureStoreByKey';
 
 interface Props {
     groups: TDisclosureGroup[];
     icon?: React.ReactNode;
     /** State key to use with a store */
     selectStateKey?: string;
+    /** State key to synchronize disclosure groups across the page */
+    stateKey?: string;
     /** Icon to display for the select */
     selectIcon?: React.ReactNode;
+    className?: string;
 }
 
 type TDisclosureGroup = {
@@ -31,18 +38,50 @@ type TDisclosureGroup = {
 
 const DisclosureGroupStateContext = createContext<DisclosureGroupState | null>(null);
 
+function useDisclosureGroupStore(stateKey = 'disclosure-group', initialKeys?: Iterable<Key>) {
+    const store = useStore(getOrCreateDisclosureStoreByKey(stateKey, initialKeys));
+    return store;
+}
+
 /**
  * Display an interactive OpenAPI disclosure group.
  */
 export function OpenAPIDisclosureGroup(props: DisclosureGroupProps & Props) {
-    const { icon, groups, selectStateKey, selectIcon } = props;
+    const {
+        icon,
+        groups,
+        selectStateKey,
+        stateKey,
+        selectIcon,
+        className,
+        expandedKeys,
+        defaultExpandedKeys,
+        onExpandedChange,
+    } = props;
 
-    const state = useDisclosureGroupState(props);
+    const initialKeys =
+        expandedKeys || defaultExpandedKeys
+            ? new Set(expandedKeys || defaultExpandedKeys)
+            : undefined;
+    const { expandedKeys: storeExpandedKeys, setExpandedKeys } = useDisclosureGroupStore(
+        stateKey,
+        initialKeys
+    );
+
+    const state = useDisclosureGroupState({
+        ...props,
+        expandedKeys: storeExpandedKeys,
+        onExpandedChange: (keys) => {
+            setExpandedKeys(keys);
+            onExpandedChange?.(keys);
+        },
+    });
 
     return (
         <DisclosureGroupStateContext.Provider value={state}>
             {groups.map((group) => (
                 <DisclosureItem
+                    className={className}
                     selectStateKey={selectStateKey}
                     selectIcon={selectIcon}
                     icon={icon}
@@ -59,8 +98,9 @@ function DisclosureItem(props: {
     icon?: React.ReactNode;
     selectStateKey?: string;
     selectIcon?: React.ReactNode;
+    className?: string;
 }) {
-    const { icon, group, selectStateKey, selectIcon } = props;
+    const { icon, group, selectStateKey, selectIcon, className } = props;
 
     const defaultId = useId();
     const id = group.key || defaultId;
@@ -95,7 +135,10 @@ function DisclosureItem(props: {
     const selectedTab = group.tabs?.find((tab) => tab.key === store.key) || group.tabs?.[0];
 
     return (
-        <div className="openapi-disclosure-group" aria-expanded={state.isExpanded}>
+        <div
+            className={clsx('openapi-disclosure-group', className)}
+            aria-expanded={state.isExpanded}
+        >
             <div
                 slot="trigger"
                 ref={triggerRef}
