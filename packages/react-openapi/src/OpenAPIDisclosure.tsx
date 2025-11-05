@@ -13,15 +13,17 @@ export function OpenAPIDisclosure(props: {
     children: React.ReactNode;
     label: string | ((isExpanded: boolean) => string);
     className?: string;
+    defaultExpanded?: boolean;
 }): React.JSX.Element {
-    const { icon, header, label, children, className } = props;
-    const [isExpanded, setIsExpanded] = useState(false);
+    const { icon, header, label, children, className, defaultExpanded = false } = props;
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
     return (
         <Disclosure
             className={clsx('openapi-disclosure', className)}
             isExpanded={isExpanded}
             onExpandedChange={setIsExpanded}
+            defaultExpanded={defaultExpanded}
         >
             <Button
                 slot="trigger"

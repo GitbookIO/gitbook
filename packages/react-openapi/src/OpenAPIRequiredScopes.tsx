@@ -40,6 +40,7 @@ export function OpenAPIRequiredScopes(props: {
 
     return (
         <OpenAPIDisclosure
+            defaultExpanded
             className="openapi-required-scopes"
             header={
                 <div className="openapi-required-scopes-header">
