@@ -37,8 +37,8 @@ export function useCoverPosition(imgs: Images, y: number) {
 
     // Load original image dimensions if not provided in `imgs`
     useLayoutEffect(() => {
-        // Check if we have dimensions from either light or dark image
-        const hasDimensions = imgs.light.size || imgs.dark?.size;
+        // Check if we have dimensions from dark (if provided) or else the default light.
+        const hasDimensions = imgs.dark?.size || imgs.light.size;
 
         if (hasDimensions) {
             return; // Already have dimensions
@@ -65,8 +65,8 @@ export function useCoverPosition(imgs: Images, y: number) {
     }, [imgs.light, imgs.dark]);
 
     // Use provided dimensions or fall back to loaded dimensions
-    // Check light first, then dark, then loaded dimensions
-    const imageDimensions = imgs.light.size ?? imgs.dark?.size ?? loadedDimensions;
+    // Check dark first, then light, then loaded dimensions
+    const imageDimensions = imgs.dark?.size ?? imgs.light.size ?? loadedDimensions;
 
     // Calculate ratio and dimensions similar to useCoverPosition hook
     const ratio =
