@@ -37,6 +37,7 @@ export const no = {
     hide: 'Skjul ${1}',
     available_items: 'Tilgjengelige elementer',
     required_scopes: 'Påkrevde scopes',
+    required_scopes_description: 'Dette endepunktet krever følgende scopes:',
     properties: 'Egenskaper',
     or: 'eller',
     and: 'og',
