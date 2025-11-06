@@ -75,7 +75,7 @@ function OpenAPISchemaScopes(props: {
     return (
         <div className="openapi-securities-scopes openapi-markdown">
             <div className="openapi-required-scopes-description">
-                This endpoint requires the following scopes:
+                {t(context.translation, 'required_scopes_description')}
             </div>
             <ul>
                 {scopes.map((scope) => (

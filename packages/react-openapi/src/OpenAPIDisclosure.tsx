@@ -23,7 +23,6 @@ export function OpenAPIDisclosure(props: {
             className={clsx('openapi-disclosure', className)}
             isExpanded={isExpanded}
             onExpandedChange={setIsExpanded}
-            defaultExpanded={defaultExpanded}
         >
             <Button
                 slot="trigger"

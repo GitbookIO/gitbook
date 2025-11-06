@@ -43,7 +43,7 @@ const createDisclosureStoreFactory = (stores: typeof defaultDisclosureStores) =>
         if (!store) {
             throw new Error(`Failed to get or create store for key: ${storeKey}`);
         }
-        return store;
+        return stores.get(storeKey)!;
     };
 };
 
