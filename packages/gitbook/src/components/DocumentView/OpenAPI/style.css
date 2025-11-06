@@ -1031,9 +1031,9 @@ body:has(.openapi-select-popover) {
     @apply px-3 pb-3;
 }
 .openapi-required-scopes .openapi-securities-scopes {
-    @apply ml-6;
+    @apply ml-6 font-normal *:!text-[0.8125rem];
 }
 
 .openapi-required-scopes .openapi-required-scopes-description {
-    @apply text-xs text-tint-subtle font-normal mb-2;
+    @apply text-xs !text-tint font-normal mb-2;
 }

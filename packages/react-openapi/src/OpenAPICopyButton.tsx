@@ -1,5 +1,6 @@
 'use client';
 
+import clsx from 'classnames';
 import { useState } from 'react';
 import { Button, type ButtonProps } from 'react-aria-components';
 import { OpenAPITooltip } from './OpenAPITooltip';
@@ -45,7 +46,7 @@ export function OpenAPICopyButton(
                     handleCopy();
                     onPress?.(e);
                 }}
-                className={`openapi-copy-button ${className}`}
+                className={clsx('openapi-copy-button', className)}
                 {...props}
             >
                 {children}

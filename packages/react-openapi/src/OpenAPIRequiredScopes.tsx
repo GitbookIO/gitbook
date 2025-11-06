@@ -98,7 +98,7 @@ function OpenAPIScopeItem(props: {
     return (
         <li>
             <OpenAPIScopeItemKey name={scope[0]} context={context} />
-            {scope[1] ? `: ${scope[1]}` : null}
+            {scope[1] ? <span>: {scope[1]}</span> : null}
         </li>
     );
 }
