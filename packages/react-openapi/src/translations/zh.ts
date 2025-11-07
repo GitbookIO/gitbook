@@ -37,6 +37,7 @@ export const zh = {
     hide: '隐藏${1}',
     available_items: '可用项',
     required_scopes: '必需范围',
+    required_scopes_description: '此端点需要以下范围：',
     properties: '属性',
     or: '或',
     and: '和',

@@ -37,6 +37,7 @@ export const nl = {
     hide: 'Verberg ${1}',
     available_items: 'Beschikbare items',
     required_scopes: 'Vereiste scopes',
+    required_scopes_description: 'Dit endpoint vereist de volgende scopes:',
     properties: 'Eigenschappen',
     or: 'of',
     and: 'en',
