@@ -1,3 +1,4 @@
+import type * as api from '@gitbook/api';
 import type { headers as nextHeaders } from 'next/headers';
 import { GITBOOK_API_PUBLIC_URL, GITBOOK_DISABLE_TRACKING } from './env';
 
@@ -48,6 +49,22 @@ export async function serveProxyAnalyticsEvent(req: Request) {
         });
     }
 
+    const body = (await req.json()) as { events: api.SiteInsightsEvent[] };
+    // Here we should filter every event that is older than 5 minutes as the API will reject them anyway, we might as well do it here
+    const filteredEvents = body.events.filter((event) => {
+        const eventDate = event.timestamp ? new Date(event.timestamp) : Date.now();
+        const now = new Date();
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+        return eventDate > fiveMinutesAgo;
+    });
+
+    if (filteredEvents.length === 0) {
+        return new Response('No valid events to process', {
+            status: 400,
+            headers: { 'content-type': 'text/plain' },
+        });
+    }
+
     // We make the request to the public API URL to ensure the request is properly enriched by the router..
     const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
     return await fetch(url.toString(), {
@@ -59,6 +76,8 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             ...(longitude ? { 'x-location-longitude': longitude } : {}),
             ...(continent ? { 'x-location-continent': continent } : {}),
         },
-        body: req.body,
+        body: JSON.stringify({
+            events: filteredEvents,
+        }),
     });
 }
