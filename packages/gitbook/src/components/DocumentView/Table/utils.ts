@@ -21,6 +21,12 @@ export function getRecordValue<T extends number | string | boolean | string[] | 
     return record.values[definitionId];
 }
 
+type RecordCardCover = {
+    contentRef: ContentRefFile | ContentRefURL | null;
+    objectFit?: CardsImageObjectFit;
+    alt?: string;
+};
+
 /**
  * Get the covers for a record card.
  * Returns both the light and dark covers with their content refs and optional object fit.
@@ -31,10 +37,7 @@ export function getRecordCardCovers(
     record: DocumentTableRecord,
     view: DocumentTableViewCards
 ): {
-    [key in 'light' | 'dark']: {
-        contentRef: ContentRefFile | ContentRefURL | null;
-        objectFit?: CardsImageObjectFit;
-    };
+    [key in 'light' | 'dark']: RecordCardCover;
 } {
     const lightValue = view.coverDefinition
         ? (getRecordValue(record, view.coverDefinition) as DocumentTableImageRecord | string[])
@@ -53,10 +56,9 @@ export function getRecordCardCovers(
 /**
  * Process a cover value and return the content ref and object fit.
  */
-function processCoverValue(value: DocumentTableImageRecord | string[] | null | undefined): {
-    contentRef: ContentRefFile | ContentRefURL | null;
-    objectFit?: CardsImageObjectFit;
-} {
+function processCoverValue(
+    value: DocumentTableImageRecord | string[] | null | undefined
+): RecordCardCover {
     if (!value) {
         return { contentRef: null };
     }
@@ -78,6 +80,7 @@ function processCoverValue(value: DocumentTableImageRecord | string[] | null | u
         return {
             contentRef: imageValue.ref,
             objectFit: imageValue.objectFit,
+            alt: imageValue.alt,
         };
     }
 

@@ -67,15 +67,18 @@ export function SiteSectionTabs(props: {
                 className={tcls(
                     'grow',
                     'md:-ml-8 -ml-4 sm:-ml-6',
-                    !children ? 'md:-mr-8 -mr-4 sm:-mr-6' : ''
+                    !children
+                        ? 'md:-mr-8 -mr-4 sm:-mr-6'
+                        : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r after:transition-colors'
                 )}
                 activeId={currentSection.id}
+                trailingEdgeScrollClassName={children ? 'after:border-tint' : ''}
             >
                 <NavigationMenu.List
                     className={tcls(
                         '-mx-3 flex grow gap-2 bg-transparent',
                         'pl-4 sm:pl-6 md:pl-8',
-                        !children ? 'pr-4 sm:pr-6 md:pr-8' : ''
+                        !children ? 'pr-4 sm:pr-6 md:pr-8' : 'pr-4'
                     )}
                     aria-label="Sections"
                     id="sections"

@@ -50,7 +50,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
             return { inline, body };
         });
 
-    if (!isEstimatedOffscreen && !hasInlineExpression) {
+    if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
         // In v2, we render the code block server-side
         const lines = await highlight(block, richInlines);
         return <CodeBlockRenderer block={block} style={style} lines={lines} />;
@@ -73,6 +73,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                 style={style}
                 inlines={richInlines}
                 inlineExprVariables={variables}
+                mode={context.mode}
             />
         </React.Suspense>
     );

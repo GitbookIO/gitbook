@@ -1,11 +1,12 @@
 'use client';
 import React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { Button, variantClasses } from '../primitives';
+import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 import { useClassnames } from '../primitives/StyleProvider';
 
 interface SearchInputProps {
@@ -20,7 +21,7 @@ interface SearchInputProps {
 }
 
 // Size classes for medium size button
-const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', 'md:circular-corners:px-4'];
+const sizeClasses = ['text-sm', 'px-3.5', 'py-1.5', '@2xl:circular-corners:px-4'];
 
 /**
  * Input to trigger search.
@@ -69,21 +70,21 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         variantClasses.header,
                         sizeClasses,
                         // Additional custom styles
-                        'has-[input:focus]:-translate-y-px h-9 grow cursor-pointer px-2.5 has-[input:focus]:bg-tint-base has-[input:focus]:depth-subtle:shadow-lg has-[input:focus]:depth-subtle:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover md:cursor-text',
+                        'has-[input:focus]:-translate-y-px h-9 grow @2xl:cursor-text cursor-pointer px-2.5 has-[input:focus]:bg-tint-base has-[input:focus]:depth-subtle:shadow-lg has-[input:focus]:depth-subtle:shadow-primary-subtle has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-primary-hover',
                         'theme-bold:border-header-link/3 has-[input:focus-visible]:theme-bold:border-header-link/5 has-[input:focus-visible]:theme-bold:bg-header-link/3 has-[input:focus-visible]:theme-bold:ring-header-link/5',
                         'theme-bold:before:absolute theme-bold:before:inset-0 theme-bold:before:bg-header-background/7 theme-bold:before:backdrop-blur-xl ', // Special overlay to make the transparent colors of theme-bold visible.
-                        'relative z-30 max-w-none shrink grow justify-start max-md:absolute max-md:right-0',
-                        isOpen ? 'max-md:w-56' : 'max-md:w-[38px]'
+                        '@max-2xl:absolute relative @max-2xl:right-0 z-30 max-w-none shrink grow justify-start',
+                        isOpen ? '@max-2xl:w-56' : '@max-2xl:w-[38px]'
                     )}
                 >
                     {value && isOpen ? (
                         <Button
                             variant="blank"
-                            label="Clear"
+                            label={tString(language, 'clear')}
                             size="medium"
                             iconOnly
                             icon="circle-xmark"
-                            className="-ml-1.5 -mr-1 animate-scale-in px-1.5"
+                            className="-ml-1.5 -mr-1 animate-scale-in px-1.5 theme-bold:text-header-link theme-bold:hover:bg-header-link/3"
                             onClick={() => {
                                 onChange('');
                                 inputRef.current?.focus();
@@ -110,7 +111,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         data-testid="search-input"
                         className={tcls(
                             'peer z-10 min-w-0 grow bg-transparent py-0.5 text-tint-strong theme-bold:text-header-link outline-hidden transition-[width] duration-300 contain-paint placeholder:text-tint theme-bold:placeholder:text-current theme-bold:placeholder:opacity-7',
-                            isOpen ? '' : 'max-md:opacity-0'
+                            isOpen ? '' : '@max-2xl:opacity-0'
                         )}
                         role="combobox"
                         autoComplete="off"
@@ -120,47 +121,12 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                         // Forward
                         ref={inputRef}
                     />
-                    {!isOpen ? <Shortcut /> : null}
+                    <KeyboardShortcut
+                        keys={isOpen ? ['esc'] : ['mod', 'k']}
+                        className="last:-mr-1 theme-bold:border-header-link/5 theme-bold:bg-header-background theme-bold:text-header-link"
+                    />
                 </div>
             </div>
         );
     }
 );
-
-function getOperatingSystem() {
-    const platform = navigator.platform.toLowerCase();
-
-    if (platform.includes('mac')) return 'mac';
-    if (platform.includes('win')) return 'win';
-
-    return 'win';
-}
-
-function Shortcut() {
-    const [operatingSystem, setOperatingSystem] = useState<string | null>(null);
-
-    useEffect(() => {
-        setOperatingSystem(getOperatingSystem());
-    }, []);
-
-    return (
-        <div
-            aria-busy={operatingSystem === null ? 'true' : undefined}
-            className={tcls(
-                `shortcut -mr-1 relative z-10 hidden justify-end gap-0.5 whitespace-nowrap text-xs [font-feature-settings:"calt","case"] after:absolute after:right-full after:z-20 after:h-full after:w-8 after:bg-linear-to-r after:from-transparent after:to-tint-base theme-bold:after:to-transparent after:content-[''] contrast-more:text-tint-strong md:flex`,
-                operatingSystem
-                    ? 'motion-safe:animate-fade-in motion-reduce:opacity-11'
-                    : 'opacity-0'
-            )}
-        >
-            <kbd
-                className={`flex h-5 min-w-5 items-center justify-center rounded-sm border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1 ${operatingSystem === 'mac' ? 'text-sm' : ''}`}
-            >
-                {operatingSystem === 'mac' ? '⌘' : 'Ctrl'}
-            </kbd>
-            <kbd className="flex size-5 items-center justify-center rounded-sm border border-tint-subtle theme-bold:border-header-link/5 bg-tint-base theme-bold:bg-header-background px-1">
-                K
-            </kbd>
-        </div>
-    );
-}

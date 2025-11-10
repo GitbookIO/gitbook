@@ -10,11 +10,9 @@ import { Footer } from '@/components/Footer';
 import { Header, HeaderLogo } from '@/components/Header';
 import { TableOfContents } from '@/components/TableOfContents';
 import { CONTAINER_STYLE } from '@/components/layout';
-import { tcls } from '@/lib/tailwind';
-
-import { getSpaceLanguage } from '@/intl/server';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import { GITBOOK_APP_URL } from '@/lib/env';
+import { tcls } from '@/lib/tailwind';
 import { AIChatProvider } from '../AI';
 import type { RenderAIMessageOptions } from '../AI';
 import { AIChat } from '../AIChat';
@@ -27,6 +25,7 @@ import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
 import { CurrentContentProvider } from '../hooks';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
+import { categorizeVariants } from './categorizeVariants';
 
 type SpaceLayoutProps = {
     context: GitBookSiteContext;
@@ -105,16 +104,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
     const withSections = Boolean(sections && sections.list.length > 1);
-
-    const currentLanguage = getSpaceLanguage(context);
-    const withVariants: 'generic' | 'translations' | undefined =
-        siteSpaces.length > 1
-            ? siteSpaces.some(
-                  (space) => space.space.language && space.space.language !== currentLanguage.locale
-              )
-                ? 'translations'
-                : 'generic'
-            : undefined;
+    const variants = categorizeVariants(context);
 
     const withFooter =
         customization.themes.toggeable ||
@@ -125,7 +115,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
     return (
         <SpaceLayoutServerContext {...props}>
             <Announcement context={context} />
-            <Header withTopHeader={withTopHeader} withVariants={withVariants} context={context} />
+            <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
             {customization.ai?.mode === CustomizationAIMode.Assistant ? (
                 <AIChat trademark={customization.trademark.enabled} />
@@ -139,7 +129,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:flex-row',
                         'lg:justify-center',
                         CONTAINER_STYLE,
-                        'site-width-wide:max-w-full',
+                        'site-width-wide:max-w-screen-4xl',
+                        'hydrated:transition-[max-width] duration-300',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withFooter && [
@@ -157,6 +148,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     className={tcls(
                                         'hidden',
                                         'pr-4',
+                                        'mt-2',
                                         'lg:flex',
                                         'grow-0',
                                         'dark:shadow-light/1',
@@ -165,11 +157,15 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     )}
                                 >
                                     <HeaderLogo context={context} />
-                                    {withVariants === 'translations' ? (
+                                    {variants.translations.length > 1 ? (
                                         <TranslationsDropdown
                                             context={context}
-                                            siteSpace={siteSpace}
-                                            siteSpaces={siteSpaces}
+                                            siteSpace={
+                                                variants.translations.find(
+                                                    (space) => space.id === siteSpace.id
+                                                ) ?? siteSpace
+                                            }
+                                            siteSpaces={variants.translations}
                                             className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
                                         />
                                     ) : null}
@@ -183,7 +179,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     <div className="flex gap-2">
                                         <SearchContainer
                                             style={CustomizationSearchStyle.Subtle}
-                                            withVariants={withVariants === 'generic'}
+                                            withVariants={variants.generic.length > 1}
                                             withSiteVariants={
                                                 sections?.list.some(
                                                     (s) =>
@@ -213,14 +209,14 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                         sections={encodeClientSiteSections(context, sections)}
                                     />
                                 )}
-                                {withVariants === 'generic' && (
+                                {variants.generic.length > 1 ? (
                                     <SpacesDropdown
                                         context={context}
                                         siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
+                                        siteSpaces={variants.generic}
                                         className="w-full px-3 py-2"
                                     />
-                                )}
+                                ) : null}
                             </>
                         }
                     />

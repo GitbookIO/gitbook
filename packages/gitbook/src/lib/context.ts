@@ -50,6 +50,13 @@ export type SiteURLData = Pick<
      * Identifier used for image resizing.
      */
     imagesContextId: string;
+
+    /**
+     * Whether this request is a fallback rendering.
+     * We use this when switching variant as we don't know if the page exists in the other variant.
+     * By knowing it's a fallback, we can redirect to the space base path instead of returning a 404.
+     */
+    isFallback?: boolean;
 };
 
 /**
@@ -127,6 +134,9 @@ export type GitBookSiteContext = GitBookSpaceContext & {
 
     /** Context ID used by adaptive content. It represents an unique identifier for the authentication context */
     contextId?: string;
+
+    /** Whether this request is a fallback rendering. */
+    isFallback: boolean;
 };
 
 /**
@@ -205,6 +215,7 @@ export async function fetchSiteContextByURLLookup(
         changeRequest: data.changeRequest,
         revision: data.revision,
         contextId: data.contextId,
+        isFallback: data.isFallback ?? false,
     });
 }
 
@@ -223,6 +234,7 @@ export async function fetchSiteContextByIds(
         changeRequest: string | undefined;
         revision: string | undefined;
         contextId?: string;
+        isFallback: boolean;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -321,6 +333,7 @@ export async function fetchSiteContextByIds(
         sections,
         scripts,
         contextId: ids.contextId,
+        isFallback: ids.isFallback,
     };
 }
 

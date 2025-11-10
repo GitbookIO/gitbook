@@ -116,7 +116,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, context, contentRef);
+                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
             }
 
             const resolvePageResult =
@@ -171,14 +171,15 @@ export async function resolveContentRef(
                 }
             } else {
                 const parentPage = (resolvePageResult?.ancestors || []).slice(-1).pop();
-                // When the looked up ref was a page group we use the page group title as resolved ref text.
-                // Otherwise use the resolved page title.
-                text =
+                // When the looked up ref was a page group we use the page group to resolve title and icon.
+                // Otherwise use the resolved page title and icon.
+                const pageOrGroup =
                     parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
-                        ? parentPage.title
-                        : page.title;
+                        ? parentPage
+                        : page;
+                text = pageOrGroup.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
-                icon = <PageIcon page={page} style={iconStyle} />;
+                icon = <PageIcon page={pageOrGroup} style={iconStyle} />;
             }
 
             return {
@@ -345,7 +346,8 @@ async function getBestTargetSpace(
 async function resolveContentRefInSpace(
     spaceId: string,
     context: GitBookAnyContext,
-    contentRef: ContentRef
+    contentRef: ContentRef,
+    options: ResolveContentRefOptions = {}
 ) {
     const ctx = await createContextForSpace(spaceId, context);
 
@@ -353,17 +355,35 @@ async function resolveContentRefInSpace(
         return null;
     }
 
-    const resolved = await resolveContentRef(contentRef, ctx.spaceContext);
+    const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
 
     if (!resolved) {
         return null;
     }
 
+    // Prefer the variant title when available, then the section title, then fallback to the space title.
+    const ancestorLabel = (() => {
+        if ('site' in context) {
+            const foundSiteSpace = findSiteSpaceBy(
+                context.structure,
+                (siteSpace) => siteSpace.space.id === spaceId
+            );
+
+            return (
+                foundSiteSpace?.siteSpace.title ??
+                foundSiteSpace?.siteSection?.title ??
+                ctx.spaceContext.space.title
+            );
+        }
+
+        return ctx.spaceContext.space.title;
+    })();
+
     return {
         ...resolved,
         ancestors: [
             {
-                label: ctx.spaceContext.space.title,
+                label: ancestorLabel,
                 href: ctx.baseURL.toString(),
             },
             ...(resolved.ancestors ?? []),

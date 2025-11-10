@@ -12,6 +12,7 @@ import type { HighlightLine, HighlightToken } from './highlight';
 type CodeBlockRendererProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     lines: HighlightLine[];
     'aria-busy'?: boolean;
+    id?: string;
 };
 
 /**
@@ -23,11 +24,12 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
 ) {
     const { block, style, lines, 'aria-busy': ariaBusy } = props;
 
-    const id = useId();
     const withLineNumbers = Boolean(block.data.lineNumbers) && block.nodes.length > 1;
     const withWrap = block.data.overflow === 'wrap';
     const title = block.data.title;
 
+    const id = useId();
+    const codeId = props.id || id;
     return (
         <div
             ref={ref}
@@ -42,7 +44,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 ) : null}
             </div>
             <CopyCodeButton
-                codeId={id}
+                codeId={codeId}
                 style="z-2 mt-2 mr-2 self-start justify-self-end leading-none opacity-0 backdrop-blur-md [grid-area:2/1] group-hover/codeblock:opacity-11"
             />
             <pre
@@ -53,7 +55,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
                 )}
             >
                 <code
-                    id={id}
+                    id={codeId}
                     className={tcls(
                         'inline-grid min-w-full grid-cols-[auto_1fr] [count-reset:line] print:whitespace-pre-wrap',
                         withWrap && 'whitespace-pre-wrap'

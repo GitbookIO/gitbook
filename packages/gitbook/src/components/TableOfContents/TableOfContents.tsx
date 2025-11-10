@@ -59,7 +59,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-6',
+                    'pt-4',
                     'pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
@@ -104,13 +104,14 @@ export async function TableOfContents(props: {
                     ) : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
                         className={tcls(
-                            'flex grow flex-col p-2',
+                            'flex grow flex-col p-2 pt-4',
                             customization.trademark.enabled && 'lg:pb-20',
                             'hide-scrollbar overflow-y-auto'
                         )}
                     >
                         <PagesList
                             pages={pages}
+                            isRoot={true}
                             style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                         />
                         {customization.trademark.enabled ? (

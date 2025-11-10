@@ -51,6 +51,8 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
 
     // Cleanup timeout on unmount
     React.useEffect(() => {
+        // Initialize hash on mount - It could be null on SSR rehydration
+        setHash(getHash());
         return () => {
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
@@ -73,7 +75,8 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
-        if (pathnameRef.current !== url.pathname) {
+        // We don't want to set isNavigating for same page hash navigation
+        if (pathnameRef.current !== url.pathname && !href.startsWith('#')) {
             timeoutRef.current = window.setTimeout(() => {
                 setIsNavigating(true);
                 timeoutRef.current = null;
@@ -94,7 +97,7 @@ export const NavigationStatusProvider: React.FC<React.PropsWithChildren> = ({ ch
 };
 
 /**
- * Hook to get the current hash from the URL.
+ * Hook to get the current hash from the URL. The hash is set on navigation clicks **NOT** on hashchange events or on navigation end.
  * @see https://github.com/vercel/next.js/discussions/49465
  * We use a different hack than this one, because for same page link it don't work
  * We can't use the `hashChange` event because it doesn't fire for `replaceState` and `pushState` which are used by Next.js.

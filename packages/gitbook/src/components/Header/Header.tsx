@@ -3,6 +3,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+import type { SiteSpace } from '@gitbook/api';
 import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -18,9 +19,12 @@ import { TranslationsDropdown } from './SpacesDropdown';
 export function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
-    withVariants?: 'generic' | 'translations';
+    variants: {
+        generic: SiteSpace[];
+        translations: SiteSpace[];
+    };
 }) {
-    const { context, withTopHeader, withVariants } = props;
+    const { context, withTopHeader, variants } = props;
     const { siteSpace, siteSpaces, sections, customization } = context;
 
     const withSections = Boolean(
@@ -63,7 +67,7 @@ export function Header(props: {
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         className={tcls(
                             'gap-4',
@@ -75,13 +79,19 @@ export function Header(props: {
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            CONTAINER_STYLE
+                            CONTAINER_STYLE,
+                            'transition-[max-width] duration-300',
+                            '@container/header'
                         )}
                     >
                         <div
                             className={tcls(
-                                'flex max-w-full lg:basis-72',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
+                                'flex max-w-full',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? 'lg:@2xl:basis-72'
+                                    : null
                             )}
                         >
                             <HeaderMobileMenu
@@ -91,8 +101,8 @@ export function Header(props: {
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
-                                    withVariants === 'generic'
-                                        ? 'xl:hidden'
+                                    variants.generic.length > 1
+                                        ? 'lg:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
                                 )}
                             />
@@ -104,36 +114,37 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                'md:basis-56',
+                                '@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
+                                'transition-[margin] duration-300',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          'md:grow-[0.8]',
-                                          'lg:basis-40',
-                                          'md:max-w-[40%]',
-                                          'lg:max-w-lg',
-                                          'lg:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'md:mr-auto',
+                                          '@2xl:grow-[0.8]',
+                                          '@4xl:basis-40',
+                                          '@2xl:max-w-[40%]',
+                                          '@4xl:max-w-lg',
+                                          'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          '@2xl:mr-auto',
                                           'order-last',
-                                          'md:order-[unset]',
+                                          '@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
                         >
                             <SearchContainer
                                 style={customization.styling.search}
-                                withVariants={withVariants === 'generic'}
+                                withVariants={variants.generic.length > 1}
                                 withSiteVariants={
                                     sections?.list.some(
                                         (s) =>
                                             s.object === 'site-section' && s.siteSpaces.length > 1
                                     ) ?? false
                                 }
-                                withSections={!!sections}
+                                withSections={sections ? sections.list.length > 1 : false}
                                 section={
                                     sections
                                         ? // Client-encode to avoid a serialisation issue that was causing the language selector to disappear
@@ -150,7 +161,7 @@ export function Header(props: {
                         </div>
 
                         {customization.header.links.length > 0 ||
-                        (!withSections && withVariants === 'translations') ? (
+                        (!withSections && variants.translations.length > 1) ? (
                             <HeaderLinks>
                                 {customization.header.links.length > 0 ? (
                                     <>
@@ -170,11 +181,15 @@ export function Header(props: {
                                         />
                                     </>
                                 ) : null}
-                                {!withSections && withVariants === 'translations' ? (
+                                {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
                                         context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
                                         className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
                                     />
                                 ) : null}
@@ -187,14 +202,17 @@ export function Header(props: {
             {sections && withSections ? (
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
-                        {withVariants === 'translations' ? (
-                            <div className="before:contents[] flex self-start py-2 before:mr-4 before:border-tint before:border-l">
-                                <TranslationsDropdown
-                                    context={context}
-                                    siteSpace={siteSpace}
-                                    siteSpaces={siteSpaces}
-                                />
-                            </div>
+                        {variants.translations.length > 1 ? (
+                            <TranslationsDropdown
+                                context={context}
+                                siteSpace={
+                                    variants.translations.find(
+                                        (space) => space.id === siteSpace.id
+                                    ) ?? siteSpace
+                                }
+                                siteSpaces={variants.translations}
+                                className="my-2 ml-2 self-start"
+                            />
                         ) : null}
                     </SiteSectionTabs>
                 </div>

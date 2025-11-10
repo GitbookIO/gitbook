@@ -9,12 +9,16 @@ import { PageDocumentItem } from './PageDocumentItem';
 import { PageGroupItem } from './PageGroupItem';
 import { PageLinkItem } from './PageLinkItem';
 
-export function PagesList(props: { pages: ClientTOCPage[]; style?: ClassValue }) {
-    const { pages, style } = props;
+export function PagesList(props: {
+    pages: ClientTOCPage[];
+    style?: ClassValue;
+    isRoot?: boolean;
+}) {
+    const { pages, style, isRoot = false } = props;
 
     return (
         <ul className={tcls('flex flex-col gap-y-0.5', style)}>
-            {pages.map((page) => {
+            {pages.map((page, idx) => {
                 switch (page.type) {
                     case 'document':
                         return <PageDocumentItem key={page.id} page={page} />;
@@ -23,7 +27,13 @@ export function PagesList(props: { pages: ClientTOCPage[]; style?: ClassValue })
                         return <PageLinkItem key={page.id} page={page} />;
 
                     case 'group':
-                        return <PageGroupItem key={page.id} page={page} />;
+                        return (
+                            <PageGroupItem
+                                key={page.id}
+                                page={page}
+                                isFirst={isRoot && idx === 0}
+                            />
+                        );
 
                     default:
                         assertNever(page);

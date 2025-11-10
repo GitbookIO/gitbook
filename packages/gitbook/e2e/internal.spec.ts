@@ -33,6 +33,7 @@ import {
     headerLinks,
     runTestCases,
     waitForCookiesDialog,
+    waitForCoverImages,
     waitForNotFound,
 } from './util';
 
@@ -226,6 +227,58 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
                         0
                     );
+                },
+            },
+            {
+                name: 'Expandable TOC navigation',
+                url: '',
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+
+                    // Verify "Navigation" link is not visible initially
+                    const navigationLink = page.getByRole('link', { name: 'Navigation' });
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Find and click the chevron element that is next to "Editor" in the TOC
+                    // It is a span inside the link
+                    const editorChevron = page
+                        .getByRole('link', { name: 'Editor' })
+                        .locator('span');
+                    await editorChevron.click();
+
+                    // Verify "Navigation" link becomes visible after expansion
+                    await expect(navigationLink).toBeVisible();
+                },
+            },
+            {
+                name: 'Expandable nested TOC navigation',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+
+                    // Verify "Spaces" link is not visible initially
+                    const navigationLink = page.getByRole('link', { name: 'Spaces' });
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Find and click the chevron element that is next to "Editor" in the TOC
+                    // It is a span inside the link
+                    const editorChevron = page
+                        .getByRole('link', { name: 'Editor' })
+                        .locator('span');
+                    await editorChevron.click();
+
+                    // At this stage the link should still not be visible
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Then we click 'Content Structure' chevron to expand further
+                    const contentStructureChevron = page
+                        .getByRole('link', { name: 'Content Structure' })
+                        .locator('span');
+                    await contentStructureChevron.click();
+
+                    // Verify "Spaces" link becomes visible after expansion
+                    await expect(navigationLink).toBeVisible();
                 },
             },
             ...searchTestCases,
@@ -727,7 +780,10 @@ const testCases: TestsCase[] = [
                 url: 'blocks/integrations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    const mermaidIframe = page.locator('iframe[title*="mermaid"]').contentFrame();
+                    const mermaidIframe = page
+                        .locator('iframe[title*="mermaid"]')
+                        .first()
+                        .contentFrame();
                     await expect(mermaidIframe.getByText('Mermaid', { exact: true })).toBeVisible();
                     await expect(mermaidIframe.getByText('Diagram', { exact: true })).toBeVisible();
                 },
@@ -851,7 +907,10 @@ const testCases: TestsCase[] = [
             {
                 name: 'With cover',
                 url: 'page-options/page-with-cover',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
             },
             {
                 name: 'With cover for dark mode',
@@ -866,12 +925,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'With hero cover',
                 url: 'page-options/page-with-hero-cover',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
             },
             {
                 name: 'With cover and no TOC',
                 url: 'page-options/page-with-cover-and-no-toc',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
                 screenshot: {
                     waitForTOCScrolling: false,
                 },

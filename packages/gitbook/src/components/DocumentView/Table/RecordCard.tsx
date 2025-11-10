@@ -60,7 +60,7 @@ export async function RecordCard(
                 'overflow-hidden',
                 '[&_.heading>div:first-child]:hidden',
                 '[&_.heading>div]:text-[.8em]',
-                'md:[&_.heading>div]:text-[1em]',
+                '@xl:[&_.heading>div]:text-[1em]',
                 '[&_.blocks:first-child_.heading]:pt-0', // Remove padding-top on first heading in card
 
                 // On mobile, check if we can display the cover responsively or not:
@@ -69,10 +69,10 @@ export async function RecordCard(
                 lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                     ? [
                           lightCoverIsSquareOrPortrait
-                              ? 'grid-cols-[40%__1fr] min-[432px]:grid-cols-none min-[432px]:grid-rows-[auto_1fr]'
+                              ? '@sm:grid-cols-none grid-cols-[40%__1fr] @sm:grid-rows-[auto_1fr]'
                               : '',
                           darkCoverIsSquareOrPortrait
-                              ? 'dark:grid-cols-[40%__1fr] dark:min-[432px]:grid-cols-none dark:min-[432px]:grid-rows-[auto_1fr]'
+                              ? 'dark:@sm:grid-cols-none dark:grid-cols-[40%__1fr] dark:@sm:grid-rows-[auto_1fr]'
                               : '',
                       ].filter(Boolean)
                     : 'grid-rows-[auto_1fr]'
@@ -85,11 +85,13 @@ export async function RecordCard(
                         light: {
                             src: lightCover.href,
                             size: lightCover.file?.dimensions,
+                            alt: light.alt,
                         },
                         dark: darkCover
                             ? {
                                   src: darkCover.href,
                                   size: darkCover.file?.dimensions,
+                                  alt: dark.alt,
                               }
                             : null,
                     }}
@@ -110,18 +112,15 @@ export async function RecordCard(
                         'bg-tint-subtle',
                         lightCoverIsSquareOrPortrait || darkCoverIsSquareOrPortrait
                             ? [
-                                  lightCoverIsSquareOrPortrait
-                                      ? 'min-[432px]:aspect-video min-[432px]:h-auto'
-                                      : '',
+                                  lightCoverIsSquareOrPortrait ? '@sm:aspect-video @sm:h-auto' : '',
                                   darkCoverIsSquareOrPortrait
-                                      ? 'dark:min-[432px]:aspect-video dark:min-[432px]:h-auto'
+                                      ? 'dark:@sm:aspect-video dark:@sm:h-auto'
                                       : '',
                               ].filter(Boolean)
                             : ['h-auto', 'aspect-video'],
                         objectFits
                     )}
-                    priority={isOffscreen ? 'lazy' : 'high'}
-                    preload
+                    loading={isOffscreen ? 'lazy' : 'eager'}
                 />
             ) : null}
             <div

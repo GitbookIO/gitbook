@@ -3,23 +3,26 @@ import type { ImageResizer } from '@/lib/images';
 import ReactDOM from 'react-dom';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
-
-import { checkIsHttpURL } from '@/lib/urls';
 import { ZoomImage } from './ZoomImage';
 import type { PolymorphicComponentProp } from './types';
 
 export type ImageSize = { width: number; height: number };
 
-type ImageSource = {
+type DefaultImageSource = {
     src: string;
-    size?: ImageSize;
     aspectRatio?: string;
+    /**
+     * Override the alt attribute.
+     */
+    alt?: string;
 };
 
-export type ImageSourceSized = {
-    src: string;
+type ImageSource = DefaultImageSource & {
+    size?: ImageSize;
+};
+
+export type ImageSourceSized = DefaultImageSource & {
     size: ImageSize | null;
-    aspectRatio?: string;
 };
 
 export type ImageResponsiveSize = {
@@ -59,16 +62,6 @@ interface ImageCommonProps {
      * @default false
      */
     zoom?: boolean;
-
-    /**
-     * Priority of the image.
-     * - `lazy` will load the image only when it's visible in the viewport.
-     * - `eager` will load the image as soon as possible, even if it's not visible; but will not preload.
-     * - `high` will preload.
-     *
-     * @default normal
-     */
-    priority?: 'lazy' | 'normal' | 'high';
 
     /**
      * Force preloading the image.
@@ -117,7 +110,7 @@ export function Image(
         } & ImageCommonProps
     >
 ) {
-    const { sources, style, inline = false, ...rest } = props;
+    const { sources, style, inline = false, alt, ...rest } = props;
 
     return (
         <>
@@ -131,6 +124,7 @@ export function Image(
                     sources.dark ? 'dark:hidden' : null,
                     style
                 )}
+                alt={sources.light.alt || alt}
             />
             {sources.dark ? (
                 <ImagePicture
@@ -139,13 +133,14 @@ export function Image(
                     inline={inline}
                     // We don't want to preload the dark image, because it's not visible
                     // TODO: adapt based on the default theme
-                    priority="lazy"
+                    loading="lazy"
                     className={tcls(
                         rest.className,
                         'hidden',
                         inline ? 'dark:inline' : 'dark:block',
                         style
                     )}
+                    alt={sources.dark.alt || sources.light.alt || alt}
                 />
             ) : null}
         </>
@@ -198,11 +193,12 @@ async function ImagePictureSized(
         style: _style,
         alt,
         quality = 100,
-        priority = 'normal',
         inline = false,
         zoom = false,
         resize = false,
         preload = false,
+        loading,
+        fetchPriority,
         inlineStyle,
         ...rest
     } = props;
@@ -212,9 +208,6 @@ async function ImagePictureSized(
     }
 
     const attrs = await getImageAttributes({ sizes, source, quality, resize });
-    const canBeFetched = checkIsHttpURL(attrs.src);
-    const fetchPriority = canBeFetched ? getFetchPriority(priority) : undefined;
-    const loading = priority === 'lazy' ? 'lazy' : undefined;
     const aspectRatioStyle = source.aspectRatio ? { aspectRatio: source.aspectRatio } : {};
     const style = { ...aspectRatioStyle, ...inlineStyle };
 
@@ -309,15 +302,4 @@ export async function getImageAttributes(params: {
         sizes: sourceSizes.join(', '),
         ...source.size,
     };
-}
-
-function getFetchPriority(priority: ImageCommonProps['priority']) {
-    switch (priority) {
-        case 'lazy':
-            return 'low';
-        case 'high':
-            return 'high';
-        default:
-            return undefined;
-    }
 }
