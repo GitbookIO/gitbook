@@ -220,7 +220,7 @@ function OpenAPICodeSampleFooter(props: {
         return null;
     }
 
-    if (!validateHttpMethod(method)) {
+    if (!validateHttpMethod(method) || (!hasMultipleMediaTypes && servers.length === 0)) {
         return null;
     }
 
@@ -237,7 +237,7 @@ function OpenAPICodeSampleFooter(props: {
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && (
+            {!hideTryItPanel && servers.length > 0 && (
                 <ScalarApiButton
                     context={getOpenAPIClientContext(context)}
                     method={method}
