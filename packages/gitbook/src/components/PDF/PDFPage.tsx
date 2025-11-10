@@ -212,7 +212,9 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
                     'py-12'
                 )}
             >
-                <h1 className={tcls('text-5xl', 'font-bold')}>{page.title}</h1>
+                <h1 className={tcls('text-5xl', 'font-bold')}>
+                    {page.publishedTitle || page.title}
+                </h1>
             </div>
         </PrintPage>
     );
@@ -227,7 +229,7 @@ async function PDFPageDocument(props: {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
+            <h1 className={tcls('text-4xl', 'font-bold')}>{page.publishedTitle || page.title}</h1>
             {page.description ? (
                 <p className={tcls('decoration-primary/6', 'mt-2', 'mb-3')}>{page.description}</p>
             ) : null}

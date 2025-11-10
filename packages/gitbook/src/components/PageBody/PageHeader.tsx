@@ -115,7 +115,7 @@ export async function PageHeader(props: {
                     )}
                 >
                     <PageIcon page={page} style={['text-tint-subtle ', 'shrink-0']} />
-                    {page.title}
+                    {page.publishedTitle || page.title}
                 </h1>
             ) : null}
             {page.description && page.layout.description ? (
