@@ -46,6 +46,11 @@ export function PageBody(props: {
     const language = getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
+    const hasVisibleTOCItems =
+        context.revision.pages.filter(
+            (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
+        ).length > 0;
+
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
             <main
@@ -57,7 +62,9 @@ export function PageBody(props: {
                     '@container',
                     pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
-                    page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'
+                    page.layout.tableOfContents && hasVisibleTOCItems
+                        ? 'page-has-toc'
+                        : 'page-no-toc'
                 )}
             >
                 <PreservePageLayout siteWidthWide={siteWidthWide} />

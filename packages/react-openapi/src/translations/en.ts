@@ -37,6 +37,7 @@ export const en = {
     hide: 'Hide ${1}',
     available_items: 'Available items',
     required_scopes: 'Required scopes',
+    required_scopes_description: 'This endpoint requires the following scopes:',
     possible_values: 'Possible values',
     properties: 'Properties',
     or: 'or',
