@@ -70,13 +70,13 @@ export function AIChat(props: { trademark: boolean }) {
         <div
             data-testid="ai-chat"
             className={tcls(
-                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl scroll-mt-36 px-4 py-4 transition-[width,opacity,margin,display] transition-discrete duration-300 sm:px-6 lg:fixed lg:w-80 lg:pr-4 lg:pl-0 xl:w-96',
+                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl scroll-mt-36 px-4 py-4 transition-[width,opacity,margin,display] transition-discrete duration-300 sm:px-6 lg:fixed lg:w-80 depth-flat:lg:p-0 lg:pr-4 lg:pl-0 xl:w-96',
                 chat.opened
                     ? 'lg:starting:ml-0 lg:starting:w-0 lg:starting:opacity-0'
                     : 'hidden lg:ml-0 lg:w-0! lg:opacity-0'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 circular-corners:rounded-3xl rounded-corners:rounded-md border border-tint-subtle depth-subtle:shadow-lg shadow-tint transition-all duration-300 lg:w-76 xl:w-92">
+            <EmbeddableFrame className="relative shrink-0 circular-corners:rounded-3xl rounded-corners:rounded-md border border-tint-subtle depth-subtle:shadow-lg shadow-tint transition-all duration-300 lg:w-76 depth-flat:lg:rounded-none depth-flat:lg:border-y-0 depth-flat:lg:border-r-0 xl:w-92">
                 <EmbeddableFrameHeader>
                     <AIChatDynamicIcon trademark={trademark} />
                     <EmbeddableFrameHeaderMain>
