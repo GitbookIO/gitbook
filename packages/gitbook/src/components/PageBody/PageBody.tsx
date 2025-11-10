@@ -59,6 +59,7 @@ export function PageBody(props: {
                     'max-w-screen-2xl py-8',
                     // Allow words to break if they are too long.
                     'break-anywhere',
+                    '@container',
                     pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
                     page.layout.tableOfContents && hasVisibleTOCItems
