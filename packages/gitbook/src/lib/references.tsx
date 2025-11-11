@@ -63,6 +63,10 @@ export interface ResolvedContentRef {
     };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
+    /**
+     * Space that the content ref belongs to (if applicable).
+     */
+    space?: Space;
 }
 
 export interface ResolveContentRefOptions {
@@ -108,6 +112,7 @@ export async function resolveContentRef(
                     text: file.name,
                     active: false,
                     file,
+                    space,
                 };
             }
             return null;
@@ -191,6 +196,7 @@ export async function resolveContentRef(
                 icon,
                 page,
                 active: !anchor && page.id === activePage?.id,
+                space,
             };
         }
 

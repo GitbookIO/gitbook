@@ -4,9 +4,6 @@ import { redirect } from 'next/navigation';
 import { getDataOrNull } from '@/lib/data';
 import { resolvePageId, resolvePagePath } from '@/lib/pages';
 import { withLeadingSlash } from '@/lib/paths';
-import { resolveContentRef } from '@/lib/references';
-import { filterOutNullable } from '@/lib/typescript';
-import type { Space } from '@gitbook/api';
 
 export interface PagePathParams {
     pathname?: string | string[];
@@ -23,16 +20,7 @@ export type PageParams = PagePathParams | PageIdParams;
  * Optimized to fetch in parallel as much as possible.
  */
 export async function fetchPageData(context: GitBookSiteContext, params: PageParams) {
-    const [pageTarget, metaLinks] = await Promise.all([
-        resolvePage(context, params),
-        'pageId' in params ? resolvePageMetaLinks(context, params.pageId) : null,
-    ]);
-
-    const pageMetaLinks = await (metaLinks
-        ? metaLinks
-        : pageTarget?.page
-          ? resolvePageMetaLinks(context, pageTarget.page.id)
-          : null);
+    const pageTarget = await resolvePage(context, params);
 
     return {
         context: {
@@ -40,7 +28,6 @@ export async function fetchPageData(context: GitBookSiteContext, params: PagePar
             page: pageTarget?.page,
         },
         pageTarget,
-        pageMetaLinks,
     };
 }
 
@@ -117,50 +104,6 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
     }
 
     return undefined;
-}
-
-async function resolvePageMetaLinks(context: GitBookSiteContext, pageId: string) {
-    const pageMetaLinks = await getDataOrNull(
-        context.dataFetcher.listRevisionPageMetaLinks({
-            spaceId: context.space.id,
-            revisionId: context.revisionId,
-            pageId,
-        })
-    );
-
-    if (pageMetaLinks) {
-        const spacesById = context.siteSpaces.reduce(
-            (acc, { space }) => {
-                acc[space.id] = space;
-                return acc;
-            },
-            {} as Record<string, Space>
-        );
-
-        const [resolvedCanonical, ...resolvedAlternates] = await Promise.all(
-            [pageMetaLinks.canonical, ...(pageMetaLinks.alternates || [])]
-                .filter(filterOutNullable)
-                .map(async (link) => {
-                    return {
-                        href: (await resolveContentRef(link, context))?.href,
-                        language:
-                            link.kind === 'url'
-                                ? null
-                                : spacesById[link.space ?? context.space.id]?.language || null,
-                    };
-                })
-        );
-
-        return {
-            canonical: resolvedCanonical ?? null,
-            alternates: resolvedAlternates.filter(filterOutNullable),
-        };
-    }
-
-    return {
-        canonical: null,
-        alternates: [],
-    };
 }
 
 /**
