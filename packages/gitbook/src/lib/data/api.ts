@@ -152,21 +152,6 @@ export function createDataFetcher(
             return getUserById(input, { userId });
         },
 
-        listSpacePageMetaLinks(params) {
-            return listSpacePageMetaLinks(input, {
-                spaceId: params.spaceId,
-                pageId: params.pageId,
-            });
-        },
-
-        listChangeRequestPageMetaLinks(params) {
-            return listChangeRequestPageMetaLinks(input, {
-                spaceId: params.spaceId,
-                changeRequestId: params.changeRequestId,
-                pageId: params.pageId,
-            });
-        },
-
         listRevisionPageMetaLinks(params) {
             return listRevisionPageMetaLinks(input, {
                 spaceId: params.spaceId,
@@ -724,79 +709,6 @@ const renderIntegrationUi = cache(
                 cacheLife('days');
                 return res.data;
             });
-        });
-    }
-);
-
-/**
- * List all the meta links for a given page in a space.
- */
-const listSpacePageMetaLinks = cache(
-    async (input: DataFetcherInput, params: { spaceId: string; pageId: string }) => {
-        'use cache';
-        cacheTag(
-            getCacheTag({
-                tag: 'space',
-                space: params.spaceId,
-            })
-        );
-
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `listSpacePageMetaLinks(${params.spaceId}, ${params.pageId})`,
-                async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.listSpacePageMetaLinks(
-                        params.spaceId,
-                        params.pageId,
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('days');
-                    return res.data;
-                }
-            );
-        });
-    }
-);
-
-/**
- * List all the meta links for a given page in a change request.
- */
-const listChangeRequestPageMetaLinks = cache(
-    async (
-        input: DataFetcherInput,
-        params: { spaceId: string; changeRequestId: string; pageId: string }
-    ) => {
-        'use cache';
-        cacheTag(
-            getCacheTag({
-                tag: 'change-request',
-                space: params.spaceId,
-                changeRequest: params.changeRequestId,
-            })
-        );
-
-        return wrapCacheDataFetcherError(async () => {
-            return trace(
-                `listChangeRequestPageMetaLinks(${params.spaceId}, ${params.changeRequestId}, ${params.pageId})`,
-                async () => {
-                    const api = apiClient(input);
-                    const res = await api.spaces.listChangeRequestPageMetaLinks(
-                        params.spaceId,
-                        params.changeRequestId,
-                        params.pageId,
-                        {
-                            ...noCacheFetchOptions,
-                        }
-                    );
-                    cacheTag(...getCacheTagsFromResponse(res));
-                    cacheLife('days');
-                    return res.data;
-                }
-            );
         });
     }
 );
