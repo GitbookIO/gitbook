@@ -4,6 +4,7 @@ import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
     SiteInsightsDisplayContext,
+    type TranslationLanguage,
 } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -117,7 +118,7 @@ function getSiteStructureTitle(context: GitBookSiteContext): string | null {
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
-    const { context, pageTarget } = await getPageDataWithFallback({
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
     });
@@ -133,6 +134,24 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     const { site, customization, revision, linker, imageResizer } = context;
     const siteStructureTitle = getSiteStructureTitle(context);
 
+    const canonical = pageMetaLinks?.canonical?.href
+        ? pageMetaLinks.canonical.href
+        : linker
+              .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page })) // Trim trailing slashes in canonical URL to match the redirect behavior
+              .replace(/\/+$/, '');
+
+    const languages = pageMetaLinks?.alternates.reduce(
+        (acc, alt) => {
+            // TODO: We can only add language alternates for now as that's all Next.js API supports for now
+            // generic alternates are not supported yet
+            if (alt.language && alt.href) {
+                acc[alt.language] = alt.href;
+            }
+            return acc;
+        },
+        {} as Record<TranslationLanguage, string>
+    );
+
     return {
         title: [
             page.title,
@@ -144,10 +163,8 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             .join(' | '),
         description: page.description ?? '',
         alternates: {
-            // Trim trailing slashes in canonical URL to match the redirect behavior
-            canonical: linker
-                .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
-                .replace(/\/+$/, ''),
+            canonical,
+            languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
             },
@@ -236,7 +253,7 @@ async function getPageDataWithFallback(args: {
     pagePathParams: PagePathParams;
 }) {
     const { context: baseContext, pagePathParams } = args;
-    const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
+    const { context, pageTarget, pageMetaLinks } = await fetchPageData(baseContext, pagePathParams);
 
     return {
         context: {
@@ -244,5 +261,6 @@ async function getPageDataWithFallback(args: {
             page: pageTarget?.page,
         },
         pageTarget,
+        pageMetaLinks,
     };
 }

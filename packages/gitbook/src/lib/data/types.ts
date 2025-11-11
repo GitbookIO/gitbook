@@ -173,4 +173,30 @@ export interface GitBookDataFetcher {
         integrationName: string;
         request: api.RenderIntegrationUI;
     }): Promise<DataFetcherResponse<api.ContentKitRenderOutput>>;
+
+    /**
+     * List space page meta links.
+     */
+    listSpacePageMetaLinks(params: {
+        spaceId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
+
+    /**
+     * List change request page meta links.
+     */
+    listChangeRequestPageMetaLinks(params: {
+        spaceId: string;
+        changeRequestId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
+
+    /**
+     * List revision page meta links.
+     */
+    listRevisionPageMetaLinks(params: {
+        spaceId: string;
+        revisionId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
 }
