@@ -25,12 +25,6 @@ export function OpenAPIRequiredScopes(props: {
     }
 
     const scopes = selectedSecurity.schemes.flatMap((scheme) => {
-        if (scheme.type === 'oauth2') {
-            return Object.entries(scheme.flows ?? {}).flatMap(([_, flow]) =>
-                Object.entries(flow.scopes ?? {})
-            );
-        }
-
         return scheme.scopes ?? [];
     });
 
@@ -66,16 +60,20 @@ export function OpenAPIRequiredScopes(props: {
     );
 }
 
-function OpenAPISchemaScopes(props: {
-    scopes: OpenAPISecurityScope[];
+export function OpenAPISchemaScopes(props: {
+    scopes: OpenAPISecurityScope[] | [string, string][];
     context: OpenAPIClientContext;
+    isOAuth2?: boolean;
 }) {
-    const { scopes, context } = props;
+    const { scopes, context, isOAuth2 } = props;
 
     return (
         <div className="openapi-securities-scopes openapi-markdown">
             <div className="openapi-required-scopes-description">
-                {t(context.translation, 'required_scopes_description')}
+                {t(
+                    context.translation,
+                    isOAuth2 ? 'available_scopes' : 'required_scopes_description'
+                )}
             </div>
             <ul>
                 {scopes.map((scope) => (

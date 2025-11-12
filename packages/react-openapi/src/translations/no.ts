@@ -38,6 +38,7 @@ export const no = {
     available_items: 'Tilgjengelige elementer',
     required_scopes: 'Påkrevde scopes',
     required_scopes_description: 'Dette endepunktet krever følgende scopes:',
+    available_scopes: 'Tilgjengelige scopes:',
     properties: 'Egenskaper',
     or: 'eller',
     and: 'og',
