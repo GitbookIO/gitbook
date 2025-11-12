@@ -259,7 +259,7 @@ export async function fetchSiteContextByIds(
     };
 
     const sections = ids.siteSection
-        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
+        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection, ids.siteSpace)
         : null;
 
     // Parse the current siteSpace and siteSpaces based on the site structure type.
@@ -274,7 +274,9 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            return { siteSpaces, siteSpace };
+            const visibleSiteSpaces = filterHiddenSiteSpaces(siteSpaces, ids.siteSpace);
+
+            return { siteSpaces: visibleSiteSpaces, siteSpace };
         }
 
         if (siteStructure.type === 'sections') {
@@ -284,6 +286,7 @@ export async function fetchSiteContextByIds(
             );
 
             const currentSection = sections.current;
+            // hidden siteSpaces are already filtered in parseSiteSectionsAndGroups
             const siteSpaces = currentSection.siteSpaces;
             const siteSpace = currentSection.siteSpaces.find(
                 (siteSpace) => siteSpace.id === ids.siteSpace
@@ -426,11 +429,59 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
     }
 }
 
-function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
+/**
+ * Filter out hidden site spaces from a list of site spaces.
+ */
+function filterHiddenSiteSpaces(siteSpaces: SiteSpace[], currentSiteSpaceId?: string): SiteSpace[] {
+    return siteSpaces.filter(
+        (siteSpace) => !siteSpace.hidden || siteSpace.id === currentSiteSpaceId
+    );
+}
+
+/**
+ * Filter out hidden site spaces from sections and groups recursively.
+ */
+function filterHiddenSiteSpacesFromSections(
+    sections: (SiteSection | SiteSectionGroup)[],
+    currentSiteSpaceId?: string
+): (SiteSection | SiteSectionGroup)[] {
+    return sections.map((item) => {
+        if (item.object === 'site-section') {
+            return {
+                ...item,
+                siteSpaces: filterHiddenSiteSpaces(item.siteSpaces, currentSiteSpaceId),
+            };
+        }
+        if (item.object === 'site-section-group') {
+            return {
+                ...item,
+                children: filterHiddenSiteSpacesFromSections(item.children, currentSiteSpaceId),
+            };
+        }
+        return item;
+    });
+}
+
+function parseSiteSectionsAndGroups(
+    structure: SiteStructure,
+    siteSectionId: string,
+    currentSiteSpaceId?: string
+) {
     const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
+    const filteredSectionsAndGroups = filterHiddenSiteSpacesFromSections(
+        sectionsAndGroups,
+        currentSiteSpaceId
+    );
     const section = parseCurrentSection(structure, siteSectionId);
     assert(section, `couldn't find section "${siteSectionId}" in site structure`);
-    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
+    const filteredSection = {
+        ...section,
+        siteSpaces: filterHiddenSiteSpaces(section.siteSpaces, currentSiteSpaceId),
+    };
+    return {
+        list: filteredSectionsAndGroups,
+        current: filteredSection,
+    } satisfies SiteSections;
 }
 
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
