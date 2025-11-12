@@ -4,7 +4,6 @@ import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
     SiteInsightsDisplayContext,
-    type Space,
     type TranslationLanguage,
 } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
@@ -136,12 +135,12 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     const { site, customization, revision, linker, imageResizer } = context;
     const siteStructureTitle = getSiteStructureTitle(context);
 
-    const canonical = pageMetaLinks?.canonical
-        ? pageMetaLinks.canonical
-        : // Trim trailing slashes in canonical URL to match the redirect behavior
-          linker
-              .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
-              .replace(/\/+$/, '');
+    const canonical = (
+        pageMetaLinks?.canonical
+            ? new URL(pageMetaLinks.canonical).toString()
+            : // If no canonical is set, use the current page URL (default case)
+              linker.toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
+    ).replace(/\/+$/, ''); // Trim trailing slashes in canonical URL to match the redirect behavior
 
     const languages = pageMetaLinks?.alternates.reduce(
         (acc, alt) => {
@@ -257,7 +256,7 @@ async function getPageDataWithFallback(args: {
 }) {
     const { context: baseContext, pagePathParams } = args;
     const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
-    const pageMetaLinks = await (pageTarget?.page
+    const pageMetaLinks = await (pageTarget?.page && shouldResolveMetaLinks(context.site.id)
         ? resolvePageMetaLinks(context, pageTarget.page.id)
         : null);
 
@@ -293,14 +292,6 @@ async function resolvePageMetaLinks(
     );
 
     if (pageMetaLinks) {
-        const spacesById = context.siteSpaces.reduce(
-            (acc, { space }) => {
-                acc[space.id] = space;
-                return acc;
-            },
-            {} as Record<string, Space>
-        );
-
         const canonicalResolution = pageMetaLinks.canonical
             ? resolveContentRef(pageMetaLinks.canonical, context).then((resolved) => resolved?.href)
             : null;
@@ -308,7 +299,7 @@ async function resolvePageMetaLinks(
         const alternatesResolutions = (pageMetaLinks.alternates || []).map((link) =>
             resolveContentRef(link, context).then((resolved) => ({
                 href: resolved?.href ?? null,
-                language: resolved?.space ? spacesById[resolved.space.id]?.language : null,
+                language: resolved?.space?.language ?? null,
             }))
         );
 
@@ -329,4 +320,20 @@ async function resolvePageMetaLinks(
         canonical: null,
         alternates: [],
     };
+}
+
+/**
+ * Determine whether to resolve meta links for a site based on a percentage rollout.
+ */
+export function shouldResolveMetaLinks(siteId: string): boolean {
+    const META_LINKS_PERCENTAGE_ROLLOUT = 10;
+
+    // compute a simple hash of the siteId
+    let hash = 0;
+    for (let i = 0; i < siteId.length; i++) {
+        hash = (hash << 5) - hash + siteId.charCodeAt(i);
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    return Math.abs(hash % 100) < META_LINKS_PERCENTAGE_ROLLOUT;
 }
