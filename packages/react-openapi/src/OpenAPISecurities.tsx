@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
-import { OpenAPIRequiredScopes } from './OpenAPIRequiredScopes';
+import { OpenAPIRequiredScopes, OpenAPISchemaScopes } from './OpenAPIRequiredScopes';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
@@ -43,7 +43,11 @@ export function OpenAPISecurities(props: {
                     body: (
                         <div className="openapi-schema">
                             {schemes.map((security, index) => {
-                                const description = resolveDescription(security);
+                                // OAuth2 description is already rendered in OpenAPISchemaOAuth2Item
+                                const description =
+                                    security.type !== 'oauth2'
+                                        ? resolveDescription(security)
+                                        : undefined;
                                 return (
                                     <div
                                         key={`${key}-${index}`}
@@ -172,6 +176,10 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
+    const scopes = !security.scopes?.length && flow.scopes ? Object.entries(flow.scopes) : [];
+
+    const description = resolveDescription(security);
+
     return (
         <div>
             <OpenAPISchemaName
@@ -181,7 +189,9 @@ function OpenAPISchemaOAuth2Item(props: {
                 required={security.required}
             />
             <div className="openapi-securities-oauth-content openapi-markdown">
-                {security.description ? <Markdown source={security.description} /> : null}
+                {description ? (
+                    <Markdown source={description} className="openapi-securities-description" />
+                ) : null}
                 {'authorizationUrl' in flow && flow.authorizationUrl ? (
                     <span>
                         Authorization URL:{' '}
@@ -220,6 +230,9 @@ function OpenAPISchemaOAuth2Item(props: {
                             {flow.refreshUrl}
                         </OpenAPICopyButton>
                     </span>
+                ) : null}
+                {scopes.length ? (
+                    <OpenAPISchemaScopes scopes={scopes} context={context} isOAuth2 />
                 ) : null}
             </div>
         </div>

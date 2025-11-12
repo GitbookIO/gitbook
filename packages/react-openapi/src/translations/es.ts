@@ -38,6 +38,7 @@ export const es = {
     available_items: 'Elementos disponibles',
     required_scopes: 'Scopes requeridos',
     required_scopes_description: 'Este endpoint requiere los siguientes scopes:',
+    available_scopes: 'Scopes disponibles:',
     properties: 'Propiedades',
     or: 'o',
     and: 'y',
