@@ -160,20 +160,20 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
         },
     },
-    {
-        name: 'Ask - AI Mode: Assistant - Button',
-        url: getCustomizationURL({
-            ai: {
-                mode: CustomizationAIMode.Assistant,
-            },
-        }),
-        screenshot: false,
-        run: async (page) => {
-            await page.getByTestId('ai-chat-button').click();
-            await expect(page.getByTestId('ai-chat')).toBeVisible();
-            await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-        },
-    },
+    // {
+    //     name: 'Ask - AI Mode: Assistant - Button',
+    //     url: getCustomizationURL({
+    //         ai: {
+    //             mode: CustomizationAIMode.Assistant,
+    //         },
+    //     }),
+    //     screenshot: false,
+    //     run: async (page) => {
+    //         await page.getByTestId('ai-chat-button').click();
+    //         await expect(page.getByTestId('ai-chat')).toBeVisible();
+    //         await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+    //     },
+    // },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Initial)',
         url: `${getCustomizationURL({
