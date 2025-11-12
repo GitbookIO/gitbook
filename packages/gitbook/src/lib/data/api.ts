@@ -151,6 +151,14 @@ export function createDataFetcher(
         getUserById(userId) {
             return getUserById(input, { userId });
         },
+
+        listRevisionPageMetaLinks(params) {
+            return listRevisionPageMetaLinks(input, {
+                spaceId: params.spaceId,
+                revisionId: params.revisionId,
+                pageId: params.pageId,
+            });
+        },
     };
 }
 
@@ -701,6 +709,37 @@ const renderIntegrationUi = cache(
                 cacheLife('days');
                 return res.data;
             });
+        });
+    }
+);
+
+/**
+ * List all the meta links for a given page in a revision.
+ */
+const listRevisionPageMetaLinks = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; pageId: string }
+    ) => {
+        'use cache';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `listRevisionPageMetaLinks(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.listRevisionPageMetaLinks(
+                        params.spaceId,
+                        params.revisionId,
+                        params.pageId,
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLife('days');
+                    return res.data;
+                }
+            );
         });
     }
 );

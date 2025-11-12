@@ -1,9 +1,10 @@
 import type { GitBookSiteContext } from '@/lib/context';
-import { getPageDocument } from '@/lib/data';
+import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
     SiteInsightsDisplayContext,
+    type TranslationLanguage,
 } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -14,6 +15,7 @@ import { getPagePath } from '@/lib/pages';
 import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@/lib/images';
+import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
@@ -117,7 +119,7 @@ function getSiteStructureTitle(context: GitBookSiteContext): string | null {
 }
 
 export async function generateSitePageMetadata(props: SitePageProps): Promise<Metadata> {
-    const { context, pageTarget } = await getPageDataWithFallback({
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
     });
@@ -133,6 +135,25 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     const { site, customization, revision, linker, imageResizer } = context;
     const siteStructureTitle = getSiteStructureTitle(context);
 
+    const canonical = (
+        pageMetaLinks?.canonical
+            ? new URL(pageMetaLinks.canonical).toString()
+            : // If no canonical is set, use the current page URL (default case)
+              linker.toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
+    ).replace(/\/+$/, ''); // Trim trailing slashes in canonical URL to match the redirect behavior
+
+    const languages = pageMetaLinks?.alternates.reduce(
+        (acc, alt) => {
+            // TODO: We can only add language alternates for now as that's all Next.js API supports
+            // generic alternates are not supported yet
+            if (alt.language) {
+                acc[alt.language] = alt.href;
+            }
+            return acc;
+        },
+        {} as Record<TranslationLanguage, string>
+    );
+
     return {
         title: [
             page.title,
@@ -144,10 +165,8 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             .join(' | '),
         description: page.description ?? '',
         alternates: {
-            // Trim trailing slashes in canonical URL to match the redirect behavior
-            canonical: linker
-                .toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
-                .replace(/\/+$/, ''),
+            canonical,
+            languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
             },
@@ -237,6 +256,9 @@ async function getPageDataWithFallback(args: {
 }) {
     const { context: baseContext, pagePathParams } = args;
     const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
+    const pageMetaLinks = await (pageTarget?.page && shouldResolveMetaLinks(context.site.id)
+        ? resolvePageMetaLinks(context, pageTarget.page.id)
+        : null);
 
     return {
         context: {
@@ -244,5 +266,74 @@ async function getPageDataWithFallback(args: {
             page: pageTarget?.page,
         },
         pageTarget,
+        pageMetaLinks,
     };
+}
+
+/**
+ * Resolve the meta links (canonical and alternates) for a page.
+ */
+async function resolvePageMetaLinks(
+    context: GitBookSiteContext,
+    pageId: string
+): Promise<{
+    canonical: string | null;
+    alternates: Array<{
+        href: string;
+        language: TranslationLanguage | null;
+    }>;
+}> {
+    const pageMetaLinks = await getDataOrNull(
+        context.dataFetcher.listRevisionPageMetaLinks({
+            spaceId: context.space.id,
+            revisionId: context.revisionId,
+            pageId,
+        })
+    );
+
+    if (pageMetaLinks) {
+        const canonicalResolution = pageMetaLinks.canonical
+            ? resolveContentRef(pageMetaLinks.canonical, context).then((resolved) => resolved?.href)
+            : null;
+
+        const alternatesResolutions = (pageMetaLinks.alternates || []).map((link) =>
+            resolveContentRef(link, context).then((resolved) => ({
+                href: resolved?.href ?? null,
+                language: resolved?.space?.language ?? null,
+            }))
+        );
+
+        const [resolvedCanonical, resolvedAlternates] = await Promise.all([
+            canonicalResolution,
+            Promise.all(alternatesResolutions),
+        ]);
+
+        return {
+            canonical: resolvedCanonical ?? null,
+            alternates: resolvedAlternates.filter(
+                (alt): alt is { href: string; language: TranslationLanguage | null } => !!alt.href
+            ),
+        };
+    }
+
+    return {
+        canonical: null,
+        alternates: [],
+    };
+}
+
+/**
+ * Determine whether to resolve meta links for a site based on a percentage rollout.
+ */
+export function shouldResolveMetaLinks(siteId: string): boolean {
+    const META_LINKS_PERCENTAGE_ROLLOUT = 10;
+
+    // compute a simple hash of the siteId
+    let hash = 0;
+    for (let i = 0; i < siteId.length; i++) {
+        hash = (hash << 5) - hash + siteId.charCodeAt(i);
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    return Math.abs(hash % 100) < META_LINKS_PERCENTAGE_ROLLOUT;
 }
