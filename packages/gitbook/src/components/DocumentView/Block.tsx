@@ -6,6 +6,7 @@ import {
     SkeletonImage,
     SkeletonParagraph,
     SkeletonSmall,
+    SkeletonUpdate,
 } from '@/components/primitives';
 import type { ClassValue } from '@/lib/tailwind';
 
@@ -34,6 +35,8 @@ import { Stepper } from './Stepper';
 import { StepperStep } from './StepperStep';
 import { Table } from './Table';
 import { Tabs } from './Tabs';
+import { Update } from './Update';
+import { Updates } from './Updates';
 
 export interface BlockProps<Block extends DocumentBlock> extends DocumentContextProps {
     block: Block;
@@ -105,6 +108,10 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
                 return <Stepper {...props} block={block} />;
             case 'stepper-step':
                 return <StepperStep {...props} block={block} />;
+            case 'updates':
+                return <Updates {...props} block={block} />;
+            case 'update':
+                return <Update {...props} block={block} />;
             case 'if':
                 // If block should be processed by the API.
                 return null;
@@ -113,9 +120,6 @@ export function Block<T extends DocumentBlock>(props: BlockProps<T>) {
             case 'tabs-item':
             case 'column':
                 throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
-            case 'update':
-            case 'updates':
-                return null;
             default:
                 return nullIfNever(block);
         }
@@ -168,14 +172,14 @@ export function BlockSkeleton(props: { block: DocumentBlock; style: ClassValue }
         case 'images':
         case 'drawing':
             return <SkeletonImage id={id} style={style} />;
+        case 'updates':
+            return <SkeletonUpdate id={id} style={style} />;
         case 'image':
         case 'code-line':
         case 'tabs-item':
         case 'column':
-            throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
         case 'update':
-        case 'updates':
-            return null;
+            throw new Error(`Blocks (${block.type}) should be directly rendered by parent`);
         default:
             return nullIfNever(block);
     }

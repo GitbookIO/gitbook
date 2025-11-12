@@ -70,3 +70,21 @@ export function SkeletonSmall(props: { id?: string; style?: ClassValue }) {
         </div>
     );
 }
+
+/**
+ * Placeholder when loading an Update block
+ */
+export function SkeletonUpdate(props: { id?: string; style?: ClassValue }) {
+    const { id, style } = props;
+    return (
+        <div
+            id={id}
+            role="status"
+            aria-busy
+            className={tcls('flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-12 xl:gap-20', style)}
+        >
+            <SkeletonSmall id={id} style={['w-48', style]} />
+            <LoadingPane tile={96} delay={0} style={['rounded-md', 'w-full']} />
+        </div>
+    );
+}
