@@ -61,7 +61,7 @@ export function OpenAPIRequiredScopes(props: {
 }
 
 export function OpenAPISchemaScopes(props: {
-    scopes: OpenAPISecurityScope[] | [string, string][];
+    scopes: OpenAPISecurityScope[];
     context: OpenAPIClientContext;
     isOAuth2?: boolean;
 }) {
