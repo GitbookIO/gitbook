@@ -134,7 +134,7 @@ export async function resolveContentRef(
             const page = resolvePageResult?.page;
             const ancestors =
                 resolvePageResult?.ancestors.map((ancestor) => ({
-                    label: ancestor.title,
+                    label: ancestor.linkTitle ?? ancestor.title,
                     icon:
                         ancestor.emoji || ancestor.icon ? (
                             <PageIcon
@@ -158,9 +158,9 @@ export async function resolveContentRef(
 
             // Compute the text to display for the link
             if (anchor) {
-                text = page.title;
+                text = page.linkTitle || page.title;
                 ancestors.push({
-                    label: page.title,
+                    label: page.linkTitle || page.title,
                     icon: <PageIcon page={page} style={iconStyle} />,
                     href,
                 });
@@ -182,7 +182,7 @@ export async function resolveContentRef(
                     parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
                         ? parentPage
                         : page;
-                text = pageOrGroup.title;
+                text = pageOrGroup.linkTitle ?? pageOrGroup.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
                 icon = <PageIcon page={pageOrGroup} style={iconStyle} />;
             }
