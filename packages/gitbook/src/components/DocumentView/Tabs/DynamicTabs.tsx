@@ -9,7 +9,7 @@ import React, {
     type ComponentPropsWithRef,
 } from 'react';
 
-import { useHash, useListOverflow } from '@/components/hooks';
+import { NavigationStatusContext, useListOverflow } from '@/components/hooks';
 import { DropdownMenu, DropdownMenuItem } from '@/components/primitives';
 import { useLanguage } from '@/intl/client';
 import { tString } from '@/intl/translate';
@@ -77,7 +77,7 @@ export function DynamicTabs(props: {
     const { id, tabs, className } = props;
     const router = useRouter();
 
-    const hash = useHash();
+    const { onNavigationClick, hash } = React.useContext(NavigationStatusContext);
     const [initialized, setInitialized] = useState(false);
     const [tabsState, setTabsState] = useTabsState();
     const activeState = useMemo(() => {
@@ -112,6 +112,7 @@ export function DynamicTabs(props: {
                 touchedRef.current = true;
                 const href = `#${tab.id}`;
                 if (window.location.hash !== href) {
+                    onNavigationClick(href);
                     router.replace(href, { scroll: false });
                 }
             }
@@ -167,7 +168,7 @@ export function DynamicTabs(props: {
     // Scroll to active element in the tab.
     React.useLayoutEffect(() => {
         // If there is no hash or active tab, nothing to scroll.
-        if (!hash || !active) {
+        if (!hash || hash !== '' || !active) {
             return;
         }
 
