@@ -342,7 +342,7 @@ async function resolvePageMetaLinks(
  * Determine whether to resolve meta links for a site based on a percentage rollout.
  */
 export function shouldResolveMetaLinks(siteId: string): boolean {
-    const META_LINKS_PERCENTAGE_ROLLOUT = 100;
+    const META_LINKS_PERCENTAGE_ROLLOUT = 10;
 
     // compute a simple hash of the siteId
     let hash = 0;
