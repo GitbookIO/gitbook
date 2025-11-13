@@ -167,7 +167,6 @@ export function DynamicTabs(props: {
 
     // Scroll to active element in the tab.
     React.useLayoutEffect(() => {
-        console.log('Scrolling to active element:', active, hash);
         // If there is no hash or active tab, nothing to scroll.
         if (!hash || hash !== '' || !active) {
             return;
