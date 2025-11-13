@@ -76,7 +76,7 @@ export function AIChat(props: { trademark: boolean }) {
                     : 'hidden lg:ml-0 lg:w-0! lg:opacity-0'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 circular-corners:rounded-3xl rounded-corners:rounded-md border border-tint-subtle depth-subtle:shadow-lg shadow-tint transition-all duration-300 lg:w-76 depth-flat:lg:rounded-none depth-flat:lg:border-y-0 depth-flat:lg:border-r-0 xl:w-92">
+            <EmbeddableFrame className="relative shrink-0 circular-corners:rounded-3xl rounded-corners:rounded-md border border-tint-subtle bg-radial-[circle_at_bottom] from-primary to-50% to-tint-base depth-subtle:shadow-lg shadow-tint transition-all duration-300 lg:w-76 depth-flat:lg:rounded-none depth-flat:lg:border-y-0 depth-flat:lg:border-r-0 xl:w-92">
                 <EmbeddableFrameHeader>
                     <AIChatDynamicIcon trademark={trademark} />
                     <EmbeddableFrameHeaderMain>
@@ -233,21 +233,21 @@ export function AIChatBody(props: {
             >
                 {isEmpty ? (
                     <div className="flex min-h-full w-full shrink-0 flex-col items-center justify-center gap-6 py-4">
-                        <div className="flex size-32 animate-fade-in-slow items-center justify-center rounded-full bg-tint-subtle">
+                        <div className="my-auto flex size-32 animate-fade-in-slow items-center justify-center rounded-full bg-primary-subtle">
                             <AIChatIcon
                                 state="intro"
                                 trademark={trademark}
-                                className="size-16 animate-[present_500ms_200ms_both]"
+                                className="size-16 animate-[present_500ms_200ms_both] text-primary"
                             />
                         </div>
-                        <div className="animate-[fadeIn_500ms_400ms_both]">
+                        {/* <div className="animate-[fadeIn_500ms_400ms_both]">
                             <h5 className=" text-center font-bold text-lg text-tint-strong">
                                 {timeGreeting}
                             </h5>
                             <p className="text-center text-tint">
                                 {t(language, 'ai_chat_assistant_description')}
                             </p>
-                        </div>
+                        </div> */}
                         {!chat.error ? (
                             <AIChatSuggestedQuestions
                                 chatController={chatController}
@@ -265,7 +265,7 @@ export function AIChatBody(props: {
             </div>
             <div
                 ref={inputRef}
-                className="absolute inset-x-0 bottom-0 mr-2 flex select-none flex-col gap-4 bg-linear-to-b from-transparent to-50% to-tint-base/9 p-4 pr-2"
+                className="absolute inset-x-0 bottom-0 mr-2 flex select-none flex-col gap-4 bg-linear-to-b from-transparent to-50% to-primary-subtle/9 p-4 pr-2"
             >
                 {/* Display an error banner when something went wrong. */}
                 {chat.error ? <AIChatError chatController={chatController} /> : null}

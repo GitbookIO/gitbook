@@ -17,7 +17,7 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
             <div
                 {...divProps}
                 className={tcls(
-                    'flex h-full grow flex-col overflow-hidden bg-tint-base text-sm text-tint',
+                    'flex h-full grow flex-col overflow-hidden text-sm text-tint',
                     divProps.className
                 )}
                 ref={ref}
@@ -34,7 +34,7 @@ export function EmbeddableFrameHeader(props: {
     const { children } = props;
 
     return (
-        <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
+        <div className="relative z-10 flex select-none items-center gap-2 bg-tint-base px-4 py-2 text-tint-strong after:absolute after:inset-x-0 after:top-full after:h-6 after:bg-linear-to-b after:from-tint-base after:to-transparent after:content-['']">
             {children}
         </div>
     );
