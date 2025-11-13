@@ -137,21 +137,36 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 
     const canonical = (
         pageMetaLinks?.canonical
-            ? new URL(pageMetaLinks.canonical).toString()
+            ? new URL(
+                  // If the canonical link is an absolute URL, use it as is.
+                  URL.canParse(pageMetaLinks.canonical)
+                      ? pageMetaLinks.canonical
+                      : linker.toAbsoluteURL(pageMetaLinks.canonical)
+              ).toString()
             : // If no canonical is set, use the current page URL (default case)
               linker.toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
     ).replace(/\/+$/, ''); // Trim trailing slashes in canonical URL to match the redirect behavior
 
-    const languages = pageMetaLinks?.alternates.reduce(
+    const alternates = pageMetaLinks?.alternates.reduce<{
+        languages: Record<string, string>;
+        generic: Array<{
+            title?: string;
+            url: string;
+        }>;
+    }>(
         (acc, alt) => {
-            // TODO: We can only add language alternates for now as that's all Next.js API supports
-            // generic alternates are not supported yet
             if (alt.language) {
-                acc[alt.language] = alt.href;
+                acc.languages[alt.language] = URL.canParse(alt.href)
+                    ? alt.href
+                    : linker.toAbsoluteURL(alt.href);
+            } else {
+                acc.generic.push({
+                    url: URL.canParse(alt.href) ? alt.href : linker.toAbsoluteURL(alt.href),
+                });
             }
             return acc;
         },
-        {} as Record<TranslationLanguage, string>
+        { languages: {}, generic: [] }
     );
 
     return {
@@ -166,9 +181,10 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         description: page.description ?? '',
         alternates: {
             canonical,
-            languages,
+            languages: alternates?.languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
+                ...(alternates?.generic ? { '': alternates?.generic } : {}),
             },
         },
         openGraph: {
@@ -326,7 +342,7 @@ async function resolvePageMetaLinks(
  * Determine whether to resolve meta links for a site based on a percentage rollout.
  */
 export function shouldResolveMetaLinks(siteId: string): boolean {
-    const META_LINKS_PERCENTAGE_ROLLOUT = 10;
+    const META_LINKS_PERCENTAGE_ROLLOUT = 100;
 
     // compute a simple hash of the siteId
     let hash = 0;
