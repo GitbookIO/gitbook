@@ -17,7 +17,7 @@
         "@gitbook/react-contentkit": "workspace:*",
         "@gitbook/react-math": "workspace:*",
         "@gitbook/react-openapi": "workspace:*",
-        "@modelcontextprotocol/sdk": "^1.17.5",
+        "@modelcontextprotocol/sdk": "1.17.5",
         "@opennextjs/aws": "^3.8.5",
         "@opennextjs/cloudflare": "^1.11.0",
         "@radix-ui/react-checkbox": "^1.0.4",
