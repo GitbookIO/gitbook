@@ -341,6 +341,13 @@ async function resolvePageMetaLinks(
  */
 function shouldResolveMetaLinks(siteId: string): boolean {
     const META_LINKS_PERCENTAGE_ROLLOUT = 25;
+    const ALLOWED_SITES: Record<string, boolean> = {
+        site_CZrtk: true,
+    };
+
+    if (ALLOWED_SITES[siteId]) {
+        return true;
+    }
 
     // compute a simple hash of the siteId
     let hash = 0;
