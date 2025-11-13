@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 
-import { useCurrentPageMetadata, useScrollPage } from '@/components/hooks';
+import { currentPageMetadataStore, useScrollPage } from '@/components/hooks';
 import type { PageMetaLinks } from './SitePage';
 
 /**
@@ -14,15 +14,14 @@ export function PageClientLayout({
 }: {
     pageMetaLinks: PageMetaLinks | null;
 }) {
-    const { setMetaLinks } = useCurrentPageMetadata();
-
     // We use this hook in the page layout to ensure the elements for the blocks
     // are rendered before we scroll to a hash or to the top of the page
     useScrollPage();
 
-    React.useEffect(() => {
-        setMetaLinks(pageMetaLinks);
-    }, [pageMetaLinks, setMetaLinks]);
+    // The page metadata such as meta links are generated on the server side,
+    // but need to be registered on the client side in other parts of the layout
+    // such as the SpaceDropdown.
+    useRegisterPageMetadata({ pageMetaLinks });
 
     useStripFallbackQueryParam();
     return null;
@@ -48,4 +47,16 @@ function useStripFallbackQueryParam() {
             router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
         }
     }, [router, pathname, searchParams]);
+}
+
+/**
+ * Register the generated page metadata such as meta links for the current page.
+ */
+function useRegisterPageMetadata(metadata: {
+    pageMetaLinks: PageMetaLinks | null;
+}) {
+    const { pageMetaLinks } = metadata;
+    React.useEffect(() => {
+        currentPageMetadataStore.setState({ metaLinks: pageMetaLinks });
+    }, [pageMetaLinks]);
 }

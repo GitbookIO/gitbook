@@ -4,7 +4,6 @@ import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
     SiteInsightsDisplayContext,
-    type Space,
     type TranslationLanguage,
 } from '@gitbook/api';
 import type { Metadata, Viewport } from 'next';
@@ -27,6 +26,11 @@ export type SitePageProps = {
     pageParams: PagePathParams;
 };
 
+type AlternateLinkSpace = {
+    id: string;
+    language: TranslationLanguage | undefined;
+};
+
 export type PageMetaLinks = {
     /**
      * The canonical URL for the page, if any.
@@ -40,7 +44,7 @@ export type PageMetaLinks = {
         /**
          * Space the alternate link points to, if any.
          */
-        space: Space | null;
+        space: AlternateLinkSpace | null;
     }>;
 };
 
@@ -313,7 +317,9 @@ async function resolvePageMetaLinks(
         const alternatesResolutions = (pageMetaLinks.alternates || []).map((link) =>
             resolveContentRef(link, context).then((resolved) => ({
                 href: resolved?.href ?? null,
-                space: resolved?.space ?? null,
+                space: resolved?.space
+                    ? { id: resolved.space.id, language: resolved.space.language }
+                    : null,
             }))
         );
 
@@ -325,7 +331,7 @@ async function resolvePageMetaLinks(
         return {
             canonical: resolvedCanonical ?? null,
             alternates: resolvedAlternates.filter(
-                (alt): alt is { href: string; space: Space | null } => !!alt.href
+                (alt): alt is { href: string; space: AlternateLinkSpace | null } => !!alt.href
             ),
         };
     }
@@ -345,7 +351,7 @@ function shouldResolveMetaLinks(siteId: string): boolean {
         site_CZrtk: true,
     };
 
-    if (ALLOWED_SITES[siteId]) {
+    if (ALLOWED_SITES[siteId] || process.env.NODE_ENV === 'development') {
         return true;
     }
 

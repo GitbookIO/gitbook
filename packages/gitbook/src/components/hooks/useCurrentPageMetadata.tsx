@@ -1,39 +1,23 @@
 'use client';
-import React from 'react';
 import type { PageMetaLinks } from '../SitePage';
 
-const CurrentPageMetadataContext = React.createContext<
-    | {
-          metaLinks: PageMetaLinks | null;
-          setMetaLinks: (links: PageMetaLinks | null) => void;
-      }
-    | undefined
->(undefined);
+import * as zustand from 'zustand';
 
 /**
- * Provide the client context about the currently viewed page metadata.
+ * A store for the current page metadata.
  */
-export function CurrentPageMetadataProvider(props: {
-    children: React.ReactNode;
-}) {
-    const [metaLinks, setMetaLinks] = React.useState<PageMetaLinks | null>(null);
-
-    const value = React.useMemo(() => ({ metaLinks, setMetaLinks }), [metaLinks]);
-
-    return (
-        <CurrentPageMetadataContext.Provider value={value}>
-            {props.children}
-        </CurrentPageMetadataContext.Provider>
-    );
-}
+export const currentPageMetadataStore = zustand.create<{
+    metaLinks: PageMetaLinks | null;
+}>(() => ({
+    metaLinks: null,
+}));
 
 /**
  * Return the metadata for the current page.
  */
 export function useCurrentPageMetadata() {
-    const context = React.useContext(CurrentPageMetadataContext);
-    if (!context) {
-        throw new Error('useCurrentPageMetadata must be used within a CurrentPageMetadataProvider');
-    }
-    return context;
+    const metaLinks = zustand.useStore(currentPageMetadataStore, (state) => state.metaLinks);
+    return {
+        metaLinks,
+    };
 }

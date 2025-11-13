@@ -22,7 +22,7 @@ import { SpacesDropdown, TranslationsDropdown } from '../Header/SpacesDropdown';
 import { InsightsProvider, VisitorSessionProvider } from '../Insights';
 import { SearchContainer } from '../Search';
 import { SiteSectionList, encodeClientSiteSections } from '../SiteSections';
-import { CurrentContentProvider, CurrentPageMetadataProvider } from '../hooks';
+import { CurrentContentProvider } from '../hooks';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { SpaceLayoutContextProvider } from './SpaceLayoutContext';
 import { categorizeVariants } from './categorizeVariants';
@@ -84,9 +84,7 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
                     >
                         <InsightsProvider enabled={withTracking} eventUrl={eventUrl.toString()}>
                             <AIChatProvider renderMessageOptions={aiChatRenderMessageOptions}>
-                                <CurrentPageMetadataProvider>
-                                    {children}
-                                </CurrentPageMetadataProvider>
+                                {children}
                             </AIChatProvider>
                         </InsightsProvider>
                     </VisitorSessionProvider>
