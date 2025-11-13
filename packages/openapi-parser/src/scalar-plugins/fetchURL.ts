@@ -20,6 +20,7 @@ export const fetchURL = (): Plugin => ({
             return {
                 ok: true,
                 data: normalize(text),
+                raw: text,
             };
         } catch {
             return { ok: false };
