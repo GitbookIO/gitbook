@@ -21,3 +21,15 @@ export function formatDateFull(date: Date): string {
         timeZone: 'UTC',
     }).format(date);
 }
+
+/**
+ * Format date as "Nov. 5 2025"
+ */
+export function formatDateShort(date: Date): string {
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC',
+    }).format(date);
+}
