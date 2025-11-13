@@ -2,13 +2,13 @@
 import React from 'react';
 import type { PageMetaLinks } from '../SitePage';
 
-const CurrentPageMetadataContext = React.createContext<{
-    metaLinks: PageMetaLinks | null;
-    setMetaLinks: (links: PageMetaLinks | null) => void;
-}>({
-    metaLinks: null,
-    setMetaLinks: () => {},
-});
+const CurrentPageMetadataContext = React.createContext<
+    | {
+          metaLinks: PageMetaLinks | null;
+          setMetaLinks: (links: PageMetaLinks | null) => void;
+      }
+    | undefined
+>(undefined);
 
 /**
  * Provide the client context about the currently viewed page metadata.
