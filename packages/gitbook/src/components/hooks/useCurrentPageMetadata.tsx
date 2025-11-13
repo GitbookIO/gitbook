@@ -11,7 +11,7 @@ const CurrentPageMetadataContext = React.createContext<{
 });
 
 /**
- * Provide the client context about the currently rendered space.
+ * Provide the client context about the currently viewed page metadata.
  */
 export function CurrentPageMetadataProvider(props: {
     children: React.ReactNode;
