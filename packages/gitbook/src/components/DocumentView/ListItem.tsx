@@ -32,8 +32,6 @@ export function ListItem(props: BlockProps<DocumentBlockListItem>) {
             ancestorBlocks={[...ancestorBlocks, block]}
             blockStyle={tcls(
                 'min-h-lh',
-                // flip heading hash icon if list item is a heading
-                'flip-heading-hash',
                 // remove margin-top for the first heading in a list
                 '[h2]:pt-0',
                 '[h3]:pt-0',

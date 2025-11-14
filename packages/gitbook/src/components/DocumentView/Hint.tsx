@@ -65,9 +65,9 @@ export function Hint({
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'w-full items-start py-4! pl-3 text-[1em] *:flex-none',
+                        'w-full items-start py-4! pl-3 text-[1em]! *:flex-none',
                         // Heading hash styles
-                        'flip-heading-hash pr-8',
+                        'flip-heading-hash pr-8 [&_.hash]:bg-transparent',
                         hintStyle.header
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}
