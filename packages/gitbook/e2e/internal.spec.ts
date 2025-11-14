@@ -338,6 +338,37 @@ const testCases: TestsCase[] = [
                     ).toBeVisible();
                 },
             },
+            {
+                name: 'Switch variant with alternate link in metadata',
+                url: 'rfcs',
+                run: async (page) => {
+                    const spaceDropdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
+
+                    // Click the variant space called 'Multi-Variants' for which
+                    // there is an alternate link in the current (RFC variant) page metadata
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
+                            name: 'Multi-Variants',
+                        })
+                        .click();
+
+                    // It should navigate to the alternate link defined in the metadata (a completely different page)
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('multi-variants/reference/api-reference/pets')
+                    );
+                    // Verify we are on the correct page by checking the h1
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Pets' })
+                    ).toBeVisible();
+                },
+            },
         ],
     },
     {

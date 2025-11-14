@@ -26,6 +26,28 @@ export type SitePageProps = {
     pageParams: PagePathParams;
 };
 
+type AlternateLinkSpace = {
+    id: string;
+    language: TranslationLanguage | undefined;
+};
+
+export type PageMetaLinks = {
+    /**
+     * The canonical URL for the page, if any.
+     */
+    canonical: string | null;
+    /**
+     * The alternate URLs for the page, if any.
+     */
+    alternates: Array<{
+        href: string;
+        /**
+         * Space the alternate link points to, if any.
+         */
+        space: AlternateLinkSpace | null;
+    }>;
+};
+
 /**
  * Fetch and render a page.
  */
@@ -39,6 +61,7 @@ export async function SitePage(props: SitePageProps) {
         withPageFeedback,
         withSections,
         withTopHeader,
+        pageMetaLinks,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
@@ -76,7 +99,7 @@ export async function SitePage(props: SitePageProps) {
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
                     />
                 </div>
-                <PageClientLayout />
+                <PageClientLayout pageMetaLinks={pageMetaLinks} />
             </div>
         </PageContextProvider>
     );
@@ -155,8 +178,8 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         }>;
     }>(
         (acc, alt) => {
-            if (alt.language) {
-                acc.languages[alt.language] = URL.canParse(alt.href)
+            if (alt.space?.language) {
+                acc.languages[alt.space.language] = URL.canParse(alt.href)
                     ? alt.href
                     : linker.toAbsoluteURL(alt.href);
             } else {
@@ -211,7 +234,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
  * Fetches all the data required to render the site page.
  */
 export async function getSitePageData(props: SitePageProps) {
-    const { context, pageTarget } = await getPageDataWithFallback({
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
     });
@@ -263,6 +286,7 @@ export async function getSitePageData(props: SitePageProps) {
         withPageFeedback,
         withFullPageCover,
         withTopHeader,
+        pageMetaLinks,
     };
 }
 
@@ -295,13 +319,7 @@ async function getPageDataWithFallback(args: {
 async function resolvePageMetaLinks(
     context: GitBookSiteContext,
     pageId: string
-): Promise<{
-    canonical: string | null;
-    alternates: Array<{
-        href: string;
-        language: TranslationLanguage | null;
-    }>;
-}> {
+): Promise<PageMetaLinks> {
     const pageMetaLinks = await getDataOrNull(
         context.dataFetcher.listRevisionPageMetaLinks({
             spaceId: context.space.id,
@@ -318,7 +336,9 @@ async function resolvePageMetaLinks(
         const alternatesResolutions = (pageMetaLinks.alternates || []).map((link) =>
             resolveContentRef(link, context).then((resolved) => ({
                 href: resolved?.href ?? null,
-                language: resolved?.space?.language ?? null,
+                space: resolved?.space
+                    ? { id: resolved.space.id, language: resolved.space.language }
+                    : null,
             }))
         );
 
@@ -330,7 +350,7 @@ async function resolvePageMetaLinks(
         return {
             canonical: resolvedCanonical ?? null,
             alternates: resolvedAlternates.filter(
-                (alt): alt is { href: string; language: TranslationLanguage | null } => !!alt.href
+                (alt): alt is { href: string; space: AlternateLinkSpace | null } => !!alt.href
             ),
         };
     }
@@ -344,8 +364,15 @@ async function resolvePageMetaLinks(
 /**
  * Determine whether to resolve meta links for a site based on a percentage rollout.
  */
-export function shouldResolveMetaLinks(siteId: string): boolean {
-    const META_LINKS_PERCENTAGE_ROLLOUT = 10;
+function shouldResolveMetaLinks(siteId: string): boolean {
+    const META_LINKS_PERCENTAGE_ROLLOUT = 25;
+    const ALLOWED_SITES: Record<string, boolean> = {
+        site_CZrtk: true,
+    };
+
+    if (ALLOWED_SITES[siteId] || process.env.NODE_ENV === 'development') {
+        return true;
+    }
 
     // compute a simple hash of the siteId
     let hash = 0;
