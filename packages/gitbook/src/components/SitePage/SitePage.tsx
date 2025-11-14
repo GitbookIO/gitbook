@@ -184,6 +184,9 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
             languages: alternates?.languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
+                // Currently it will output with an empty "type" like <link rel="alternate" href="..." type />
+                // Team at Vercel is aware of this and will ensure it will be omitted when the value is empty in future versions of Next.js
+                // https://gitbook.slack.com/archives/C04K6MV5W1K/p1763034072958419?thread_ts=1762937203.511629&cid=C04K6MV5W1K
                 ...(alternates?.generic ? { '': alternates?.generic } : {}),
             },
         },
