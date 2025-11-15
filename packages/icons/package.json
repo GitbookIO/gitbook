@@ -40,7 +40,7 @@
         "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist && rm -rf ./src/data",
         "unit": "bun test",
-        "publish-to-npm": "npm publish $(bun pm pack --quiet --dirname ./.publish) --no-workspaces"
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"

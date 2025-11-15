@@ -22,7 +22,7 @@
         "build": "tsdown",
         "typecheck": "tsc --noEmit",
         "dev": "bun run build -- --watch ./src",
-        "publish-to-npm": "npm publish $(bun pm pack --quiet --dirname ./.publish) --no-workspaces"
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
