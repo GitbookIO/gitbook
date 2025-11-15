@@ -8,9 +8,6 @@
 
 set -euo pipefail
 
-echo "Node auth token: ${NODE_AUTH_TOKEN:-not set}"
-echo "Npm config userconfig: ${NPM_CONFIG_USERCONFIG:-not set}"
-
 NAME=$(node -p "require('./package.json').name")
 VERSION=$(node -p "require('./package.json').version")
 
@@ -40,4 +37,4 @@ fi
 # Clean up the tarball
 trap 'rm -f "${TARBALL_PATH}"' EXIT
 
-npm publish "${TARBALL_PATH}" --no-workspaces --provenance --dry-run
+npm publish "${TARBALL_PATH}" --no-workspaces --provenance
