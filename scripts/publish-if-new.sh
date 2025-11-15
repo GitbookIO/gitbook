@@ -37,4 +37,4 @@ fi
 # Clean up the tarball
 trap 'rm -f "${TARBALL_PATH}"' EXIT
 
-npm publish "${TARBALL_PATH}" --no-workspaces --provenance --dry-run
+npm publish "${TARBALL_PATH}" --no-workspaces --provenance
