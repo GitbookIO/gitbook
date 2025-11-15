@@ -64,7 +64,7 @@ export function SearchContainer(props: SearchContainerProps) {
         siteSpaceIds,
     } = props;
 
-    const { assistants } = useAI();
+    const { assistants, config } = useAI();
 
     const [state, setSearchState] = useSearch();
     const searchAsk = useSearchAskState();
@@ -187,7 +187,8 @@ export function SearchContainer(props: SearchContainerProps) {
         siteSpaceId,
         siteSpaceIds,
         scope: state?.scope ?? 'default',
-        withAI: withAI,
+        withAI,
+        suggestions: config.suggestions,
     });
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 

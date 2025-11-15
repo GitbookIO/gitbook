@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import {
     type AIChatController,
     type AIChatState,
+    useAI,
     useAIChatController,
     useAIChatState,
 } from '../AI';
@@ -33,6 +34,9 @@ import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 export function AIChat(props: { trademark: boolean }) {
     const { trademark } = props;
 
+    const {
+        config: { suggestions },
+    } = useAI();
     const language = useLanguage();
     const chat = useAIChatState();
     const chatController = useAIChatController();
@@ -98,7 +102,12 @@ export function AIChat(props: { trademark: boolean }) {
                     </EmbeddableFrameButtons>
                 </EmbeddableFrameHeader>
                 <EmbeddableFrameBody>
-                    <AIChatBody chatController={chatController} chat={chat} trademark={trademark} />
+                    <AIChatBody
+                        chatController={chatController}
+                        chat={chat}
+                        trademark={trademark}
+                        suggestions={suggestions}
+                    />
                 </EmbeddableFrameBody>
             </EmbeddableFrame>
         </div>
