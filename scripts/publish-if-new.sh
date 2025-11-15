@@ -17,15 +17,19 @@ if [[ -z "${GITHUB_TOKEN:-}" ]]; then
     exit 1
 fi
 
+echo "Verifying GitHub token permissions..."
 # Use GitHub API to check permissions for the token.
 # The 'id-token' permission should be set to 'write'
 PERMS_JSON=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/rate_limit)
+echo "Rate limit: $PERMS_JSON"
 if [[ $? -ne 0 ]]; then
     echo "Failed to verify GITHUB_TOKEN."
     exit 1
 fi
 
 PERMS=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/user/permissions 2>/dev/null || true)
+
+echo "Permissions: $PERMS"
 
 if [[ -n "$PERMS" && "$PERMS" != "Not Found" ]]; then
     ID_TOKEN_PERMISSION=$(echo "$PERMS" | grep -o '"id-token":[^,}]*' | head -n1 | awk -F: '{gsub(/^[ \t"]+|[ \t"]+$/, "", $2); print $2}')
@@ -41,7 +45,6 @@ else
     # exit 1
 fi
 
-echo "Permissions: $PERMS"
 echo "GITHUB_TOKEN has id-token: write permission."
 exit 1
 
