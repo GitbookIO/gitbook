@@ -5,6 +5,10 @@ on:
         branches:
             - main
 
+permissions:
+    id-token: write
+    contents: read
+
 env:
     BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     
