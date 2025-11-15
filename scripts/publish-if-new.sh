@@ -41,7 +41,8 @@ else
     # exit 1
 fi
 
-
+echo "Permissions: $PERMS"
+echo "GITHUB_TOKEN has id-token: write permission."
 exit 1
 
 NAME=$(node -p "require('./package.json').name")
