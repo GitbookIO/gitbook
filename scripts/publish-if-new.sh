@@ -17,39 +17,6 @@ if [[ -z "${GITHUB_TOKEN:-}" ]]; then
     exit 1
 fi
 
-echo "Verifying GitHub token permissions..."
-# Use GitHub API to check permissions for the token.
-# The 'id-token' permission should be set to 'write'
-PERMS_JSON=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/rate_limit)
-echo "Rate limit: $PERMS_JSON"
-if [[ $? -ne 0 ]]; then
-    echo "Failed to verify GITHUB_TOKEN."
-    exit 1
-fi
-
-curl -sS -f -I -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com
-
-PERMS=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/user 2>/dev/null || true)
-
-echo "Permissions: $PERMS"
-
-if [[ -n "$PERMS" && "$PERMS" != "Not Found" ]]; then
-    ID_TOKEN_PERMISSION=$(echo "$PERMS" | grep -o '"id-token":[^,}]*' | head -n1 | awk -F: '{gsub(/^[ \t"]+|[ \t"]+$/, "", $2); print $2}')
-    if [[ "$ID_TOKEN_PERMISSION" == "write" ]]; then
-        echo "GITHUB_TOKEN has id-token: write permission."
-    else
-        echo "Warning: GITHUB_TOKEN does not have id-token: write permission! Found: $ID_TOKEN_PERMISSION"
-        exit 1
-    fi
-else
-    echo "Could not verify id-token permission via API (endpoint not found or insufficient scopes)."
-    # Not failing here as fallback, but you can uncomment the next line to enforce exit.
-    # exit 1
-fi
-
-echo "GITHUB_TOKEN has id-token: write permission."
-exit 1
-
 NAME=$(node -p "require('./package.json').name")
 VERSION=$(node -p "require('./package.json').version")
 
