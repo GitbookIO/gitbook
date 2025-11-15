@@ -30,7 +30,8 @@
         "build": "tsdown",
         "typecheck": "tsc --noEmit",
         "dev": "bun run build -- --watch ./src",
-        "clean": "rm -rf ./dist"
+        "clean": "rm -rf ./dist",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "bin": {
         "gitbook-math": "./bin/gitbook-math.js"

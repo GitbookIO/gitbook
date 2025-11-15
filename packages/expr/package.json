@@ -16,7 +16,7 @@
         "acorn-walk": "^8.3.4",
         "assert-never": "catalog:",
         "escodegen": "^2.1.0",
-        "eval-estree-expression": "github:jonschlinkert/eval-estree-expression#9cf28d2"
+        "eval-estree-expression": "github:jonschlinkert/eval-estree-expression#fb0246a"
     },
     "devDependencies": {
         "@tsconfig/strictest": "catalog:",
@@ -33,7 +33,8 @@
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
         "clean": "rm -rf ./dist",
-        "dev": "bun run build -- --watch ./src"
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {

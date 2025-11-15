@@ -53,10 +53,10 @@
             "cache": false,
             "dependsOn": ["generate", "^build"]
         },
-        // Script run when the package is deployed
-        "release": {
-            "dependsOn": ["^release", "build"],
-            "env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]
+        // Publish the package to npm
+        "publish-to-npm": {
+            "dependsOn": ["build"],
+            "cache": false
         },
         // Clean up the package
         "clean": {

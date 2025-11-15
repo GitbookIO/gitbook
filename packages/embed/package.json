@@ -34,7 +34,8 @@
         "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
         "clean": "rm -rf ./dist",
         "typecheck": "tsc --noEmit",
-        "dev": "bun run build -- --watch ./src"
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
