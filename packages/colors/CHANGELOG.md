@@ -1,5 +1,11 @@
 # @gitbook/colors
 
+## 0.4.3
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
 ## 0.4.2
 
 ### Patch Changes

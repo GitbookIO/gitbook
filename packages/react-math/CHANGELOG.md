@@ -1,5 +1,11 @@
 # @gitbook/react-math
 
+## 0.6.4
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
 ## 0.6.3
 
 ### Patch Changes

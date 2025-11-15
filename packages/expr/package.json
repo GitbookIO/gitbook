@@ -1,7 +1,7 @@
 {
     "name": "@gitbook/expr",
     "description": "Safely evaluate & parse user-defined GitBook expressions.",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "type": "module",
     "exports": {
         ".": {

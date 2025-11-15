@@ -1,5 +1,23 @@
 # @gitbook/react-openapi
 
+## 1.5.3
+
+### Patch Changes
+
+- b4a021a: Add heredoc support for cURL JSON body
+- a512c90: Re-arrange OpenAPI Scopes for OAuth2
+- df1966d: Bump Scalar
+- b45feaf: Disable OpenAPI "Try it" when no servers are defined
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- f9f8011: Add alt text support to card covers
+- 8ce7322: Add OpenAPI servers selection
+- 2c3066e: Improve OAuth2 scopes handling in OpenAPI
+- Updated dependencies [df1966d]
+- Updated dependencies [10995e0]
+- Updated dependencies [10995e0]
+  - @gitbook/openapi-parser@3.0.5
+  - @gitbook/expr@1.2.4
+
 ## 1.5.2
 
 ### Patch Changes
