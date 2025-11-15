@@ -8,9 +8,6 @@
 
 set -euo pipefail
 
-cat /home/runner/work/_temp/.npmrc
-cat ~/.npmrc
-
 echo "Node auth token: ${NODE_AUTH_TOKEN:-not set}"
 echo "Npm config userconfig: ${NPM_CONFIG_USERCONFIG:-not set}"
 
@@ -43,4 +40,4 @@ fi
 # Clean up the tarball
 trap 'rm -f "${TARBALL_PATH}"' EXIT
 
-npm publish "${TARBALL_PATH}" --no-workspaces --provenance
+npm publish "${TARBALL_PATH}" --no-workspaces --provenance --dry-run
