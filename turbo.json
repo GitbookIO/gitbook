@@ -56,7 +56,8 @@
         // Publish the package to npm
         "publish-to-npm": {
             "dependsOn": ["build"],
-            "cache": false
+            "cache": false,
+            "env": ["NODE_AUTH_TOKEN", "NPM_CONFIG_USERCONFIG"]
         },
         // Clean up the package
         "clean": {
