@@ -4,7 +4,6 @@ on:
     push:
         branches:
             - main
-            - test-publish
 
 permissions:
     id-token: write
@@ -47,6 +46,4 @@ jobs:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-            # - name: Publish to NPM
-            #   if: steps.changesets.outputs.hasChangesets == 'false'
-            #   run: bun run publish-all-packages
+
