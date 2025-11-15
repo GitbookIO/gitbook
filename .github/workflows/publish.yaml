@@ -36,7 +36,7 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
-            - name: Create Release Pull Request
+            - name: Create Release Pull Request or Publish to npm
               id: changesets
               uses: changesets/action@v1
               with:
