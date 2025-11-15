@@ -12,5 +12,4 @@ fi
 
 TARBALL=$(bun pm pack --quiet --dirname ./.publish)
 
-npm publish "${TARBALL}" --no-workspaces
-
+npm publish "${TARBALL}" --no-workspaces --provenance

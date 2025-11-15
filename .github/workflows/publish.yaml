@@ -25,6 +25,11 @@ jobs:
               with:
                   # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
                   fetch-depth: 0
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  registry-url: 'https://registry.npmjs.org'
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -41,4 +46,3 @@ jobs:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-
