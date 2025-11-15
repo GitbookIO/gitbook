@@ -27,6 +27,8 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+curl -sS -f -I -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com | grep -i x-oauth-scopes
+
 PERMS=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/user/permissions 2>/dev/null || true)
 
 echo "Permissions: $PERMS"
