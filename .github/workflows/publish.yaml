@@ -6,11 +6,6 @@ on:
             - main
             - test-publish-2
 
-permissions:
-    id-token: write
-    pull-requests: write
-    contents: write
-
 env:
     BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
     
@@ -20,6 +15,10 @@ jobs:
     publish:
         name: Publish
         runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            pull-requests: write
+            contents: write
         steps:
             - name: Checkout Repo
               uses: actions/checkout@v3
