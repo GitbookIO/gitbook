@@ -7,7 +7,8 @@ on:
 
 permissions:
     id-token: write
-    contents: read
+    pull-requests: write
+    contents: write
 
 env:
     BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
