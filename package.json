@@ -33,7 +33,7 @@
         "changeset": "changeset",
         "changeset-version": "changeset version && bun run format && bun update",
         "release": "turbo run release && bun run publish-all-packages",
-        "publish-all-packages": "for dir in packages/*; do (cd \"$dir\" && bun publish || true); done && changeset tag",
+        "publish-all-packages": "turbo run publish-to-npm",
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },

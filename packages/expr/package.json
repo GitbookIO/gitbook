@@ -33,7 +33,8 @@
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
         "clean": "rm -rf ./dist",
-        "dev": "bun run build -- --watch ./src"
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "npm publish $(bun pm pack --quiet --dirname ./.publish) --no-workspaces --provenance"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
