@@ -50,7 +50,3 @@ jobs:
             - name: Publish to NPM
               if: steps.changesets.outputs.hasChangesets == 'false'
               run: bun run publish-all-packages
-              env:
-                  GITHUB_TOKEN: ${{ github.token }}
-                  NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
-                  NPM_CONFIG_USERCONFIG: ${{ env.NPM_CONFIG_USERCONFIG }}

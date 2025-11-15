@@ -6,6 +6,7 @@
         "CI",
         "ARGOS_*",
         "GITHUB_*",
+        "ACTIONS_ID_TOKEN_*",
         "GITBOOK_*",
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"
     ],
