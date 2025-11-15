@@ -29,7 +29,7 @@ fi
 
 curl -sS -f -I -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com
 
-PERMS=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/user/permissions 2>/dev/null || true)
+PERMS=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/user 2>/dev/null || true)
 
 echo "Permissions: $PERMS"
 
