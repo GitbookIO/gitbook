@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - main
+            - test-publish
 
 permissions:
     id-token: write
@@ -30,8 +31,12 @@ jobs:
               with:
                   node-version: 22
                   registry-url: 'https://registry.npmjs.org'
+            - name: Log .npmrc after node setup
+              run: cat .npmrc
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
+            - name: Log .npmrc after bun setup
+              run: cat .npmrc
             - name: Install dependencies
               run: bun install --frozen-lockfile
               env:
