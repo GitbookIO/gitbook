@@ -36,14 +36,17 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
-            - name: Create Release Pull Request or Publish to npm
+            - name: Create Release Pull Request
               id: changesets
               uses: changesets/action@v1
               with:
-                  publish: bun run publish-all-packages
                   version: bun run changeset-version
               env:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
 
+            # We use a dedicated step to publish to npm because it needs the top level GITHUB_TOKEN and not the GH_PERSONAL_TOKEN one
+            - name: Publish to NPM
+              if: steps.changesets.outputs.hasChangesets == 'false'
+              run: bun run publish-all-packages
