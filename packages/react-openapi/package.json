@@ -51,7 +51,7 @@
         "unit": "bun test",
         "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist",
-        "publish-to-npm": "npm publish $(bun pm pack --quiet --dirname ./.publish) --no-workspaces --provenance"
+        "publish-to-npm": "npm publish $(bun pm pack --quiet --dirname ./.publish) --no-workspaces"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
