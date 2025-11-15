@@ -43,6 +43,8 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
+            - name: Log .npmrc after bun install
+              run: cat ${NPM_CONFIG_USERCONFIG}
             - name: Create Release Pull Request or Publish to npm
               id: changesets
               uses: changesets/action@v1
@@ -53,3 +55,4 @@ jobs:
                   # Using a PAT instead of GITHUB_TOKEN because we need to run workflows when releases are created
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
+                  NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
