@@ -8,8 +8,11 @@
 
 set -euo pipefail
 
-echo "Node auth token: ${NODE_AUTH_TOKEN}"
-echo "Npm config userconfig: ${NPM_CONFIG_USERCONFIG}"
+cat /home/runner/work/_temp/.npmrc
+cat ~/.npmrc
+
+echo "Node auth token: ${NODE_AUTH_TOKEN:-not set}"
+echo "Npm config userconfig: ${NPM_CONFIG_USERCONFIG:-not set}"
 
 NAME=$(node -p "require('./package.json').name")
 VERSION=$(node -p "require('./package.json').version")
