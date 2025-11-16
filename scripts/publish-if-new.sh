@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+npm whoami
+
 LOG_DIR="/home/runner/.npm/_logs"
 
 print_npm_logs() {
@@ -28,8 +30,6 @@ print_npm_logs() {
 
 # On any error, print npm logs if available
 trap 'print_npm_logs' ERR
-
-env
 
 echo "Node auth token: ${NODE_AUTH_TOKEN}"
 echo "NPM config userconfig: ${NPM_CONFIG_USERCONFIG}"
