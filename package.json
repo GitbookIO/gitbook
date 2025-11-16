@@ -32,7 +32,7 @@
         "e2e-customers": "turbo run e2e-customers",
         "changeset": "changeset",
         "changeset-version": "changeset version && bun run format && bun update",
-        "publish-all-packages": "turbo run publish-to-npm",
+        "publish-all-packages": "turbo run publish-to-npm --continue=dependencies-successful",
         "download:env": "op read op://gitbook-x-dev/gitbook-open/.env.local >> .env.local",
         "clean": "turbo run clean"
     },

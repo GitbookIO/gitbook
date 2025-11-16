@@ -8,9 +8,6 @@
 
 set -euo pipefail
 
-echo "Node auth token: ${NODE_AUTH_TOKEN}"
-echo "NPM config userconfig: ${NPM_CONFIG_USERCONFIG}"
-
 NAME=$(node -p "require('./package.json').name")
 VERSION=$(node -p "require('./package.json').version")
 
@@ -41,4 +38,4 @@ fi
 trap 'rm -f "${TARBALL_PATH}"' EXIT
 
 # Publish with verbose logging to aid debugging
-npm publish "${TARBALL_PATH}" --no-workspaces --provenance --loglevel=verbose
+npm publish "${TARBALL_PATH}" --no-workspaces --provenance

@@ -57,7 +57,7 @@
         "publish-to-npm": {
             "dependsOn": ["build"],
             "cache": false,
-            "env": ["NODE_AUTH_TOKEN", "NPM_CONFIG_USERCONFIG", "ACTIONS_ID_TOKEN_*"]
+            "env": ["NODE_AUTH_TOKEN", "NPM_*", "ACTIONS_ID_TOKEN_*", "SIGSTORE_*"]
         },
         // Clean up the package
         "clean": {
