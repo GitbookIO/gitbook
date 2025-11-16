@@ -10,12 +10,6 @@ set -euo pipefail
 
 echo "Node auth token: ${NODE_AUTH_TOKEN}"
 echo "NPM config userconfig: ${NPM_CONFIG_USERCONFIG}"
-echo "GitHub token: ${GITHUB_TOKEN}"
-
-if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-    echo "GITHUB_TOKEN is not set."
-    exit 1
-fi
 
 NAME=$(node -p "require('./package.json').name")
 VERSION=$(node -p "require('./package.json').version")
