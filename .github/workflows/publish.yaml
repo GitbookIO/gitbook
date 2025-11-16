@@ -49,4 +49,4 @@ jobs:
             # We use a dedicated step to publish to npm because it needs the top level GITHUB_TOKEN and not the GH_PERSONAL_TOKEN one
             - name: Publish to NPM
               if: steps.changesets.outputs.hasChangesets == 'false'
-              run: cd packages/expr && bun run publish-to-npm
+              run: cd packages/expr && npm run publish-to-npm
