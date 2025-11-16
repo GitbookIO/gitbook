@@ -38,4 +38,4 @@ fi
 trap 'rm -f "${TARBALL_PATH}"' EXIT
 
 # Publish with verbose logging to aid debugging
-npm publish "${TARBALL_PATH}" --no-workspaces --provenance --loglevel=verbose
+npm publish "${TARBALL_PATH}" --no-workspaces --provenance
