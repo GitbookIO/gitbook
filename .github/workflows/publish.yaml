@@ -46,6 +46,9 @@ jobs:
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
 
+            - name: Log environment variables
+              run: env
+
             # We use a dedicated step to publish to npm because it needs the top level GITHUB_TOKEN and not the GH_PERSONAL_TOKEN one
             - name: Publish to NPM
               if: steps.changesets.outputs.hasChangesets == 'false'
