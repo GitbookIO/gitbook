@@ -29,7 +29,10 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: 22
-                #   registry-url: 'https://registry.npmjs.org'
+                  registry-url: 'https://registry.npmjs.org'
+            # Ensure npm 11.5.1 or later is installed
+            - name: Update npm
+              run: npm install -g npm@latest
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -46,7 +49,9 @@ jobs:
                   # https://github.com/orgs/community/discussions/26875#discussioncomment-3253761
                   GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
 
+            - name: Log npm version
+              run: npm --version
             # We use a dedicated step to publish to npm because it needs the top level GITHUB_TOKEN and not the GH_PERSONAL_TOKEN one
             - name: Publish to NPM
               if: steps.changesets.outputs.hasChangesets == 'false'
-              run: cd packages/expr && npm run publish-to-npm
+              run: bun run publish-all-packages
