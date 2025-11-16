@@ -8,6 +8,27 @@
 
 set -euo pipefail
 
+LOG_DIR="/home/runner/.npm/_logs"
+
+print_npm_logs() {
+    if [[ -d "${LOG_DIR}" ]]; then
+        echo "===== Begin npm logs (${LOG_DIR}) ====="
+        for f in "${LOG_DIR}"/*; do
+            if [[ -f "${f}" ]]; then
+                echo "----- ${f} -----"
+                cat "${f}" || true
+                echo
+            fi
+        done
+        echo "===== End npm logs ====="
+    else
+        echo "No npm log directory found at ${LOG_DIR}"
+    fi
+}
+
+# On any error, print npm logs if available
+trap 'print_npm_logs' ERR
+
 env
 
 echo "Node auth token: ${NODE_AUTH_TOKEN}"
@@ -42,4 +63,5 @@ fi
 # Clean up the tarball
 trap 'rm -f "${TARBALL_PATH}"' EXIT
 
-npm publish "${TARBALL_PATH}" --no-workspaces --provenance
+# Publish with verbose logging to aid debugging
+npm publish "${TARBALL_PATH}" --no-workspaces --provenance --loglevel=verbose
