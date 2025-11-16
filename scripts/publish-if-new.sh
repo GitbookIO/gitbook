@@ -10,7 +10,6 @@ set -euo pipefail
 
 echo "Node auth token: ${NODE_AUTH_TOKEN}"
 echo "NPM config userconfig: ${NPM_CONFIG_USERCONFIG}"
-cat ${NPM_CONFIG_USERCONFIG}
 
 NAME=$(node -p "require('./package.json').name")
 VERSION=$(node -p "require('./package.json').version")
