@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - main
+            - test-publish-3
 
 env:
     BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
@@ -48,4 +49,4 @@ jobs:
             # We use a dedicated step to publish to npm because it needs the top level GITHUB_TOKEN and not the GH_PERSONAL_TOKEN one
             - name: Publish to NPM
               if: steps.changesets.outputs.hasChangesets == 'false'
-              run: bun run publish-all-packages
+              run: cd packages/expr && bun run publish-to-npm
