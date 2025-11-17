@@ -259,7 +259,7 @@ export async function fetchSiteContextByIds(
     };
 
     const sections = ids.siteSection
-        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection, ids.siteSpace)
+        ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
         : null;
 
     // Parse the current siteSpace and siteSpaces based on the site structure type.
@@ -274,9 +274,7 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            const visibleSiteSpaces = filterHiddenSiteSpaces(siteSpaces, ids.siteSpace);
-
-            return { siteSpaces: visibleSiteSpaces, siteSpace };
+            return { siteSpaces: filterHiddenSiteSpaces(siteSpaces), siteSpace };
         }
 
         if (siteStructure.type === 'sections') {
@@ -286,7 +284,6 @@ export async function fetchSiteContextByIds(
             );
 
             const currentSection = sections.current;
-            // hidden siteSpaces are already filtered in parseSiteSectionsAndGroups
             const siteSpaces = currentSection.siteSpaces;
             const siteSpace = currentSection.siteSpaces.find(
                 (siteSpace) => siteSpace.id === ids.siteSpace
@@ -298,7 +295,7 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            return { siteSpaces, siteSpace };
+            return { siteSpaces: filterHiddenSiteSpaces(siteSpaces), siteSpace };
         }
 
         // @ts-expect-error
@@ -432,56 +429,15 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
 /**
  * Filter out hidden site spaces from a list of site spaces.
  */
-function filterHiddenSiteSpaces(siteSpaces: SiteSpace[], currentSiteSpaceId?: string): SiteSpace[] {
-    return siteSpaces.filter(
-        (siteSpace) => !siteSpace.hidden || siteSpace.id === currentSiteSpaceId
-    );
+function filterHiddenSiteSpaces(siteSpaces: SiteSpace[]): SiteSpace[] {
+    return siteSpaces.filter((siteSpace) => !siteSpace.hidden);
 }
 
-/**
- * Filter out hidden site spaces from sections and groups recursively.
- */
-function filterHiddenSiteSpacesFromSections(
-    sections: (SiteSection | SiteSectionGroup)[],
-    currentSiteSpaceId?: string
-): (SiteSection | SiteSectionGroup)[] {
-    return sections.map((item) => {
-        if (item.object === 'site-section') {
-            return {
-                ...item,
-                siteSpaces: filterHiddenSiteSpaces(item.siteSpaces, currentSiteSpaceId),
-            };
-        }
-        if (item.object === 'site-section-group') {
-            return {
-                ...item,
-                children: filterHiddenSiteSpacesFromSections(item.children, currentSiteSpaceId),
-            };
-        }
-        return item;
-    });
-}
-
-function parseSiteSectionsAndGroups(
-    structure: SiteStructure,
-    siteSectionId: string,
-    currentSiteSpaceId?: string
-) {
+function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
     const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
-    const filteredSectionsAndGroups = filterHiddenSiteSpacesFromSections(
-        sectionsAndGroups,
-        currentSiteSpaceId
-    );
     const section = parseCurrentSection(structure, siteSectionId);
     assert(section, `couldn't find section "${siteSectionId}" in site structure`);
-    const filteredSection = {
-        ...section,
-        siteSpaces: filterHiddenSiteSpaces(section.siteSpaces, currentSiteSpaceId),
-    };
-    return {
-        list: filteredSectionsAndGroups,
-        current: filteredSection,
-    } satisfies SiteSections;
+    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
 }
 
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
