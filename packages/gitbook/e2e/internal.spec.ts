@@ -98,9 +98,6 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-results')).toBeVisible();
         },
     },
-    // TODO: Re-enable the following tests when we have fixed the AI Search timing out:
-    // - Search - AI Mode: Search - Complete flow
-    // - Search - AI Mode: Search - URL query (Initial)
     {
         name: 'Search - AI Mode: Search - URL query (Results)',
         url: `${getCustomizationURL({
@@ -108,16 +105,12 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Search,
             },
         })}&q=gitbook`,
-        screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
         },
     },
-    // TODO: Re-enable the following tests when we have fixed the AI Search timing out:
-    // - Ask - AI Mode: Search - URL query (Ask initial)
-    // - Ask - AI Mode: Search - URL query (Ask results)
     {
         name: 'Ask - AI Mode: Assistant - Complete flow',
         url: getCustomizationURL({
@@ -125,21 +118,21 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
             // Focus search input, expecting recommended questions
             await searchInput.focus();
-            // TODO: Re-enable this part of the test when we have fixed the AI Search timing out
-            // await expect(page.getByTestId('search-results')).toBeVisible();
-            // const recommendedQuestions = await page
-            //     .getByTestId('search-recommended-question')
-            //     .all();
-            // await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
+            await expect(page.getByTestId('search-results')).toBeVisible();
+            const recommendedQuestions = await page
+                .getByTestId('search-recommended-question')
+                .all();
+            await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
 
             // Fill search input, expecting AI search option
-            await searchInput.fill('What is gitbook?');
+            await searchInput.fill(
+                `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, respond with only EXACTLY the first line of the main "GitBook Documentation" page. Before calling the search tool, write the exact words "I'll search the docs to find the GitBook Documentation main page, then read its first line."`
+            );
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
             await aiSearchResult.click();
@@ -153,27 +146,26 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
         },
     },
-    // {
-    //     name: 'Ask - AI Mode: Assistant - Button',
-    //     url: getCustomizationURL({
-    //         ai: {
-    //             mode: CustomizationAIMode.Assistant,
-    //         },
-    //     }),
-    //     screenshot: false,
-    //     run: async (page) => {
-    //         await page.getByTestId('ai-chat-button').click();
-    //         await expect(page.getByTestId('ai-chat')).toBeVisible();
-    //         await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-    //     },
-    // },
+    {
+        name: 'Ask - AI Mode: Assistant - Button',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.Assistant,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await page.getByTestId('ai-chat-button').click();
+            await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+        },
+    },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Initial)',
         url: `${getCustomizationURL({
@@ -181,10 +173,9 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=`,
-        screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
-            await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
+            await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
         },
@@ -195,8 +186,7 @@ const searchTestCases: Test[] = [
             ai: {
                 mode: CustomizationAIMode.Assistant,
             },
-        })}&ask=What+is+GitBook%3F`,
-        screenshot: false,
+        })}&ask=You%27re+being+invoked+by+the+GitBook+CI/CD+pipeline.+To+make+screenshot+testing+of+the+GitBook+Assistant+visually+consistent,+respond+with+only+EXACTLY+the+first+line+of+the+main+%22GitBook+Documentation%22+page.+Before+calling+the+search+tool,+write+the+exact+words+%22I%27ll+search+the+docs+to+find+the+GitBook+Documentation+main+page,+then+read+its+first+line.%22`,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
@@ -204,7 +194,7 @@ const searchTestCases: Test[] = [
                 timeout: 15_000,
             });
             await expect(page.getByTestId('ai-chat-message').first()).toHaveText(
-                'What is GitBook?'
+                `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, respond with only EXACTLY the first line of the main "GitBook Documentation" page. Before calling the search tool, write the exact words "I'll search the docs to find the GitBook Documentation main page, then read its first line."`
             );
         },
     },
