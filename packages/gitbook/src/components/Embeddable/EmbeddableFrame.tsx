@@ -73,7 +73,7 @@ export function EmbeddableFrameSubtitle(props: {
     return (
         <div
             className={tcls(
-                'text-tint text-xs leading-none transition-all duration-500',
+                'origin-left text-tint text-xs leading-none transition-all duration-500',
                 className
             )}
         >
@@ -87,5 +87,5 @@ export function EmbeddableFrameButtons(props: {
 }) {
     const { children } = props;
 
-    return <div className="ml-auto flex gap-2">{children}</div>;
+    return <div className="-mr-2 ml-auto flex gap-2">{children}</div>;
 }

@@ -23,6 +23,7 @@ import {
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
 import { useTrackEvent } from '../Insights';
+import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { AIChatControlButton } from './AIChatControlButton';
@@ -76,7 +77,7 @@ export function AIChat() {
                     : 'hidden lg:ml-0 lg:w-0! lg:opacity-0'
             )}
         >
-            <EmbeddableFrame className="relative max-w-full shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-76 xl:w-92">
+            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
                 <EmbeddableFrameHeader>
                     <AIChatDynamicIcon trademark={config.trademark} />
                     <EmbeddableFrameHeaderMain>
@@ -145,10 +146,33 @@ export function AIChatSubtitle(props: {
     const language = useLanguage();
 
     return (
-        <EmbeddableFrameSubtitle className={chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0'}>
-            {chat.messages[chat.messages.length - 1]?.content
-                ? tString(language, 'ai_chat_working')
-                : tString(language, 'ai_chat_thinking')}
+        <EmbeddableFrameSubtitle
+            className={tcls('relative', chat.loading ? 'h-3 opacity-11' : 'h-0 opacity-0')}
+        >
+            <span
+                className={tcls(
+                    'absolute left-0',
+                    chat.loading
+                        ? chat.messages[chat.messages.length - 1]?.content
+                            ? 'animate-blur-in-slow'
+                            : 'hidden'
+                        : 'animate-blur-out-slow'
+                )}
+            >
+                {t(language, 'ai_chat_working')}
+            </span>
+            <span
+                className={tcls(
+                    'absolute left-0',
+                    chat.loading
+                        ? chat.messages[chat.messages.length - 1]?.content
+                            ? 'animate-blur-out-slow'
+                            : 'animate-blur-in-slow'
+                        : 'hidden'
+                )}
+            >
+                {t(language, 'ai_chat_thinking')}
+            </span>
         </EmbeddableFrameSubtitle>
     );
 }
@@ -166,8 +190,18 @@ export function AIChatBody(props: {
     const { trademark } = useAI().config;
 
     const [input, setInput] = React.useState('');
+    const language = useLanguage();
+    const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
     const isEmpty = !chat.messages.length;
+
+    const timeGreeting = React.useMemo(() => {
+        const hour = new Date(now).getHours();
+        if (hour < 6) return tString(language, 'ai_chat_assistant_greeting_night');
+        if (hour < 12) return tString(language, 'ai_chat_assistant_greeting_morning');
+        if (hour < 18) return tString(language, 'ai_chat_assistant_greeting_afternoon');
+        return tString(language, 'ai_chat_assistant_greeting_evening');
+    }, [now, language]);
 
     return (
         <>
@@ -179,13 +213,32 @@ export function AIChatBody(props: {
                 active={`message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
             >
                 {isEmpty ? (
-                    <div className="flex grow flex-col items-center gap-6">
-                        <div className="my-auto flex size-32 shrink-0 animate-[scaleIn_500ms_300ms_both] items-center justify-center rounded-full bg-primary-solid/1">
-                            <AIChatIcon
-                                state="intro"
-                                trademark={trademark}
-                                className="size-16 animate-[scaleIn_500ms_500ms_both] text-primary"
-                            />
+                    <div className="flex grow flex-col">
+                        <div className="my-auto flex flex-col items-center gap-4 py-4">
+                            <div
+                                className="flex size-32 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1"
+                                style={{ animationDelay: '.3s' }}
+                            >
+                                <AIChatIcon
+                                    state="intro"
+                                    trademark={trademark}
+                                    className="size-16 text-primary"
+                                />
+                            </div>
+                            <div className="flex min-w-full flex-col">
+                                <h5
+                                    className="animate-blur-in-slow text-center font-bold text-lg text-tint-strong"
+                                    style={{ animationDelay: '.5s' }}
+                                >
+                                    {timeGreeting}
+                                </h5>
+                                <p
+                                    className="animate-blur-in-slow text-center text-tint"
+                                    style={{ animationDelay: '.6s' }}
+                                >
+                                    {t(language, 'ai_chat_assistant_description')}
+                                </p>
+                            </div>
                         </div>
                         {!chat.error ? (
                             <AIChatSuggestedQuestions
