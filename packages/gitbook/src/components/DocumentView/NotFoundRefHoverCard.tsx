@@ -12,8 +12,10 @@ export function NotFoundRefHoverCard(
         children: React.ReactNode;
     }
 ) {
-    const { context, children } = props;
-    const { contentContext } = context;
+    const {
+        context: { contentContext },
+        children,
+    } = props;
     const language = contentContext ? getSpaceLanguage(contentContext) : languages.en;
     return (
         <HoverCardRoot>
