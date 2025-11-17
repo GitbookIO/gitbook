@@ -17,15 +17,15 @@ export default function AIChatSuggestedQuestions(props: {
     } = props;
 
     return (
-        <div className="flex flex-col items-center gap-2 self-start">
+        <div className="flex flex-col items-start gap-2 self-start">
             {suggestions.map((question, index) => (
                 <Button
                     key={question}
                     variant="blank"
-                    size="small"
-                    className="max-w-full animate-[present_500ms_both] whitespace-normal bg-primary px-2 py-1"
+                    size="medium"
+                    className="max-w-full animate-blur-in-slow border-none bg-primary-solid/1 px-3 py-1.5 hover:bg-primary-hover"
                     style={{
-                        animationDelay: `${500 + index * 100}ms`,
+                        animationDelay: `${1000 + index * 100}ms`,
                     }}
                     onClick={() => chatController.postMessage({ message: question })}
                 >

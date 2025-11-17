@@ -57,11 +57,13 @@ function preloadFont(fontData: FontData) {
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
+    /** The class name to apply to the body element. */
+    className?: string;
     forcedTheme?: CustomizationThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
-    const { context, forcedTheme, children } = props;
+    const { className, context, forcedTheme, children } = props;
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
@@ -177,7 +179,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className="site-background">
+            <body className={className}>
                 <IconsProvider
                     assetsURL={GITBOOK_ICONS_URL}
                     assetsURLToken={GITBOOK_ICONS_TOKEN}
