@@ -160,12 +160,12 @@ export function HoldMessage({
 function LoadingSkeleton() {
     return (
         <div className="flex flex-wrap gap-2">
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 7 }).map((_, index) => (
                 <div
                     key={index}
                     className="h-4 animate-[blurIn_500ms_ease-out_both,pulse_1.5s_infinite] circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-solid/2"
                     style={{
-                        width: `calc(${(index % 5) * 20 + 10}% - 4px)`,
+                        width: `calc(${(4 - (index % 4)) * 8 + 14}% - 4px)`,
                         animationDelay: `${index * 0.1}s`,
                     }}
                 />
