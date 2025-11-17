@@ -59,10 +59,11 @@ export const fetchURLs = (customConfiguration: {
                 }
                 const text = await response.text();
                 // Try to normalize the text to be sure it's a valid JSON or YAML.
-                await normalize(text);
+                const normalized = await normalize(text);
                 return {
                     ok: true,
-                    data: text,
+                    data: normalized,
+                    raw: text,
                 };
             } catch {
                 return { ok: false };

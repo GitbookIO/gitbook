@@ -26,6 +26,28 @@ export type SitePageProps = {
     pageParams: PagePathParams;
 };
 
+type AlternateLinkSpace = {
+    id: string;
+    language: TranslationLanguage | undefined;
+};
+
+export type PageMetaLinks = {
+    /**
+     * The canonical URL for the page, if any.
+     */
+    canonical: string | null;
+    /**
+     * The alternate URLs for the page, if any.
+     */
+    alternates: Array<{
+        href: string;
+        /**
+         * Space the alternate link points to, if any.
+         */
+        space: AlternateLinkSpace | null;
+    }>;
+};
+
 /**
  * Fetch and render a page.
  */
@@ -39,6 +61,7 @@ export async function SitePage(props: SitePageProps) {
         withPageFeedback,
         withSections,
         withTopHeader,
+        pageMetaLinks,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
 
@@ -76,7 +99,7 @@ export async function SitePage(props: SitePageProps) {
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
                     />
                 </div>
-                <PageClientLayout />
+                <PageClientLayout pageMetaLinks={pageMetaLinks} />
             </div>
         </PageContextProvider>
     );
@@ -137,21 +160,36 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
 
     const canonical = (
         pageMetaLinks?.canonical
-            ? new URL(pageMetaLinks.canonical).toString()
+            ? new URL(
+                  // If the canonical link is an absolute URL, use it as is.
+                  URL.canParse(pageMetaLinks.canonical)
+                      ? pageMetaLinks.canonical
+                      : linker.toAbsoluteURL(pageMetaLinks.canonical)
+              ).toString()
             : // If no canonical is set, use the current page URL (default case)
               linker.toAbsoluteURL(linker.toPathForPage({ pages: revision.pages, page }))
     ).replace(/\/+$/, ''); // Trim trailing slashes in canonical URL to match the redirect behavior
 
-    const languages = pageMetaLinks?.alternates.reduce(
+    const alternates = pageMetaLinks?.alternates.reduce<{
+        languages: Record<string, string>;
+        generic: Array<{
+            title?: string;
+            url: string;
+        }>;
+    }>(
         (acc, alt) => {
-            // TODO: We can only add language alternates for now as that's all Next.js API supports
-            // generic alternates are not supported yet
-            if (alt.language) {
-                acc[alt.language] = alt.href;
+            if (alt.space?.language) {
+                acc.languages[alt.space.language] = URL.canParse(alt.href)
+                    ? alt.href
+                    : linker.toAbsoluteURL(alt.href);
+            } else {
+                acc.generic.push({
+                    url: URL.canParse(alt.href) ? alt.href : linker.toAbsoluteURL(alt.href),
+                });
             }
             return acc;
         },
-        {} as Record<TranslationLanguage, string>
+        { languages: {}, generic: [] }
     );
 
     return {
@@ -166,9 +204,13 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
         description: page.description ?? '',
         alternates: {
             canonical,
-            languages,
+            languages: alternates?.languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
+                // Currently it will output with an empty "type" like <link rel="alternate" href="..." type />
+                // Team at Vercel is aware of this and will ensure it will be omitted when the value is empty in future versions of Next.js
+                // https://gitbook.slack.com/archives/C04K6MV5W1K/p1763034072958419?thread_ts=1762937203.511629&cid=C04K6MV5W1K
+                ...(alternates?.generic ? { '': alternates?.generic } : {}),
             },
         },
         openGraph: {
@@ -192,7 +234,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
  * Fetches all the data required to render the site page.
  */
 export async function getSitePageData(props: SitePageProps) {
-    const { context, pageTarget } = await getPageDataWithFallback({
+    const { context, pageTarget, pageMetaLinks } = await getPageDataWithFallback({
         context: props.context,
         pagePathParams: props.pageParams,
     });
@@ -244,6 +286,7 @@ export async function getSitePageData(props: SitePageProps) {
         withPageFeedback,
         withFullPageCover,
         withTopHeader,
+        pageMetaLinks,
     };
 }
 
@@ -276,13 +319,7 @@ async function getPageDataWithFallback(args: {
 async function resolvePageMetaLinks(
     context: GitBookSiteContext,
     pageId: string
-): Promise<{
-    canonical: string | null;
-    alternates: Array<{
-        href: string;
-        language: TranslationLanguage | null;
-    }>;
-}> {
+): Promise<PageMetaLinks> {
     const pageMetaLinks = await getDataOrNull(
         context.dataFetcher.listRevisionPageMetaLinks({
             spaceId: context.space.id,
@@ -299,7 +336,9 @@ async function resolvePageMetaLinks(
         const alternatesResolutions = (pageMetaLinks.alternates || []).map((link) =>
             resolveContentRef(link, context).then((resolved) => ({
                 href: resolved?.href ?? null,
-                language: resolved?.space?.language ?? null,
+                space: resolved?.space
+                    ? { id: resolved.space.id, language: resolved.space.language }
+                    : null,
             }))
         );
 
@@ -311,7 +350,7 @@ async function resolvePageMetaLinks(
         return {
             canonical: resolvedCanonical ?? null,
             alternates: resolvedAlternates.filter(
-                (alt): alt is { href: string; language: TranslationLanguage | null } => !!alt.href
+                (alt): alt is { href: string; space: AlternateLinkSpace | null } => !!alt.href
             ),
         };
     }
@@ -325,8 +364,15 @@ async function resolvePageMetaLinks(
 /**
  * Determine whether to resolve meta links for a site based on a percentage rollout.
  */
-export function shouldResolveMetaLinks(siteId: string): boolean {
-    const META_LINKS_PERCENTAGE_ROLLOUT = 10;
+function shouldResolveMetaLinks(siteId: string): boolean {
+    const META_LINKS_PERCENTAGE_ROLLOUT = 25;
+    const ALLOWED_SITES: Record<string, boolean> = {
+        site_CZrtk: true,
+    };
+
+    if (ALLOWED_SITES[siteId] || process.env.NODE_ENV === 'development') {
+        return true;
+    }
 
     // compute a simple hash of the siteId
     let hash = 0;

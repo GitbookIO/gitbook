@@ -1,5 +1,11 @@
 # @gitbook/cache-tags
 
+## 0.3.4
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
 ## 0.3.3
 
 ### Patch Changes

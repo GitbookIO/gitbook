@@ -276,13 +276,6 @@
         /* Don't apply antialiased to `code` and `pre` elements */
         @apply subpixel-antialiased;
     }
-
-    .flip-heading-hash {
-        @apply [h1,h2,h3,h4]:content-start;
-        @apply [h1,h2,h3,h4]:auto-cols-[auto_1fr];
-        @apply [&:is(h1,h2,h3,h4)>div:first-child]:[grid-area:1/2];
-        @apply [&:is(h1,h2,h3,h4)>div:first-child]:ml-1;
-    }
 }
 
 html {

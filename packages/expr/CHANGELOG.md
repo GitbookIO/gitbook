@@ -1,5 +1,12 @@
 # @gitbook/expr
 
+## 1.2.4
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- 10995e0: Use NPM dependency for eval-estree-expression
+
 ## 1.2.3
 
 ### Patch Changes
