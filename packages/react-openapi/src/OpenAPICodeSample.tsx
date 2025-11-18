@@ -315,11 +315,12 @@ function getSecurityHeaders(args: {
         switch (security.type) {
             case 'http': {
                 let scheme = security.scheme;
+                const defaultPlaceholderValue = scheme?.toLowerCase()?.includes('basic')
+                    ? 'username:password'
+                    : 'YOUR_SECRET_TOKEN';
                 const format = resolvePrefillCodePlaceholderFromSecurityScheme({
                     security: security,
-                    defaultPlaceholderValue: scheme?.includes('basic')
-                        ? 'username:password'
-                        : 'YOUR_SECRET_TOKEN',
+                    defaultPlaceholderValue,
                 });
 
                 if (scheme?.includes('bearer')) {
