@@ -589,12 +589,10 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname, routeType: 'static' };
     }
 
-    // If the pathname is an embedded page
-    const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
-    if (embedPage) {
-        return {
-            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1]!)}`,
-        };
+    // If the pathname is an embedded page, let the optional catch-all route [[...pagePath]] handle it
+    // This naturally supports both empty paths (~gitbook/embed/page) and paths with segments
+    if (pathname.match(/^~gitbook\/embed\/page(\/.*)?$/)) {
+        return { pathname };
     }
 
     switch (pathname) {

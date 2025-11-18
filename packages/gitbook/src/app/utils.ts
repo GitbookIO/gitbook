@@ -19,7 +19,7 @@ export type RouteLayoutParams = {
 };
 
 export type RouteParams = RouteLayoutParams & {
-    pagePath: string;
+    pagePath?: string[];
 };
 
 /**
@@ -80,8 +80,10 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
  * Get the decoded page path from the params.
  */
 export function getPagePathFromParams(params: RouteParams) {
-    const decoded = decodeURIComponent(params.pagePath);
-    return decoded;
+    if (!params.pagePath || params.pagePath.length === 0) {
+        return '';
+    }
+    return params.pagePath.map((part) => decodeURIComponent(part)).join('/');
 }
 
 function getSiteURLFromParams(params: RouteLayoutParams) {
