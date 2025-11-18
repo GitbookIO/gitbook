@@ -1,12 +1,17 @@
-import { type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
+import { type ContentRef, type DocumentInlineLink, SiteInsightsLinkPosition } from '@gitbook/api';
 
 import { getSpaceLanguage, tString } from '@/intl/server';
 import { type TranslationLanguage, languages } from '@/intl/translations';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import {
+    type ResolvedContentRef,
+    resolveContentRef,
+    resolveContentRefFallback,
+} from '@/lib/references';
 import { Icon } from '@gitbook/icons';
-import { HoverCard, HoverCardRoot, HoverCardTrigger, StyledLink } from '../../primitives';
+import { StyledLink } from '../../primitives';
 import type { InlineProps } from '../Inline';
 import { Inlines } from '../Inlines';
+import { NotFoundRefHoverCard } from '../NotFoundRefHoverCard';
 import { InlineLinkTooltip } from './InlineLinkTooltip';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
@@ -18,52 +23,75 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
               resolveAnchorText: false,
           })
         : null;
+
     const { contentContext } = context;
 
-    const language = contentContext ? getSpaceLanguage(contentContext) : languages.en;
+    const inlinesElement = (
+        <Inlines
+            context={context}
+            document={document}
+            nodes={inline.nodes}
+            ancestorInlines={[...ancestorInlines, inline]}
+        />
+    );
 
-    if (!contentContext || !resolved) {
+    if (!resolved) {
+        const fallback = resolveContentRefFallback(inline.data.ref);
         return (
-            <HoverCardRoot>
-                <HoverCardTrigger>
-                    <span className="cursor-not-allowed underline">
-                        <Inlines
-                            context={context}
-                            document={document}
-                            nodes={inline.nodes}
-                            ancestorInlines={[...ancestorInlines, inline]}
-                        />
-                    </span>
-                </HoverCardTrigger>
-                <HoverCard className="flex flex-col gap-1 p-4">
-                    <div className="flex items-center gap-2">
-                        <Icon icon="ban" className="size-4 text-tint-subtle" />
-                        <h5 className="font-semibold">{tString(language, 'notfound_title')}</h5>
-                    </div>
-                    <p className="text-sm text-tint">{tString(language, 'notfound_link')}</p>
-                </HoverCard>
-            </HoverCardRoot>
+            <NotFoundRefHoverCard context={context}>
+                {fallback ? (
+                    <InlineLinkAnchor href={fallback.href} contentRef={inline.data.ref} isExternal>
+                        {inlinesElement}
+                    </InlineLinkAnchor>
+                ) : (
+                    <span className="cursor-not-allowed underline">{inlinesElement}</span>
+                )}
+            </NotFoundRefHoverCard>
         );
     }
-    const isExternal = inline.data.ref.kind === 'url';
-    const isMailto = resolved.href.startsWith('mailto:');
-    const content = (
-        <StyledLink
+    const anchorElement = (
+        <InlineLinkAnchor
             href={resolved.href}
+            contentRef={inline.data.ref}
+            isExternal={inline.data.ref.kind === 'url'}
+        >
+            {inlinesElement}
+        </InlineLinkAnchor>
+    );
+
+    if (context.withLinkPreviews) {
+        const language = contentContext ? getSpaceLanguage(contentContext) : languages.en;
+
+        return (
+            <InlineLinkTooltipWrapper inline={inline} language={language} resolved={resolved}>
+                {anchorElement}
+            </InlineLinkTooltipWrapper>
+        );
+    }
+
+    return anchorElement;
+}
+
+function InlineLinkAnchor(props: {
+    href: string;
+    contentRef: ContentRef;
+    isExternal?: boolean;
+    children: React.ReactNode;
+}) {
+    const { href, isExternal, contentRef, children } = props;
+    const isMailto = href.startsWith('mailto:');
+    return (
+        <StyledLink
+            href={href}
             insights={{
                 type: 'link_click',
                 link: {
-                    target: inline.data.ref,
+                    target: contentRef,
                     position: SiteInsightsLinkPosition.Content,
                 },
             }}
         >
-            <Inlines
-                context={context}
-                document={document}
-                nodes={inline.nodes}
-                ancestorInlines={[...ancestorInlines, inline]}
-            />
+            {children}
             {isMailto ? (
                 <Icon
                     icon="envelope"
@@ -77,16 +105,6 @@ export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
             ) : null}
         </StyledLink>
     );
-
-    if (context.withLinkPreviews) {
-        return (
-            <InlineLinkTooltipWrapper inline={inline} language={language} resolved={resolved}>
-                {content}
-            </InlineLinkTooltipWrapper>
-        );
-    }
-
-    return content;
 }
 
 /**
