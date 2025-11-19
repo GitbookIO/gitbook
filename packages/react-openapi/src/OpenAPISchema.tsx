@@ -388,39 +388,44 @@ export function OpenAPISchemaPresentation(props: {
                 required={required}
                 context={context}
             />
-            {circularRefId ? <OpenAPISchemaCircularRef id={circularRefId} schema={schema} /> : null}
-            {typeof schema['x-deprecated-sunset'] === 'string' ? (
-                <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
-                    Sunset date:{' '}
-                    <span className="openapi-deprecated-sunset-date">
-                        {schema['x-deprecated-sunset']}
-                    </span>
-                </div>
-            ) : null}
-            {description ? (
-                <Markdown source={description} className="openapi-schema-description" />
-            ) : null}
-            {schema.default !== undefined ? (
-                <span className="openapi-schema-default">
-                    Default:{' '}
-                    <code>
-                        {typeof schema.default === 'string' && schema.default
-                            ? schema.default
-                            : stringifyOpenAPI(schema.default)}
-                    </code>
-                </span>
-            ) : null}
-            {typeof example === 'string' ? (
-                <span className="openapi-schema-example">
-                    Example: <code>{example}</code>
-                </span>
-            ) : null}
-            {schema.pattern ? (
-                <span className="openapi-schema-pattern">
-                    Pattern: <code>{schema.pattern}</code>
-                </span>
-            ) : null}
-            <OpenAPISchemaEnum schema={schema} context={context} />
+            {circularRefId ? (
+                <OpenAPISchemaCircularRef id={circularRefId} schema={schema} />
+            ) : (
+                <>
+                    {typeof schema['x-deprecated-sunset'] === 'string' ? (
+                        <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
+                            Sunset date:{' '}
+                            <span className="openapi-deprecated-sunset-date">
+                                {schema['x-deprecated-sunset']}
+                            </span>
+                        </div>
+                    ) : null}
+                    {description ? (
+                        <Markdown source={description} className="openapi-schema-description" />
+                    ) : null}
+                    {schema.default !== undefined ? (
+                        <span className="openapi-schema-default">
+                            Default:{' '}
+                            <code>
+                                {typeof schema.default === 'string' && schema.default
+                                    ? schema.default
+                                    : stringifyOpenAPI(schema.default)}
+                            </code>
+                        </span>
+                    ) : null}
+                    {typeof example === 'string' ? (
+                        <span className="openapi-schema-example">
+                            Example: <code>{example}</code>
+                        </span>
+                    ) : null}
+                    {schema.pattern ? (
+                        <span className="openapi-schema-pattern">
+                            Pattern: <code>{schema.pattern}</code>
+                        </span>
+                    ) : null}
+                    <OpenAPISchemaEnum schema={schema} context={context} />
+                </>
+            )}
         </div>
     );
 }
