@@ -182,7 +182,7 @@
 
 /* Schema Presentation */
 .openapi-schema-presentation {
-    @apply flex flex-col gap-1 font-normal;
+    @apply flex flex-col gap-1 font-normal scroll-mt-[calc(var(--toc-top-offset)+0.5rem)];
 }
 
 .openapi-schema-properties:last-child {
@@ -249,7 +249,7 @@
 }
 
 .openapi-schema-circular {
-    @apply text-xs text-tint;
+    @apply text-sm text-tint;
 }
 
 .openapi-schema-circular a {
@@ -257,7 +257,7 @@
 }
 
 .openapi-schema-circular-glyph {
-    @apply text-base;
+    @apply text-base mr-1;
 }
 
 /* Schema Enum */
