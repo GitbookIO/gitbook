@@ -290,7 +290,7 @@ function getCustomCodeSamples(props: {
     return customCodeSamples;
 }
 
-function getSecurityHeaders(args: {
+export function getSecurityHeaders(args: {
     securityRequirement: OpenAPIV3.OperationObject['security'];
     securities: OpenAPIOperationData['securities'];
 }): {
@@ -314,7 +314,7 @@ function getSecurityHeaders(args: {
     for (const security of selectedSecurity.schemes) {
         switch (security.type) {
             case 'http': {
-                let scheme = security.scheme;
+                const scheme = security.scheme;
                 const defaultPlaceholderValue = scheme?.toLowerCase()?.includes('basic')
                     ? 'username:password'
                     : 'YOUR_SECRET_TOKEN';
@@ -323,15 +323,21 @@ function getSecurityHeaders(args: {
                     defaultPlaceholderValue,
                 });
 
-                if (scheme?.includes('bearer')) {
-                    scheme = 'Bearer';
-                } else if (scheme?.includes('basic')) {
-                    scheme = 'Basic';
-                } else if (scheme?.includes('token')) {
-                    scheme = 'Token';
+                // Use x-prefix if provided, otherwise fall back to default logic
+                let prefix = security['x-prefix'];
+                if (!prefix) {
+                    if (scheme?.includes('bearer')) {
+                        prefix = 'Bearer';
+                    } else if (scheme?.includes('basic')) {
+                        prefix = 'Basic';
+                    } else if (scheme?.includes('token')) {
+                        prefix = 'Token';
+                    } else {
+                        prefix = scheme ?? '';
+                    }
                 }
 
-                headers.Authorization = `${scheme} ${format}`;
+                headers.Authorization = `${prefix} ${format}`;
                 break;
             }
             case 'apiKey': {
@@ -339,17 +345,23 @@ function getSecurityHeaders(args: {
                     break;
                 }
                 const name = security.name ?? 'Authorization';
-                headers[name] = resolvePrefillCodePlaceholderFromSecurityScheme({
+                const placeholder = resolvePrefillCodePlaceholderFromSecurityScheme({
                     security: security,
                     defaultPlaceholderValue: 'YOUR_API_KEY',
                 });
+                // Use x-prefix if provided for apiKey schemes
+                const prefix = security['x-prefix'];
+                headers[name] = prefix ? `${prefix} ${placeholder}` : placeholder;
                 break;
             }
             case 'oauth2': {
-                headers.Authorization = `Bearer ${resolvePrefillCodePlaceholderFromSecurityScheme({
-                    security: security,
-                    defaultPlaceholderValue: 'YOUR_OAUTH2_TOKEN',
-                })}`;
+                const prefix = security['x-prefix'] ?? 'Bearer';
+                headers.Authorization = `${prefix} ${resolvePrefillCodePlaceholderFromSecurityScheme(
+                    {
+                        security: security,
+                        defaultPlaceholderValue: 'YOUR_OAUTH2_TOKEN',
+                    }
+                )}`;
                 break;
             }
             default: {

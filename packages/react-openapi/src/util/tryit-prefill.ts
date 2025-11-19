@@ -177,6 +177,10 @@ export function resolvePrefillCodePlaceholderFromSecurityScheme(args: {
     const prefillExprParts = extractPrefillExpressionPartsFromSecurityScheme(security);
 
     if (prefillExprParts.length === 0) {
+        // If no x-gitbook-prefill, check for x-placeholder
+        if (security['x-placeholder']) {
+            return security['x-placeholder'];
+        }
         return defaultPlaceholderValue ?? '';
     }
     const prefillExpr = templatePartsToExpression(prefillExprParts);
