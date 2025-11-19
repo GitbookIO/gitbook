@@ -47,7 +47,13 @@ function OpenAPISchemaProperty(
     const circularRefId = parentCircularRefs.get(schema);
     // Avoid recursing infinitely, and instead render a link to the parent schema
     if (circularRefId) {
-        return <OpenAPISchemaCircularRef id={circularRefId} schema={schema} />;
+        return (
+            <OpenAPISchemaPresentation
+                context={context}
+                property={property}
+                circularRefId={circularRefId}
+            />
+        );
     }
 
     const circularRefs = new Map(parentCircularRefs);
@@ -99,15 +105,15 @@ function OpenAPISchemaProperty(
 
     if (properties?.length) {
         return (
-            <OpenAPIDisclosure
-                icon={context.icons.plus}
-                className={clsx('openapi-schema', className)}
-                header={header}
-                label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
-                {...rest}
-            >
-                {content}
-            </OpenAPIDisclosure>
+            <div id={id} className={clsx('openapi-schema', className)} {...rest}>
+                <OpenAPIDisclosure
+                    icon={context.icons.plus}
+                    header={header}
+                    label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+                >
+                    {content}
+                </OpenAPIDisclosure>
+            </div>
         );
     }
 
@@ -289,8 +295,8 @@ function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaO
 
     return (
         <div className="openapi-schema-circular">
+            <span className="openapi-schema-circular-glyph">⤷</span>
             Circular reference to <a href={`#${id}`}>{getSchemaTitle(schema)}</a>{' '}
-            <span className="openapi-schema-circular-glyph">↩</span>
         </div>
     );
 }
@@ -361,9 +367,11 @@ function OpenAPISchemaEnum(props: {
 export function OpenAPISchemaPresentation(props: {
     property: OpenAPISchemaPropertyEntry;
     context: OpenAPIClientContext;
+    circularRefId?: string;
 }) {
     const {
         property: { schema, propertyName, required, isDiscriminatorProperty },
+        circularRefId,
         context,
     } = props;
 
@@ -380,6 +388,7 @@ export function OpenAPISchemaPresentation(props: {
                 required={required}
                 context={context}
             />
+            {circularRefId ? <OpenAPISchemaCircularRef id={circularRefId} schema={schema} /> : null}
             {typeof schema['x-deprecated-sunset'] === 'string' ? (
                 <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
                     Sunset date:{' '}

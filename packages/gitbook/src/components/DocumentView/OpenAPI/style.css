@@ -173,7 +173,7 @@
 
 .openapi-schema,
 .openapi-disclosure {
-    @apply py-2.5 flex flex-col gap-2;
+    @apply py-2.5 flex flex-col gap-2 scroll-mt-(--toc-top-offset);
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -249,7 +249,7 @@
 }
 
 .openapi-schema-circular {
-    @apply text-xs text-tint;
+    @apply text-sm text-tint;
 }
 
 .openapi-schema-circular a {
@@ -257,7 +257,7 @@
 }
 
 .openapi-schema-circular-glyph {
-    @apply text-base;
+    @apply text-base mr-1;
 }
 
 /* Schema Enum */
