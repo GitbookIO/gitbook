@@ -61,6 +61,11 @@ export interface GitBookLinker {
     fork(override: { spaceBasePath: string }): GitBookLinker;
 
     /**
+     * Create a new linker that resolves links relative to a new space in the current site.
+     */
+    withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker;
+
+    /**
      * Site base path used to create this linker.
      */
     siteBasePath: string;
@@ -156,6 +161,25 @@ export function createLinker(
 
             return rawURL;
         },
+
+        withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {
+            const newLinker: GitBookLinker = {
+                ...linker,
+                toPathInSpace(relativePath: string): string {
+                    return linker.toPathInSite(joinPaths(override.spaceBasePath, relativePath));
+                },
+                // implementation matches the base linker toPathForPage, but decouples from using `this` to
+                // ensure we always use the updates `toPathInSpace` method.
+                toPathForPage({ pages, page, anchor }) {
+                    return (
+                        newLinker.toPathInSpace(getPagePath(pages, page)) +
+                        (anchor ? `#${anchor}` : '')
+                    );
+                },
+            };
+
+            return newLinker;
+        },
     };
 
     return linker;
@@ -202,35 +226,6 @@ export function linkerWithAbsoluteURLs(linker: GitBookLinker): GitBookLinker {
         toPathInSite: (path) => linker.toAbsoluteURL(linker.toPathInSite(path)),
         toPathForPage: (input) => linker.toAbsoluteURL(linker.toPathForPage(input)),
     };
-}
-
-/**
- * Create a new linker that resolves links relative to a new spaceBasePath in the current site.
- */
-export function linkerWithOtherSpaceBasePath(
-    linker: GitBookLinker,
-    {
-        spaceBasePath,
-    }: {
-        /**
-         * The base path of the space. It should be relative to the root of the site.
-         */
-        spaceBasePath: string;
-    }
-): GitBookLinker {
-    const newLinker: GitBookLinker = {
-        ...linker,
-        toPathInSpace(relativePath: string): string {
-            return linker.toPathInSite(joinPaths(spaceBasePath, relativePath));
-        },
-        // implementation matches the base linker toPathForPage, but decouples from using `this` to
-        // ensure we always use the updates `toPathInSpace` method.
-        toPathForPage({ pages, page, anchor }) {
-            return newLinker.toPathInSpace(getPagePath(pages, page)) + (anchor ? `#${anchor}` : '');
-        },
-    };
-
-    return newLinker;
 }
 
 function joinPaths(prefix: string, path: string): string {
