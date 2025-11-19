@@ -24,7 +24,7 @@ export function AIChatFollowupSuggestions(props: {
                             chatController.postMessage({ message: suggestion });
                         }}
                         label={suggestion}
-                        className="whitespace-normal! starting:h-0 max-w-full origin-left animate-blur-in-slow border-none bg-primary-11/1 px-3 py-1.5 starting:py-0 transition-all transition-discrete duration-500 hover:bg-primary-hover"
+                        className="starting:h-0 max-w-full origin-left animate-blur-in-slow whitespace-normal border-none bg-primary-11/1 px-3 py-1.5 starting:py-0 text-left transition-all transition-discrete duration-500 *:whitespace-normal hover:bg-primary-hover"
                         size="medium"
                         variant="blank"
                         style={{
