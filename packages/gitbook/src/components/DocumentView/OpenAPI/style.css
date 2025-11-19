@@ -173,7 +173,7 @@
 
 .openapi-schema,
 .openapi-disclosure {
-    @apply py-2.5 flex flex-col gap-2 scroll-mt-(--toc-top-offset);
+    @apply py-2.5 flex flex-col gap-2;
 }
 
 .openapi-schema-properties .openapi-schema:last-child {
@@ -182,7 +182,7 @@
 
 /* Schema Presentation */
 .openapi-schema-presentation {
-    @apply flex flex-col gap-1 font-normal;
+    @apply flex flex-col gap-1 font-normal scroll-mt-[calc(var(--toc-top-offset)+0.5rem)];
 }
 
 .openapi-schema-properties:last-child {

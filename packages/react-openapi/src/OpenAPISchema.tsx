@@ -64,7 +64,7 @@ function OpenAPISchemaProperty(
     const ancestors = new Set(circularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
 
-    const header = <OpenAPISchemaPresentation context={context} property={property} />;
+    const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
     const content = (() => {
         if (alternatives?.schemas) {
             const { schemas, discriminator } = alternatives;
@@ -105,15 +105,13 @@ function OpenAPISchemaProperty(
 
     if (properties?.length) {
         return (
-            <div id={id} className={clsx('openapi-schema', className)} {...rest}>
-                <OpenAPIDisclosure
-                    icon={context.icons.plus}
-                    header={header}
-                    label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
-                >
-                    {content}
-                </OpenAPIDisclosure>
-            </div>
+            <OpenAPIDisclosure
+                icon={context.icons.plus}
+                header={header}
+                label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
+            >
+                {content}
+            </OpenAPIDisclosure>
         );
     }
 
@@ -365,11 +363,13 @@ function OpenAPISchemaEnum(props: {
  * Render the top row of a schema. e.g: name, type, and required status.
  */
 export function OpenAPISchemaPresentation(props: {
+    id?: string;
     property: OpenAPISchemaPropertyEntry;
     context: OpenAPIClientContext;
     circularRefId?: string;
 }) {
     const {
+        id,
         property: { schema, propertyName, required, isDiscriminatorProperty },
         circularRefId,
         context,
@@ -379,7 +379,7 @@ export function OpenAPISchemaPresentation(props: {
     const example = resolveFirstExample(schema);
 
     return (
-        <div className="openapi-schema-presentation">
+        <div id={id} className="openapi-schema-presentation">
             <OpenAPISchemaName
                 schema={schema}
                 type={getSchemaTitle(schema)}
