@@ -210,11 +210,7 @@ export async function resolveContentRef(
                     : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
-                return {
-                    href: getGitBookAppHref(`/s/${contentRef.space}`),
-                    text: 'space',
-                    active: false,
-                };
+                return null;
             }
 
             return {
@@ -313,6 +309,22 @@ export async function resolveContentRef(
         default:
             assertNever(contentRef);
     }
+}
+
+/**
+ * Fallback to resolve a content ref.
+ * Called if we can't resolve the content ref to have a potential fallback to display to the
+ * user instead of not found.
+ */
+export function resolveContentRefFallback(contentRef: ContentRef): ResolvedContentRef | null {
+    if ('space' in contentRef && contentRef.space) {
+        return {
+            href: getGitBookAppHref(`/s/${contentRef.space}`),
+            text: 'space',
+            active: false,
+        };
+    }
+    return null;
 }
 
 /**

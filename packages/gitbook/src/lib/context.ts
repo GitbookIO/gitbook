@@ -274,7 +274,7 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            return { siteSpaces, siteSpace };
+            return { siteSpaces: filterHiddenSiteSpaces(siteSpaces), siteSpace };
         }
 
         if (siteStructure.type === 'sections') {
@@ -295,7 +295,7 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            return { siteSpaces, siteSpace };
+            return { siteSpaces: filterHiddenSiteSpaces(siteSpaces), siteSpace };
         }
 
         // @ts-expect-error
@@ -424,6 +424,13 @@ export function checkIsRootSiteContext(context: GitBookSiteContext): boolean {
             );
         }
     }
+}
+
+/**
+ * Filter out hidden site spaces from a list of site spaces.
+ */
+function filterHiddenSiteSpaces(siteSpaces: SiteSpace[]): SiteSpace[] {
+    return siteSpaces.filter((siteSpace) => !siteSpace.hidden);
 }
 
 function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
