@@ -206,7 +206,7 @@ export function AIChatBody(props: {
     return (
         <>
             <ScrollContainer
-                className="grow animate-fade-in-slow"
+                className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
                 contentClassName="p-4 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
                 fadeEdges={['leading']}
@@ -214,26 +214,26 @@ export function AIChatBody(props: {
             >
                 {isEmpty ? (
                     <div className="flex grow flex-col">
-                        <div className="my-auto flex flex-col items-center gap-4 py-4">
+                        <div className="my-auto flex flex-row items-center gap-4 pb-6 [@container(min-height:400px)]:flex-col">
                             <div
-                                className="flex size-32 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1"
+                                className="flex size-16 shrink-0 animate-scale-in items-center justify-center rounded-full bg-primary-solid/1 [@container(min-height:400px)]:size-32"
                                 style={{ animationDelay: '.3s' }}
                             >
                                 <AIChatIcon
                                     state="intro"
                                     trademark={trademark}
-                                    className="size-16 text-primary"
+                                    className="size-8 text-primary [@container(min-height:400px)]:size-16"
                                 />
                             </div>
-                            <div className="flex min-w-full flex-col">
+                            <div className="flex flex-col items-start [@container(min-height:400px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow text-center font-bold text-lg text-tint-strong"
+                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                 >
                                     {timeGreeting}
                                 </h5>
                                 <p
-                                    className="animate-blur-in-slow text-center text-tint"
+                                    className="animate-blur-in-slow text-tint [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
                                 >
                                     {t(language, 'ai_chat_assistant_description')}
