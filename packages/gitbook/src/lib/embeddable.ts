@@ -48,5 +48,12 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
 
             return linker.toPathInSpace(embedPagePath) + (anchor ? `#${anchor}` : '');
         },
+
+        withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {
+            return linker.withOtherSiteSpace({
+                // We make sure that links in the other site space will be shown in the embeddeable view.
+                spaceBasePath: joinPath(override.spaceBasePath, '~gitbook/embed/page'),
+            });
+        },
     };
 }
