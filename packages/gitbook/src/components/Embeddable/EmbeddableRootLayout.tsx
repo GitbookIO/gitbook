@@ -35,6 +35,7 @@ export async function EmbeddableRootLayout({
             >
                 <AIContextProvider
                     aiMode={CustomizationAIMode.Assistant}
+                    suggestions={context.customization.ai?.suggestions}
                     trademark={context.customization.trademark.enabled}
                 >
                     <SpaceLayoutServerContext

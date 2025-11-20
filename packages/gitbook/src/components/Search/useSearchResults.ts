@@ -36,8 +36,9 @@ export function useSearchResults(props: {
     siteSpaceIds: string[];
     scope: SearchScope;
     withAI: boolean;
+    suggestions?: string[];
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope } = props;
+    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions } = props;
 
     const trackEvent = useTrackEvent();
 
@@ -78,6 +79,22 @@ export function useSearchResults(props: {
             // This is a workaround to avoid that.
             const questions = new Set<string>();
             const recommendedQuestions: ResultType[] = [];
+
+            if (suggestions && suggestions.length > 0) {
+                suggestions.forEach((question) => {
+                    questions.add(question);
+                });
+                setResultsState({
+                    results: suggestions.map((question, index) => ({
+                        type: 'recommended-question',
+                        id: `recommended-question-${index}`,
+                        question,
+                    })),
+                    fetching: false,
+                    error: false,
+                });
+                return;
+            }
 
             const timeout = setTimeout(async () => {
                 if (cancelled) {
