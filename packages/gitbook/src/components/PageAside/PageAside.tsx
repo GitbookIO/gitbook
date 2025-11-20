@@ -169,7 +169,11 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
     const sections = await getDocumentSections(context, document);
 
-    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
+    return sections.length > 1 ? (
+        <div className="overflow-y-auto">
+            <ScrollSectionsList sections={sections} />
+        </div>
+    ) : null;
 }
 
 function PageAsideActions(props: {
