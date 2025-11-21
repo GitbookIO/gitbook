@@ -314,7 +314,8 @@ export function getSecurityHeaders(args: {
     for (const security of selectedSecurity.schemes) {
         switch (security.type) {
             case 'http': {
-                const scheme = security.scheme;
+                // We do not use x-gitbook-prefix for http schemes to avoid confusion with the standard.
+                let scheme = security.scheme;
                 const defaultPlaceholderValue = scheme?.toLowerCase()?.includes('basic')
                     ? 'username:password'
                     : 'YOUR_SECRET_TOKEN';
@@ -323,21 +324,17 @@ export function getSecurityHeaders(args: {
                     defaultPlaceholderValue,
                 });
 
-                // Use x-gitbook-prefix if provided, otherwise fall back to default logic
-                let prefix = security['x-gitbook-prefix'];
-                if (!prefix) {
-                    if (scheme?.includes('bearer')) {
-                        prefix = 'Bearer';
-                    } else if (scheme?.includes('basic')) {
-                        prefix = 'Basic';
-                    } else if (scheme?.includes('token')) {
-                        prefix = 'Token';
-                    } else {
-                        prefix = scheme ?? '';
-                    }
+                if (scheme?.includes('bearer')) {
+                    scheme = 'Bearer';
+                } else if (scheme?.includes('basic')) {
+                    scheme = 'Basic';
+                } else if (scheme?.includes('token')) {
+                    scheme = 'Token';
+                } else {
+                    scheme = scheme ?? '';
                 }
 
-                headers.Authorization = `${prefix} ${format}`;
+                headers.Authorization = `${scheme} ${format}`;
                 break;
             }
             case 'apiKey': {

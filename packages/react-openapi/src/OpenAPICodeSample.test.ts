@@ -49,4 +49,28 @@ describe('getSecurityHeaders', () => {
             Authorization: 'Token MY_CUSTOM_TOKEN',
         });
     });
+
+    it('should not use x-gitbook-prefix for http scheme', () => {
+        const securities: OpenAPIOperationData['securities'] = [
+            [
+                'customAuth',
+                {
+                    type: 'http',
+                    in: 'header',
+                    name: 'Authorization',
+                    scheme: 'bearer',
+                    'x-gitbook-prefix': 'Token',
+                },
+            ],
+        ];
+
+        const result = getSecurityHeaders({
+            securityRequirement: [{ customAuth: [] }],
+            securities,
+        });
+
+        expect(result).toEqual({
+            Authorization: 'Bearer YOUR_SECRET_TOKEN',
+        });
+    });
 });

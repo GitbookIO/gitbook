@@ -419,8 +419,8 @@ describe('resolvePrefillCodePlaceholderFromSecurityScheme (integration style)', 
     it('should prioritize x-gitbook-prefill over x-gitbook-token-placeholder when both are present', () => {
         const result = resolvePrefillCodePlaceholderFromSecurityScheme({
             security: {
-                type: 'http',
-                scheme: 'bearer',
+                type: 'apiKey',
+                in: 'header',
                 'x-gitbook-prefill': '{{ visitor.claims.apiToken }}',
                 'x-gitbook-token-placeholder': 'API_TOKEN_KEY',
             },
