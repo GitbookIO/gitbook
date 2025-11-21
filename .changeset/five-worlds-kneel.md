@@ -3,4 +3,4 @@
 '@gitbook/react-openapi': patch
 ---
 
-Add x-prefix and x-placeholder for OpenAPI security scheme
+Add x-gitbook-prefix and x-gitbook-token-placeholder for OpenAPI security scheme

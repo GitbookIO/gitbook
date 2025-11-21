@@ -76,13 +76,13 @@ export interface OpenAPICustomOperationProperties {
 export interface OpenAPICustomPrefillProperties {
     'x-gitbook-prefill'?: string;
     /**
-     * Placeholder to override the default one for the security scheme.
+     * Token placeholder used inside sample credentials (e.g., "Bearer ${token}").
      */
-    'x-placeholder'?: string;
+    'x-gitbook-token-placeholder'?: string;
     /**
      * Prefix to override the default one for the security scheme (e.g., "Bearer", "Basic", "Token").
      */
-    'x-prefix'?: string;
+    'x-gitbook-prefix'?: string;
 }
 
 export type OpenAPIStability = 'experimental' | 'alpha' | 'beta';

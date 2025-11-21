@@ -177,9 +177,9 @@ export function resolvePrefillCodePlaceholderFromSecurityScheme(args: {
     const prefillExprParts = extractPrefillExpressionPartsFromSecurityScheme(security);
 
     if (prefillExprParts.length === 0) {
-        // If no x-gitbook-prefill, check for x-placeholder
-        if (security['x-placeholder']) {
-            return security['x-placeholder'];
+        // If no x-gitbook-prefill, check for x-gitbook-token-placeholder
+        if (security['x-gitbook-token-placeholder']) {
+            return security['x-gitbook-token-placeholder'];
         }
         return defaultPlaceholderValue ?? '';
     }

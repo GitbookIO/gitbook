@@ -3,7 +3,7 @@ import { getSecurityHeaders } from './OpenAPICodeSample';
 import type { OpenAPIOperationData } from './types';
 
 describe('getSecurityHeaders', () => {
-    it('should handle custom HTTP scheme with x-prefix', () => {
+    it('should handle custom HTTP scheme with x-gitbook-prefix', () => {
         const securities: OpenAPIOperationData['securities'] = [
             [
                 'customScheme',
@@ -11,7 +11,7 @@ describe('getSecurityHeaders', () => {
                     type: 'apiKey',
                     in: 'header',
                     name: 'Authorization',
-                    'x-prefix': 'CustomScheme',
+                    'x-gitbook-prefix': 'CustomScheme',
                 },
             ],
         ];
@@ -26,7 +26,7 @@ describe('getSecurityHeaders', () => {
         });
     });
 
-    it('should use x-prefix with x-placeholder together', () => {
+    it('should use x-gitbook-prefix with x-gitbook-token-placeholder together', () => {
         const securities: OpenAPIOperationData['securities'] = [
             [
                 'customAuth',
@@ -34,8 +34,8 @@ describe('getSecurityHeaders', () => {
                     type: 'apiKey',
                     in: 'header',
                     name: 'Authorization',
-                    'x-prefix': 'Token',
-                    'x-placeholder': 'MY_CUSTOM_TOKEN',
+                    'x-gitbook-prefix': 'Token',
+                    'x-gitbook-token-placeholder': 'MY_CUSTOM_TOKEN',
                 },
             ],
         ];

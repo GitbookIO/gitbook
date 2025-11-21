@@ -323,8 +323,8 @@ export function getSecurityHeaders(args: {
                     defaultPlaceholderValue,
                 });
 
-                // Use x-prefix if provided, otherwise fall back to default logic
-                let prefix = security['x-prefix'];
+                // Use x-gitbook-prefix if provided, otherwise fall back to default logic
+                let prefix = security['x-gitbook-prefix'];
                 if (!prefix) {
                     if (scheme?.includes('bearer')) {
                         prefix = 'Bearer';
@@ -349,13 +349,13 @@ export function getSecurityHeaders(args: {
                     security: security,
                     defaultPlaceholderValue: 'YOUR_API_KEY',
                 });
-                // Use x-prefix if provided for apiKey schemes
-                const prefix = security['x-prefix'];
+                // Use x-gitbook-prefix if provided for apiKey schemes
+                const prefix = security['x-gitbook-prefix'];
                 headers[name] = prefix ? `${prefix} ${placeholder}` : placeholder;
                 break;
             }
             case 'oauth2': {
-                const prefix = security['x-prefix'] ?? 'Bearer';
+                const prefix = security['x-gitbook-prefix'] ?? 'Bearer';
                 headers.Authorization = `${prefix} ${resolvePrefillCodePlaceholderFromSecurityScheme(
                     {
                         security: security,
