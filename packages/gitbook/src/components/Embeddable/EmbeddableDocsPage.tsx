@@ -32,7 +32,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
     });
 
     return (
-        <EmbeddableFrame>
+        <EmbeddableFrame className="site-background">
             <EmbeddableFrameHeader>
                 <EmbeddableFrameHeaderMain>
                     <Button

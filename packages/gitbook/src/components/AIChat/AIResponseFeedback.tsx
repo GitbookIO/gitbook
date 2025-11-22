@@ -24,7 +24,9 @@ export function AIResponseFeedback(props: {
     };
 
     return (
-        <div className={tcls('flex h-fit items-center', className)}>
+        <div
+            className={tcls('flex h-fit animate-[heightIn_.5s_ease_both] items-center', className)}
+        >
             <Button
                 icon="thumbs-up"
                 iconOnly
@@ -35,7 +37,7 @@ export function AIResponseFeedback(props: {
                     rating !== null && rating !== 1 && 'px-0 text-[0rem] opacity-0'
                 )}
                 size="medium"
-                style={{ animationDuration: '.5s' }}
+                style={{ animationDelay: '.5s', animationDuration: '.5s' }}
                 onClick={() => handleRating(1)}
                 disabled={rating !== null}
                 active={rating === 1}
@@ -51,7 +53,7 @@ export function AIResponseFeedback(props: {
                     rating !== null && rating !== -1 && 'px-0 text-[0rem] opacity-0'
                 )}
                 size="medium"
-                style={{ animationDelay: '.2s', animationDuration: '.5s' }}
+                style={{ animationDelay: '.7s', animationDuration: '.5s' }}
                 onClick={() => handleRating(-1)}
                 disabled={rating !== null}
                 active={rating === -1}
@@ -59,8 +61,8 @@ export function AIResponseFeedback(props: {
             />
             {rating !== null ? (
                 <span
-                    className="ml-2 animate-fade-in-slow text-tint-subtle"
-                    style={{ animationDelay: '.3s' }}
+                    className="ml-2 animate-blur-in-slow text-tint-subtle"
+                    style={{ animationDelay: '.5s' }}
                 >
                     {t(language, 'was_this_helpful_thank_you')}
                 </span>

@@ -15,6 +15,7 @@ import { Button } from './Button';
 export type ScrollContainerProps = {
     children: React.ReactNode;
     className?: string;
+    contentClassName?: string;
 
     /** Optional class(es) to apply when there the container can be scrolled on the leading (left or top) edge */
     leadingEdgeScrollClassName?: string;
@@ -25,16 +26,21 @@ export type ScrollContainerProps = {
     /** The direction of the scroll container. */
     orientation: 'horizontal' | 'vertical';
 
-    /** The ID of the active item to scroll to. */
-    activeId?: string;
+    /** Whether to fade out the edges of the container. */
+    fadeEdges?: ('leading' | 'trailing')[];
+
+    /** The ID or ref of the active item to scroll to. */
+    active?: string | React.RefObject<HTMLElement | null>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function ScrollContainer(props: ScrollContainerProps) {
     const {
         children,
         className,
+        contentClassName,
         orientation,
-        activeId,
+        fadeEdges = ['leading', 'trailing'],
+        active,
         leadingEdgeScrollClassName,
         trailingEdgeScrollClassName,
         ...rest
@@ -52,6 +58,12 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!container) {
             return;
         }
+
+        setScrollSize(
+            orientation === 'horizontal'
+                ? container.scrollWidth - container.clientWidth - 1
+                : container.scrollHeight - container.clientHeight - 1
+        );
 
         setScrollPosition(
             orientation === 'horizontal' ? container.scrollLeft : container.scrollTop
@@ -86,15 +98,16 @@ export function ScrollContainer(props: ScrollContainerProps) {
         if (!container) {
             return;
         }
-        if (!activeId) {
+        if (!active) {
             return;
         }
-        const activeItem = document.getElementById(activeId);
+        const activeItem =
+            typeof active === 'string' ? document.getElementById(active) : active.current;
         if (!activeItem || !container.contains(activeItem)) {
             return;
         }
         scrollToElementInContainer(activeItem, container);
-    }, [activeId]);
+    }, [active]);
 
     const scrollFurther = () => {
         const container = containerRef.current;
@@ -137,17 +150,18 @@ export function ScrollContainer(props: ScrollContainerProps) {
                 className={tcls(
                     'flex shrink grow',
                     orientation === 'horizontal' ? 'no-scrollbar' : 'hide-scrollbar',
-                    orientation === 'horizontal' ? 'overflow-x-scroll' : 'overflow-y-auto',
-                    scrollPosition > 0
+                    orientation === 'horizontal' ? 'overflow-x-scroll' : 'flex-col overflow-y-auto',
+                    fadeEdges.includes('leading') && scrollPosition > 0
                         ? orientation === 'horizontal'
                             ? 'mask-l-from-[calc(100%-2rem)]'
                             : 'mask-t-from-[calc(100%-2rem)]'
                         : '',
-                    scrollPosition < scrollSize
+                    fadeEdges.includes('trailing') && scrollPosition < scrollSize
                         ? orientation === 'horizontal'
                             ? 'mask-r-from-[calc(100%-2rem)]'
                             : 'mask-b-from-[calc(100%-2rem)]'
-                        : ''
+                        : '',
+                    contentClassName
                 )}
                 ref={containerRef}
             >
@@ -159,13 +173,14 @@ export function ScrollContainer(props: ScrollContainerProps) {
                 icon={orientation === 'horizontal' ? 'chevron-left' : 'chevron-up'}
                 iconOnly
                 size="xsmall"
-                variant="header"
+                variant="secondary"
                 tabIndex={-1}
                 className={tcls(
+                    'bg-tint-base!',
                     orientation === 'horizontal'
                         ? '-translate-y-1/2! top-1/2 left-0 ml-2'
                         : '-translate-x-1/2! top-0 left-1/2 mt-2',
-                    'absolute not-pointer-none:block hidden scale-0 opacity-0 backdrop-blur-xl transition-[scale,opacity]',
+                    'absolute not-pointer-none:block hidden scale-0 opacity-0 transition-[scale,opacity]',
                     scrollPosition > 0
                         ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
                         : 'pointer-events-none'
@@ -177,13 +192,14 @@ export function ScrollContainer(props: ScrollContainerProps) {
                 icon={orientation === 'horizontal' ? 'chevron-right' : 'chevron-down'}
                 iconOnly
                 size="xsmall"
-                variant="header"
+                variant="secondary"
                 tabIndex={-1}
                 className={tcls(
+                    'bg-tint-base!',
                     orientation === 'horizontal'
                         ? '-translate-y-1/2! top-1/2 right-0 mr-2'
                         : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
-                    'absolute not-pointer-none:block hidden scale-0 backdrop-blur-xl transition-[scale,opacity]',
+                    'absolute not-pointer-none:block hidden scale-0 transition-[scale,opacity]',
                     scrollPosition < scrollSize
                         ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
                         : 'pointer-events-none'

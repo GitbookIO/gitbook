@@ -117,9 +117,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
-            {customization.ai?.mode === CustomizationAIMode.Assistant ? (
-                <AIChat trademark={customization.trademark.enabled} />
-            ) : null}
+            {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
 
             <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                 <div

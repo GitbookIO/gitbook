@@ -372,7 +372,7 @@ async function transformAnswer(
                         wrapBlocksInSuspense: false,
                         withLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
-                    style={['space-y-5']}
+                    style="space-y-5 *:origin-top-left *:animate-blur-in-slow"
                 />
             ) : null,
         followupQuestions: answer.followupQuestions,
