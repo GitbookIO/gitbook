@@ -108,7 +108,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.20.0",
+      "version": "0.20.1",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
         "@gitbook/api": "catalog:",
@@ -240,7 +240,7 @@
     },
     "packages/openapi-parser": {
       "name": "@gitbook/openapi-parser",
-      "version": "3.0.5",
+      "version": "3.0.6",
       "dependencies": {
         "@scalar/json-magic": "^0.8.1",
         "@scalar/openapi-parser": "^0.23.2",
@@ -299,7 +299,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.5.3",
+      "version": "1.5.4",
       "dependencies": {
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
