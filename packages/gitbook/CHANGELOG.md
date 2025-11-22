@@ -1,5 +1,18 @@
 # gitbook
 
+## 0.20.1
+
+### Patch Changes
+
+- c51076e: Fix links to other spaces and root page in embeddable view.
+- 04a4175: Remove hidden site spaces from navigation
+- 344842f: Improve OpenAPI circular references
+- Updated dependencies [461e15f]
+- Updated dependencies [3e40b4d]
+- Updated dependencies [344842f]
+  - @gitbook/openapi-parser@3.0.6
+  - @gitbook/react-openapi@1.5.4
+
 ## 0.20.0
 
 ### Minor Changes
