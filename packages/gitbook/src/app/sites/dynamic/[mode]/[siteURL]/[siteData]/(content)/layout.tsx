@@ -22,7 +22,11 @@ export default async function SiteDynamicLayout({
     const withTracking = shouldTrackEvents(await headers());
 
     return (
-        <CustomizationRootLayout forcedTheme={forcedTheme} context={context}>
+        <CustomizationRootLayout
+            className="site-background"
+            forcedTheme={forcedTheme}
+            context={context}
+        >
             <SiteLayout
                 context={context}
                 forcedTheme={forcedTheme}
