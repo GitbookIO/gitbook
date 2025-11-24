@@ -141,4 +141,5 @@ export const en = {
     hint_success: 'Success',
     download: 'Download',
     open: 'Open',
+    documentation: 'Documentation',
 };

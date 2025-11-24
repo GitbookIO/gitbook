@@ -598,6 +598,7 @@ function encodePathInSiteContent(rawPathname: string): {
     }
 
     switch (pathname) {
+        case '~gitbook/embed':
         case '~gitbook/embed/assistant':
         case '~gitbook/icon':
             return { pathname };

@@ -4,7 +4,6 @@ import { useAI, useAIChatController, useAIChatState } from '@/components/AI';
 import {
     AIChatBody,
     AIChatControlButton,
-    AIChatDynamicIcon,
     AIChatSubtitle,
     getAIChatName,
 } from '@/components/AIChat';
@@ -18,9 +17,15 @@ import {
     EmbeddableFrameButtons,
     EmbeddableFrameHeader,
     EmbeddableFrameHeaderMain,
+    EmbeddableFrameMain,
+    EmbeddableFrameSidebar,
     EmbeddableFrameTitle,
 } from './EmbeddableFrame';
-import { EmbeddableIframeButtons, useEmbeddableConfiguration } from './EmbeddableIframeAPI';
+import {
+    EmbeddableIframeButtons,
+    EmbeddableIframeTabs,
+    useEmbeddableConfiguration,
+} from './EmbeddableIframeAPI';
 
 /**
  * Embeddable AI chat window in an iframe.
@@ -48,26 +53,30 @@ export function EmbeddableAIChat() {
 
     return (
         <EmbeddableFrame>
-            <EmbeddableFrameHeader>
-                <AIChatDynamicIcon trademark={config.trademark} />
-                <EmbeddableFrameHeaderMain>
-                    <EmbeddableFrameTitle>
-                        {getAIChatName(language, config.trademark)}
-                    </EmbeddableFrameTitle>
-                    <AIChatSubtitle chat={chat} />
-                </EmbeddableFrameHeaderMain>
-                <EmbeddableFrameButtons>
-                    <AIChatControlButton />
-                    <EmbeddableIframeButtons />
-                </EmbeddableFrameButtons>
-            </EmbeddableFrameHeader>
-            <EmbeddableFrameBody>
-                <AIChatBody
-                    chatController={chatController}
-                    chat={chat}
-                    suggestions={configuration.suggestions}
-                />
-            </EmbeddableFrameBody>
+            <EmbeddableFrameSidebar>
+                <EmbeddableIframeTabs active="assistant" />
+                <EmbeddableIframeButtons />
+            </EmbeddableFrameSidebar>
+            <EmbeddableFrameMain>
+                <EmbeddableFrameHeader>
+                    <EmbeddableFrameHeaderMain>
+                        <EmbeddableFrameTitle>
+                            {getAIChatName(language, config.trademark)}
+                        </EmbeddableFrameTitle>
+                        <AIChatSubtitle chat={chat} />
+                    </EmbeddableFrameHeaderMain>
+                    <EmbeddableFrameButtons>
+                        <AIChatControlButton />
+                    </EmbeddableFrameButtons>
+                </EmbeddableFrameHeader>
+                <EmbeddableFrameBody>
+                    <AIChatBody
+                        chatController={chatController}
+                        chat={chat}
+                        suggestions={configuration.suggestions}
+                    />
+                </EmbeddableFrameBody>
+            </EmbeddableFrameMain>
         </EmbeddableFrame>
     );
 }

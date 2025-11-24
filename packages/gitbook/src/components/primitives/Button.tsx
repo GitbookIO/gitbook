@@ -7,7 +7,7 @@ import { type ClassValue, tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import { Link, type LinkInsightsProps } from './Link';
 import { useClassnames } from './StyleProvider';
-import { Tooltip } from './Tooltip';
+import { Tooltip, type TooltipProps } from './Tooltip';
 
 export type ButtonProps = {
     href?: string;
@@ -20,6 +20,7 @@ export type ButtonProps = {
     trailing?: React.ReactNode;
     children?: React.ReactNode;
     active?: boolean;
+    tooltipProps?: TooltipProps;
 } & LinkInsightsProps &
     React.HTMLAttributes<HTMLElement>;
 
@@ -112,6 +113,7 @@ export const Button = React.forwardRef<
             active,
             trailing,
             disabled,
+            tooltipProps,
             ...rest
         },
         ref
@@ -142,7 +144,10 @@ export const Button = React.forwardRef<
                             className={tcls('button-leading-icon size-[1em] shrink-0')}
                         />
                     ) : (
-                        icon
+                        React.cloneElement(
+                            icon as React.ReactElement<React.SVGProps<SVGSVGElement>>,
+                            { className: tcls('button-leading-icon size-[1em] shrink-0') }
+                        )
                     )
                 ) : null}
                 {iconOnly || (!children && !label) ? null : (
@@ -184,9 +189,13 @@ export const Button = React.forwardRef<
 
         return (children || iconOnly) && label ? (
             <Tooltip
-                rootProps={{ open: disabled === true ? false : undefined }}
+                rootProps={{
+                    open: disabled === true ? false : undefined,
+                    ...tooltipProps?.rootProps,
+                }}
                 label={label}
-                triggerProps={{ disabled }}
+                triggerProps={{ disabled, ...tooltipProps?.triggerProps }}
+                contentProps={{ ...tooltipProps?.contentProps }}
             >
                 {button}
             </Tooltip>
