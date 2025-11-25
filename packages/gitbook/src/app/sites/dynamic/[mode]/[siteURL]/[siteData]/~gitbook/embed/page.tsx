@@ -19,4 +19,3 @@ export default async function Page(props: PageProps) {
         redirect(`${baseURL}/page/`);
     }
 }
-
