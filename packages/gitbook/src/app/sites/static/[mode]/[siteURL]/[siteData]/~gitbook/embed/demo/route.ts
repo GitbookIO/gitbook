@@ -109,22 +109,6 @@ export async function GET(
     <script src="${context.linker.toAbsoluteURL(context.linker.toPathInSite('~gitbook/embed/script.js'))}"></script>
     <script>
     window.GitBook('configure', {
-        actions: [
-            {
-                icon: 'github',
-                label: 'GitHub',
-                onClick: () => {
-                    window.open('https://github.com', '_blank');
-                },
-            },
-            {
-                icon: 'life-ring',
-                label: 'Help',
-                onClick: () => {
-                    window.open('https://help.gitbook.com', '_blank');
-                },
-            },
-        ],
         suggestions: [
             'Help me get started',
             'What can I ask you?',
