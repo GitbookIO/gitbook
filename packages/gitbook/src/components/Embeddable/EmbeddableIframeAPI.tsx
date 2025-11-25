@@ -119,12 +119,13 @@ export function EmbeddableIframeButtons() {
                     key={action.label}
                     size="default"
                     variant="blank"
-                    icon={action.icon}
-                    label={action.label}
+                    icon={action?.icon ?? 'square-question'}
+                    label={action?.label}
                     iconOnly
                     className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
+                    disabled={!action.onClick}
                     onClick={() => {
-                        action.onClick();
+                        action.onClick?.();
                     }}
                     tooltipProps={{
                         contentProps: {
