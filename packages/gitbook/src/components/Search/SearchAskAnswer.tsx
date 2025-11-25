@@ -103,9 +103,7 @@ export function SearchAskAnswer(props: { query: string }) {
                 </React.Suspense>
             ) : null}
             {askState?.type === 'error' ? (
-                <div className={tcls('grow p-4 text-center')}>
-                    {t(language, 'search_ask_error')}
-                </div>
+                <div className="grow p-4 text-center">{t(language, 'search_ask_error')}</div>
             ) : null}
             {askState?.type === 'loading' ? loading : null}
         </div>

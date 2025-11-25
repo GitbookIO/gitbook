@@ -14,10 +14,10 @@ export function AIChatMessages(props: {
     const { chat, chatController } = props;
 
     // Group messages: user messages start a new group, all following messages until next user message belong to that group
-    const messageGroups: Array<
-        Array<{ message: (typeof chat.messages)[0]; originalIndex: number }>
-    > = [];
-    let currentGroup: Array<{ message: (typeof chat.messages)[0]; originalIndex: number }> = [];
+    type Message = (typeof chat.messages)[0];
+    type MessageGroup = { message: Message; originalIndex: number };
+    const messageGroups: Array<Array<MessageGroup>> = [];
+    let currentGroup: Array<MessageGroup> = [];
 
     chat.messages.forEach((message, index) => {
         if (message.role === AIMessageRole.User) {
