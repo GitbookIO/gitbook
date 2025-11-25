@@ -28,7 +28,7 @@ export function HoverCard(
         <RadixHoverCard.Portal>
             <RadixHoverCard.Content
                 side={props.side ?? 'top'}
-                className="z-40 w-screen max-w-md animate-present px-4 sm:w-auto"
+                className="z-40 w-screen max-w-md animate-scale-in px-4 data-[state='closed']:animate-scale-out sm:w-auto"
             >
                 <div
                     className={tcls(
