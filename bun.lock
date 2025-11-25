@@ -143,6 +143,7 @@
         "classnames": "catalog:",
         "direction": "^2.0.1",
         "event-iterator": "^2.0.0",
+        "feed": "^5.1.0",
         "image-size": "^2.0.2",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
@@ -2003,6 +2004,8 @@
 
     "fdir": ["fdir@6.5.0", "", { "peerDependencies": { "picomatch": "^3 || ^4" }, "optionalPeers": ["picomatch"] }, "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg=="],
 
+    "feed": ["feed@5.1.0", "", { "dependencies": { "xml-js": "^1.6.11" } }, "sha512-qGNhgYygnefSkAHHrNHqC7p3R8J0/xQDS/cYUud8er/qD9EFGWyCdUDfULHTJQN1d3H3WprzVwMc9MfB4J50Wg=="],
+
     "file-entry-cache": ["file-entry-cache@10.0.7", "", { "dependencies": { "flat-cache": "^6.1.7" } }, "sha512-txsf5fu3anp2ff3+gOJJzRImtrtm/oa9tYLN0iTuINZ++EyVR/nRrg2fKYwvG/pXDofcrvvb0scEbX3NyW/COw=="],
 
     "file-uri-to-path": ["file-uri-to-path@1.0.0", "", {}, "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw=="],
@@ -2739,6 +2742,8 @@
 
     "safer-buffer": ["safer-buffer@2.1.2", "", {}, "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg=="],
 
+    "sax": ["sax@1.4.3", "", {}, "sha512-yqYn1JhPczigF94DMS+shiDMjDowYO6y9+wB/4WgO0Y19jWYk0lQ4tuG5KI7kj4FTp1wxPj5IFfcrz/s1c3jjQ=="],
+
     "scheduler": ["scheduler@0.26.0", "", {}, "sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA=="],
 
     "secure-json-parse": ["secure-json-parse@2.7.0", "", {}, "sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw=="],
@@ -3026,6 +3031,8 @@
     "xdg-app-paths": ["xdg-app-paths@5.1.0", "", { "dependencies": { "xdg-portable": "^7.0.0" } }, "sha512-RAQ3WkPf4KTU1A8RtFx3gWywzVKe00tfOPFfl2NDGqbIFENQO4kqAJp7mhQjNj/33W5x5hiWWUdyfPq/5SU3QA=="],
 
     "xdg-portable": ["xdg-portable@7.3.0", "", { "dependencies": { "os-paths": "^4.0.1" } }, "sha512-sqMMuL1rc0FmMBOzCpd0yuy9trqF2yTTVe+E9ogwCSWQCdDEtQUwrZPT6AxqtsFGRNxycgncbP/xmOOSPw5ZUw=="],
+
+    "xml-js": ["xml-js@1.6.11", "", { "dependencies": { "sax": "^1.2.4" }, "bin": { "xml-js": "./bin/cli.js" } }, "sha512-7rVi2KMfwfWFl+GpPg6m80IVMWXLRjO+PxTq7V2CDhoGak0wzYzFgUY2m4XJ47OGdXd8eLE8EmwfAmdjw7lC1g=="],
 
     "xxhash-wasm": ["xxhash-wasm@1.1.0", "", {}, "sha512-147y/6YNh+tlp6nd/2pWq38i9h6mz/EuQ6njIrmW8D1BS5nCqs0P6DG+m6zTGnNz5I+uhZ0SHxBs9BsPrwcKDA=="],
 

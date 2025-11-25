@@ -15,7 +15,7 @@ import {
 import { isGitBookAssetsHostURL, isGitBookHostURL } from '@/lib/env';
 import { getImageResizingContextId } from '@/lib/images';
 import { MiddlewareHeaders } from '@/lib/middleware';
-import { removeLeadingSlash, removeTrailingSlash } from '@/lib/paths';
+import { removeLeadingSlash, removeTrailingSlash, withLeadingSlash } from '@/lib/paths';
 import {
     type ResponseCookies,
     getPathScopedCookieName,
@@ -172,10 +172,16 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
     //
     request.headers.delete('x-gitbook-disable-tracking');
 
+    // For feed requests, strip `/feed.xml` from the lookup URL so we're still targeting the actual page for content resolution.
+    const rssSuffixMatch = siteRequestURL.pathname.match(/^(.*)\/feed\.xml$/);
+    const siteRequestURLForLookup = rssSuffixMatch?.[1]
+        ? new URL(siteRequestURL.toString().replace(/feed\.xml$/, ''))
+        : siteRequestURL;
+
     const withAPIToken = async (apiToken: string | null) => {
         const siteURLData = await throwIfDataError(
             lookupPublishedContentByUrl({
-                url: siteRequestURL.toString(),
+                url: siteRequestURLForLookup.toString(),
                 visitorPayload: {
                     jwtToken: visitorToken?.token ?? undefined,
                     unsignedClaims,
@@ -359,10 +365,31 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set('origin', request.nextUrl.origin);
 
         const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
-        const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
-            siteURLData.pathname
+        const basePathNormalized = withLeadingSlash(
+            removeTrailingSlash(siteURLData.basePath || '')
         );
-        routeType = routeTypeFromPathname ?? routeType;
+        const lookupPathname = siteRequestURLForLookup.pathname;
+        let pagePathRelative =
+            siteURLData.pathname && siteURLData.pathname.length > 0
+                ? siteURLData.pathname
+                : lookupPathname;
+        if (lookupPathname.startsWith(basePathNormalized)) {
+            pagePathRelative = lookupPathname.slice(basePathNormalized.length) || '/';
+        }
+
+        let pathForEncoding = pagePathRelative;
+        let forcedRouteType: 'static' | undefined;
+
+        if (rssSuffixMatch) {
+            const normalizedPagePath =
+                pagePathRelative === '/' ? '%2F' : removeLeadingSlash(pagePathRelative);
+            pathForEncoding = `~gitbook/rss/${normalizedPagePath}`;
+            forcedRouteType = 'static';
+        }
+
+        const { pathname, routeType: routeTypeFromPathname } =
+            encodePathInSiteContent(pathForEncoding);
+        routeType = forcedRouteType ?? routeTypeFromPathname ?? routeType;
 
         const route = [
             'sites',
@@ -572,6 +599,17 @@ function encodePathInSiteContent(rawPathname: string): {
 
     if (pathname.match(/^~gitbook\/ogimage\/\S+$/)) {
         return { pathname };
+    }
+
+    // RSS feeds: either `/.../feed.xml` (external) or already `~gitbook/rss/...`.
+    const rssPath =
+        (!pathname.startsWith('~gitbook/') && pathname.match(/^(.*)\/feed\.xml$/)?.[1]) ||
+        pathname.match(/^~gitbook\/rss\/(.+)$/)?.[1];
+    if (rssPath !== undefined) {
+        return {
+            pathname: `~gitbook/rss/${encodeURIComponent(rssPath)}`,
+            routeType: 'static',
+        };
     }
 
     // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
