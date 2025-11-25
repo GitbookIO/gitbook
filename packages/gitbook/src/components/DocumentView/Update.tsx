@@ -35,7 +35,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
         short: formatDateShort(parsedDate),
     }[dateFormat];
 
-    const isSticky = parentUpdates.data.sticky;
+    const isSticky = true; // TODO: use parentUpdates.data.sticky once implemented
 
     return (
         <div
