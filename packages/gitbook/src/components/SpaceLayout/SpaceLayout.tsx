@@ -189,22 +189,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             }
                                             withSections={withSections}
                                             section={sections?.current}
-                                            spaceTitle={siteSpace.title}
-                                            siteSpaceId={siteSpace.id}
-                                            // If searching all variants of the current section
-                                            // (the "extended" scope), filter by language if the language
-                                            // is set for both the current and the target site space.
-                                            siteSpaceIds={siteSpaces.reduce((acc: string[], ss) => {
-                                                if (
-                                                    !siteSpace.space.language ||
-                                                    !ss.space.language ||
-                                                    ss.space.language === siteSpace.space.language
-                                                ) {
-                                                    acc.push(ss.id);
-                                                }
-
-                                                return acc;
-                                            }, [])}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={siteSpaces}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />

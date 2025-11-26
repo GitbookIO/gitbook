@@ -1,7 +1,7 @@
 'use client';
 
 import { t, useLanguage } from '@/intl/client';
-import { CustomizationSearchStyle, type SiteSection } from '@gitbook/api';
+import { CustomizationSearchStyle, type SiteSection, type SiteSpace } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -21,14 +21,11 @@ import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
 
 interface SearchContainerProps {
-    /** The current site space id. */
-    siteSpaceId: string;
+    /** The current site space. */
+    siteSpace: SiteSpace;
 
-    /** The title of the current space. */
-    spaceTitle: string;
-
-    /** The ids of all spaces in the current section. */
-    siteSpaceIds: string[];
+    /** All site spaces in the current section. */
+    siteSpaces: ReadonlyArray<SiteSpace>;
 
     /** Whether there are sections on the site. */
     withSections: boolean;
@@ -52,8 +49,9 @@ interface SearchContainerProps {
  */
 export function SearchContainer(props: SearchContainerProps) {
     const {
-        siteSpaceId,
-        spaceTitle,
+        siteSpace,
+        // siteSpaceId,
+        // spaceTitle,
         section,
         withVariants,
         withSiteVariants,
@@ -61,7 +59,8 @@ export function SearchContainer(props: SearchContainerProps) {
         style,
         className,
         viewport,
-        siteSpaceIds,
+        // siteSpaceIds,
+        siteSpaces,
     } = props;
 
     const { assistants } = useAI();
@@ -184,8 +183,20 @@ export function SearchContainer(props: SearchContainerProps) {
     const { results, fetching, error } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
-        siteSpaceId,
-        siteSpaceIds,
+        siteSpaceId: siteSpace.id,
+        // If searching all variants of the current section (the "extended" scope),
+        // filter by language if the language is set for both the current and the target site space.
+        siteSpaceIds: siteSpaces.reduce((acc: string[], ss) => {
+            if (
+                !siteSpace.space.language ||
+                !ss.space.language ||
+                ss.space.language === siteSpace.space.language
+            ) {
+                acc.push(ss.id);
+            }
+
+            return acc;
+        }, []),
         scope: state?.scope ?? 'default',
         withAI: withAI,
     });
@@ -233,7 +244,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                 <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
                                     <SearchScopeControl
                                         section={section}
-                                        spaceTitle={spaceTitle}
+                                        spaceTitle={siteSpace.title}
                                         withVariants={withVariants}
                                         withSiteVariants={withSiteVariants}
                                         withSections={withSections}
