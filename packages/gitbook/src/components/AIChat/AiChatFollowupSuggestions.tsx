@@ -19,6 +19,7 @@ export function AIChatFollowupSuggestions(props: {
             <div className="sticky bottom-0 mt-auto flex flex-col items-start gap-2">
                 {chat.followUpSuggestions.map((suggestion, index) => (
                     <Button
+                        data-testid="ai-chat-followup-suggestion"
                         key={index}
                         onClick={() => {
                             chatController.postMessage({ message: suggestion });

@@ -128,7 +128,7 @@ const searchTestCases: Test[] = [
             // Focus search input, expecting recommended questions
             await searchInput.focus();
             await expect(page.getByTestId('search-results')).toBeVisible({
-                timeout: 20_000,
+                timeout: 30_000,
             });
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
@@ -142,8 +142,9 @@ const searchTestCases: Test[] = [
             await aiSearchResult.click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
-            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible({
-                timeout: 30_000,
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
+            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
+                timeout: 60_000,
             });
         },
     },
@@ -198,10 +199,12 @@ const searchTestCases: Test[] = [
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
-            await expect(page.getByTestId('ai-chat')).toBeVisible({
-                timeout: 15_000,
-            });
+            await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
+            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
+                timeout: 60_000,
+            });
         },
     },
 ];
