@@ -47,22 +47,17 @@ interface SearchContainerProps {
 /**
  * Client component to render the search input and results.
  */
-export function SearchContainer(props: SearchContainerProps) {
-    const {
-        siteSpace,
-        // siteSpaceId,
-        // spaceTitle,
-        section,
-        withVariants,
-        withSiteVariants,
-        withSections,
-        style,
-        className,
-        viewport,
-        // siteSpaceIds,
-        siteSpaces,
-    } = props;
-
+export function SearchContainer({
+    siteSpace,
+    section,
+    withVariants,
+    withSiteVariants,
+    withSections,
+    style,
+    className,
+    viewport,
+    siteSpaces,
+}: SearchContainerProps) {
     const { assistants } = useAI();
 
     const [state, setSearchState] = useSearch();
@@ -325,8 +320,7 @@ export function SearchContainer(props: SearchContainerProps) {
  *  Screen reader announcement for search results.
  *  Without it there is no feedback for screen reader users when a search returns no results.
  */
-function LiveResultsAnnouncer(props: { count: number; showing: boolean }) {
-    const { count, showing } = props;
+function LiveResultsAnnouncer({ count, showing }: { count: number; showing: boolean }) {
     const language = useLanguage();
     return (
         <div className="sr-only" aria-live="assertive" role="alert" aria-relevant="all">
