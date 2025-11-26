@@ -52,7 +52,12 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                         </EmbeddableFrameHeaderMain>
                         <EmbeddableFrameButtons>
                             <EmbeddableDocsPageControlButtons
-                                href={context.linker.toPathInSite(page.path)}
+                                href={context.linker
+                                    .toPathForPage({
+                                        pages: context.revision.pages,
+                                        page,
+                                    })
+                                    .replace(/~gitbook\/embed\/page\/?/, '')}
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>
