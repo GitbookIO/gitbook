@@ -583,7 +583,7 @@ function encodePathInSiteContent(rawPathname: string): {
     const rssMatch = pathname.match(RSS_PATH_REGEX);
     if (rssMatch) {
         return {
-            pathname: `~gitbook/rss/${encodeURIComponent(rssMatch[2] ?? '')}`,
+            pathname: `~gitbook/rss/${encodePagePath(rssMatch[2])}`,
             routeType: 'static',
         };
     }
@@ -592,7 +592,7 @@ function encodePathInSiteContent(rawPathname: string): {
     if (pathname.match(MARKDOWN_PATH_REGEX)) {
         const pagePathWithoutMD = pathname.slice(0, -3);
         return {
-            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
             // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
             routeType: 'static',
         };
@@ -607,7 +607,7 @@ function encodePathInSiteContent(rawPathname: string): {
     const embedPage = pathname.match(EMBED_PAGE_PATH_REGEX);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1] || '/')}`,
+            pathname: `~gitbook/embed/page/${encodePagePath(embedPage[1])}`,
         };
     }
 
@@ -629,8 +629,12 @@ function encodePathInSiteContent(rawPathname: string): {
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };
         default:
-            return { pathname: encodeURIComponent(pathname || '/') };
+            return { pathname: encodePagePath(pathname) };
     }
+}
+
+function encodePagePath(path: string | undefined): string {
+    return encodeURIComponent(path || '/');
 }
 
 /**
