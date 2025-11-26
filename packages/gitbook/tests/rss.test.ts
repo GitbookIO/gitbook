@@ -9,7 +9,7 @@ it('should expose a RSS feed for a page with updates', async () => {
     );
     const feed = await parser.parseURL(feedURL);
 
-    expect(feed.title).toBe('Updates | Test GitBook Open');
+    expect(feed.title).toBe('Updates | E2E Tests GitBook Open');
     expect(feed.items.length).toBe(4);
 });
 
