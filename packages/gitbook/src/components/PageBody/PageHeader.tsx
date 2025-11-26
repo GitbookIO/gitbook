@@ -144,7 +144,7 @@ function getPageActionsURLs({
         html: context.linker.toAbsoluteURL(pagePath),
         // For the markdown URL, we use the page.path to ensure it works for the default page.
         markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
-        rss: withRSSFeed ? context.linker.toAbsoluteURL(joinPath(pagePath, 'feed.xml')) : undefined,
+        rss: withRSSFeed ? context.linker.toAbsoluteURL(joinPath(pagePath, 'rss.xml')) : undefined,
         editOnGit:
             context.customization.git.showEditLink && context.space.gitSync?.url && page.git
                 ? {

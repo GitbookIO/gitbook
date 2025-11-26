@@ -38,7 +38,7 @@ export async function servePageRSS(
     // Get page URL
     const pagePath = context.linker.toPathForPage({ pages: context.revision.pages, page });
     const pageURL = context.linker.toAbsoluteURL(pagePath);
-    const rssPath = joinPath(pagePath, 'feed.xml');
+    const rssPath = joinPath(pagePath, 'rss.xml');
     const rssURL = context.linker.toAbsoluteURL(rssPath);
     const docsURL = context.linker.toAbsoluteURL(context.linker.toPathInSite('/'));
 

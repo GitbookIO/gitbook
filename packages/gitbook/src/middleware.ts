@@ -560,7 +560,7 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     return null;
 }
 
-const RSS_PATH_REGEX = /^((\S+)\/)?feed\.xml$/;
+const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
 const MARKDOWN_PATH_REGEX = /\.md$/;
 const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
 const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
@@ -579,7 +579,7 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
-    // If the pathname is a RSS feed (/.../feed.xml), we rewrite it to ~gitbook/rss/:pathname
+    // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname
     const rssMatch = pathname.match(RSS_PATH_REGEX);
     if (rssMatch) {
         return {

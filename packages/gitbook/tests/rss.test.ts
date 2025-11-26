@@ -5,7 +5,7 @@ import { getContentTestURL } from './utils';
 it('should expose a RSS feed for a page with updates', async () => {
     const parser = new Parser();
     const feedURL = getContentTestURL(
-        'https://gitbook.gitbook.io/test-gitbook-open/blocks/updates/feed.xml'
+        'https://gitbook.gitbook.io/test-gitbook-open/blocks/updates/rss.xml'
     );
     const feed = await parser.parseURL(feedURL);
 
@@ -15,7 +15,7 @@ it('should expose a RSS feed for a page with updates', async () => {
 
 it('should not expose a RSS feed for a page without updates', async () => {
     const feedURL = getContentTestURL(
-        'https://gitbook.gitbook.io/test-gitbook-open/text-page/feed.xml'
+        'https://gitbook.gitbook.io/test-gitbook-open/text-page/rss.xml'
     );
     const response = await fetch(feedURL);
     expect(response.status).toBe(404);
