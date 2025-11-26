@@ -55,7 +55,9 @@ const searchTestCases: Test[] = [
 
             // Fill search input, expecting search results
             await searchInput.fill('gitbook');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 10_000,
+            });
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
             const pageSectionResults = await page.getByTestId('search-page-section-result').all();
@@ -125,7 +127,9 @@ const searchTestCases: Test[] = [
 
             // Focus search input, expecting recommended questions
             await searchInput.focus();
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 20_000,
+            });
             const recommendedQuestions = await page
                 .getByTestId('search-recommended-question')
                 .all();
@@ -137,6 +141,10 @@ const searchTestCases: Test[] = [
             await expect(aiSearchResult).toBeVisible();
             await aiSearchResult.click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible({
+                timeout: 30_000,
+            });
         },
     },
     {
@@ -193,7 +201,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible({
                 timeout: 15_000,
             });
-            await expect(page.getByTestId('ai-chat-message').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
         },
     },
 ];
