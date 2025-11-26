@@ -47,7 +47,13 @@ function OpenAPISchemaProperty(
     const circularRefId = parentCircularRefs.get(schema);
     // Avoid recursing infinitely, and instead render a link to the parent schema
     if (circularRefId) {
-        return <OpenAPISchemaCircularRef id={circularRefId} schema={schema} />;
+        return (
+            <OpenAPISchemaPresentation
+                context={context}
+                property={property}
+                circularRefId={circularRefId}
+            />
+        );
     }
 
     const circularRefs = new Map(parentCircularRefs);
@@ -58,7 +64,7 @@ function OpenAPISchemaProperty(
     const ancestors = new Set(circularRefs.keys());
     const alternatives = getSchemaAlternatives(schema, ancestors);
 
-    const header = <OpenAPISchemaPresentation context={context} property={property} />;
+    const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
     const content = (() => {
         if (alternatives?.schemas) {
             const { schemas, discriminator } = alternatives;
@@ -101,10 +107,8 @@ function OpenAPISchemaProperty(
         return (
             <OpenAPIDisclosure
                 icon={context.icons.plus}
-                className={clsx('openapi-schema', className)}
                 header={header}
                 label={(isExpanded) => getDisclosureLabel({ schema, isExpanded, context })}
-                {...rest}
             >
                 {content}
             </OpenAPIDisclosure>
@@ -289,8 +293,8 @@ function OpenAPISchemaCircularRef(props: { id: string; schema: OpenAPIV3.SchemaO
 
     return (
         <div className="openapi-schema-circular">
+            <span className="openapi-schema-circular-glyph">⤷</span>
             Circular reference to <a href={`#${id}`}>{getSchemaTitle(schema)}</a>{' '}
-            <span className="openapi-schema-circular-glyph">↩</span>
         </div>
     );
 }
@@ -359,11 +363,15 @@ function OpenAPISchemaEnum(props: {
  * Render the top row of a schema. e.g: name, type, and required status.
  */
 export function OpenAPISchemaPresentation(props: {
+    id?: string;
     property: OpenAPISchemaPropertyEntry;
     context: OpenAPIClientContext;
+    circularRefId?: string;
 }) {
     const {
+        id,
         property: { schema, propertyName, required, isDiscriminatorProperty },
+        circularRefId,
         context,
     } = props;
 
@@ -371,7 +379,7 @@ export function OpenAPISchemaPresentation(props: {
     const example = resolveFirstExample(schema);
 
     return (
-        <div className="openapi-schema-presentation">
+        <div id={id} className="openapi-schema-presentation">
             <OpenAPISchemaName
                 schema={schema}
                 type={getSchemaTitle(schema)}
@@ -380,38 +388,44 @@ export function OpenAPISchemaPresentation(props: {
                 required={required}
                 context={context}
             />
-            {typeof schema['x-deprecated-sunset'] === 'string' ? (
-                <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
-                    Sunset date:{' '}
-                    <span className="openapi-deprecated-sunset-date">
-                        {schema['x-deprecated-sunset']}
-                    </span>
-                </div>
-            ) : null}
-            {description ? (
-                <Markdown source={description} className="openapi-schema-description" />
-            ) : null}
-            {schema.default !== undefined ? (
-                <span className="openapi-schema-default">
-                    Default:{' '}
-                    <code>
-                        {typeof schema.default === 'string' && schema.default
-                            ? schema.default
-                            : stringifyOpenAPI(schema.default)}
-                    </code>
-                </span>
-            ) : null}
-            {typeof example === 'string' ? (
-                <span className="openapi-schema-example">
-                    Example: <code>{example}</code>
-                </span>
-            ) : null}
-            {schema.pattern ? (
-                <span className="openapi-schema-pattern">
-                    Pattern: <code>{schema.pattern}</code>
-                </span>
-            ) : null}
-            <OpenAPISchemaEnum schema={schema} context={context} />
+            {circularRefId ? (
+                <OpenAPISchemaCircularRef id={circularRefId} schema={schema} />
+            ) : (
+                <>
+                    {typeof schema['x-deprecated-sunset'] === 'string' ? (
+                        <div className="openapi-deprecated-sunset openapi-schema-description openapi-markdown">
+                            Sunset date:{' '}
+                            <span className="openapi-deprecated-sunset-date">
+                                {schema['x-deprecated-sunset']}
+                            </span>
+                        </div>
+                    ) : null}
+                    {description ? (
+                        <Markdown source={description} className="openapi-schema-description" />
+                    ) : null}
+                    {schema.default !== undefined ? (
+                        <span className="openapi-schema-default">
+                            Default:{' '}
+                            <code>
+                                {typeof schema.default === 'string' && schema.default
+                                    ? schema.default
+                                    : stringifyOpenAPI(schema.default)}
+                            </code>
+                        </span>
+                    ) : null}
+                    {typeof example === 'string' ? (
+                        <span className="openapi-schema-example">
+                            Example: <code>{example}</code>
+                        </span>
+                    ) : null}
+                    {schema.pattern ? (
+                        <span className="openapi-schema-pattern">
+                            Pattern: <code>{schema.pattern}</code>
+                        </span>
+                    ) : null}
+                    <OpenAPISchemaEnum schema={schema} context={context} />
+                </>
+            )}
         </div>
     );
 }

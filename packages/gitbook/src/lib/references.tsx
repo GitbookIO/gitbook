@@ -10,12 +10,7 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import {
-    type GitBookLinker,
-    createLinker,
-    linkerWithAbsoluteURLs,
-    linkerWithOtherSpaceBasePath,
-} from '@/lib/links';
+import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import type {
     ContentRef,
     RevisionFile,
@@ -210,11 +205,7 @@ export async function resolveContentRef(
                     : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
-                return {
-                    href: getGitBookAppHref(`/s/${contentRef.space}`),
-                    text: 'space',
-                    active: false,
-                };
+                return null;
             }
 
             return {
@@ -313,6 +304,22 @@ export async function resolveContentRef(
         default:
             assertNever(contentRef);
     }
+}
+
+/**
+ * Fallback to resolve a content ref.
+ * Called if we can't resolve the content ref to have a potential fallback to display to the
+ * user instead of not found.
+ */
+export function resolveContentRefFallback(contentRef: ContentRef): ResolvedContentRef | null {
+    if ('space' in contentRef && contentRef.space) {
+        return {
+            href: getGitBookAppHref(`/s/${contentRef.space}`),
+            text: 'space',
+            active: false,
+        };
+    }
+    return null;
 }
 
 /**
@@ -436,7 +443,7 @@ async function createContextForSpace(
 
     if (bestTargetSpace?.siteSpace && 'site' in context) {
         // If we found the space ID in the current site context, we can resolve links relative to it in the site.
-        linker = linkerWithOtherSpaceBasePath(context.linker, {
+        linker = context.linker.withOtherSiteSpace({
             spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
         });
     } else {
