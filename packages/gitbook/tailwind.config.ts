@@ -323,6 +323,11 @@ const config: Config = {
                 'fadeOut-slow': 'fadeOut 500ms ease both',
                 appear: 'appear 200ms ease both allow-discrete',
 
+                blurIn: 'blurIn 200ms ease-out both',
+                'blurIn-slow': 'blurIn 500ms ease-out both',
+                blurOut: 'blurOut 200ms ease-in both',
+                'blurOut-slow': 'blurOut 500ms ease-in both',
+
                 enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
@@ -491,13 +496,21 @@ const config: Config = {
                     from: { opacity: '1', transform: 'rotateX(0deg) scale(1)' },
                     to: { opacity: '0', transform: 'rotateX(-10deg) scale(0.95)' },
                 },
+                blurIn: {
+                    '0%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                    '100%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                },
+                blurOut: {
+                    from: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                    to: { filter: 'blur(16px)', opacity: '0', transform: 'scale(0.95)' },
+                },
                 fadeOut: {
                     from: { opacity: '1' },
                     to: { opacity: '0' },
                 },
                 heightIn: {
-                    from: { height: '0' },
-                    to: { height: 'max-content' },
+                    from: { height: '0', opacity: '0' },
+                    to: { height: 'max-content', opacity: '1' },
                 },
                 crawl: {
                     '0%': {

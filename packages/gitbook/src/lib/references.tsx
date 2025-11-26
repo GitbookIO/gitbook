@@ -10,12 +10,7 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import {
-    type GitBookLinker,
-    createLinker,
-    linkerWithAbsoluteURLs,
-    linkerWithOtherSpaceBasePath,
-} from '@/lib/links';
+import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import type {
     ContentRef,
     RevisionFile,
@@ -448,7 +443,7 @@ async function createContextForSpace(
 
     if (bestTargetSpace?.siteSpace && 'site' in context) {
         // If we found the space ID in the current site context, we can resolve links relative to it in the site.
-        linker = linkerWithOtherSpaceBasePath(context.linker, {
+        linker = context.linker.withOtherSiteSpace({
             spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
         });
     } else {
