@@ -135,21 +135,29 @@ export const Button = React.forwardRef<
         );
         const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
+        let iconElement = null;
+        if (icon) {
+            if (React.isValidElement(icon)) {
+                type IconElement = React.ReactElement<React.SVGProps<SVGSVGElement>>;
+                iconElement = React.cloneElement(icon as IconElement, {
+                    className: tcls(
+                        'button-leading-icon size-[1em] shrink-0',
+                        (icon as IconElement).props.className
+                    ),
+                });
+            } else {
+                iconElement = (
+                    <Icon
+                        icon={icon as IconName}
+                        className={tcls('button-leading-icon size-[1em] shrink-0')}
+                    />
+                );
+            }
+        }
+
         const content = (
             <>
-                {icon ? (
-                    typeof icon === 'string' ? (
-                        <Icon
-                            icon={icon as IconName}
-                            className={tcls('button-leading-icon size-[1em] shrink-0')}
-                        />
-                    ) : (
-                        React.cloneElement(
-                            icon as React.ReactElement<React.SVGProps<SVGSVGElement>>,
-                            { className: tcls('button-leading-icon size-[1em] shrink-0') }
-                        )
-                    )
-                ) : null}
+                {iconElement}
                 {iconOnly || (!children && !label) ? null : (
                     <span className="button-content truncate">{children ?? label}</span>
                 )}
