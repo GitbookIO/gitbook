@@ -223,7 +223,7 @@ export function getBlocksByType<Type extends DocumentBlock['type']>(
     document: JSONDocument,
     type: Type
 ): Extract<DocumentBlock, { type: Type }>[] {
-    return findBlocks(document, (block) => {
+    return findBlocks(document, (block): block is Extract<DocumentBlock, { type: Type }> => {
         return block.type === type;
     });
 }
@@ -240,7 +240,7 @@ export function isHeadingBlock(block: DocumentBlock): block is DocumentBlockHead
  */
 function findBlocks<Block extends DocumentBlock>(
     container: JSONDocument | DocumentBlock | DocumentFragment,
-    test: (block: DocumentBlock) => boolean
+    test: (block: DocumentBlock) => block is Block
 ): Block[] {
     if (!('nodes' in container)) {
         return [];
@@ -253,7 +253,6 @@ function findBlocks<Block extends DocumentBlock>(
         }
 
         if (test(block)) {
-            // @ts-expect-error - we know that the block is of type Block
             results.push(block);
         }
 
