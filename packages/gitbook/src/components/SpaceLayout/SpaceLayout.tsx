@@ -170,8 +170,10 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                 </div>
                             )
                         }
+                        // Displays the search button and/or the space dropdown in the ToC
+                        // according to the header/variant settings.
+                        // E.g if there is no header, the search button will be displayed in the ToC.
                         innerHeader={
-                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                             <>
                                 {!withTopHeader && (
                                     <div className="flex gap-2">
@@ -189,13 +191,20 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             section={sections?.current}
                                             spaceTitle={siteSpace.title}
                                             siteSpaceId={siteSpace.id}
-                                            siteSpaceIds={siteSpaces
-                                                .filter(
-                                                    (s) =>
-                                                        s.space.language ===
-                                                        siteSpace.space.language
-                                                )
-                                                .map((s) => s.id)}
+                                            // If searching all variants of the current section
+                                            // (the "extended" scope), filter by language if the language
+                                            // is set for both the current and the target site space.
+                                            siteSpaceIds={siteSpaces.reduce((acc: string[], ss) => {
+                                                if (
+                                                    !siteSpace.space.language ||
+                                                    !ss.space.language ||
+                                                    ss.space.language === siteSpace.space.language
+                                                ) {
+                                                    acc.push(ss.id);
+                                                }
+
+                                                return acc;
+                                            }, [])}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />
