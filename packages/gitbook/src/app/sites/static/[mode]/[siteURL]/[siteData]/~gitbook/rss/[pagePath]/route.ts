@@ -8,16 +8,5 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<R
     const { context } = await getStaticSiteContext(await params);
     const pathname = getPagePathFromParams(await params);
 
-    const rssResponse = await servePageRSS(context, pathname);
-
-    if (!rssResponse) {
-        return new Response('RSS feed not found', {
-            status: 404,
-            headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
-            },
-        });
-    }
-
-    return rssResponse;
+    return servePageRSS(context, pathname);
 }

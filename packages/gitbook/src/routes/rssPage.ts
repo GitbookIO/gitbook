@@ -1,228 +1,96 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data/pages';
-import { getNodeText } from '@/lib/document';
+import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
-import { removeLeadingSlash } from '@/lib/paths';
-import type {
-    DocumentBlock,
-    DocumentBlockHeading,
-    DocumentBlockUpdate,
-    DocumentBlockUpdates,
-    JSONDocument,
-} from '@gitbook/api';
+import { joinPath } from '@/lib/paths';
 import { RevisionPageType } from '@gitbook/api';
 import { Feed } from 'feed';
 
 /**
- * Find all Updates blocks in a document and extract their Update entries.
- */
-function findUpdatesInDocument(document: JSONDocument): Array<{
-    updatesBlock: DocumentBlockUpdates;
-    updateEntries: DocumentBlockUpdate[];
-}> {
-    const results: Array<{
-        updatesBlock: DocumentBlockUpdates;
-        updateEntries: DocumentBlockUpdate[];
-    }> = [];
-
-    function traverse(nodes: DocumentBlock[], depth = 0) {
-        for (const node of nodes) {
-            if (node.type === 'updates') {
-                const updatesBlock = node as DocumentBlockUpdates;
-
-                const updateEntries = updatesBlock.nodes.filter(
-                    (child): child is DocumentBlockUpdate => child.type === 'update'
-                );
-
-                if (updateEntries.length > 0) {
-                    results.push({ updatesBlock, updateEntries });
-                }
-            }
-            // Only traverse child nodes if they are blocks (not inlines or text)
-            if ('nodes' in node && Array.isArray(node.nodes) && node.object === 'block') {
-                // Filter to only blocks before recursing
-                const childBlocks: DocumentBlock[] = [];
-                for (const child of node.nodes) {
-                    if (child.object === 'block') {
-                        childBlocks.push(child);
-                    }
-                }
-                if (childBlocks.length > 0) {
-                    traverse(childBlocks, depth + 1);
-                }
-            }
-        }
-    }
-
-    traverse(document.nodes);
-    return results;
-}
-
-/**
- * Convert an Update block's content to markdown-like text.
- * This extracts text content from all nodes in the update.
- */
-function getUpdateContent(update: DocumentBlockUpdate): string {
-    return getNodeText(update).trim();
-}
-
-function slugifyHeading(text: string): string {
-    return text
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-}
-
-function getHeadingInfo(update: DocumentBlockUpdate): {
-    title?: string;
-    anchorId?: string;
-} {
-    for (const node of update.nodes ?? []) {
-        if (node.object !== 'block') {
-            continue;
-        }
-        if (!node.type.startsWith('heading')) {
-            continue;
-        }
-
-        const title = getNodeText(node).trim();
-        const anchorId =
-            (isHeadingBlock(node) && node.meta?.id) || (title ? slugifyHeading(title) : undefined);
-        return {
-            title: title || undefined,
-            anchorId: anchorId || undefined,
-        };
-    }
-
-    return {};
-}
-
-function isHeadingBlock(block: DocumentBlock): block is DocumentBlockHeading {
-    return block.type.startsWith('heading');
-}
-
-/**
  * Generate an RSS feed from Updates blocks in a page.
- * Returns null if no Updates blocks are found.
  */
 export async function servePageRSS(
     context: GitBookSiteContext,
-    pagePath: string
+    inputPagePath: string
 ): Promise<Response | null> {
-    const normalizedPath = pagePath === '/' ? '' : removeLeadingSlash(pagePath);
-    const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, normalizedPath);
+    const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, inputPagePath);
 
-    if (!pageLookup || pageLookup.page.type !== RevisionPageType.Document) {
-        return null;
+    if (!pageLookup) {
+        return notFoundResponse('Page not found');
+    }
+    if (pageLookup.page.type !== RevisionPageType.Document) {
+        return notFoundResponse('Page is not a document');
     }
 
     const { page } = pageLookup;
-
     const document = await getPageDocument(context, page);
-
     if (!document) {
-        return null;
+        return notFoundResponse('Page is empty');
     }
 
-    const updatesData = findUpdatesInDocument(document);
+    const updatesBlocks = getBlocksByType(document, 'updates');
 
-    // Collect all update entries from all Updates blocks
-    const allUpdates: Array<{
-        update: DocumentBlockUpdate;
-        date: Date;
-        content: string;
-    }> = [];
-
-    for (const { updateEntries } of updatesData) {
-        for (const update of updateEntries) {
-            const dateStr = update.data?.date;
-
-            if (!dateStr) {
-                continue;
-            }
-
-            const date = new Date(dateStr);
-            if (Number.isNaN(date.getTime())) {
-                continue;
-            }
-
-            const content = getUpdateContent(update);
-
-            if (!content) {
-                continue;
-            }
-
-            allUpdates.push({ update, date, content });
-        }
+    if (updatesBlocks.length === 0) {
+        return notFoundResponse('No updates found in page');
     }
-
-    if (allUpdates.length === 0) {
-        return null;
-    }
-
-    // Sort updates by date (newest first)
-    allUpdates.sort((a, b) => b.date.getTime() - a.date.getTime());
 
     // Get page URL
-    const pagePathForLink = context.linker.toPathForPage({ pages: context.revision.pages, page });
-    const pageURL = context.linker.toAbsoluteURL(pagePathForLink);
-
-    // Get feed URL - exposed as `/feed.xml`
-    const normalizedPagePath =
-        pagePathForLink.endsWith('/') && pagePathForLink !== '/'
-            ? pagePathForLink.slice(0, -1)
-            : pagePathForLink;
-    const rssPath = `${normalizedPagePath}/feed.xml`;
+    const pagePath = context.linker.toPathForPage({ pages: context.revision.pages, page });
+    const pageURL = context.linker.toAbsoluteURL(pagePath);
+    const rssPath = joinPath(pagePath, 'feed.xml');
     const rssURL = context.linker.toAbsoluteURL(rssPath);
-    const docsURL = context.linker.toAbsoluteURL(
-        context.linker.siteBasePath || context.linker.spaceBasePath
-    );
+    const docsURL = context.linker.toAbsoluteURL(context.linker.toPathInSite('/'));
 
     // Create RSS feed
     const feed = new Feed({
+        id: page.id,
         title: page.title,
         description: page.description || `Updates feed for ${page.title}`,
-        id: pageURL,
         link: pageURL,
         copyright: `Copyright ${new Date().getFullYear()}`,
-        updated: allUpdates[0]?.date ?? new Date(),
+        updated: new Date(page.updatedAt ?? page.createdAt ?? Date.now()),
         feedLinks: {
             rss: rssURL,
         },
         docs: docsURL,
     });
 
-    // Add update entries as feed items
-    for (const { update, date, content } of allUpdates) {
-        // Create the anchor link for the update
-        const headingInfo = getHeadingInfo(update);
-        const anchorId = headingInfo.anchorId;
-        const itemLink = `${pageURL}#${anchorId}`;
+    updatesBlocks.forEach((updatesBlock) => {
+        updatesBlock.nodes.forEach((update) => {
+            const heading = update.nodes[0];
+            if (!heading || !isHeadingBlock(heading)) {
+                return;
+            }
 
-        // Extract title from first line or heading, fallback to date
-        const firstLine = content.split('\n')[0]?.trim() || '';
-        const title =
-            headingInfo.title && headingInfo.title.length > 0
-                ? headingInfo.title
-                : firstLine.length > 0 && firstLine.length < 100
-                  ? firstLine
-                  : `Update - ${date.toLocaleDateString()}`;
+            const title = getNodeText(heading).trim();
+            const anchorId = heading.meta?.id;
+            const itemLink = anchorId ? `${pageURL}#${anchorId}` : pageURL;
 
-        feed.addItem({
-            title: title,
-            id: itemLink,
-            link: itemLink,
-            content,
-            date: date,
+            const contentNodes = update.nodes.slice(1);
+            const content = contentNodes.map((node) => getNodeText(node)).join('\n\n');
+
+            feed.addItem({
+                title: title,
+                id: itemLink,
+                link: itemLink,
+                content,
+                date: new Date(update.data.date),
+            });
         });
-    }
+    });
 
     return new Response(feed.rss2(), {
         headers: {
             'Content-Type': 'application/rss+xml; charset=utf-8',
+        },
+    });
+}
+
+function notFoundResponse(message: string) {
+    return new Response(message, {
+        status: 404,
+        headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
         },
     });
 }

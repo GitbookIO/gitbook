@@ -1,6 +1,7 @@
 import { Emoji } from '@/components/primitives';
 import type {
     DocumentBlock,
+    DocumentBlockHeading,
     DocumentFragment,
     DocumentInline,
     DocumentText,
@@ -199,6 +200,67 @@ export function getBlockById(document: JSONDocument, id: string): DocumentBlock 
         }
         return false;
     });
+}
+
+/**
+ * Get all block by a type in the document.
+ */
+export function getBlocksByType<Type extends DocumentBlock['type']>(
+    document: JSONDocument,
+    type: Type
+): Extract<DocumentBlock, { type: Type }>[] {
+    return findBlocks(document, (block) => {
+        return block.type === type;
+    });
+}
+
+/**
+ * Check if a block is a heading block.
+ */
+export function isHeadingBlock(block: DocumentBlock): block is DocumentBlockHeading {
+    return ['heading-1', 'heading-2', 'heading-3'].includes(block.type);
+}
+
+/**
+ * Find all blocks by a predicate in the document.
+ */
+function findBlocks<Block extends DocumentBlock>(
+    container: JSONDocument | DocumentBlock | DocumentFragment,
+    test: (block: DocumentBlock) => boolean
+): Block[] {
+    if (!('nodes' in container)) {
+        return [];
+    }
+
+    const results: Block[] = [];
+    for (const block of container.nodes) {
+        if (block.object !== 'block') {
+            continue;
+        }
+
+        if (test(block)) {
+            // @ts-expect-error - we know that the block is of type Block
+            results.push(block);
+        }
+
+        if (block.object === 'block' && 'nodes' in block) {
+            const result = findBlocks<Block>(block, test);
+            if (result.length > 0) {
+                results.push(...result);
+            }
+        }
+
+        if (block.object === 'block' && 'fragments' in block) {
+            for (const fragment of block.fragments) {
+                const result = findBlocks<Block>(fragment, test);
+                if (result.length > 0) {
+                    results.push(...result);
+                }
+            }
+        }
+    }
+
+    return results;
 }
 
 /**
