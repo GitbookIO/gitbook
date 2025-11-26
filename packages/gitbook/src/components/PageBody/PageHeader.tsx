@@ -1,7 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
-import { joinPath } from '@/lib/paths';
 import { tcls } from '@/lib/tailwind';
+import { getPageRSSURL } from '@/routes/rss';
 import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
@@ -144,7 +144,7 @@ function getPageActionsURLs({
         html: context.linker.toAbsoluteURL(pagePath),
         // For the markdown URL, we use the page.path to ensure it works for the default page.
         markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
-        rss: withRSSFeed ? context.linker.toAbsoluteURL(joinPath(pagePath, 'rss.xml')) : undefined,
+        rss: withRSSFeed ? getPageRSSURL(context, page) : undefined,
         editOnGit:
             context.customization.git.showEditLink && context.space.gitSync?.url && page.git
                 ? {

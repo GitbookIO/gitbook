@@ -4,8 +4,16 @@ import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
 import { resolvePagePathDocumentOrGroup } from '@/lib/pages';
 import { joinPath } from '@/lib/paths';
-import { RevisionPageType } from '@gitbook/api';
+import { type RevisionPageDocument, RevisionPageType } from '@gitbook/api';
 import { Feed } from 'feed';
+
+/**
+ * Get the URL of a RSS feed for a page.
+ */
+export function getPageRSSURL(context: GitBookSiteContext, page: RevisionPageDocument): string {
+    const pagePath = context.linker.toPathForPage({ pages: context.revision.pages, page });
+    return context.linker.toAbsoluteURL(joinPath(pagePath, 'rss.xml'));
+}
 
 /**
  * Generate an RSS feed from Updates blocks in a page.
@@ -38,8 +46,7 @@ export async function servePageRSS(
     // Get page URL
     const pagePath = context.linker.toPathForPage({ pages: context.revision.pages, page });
     const pageURL = context.linker.toAbsoluteURL(pagePath);
-    const rssPath = joinPath(pagePath, 'rss.xml');
-    const rssURL = context.linker.toAbsoluteURL(rssPath);
+    const rssURL = getPageRSSURL(context, page);
     const docsURL = context.linker.toAbsoluteURL(context.linker.toPathInSite('/'));
 
     // Create RSS feed
