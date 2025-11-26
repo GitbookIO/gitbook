@@ -146,6 +146,9 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
                 timeout: 60_000,
             });
+            await expect(page).toHaveScreenshot({
+                mask: [page.locator('[data-testid="ai-chat-followup-suggestions"]')],
+            });
         },
     },
     {
@@ -204,6 +207,9 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
             await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
                 timeout: 60_000,
+            });
+            await expect(page).toHaveScreenshot({
+                mask: [page.locator('[data-testid="ai-chat-followup-suggestions"]')],
             });
         },
     },

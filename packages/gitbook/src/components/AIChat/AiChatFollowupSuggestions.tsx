@@ -16,7 +16,10 @@ export function AIChatFollowupSuggestions(props: {
 
     return (
         <div className="flex grow flex-col">
-            <div className="sticky bottom-0 mt-auto flex flex-col items-start gap-2">
+            <div
+                className="sticky bottom-0 mt-auto flex flex-col items-start gap-2"
+                data-testid="ai-chat-followup-suggestions"
+            >
                 {chat.followUpSuggestions.map((suggestion, index) => (
                     <Button
                         data-testid="ai-chat-followup-suggestion"
