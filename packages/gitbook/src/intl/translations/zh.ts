@@ -72,6 +72,8 @@ export const zh: TranslationLanguage = {
     unexpected_error_title: '发生错误',
     unexpected_error: '抱歉，发生了意外的错误。请稍后再试。',
     unexpected_error_retry: '重试',
+    rss_feed: 'RSS 源',
+    open_rss_feed: '订阅此页面的 RSS 源',
     pdf_download: '导出为 PDF',
     pdf_goback: '返回内容',
     pdf_print: '打印或另存为 PDF',

@@ -21,15 +21,29 @@ export interface DocumentSection {
  * Check if the document contains one block that should be rendered in full-width mode.
  */
 export function hasFullWidthBlock(document: JSONDocument): boolean {
-    for (const node of document.nodes) {
-        if (node.data && 'fullWidth' in node.data && node.data.fullWidth) {
+    return hasTopLevelBlock(document, (block) => {
+        if (block.data && 'fullWidth' in block.data && block.data.fullWidth) {
             return true;
         }
-        if (node.type === 'swagger' || node.type === 'openapi-operation') {
+        if (block.type === 'swagger' || block.type === 'openapi-operation') {
+            return true;
+        }
+        return false;
+    });
+}
+
+/**
+ * Check if a top level block matches a predicate.
+ */
+export function hasTopLevelBlock(
+    document: JSONDocument,
+    predicate: (block: DocumentBlock) => boolean
+): boolean {
+    for (const node of document.nodes) {
+        if (node.object === 'block' && predicate(node)) {
             return true;
         }
     }
-
     return false;
 }
 

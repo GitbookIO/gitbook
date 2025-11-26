@@ -16,6 +16,7 @@ import {
     ActionOpenMCP,
     ActionViewAsMarkdown,
     ActionViewAsPDF,
+    ActionViewAsRSS,
 } from './PageActions';
 
 export type PageActionsDropdownURLs = {
@@ -23,6 +24,7 @@ export type PageActionsDropdownURLs = {
     markdown: string;
     mcp?: string;
     pdf?: string;
+    rss?: string;
     editOnGit?: {
         provider: GitSyncState['installationProvider'];
         url: string;
@@ -43,7 +45,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
     const language = useLanguage();
 
-    const defaultAction = getPageDefaultAction(props);
+    const defaultAction = usePageDefaultAction(props);
     const dropdownActions = getPageDropdownActions(props);
 
     return defaultAction || dropdownActions.length > 0 ? (
@@ -127,7 +129,7 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
             </React.Fragment>
         ) : null,
 
-        urls.editOnGit || urls.pdf ? (
+        urls.editOnGit || urls.pdf || urls.rss ? (
             <React.Fragment key="editOnGit">
                 <DropdownMenuSeparator className="first:hidden" />
                 {urls.editOnGit ? (
@@ -137,6 +139,7 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
                         url={urls.editOnGit.url}
                     />
                 ) : null}
+                {urls.rss ? <ActionViewAsRSS url={urls.rss} type="dropdown-menu-item" /> : null}
                 {urls.pdf ? <ActionViewAsPDF url={urls.pdf} type="dropdown-menu-item" /> : null}
             </React.Fragment>
         ) : null,
@@ -146,11 +149,15 @@ function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNod
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function getPageDefaultAction(props: PageActionsDropdownProps) {
+function usePageDefaultAction(props: PageActionsDropdownProps) {
     const { urls, actions } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
+
+    if (urls.rss) {
+        return <ActionViewAsRSS url={urls.rss} type="button" />;
+    }
 
     const assistant = assistants[0];
     if (assistant) {
