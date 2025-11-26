@@ -881,6 +881,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
             {
+                name: 'Updates',
+                url: 'blocks/updates',
+                fullPage: true,
+            },
+            {
                 name: 'Math',
                 url: 'blocks/math',
                 run: async (page) => {
