@@ -37,7 +37,7 @@ export interface GitBookLinker {
 
     /**
      * Generate an absolute path for a page in the current content.
-     * The result should NOT be passed to `toPathInContent`.
+     * The result should NOT be passed to `toPathInSpace`.
      */
     toPathForPage(input: {
         pages: RevisionPage[];

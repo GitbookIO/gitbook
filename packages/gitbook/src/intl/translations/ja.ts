@@ -74,6 +74,8 @@ export const ja: TranslationLanguage = {
     unexpected_error_title: 'エラーが発生しました',
     unexpected_error: '申し訳ありません、予期せぬエラーが発生しました。もう一度お試しください。',
     unexpected_error_retry: '再試行',
+    rss_feed: 'RSSフィード',
+    open_rss_feed: 'このページのフィードを購読する',
     pdf_download: 'PDFとしてエクスポート',
     pdf_goback: 'コンテンツに戻る',
     pdf_print: '印刷するかPDFとして保存',

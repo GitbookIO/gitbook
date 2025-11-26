@@ -74,6 +74,8 @@ export const it: TranslationLanguage = {
     unexpected_error_title: 'Si è verificato un errore',
     unexpected_error: 'Spiacenti, si è verificato un errore imprevisto. Riprova più tardi.',
     unexpected_error_retry: 'Riprova',
+    rss_feed: 'Feed RSS',
+    open_rss_feed: 'Iscriviti al feed di questa pagina',
     pdf_download: 'Esporta in PDF',
     pdf_goback: 'Torna al contenuto',
     pdf_print: 'Stampa o salva come PDF',

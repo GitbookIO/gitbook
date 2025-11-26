@@ -72,6 +72,8 @@ export const en = {
     unexpected_error_title: 'An error occurred',
     unexpected_error: 'Sorry, an unexpected error has occurred. Please try again later.',
     unexpected_error_retry: 'Try again',
+    rss_feed: 'RSS feed',
+    open_rss_feed: 'Subscribe to the feed for this page',
     pdf_download: 'Export as PDF',
     pdf_goback: 'Go back to content',
     pdf_print: 'Print or Save as PDF',

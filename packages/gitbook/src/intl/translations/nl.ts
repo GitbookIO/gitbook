@@ -74,6 +74,8 @@ export const nl: TranslationLanguage = {
     unexpected_error_title: 'Er is een fout opgetreden',
     unexpected_error: 'Sorry, er is een onverwachte fout opgetreden. Probeer het later opnieuw.',
     unexpected_error_retry: 'Opnieuw proberen',
+    rss_feed: 'RSS-feed',
+    open_rss_feed: 'Abonneer je op de feed van deze pagina',
     pdf_download: 'Exporteer als PDF',
     pdf_goback: 'Ga terug naar inhoud',
     pdf_print: 'Print of opslaan als PDF',
