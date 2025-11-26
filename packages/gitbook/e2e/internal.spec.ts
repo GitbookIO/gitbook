@@ -146,6 +146,15 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
                 timeout: 60_000,
             });
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const suggestions = document.querySelectorAll(
+                    '[data-testid="ai-chat-followup-suggestion"]'
+                );
+                suggestions.forEach((suggestion) => {
+                    suggestion.textContent = 'Follow-up suggestion';
+                });
+            });
         },
     },
     {
@@ -204,6 +213,15 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
             await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
                 timeout: 60_000,
+            });
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const suggestions = document.querySelectorAll(
+                    '[data-testid="ai-chat-followup-suggestion"]'
+                );
+                suggestions.forEach((suggestion) => {
+                    suggestion.textContent = 'Follow-up suggestion';
+                });
             });
         },
     },
