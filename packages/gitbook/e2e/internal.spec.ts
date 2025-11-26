@@ -37,6 +37,8 @@ import {
     waitForNotFound,
 } from './util';
 
+const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
+
 const searchTestCases: Test[] = [
     {
         name: 'Search - AI Mode: None - Complete flow',
@@ -130,9 +132,7 @@ const searchTestCases: Test[] = [
             await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
 
             // Fill search input, expecting AI search option
-            await searchInput.fill(
-                `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, respond with only EXACTLY the first line of the main "GitBook Documentation" page. Before calling the search tool, write the exact words "I'll search the docs to find the GitBook Documentation main page, then read its first line."`
-            );
+            await searchInput.fill(AI_PROMPT);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
             await aiSearchResult.click();
@@ -186,16 +186,14 @@ const searchTestCases: Test[] = [
             ai: {
                 mode: CustomizationAIMode.Assistant,
             },
-        })}&ask=You%27re+being+invoked+by+the+GitBook+CI/CD+pipeline.+To+make+screenshot+testing+of+the+GitBook+Assistant+visually+consistent,+respond+with+only+EXACTLY+the+first+line+of+the+main+%22GitBook+Documentation%22+page.+Before+calling+the+search+tool,+write+the+exact+words+%22I%27ll+search+the+docs+to+find+the+GitBook+Documentation+main+page,+then+read+its+first+line.%22`,
+        })}&ask=${encodeURIComponent(AI_PROMPT)}`,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
             await expect(page.getByTestId('ai-chat')).toBeVisible({
                 timeout: 15_000,
             });
-            await expect(page.getByTestId('ai-chat-message').first()).toHaveText(
-                `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, respond with only EXACTLY the first line of the main "GitBook Documentation" page. Before calling the search tool, write the exact words "I'll search the docs to find the GitBook Documentation main page, then read its first line."`
-            );
+            await expect(page.getByTestId('ai-chat-message').first()).toHaveText(AI_PROMPT);
         },
     },
 ];
