@@ -21,7 +21,7 @@ export function getPageRSSURL(context: GitBookSiteContext, page: RevisionPageDoc
 export async function servePageRSS(
     context: GitBookSiteContext,
     inputPagePath: string
-): Promise<Response | null> {
+): Promise<Response> {
     const pageLookup = resolvePagePathDocumentOrGroup(context.revision.pages, inputPagePath);
 
     if (!pageLookup) {
