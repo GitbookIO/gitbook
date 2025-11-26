@@ -175,13 +175,11 @@ export function SearchContainer({
     const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
 
     const searchResultsId = `search-results-${React.useId()}`;
-    const { results, fetching, error } = useSearchResults({
-        disabled: !(state?.query || withAI),
-        query: normalizedQuery,
-        siteSpaceId: siteSpace.id,
-        // If searching all variants of the current section (the "extended" scope),
-        // filter by language if the language is set for both the current and the target site space.
-        siteSpaceIds: siteSpaces.reduce((acc: string[], ss) => {
+
+    // If searching all variants of the current section (the "extended" scope),
+    // filter by language if the language is set for both the current and the target site space.
+    const siteSpaceIds = React.useMemo(() => {
+        return siteSpaces.reduce((acc: string[], ss) => {
             if (
                 !siteSpace.space.language ||
                 !ss.space.language ||
@@ -191,7 +189,14 @@ export function SearchContainer({
             }
 
             return acc;
-        }, []),
+        }, []);
+    }, [siteSpaces, siteSpace.space.language]);
+
+    const { results, fetching, error } = useSearchResults({
+        disabled: !(state?.query || withAI),
+        query: normalizedQuery,
+        siteSpaceId: siteSpace.id,
+        siteSpaceIds,
         scope: state?.scope ?? 'default',
         withAI: withAI,
     });
