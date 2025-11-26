@@ -3,6 +3,7 @@ import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
+    type RevisionPageDocument,
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
@@ -155,8 +156,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, revision, linker, imageResizer } = context;
-    const siteStructureTitle = getSiteStructureTitle(context);
+    const { customization, revision, linker, imageResizer } = context;
 
     const canonical = (
         pageMetaLinks?.canonical
@@ -193,14 +193,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     );
 
     return {
-        title: [
-            page.title,
-            // Prevent duplicate titles by comparing against the page title.
-            page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
-            page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
-        ]
-            .filter(Boolean)
-            .join(' | '),
+        title: getPageFullTitle(context, page),
         description: page.description ?? '',
         alternates: {
             canonical,
@@ -382,4 +375,21 @@ function shouldResolveMetaLinks(siteId: string): boolean {
     }
 
     return Math.abs(hash % 100) < META_LINKS_PERCENTAGE_ROLLOUT;
+}
+
+/**
+ * Get the <title> for a page.
+ */
+export function getPageFullTitle(context: GitBookSiteContext, page: RevisionPageDocument) {
+    const { site } = context;
+    const siteStructureTitle = getSiteStructureTitle(context);
+
+    return [
+        page.title,
+        // Prevent duplicate titles by comparing against the page title.
+        page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
+        page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
+    ]
+        .filter(Boolean)
+        .join(' | ');
 }

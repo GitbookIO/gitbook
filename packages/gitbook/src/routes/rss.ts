@@ -1,3 +1,4 @@
+import { getPageFullTitle } from '@/components/SitePage';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getPageDocument } from '@/lib/data/pages';
 import { getBlocksByType, getNodeText, isHeadingBlock } from '@/lib/document';
@@ -44,7 +45,7 @@ export async function servePageRSS(
     // Create RSS feed
     const feed = new Feed({
         id: page.id,
-        title: page.title,
+        title: getPageFullTitle(context, page),
         description: page.description || `Updates feed for ${page.title}`,
         link: pageURL,
         copyright: `Copyright ${new Date().getFullYear()}`,

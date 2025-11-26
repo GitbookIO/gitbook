@@ -105,7 +105,8 @@
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
         "vercel": "^39.3.0",
-        "wrangler": "^4.43.0"
+        "wrangler": "^4.43.0",
+        "rss-parser": "^3.13.0"
     },
     "scripts": {
         "generate": "./scripts/generate.sh",
