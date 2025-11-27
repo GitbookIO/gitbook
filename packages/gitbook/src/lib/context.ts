@@ -434,13 +434,44 @@ function filterHiddenSiteSpaces(siteSpaces: SiteSpace[]): SiteSpace[] {
 }
 
 function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
-    const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
+    const sectionsAndGroups = getSiteStructureSections(structure);
+    const visibleSectionsAndGroups = filterSectionsAndGroupsWithHiddenSiteSpaces(sectionsAndGroups);
     const section = parseCurrentSection(structure, siteSectionId);
     assert(section, `couldn't find section "${siteSectionId}" in site structure`);
-    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
+    return { list: visibleSectionsAndGroups, current: section } satisfies SiteSections;
 }
 
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure, { ignoreGroups: true });
     return sections.find((section) => section.id === siteSectionId);
+}
+
+type SectionOrGroup = SiteSection | SiteSectionGroup;
+
+/**
+ * Filter out sections and groups with hidden site spaces.
+ */
+function filterSectionsAndGroupsWithHiddenSiteSpaces(
+    sectionsOrGroups: SectionOrGroup[]
+): SectionOrGroup[] {
+    return sectionsOrGroups
+        .map((entry) => {
+            if (entry.object === 'site-section') {
+                return sectionHasHiddenSiteSpace(entry) ? null : entry;
+            }
+
+            const visibleChildren: SectionOrGroup[] = filterSectionsAndGroupsWithHiddenSiteSpaces(
+                entry.children
+            );
+
+            return {
+                ...entry,
+                children: visibleChildren,
+            };
+        })
+        .filter((entry): entry is SiteSection | SiteSectionGroup => Boolean(entry));
+}
+
+function sectionHasHiddenSiteSpace(section: SiteSection) {
+    return section.siteSpaces.every((siteSpace) => siteSpace.hidden);
 }
