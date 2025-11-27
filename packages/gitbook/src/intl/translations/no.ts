@@ -75,6 +75,8 @@ export const no: TranslationLanguage = {
     unexpected_error_title: 'En feil oppstod',
     unexpected_error: 'Beklager, en uventet feil har oppstått. Vennligst prøv igjen senere.',
     unexpected_error_retry: 'Prøv igjen',
+    rss_feed: 'RSS-feed',
+    open_rss_feed: 'Abonner på feeden til denne siden',
     pdf_download: 'Eksporter som PDF',
     pdf_goback: 'Gå tilbake til innhold',
     pdf_print: 'Skriv ut eller lagre som PDF',

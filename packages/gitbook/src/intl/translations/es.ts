@@ -75,6 +75,8 @@ export const es: TranslationLanguage = {
     unexpected_error:
         'Lo sentimos, ha ocurrido un error inesperado. Por favor, intenta de nuevo más tarde.',
     unexpected_error_retry: 'Reintentar',
+    rss_feed: 'Feed RSS',
+    open_rss_feed: 'Suscribirse al feed de esta página',
     pdf_download: 'Exportar como PDF',
     pdf_goback: 'Volver al contenido',
     pdf_print: 'Imprimir o Guardar como PDF',
