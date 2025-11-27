@@ -30,7 +30,7 @@ runs:
             apiToken: ${{ inputs.apiToken }}
             accountId: ${{ inputs.accountId }}
             workingDirectory: ./
-            wranglerVersion: '4.10.0'
+            wranglerVersion: '4.43.0'
             environment: ${{ inputs.environment }}
             command: deployments status --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
@@ -49,7 +49,7 @@ runs:
             apiToken: ${{ inputs.apiToken }}
             accountId: ${{ inputs.accountId }}
             workingDirectory: ./
-            wranglerVersion: '4.10.0'
+            wranglerVersion: '4.43.0'
             environment: ${{ inputs.environment }}
             command: versions deploy ${{ steps.extract_current_version.outputs.version_id }}@100% ${{ inputs.serverVersionId }}@0% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
@@ -61,7 +61,7 @@ runs:
             apiToken: ${{ inputs.apiToken }}
             accountId: ${{ inputs.accountId }}
             workingDirectory: ./
-            wranglerVersion: '4.10.0'
+            wranglerVersion: '4.43.0'
             environment: ${{ inputs.environment }}
             command: versions deploy ${{ inputs.middlewareVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/middlewareWrangler.jsonc
 
@@ -71,7 +71,7 @@ runs:
             apiToken: ${{ inputs.apiToken }}
             accountId: ${{ inputs.accountId }}
             workingDirectory: ./
-            wranglerVersion: '4.10.0'
+            wranglerVersion: '4.43.0'
             environment: ${{ inputs.environment }}
             command: versions deploy ${{ inputs.serverVersionId }}@100% -y --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 

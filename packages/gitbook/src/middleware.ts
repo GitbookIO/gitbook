@@ -560,6 +560,11 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     return null;
 }
 
+const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
+const MARKDOWN_PATH_REGEX = /\.md$/;
+const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
+const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
+
 /**
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
@@ -574,26 +579,35 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
+    // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname
+    const rssMatch = pathname.match(RSS_PATH_REGEX);
+    if (rssMatch) {
+        return {
+            pathname: `~gitbook/rss/${encodePagePath(rssMatch[2])}`,
+            routeType: 'static',
+        };
+    }
+
     // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
-    if (pathname.match(/\.md$/)) {
+    if (pathname.match(MARKDOWN_PATH_REGEX)) {
         const pagePathWithoutMD = pathname.slice(0, -3);
         return {
-            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
             // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
             routeType: 'static',
         };
     }
 
     // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
-    if (pathname.match(/^llms-full\.txt\/\d+$/)) {
+    if (pathname.match(LLMS_FULL_PATH_REGEX)) {
         return { pathname, routeType: 'static' };
     }
 
     // If the pathname is an embedded page
-    const embedPage = pathname.match(/^~gitbook\/embed\/page(\/(\S*))?$/);
+    const embedPage = pathname.match(EMBED_PAGE_PATH_REGEX);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1] || '/')}`,
+            pathname: `~gitbook/embed/page/${encodePagePath(embedPage[1])}`,
         };
     }
 
@@ -615,8 +629,12 @@ function encodePathInSiteContent(rawPathname: string): {
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };
         default:
-            return { pathname: encodeURIComponent(pathname || '/') };
+            return { pathname: encodePagePath(pathname) };
     }
+}
+
+function encodePagePath(path: string | undefined): string {
+    return encodeURIComponent(path || '/');
 }
 
 /**

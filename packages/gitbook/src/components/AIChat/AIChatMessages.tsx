@@ -56,6 +56,11 @@ export function AIChatMessages(props: {
                     return (
                         <div
                             key={originalIndex}
+                            data-testid={
+                                message.role === AIMessageRole.User
+                                    ? 'ai-chat-message-user'
+                                    : 'ai-chat-message-assistant'
+                            }
                             id={`message-${originalIndex}`}
                             className={tcls(
                                 'flex flex-col gap-6',

@@ -1,6 +1,7 @@
 import { Emoji } from '@/components/primitives';
 import type {
     DocumentBlock,
+    DocumentBlockHeading,
     DocumentFragment,
     DocumentInline,
     DocumentText,
@@ -20,15 +21,29 @@ export interface DocumentSection {
  * Check if the document contains one block that should be rendered in full-width mode.
  */
 export function hasFullWidthBlock(document: JSONDocument): boolean {
-    for (const node of document.nodes) {
-        if (node.data && 'fullWidth' in node.data && node.data.fullWidth) {
+    return hasTopLevelBlock(document, (block) => {
+        if (block.data && 'fullWidth' in block.data && block.data.fullWidth) {
             return true;
         }
-        if (node.type === 'swagger' || node.type === 'openapi-operation') {
+        if (block.type === 'swagger' || block.type === 'openapi-operation') {
+            return true;
+        }
+        return false;
+    });
+}
+
+/**
+ * Check if a top level block matches a predicate.
+ */
+export function hasTopLevelBlock(
+    document: JSONDocument,
+    predicate: (block: DocumentBlock) => boolean
+): boolean {
+    for (const node of document.nodes) {
+        if (node.object === 'block' && predicate(node)) {
             return true;
         }
     }
-
     return false;
 }
 
@@ -199,6 +214,66 @@ export function getBlockById(document: JSONDocument, id: string): DocumentBlock 
         }
         return false;
     });
+}
+
+/**
+ * Get all block by a type in the document.
+ */
+export function getBlocksByType<Type extends DocumentBlock['type']>(
+    document: JSONDocument,
+    type: Type
+): Extract<DocumentBlock, { type: Type }>[] {
+    return findBlocks(document, (block): block is Extract<DocumentBlock, { type: Type }> => {
+        return block.type === type;
+    });
+}
+
+/**
+ * Check if a block is a heading block.
+ */
+export function isHeadingBlock(block: DocumentBlock): block is DocumentBlockHeading {
+    return ['heading-1', 'heading-2', 'heading-3'].includes(block.type);
+}
+
+/**
+ * Find all blocks by a predicate in the document.
+ */
+function findBlocks<Block extends DocumentBlock>(
+    container: JSONDocument | DocumentBlock | DocumentFragment,
+    test: (block: DocumentBlock) => block is Block
+): Block[] {
+    if (!('nodes' in container)) {
+        return [];
+    }
+
+    const results: Block[] = [];
+    for (const block of container.nodes) {
+        if (block.object !== 'block') {
+            continue;
+        }
+
+        if (test(block)) {
+            results.push(block);
+        }
+
+        if (block.object === 'block' && 'nodes' in block) {
+            const result = findBlocks<Block>(block, test);
+            if (result.length > 0) {
+                results.push(...result);
+            }
+        }
+
+        if (block.object === 'block' && 'fragments' in block) {
+            for (const fragment of block.fragments) {
+                const result = findBlocks<Block>(fragment, test);
+                if (result.length > 0) {
+                    results.push(...result);
+                }
+            }
+        }
+    }
+
+    return results;
 }
 
 /**

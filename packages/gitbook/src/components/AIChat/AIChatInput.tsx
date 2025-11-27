@@ -3,6 +3,7 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useAIChatState } from '../AI/useAIChat';
 import { Button, HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
@@ -19,6 +20,7 @@ export function AIChatInput(props: {
     const { value, onChange, onSubmit, disabled, loading } = props;
 
     const language = useLanguage();
+    const chat = useAIChatState();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +34,7 @@ export function AIChatInput(props: {
     };
 
     useEffect(() => {
-        if (!disabled && !loading) {
+        if (chat.opened && !disabled && !loading) {
             // Add a small delay to ensure the input is rendered before focusing
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
@@ -41,7 +43,7 @@ export function AIChatInput(props: {
 
             return () => clearTimeout(timeout);
         }
-    }, [disabled, loading]);
+    }, [disabled, loading, chat.opened]);
 
     useHotkeys(
         'mod+i',
