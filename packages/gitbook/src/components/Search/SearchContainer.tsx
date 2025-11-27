@@ -178,19 +178,21 @@ export function SearchContainer({
 
     // If searching all variants of the current section (the "extended" scope),
     // filter by language if the language is set for both the current and the target site space.
-    const siteSpaceIds = React.useMemo(() => {
-        return siteSpaces.reduce((acc: string[], ss) => {
-            if (
-                !siteSpace.space.language ||
-                !ss.space.language ||
-                ss.space.language === siteSpace.space.language
-            ) {
-                acc.push(ss.id);
-            }
+    const siteSpaceIds = React.useMemo(
+        () =>
+            siteSpaces.reduce((acc: string[], ss) => {
+                if (
+                    !siteSpace.space.language ||
+                    !ss.space.language ||
+                    ss.space.language === siteSpace.space.language
+                ) {
+                    acc.push(ss.id);
+                }
 
-            return acc;
-        }, []);
-    }, [siteSpaces, siteSpace.space.language]);
+                return acc;
+            }, []),
+        [siteSpaces, siteSpace.space.language]
+    );
 
     const { results, fetching, error } = useSearchResults({
         disabled: !(state?.query || withAI),
