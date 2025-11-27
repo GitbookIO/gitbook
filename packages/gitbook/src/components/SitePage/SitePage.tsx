@@ -321,11 +321,17 @@ async function resolvePageMetaLinks(
     pageId: string
 ): Promise<PageMetaLinks> {
     const pageMetaLinks = await getDataOrNull(
-        context.dataFetcher.listRevisionPageMetaLinks({
-            spaceId: context.space.id,
-            revisionId: context.revisionId,
-            pageId,
-        })
+        context.changeRequest
+            ? context.dataFetcher.listChangeRequestPageMetaLinks({
+                  spaceId: context.space.id,
+                  changeRequestId: context.changeRequest.id,
+                  pageId,
+              })
+            : context.dataFetcher.listSpacePageMetaLinks({
+                  spaceId: context.space.id,
+
+                  pageId,
+              })
     );
 
     if (pageMetaLinks) {
