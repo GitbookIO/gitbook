@@ -41,6 +41,12 @@ export function EmbeddableIframeAPI(props: {
     }, [baseURL, siteTitle]);
 
     React.useEffect(() => {
+        return chatController.on('postMessage', () => {
+            router.push(`${baseURL}/assistant`);
+        });
+    }, [router, baseURL, chatController]);
+
+    React.useEffect(() => {
         if (window.parent === window) {
             return;
         }
@@ -62,6 +68,7 @@ export function EmbeddableIframeAPI(props: {
                     chatController.postMessage({
                         message: message.message,
                     });
+                    router.push(`${baseURL}/assistant`);
                     break;
                 }
                 case 'configure': {
@@ -192,6 +199,7 @@ export function EmbeddableIframeTabs(props: { active?: string }) {
                 ? tabs.map((tab) => (
                       <Button
                           key={tab.key}
+                          data-testid={`embed-tab-${tab.key}`}
                           label={tab.label}
                           size="default"
                           variant="blank"

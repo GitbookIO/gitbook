@@ -37,6 +37,10 @@ export function EmbeddableAIChat() {
     const configuration = useEmbeddableConfiguration();
     const language = useLanguage();
 
+    React.useEffect(() => {
+        chatController.open();
+    }, [chatController]);
+
     // Track the view of the AI chat
     const trackEvent = useTrackEvent();
     React.useEffect(() => {
