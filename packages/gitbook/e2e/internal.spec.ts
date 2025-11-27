@@ -170,10 +170,10 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
             await page.evaluate(() => {
-                const greeting = document.querySelectorAll('[data-testid="ai-chat-time-greeting"]');
-                greeting.forEach((greeting) => {
+                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                if (greeting) {
                     greeting.textContent = 'Good morning';
-                });
+                }
             });
         },
     },
@@ -191,10 +191,10 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
             await page.evaluate(() => {
-                const greeting = document.querySelectorAll('[data-testid="ai-chat-time-greeting"]');
-                greeting.forEach((greeting) => {
+                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                if (greeting) {
                     greeting.textContent = 'Good morning';
-                });
+                }
             });
         },
     },
@@ -212,10 +212,10 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
             await page.evaluate(() => {
-                const greeting = document.querySelectorAll('[data-testid="ai-chat-time-greeting"]');
-                greeting.forEach((greeting) => {
+                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                if (greeting) {
                     greeting.textContent = 'Good morning';
-                });
+                }
             });
         },
     },
