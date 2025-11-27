@@ -229,6 +229,7 @@ export function AIChatBody(props: {
                                 <h5
                                     className="animate-blur-in-slow font-bold text-lg text-tint-strong [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
+                                    data-testid="ai-chat-time-greeting"
                                 >
                                     {timeGreeting}
                                 </h5>
