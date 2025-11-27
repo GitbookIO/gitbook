@@ -317,19 +317,34 @@ async function resolvePageMetaLinks(
     context: GitBookSiteContext,
     pageId: string
 ): Promise<PageMetaLinks> {
-    const pageMetaLinks = await getDataOrNull(
-        context.changeRequest
-            ? context.dataFetcher.listChangeRequestPageMetaLinks({
-                  spaceId: context.space.id,
-                  changeRequestId: context.changeRequest.id,
-                  pageId,
-              })
-            : context.dataFetcher.listSpacePageMetaLinks({
-                  spaceId: context.space.id,
+    const pageMetaLinks = await (async () => {
+        if (context.changeRequest) {
+            return getDataOrNull(
+                context.dataFetcher.listChangeRequestPageMetaLinks({
+                    spaceId: context.space.id,
+                    changeRequestId: context.changeRequest.id,
+                    pageId,
+                })
+            );
+        }
 
-                  pageId,
-              })
-    );
+        if (context.revisionId !== context.space.revision) {
+            return getDataOrNull(
+                context.dataFetcher.listRevisionPageMetaLinks({
+                    spaceId: context.space.id,
+                    revisionId: context.revisionId,
+                    pageId,
+                })
+            );
+        }
+
+        return getDataOrNull(
+            context.dataFetcher.listSpacePageMetaLinks({
+                spaceId: context.space.id,
+                pageId,
+            })
+        );
+    })();
 
     if (pageMetaLinks) {
         const canonicalResolution = pageMetaLinks.canonical
