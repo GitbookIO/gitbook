@@ -73,6 +73,8 @@ export const pt_br = {
     unexpected_error:
         'Desculpe, aconteceu um erro inesperado. Por favor tente novamente mais tarde.',
     unexpected_error_retry: ' Tentar novamente',
+    rss_feed: 'Feed RSS',
+    open_rss_feed: 'Assinar o feed desta página',
     pdf_download: 'Exportar como PDF',
     pdf_goback: 'Voltar ao conteúdo',
     pdf_print: 'Imprimir ou salvar como PDF',
