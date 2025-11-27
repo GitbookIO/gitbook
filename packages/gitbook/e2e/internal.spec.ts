@@ -9,6 +9,7 @@ import {
     CustomizationSidebarListStyle,
     CustomizationThemeMode,
 } from '@gitbook/api';
+import type { GitBookStandalone } from '@gitbook/embed';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
@@ -170,7 +171,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
             await page.evaluate(() => {
-                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
                 if (greeting) {
                     greeting.textContent = 'Good morning';
                 }
@@ -191,7 +192,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
             await page.evaluate(() => {
-                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
                 if (greeting) {
                     greeting.textContent = 'Good morning';
                 }
@@ -212,7 +213,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
             await page.evaluate(() => {
-                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
                 if (greeting) {
                     greeting.textContent = 'Good morning';
                 }
@@ -1950,6 +1951,299 @@ const testCases: TestsCase[] = [
                     fullPage: true,
                 },
             ]),
+        ],
+    },
+    {
+        name: 'Docs Embed - GitBook (Assistant + Docs)',
+        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
+        tests: [
+            {
+                name: 'Basic functionality',
+                url: '',
+                run: async (page) => {
+                    const button = page.locator('#gitbook-widget-button');
+                    await expect(button).toBeVisible();
+                    await expect(button.locator('#gitbook-widget-button-label')).toHaveText('Ask');
+                    await expect(button.locator('#gitbook-widget-button-icon')).toHaveAttribute(
+                        'data-icon',
+                        'assistant'
+                    );
+
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-tab-assistant')).toBeVisible();
+                    await expect(iframe.getByTestId('embed-tab-docs')).toBeVisible();
+
+                    await button.click(); // Toggle the window off
+                    await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
+                    await button.click(); // Toggle the window on
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                },
+            },
+            {
+                name: 'Switch between tabs',
+                url: '',
+                run: async (page) => {
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await iframe.getByTestId('embed-tab-docs').click(); // Switch to docs tab
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+
+                    await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
+                    await expect(iframe.getByTestId('ai-chat')).toBeVisible();
+                },
+            },
+            {
+                name: 'API - navigateToPage',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('navigateToPage', '/getting-started/quickstart');
+                    });
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+                    await expect(iframe.owner()).toHaveAttribute(
+                        'src',
+                        expect.stringContaining('getting-started/quickstart')
+                    );
+                },
+            },
+            {
+                name: 'API - postUserMessage',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate((aiPrompt) => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('postUserMessage', aiPrompt);
+                    }, AI_PROMPT);
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('ai-chat')).toBeVisible();
+                    await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
+                        AI_PROMPT
+                    );
+                },
+            },
+            {
+                name: 'Configuration - Change standalone button label and icon',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            button: {
+                                label: 'Docs',
+                                icon: 'book',
+                            },
+                        });
+                    });
+                    await expect(page.locator('#gitbook-widget-button-label')).toHaveText('Docs');
+                    await expect(page.locator('#gitbook-widget-button-icon')).toHaveAttribute(
+                        'data-icon',
+                        'book'
+                    );
+                },
+            },
+            {
+                name: 'Configuration - Suggested questions',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            suggestions: [
+                                'What is GitBook?',
+                                'How do I get started?',
+                                'What can you do?',
+                            ],
+                        });
+                    });
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(
+                        iframe.getByTestId('ai-chat-suggested-question').nth(0)
+                    ).toHaveText('What is GitBook?');
+                    await expect(
+                        iframe.getByTestId('ai-chat-suggested-question').nth(1)
+                    ).toHaveText('How do I get started?');
+                    await expect(
+                        iframe.getByTestId('ai-chat-suggested-question').nth(2)
+                    ).toHaveText('What can you do?');
+                },
+            },
+            {
+                name: 'Configuration - Custom action buttons',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate((aiPrompt) => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            actions: [
+                                {
+                                    label: 'Open internal link',
+                                    icon: 'bolt',
+                                    onClick: () =>
+                                        (window.GitBook as unknown as GitBookStandalone)(
+                                            'navigateToPage',
+                                            '/getting-started/quickstart'
+                                        ),
+                                },
+                                {
+                                    label: 'Open external link',
+                                    icon: 'sparkle',
+                                    onClick: () => {
+                                        window.open('https://gitbook.com', '_blank');
+                                    },
+                                },
+                                {
+                                    label: 'Post message',
+                                    icon: 'message',
+                                    onClick: () =>
+                                        (window.GitBook as unknown as GitBookStandalone)(
+                                            'postUserMessage',
+                                            aiPrompt
+                                        ),
+                                },
+                                {
+                                    label: 'Close',
+                                    icon: 'xmark',
+                                    onClick: () =>
+                                        (window.GitBook as unknown as GitBookStandalone)('close'),
+                                },
+                            ],
+                        });
+                    }, AI_PROMPT);
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-action')).toHaveCount(4);
+                    const actions = iframe.getByTestId('embed-action');
+
+                    await expect(actions.nth(0)).toHaveAccessibleName('Open internal link');
+                    await actions.nth(0).click();
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+                    await expect(iframe.owner()).toHaveAttribute(
+                        'src',
+                        expect.stringContaining('getting-started/quickstart')
+                    );
+
+                    await expect(actions.nth(1)).toHaveAccessibleName('Open external link');
+                    // Intercept the new page event without navigating
+                    const [newPage] = await Promise.all([
+                        page.context().waitForEvent('page', { timeout: 5000 }),
+                        actions.nth(1).click(),
+                    ]);
+                    // Verify the new page would have opened with the expected URL
+                    expect(newPage.url()).toContain('gitbook.com');
+                    // Close it immediately to avoid navigation
+                    await newPage.close();
+
+                    await expect(actions.nth(2)).toHaveAccessibleName('Post message');
+                    await actions.nth(2).click();
+                    await expect(iframe.getByTestId('ai-chat')).toBeVisible();
+                    await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
+                        AI_PROMPT
+                    );
+
+                    await expect(actions.nth(3)).toHaveAccessibleName('Close');
+                    await actions.nth(3).click();
+                    await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
+                    await page.locator('#gitbook-widget-button').click();
+                },
+            },
+            {
+                name: 'Configuration - Custom tools',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            tools: [
+                                {
+                                    name: 'contact_support',
+                                    description: 'Contact support on behalf of the user',
+                                    execute: async () => {
+                                        return {
+                                            output: { message: 'Support message' },
+                                            summary: {
+                                                text: 'Contacted support',
+                                                icon: 'circle-question',
+                                            },
+                                        };
+                                    },
+                                    confirmation: {
+                                        icon: 'circle-question',
+                                        label: 'Contact support',
+                                    },
+                                },
+                            ],
+                        });
+                        GitBook(
+                            'postUserMessage',
+                            'I want to contact support. Call the tool directly without a preamble. Do not respond with anything else.'
+                        );
+                    });
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
+                        'I want to contact support. Call the tool directly without a preamble. Do not respond with anything else.'
+                    );
+                    const toolConfirmation = iframe
+                        .getByTestId('ai-chat-tool-confirmation')
+                        .first();
+                    await expect(toolConfirmation).toBeVisible({
+                        timeout: 30000,
+                    });
+                    await page.waitForTimeout(10000);
+                },
+            },
+        ],
+    },
+    {
+        name: 'Docs Embed - Docs Only',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
+        tests: [
+            {
+                name: 'Docs only',
+                url: '',
+                run: async (page) => {
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+                },
+            },
+            {
+                name: 'Table of contents',
+                url: '',
+                run: async (page) => {
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+                    const tocButton = iframe.getByTestId('toc-button');
+                    await expect(tocButton).toBeVisible();
+                    await tocButton.click();
+                    await expect(iframe.getByTestId('table-of-contents')).toBeVisible();
+                },
+            },
+            {
+                name: 'Open in new tab',
+                url: '',
+                run: async (page) => {
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+                    const openInNewTabButton = iframe.getByTestId(
+                        'embed-docs-page-open-in-new-tab'
+                    );
+                    await expect(openInNewTabButton).toBeVisible();
+                    // Intercept the new page event without navigating
+                    const [newPage] = await Promise.all([
+                        page.context().waitForEvent('page', { timeout: 5000 }),
+                        openInNewTabButton.click(),
+                    ]);
+                    // Verify the new page would have opened with the expected URL
+                    expect(newPage.url()).toContain('gitbook.gitbook.io');
+                    // Close it immediately to avoid navigation
+                    await newPage.close();
+                },
+            },
         ],
     },
 ];

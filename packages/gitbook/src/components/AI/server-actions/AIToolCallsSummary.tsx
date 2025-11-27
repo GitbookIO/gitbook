@@ -39,7 +39,10 @@ function ToolCallSummary(props: { toolCall: AIToolCall; context: GitBookSiteCont
     const { toolCall, context } = props;
 
     return (
-        <div className="mt-2 flex origin-top-left animate-blur-in-slow items-start gap-2 text-sm text-tint-subtle">
+        <div
+            data-testid="ai-chat-tool-summary"
+            className="mt-2 flex origin-top-left animate-blur-in-slow items-start gap-2 text-sm text-tint-subtle"
+        >
             <Icon
                 icon={getIconForToolCall(toolCall)}
                 className="mt-1 size-3 shrink-0 text-tint-subtle/8"
@@ -160,7 +163,7 @@ async function DescriptionForSearchToolCall(props: {
     const hasResults = toolCall.results.length > 0;
 
     return (
-        <details className="-ml-5 group flex w-full flex-col">
+        <details className={tcls('-ml-5 group flex w-full flex-col')}>
             <summary
                 className={tcls(
                     '-mx-2 flex list-none items-center gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md pr-4 pl-7 transition-colors marker:hidden',

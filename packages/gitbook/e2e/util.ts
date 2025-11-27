@@ -454,7 +454,7 @@ export async function waitForIcons(page: Page) {
  */
 async function waitForTOCScrolling(page: Page) {
     const viewport = await page.viewportSize();
-    if (viewport && viewport.width >= 1024) {
+    if (viewport && viewport.width >= 1024 && !page.url().includes('~gitbook')) {
         const toc = page.getByTestId('table-of-contents');
         await expect(toc).toBeVisible();
         await page.evaluate(() => {
