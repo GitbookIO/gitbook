@@ -168,6 +168,13 @@ const searchTestCases: Test[] = [
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                if (greeting) {
+                    greeting.textContent = 'Good morning';
+                }
+            });
         },
     },
     {
@@ -182,6 +189,13 @@ const searchTestCases: Test[] = [
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                if (greeting) {
+                    greeting.textContent = 'Good morning';
+                }
+            });
         },
     },
     {
@@ -196,6 +210,13 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+                if (greeting) {
+                    greeting.textContent = 'Good morning';
+                }
+            });
         },
     },
     {
