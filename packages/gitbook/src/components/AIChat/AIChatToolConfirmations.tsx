@@ -37,6 +37,7 @@ export function AIChatToolConfirmations(props: {
                     style={{ animationDelay: `${0.5 + index * 0.1}s` }}
                 >
                     <Button
+                        data-testid="ai-chat-tool-confirmation"
                         onClick={() => {
                             tool.confirm();
                         }}

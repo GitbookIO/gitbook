@@ -28,10 +28,14 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
     }
 );
 
-export function EmbeddableFrameMain(props: { children: React.ReactNode }) {
-    const { children } = props;
+export function EmbeddableFrameMain(props: React.ComponentProps<'div'>) {
+    const { children, ...rest } = props;
 
-    return <div className="flex flex-1 flex-col overflow-hidden">{children}</div>;
+    return (
+        <div className="flex flex-1 flex-col overflow-hidden" {...rest}>
+            {children}
+        </div>
+    );
 }
 
 export function EmbeddableFrameHeader(props: {

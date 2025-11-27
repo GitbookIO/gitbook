@@ -70,7 +70,6 @@ export function AIChat() {
 
     return (
         <div
-            data-testid="ai-chat"
             className={tcls(
                 'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl scroll-mt-36 px-4 py-4 transition-[width,opacity,margin,display] transition-discrete duration-300 sm:px-6 lg:fixed lg:w-80 lg:p-0 xl:w-96',
                 chat.opened
@@ -79,7 +78,7 @@ export function AIChat() {
             )}
         >
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
-                <EmbeddableFrameMain>
+                <EmbeddableFrameMain data-testid="ai-chat">
                     <EmbeddableFrameHeader>
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
@@ -232,13 +231,14 @@ export function AIChatBody(props: {
                                 <h5
                                     className="animate-blur-in-slow font-bold text-lg text-tint-strong [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
-                                    data-testid="ai-chat-time-greeting"
+                                    data-testid="ai-chat-greeting-title"
                                 >
                                     {timeGreeting}
                                 </h5>
                                 <p
                                     className="animate-blur-in-slow text-tint [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
+                                    data-testid="ai-chat-greeting-subtitle"
                                 >
                                     {t(language, 'ai_chat_assistant_description')}
                                 </p>

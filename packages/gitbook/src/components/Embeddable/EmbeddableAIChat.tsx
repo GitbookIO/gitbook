@@ -61,7 +61,7 @@ export function EmbeddableAIChat() {
                 <EmbeddableIframeTabs active="assistant" />
                 <EmbeddableIframeButtons />
             </EmbeddableFrameSidebar>
-            <EmbeddableFrameMain>
+            <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
                     <EmbeddableFrameHeaderMain>
                         <EmbeddableFrameTitle>
