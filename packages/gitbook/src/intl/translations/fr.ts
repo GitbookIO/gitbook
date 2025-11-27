@@ -71,6 +71,8 @@ export const fr = {
     unexpected_error_title: 'Erreur inattendue',
     unexpected_error: 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
     unexpected_error_retry: 'Réessayer',
+    rss_feed: 'Flux RSS',
+    open_rss_feed: 'S’abonner au flux de cette page',
     pdf_download: 'Exporter en PDF',
     pdf_goback: 'Retourner au contenu',
     pdf_print: 'Imprimer ou enregistrer en PDF',

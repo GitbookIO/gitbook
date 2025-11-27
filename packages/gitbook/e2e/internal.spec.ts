@@ -37,6 +37,8 @@ import {
     waitForNotFound,
 } from './util';
 
+const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
+
 const searchTestCases: Test[] = [
     {
         name: 'Search - AI Mode: None - Complete flow',
@@ -53,7 +55,9 @@ const searchTestCases: Test[] = [
 
             // Fill search input, expecting search results
             await searchInput.fill('gitbook');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 10_000,
+            });
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
             const pageSectionResults = await page.getByTestId('search-page-section-result').all();
@@ -98,9 +102,6 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-results')).toBeVisible();
         },
     },
-    // TODO: Re-enable the following tests when we have fixed the AI Search timing out:
-    // - Search - AI Mode: Search - Complete flow
-    // - Search - AI Mode: Search - URL query (Initial)
     {
         name: 'Search - AI Mode: Search - URL query (Results)',
         url: `${getCustomizationURL({
@@ -108,16 +109,12 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Search,
             },
         })}&q=gitbook`,
-        screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
         },
     },
-    // TODO: Re-enable the following tests when we have fixed the AI Search timing out:
-    // - Ask - AI Mode: Search - URL query (Ask initial)
-    // - Ask - AI Mode: Search - URL query (Ask results)
     {
         name: 'Ask - AI Mode: Assistant - Complete flow',
         url: getCustomizationURL({
@@ -125,25 +122,39 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
             // Focus search input, expecting recommended questions
             await searchInput.focus();
-            // TODO: Re-enable this part of the test when we have fixed the AI Search timing out
-            // await expect(page.getByTestId('search-results')).toBeVisible();
-            // const recommendedQuestions = await page
-            //     .getByTestId('search-recommended-question')
-            //     .all();
-            // await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 30_000,
+            });
+            const recommendedQuestions = await page
+                .getByTestId('search-recommended-question')
+                .all();
+            await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
 
             // Fill search input, expecting AI search option
-            await searchInput.fill('What is gitbook?');
+            await searchInput.fill(AI_PROMPT);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
             await aiSearchResult.click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
+            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
+                timeout: 60_000,
+            });
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const suggestions = document.querySelectorAll(
+                    '[data-testid="ai-chat-followup-suggestion"]'
+                );
+                suggestions.forEach((suggestion) => {
+                    suggestion.textContent = 'Follow-up suggestion';
+                });
+            });
         },
     },
     {
@@ -153,27 +164,26 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
         },
     },
-    // {
-    //     name: 'Ask - AI Mode: Assistant - Button',
-    //     url: getCustomizationURL({
-    //         ai: {
-    //             mode: CustomizationAIMode.Assistant,
-    //         },
-    //     }),
-    //     screenshot: false,
-    //     run: async (page) => {
-    //         await page.getByTestId('ai-chat-button').click();
-    //         await expect(page.getByTestId('ai-chat')).toBeVisible();
-    //         await expect(page.getByTestId('ai-chat-input')).toBeFocused();
-    //     },
-    // },
+    {
+        name: 'Ask - AI Mode: Assistant - Button',
+        url: getCustomizationURL({
+            ai: {
+                mode: CustomizationAIMode.Assistant,
+            },
+        }),
+        screenshot: false,
+        run: async (page) => {
+            await page.getByTestId('ai-chat-button').click();
+            await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+        },
+    },
     {
         name: 'Ask - AI Mode: Assistant - URL query (Initial)',
         url: `${getCustomizationURL({
@@ -181,10 +191,9 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=`,
-        screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
-            await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
+            await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
         },
@@ -195,17 +204,25 @@ const searchTestCases: Test[] = [
             ai: {
                 mode: CustomizationAIMode.Assistant,
             },
-        })}&ask=What+is+GitBook%3F`,
-        screenshot: false,
+        })}&ask=${encodeURIComponent(AI_PROMPT)}`,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
-            await expect(page.getByTestId('ai-chat')).toBeVisible({
-                timeout: 15_000,
+            await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
+            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
+                timeout: 60_000,
             });
-            await expect(page.getByTestId('ai-chat-message').first()).toHaveText(
-                'What is GitBook?'
-            );
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(() => {
+                const suggestions = document.querySelectorAll(
+                    '[data-testid="ai-chat-followup-suggestion"]'
+                );
+                suggestions.forEach((suggestion) => {
+                    suggestion.textContent = 'Follow-up suggestion';
+                });
+            });
         },
     },
 ];
@@ -878,6 +895,11 @@ const testCases: TestsCase[] = [
             {
                 name: 'Cards',
                 url: 'blocks/cards',
+                fullPage: true,
+            },
+            {
+                name: 'Updates',
+                url: 'blocks/updates',
                 fullPage: true,
             },
             {
