@@ -35,7 +35,7 @@ export function AIMessageView(
                                 wrapBlocksInSuspense: false,
                                 withLinkPreviews,
                             }}
-                            style="mt-2 space-y-4 *:origin-top-left *:animate-blur-in-slow"
+                            style="ai-response-document mt-2 space-y-4 *:origin-top-left *:animate-blur-in-slow"
                         />
 
                         {withToolCalls && step.toolCalls && step.toolCalls.length > 0 ? (
