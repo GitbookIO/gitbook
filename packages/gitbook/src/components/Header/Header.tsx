@@ -151,11 +151,8 @@ export function Header(props: {
                                           encodeClientSiteSections(context, sections).current
                                         : undefined
                                 }
-                                spaceTitle={siteSpace.title}
-                                siteSpaceId={siteSpace.id}
-                                siteSpaceIds={siteSpaces
-                                    .filter((s) => s.space.language === siteSpace.space.language)
-                                    .map((s) => s.id)}
+                                siteSpace={siteSpace}
+                                siteSpaces={siteSpaces}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                             />
                         </div>
