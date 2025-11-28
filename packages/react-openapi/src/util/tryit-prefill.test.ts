@@ -415,6 +415,32 @@ describe('resolvePrefillCodePlaceholderFromSecurityScheme (integration style)', 
 
         expect(result).toBe('');
     });
+
+    it('should prioritize x-gitbook-prefill over x-gitbook-token-placeholder when both are present', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'apiKey',
+                in: 'header',
+                'x-gitbook-prefill': '{{ visitor.claims.apiToken }}',
+                'x-gitbook-token-placeholder': 'API_TOKEN_KEY',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.apiToken)]__$$');
+    });
+
+    it('should return x-gitbook-token-placeholder for apiKey scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'apiKey',
+                in: 'header',
+                name: 'X-API-KEY',
+                'x-gitbook-token-placeholder': 'YOUR_API_KEY_HERE',
+            },
+        });
+
+        expect(result).toBe('YOUR_API_KEY_HERE');
+    });
 });
 
 describe('resolveURLWithPrefillCodePlaceholdersFromServer', () => {

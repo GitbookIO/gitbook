@@ -3,10 +3,11 @@ import { Fragment } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
+import { OpenAPIRequiredScopes, OpenAPISchemaScopes } from './OpenAPIRequiredScopes';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import type { OpenAPICustomSecurityScheme, OpenAPISecurityScope } from './types';
+import type { OpenAPICustomSecurityScheme } from './types';
 import type { OpenAPIOperationData } from './types';
 import { createStateKey, extractOperationSecurityInfo, resolveDescription } from './utils';
 
@@ -25,48 +26,48 @@ export function OpenAPISecurities(props: {
     }
 
     const tabsData = extractOperationSecurityInfo({ securityRequirement, securities });
+    const stateKey = createStateKey('securities', context.blockKey);
 
     return (
-        <InteractiveSection
-            header={t(context.translation, 'authorizations')}
-            stateKey={createStateKey('securities', context.blockKey)}
-            toggeable
-            defaultOpened={false}
-            toggleIcon={context.icons.chevronRight}
-            selectIcon={context.icons.chevronDown}
-            className="openapi-securities"
-            tabs={tabsData.map(({ key, label, schemes }) => ({
-                key,
-                label,
-                body: (
-                    <div className="openapi-schema">
-                        {schemes.map((security, index) => {
-                            const description = resolveDescription(security);
-                            return (
-                                <div
-                                    key={`${key}-${index}`}
-                                    className="openapi-schema-presentation"
-                                >
-                                    {getLabelForType(security, context)}
-                                    {description ? (
-                                        <Markdown
-                                            source={description}
-                                            className="openapi-securities-description"
-                                        />
-                                    ) : null}
-                                    {security.scopes?.length ? (
-                                        <OpenAPISchemaScopes
-                                            scopes={security.scopes}
-                                            context={context}
-                                        />
-                                    ) : null}
-                                </div>
-                            );
-                        })}
-                    </div>
-                ),
-            }))}
-        />
+        <>
+            <OpenAPIRequiredScopes context={context} stateKey={stateKey} securities={tabsData} />
+            <InteractiveSection
+                header={t(context.translation, 'authorizations')}
+                stateKey={stateKey}
+                toggleIcon={context.icons.chevronRight}
+                selectIcon={context.icons.chevronDown}
+                className="openapi-securities"
+                tabs={tabsData.map(({ key, label, schemes }) => ({
+                    key,
+                    label,
+                    body: (
+                        <div className="openapi-schema">
+                            {schemes.map((security, index) => {
+                                // OAuth2 description is already rendered in OpenAPISchemaOAuth2Item
+                                const description =
+                                    security.type !== 'oauth2'
+                                        ? resolveDescription(security)
+                                        : undefined;
+                                return (
+                                    <div
+                                        key={`${key}-${index}`}
+                                        className="openapi-schema-presentation"
+                                    >
+                                        {getLabelForType(security, context)}
+                                        {description ? (
+                                            <Markdown
+                                                source={description}
+                                                className="openapi-securities-description"
+                                            />
+                                        ) : null}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ),
+                }))}
+            />
+        </>
     );
 }
 
@@ -175,8 +176,9 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    // If the security scheme has scopes, we don't need to display the scopes from the flow
     const scopes = !security.scopes?.length && flow.scopes ? Object.entries(flow.scopes) : [];
+
+    const description = resolveDescription(security);
 
     return (
         <div>
@@ -187,7 +189,9 @@ function OpenAPISchemaOAuth2Item(props: {
                 required={security.required}
             />
             <div className="openapi-securities-oauth-content openapi-markdown">
-                {security.description ? <Markdown source={security.description} /> : null}
+                {description ? (
+                    <Markdown source={description} className="openapi-securities-description" />
+                ) : null}
                 {'authorizationUrl' in flow && flow.authorizationUrl ? (
                     <span>
                         Authorization URL:{' '}
@@ -227,62 +231,10 @@ function OpenAPISchemaOAuth2Item(props: {
                         </OpenAPICopyButton>
                     </span>
                 ) : null}
-                {scopes.length ? <OpenAPISchemaScopes scopes={scopes} context={context} /> : null}
+                {scopes.length ? (
+                    <OpenAPISchemaScopes scopes={scopes} context={context} isOAuth2 />
+                ) : null}
             </div>
         </div>
-    );
-}
-
-/**
- * Render a list of available scopes.
- */
-function OpenAPISchemaScopes(props: {
-    scopes: OpenAPISecurityScope[];
-    context: OpenAPIClientContext;
-}) {
-    const { scopes, context } = props;
-
-    return (
-        <div className="openapi-securities-scopes openapi-markdown">
-            <span>{t(context.translation, 'required_scopes')}: </span>
-            <ul>
-                {scopes.map((scope) => (
-                    <OpenAPIScopeItem key={scope[0]} scope={scope} context={context} />
-                ))}
-            </ul>
-        </div>
-    );
-}
-
-/**
- * Display a scope item. Either a key-value pair or a single string.
- */
-function OpenAPIScopeItem(props: {
-    scope: OpenAPISecurityScope;
-    context: OpenAPIClientContext;
-}) {
-    const { scope, context } = props;
-
-    return (
-        <li>
-            <OpenAPIScopeItemKey name={scope[0]} context={context} />
-            {scope[1] ? `: ${scope[1]}` : null}
-        </li>
-    );
-}
-
-/**
- * Displays the scope name within a copyable button.
- */
-function OpenAPIScopeItemKey(props: {
-    name: string;
-    context: OpenAPIClientContext;
-}) {
-    const { name, context } = props;
-
-    return (
-        <OpenAPICopyButton value={name} context={context} withTooltip>
-            <code>{name}</code>
-        </OpenAPICopyButton>
     );
 }

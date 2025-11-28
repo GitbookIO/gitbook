@@ -1,6 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
+import { getPageRSSURL } from '@/routes/rss';
 import { type RevisionPageDocument, SiteVisibility } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 import urlJoin from 'url-join';
@@ -16,8 +17,9 @@ export async function PageHeader(props: {
     context: GitBookSiteContext;
     page: RevisionPageDocument;
     ancestors: AncestorRevisionPage[];
+    withRSSFeed: boolean;
 }) {
-    const { context, page, ancestors } = props;
+    const { context, page, ancestors, withRSSFeed } = props;
     const { revision, linker } = context;
 
     if (!page.layout.title && !page.layout.description) {
@@ -43,7 +45,7 @@ export async function PageHeader(props: {
                 // Show page actions if *any* of the actions are enabled
                 <PageActionsDropdown
                     siteTitle={context.site.title}
-                    urls={getPageActionsURLs(context, page)}
+                    urls={getPageActionsURLs({ context, page, withRSSFeed })}
                     actions={context.customization.pageActions}
                     className={tcls(
                         'float-right ml-4 xl:max-2xl:page-api-block:mr-62',
@@ -100,11 +102,14 @@ export async function PageHeader(props: {
             {page.layout.title ? (
                 <h1
                     className={tcls(
-                        'text-4xl',
+                        'text-2xl',
+                        '@xs:text-3xl',
+                        '@lg:text-4xl',
+                        'leading-tight',
                         'font-bold',
                         'flex',
                         'items-center',
-                        'gap-4',
+                        'gap-[.5em]',
                         'grow',
                         'text-pretty',
                         'clear-right',
@@ -125,15 +130,21 @@ export async function PageHeader(props: {
 /**
  * Return the URLs for the page actions.
  */
-function getPageActionsURLs(
-    context: GitBookSiteContext,
-    page: RevisionPageDocument
-): PageActionsDropdownURLs {
+function getPageActionsURLs({
+    context,
+    page,
+    withRSSFeed,
+}: {
+    context: GitBookSiteContext;
+    page: RevisionPageDocument;
+    withRSSFeed: boolean;
+}): PageActionsDropdownURLs {
+    const pagePath = context.linker.toPathForPage({ pages: context.revision.pages, page });
     return {
-        html: context.linker.toAbsoluteURL(
-            context.linker.toPathForPage({ pages: context.revision.pages, page })
-        ),
+        html: context.linker.toAbsoluteURL(pagePath),
+        // For the markdown URL, we use the page.path to ensure it works for the default page.
         markdown: `${context.linker.toAbsoluteURL(context.linker.toPathInSpace(page.path))}.md`,
+        rss: withRSSFeed ? getPageRSSURL(context, page) : undefined,
         editOnGit:
             context.customization.git.showEditLink && context.space.gitSync?.url && page.git
                 ? {

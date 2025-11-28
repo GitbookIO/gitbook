@@ -27,6 +27,7 @@ export type LinkInsightsProps = {
 
 export type LinkProps = Omit<BaseLinkProps, 'href'> &
     LinkInsightsProps & {
+        ref?: React.Ref<HTMLAnchorElement>;
         /** Enforce href is passed as a string (not a URL). */
         href: string;
         /** This is a temporary solution designed to reduce the number of tailwind class passed to the client */
@@ -66,11 +67,8 @@ function getTargetProps(
  * Low-level Link component that handles navigation to external urls.
  * It does not contain any styling.
  */
-export const Link = React.forwardRef(function Link(
-    props: LinkProps,
-    ref: React.Ref<HTMLAnchorElement>
-) {
-    const { href, prefetch, children, insights, classNames, className, ...domProps } = props;
+export function Link(props: LinkProps) {
+    const { ref, href, prefetch, children, insights, classNames, className, ...domProps } = props;
     const { externalLinksTarget } = React.useContext(LinkSettingsContext);
     const { onNavigationClick } = React.useContext(NavigationStatusContext);
     const trackEvent = useTrackEvent();
@@ -80,8 +78,8 @@ export const Link = React.forwardRef(function Link(
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         const isExternalWithOrigin = isExternalLink(href, window.location.origin);
-        // Only trigger navigation context for internal links without modifier keys (i.e. open in new tab).
-        if (!isExternal && !event.ctrlKey && !event.metaKey) {
+        // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
+        if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
             onNavigationClick(href);
         }
 
@@ -145,7 +143,7 @@ export const Link = React.forwardRef(function Link(
             {children}
         </NextLink>
     );
-});
+}
 
 /**
  * A box used to contain a link overlay.

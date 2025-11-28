@@ -67,53 +67,6 @@ export interface AskAnswerResult {
 }
 
 /**
- * Server action to search content in the entire site.
- */
-export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    return traceErrorOnly('Search.searchAllSiteContent', async () => {
-        const context = await getServerActionBaseContext();
-        return searchSiteContent(context, {
-            query,
-            scope: { mode: 'all' },
-        });
-    });
-}
-
-/**
- * Server action to search content in a space.
- */
-export async function searchCurrentSiteSpaceContent(
-    query: string,
-    siteSpaceId: string
-): Promise<OrderedComputedResult[]> {
-    return traceErrorOnly('Search.searchSiteSpaceContent', async () => {
-        const context = await getServerActionBaseContext();
-
-        return await searchSiteContent(context, {
-            query,
-            scope: { mode: 'current', siteSpaceId },
-        });
-    });
-}
-
-/**
- * Server action to search content in a specific space.
- */
-export async function searchSpecificSiteSpaceContent(
-    query: string,
-    siteSpaceIds: string[]
-): Promise<OrderedComputedResult[]> {
-    return traceErrorOnly('Search.searchSiteSpaceContent', async () => {
-        const context = await getServerActionBaseContext();
-
-        return await searchSiteContent(context, {
-            query,
-            scope: { mode: 'specific', siteSpaceIds },
-        });
-    });
-}
-
-/**
  * Server action to ask a question in a space.
  */
 export async function streamAskQuestion({
@@ -245,69 +198,72 @@ export async function streamRecommendedQuestions(args: { siteSpaceId?: string })
 /**
  * Search for content in a site by scoping the search to all content, a specific spaces or current space.
  */
-async function searchSiteContent(
-    context: GitBookBaseContext,
-    args: {
-        query: string;
-        scope:
-            | { mode: 'all' }
-            | { mode: 'current'; siteSpaceId: string }
-            | { mode: 'specific'; siteSpaceIds: string[] };
-    }
-): Promise<OrderedComputedResult[]> {
-    const { dataFetcher } = context;
-    const siteURLData = await getSiteURLDataFromMiddleware();
+export async function searchSiteContent({
+    query,
+    ...scope
+}: {
+    query: string;
+} & (
+    | { mode: 'all' }
+    | { mode: 'current'; siteSpaceId: string }
+    | { mode: 'specific'; siteSpaceIds: string[] }
+)): Promise<OrderedComputedResult[]> {
+    return traceErrorOnly(`Search.searchSiteContent.${scope.mode}`, async () => {
+        if (query.length <= 1) {
+            return [];
+        }
 
-    const { scope, query } = args;
+        const [context, { organization, site, shareKey }] = await Promise.all([
+            getServerActionBaseContext(),
+            getSiteURLDataFromMiddleware(),
+        ]);
 
-    if (query.length <= 1) {
-        return [];
-    }
+        const [searchResults, { structure }] = await Promise.all([
+            throwIfDataError(
+                context.dataFetcher.searchSiteContent({
+                    organizationId: organization,
+                    siteId: site,
+                    query,
+                    scope,
+                })
+            ),
+            throwIfDataError(
+                context.dataFetcher.getPublishedContentSite({
+                    organizationId: organization,
+                    siteId: site,
+                    siteShareKey: shareKey,
+                })
+            ),
+        ]);
 
-    const [searchResults, { structure }] = await Promise.all([
-        throwIfDataError(
-            dataFetcher.searchSiteContent({
-                organizationId: siteURLData.organization,
-                siteId: siteURLData.site,
-                query,
-                scope,
-            })
-        ),
-        throwIfDataError(
-            dataFetcher.getPublishedContentSite({
-                organizationId: siteURLData.organization,
-                siteId: siteURLData.site,
-                siteShareKey: siteURLData.shareKey,
-            })
-        ),
-    ]);
+        return (
+            await Promise.all(
+                searchResults.map((spaceItem) => {
+                    const found = findSiteSpaceBy(
+                        structure,
+                        (siteSpace) => siteSpace.space.id === spaceItem.id
+                    );
+                    const siteSection = found?.siteSection;
+                    const siteSectionGroup = found?.siteSectionGroup;
 
-    return (
-        await Promise.all(
-            searchResults.map((spaceItem) => {
-                const found = findSiteSpaceBy(
-                    structure,
-                    (siteSpace) => siteSpace.space.id === spaceItem.id
-                );
-                const siteSection = found?.siteSection;
-                const siteSectionGroup = found?.siteSectionGroup;
-
-                return Promise.all(
-                    spaceItem.pages.map((pageItem) =>
-                        transformSitePageResult(context, {
-                            pageItem,
-                            spaceItem,
-                            siteSpace: found?.siteSpace,
-                            space: found?.siteSpace.space,
-                            spaceURL: found?.siteSpace.urls.published,
-                            siteSection: siteSection ?? undefined,
-                            siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
-                        })
-                    )
-                );
-            })
-        )
-    ).flat(2);
+                    return Promise.all(
+                        spaceItem.pages.map((pageItem) =>
+                            transformSitePageResult(context, {
+                                pageItem,
+                                spaceItem,
+                                siteSpace: found?.siteSpace,
+                                space: found?.siteSpace.space,
+                                spaceURL: found?.siteSpace.urls.published,
+                                siteSection: siteSection ?? undefined,
+                                siteSectionGroup:
+                                    (siteSectionGroup as SiteSectionGroup) ?? undefined,
+                            })
+                        )
+                    );
+                })
+            )
+        ).flat(2);
+    });
 }
 
 async function transformAnswer(
@@ -372,7 +328,7 @@ async function transformAnswer(
                         wrapBlocksInSuspense: false,
                         withLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
-                    style={['space-y-5']}
+                    style="space-y-5 *:origin-top-left *:animate-blur-in-slow"
                 />
             ) : null,
         followupQuestions: answer.followupQuestions,

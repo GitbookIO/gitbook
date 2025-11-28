@@ -220,7 +220,7 @@ function OpenAPICodeSampleFooter(props: {
         return null;
     }
 
-    if (!validateHttpMethod(method)) {
+    if (!validateHttpMethod(method) || (!hasMultipleMediaTypes && servers.length === 0)) {
         return null;
     }
 
@@ -237,7 +237,7 @@ function OpenAPICodeSampleFooter(props: {
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && (
+            {!hideTryItPanel && servers.length > 0 && (
                 <ScalarApiButton
                     context={getOpenAPIClientContext(context)}
                     method={method}
@@ -290,7 +290,7 @@ function getCustomCodeSamples(props: {
     return customCodeSamples;
 }
 
-function getSecurityHeaders(args: {
+export function getSecurityHeaders(args: {
     securityRequirement: OpenAPIV3.OperationObject['security'];
     securities: OpenAPIOperationData['securities'];
 }): {
@@ -314,12 +314,14 @@ function getSecurityHeaders(args: {
     for (const security of selectedSecurity.schemes) {
         switch (security.type) {
             case 'http': {
+                // We do not use x-gitbook-prefix for http schemes to avoid confusion with the standard.
                 let scheme = security.scheme;
+                const defaultPlaceholderValue = scheme?.toLowerCase()?.includes('basic')
+                    ? 'username:password'
+                    : 'YOUR_SECRET_TOKEN';
                 const format = resolvePrefillCodePlaceholderFromSecurityScheme({
                     security: security,
-                    defaultPlaceholderValue: scheme?.includes('basic')
-                        ? 'username:password'
-                        : 'YOUR_SECRET_TOKEN',
+                    defaultPlaceholderValue,
                 });
 
                 if (scheme?.includes('bearer')) {
@@ -328,6 +330,8 @@ function getSecurityHeaders(args: {
                     scheme = 'Basic';
                 } else if (scheme?.includes('token')) {
                     scheme = 'Token';
+                } else {
+                    scheme = scheme ?? '';
                 }
 
                 headers.Authorization = `${scheme} ${format}`;
@@ -338,17 +342,23 @@ function getSecurityHeaders(args: {
                     break;
                 }
                 const name = security.name ?? 'Authorization';
-                headers[name] = resolvePrefillCodePlaceholderFromSecurityScheme({
+                const placeholder = resolvePrefillCodePlaceholderFromSecurityScheme({
                     security: security,
                     defaultPlaceholderValue: 'YOUR_API_KEY',
                 });
+                // Use x-gitbook-prefix if provided for apiKey schemes
+                const prefix = security['x-gitbook-prefix'];
+                headers[name] = prefix ? `${prefix} ${placeholder}` : placeholder;
                 break;
             }
             case 'oauth2': {
-                headers.Authorization = `Bearer ${resolvePrefillCodePlaceholderFromSecurityScheme({
-                    security: security,
-                    defaultPlaceholderValue: 'YOUR_OAUTH2_TOKEN',
-                })}`;
+                const prefix = security['x-gitbook-prefix'] ?? 'Bearer';
+                headers.Authorization = `${prefix} ${resolvePrefillCodePlaceholderFromSecurityScheme(
+                    {
+                        security: security,
+                        defaultPlaceholderValue: 'YOUR_OAUTH2_TOKEN',
+                    }
+                )}`;
                 break;
             }
             default: {

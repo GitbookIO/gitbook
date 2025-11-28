@@ -23,7 +23,7 @@ export function AIChatButton(props: {
             iconOnly={!showLabel}
             size="medium"
             variant="header"
-            className="h-9 px-2.5 max-md:[&_.button-content]:hidden"
+            className="h-9 px-2.5 @max-2xl:[&_.button-content]:hidden"
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', assistant.label)}

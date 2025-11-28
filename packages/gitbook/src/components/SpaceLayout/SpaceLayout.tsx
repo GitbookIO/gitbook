@@ -117,9 +117,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
             <Announcement context={context} />
             <Header withTopHeader={withTopHeader} variants={variants} context={context} />
             <NavigationLoader />
-            {customization.ai?.mode === CustomizationAIMode.Assistant ? (
-                <AIChat trademark={customization.trademark.enabled} />
-            ) : null}
+            {customization.ai?.mode === CustomizationAIMode.Assistant ? <AIChat /> : null}
 
             <div className="motion-safe:transition-all motion-safe:duration-300 lg:chat-open:mr-80 xl:chat-open:mr-96">
                 <div
@@ -129,7 +127,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:flex-row',
                         'lg:justify-center',
                         CONTAINER_STYLE,
-                        'site-width-wide:max-w-full',
+                        'site-width-wide:max-w-screen-4xl',
+                        'hydrated:transition-[max-width] duration-300',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withFooter && [
@@ -171,8 +170,10 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                 </div>
                             )
                         }
+                        // Displays the search button and/or the space dropdown in the ToC
+                        // according to the header/variant settings.
+                        // E.g if there is no header, the search button will be displayed in the ToC.
                         innerHeader={
-                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                             <>
                                 {!withTopHeader && (
                                     <div className="flex gap-2">
@@ -188,15 +189,8 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             }
                                             withSections={withSections}
                                             section={sections?.current}
-                                            spaceTitle={siteSpace.title}
-                                            siteSpaceId={siteSpace.id}
-                                            siteSpaceIds={siteSpaces
-                                                .filter(
-                                                    (s) =>
-                                                        s.space.language ===
-                                                        siteSpace.space.language
-                                                )
-                                                .map((s) => s.id)}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={siteSpaces}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />

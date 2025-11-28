@@ -26,3 +26,6 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 .npmrc
+
+# Bun pack artifacts
+packages/*/*.tgz

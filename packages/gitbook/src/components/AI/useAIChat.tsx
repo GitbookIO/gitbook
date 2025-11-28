@@ -96,6 +96,8 @@ export type AIChatController = {
     postMessage: (input: { message: string }) => void;
     /** Clear the conversation */
     clear: () => void;
+    /** Register an event listener */
+    on: (event: 'postMessage', listener: (input: { message: string }) => void) => () => void;
 };
 
 const AIChatControllerContext = React.createContext<AIChatController | null>(null);
@@ -136,6 +138,11 @@ export function AIChatProvider(props: {
     const trackEvent = useTrackEvent();
     const [, setSearchState] = useSearch();
     const language = useLanguage();
+
+    // Event listeners storage
+    const eventsRef = React.useRef<Map<'postMessage', Array<(input: { message: string }) => void>>>(
+        new Map()
+    );
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
@@ -379,8 +386,18 @@ export function AIChatProvider(props: {
                 }));
             }
 
+            // Defer event listeners to next tick so React can process state updates first
+            setTimeout(() => {
+                const listeners = eventsRef.current.get('postMessage') || [];
+                listeners.forEach((listener) => listener(input));
+            }, 0);
+
             if (query === input.message) {
                 // Return early if the message is the same as the previous message
+                globalState.setState((state) => ({
+                    ...state,
+                    opened: true,
+                }));
                 return;
             }
 
@@ -440,14 +457,31 @@ export function AIChatProvider(props: {
         }));
     }, [setSearchState]);
 
+    const onEvent = React.useCallback(
+        (event: 'postMessage', listener: (input: { message: string }) => void) => {
+            const listeners = eventsRef.current.get(event) || [];
+            listeners.push(listener);
+            eventsRef.current.set(event, listeners);
+            return () => {
+                const currentListeners = eventsRef.current.get(event) || [];
+                eventsRef.current.set(
+                    event,
+                    currentListeners.filter((l) => l !== listener)
+                );
+            };
+        },
+        []
+    );
+
     const controller = React.useMemo(() => {
         return {
             open: onOpen,
             close: onClose,
             clear: onClear,
             postMessage: onPostMessage,
+            on: onEvent,
         };
-    }, [onOpen, onClose, onClear, onPostMessage]);
+    }, [onOpen, onClose, onClear, onPostMessage, onEvent]);
 
     return (
         <AIChatControllerContext.Provider value={controller}>

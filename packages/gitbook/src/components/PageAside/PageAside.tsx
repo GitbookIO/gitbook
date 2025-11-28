@@ -37,24 +37,32 @@ export function PageAside(props: {
                 'group/aside',
                 'order-last',
                 'hidden',
+                'max-w-0',
                 'pt-8',
                 'pb-4',
+                'opacity-0',
 
                 'xl:flex',
-                'xl:max-3xl:chat-open:hidden',
-                'xl:max-3xl:chat-open:opacity-0',
-                'max-w-56',
 
-                // Animate the width of the aside when the chat is open
-                'xl:max-3xl:*:chat-open:w-56',
+                'overflow-hidden',
+
+                'xl:max-w-56',
+                'xl:opacity-11',
+                'xl:ml-12',
+
+                'xl:max-3xl:chat-open:hidden',
                 'xl:max-3xl:chat-open:max-w-0',
+                'xl:max-3xl:chat-open:opacity-0',
                 'xl:max-3xl:chat-open:ml-0',
 
-                'motion-safe:xl:transition-[width,max-width,margin,opacity,display] motion-safe:xl:duration-300',
-                'motion-safe:transition-discrete',
+                'hydrated:starting:ml-0',
+                'hydrated:starting:max-w-0',
+                'hydrated:starting:opacity-0',
+
+                'transition-[margin,max-width,opacity,display] duration-300',
+                'transition-discrete',
 
                 'basis-56',
-                'xl:ml-12',
                 'grow-0',
                 'shrink-0',
                 'break-anywhere', // To prevent long words in headings from breaking the layout
@@ -93,6 +101,7 @@ export function PageAside(props: {
             <div
                 className={tcls(
                     'flex flex-col',
+                    'min-w-56 shrink-0',
                     'overflow-hidden',
                     'w-full',
                     'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
@@ -160,7 +169,11 @@ async function PageAsideSections(props: { document: JSONDocument; context: GitBo
 
     const sections = await getDocumentSections(context, document);
 
-    return sections.length > 1 ? <ScrollSectionsList sections={sections} /> : null;
+    return sections.length > 1 ? (
+        <div className="overflow-y-auto">
+            <ScrollSectionsList sections={sections} />
+        </div>
+    ) : null;
 }
 
 function PageAsideActions(props: {

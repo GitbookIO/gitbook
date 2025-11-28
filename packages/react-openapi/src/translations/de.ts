@@ -37,6 +37,8 @@ export const de = {
     hide: 'Verstecke ${1}',
     available_items: 'Verfügbare Elemente',
     required_scopes: 'Erforderliche Scopes',
+    required_scopes_description: 'Dieser Endpunkt erfordert die folgenden Scopes:',
+    available_scopes: 'Verfügbare Scopes:',
     properties: 'Eigenschaften',
     or: 'oder',
     and: 'und',

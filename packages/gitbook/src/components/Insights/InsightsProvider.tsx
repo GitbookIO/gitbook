@@ -127,9 +127,16 @@ export function InsightsProvider(props: InsightsProviderProps) {
         }
     });
 
-    const flushBatchedEvents = useDebounceCallback(() => {
-        flushEventsSync();
-    }, 1500);
+    const flushBatchedEvents = useDebounceCallback(
+        () => {
+            flushEventsSync();
+        },
+        1500,
+        {
+            // We don't want to debounce indefinitely, after 1 minute we want to flush anyway
+            maxWait: 60000,
+        }
+    );
 
     // Flush pending events once the visitor session has been fetched
     React.useEffect(() => {

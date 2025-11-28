@@ -28,7 +28,7 @@ export function KeyboardShortcut(props: { keys: string[]; className?: ClassValue
             className={tcls(
                 'shortcut hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong md:flex',
                 operatingSystem
-                    ? 'motion-safe:animate-fade-in motion-reduce:opacity-100'
+                    ? 'motion-safe:animate-fade-in motion-reduce:opacity-11'
                     : 'opacity-0'
             )}
         >

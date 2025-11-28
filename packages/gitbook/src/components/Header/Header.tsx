@@ -67,7 +67,7 @@ export function Header(props: {
                     'theme-bold:shadow-tint-12/2'
                 )}
             >
-                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
                         className={tcls(
                             'gap-4',
@@ -79,13 +79,19 @@ export function Header(props: {
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            CONTAINER_STYLE
+                            CONTAINER_STYLE,
+                            'transition-[max-width] duration-300',
+                            '@container/header'
                         )}
                     >
                         <div
                             className={tcls(
-                                'flex max-w-full lg:basis-72',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
+                                'flex max-w-full',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? 'lg:@2xl:basis-72'
+                                    : null
                             )}
                         >
                             <HeaderMobileMenu
@@ -96,7 +102,7 @@ export function Header(props: {
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
-                                        ? 'xl:hidden'
+                                        ? 'lg:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
                                 )}
                             />
@@ -108,22 +114,23 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                'md:basis-56',
+                                '@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
+                                'transition-[margin] duration-300',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          'md:grow-[0.8]',
-                                          'lg:basis-40',
-                                          'md:max-w-[40%]',
-                                          'lg:max-w-lg',
-                                          'lg:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'md:mr-auto',
+                                          '@2xl:grow-[0.8]',
+                                          '@4xl:basis-40',
+                                          '@2xl:max-w-[40%]',
+                                          '@4xl:max-w-lg',
+                                          'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          '@2xl:mr-auto',
                                           'order-last',
-                                          'md:order-[unset]',
+                                          '@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
@@ -144,11 +151,8 @@ export function Header(props: {
                                           encodeClientSiteSections(context, sections).current
                                         : undefined
                                 }
-                                spaceTitle={siteSpace.title}
-                                siteSpaceId={siteSpace.id}
-                                siteSpaceIds={siteSpaces
-                                    .filter((s) => s.space.language === siteSpace.space.language)
-                                    .map((s) => s.id)}
+                                siteSpace={siteSpace}
+                                siteSpaces={siteSpaces}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                             />
                         </div>

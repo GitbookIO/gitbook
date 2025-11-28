@@ -4,7 +4,7 @@ import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, hasMoreThan, isNodeEmpty } from '@/lib/document';
+import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -33,6 +33,11 @@ export function PageBody(props: {
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
 
+    // Update blocks can only be at the top level of the document, so we optimize the check.
+    const contentHasUpdates = document
+        ? hasTopLevelBlock(document, (block) => block.type === 'updates')
+        : false;
+
     // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
     const withLinkPreviews = document
         ? !hasMoreThan(
@@ -59,6 +64,7 @@ export function PageBody(props: {
                     'max-w-screen-2xl py-8',
                     // Allow words to break if they are too long.
                     'break-anywhere',
+                    '@container',
                     pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
                     page.layout.tableOfContents && hasVisibleTOCItems
@@ -71,7 +77,12 @@ export function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader context={context} page={page} ancestors={ancestors} />
+                <PageHeader
+                    context={context}
+                    page={page}
+                    ancestors={ancestors}
+                    withRSSFeed={contentHasUpdates}
+                />
                 {document && !isNodeEmpty(document) ? (
                     <React.Suspense
                         fallback={

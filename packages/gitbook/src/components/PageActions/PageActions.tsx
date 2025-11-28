@@ -290,6 +290,25 @@ export function ActionViewAsPDF(props: { url: string; type: PageActionType }) {
 }
 
 /**
+ * Action to view the page as an RSS feed.
+ */
+export function ActionViewAsRSS(props: { url: string; type: PageActionType }) {
+    const { url, type } = props;
+    const language = useLanguage();
+
+    return (
+        <PageActionWrapper
+            type={type}
+            icon="rss"
+            label={tString(language, 'rss_feed')}
+            description={tString(language, 'open_rss_feed')}
+            href={url}
+            target="_blank"
+        />
+    );
+}
+
+/**
  * Action to copy a string to the clipboard.
  */
 export function CopyToClipboard(props: {

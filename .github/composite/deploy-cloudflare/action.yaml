@@ -70,7 +70,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '4.10.0'
+              wranglerVersion: '4.43.0'
               environment: ${{ inputs.environment }}
               command: deploy --config ./packages/gitbook/openNext/customWorkers/doWrangler.jsonc
 
@@ -81,7 +81,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '4.10.0'
+              wranglerVersion: '4.43.0'
               environment: ${{ inputs.environment }}
               command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook/openNext/customWorkers/defaultWrangler.jsonc
 
@@ -104,7 +104,7 @@ runs:
               apiToken: ${{ inputs.apiToken }}
               accountId: ${{ inputs.accountId }}
               workingDirectory: ./
-              wranglerVersion: '4.10.0'
+              wranglerVersion: '4.43.0'
               environment: ${{ inputs.environment }}
               command: ${{ format('versions upload --tag {0} --message "{1}"', inputs.commitTag, inputs.commitMessage) }} --config ./packages/gitbook/openNext/customWorkers/middlewareWrangler.jsonc
         

@@ -1,5 +1,12 @@
 # @gitbook/openapi-parser
 
+## 3.0.5
+
+### Patch Changes
+
+- df1966d: Bump Scalar
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
 ## 3.0.4
 
 ### Patch Changes

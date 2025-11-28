@@ -1,7 +1,7 @@
 'use client';
 
 import { t, useLanguage } from '@/intl/client';
-import { CustomizationSearchStyle, type SiteSection } from '@gitbook/api';
+import { CustomizationSearchStyle, type SiteSection, type SiteSpace } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -21,14 +21,11 @@ import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
 
 interface SearchContainerProps {
-    /** The current site space id. */
-    siteSpaceId: string;
+    /** The current site space. */
+    siteSpace: SiteSpace;
 
-    /** The title of the current space. */
-    spaceTitle: string;
-
-    /** The ids of all spaces in the current section. */
-    siteSpaceIds: string[];
+    /** All site spaces in the current section. */
+    siteSpaces: ReadonlyArray<SiteSpace>;
 
     /** Whether there are sections on the site. */
     withSections: boolean;
@@ -50,20 +47,17 @@ interface SearchContainerProps {
 /**
  * Client component to render the search input and results.
  */
-export function SearchContainer(props: SearchContainerProps) {
-    const {
-        siteSpaceId,
-        spaceTitle,
-        section,
-        withVariants,
-        withSiteVariants,
-        withSections,
-        style,
-        className,
-        viewport,
-        siteSpaceIds,
-    } = props;
-
+export function SearchContainer({
+    siteSpace,
+    section,
+    withVariants,
+    withSiteVariants,
+    withSections,
+    style,
+    className,
+    viewport,
+    siteSpaces,
+}: SearchContainerProps) {
     const { assistants, config } = useAI();
 
     const [state, setSearchState] = useSearch();
@@ -181,10 +175,29 @@ export function SearchContainer(props: SearchContainerProps) {
     const visible = viewport === 'desktop' ? !isMobile : viewport === 'mobile' ? isMobile : true;
 
     const searchResultsId = `search-results-${React.useId()}`;
+
+    // If searching all variants of the current section (the "extended" scope),
+    // filter by language if the language is set for both the current and the target site space.
+    const siteSpaceIds = React.useMemo(
+        () =>
+            siteSpaces.reduce((acc: string[], ss) => {
+                if (
+                    !siteSpace.space.language ||
+                    !ss.space.language ||
+                    ss.space.language === siteSpace.space.language
+                ) {
+                    acc.push(ss.id);
+                }
+
+                return acc;
+            }, []),
+        [siteSpaces, siteSpace.space.language]
+    );
+
     const { results, fetching, error } = useSearchResults({
         disabled: !(state?.query || withAI),
         query: normalizedQuery,
-        siteSpaceId,
+        siteSpaceId: siteSpace.id,
         siteSpaceIds,
         scope: state?.scope ?? 'default',
         withAI,
@@ -234,7 +247,7 @@ export function SearchContainer(props: SearchContainerProps) {
                                 <div className="border-tint-subtle border-t bg-tint-subtle px-4 py-1.5">
                                     <SearchScopeControl
                                         section={section}
-                                        spaceTitle={spaceTitle}
+                                        spaceTitle={siteSpace.title}
                                         withVariants={withVariants}
                                         withSiteVariants={withSiteVariants}
                                         withSections={withSections}
@@ -315,8 +328,7 @@ export function SearchContainer(props: SearchContainerProps) {
  *  Screen reader announcement for search results.
  *  Without it there is no feedback for screen reader users when a search returns no results.
  */
-function LiveResultsAnnouncer(props: { count: number; showing: boolean }) {
-    const { count, showing } = props;
+function LiveResultsAnnouncer({ count, showing }: { count: number; showing: boolean }) {
     const language = useLanguage();
     return (
         <div className="sr-only" aria-live="assertive" role="alert" aria-relevant="all">

@@ -48,5 +48,23 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
 
             return linker.toPathInSpace(embedPagePath) + (anchor ? `#${anchor}` : '');
         },
+
+        withOtherSiteSpace(override: { spaceBasePath: string }): GitBookLinker {
+            return linker.withOtherSiteSpace({
+                // We make sure that links in the other site space will be shown in the embeddeable view.
+                spaceBasePath: joinPath(override.spaceBasePath, '~gitbook/embed/page'),
+            });
+        },
+
+        toLinkForContent(rawURL: string): string {
+            const result = linker.toLinkForContent(rawURL);
+            // If the link is not relative or already an embed, return it as is
+            if (result.includes('~gitbook') || !result.startsWith('/')) {
+                return result;
+            }
+
+            // If the link is relative, assume it's a section link and append the embed path
+            return joinPath(result, '~gitbook/embed/page');
+        },
     };
 }

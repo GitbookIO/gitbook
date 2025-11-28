@@ -80,6 +80,7 @@ export function Column(props: {
         <div
             className={tcls(
                 'flex flex-col',
+                '@container/column',
                 (verticalAlignment === VerticalAlignment.Top || !verticalAlignment) &&
                     'justify-start',
                 verticalAlignment === VerticalAlignment.Middle && 'justify-center',

@@ -1,18 +1,24 @@
 import { type PagePathParams, getSitePageData } from '@/components/SitePage';
-
-import { PageBody } from '@/components/PageBody';
 import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsDisplayContext } from '@gitbook/api';
 import type { Metadata } from 'next';
-import { Button } from '../primitives';
+import { HeaderMobileMenu } from '../Header/HeaderMobileMenu';
+import { PageBody } from '../PageBody';
+import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
+import { TableOfContents } from '../TableOfContents';
+import { ScrollContainer } from '../primitives/ScrollContainer';
+import { EmbeddableDocsPageControlButtons } from './EmbeddableDocsPageControlButtons';
 import {
     EmbeddableFrame,
     EmbeddableFrameBody,
     EmbeddableFrameButtons,
     EmbeddableFrameHeader,
     EmbeddableFrameHeaderMain,
+    EmbeddableFrameMain,
+    EmbeddableFrameSidebar,
+    EmbeddableFrameTitle,
 } from './EmbeddableFrame';
-import { EmbeddableIframeButtons } from './EmbeddableIframeAPI';
+import { EmbeddableIframeButtons, EmbeddableIframeTabs } from './EmbeddableIframeAPI';
 
 export const dynamic = 'force-static';
 
@@ -32,33 +38,55 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
     });
 
     return (
-        <EmbeddableFrame>
-            <EmbeddableFrameHeader>
-                <EmbeddableFrameHeaderMain>
-                    <Button
-                        href={context.linker.toPathInSite('~gitbook/embed/assistant')}
-                        size="default"
-                        variant="blank"
-                        icon="arrow-left"
-                        label="Back"
-                    />
-                </EmbeddableFrameHeaderMain>
-                <EmbeddableFrameButtons>
-                    <EmbeddableIframeButtons />
-                </EmbeddableFrameButtons>
-            </EmbeddableFrameHeader>
-            <EmbeddableFrameBody>
-                <div className="flex-1 overflow-auto p-6">
-                    <PageBody
-                        context={context}
-                        page={page}
-                        ancestors={ancestors}
-                        document={document}
-                        withPageFeedback={withPageFeedback}
-                        insightsDisplayContext={SiteInsightsDisplayContext.Embed}
-                    />
+        <EmbeddableFrame className="site-background">
+            <EmbeddableFrameSidebar>
+                <EmbeddableIframeTabs active="docs" />
+                <EmbeddableIframeButtons />
+            </EmbeddableFrameSidebar>
+            <EmbeddableFrameMain>
+                <div className="relative flex not-hydrated:animate-blur-in-slow flex-col">
+                    <EmbeddableFrameHeader>
+                        <HeaderMobileMenu className="-ml-2 page-no-toc:hidden" />
+                        <EmbeddableFrameHeaderMain>
+                            <EmbeddableFrameTitle>{context.site.title}</EmbeddableFrameTitle>
+                        </EmbeddableFrameHeaderMain>
+                        <EmbeddableFrameButtons>
+                            <EmbeddableDocsPageControlButtons
+                                href={context.linker
+                                    .toPathForPage({
+                                        pages: context.revision.pages,
+                                        page,
+                                    })
+                                    .replace(/~gitbook\/embed\/page\/?/, '')}
+                            />
+                        </EmbeddableFrameButtons>
+                    </EmbeddableFrameHeader>
+                    {context.sections ? (
+                        <SiteSectionTabs
+                            className="-mt-2 border-tint-subtle border-b"
+                            sections={encodeClientSiteSections(context, context.sections)}
+                        />
+                    ) : null}
                 </div>
-            </EmbeddableFrameBody>
+                <EmbeddableFrameBody>
+                    <ScrollContainer
+                        orientation="vertical"
+                        className="not-hydrated:animate-blur-in-slow"
+                        contentClassName="p-4"
+                        fadeEdges={context.sections ? [] : ['leading']}
+                    >
+                        <TableOfContents className="pt-0" context={context} />
+                        <PageBody
+                            context={context}
+                            page={page}
+                            ancestors={ancestors}
+                            document={document}
+                            withPageFeedback={withPageFeedback}
+                            insightsDisplayContext={SiteInsightsDisplayContext.Embed}
+                        />
+                    </ScrollContainer>
+                </EmbeddableFrameBody>
+            </EmbeddableFrameMain>
         </EmbeddableFrame>
     );
 }
