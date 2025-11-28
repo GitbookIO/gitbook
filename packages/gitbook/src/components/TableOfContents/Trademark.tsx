@@ -13,7 +13,9 @@ import { Link } from '../primitives';
 export function Trademark(props: {
     context: GitBookSpaceContext;
     placement: SiteInsightsTrademarkPlacement;
+    className?: string;
 }) {
+    const { className, ...rest } = props;
     return (
         <div
             className={tcls(
@@ -55,10 +57,12 @@ export function Trademark(props: {
                 '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
-                'page-no-toc:before:to-transparent!'
+                'page-no-toc:before:to-transparent!',
+
+                className
             )}
         >
-            <TrademarkLink {...props} />
+            <TrademarkLink {...rest} />
         </div>
     );
 }
@@ -69,8 +73,9 @@ export function Trademark(props: {
 export function TrademarkLink(props: {
     context: GitBookSpaceContext;
     placement: SiteInsightsTrademarkPlacement;
+    className?: string;
 }) {
-    const { context, placement } = props;
+    const { context, placement, className } = props;
     const { space } = context;
     const language = getSpaceLanguage(context);
 
@@ -85,9 +90,6 @@ export function TrademarkLink(props: {
             href={url.toString()}
             className={tcls(
                 'text-sm',
-                // 'lg:max-xl:page-no-toc:text-xs',
-                // 'lg:max-xl:page-no-toc:px-3',
-                // 'lg:max-xl:page-no-toc:py-3',
                 'font-semibold',
                 'text-tint',
 
@@ -113,29 +115,17 @@ export function TrademarkLink(props: {
                 'ring-tint-subtle',
 
                 'transition-colors',
-                'pointer-events-auto'
+                'pointer-events-auto',
+
+                className
             )}
             insights={{
                 type: 'trademark_click',
                 placement,
             }}
         >
-            <Icon
-                icon="gitbook"
-                className={tcls(
-                    'size-5',
-                    // 'lg:max-xl:page-no-toc:size-4',
-                    'shrink-0'
-                )}
-            />
-            <span
-                className={tcls(
-                    'ml-3'
-                    // 'lg:max-xl:page-no-toc:ml-2'
-                )}
-            >
-                {t(language, 'powered_by_gitbook')}
-            </span>
+            <Icon icon="gitbook" className={tcls('size-5', 'shrink-0')} />
+            <span className={tcls('ml-3')}>{t(language, 'powered_by_gitbook')}</span>
         </Link>
     );
 }

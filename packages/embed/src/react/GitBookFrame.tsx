@@ -17,7 +17,7 @@ export type GitBookFrameProps = {
  * Render a frame with the GitBook Assistant in it.
  */
 export function GitBookFrame(props: GitBookFrameProps) {
-    const { className, visitor, buttons, welcomeMessage, suggestions, tools } = props;
+    const { className, visitor, actions, greeting, suggestions, tools } = props;
 
     const frameRef = useRef<HTMLIFrameElement>(null);
     const gitbook = useGitBook();
@@ -33,12 +33,13 @@ export function GitBookFrame(props: GitBookFrameProps) {
 
     useEffect(() => {
         gitbookFrame?.configure({
-            buttons,
-            welcomeMessage,
+            tabs: ['assistant', 'docs'],
+            actions,
+            greeting,
             suggestions,
             tools,
         });
-    }, [gitbookFrame, buttons, welcomeMessage, suggestions, tools]);
+    }, [gitbookFrame, actions, greeting, suggestions, tools]);
 
     return (
         <iframe
