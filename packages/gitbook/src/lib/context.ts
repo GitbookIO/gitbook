@@ -434,13 +434,49 @@ function filterHiddenSiteSpaces(siteSpaces: SiteSpace[]): SiteSpace[] {
 }
 
 function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
-    const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
+    const sectionsAndGroups = getSiteStructureSections(structure);
+    const visibleSectionsAndGroups = filterSectionsAndGroupsWithHiddenSiteSpaces(sectionsAndGroups);
     const section = parseCurrentSection(structure, siteSectionId);
-    assert(section, `couldn't find section "${siteSectionId}" in site structure`);
-    return { list: sectionsAndGroups, current: section } satisfies SiteSections;
+    const current = section && !sectionHasOnlyHiddenSiteSpaces(section) ? section : null;
+    assert(current, `couldn't find section "${siteSectionId}" in site structure`);
+    return { list: visibleSectionsAndGroups, current } satisfies SiteSections;
 }
 
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure, { ignoreGroups: true });
     return sections.find((section) => section.id === siteSectionId);
+}
+
+type SectionOrGroup = SiteSection | SiteSectionGroup;
+
+/**
+ * Filter out sections where all site spaces are hidden and groups that become empty after filtering.
+ */
+function filterSectionsAndGroupsWithHiddenSiteSpaces(
+    sectionsOrGroups: SectionOrGroup[]
+): SectionOrGroup[] {
+    return sectionsOrGroups
+        .map((entry) => {
+            if (entry.object === 'site-section') {
+                return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
+            }
+
+            const visibleChildren: SectionOrGroup[] = filterSectionsAndGroupsWithHiddenSiteSpaces(
+                entry.children
+            );
+
+            if (visibleChildren.length === 0) {
+                return null;
+            }
+
+            return {
+                ...entry,
+                children: visibleChildren,
+            };
+        })
+        .filter((entry): entry is SiteSection | SiteSectionGroup => Boolean(entry));
+}
+
+function sectionHasOnlyHiddenSiteSpaces(section: SiteSection) {
+    return section.siteSpaces.every((siteSpace) => siteSpace.hidden);
 }
