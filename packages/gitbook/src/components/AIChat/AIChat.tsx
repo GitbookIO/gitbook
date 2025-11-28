@@ -19,6 +19,7 @@ import {
     EmbeddableFrameButtons,
     EmbeddableFrameHeader,
     EmbeddableFrameHeaderMain,
+    EmbeddableFrameMain,
     EmbeddableFrameSubtitle,
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
@@ -32,8 +33,12 @@ import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
-export function AIChat() {
-    const { config } = useAI();
+export function AIChat(props: { trademark: boolean }) {
+    const { trademark } = props;
+
+    const {
+        config: { suggestions },
+    } = useAI();
     const language = useLanguage();
     const chat = useAIChatState();
     const chatController = useAIChatController();
@@ -78,29 +83,35 @@ export function AIChat() {
             )}
         >
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
-                <EmbeddableFrameHeader>
-                    <AIChatDynamicIcon trademark={config.trademark} />
-                    <EmbeddableFrameHeaderMain>
-                        <EmbeddableFrameTitle>
-                            {getAIChatName(language, config.trademark)}
-                        </EmbeddableFrameTitle>
-                        <AIChatSubtitle chat={chat} />
-                    </EmbeddableFrameHeaderMain>
-                    <EmbeddableFrameButtons>
-                        <AIChatControlButton />
-                        <Button
-                            onClick={() => chatController.close()}
-                            iconOnly
-                            icon="close"
-                            label={tString(language, 'close')}
-                            variant="blank"
-                            size="default"
+                <EmbeddableFrameMain>
+                    <EmbeddableFrameHeader>
+                        <AIChatDynamicIcon trademark={trademark} />
+                        <EmbeddableFrameHeaderMain>
+                            <EmbeddableFrameTitle>
+                                {getAIChatName(language, trademark)}
+                            </EmbeddableFrameTitle>
+                            <AIChatSubtitle chat={chat} />
+                        </EmbeddableFrameHeaderMain>
+                        <EmbeddableFrameButtons>
+                            <AIChatControlButton />
+                            <Button
+                                onClick={() => chatController.close()}
+                                iconOnly
+                                icon="close"
+                                label={tString(language, 'close')}
+                                variant="blank"
+                                size="default"
+                            />
+                        </EmbeddableFrameButtons>
+                    </EmbeddableFrameHeader>
+                    <EmbeddableFrameBody>
+                        <AIChatBody
+                            chatController={chatController}
+                            chat={chat}
+                            suggestions={suggestions}
                         />
-                    </EmbeddableFrameButtons>
-                </EmbeddableFrameHeader>
-                <EmbeddableFrameBody>
-                    <AIChatBody chatController={chatController} chat={chat} />
-                </EmbeddableFrameBody>
+                    </EmbeddableFrameBody>
+                </EmbeddableFrameMain>
             </EmbeddableFrame>
         </div>
     );

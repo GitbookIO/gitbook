@@ -13,8 +13,9 @@ export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
+    className?: string;
 }) {
-    const { innerHeader, context, header } = props;
+    const { innerHeader, context, header, className } = props;
     const { customization, revision } = context;
 
     const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
@@ -74,7 +75,8 @@ export async function TableOfContents(props: {
                     'gap-4',
 
                     'navigation-open:border-b',
-                    'border-tint-subtle'
+                    'border-tint-subtle',
+                    className
                 )}
             >
                 {header && header}

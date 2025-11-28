@@ -40,7 +40,7 @@ export function createGitBook(options: CreateGitBookOptions) {
     const client: GitBookClient = {
         getFrameURL: (frameOptions) => {
             const url = new URL(options.siteURL);
-            url.pathname = `${url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`}~gitbook/embed/assistant`;
+            url.pathname = `${url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`}~gitbook/embed`;
 
             if (frameOptions.visitor?.token) {
                 url.searchParams.set('token', frameOptions.visitor.token);
