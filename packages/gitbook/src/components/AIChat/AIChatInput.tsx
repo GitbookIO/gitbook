@@ -108,9 +108,9 @@ export function AIChatInput(props: {
                 </div>
             ) : null}
             <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2 py-2">
-                <HoverCardRoot>
+                <HoverCardRoot openDelay={500}>
                     <HoverCard
-                        className="max-w-xs bg-tint p-2 text-sm text-tint"
+                        className="max-w-xs select-none bg-tint p-2 text-sm text-tint"
                         arrow={{ className: 'fill-tint-3' }}
                     >
                         <div className="flex flex-col gap-3 p-2">
