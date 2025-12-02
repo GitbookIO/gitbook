@@ -261,6 +261,8 @@ actions: [
 ]
 ```
 
+**Note**: This prop was previously named `buttons`. Use `actions` instead, it has the same functionality.
+
 ### `greeting`
 
 Available in: Standalone script, NPM package, React components
