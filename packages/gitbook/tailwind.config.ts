@@ -579,7 +579,7 @@ const config: Config = {
             addVariant('chat-open', 'body:has(.ai-chat[aria-expanded="true"]) &');
             addVariant(
                 'sheet-open',
-                'html:has(.side-sheet[aria-modal="true"][aria-expanded="true"]) &'
+                'html:has(.side-sheet[aria-modal="true"][aria-expanded="true"]) &, &:has(.side-sheet[aria-modal="true"][aria-expanded="true"])'
             );
 
             /**

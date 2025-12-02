@@ -91,7 +91,7 @@ export async function CustomizationRootLayout(props: {
             suppressHydrationWarning
             lang={customization.internationalization.locale}
             className={tcls(
-                'gutter-stable',
+                'sheet-open:gutter-stable',
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
