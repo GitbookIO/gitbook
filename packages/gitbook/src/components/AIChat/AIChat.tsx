@@ -26,6 +26,7 @@ import { useTrackEvent } from '../Insights';
 import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
+import { SideSheet } from '../primitives/SideSheet';
 import { AIChatControlButton } from './AIChatControlButton';
 import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
@@ -68,16 +69,17 @@ export function AIChat() {
     }, [chat.opened, trackEvent]);
 
     return (
-        <div
+        <SideSheet
+            side="right"
+            open={chat.opened}
+            onClose={() => chatController.close()}
             data-testid="ai-chat"
+            withShim={true}
             className={tcls(
-                'ai-chat inset-y-0 right-0 z-40 mx-auto flex max-w-3xl scroll-mt-36 px-4 py-4 transition-[width,opacity,margin,display] transition-discrete duration-300 sm:px-6 lg:fixed lg:w-80 lg:p-0 xl:w-96',
-                chat.opened
-                    ? 'lg:starting:ml-0 lg:starting:w-0 lg:starting:opacity-0'
-                    : 'hidden lg:ml-0 lg:w-0! lg:opacity-0'
+                'ai-chat z-40 mx-auto not-hydrated:hidden w-96 max-w-full pl-8 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
+            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
                 <EmbeddableFrameHeader>
                     <AIChatDynamicIcon trademark={config.trademark} />
                     <EmbeddableFrameHeaderMain>
@@ -102,7 +104,7 @@ export function AIChat() {
                     <AIChatBody chatController={chatController} chat={chat} />
                 </EmbeddableFrameBody>
             </EmbeddableFrame>
-        </div>
+        </SideSheet>
     );
 }
 

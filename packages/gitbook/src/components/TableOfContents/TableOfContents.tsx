@@ -3,12 +3,16 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { SideSheet } from '../primitives/SideSheet';
 import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
 import { encodeClientTableOfContents } from './encodeClientTableOfContents';
 
+/**
+ * Sidebar container, responsible for setting the right dimensions and position for the sidebar.
+ */
 export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
@@ -21,23 +25,33 @@ export async function TableOfContents(props: {
 
     return (
         <>
-            <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
+            <SideSheet
+                side="left"
                 data-testid="table-of-contents"
                 id="table-of-contents"
+                toggleClass="navigation-open"
+                withShim={true}
+                withCloseButton={true}
                 className={tcls(
-                    'group',
+                    'group/table-of-contents',
                     'text-sm',
 
                     'grow-0',
                     'shrink-0',
-                    'basis-full',
-                    'lg:basis-72',
+
+                    'max-w-72',
+                    'basis-72',
                     'lg:page-no-toc:basis-56',
 
-                    'relative',
-                    'z-1',
+                    'max-lg:not-sidebar-filled:bg-tint-base',
+                    'max-lg:not-sidebar-filled:border-r',
+                    'border-tint-subtle',
+
+                    'lg:flex!',
+                    'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
+                    'max-lg:pl-3',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -59,22 +73,12 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-4',
-                    'pb-4',
+                    'py-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
 
-                    'hidden',
-                    'navigation-open:flex!',
-                    'lg:flex',
-                    'lg:page-no-toc:hidden',
-                    'xl:page-no-toc:flex',
-                    'lg:site-header-none:page-no-toc:flex',
                     'flex-col',
-                    'gap-4',
-
-                    'navigation-open:border-b',
-                    'border-tint-subtle'
+                    'gap-4'
                 )}
             >
                 {header && header}
@@ -122,7 +126,7 @@ export async function TableOfContents(props: {
                         ) : null}
                     </TOCScrollContainer>
                 </div>
-            </aside>
+            </SideSheet>
             <TableOfContentsScript />
         </>
     );

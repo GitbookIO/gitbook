@@ -23,12 +23,7 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
     const hasScrollRef = useRef(false);
 
     const toggleNavigation = () => {
-        if (!hasScrollRef.current && document.body.classList.contains(globalClassName)) {
-            document.body.classList.remove(globalClassName);
-        } else {
-            document.body.classList.add(globalClassName);
-            window.scrollTo(0, 0);
-        }
+        document.body.classList.toggle(globalClassName);
     };
 
     const windowRef = useRef(typeof window === 'undefined' ? null : window);

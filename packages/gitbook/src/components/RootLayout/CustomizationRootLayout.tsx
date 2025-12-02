@@ -91,6 +91,7 @@ export async function CustomizationRootLayout(props: {
             suppressHydrationWarning
             lang={customization.internationalization.locale}
             className={tcls(
+                'gutter-stable',
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
@@ -179,7 +180,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className={className}>
+            <body className={tcls(className, 'sheet-open:overflow-hidden')}>
                 <IconsProvider
                     assetsURL={GITBOOK_ICONS_URL}
                     assetsURLToken={GITBOOK_ICONS_TOKEN}

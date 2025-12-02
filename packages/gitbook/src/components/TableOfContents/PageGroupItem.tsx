@@ -25,8 +25,8 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                     '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                    '[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
-                    '[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
+                    'lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
+                    'lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
                     isFirst ? '-mt-6' : ''
                 )}
             >
