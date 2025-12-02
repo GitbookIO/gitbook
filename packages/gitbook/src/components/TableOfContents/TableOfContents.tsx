@@ -73,8 +73,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-6',
-                    'pb-4',
+                    'py-6',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
                     'max-lg:pl-8',
@@ -95,6 +94,7 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
+                        'max-lg:sidebar-filled:border',
                         'page-no-toc:bg-transparent!',
                         'page-no-toc:border-none!',
 
@@ -107,7 +107,10 @@ export async function TableOfContents(props: {
                         <div className="flex flex-col gap-4 px-5 empty:hidden">{innerHeader}</div>
                     ) : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls('flex grow flex-col p-2', 'hide-scrollbar overflow-y-auto')}
+                        className={tcls(
+                            'flex grow flex-col p-2 pt-4 ',
+                            'hide-scrollbar overflow-y-auto'
+                        )}
                     >
                         <PagesList
                             pages={pages}

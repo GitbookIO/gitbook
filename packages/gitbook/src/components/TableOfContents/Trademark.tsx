@@ -20,10 +20,12 @@ export function Trademark(props: {
                 'sticky',
                 'z-2',
 
+                'mt-auto',
                 'inset-x-0',
                 '-bottom-2',
                 '-mb-2',
                 'sidebar-filled:pb-2',
+                'page-no-toc:pb-0',
 
                 'pointer-events-none',
 
@@ -32,6 +34,7 @@ export function Trademark(props: {
                 'theme-muted:bg-tint-subtle',
                 '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                 '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
+                'lg:page-no-toc:bg-transparent',
 
                 'rounded-lg',
                 'straight-corners:rounded-none',
@@ -65,9 +68,6 @@ export function TrademarkLink(props: {
             href={url.toString()}
             className={tcls(
                 'text-sm',
-                // 'lg:max-xl:page-no-toc:text-xs',
-                // 'lg:max-xl:page-no-toc:px-3',
-                // 'lg:max-xl:page-no-toc:py-3',
                 'font-semibold',
                 'text-tint',
 

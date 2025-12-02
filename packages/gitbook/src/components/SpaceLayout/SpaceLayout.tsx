@@ -144,7 +144,6 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             <div
                                 className={tcls(
                                     'pr-4',
-                                    'mt-2',
                                     'flex',
                                     withTopHeader ? 'lg:hidden' : '',
                                     'grow-0',
