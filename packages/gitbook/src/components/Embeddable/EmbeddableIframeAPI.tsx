@@ -112,7 +112,9 @@ export function useEmbeddableConfiguration<
  * Display the buttons defined by the parent window.
  */
 export function EmbeddableIframeButtons() {
-    const actions = useEmbeddableConfiguration((state) => state.actions);
+    const { actions: configuredActions, buttons: configuredButtons = [] } =
+        useEmbeddableConfiguration((state) => state);
+    const actions = configuredActions.length > 0 ? configuredActions : configuredButtons;
 
     return (
         <>
