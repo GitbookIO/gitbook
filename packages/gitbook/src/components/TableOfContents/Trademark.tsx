@@ -87,8 +87,7 @@ export function TrademarkLink(props: {
                 'hover:bg-tint',
                 'hover:text-tint-strong',
 
-                'ring-2',
-                'lg:ring-1',
+                'ring-1',
                 'ring-inset',
                 'ring-tint-subtle',
 

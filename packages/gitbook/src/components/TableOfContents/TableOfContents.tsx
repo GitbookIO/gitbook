@@ -105,7 +105,7 @@ export async function TableOfContents(props: {
                 >
                     {innerHeader ? innerHeader : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
-                        className="hide-scrollbar flex grow flex-col overflow-y-auto p-2"
+                        className="hide-scrollbar gutter-stable flex grow flex-col overflow-y-auto p-2"
                     >
                         <PagesList
                             pages={pages}

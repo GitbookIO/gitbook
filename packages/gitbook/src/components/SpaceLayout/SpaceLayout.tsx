@@ -174,7 +174,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             !withTopHeader || variants.generic.length > 1 ? (
                                 <div
                                     className={tcls(
-                                        'my-4 flex flex-col gap-4 px-5 empty:hidden',
+                                        'my-4 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
                                         variants.generic.length > 1 ? '' : 'max-lg:hidden'
                                     )}
                                 >
@@ -200,7 +200,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                     )}
                                     {!withTopHeader && withSections && visibleSections && (
                                         <SiteSectionList
-                                            className={tcls('hidden', 'lg:block')}
+                                            className="hidden lg:block"
                                             sections={encodeClientSiteSections(
                                                 context,
                                                 visibleSections
