@@ -99,11 +99,11 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
  */
 export function SpaceLayout(props: SpaceLayoutProps) {
     const { context, children } = props;
-    const { siteSpace, customization, sections, siteSpaces } = context;
+    const { siteSpace, customization, visibleSections, visibleSiteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(sections && sections.list.length > 1);
+    const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
     const variants = categorizeVariants(context);
 
     const withFooter =
@@ -181,25 +181,28 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             style={CustomizationSearchStyle.Subtle}
                                             withVariants={variants.generic.length > 1}
                                             withSiteVariants={
-                                                sections?.list.some(
+                                                visibleSections?.list.some(
                                                     (s) =>
                                                         s.object === 'site-section' &&
                                                         s.siteSpaces.length > 1
                                                 ) ?? false
                                             }
                                             withSections={withSections}
-                                            section={sections?.current}
+                                            section={visibleSections?.current}
                                             siteSpace={siteSpace}
-                                            siteSpaces={siteSpaces}
+                                            siteSpaces={visibleSiteSpaces}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />
                                     </div>
                                 )}
-                                {!withTopHeader && withSections && sections && (
+                                {!withTopHeader && withSections && visibleSections && (
                                     <SiteSectionList
                                         className={tcls('hidden', 'lg:block')}
-                                        sections={encodeClientSiteSections(context, sections)}
+                                        sections={encodeClientSiteSections(
+                                            context,
+                                            visibleSections
+                                        )}
                                     />
                                 )}
                                 {variants.generic.length > 1 ? (
