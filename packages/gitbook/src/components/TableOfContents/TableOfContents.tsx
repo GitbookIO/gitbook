@@ -51,6 +51,7 @@ export async function TableOfContents(props: {
                     'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
+                    'lg:z-0!',
 
                     // Server-side static positioning
                     'lg:top-0',

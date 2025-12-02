@@ -174,7 +174,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         innerHeader={
                             <>
                                 {!withTopHeader && (
-                                    <div className="flex gap-2 max-lg:hidden">
+                                    <div className="mt-4 flex gap-2 max-lg:hidden">
                                         <SearchContainer
                                             style={CustomizationSearchStyle.Subtle}
                                             withVariants={variants.generic.length > 1}
