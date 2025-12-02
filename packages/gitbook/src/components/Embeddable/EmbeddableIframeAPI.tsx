@@ -40,7 +40,7 @@ export function EmbeddableIframeAPI(props: {
     }, [baseURL, siteTitle]);
 
     React.useEffect(() => {
-        return chatController.on('postMessage', () => {
+        return chatController.on('open', () => {
             router.push(`${baseURL}/assistant`);
         });
     }, [router, baseURL, chatController]);
@@ -154,15 +154,6 @@ export function EmbeddableIframeTabs(props: { active?: string }) {
 
     const router = useRouter();
 
-    // Override the active tab if it doesn't match the configured tabs
-    React.useEffect(() => {
-        if (active === 'assistant' && !configuredTabs.includes('assistant')) {
-            router.replace(`${baseURL}/page`);
-        } else if (active === 'docs' && !configuredTabs.includes('docs')) {
-            router.replace(`${baseURL}/assistant`);
-        }
-    }, [configuredTabs, baseURL, router, active]);
-
     const tabs = [
         config.aiMode === CustomizationAIMode.Assistant &&
         assistants[0] &&
@@ -187,6 +178,21 @@ export function EmbeddableIframeTabs(props: { active?: string }) {
               }
             : null,
     ].filter((tab) => tab !== null);
+
+    // Override the active tab if it doesn't match the configured tabs
+    React.useEffect(() => {
+        const hasAssistant = tabs.find((tab) => tab.key === 'assistant');
+        const hasDocs = tabs.find((tab) => tab.key === 'docs');
+        if (!hasAssistant && !hasDocs) {
+            // No valid tabs, do not redirect
+            return;
+        }
+        if (active === 'assistant' && !hasAssistant) {
+            router.replace(`${baseURL}/page`);
+        } else if (active === 'docs' && !hasDocs) {
+            router.replace(`${baseURL}/assistant`);
+        }
+    }, [tabs, baseURL, router, active]);
 
     return (
         <>
