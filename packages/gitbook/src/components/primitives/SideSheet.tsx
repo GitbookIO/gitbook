@@ -127,7 +127,7 @@ export function SideSheet(
                         : side === 'left'
                           ? 'hydrated:animate-exit-to-left'
                           : 'hydrated:animate-exit-to-right',
-                    'fixed inset-y-0 z-41', // Above the side sheet scrim on z-40
+                    'fixed inset-y-0 z-41 max-w-full', // Above the side sheet scrim on z-40
                     side === 'left' ? 'left-0' : 'right-0',
                     withCloseButton ? (side === 'left' ? 'mr-16' : 'ml-16') : '',
                     isOpen ? '' : 'hidden',

@@ -171,46 +171,52 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         // according to the header/variant settings.
                         // E.g if there is no header, the search button will be displayed in the ToC.
                         innerHeader={
-                            <>
-                                {!withTopHeader && (
-                                    <div className="mt-4 flex gap-2 max-lg:hidden">
-                                        <SearchContainer
-                                            style={CustomizationSearchStyle.Subtle}
-                                            withVariants={variants.generic.length > 1}
-                                            withSiteVariants={
-                                                visibleSections?.list.some(
-                                                    (s) =>
-                                                        s.object === 'site-section' &&
-                                                        s.siteSpaces.length > 1
-                                                ) ?? false
-                                            }
-                                            withSections={withSections}
-                                            section={visibleSections?.current}
-                                            siteSpace={siteSpace}
-                                            siteSpaces={visibleSiteSpaces}
-                                            className="max-lg:hidden"
-                                            viewport="desktop"
+                            !withTopHeader || variants.generic.length > 1 ? (
+                                <div
+                                    className={tcls(
+                                        'my-4 flex flex-col gap-4 px-5 empty:hidden',
+                                        variants.generic.length > 1 ? '' : 'max-lg:hidden'
+                                    )}
+                                >
+                                    {!withTopHeader && (
+                                        <div className="flex gap-2 max-lg:hidden">
+                                            <SearchContainer
+                                                style={CustomizationSearchStyle.Subtle}
+                                                withVariants={variants.generic.length > 1}
+                                                withSiteVariants={
+                                                    visibleSections?.list.some(
+                                                        (s) =>
+                                                            s.object === 'site-section' &&
+                                                            s.siteSpaces.length > 1
+                                                    ) ?? false
+                                                }
+                                                withSections={withSections}
+                                                section={visibleSections?.current}
+                                                siteSpace={siteSpace}
+                                                siteSpaces={visibleSiteSpaces}
+                                                viewport="desktop"
+                                            />
+                                        </div>
+                                    )}
+                                    {!withTopHeader && withSections && visibleSections && (
+                                        <SiteSectionList
+                                            className={tcls('hidden', 'lg:block')}
+                                            sections={encodeClientSiteSections(
+                                                context,
+                                                visibleSections
+                                            )}
                                         />
-                                    </div>
-                                )}
-                                {!withTopHeader && withSections && visibleSections && (
-                                    <SiteSectionList
-                                        className={tcls('hidden', 'lg:block')}
-                                        sections={encodeClientSiteSections(
-                                            context,
-                                            visibleSections
-                                        )}
-                                    />
-                                )}
-                                {variants.generic.length > 1 ? (
-                                    <SpacesDropdown
-                                        context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={variants.generic}
-                                        className="w-full px-3 py-2"
-                                    />
-                                ) : null}
-                            </>
+                                    )}
+                                    {variants.generic.length > 1 ? (
+                                        <SpacesDropdown
+                                            context={context}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={variants.generic}
+                                            className="w-full px-3"
+                                        />
+                                    ) : null}
+                                </div>
+                            ) : null
                         }
                     />
                     {children}

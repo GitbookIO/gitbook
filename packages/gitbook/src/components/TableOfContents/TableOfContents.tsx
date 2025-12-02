@@ -103,14 +103,9 @@ export async function TableOfContents(props: {
                         'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-3xl'
                     )}
                 >
-                    {innerHeader ? (
-                        <div className="flex flex-col gap-4 px-5 empty:hidden">{innerHeader}</div>
-                    ) : null}
+                    {innerHeader ? innerHeader : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls(
-                            'flex grow flex-col p-2 pt-4 ',
-                            'hide-scrollbar overflow-y-auto'
-                        )}
+                        className="hide-scrollbar flex grow flex-col overflow-y-auto p-2"
                     >
                         <PagesList
                             pages={pages}
