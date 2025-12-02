@@ -39,7 +39,7 @@ export async function TableOfContents(props: {
                     'grow-0',
                     'shrink-0',
 
-                    'max-w-72',
+                    'w-72',
                     'basis-72',
                     'lg:page-no-toc:basis-56',
 
@@ -109,14 +109,13 @@ export async function TableOfContents(props: {
                     <TOCScrollContainer // The scrollview inside the sidebar
                         className={tcls(
                             'flex grow flex-col p-2 pt-4',
-                            customization.trademark.enabled && 'lg:pb-20',
                             'hide-scrollbar overflow-y-auto'
                         )}
                     >
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
+                            style="mb-5 page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
                         />
                         {customization.trademark.enabled ? (
                             <Trademark

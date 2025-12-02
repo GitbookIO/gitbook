@@ -17,18 +17,14 @@ export function Trademark(props: {
     return (
         <div
             className={tcls(
-                'relative',
+                'sticky',
                 'z-2',
-                'lg:absolute',
 
-                'left-0',
-                'right-2',
-                'bottom-0',
+                'inset-x-0',
+                '-bottom-2',
+                '-mb-2',
 
                 'pointer-events-none',
-                'sidebar-filled:pl-2',
-                'sidebar-filled:pb-2',
-                'sidebar-filled:page-no-toc:p-0',
 
                 'bg-tint-base',
                 'sidebar-filled:bg-tint-subtle',
@@ -38,24 +34,7 @@ export function Trademark(props: {
 
                 'rounded-lg',
                 'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
-
-                'before:hidden',
-                'lg:before:block',
-                'before:content-[""]',
-                'before:absolute',
-                'before:inset-x-0',
-                'before:bottom-full',
-                'before:h-8',
-                'before:bg-linear-to-b',
-                'before:from-transparent',
-                'before:to-tint-base',
-                'sidebar-filled:before:to-tint-subtle',
-                'theme-muted:before:to-tint-subtle',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-subtle',
-                '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
-                'page-no-toc:before:to-transparent!'
+                'circular-corners:rounded-2xl'
             )}
         >
             <TrademarkLink {...props} />
