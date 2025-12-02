@@ -465,9 +465,7 @@ function parseVisibleSiteSectionsAndGroups(structure: SiteStructure, siteSection
         siteSectionId
     );
     const visibleSectionsAndGroups = filterSectionsAndGroupsWithHiddenSiteSpaces(sectionsAndGroups);
-    const current = section && !sectionHasOnlyHiddenSiteSpaces(section) ? section : null;
-    assert(current, `couldn't find section "${siteSectionId}" in site structure`);
-    return { list: visibleSectionsAndGroups, current } satisfies SiteSections;
+    return { list: visibleSectionsAndGroups, current: section } satisfies SiteSections;
 }
 
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
