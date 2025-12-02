@@ -30,7 +30,7 @@ export async function TableOfContents(props: {
                 data-testid="table-of-contents"
                 id="table-of-contents"
                 toggleClass="navigation-open"
-                withShim={true}
+                withScrim={true}
                 withCloseButton={true}
                 className={tcls(
                     'group/table-of-contents',
@@ -51,7 +51,6 @@ export async function TableOfContents(props: {
                     'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
-                    'max-lg:pl-3',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -73,18 +72,20 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'py-4',
+                    'pt-6',
+                    'pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
+                    'max-lg:pl-8',
 
                     'flex-col',
                     'gap-4'
                 )}
             >
-                {header && header}
+                {header ? header : null}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
-                        'lg:-ms-5',
+                        '-ms-5',
                         'relative flex grow flex-col overflow-hidden border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
@@ -102,15 +103,10 @@ export async function TableOfContents(props: {
                     )}
                 >
                     {innerHeader ? (
-                        <div className="my-4 flex flex-col space-y-4 px-5 empty:hidden">
-                            {innerHeader}
-                        </div>
+                        <div className="flex flex-col gap-4 px-5 empty:hidden">{innerHeader}</div>
                     ) : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls(
-                            'flex grow flex-col p-2 pt-4',
-                            'hide-scrollbar overflow-y-auto'
-                        )}
+                        className={tcls('flex grow flex-col p-2', 'hide-scrollbar overflow-y-auto')}
                     >
                         <PagesList
                             pages={pages}

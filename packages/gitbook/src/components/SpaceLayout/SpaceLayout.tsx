@@ -141,34 +141,32 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                     <TableOfContents
                         context={context}
                         header={
-                            withTopHeader ? null : (
-                                <div
-                                    className={tcls(
-                                        'hidden',
-                                        'pr-4',
-                                        'mt-2',
-                                        'lg:flex',
-                                        'grow-0',
-                                        'dark:shadow-light/1',
-                                        'text-base/tight',
-                                        'items-center'
-                                    )}
-                                >
-                                    <HeaderLogo context={context} />
-                                    {variants.translations.length > 1 ? (
-                                        <TranslationsDropdown
-                                            context={context}
-                                            siteSpace={
-                                                variants.translations.find(
-                                                    (space) => space.id === siteSpace.id
-                                                ) ?? siteSpace
-                                            }
-                                            siteSpaces={variants.translations}
-                                            className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
-                                        />
-                                    ) : null}
-                                </div>
-                            )
+                            <div
+                                className={tcls(
+                                    'pr-4',
+                                    'mt-2',
+                                    'flex',
+                                    withTopHeader ? 'lg:hidden' : '',
+                                    'grow-0',
+                                    'dark:shadow-light/1',
+                                    'text-base/tight',
+                                    'items-center'
+                                )}
+                            >
+                                <HeaderLogo context={context} />
+                                {variants.translations.length > 1 ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
+                                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                    />
+                                ) : null}
+                            </div>
                         }
                         // Displays the search button and/or the space dropdown in the ToC
                         // according to the header/variant settings.
@@ -176,7 +174,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         innerHeader={
                             <>
                                 {!withTopHeader && (
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 max-lg:hidden">
                                         <SearchContainer
                                             style={CustomizationSearchStyle.Subtle}
                                             withVariants={variants.generic.length > 1}

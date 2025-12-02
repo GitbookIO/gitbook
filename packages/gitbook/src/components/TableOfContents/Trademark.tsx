@@ -23,6 +23,7 @@ export function Trademark(props: {
                 'inset-x-0',
                 '-bottom-2',
                 '-mb-2',
+                'sidebar-filled:pb-2',
 
                 'pointer-events-none',
 
