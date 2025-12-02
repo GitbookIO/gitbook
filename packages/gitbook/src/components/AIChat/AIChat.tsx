@@ -72,11 +72,17 @@ export function AIChat() {
         <SideSheet
             side="right"
             open={chat.opened}
-            onClose={() => chatController.close()}
+            onOpenChange={(open) => {
+                if (open) {
+                    chatController.open();
+                } else {
+                    chatController.close();
+                }
+            }}
             data-testid="ai-chat"
-            withShim={true}
+            withScrim={true}
             className={tcls(
-                'ai-chat z-40 mx-auto not-hydrated:hidden w-96 max-w-full pl-8 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
+                'ai-chat mx-auto not-hydrated:hidden w-96 max-w-full pl-8 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
         >
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
