@@ -36,8 +36,7 @@ export function EmbeddableIframeAPI(props: {
     const chatController = useAIChatController();
 
     React.useEffect(() => {
-        embeddableConfiguration.setState({ baseURL });
-        embeddableConfiguration.setState({ siteTitle });
+        embeddableConfiguration.setState({ baseURL, siteTitle });
     }, [baseURL, siteTitle]);
 
     React.useEffect(() => {
@@ -68,7 +67,6 @@ export function EmbeddableIframeAPI(props: {
                     chatController.postMessage({
                         message: message.message,
                     });
-                    router.push(`${baseURL}/assistant`);
                     break;
                 }
                 case 'configure': {
@@ -148,16 +146,11 @@ export function EmbeddableIframeButtons() {
 
 export function EmbeddableIframeTabs(props: { active?: string }) {
     const { active = 'assistant' } = props;
-    let { tabs: configuredTabs, actions } = useEmbeddableConfiguration();
-
-    if (configuredTabs.length === 0) {
-        configuredTabs = ['assistant', 'docs'];
-    }
+    const { baseURL, siteTitle, tabs: configuredTabs, actions } = useEmbeddableConfiguration();
 
     const { assistants, config } = useAI();
 
     const router = useRouter();
-    const { baseURL, siteTitle } = useEmbeddableConfiguration();
 
     // Override the active tab if it doesn't match the configured tabs
     React.useEffect(() => {
@@ -171,7 +164,7 @@ export function EmbeddableIframeTabs(props: { active?: string }) {
     const tabs = [
         config.aiMode === CustomizationAIMode.Assistant &&
         assistants[0] &&
-        configuredTabs.includes('assistant')
+        (configuredTabs.includes('assistant') || configuredTabs.length === 0)
             ? {
                   key: 'assistant',
                   label: assistants[0].label,
@@ -181,7 +174,7 @@ export function EmbeddableIframeTabs(props: { active?: string }) {
                   },
               }
             : null,
-        configuredTabs.includes('docs')
+        configuredTabs.includes('docs') || configuredTabs.length === 0
             ? {
                   key: 'docs',
                   label: siteTitle,
