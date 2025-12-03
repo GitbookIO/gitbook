@@ -33,7 +33,7 @@ export function Hint({
                 'hint',
                 'transition-colors',
                 'rounded-md',
-                hasHeading ? 'rounded-l-sm' : null,
+                hasHeading ? 'rounded-l-none!' : null,
                 'straight-corners:rounded-none',
                 'circular-corners:rounded-xl',
                 'overflow-hidden',
