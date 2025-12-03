@@ -1,5 +1,60 @@
 # gitbook
 
+## 0.20.0
+
+### Minor Changes
+
+- 1d92dc1: Update site layout and blocks with container queries and better transitions
+
+### Patch Changes
+
+- 8fdc5c8: Fix webframe height issue
+- 9022d87: Add breadcrumbs to search results
+- 0c01832: SearchInput fixes — Translate Clear button, Bold theme color, "Esc" keyboard shortcut
+- 1d1f0a7: Fix search container shadow
+- 2aa4f2e: Update dropdown menu styling
+- a49781e: Printable collapsed code block
+- 7d6a316: Revert contentref anchor title
+- e27986b: Reword "Everywhere" search scope to "All docs"
+- 758b34d: Move the "Ask <query>" to the bottom of search results if query is not a question
+- 0ae7cfd: Improve AI Search branding
+- f9f8011: Add alt text support to card covers
+- ebbb476: Improve ancestor label in references
+- 1b0613e: Tweak language dropdown styling
+- 3355960: Fix ToggeableLinkItem display
+- c31e564: Fix icon resolution for page group
+- 55c0b03: Support translations and generic variants together
+- 3876f70: Edgeless Assistant window on `depth: flat` sites
+- 683bb8f: Add confirmation to "Copy MCP URL" page action
+- 4534ea8: Implement unique title tags for sections & variants
+- 6d56df7: Treat pages without visible TOC items as `no-toc`
+- 8606f22: Add padding to TOC page group items
+- 3676d64: Update search scope UI
+- c32d449: Fix OpenAPI path display
+- 8ce7322: Add OpenAPI servers selection
+- 2c3066e: Improve OAuth2 scopes handling in OpenAPI
+- 6b1c9fe: Fix opacity of ScrollContainer buttons on bold themes
+- Updated dependencies [b4a021a]
+- Updated dependencies [a512c90]
+- Updated dependencies [df1966d]
+- Updated dependencies [b45feaf]
+- Updated dependencies [10995e0]
+- Updated dependencies [f9f8011]
+- Updated dependencies [10995e0]
+- Updated dependencies [8ce7322]
+- Updated dependencies [2c3066e]
+  - @gitbook/react-openapi@1.5.3
+  - @gitbook/openapi-parser@3.0.5
+  - @gitbook/react-contentkit@0.7.8
+  - @gitbook/browser-types@0.1.3
+  - @gitbook/cache-tags@0.3.4
+  - @gitbook/react-math@0.6.4
+  - @gitbook/colors@0.4.3
+  - @gitbook/embed@0.1.5
+  - @gitbook/fonts@0.1.3
+  - @gitbook/icons@0.3.4
+  - @gitbook/expr@1.2.4
+
 ## 0.19.2
 
 ### Patch Changes

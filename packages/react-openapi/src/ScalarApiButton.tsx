@@ -85,9 +85,7 @@ function ScalarModal(props: {
     return (
         <ApiClientModalProvider
             configuration={{ url: specUrl, ...prefillConfig }}
-            initialRequest={
-                method !== 'connect' ? { method: toScalarHttpMethod(method), path } : undefined
-            }
+            initialRequest={{ method: toScalarHttpMethod(method), path }}
         >
             <ScalarModalController method={method} path={path} controllerRef={controllerRef} />
         </ApiClientModalProvider>
@@ -112,7 +110,7 @@ function ScalarModalController(props: {
     const openScalarClient = client?.open;
     const { onOpenClient: trackClientOpening } = useOpenAPIOperationContext();
     const openClient = useMemo(() => {
-        if (openScalarClient && method !== 'connect') {
+        if (openScalarClient) {
             return () => {
                 openScalarClient({
                     method: toScalarHttpMethod(method),

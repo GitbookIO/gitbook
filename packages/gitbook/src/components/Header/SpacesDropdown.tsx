@@ -45,11 +45,12 @@ export function SpacesDropdown(props: {
             }
         >
             <SpacesDropdownMenuItems
-                slimSpaces={siteSpaces.map((space) => ({
-                    id: space.id,
-                    title: space.title,
-                    url: getSiteSpaceURL(context, space),
-                    isActive: space.id === siteSpace.id,
+                slimSpaces={siteSpaces.map((siteSp) => ({
+                    id: siteSp.id,
+                    title: siteSp.title,
+                    url: getSiteSpaceURL(context, siteSp),
+                    isActive: siteSp.id === siteSpace.id,
+                    spaceId: siteSp.space.id,
                 }))}
                 curPath={siteSpace.path}
             />

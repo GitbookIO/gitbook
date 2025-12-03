@@ -7,14 +7,14 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "1.5.2",
+    "version": "1.5.3",
     "sideEffects": false,
     "dependencies": {
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
         "@scalar/api-client-react": "catalog:",
-        "@scalar/oas-utils": "^0.2.130",
-        "@scalar/types": "^0.1.9",
+        "@scalar/oas-utils": "^0.6.3",
+        "@scalar/types": "^0.4.0",
         "classnames": "catalog:",
         "flatted": "^3.2.9",
         "json-xml-parse": "^1.3.0",
@@ -50,11 +50,15 @@
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
         "dev": "bun run build -- --watch ./src",
-        "clean": "rm -rf ./dist"
+        "clean": "rm -rf ./dist",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

@@ -74,6 +74,8 @@ export const de = {
     unexpected_error:
         'Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
     unexpected_error_retry: 'Erneut versuchen',
+    rss_feed: 'RSS-Feed',
+    open_rss_feed: 'Feed für diese Seite abonnieren',
     pdf_download: 'Als PDF exportieren',
     pdf_goback: 'Zurück zum Inhalt',
     pdf_print: 'Drucken oder als PDF speichern',

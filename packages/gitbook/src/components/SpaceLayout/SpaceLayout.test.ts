@@ -14,6 +14,7 @@ function makeContext(current: FakeSiteSpace, all: FakeSiteSpace[]) {
         // Only the properties used by categorizeVariants are required for these tests
         siteSpace: current,
         siteSpaces: all,
+        visibleSiteSpaces: all,
     } as unknown as Parameters<typeof categorizeVariants>[0];
 }
 

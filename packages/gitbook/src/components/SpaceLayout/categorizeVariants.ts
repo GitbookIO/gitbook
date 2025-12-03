@@ -5,7 +5,7 @@ import type { GitBookSiteContext } from '@/lib/context';
  * Categorize the variants of the space into generic and translation variants.
  */
 export function categorizeVariants(context: GitBookSiteContext) {
-    const { siteSpace, siteSpaces } = context;
+    const { siteSpace, visibleSiteSpaces: siteSpaces } = context;
     const currentLanguage = siteSpace.space.language;
 
     // Get all languages of the variants.

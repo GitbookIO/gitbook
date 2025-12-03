@@ -5,13 +5,12 @@ import { assert } from 'ts-essentials';
 
 import {
     type OrderedComputedResult,
-    searchAllSiteContent,
-    searchCurrentSiteSpaceContent,
-    searchSpecificSiteSpaceContent,
+    searchSiteContent,
     streamRecommendedQuestions,
 } from './server-actions';
 
 import { type Assistant, useAI } from '@/components/AI';
+import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
 import type { SearchScope } from './useSearch';
@@ -123,23 +122,26 @@ export function useSearchResults(props: {
         const timeout = setTimeout(async () => {
             try {
                 const results = await (() => {
-                    if (scope === 'all') {
-                        // Search all content on the site
-                        return searchAllSiteContent(query);
+                    switch (scope) {
+                        case 'all':
+                            // Search all content on the site
+                            return searchSiteContent({ query, mode: 'all' });
+                        case 'default':
+                            // Search the current section's variant + matched/default variant for other sections
+                            return searchSiteContent({ query, mode: 'current', siteSpaceId });
+                        case 'extended':
+                            // Search all variants of the current section
+                            return searchSiteContent({ query, mode: 'specific', siteSpaceIds });
+                        case 'current':
+                            // Search only the current section's current variant
+                            return searchSiteContent({
+                                query,
+                                mode: 'specific',
+                                siteSpaceIds: [siteSpaceId],
+                            });
+                        default:
+                            assertNever(scope);
                     }
-                    if (scope === 'default') {
-                        // Search the current section's variant + matched/default variant for other sections
-                        return searchCurrentSiteSpaceContent(query, siteSpaceId);
-                    }
-                    if (scope === 'extended') {
-                        // Search all variants of the current section
-                        return searchSpecificSiteSpaceContent(query, siteSpaceIds);
-                    }
-                    if (scope === 'current') {
-                        // Search only the current section's current variant
-                        return searchSpecificSiteSpaceContent(query, [siteSpaceId]);
-                    }
-                    throw new Error(`Unhandled search scope: ${scope}`);
                 })();
 
                 if (cancelled) {

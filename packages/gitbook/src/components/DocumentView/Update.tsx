@@ -1,4 +1,4 @@
-import { formatDateFull, formatNumericDate } from '@/components/utils/dates';
+import { formatDateFull, formatDateShort, formatNumericDate } from '@/components/utils/dates';
 import { tcls } from '@/lib/tailwind';
 import type { DocumentBlockUpdate, DocumentBlockUpdates } from '@gitbook/api';
 import { assert } from 'ts-essentials';
@@ -29,8 +29,11 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
 
     // Then get the format from the parent Updates block and use that format
     const dateFormat = parentUpdates.data?.format ?? 'full';
-    const displayDate =
-        dateFormat === 'numeric' ? formatNumericDate(parsedDate) : formatDateFull(parsedDate);
+    const displayDate = {
+        numeric: formatNumericDate(parsedDate),
+        full: formatDateFull(parsedDate),
+        short: formatDateShort(parsedDate),
+    }[dateFormat];
 
     return (
         <div
@@ -39,11 +42,16 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 style
             )}
         >
-            <div className="h-fit w-40 min-w-40 shrink-0">
+            <div
+                className={tcls(
+                    // Date is only sticky on larger screens when we use flex-row layout
+                    'h-fit w-40 min-w-40 shrink-0 md:sticky md:top-[calc(var(--toc-top-offset)+8px)]!'
+                )}
+            >
                 <time
                     // Adding a dateTime attribute for accessibility (and SEO)
                     dateTime={date}
-                    className="inline-flex items-center font-medium text-neutral-10 text-xs uppercase tracking-wide"
+                    className="inline-flex items-center font-medium text-neutral-10 text-sm tracking-wide"
                 >
                     {displayDate}
                 </time>

@@ -1,5 +1,13 @@
 # @gitbook/browser-types
 
+## 0.1.3
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- Updated dependencies [10995e0]
+  - @gitbook/icons@0.3.4
+
 ## 0.1.2
 
 ### Patch Changes

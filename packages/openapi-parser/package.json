@@ -8,12 +8,12 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "3.0.4",
+    "version": "3.0.5",
     "sideEffects": false,
     "dependencies": {
-        "@scalar/json-magic": "^0.3.1",
-        "@scalar/openapi-parser": "^0.20.1",
-        "@scalar/openapi-types": "^0.3.7"
+        "@scalar/json-magic": "^0.8.1",
+        "@scalar/openapi-parser": "^0.23.2",
+        "@scalar/openapi-types": "^0.5.1"
     },
     "devDependencies": {
         "@tsconfig/strictest": "catalog:",
@@ -28,11 +28,15 @@
         "typecheck": "tsc --noEmit",
         "unit": "bun test",
         "dev": "bun run build -- --watch ./src",
-        "clean": "rm -rf ./dist"
+        "clean": "rm -rf ./dist",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

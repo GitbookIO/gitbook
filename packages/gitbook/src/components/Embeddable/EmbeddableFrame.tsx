@@ -17,7 +17,7 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
             <div
                 {...divProps}
                 className={tcls(
-                    'flex h-full grow flex-col overflow-hidden bg-tint-base text-sm text-tint',
+                    'flex h-full grow flex-col overflow-hidden bg-radial-[circle_at_bottom] from-primary to-50% to-transparent text-sm text-tint',
                     divProps.className
                 )}
                 ref={ref}
@@ -34,7 +34,7 @@ export function EmbeddableFrameHeader(props: {
     const { children } = props;
 
     return (
-        <div className="flex select-none items-center gap-2 border-tint-subtle border-b bg-tint-subtle px-4 py-2 text-tint-strong">
+        <div className="relative z-10 flex animate-fade-in-slow select-none items-center gap-2 px-4 py-2 text-tint-strong">
             {children}
         </div>
     );
@@ -73,7 +73,7 @@ export function EmbeddableFrameSubtitle(props: {
     return (
         <div
             className={tcls(
-                'text-tint text-xs leading-none transition-all duration-500',
+                'origin-left text-tint text-xs leading-none transition-all duration-500',
                 className
             )}
         >
@@ -87,5 +87,5 @@ export function EmbeddableFrameButtons(props: {
 }) {
     const { children } = props;
 
-    return <div className="ml-auto flex gap-2">{children}</div>;
+    return <div className="-mr-2 ml-auto flex gap-2">{children}</div>;
 }
