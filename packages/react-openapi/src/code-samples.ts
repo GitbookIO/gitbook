@@ -156,7 +156,33 @@ ${headerString}${bodyString}`;
         syntax: 'python',
         generate: ({ method, url: { origin, path }, headers, body }) => {
             const contentType = headers?.['Content-Type'];
-            let code = `${isJSON(contentType) ? 'import json\n' : ''}import requests\n\n`;
+            const needsJsonImport = body && isJSON(contentType) && typeof body === 'string';
+            
+            let code = '';
+            
+            // Import statements
+            if (needsJsonImport) {
+                code += 'import json\n';
+            }
+            code += 'import requests\n\n';
+
+            // Extract path parameters and create constants
+            const { extractedParams, processedPath } = extractPathParameters(path);
+            if (extractedParams.length > 0) {
+                extractedParams.forEach(param => {
+                    code += `${param.constant} = "${param.placeholder}"\n`;
+                });
+                code += '\n';
+            }
+
+            // Process headers to create better placeholders
+            const processedHeaders = processPythonHeaders(headers);
+            if (processedHeaders.constants.length > 0) {
+                processedHeaders.constants.forEach(constant => {
+                    code += `${constant.name} = "${constant.placeholder}"\n`;
+                });
+                code += '\n';
+            }
 
             if (body) {
                 const lines = BodyGenerators.getPythonBody(body, headers);
@@ -169,17 +195,31 @@ ${headerString}${bodyString}`;
                 }
             }
 
+            // Build the request
+            const urlStr = extractedParams.length > 0 
+                ? `f"${origin}${processedPath}"`
+                : `"${origin}${path}"`;
+                
             code += `response = requests.${method.toLowerCase()}(\n`;
-            code += indent(`"${origin}${path}",\n`, 4);
+            code += indent(`${urlStr},\n`, 4);
 
-            if (headers && Object.keys(headers).length > 0) {
-                code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
+            if (processedHeaders.headers && Object.keys(processedHeaders.headers).length > 0) {
+                code += indent(`headers={\n`, 4);
+                Object.entries(processedHeaders.headers).forEach(([key, value], index, array) => {
+                    const isLast = index === array.length - 1;
+                    code += indent(`"${key}": ${value}${isLast ? '' : ','}\n`, 8);
+                });
+                code += indent(`},\n`, 4);
             }
 
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
-                } else if (isJSON(contentType)) {
+                } else if (isJSON(contentType) && isPlainObject(body)) {
+                    // Use json parameter for dict objects
+                    code += indent(`json=${body}\n`, 4);
+                } else if (isJSON(contentType) && needsJsonImport) {
+                    // Use data=json.dumps() for JSON strings
                     code += indent(`data=json.dumps(${body})\n`, 4);
                 } else {
                     code += indent(`data=${body}\n`, 4);
@@ -372,7 +412,29 @@ const BodyGenerators = {
         } else if (isYAML(contentType)) {
             code += `yamlBody = \"\"\"\n${indent(yaml.dump(body), 4)}\"\"\"\n\n`;
             body = 'yamlBody';
+        } else if (isJSON(contentType) && isPlainObject(body)) {
+            // For dict objects, return as-is to use with json= parameter
+            body = stringifyOpenAPI(
+                body,
+                (_key, value) => {
+                    switch (value) {
+                        case true:
+                            return '$$__TRUE__$$';
+                        case false:
+                            return '$$__FALSE__$$';
+                        case null:
+                            return '$$__NULL__$$';
+                        default:
+                            return value;
+                    }
+                },
+                2
+            )
+                .replaceAll('"$$__TRUE__$$"', 'True')
+                .replaceAll('"$$__FALSE__$$"', 'False')
+                .replaceAll('"$$__NULL__$$"', 'None');
         } else {
+            // For everything else (including JSON strings)
             body = stringifyOpenAPI(
                 body,
                 (_key, value) => {
@@ -486,4 +548,81 @@ function buildHeredoc(lines: string[]): string {
         }
     }
     return result;
+}
+
+/**
+ * Extracts path parameters and converts them to Python constants
+ */
+function extractPathParameters(path: string): {
+    extractedParams: Array<{ constant: string; placeholder: string; param: string }>;
+    processedPath: string;
+} {
+    const extractedParams: Array<{ constant: string; placeholder: string; param: string }> = [];
+    let processedPath = path;
+
+    // Find all path parameters in the format {paramName}
+    const paramMatches = path.match(/\{([^}]+)\}/g);
+    
+    if (paramMatches) {
+        paramMatches.forEach(match => {
+            const paramName = match.slice(1, -1); // Remove { and }
+            // Convert camelCase to SNAKE_CASE
+            const constantName = paramName
+                .replace(/([a-z])([A-Z])/g, '$1_$2')
+                .toUpperCase();
+            const placeholder = `<your ${paramName.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()}>`;
+            
+            extractedParams.push({
+                constant: constantName,
+                placeholder: placeholder,
+                param: paramName
+            });
+            
+            // Replace {paramName} with {CONSTANT_NAME} for f-string
+            processedPath = processedPath.replace(match, `{${constantName}}`);
+        });
+    }
+
+    return { extractedParams, processedPath };
+}
+
+/**
+ * Processes headers to create Python constants and clean formatting
+ */
+function processPythonHeaders(headers?: Record<string, string>): {
+    constants: Array<{ name: string; placeholder: string }>;
+    headers: Record<string, string>;
+} {
+    if (!headers) {
+        return { constants: [], headers: {} };
+    }
+
+    const constants: Array<{ name: string; placeholder: string }> = [];
+    const processedHeaders: Record<string, string> = {};
+
+    Object.entries(headers).forEach(([key, value]) => {
+        if (key === 'Authorization' && value.includes('Bearer')) {
+            // Extract token constants
+            const constantName = 'API_TOKEN';
+            const placeholder = '<your gitbook api token>';
+            constants.push({ name: constantName, placeholder });
+            processedHeaders[key] = `f"Bearer {${constantName}}"`;
+        } else if (key === 'Authorization' && value.includes('Basic')) {
+            const constantName = 'API_TOKEN';
+            const placeholder = '<your basic auth token>';
+            constants.push({ name: constantName, placeholder });
+            processedHeaders[key] = `f"Basic {${constantName}}"`;
+        } else if (value.includes('YOUR_') || value.includes('TOKEN')) {
+            // Generic token handling
+            const constantName = 'API_TOKEN';
+            const placeholder = '<your api token>';
+            constants.push({ name: constantName, placeholder });
+            processedHeaders[key] = `f"Bearer {${constantName}}"`;
+        } else {
+            // Regular headers
+            processedHeaders[key] = `"${value}"`;
+        }
+    });
+
+    return { constants, headers: processedHeaders };
 }
