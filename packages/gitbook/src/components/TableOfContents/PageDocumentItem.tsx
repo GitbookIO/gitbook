@@ -10,7 +10,6 @@ import { ToggleableLinkItem } from './ToggleableLinkItem';
 
 export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     const { page } = props;
-    const title = page.linkTitle || page.title;
 
     return (
         <li className="flex flex-col">
@@ -42,10 +41,10 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                 {page.emoji || page.icon ? (
                     <span className="flex items-center gap-3">
                         <TOCPageIcon page={page} />
-                        {title}
+                        {page.title}
                     </span>
                 ) : (
-                    title
+                    page.title
                 )}
             </ToggleableLinkItem>
         </li>
