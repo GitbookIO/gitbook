@@ -37,30 +37,31 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
         label: 'HTTP',
         syntax: 'http',
         generate: ({ method, url: { origin, path }, headers = {}, body }: CodeSampleInput) => {
+            // Process URL and headers to use consistent placeholder format
+            const processedPath = convertPathParametersToPlaceholders(path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
+
             if (body) {
                 // if we had a body add a content length header
                 const bodyContent = body ? stringifyOpenAPI(body) : '';
                 // handle unicode chars with a text encoder
                 const encoder = new TextEncoder();
 
-                const bodyString = BodyGenerators.getHTTPBody(body, headers);
+                const bodyString = BodyGenerators.getHTTPBody(body, processedHeaders);
 
                 if (bodyString) {
                     body = bodyString;
                 }
 
-                headers = {
-                    ...headers,
-                    'Content-Length': encoder.encode(bodyContent).length.toString(),
-                };
+                processedHeaders['Content-Length'] = encoder.encode(bodyContent).length.toString();
             }
 
-            if (!headers.hasOwnProperty('Accept')) {
-                headers.Accept = '*/*';
+            if (!processedHeaders.hasOwnProperty('Accept')) {
+                processedHeaders.Accept = '*/*';
             }
 
-            const headerString = headers
-                ? `${Object.entries(headers)
+            const headerString = processedHeaders
+                ? `${Object.entries(processedHeaders)
                       .map(([key, value]) =>
                           key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
                       )
@@ -69,7 +70,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             const bodyString = body ? `\n${body}` : '';
 
-            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
+            const httpRequest = `${method.toUpperCase()} ${decodeURI(processedPath)} HTTP/1.1
 Host: ${origin.replaceAll(/https*:\/\//g, '')}
 ${headerString}${bodyString}`;
 
@@ -87,15 +88,23 @@ ${headerString}${bodyString}`;
                 lines.push(`--request ${method.toUpperCase()}`);
             }
 
-            lines.push(`--url '${origin}${path}'`);
+            // Process URL and headers to use consistent placeholder format
+            const processedUrl = convertPathParametersToPlaceholders(origin + path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
+
+            lines.push(`--url '${processedUrl}'`);
 
             if (body) {
-                const bodyContent = BodyGenerators.getCurlBody(body, headers);
+                const bodyContent = BodyGenerators.getCurlBody(body, processedHeaders);
 
                 if (bodyContent) {
                     body = bodyContent.body;
                     headers = bodyContent.headers;
+                } else {
+                    headers = processedHeaders;
                 }
+            } else {
+                headers = processedHeaders;
             }
 
             if (headers && Object.keys(headers).length > 0) {
@@ -122,18 +131,26 @@ ${headerString}${bodyString}`;
         generate: ({ method, url: { origin, path }, headers, body }) => {
             let code = '';
 
+            // Process URL and headers to use consistent placeholder format
+            const processedUrl = convertPathParametersToPlaceholders(origin + path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
+
             if (body) {
-                const lines = BodyGenerators.getJavaScriptBody(body, headers);
+                const lines = BodyGenerators.getJavaScriptBody(body, processedHeaders);
 
                 if (lines) {
                     // add the generated code to the top
                     code += lines.code;
                     body = lines.body;
                     headers = lines.headers;
+                } else {
+                    headers = processedHeaders;
                 }
+            } else {
+                headers = processedHeaders;
             }
 
-            code += `const response = await fetch('${origin}${path}', {
+            code += `const response = await fetch('${processedUrl}', {
     method: '${method.toUpperCase()}',\n`;
 
             if (headers && Object.keys(headers).length > 0) {
@@ -166,23 +183,9 @@ ${headerString}${bodyString}`;
             }
             code += 'import requests\n\n';
 
-            // Extract path parameters and create constants
-            const { extractedParams, processedPath } = extractPathParameters(path);
-            if (extractedParams.length > 0) {
-                extractedParams.forEach(param => {
-                    code += `${param.constant} = "${param.placeholder}"\n`;
-                });
-                code += '\n';
-            }
-
-            // Process headers to create better placeholders
-            const processedHeaders = processPythonHeaders(headers);
-            if (processedHeaders.constants.length > 0) {
-                processedHeaders.constants.forEach(constant => {
-                    code += `${constant.name} = "${constant.placeholder}"\n`;
-                });
-                code += '\n';
-            }
+            // Process headers and URL to use consistent placeholder format
+            const processedUrl = convertPathParametersToPlaceholders(origin + path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
 
             if (body) {
                 const lines = BodyGenerators.getPythonBody(body, headers);
@@ -195,19 +198,14 @@ ${headerString}${bodyString}`;
                 }
             }
 
-            // Build the request
-            const urlStr = extractedParams.length > 0 
-                ? `f"${origin}${processedPath}"`
-                : `"${origin}${path}"`;
-                
             code += `response = requests.${method.toLowerCase()}(\n`;
-            code += indent(`${urlStr},\n`, 4);
+            code += indent(`"${processedUrl}",\n`, 4);
 
-            if (processedHeaders.headers && Object.keys(processedHeaders.headers).length > 0) {
+            if (processedHeaders && Object.keys(processedHeaders).length > 0) {
                 code += indent(`headers={\n`, 4);
-                Object.entries(processedHeaders.headers).forEach(([key, value], index, array) => {
+                Object.entries(processedHeaders).forEach(([key, value], index, array) => {
                     const isLast = index === array.length - 1;
-                    code += indent(`"${key}": ${value}${isLast ? '' : ','}\n`, 8);
+                    code += indent(`"${key}": "${value}"${isLast ? '' : ','}\n`, 8);
                 });
                 code += indent(`},\n`, 4);
             }
@@ -551,78 +549,41 @@ function buildHeredoc(lines: string[]): string {
 }
 
 /**
- * Extracts path parameters and converts them to Python constants
+ * Converts path parameters from {paramName} to YOUR_PARAM_NAME format
  */
-function extractPathParameters(path: string): {
-    extractedParams: Array<{ constant: string; placeholder: string; param: string }>;
-    processedPath: string;
-} {
-    const extractedParams: Array<{ constant: string; placeholder: string; param: string }> = [];
-    let processedPath = path;
-
-    // Find all path parameters in the format {paramName}
-    const paramMatches = path.match(/\{([^}]+)\}/g);
-    
-    if (paramMatches) {
-        paramMatches.forEach(match => {
-            const paramName = match.slice(1, -1); // Remove { and }
-            // Convert camelCase to SNAKE_CASE
-            const constantName = paramName
-                .replace(/([a-z])([A-Z])/g, '$1_$2')
-                .toUpperCase();
-            const placeholder = `<your ${paramName.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()}>`;
-            
-            extractedParams.push({
-                constant: constantName,
-                placeholder: placeholder,
-                param: paramName
-            });
-            
-            // Replace {paramName} with {CONSTANT_NAME} for f-string
-            processedPath = processedPath.replace(match, `{${constantName}}`);
-        });
-    }
-
-    return { extractedParams, processedPath };
+function convertPathParametersToPlaceholders(urlPath: string): string {
+    return urlPath.replace(/\{([^}]+)\}/g, (match, paramName) => {
+        // Convert camelCase to UPPER_SNAKE_CASE
+        const placeholder = paramName
+            .replace(/([a-z])([A-Z])/g, '$1_$2')
+            .toUpperCase();
+        return `YOUR_${placeholder}`;
+    });
 }
 
 /**
- * Processes headers to create Python constants and clean formatting
+ * Processes headers to use consistent placeholder format
  */
-function processPythonHeaders(headers?: Record<string, string>): {
-    constants: Array<{ name: string; placeholder: string }>;
-    headers: Record<string, string>;
-} {
+function processHeadersWithPlaceholders(headers?: Record<string, string>): Record<string, string> {
     if (!headers) {
-        return { constants: [], headers: {} };
+        return {};
     }
 
-    const constants: Array<{ name: string; placeholder: string }> = [];
     const processedHeaders: Record<string, string> = {};
 
     Object.entries(headers).forEach(([key, value]) => {
         if (key === 'Authorization' && value.includes('Bearer')) {
-            // Extract token constants
-            const constantName = 'API_TOKEN';
-            const placeholder = '<your gitbook api token>';
-            constants.push({ name: constantName, placeholder });
-            processedHeaders[key] = `f"Bearer {${constantName}}"`;
+            processedHeaders[key] = 'Bearer YOUR_API_TOKEN';
         } else if (key === 'Authorization' && value.includes('Basic')) {
-            const constantName = 'API_TOKEN';
-            const placeholder = '<your basic auth token>';
-            constants.push({ name: constantName, placeholder });
-            processedHeaders[key] = `f"Basic {${constantName}}"`;
+            processedHeaders[key] = 'Basic YOUR_API_TOKEN';
         } else if (value.includes('YOUR_') || value.includes('TOKEN')) {
-            // Generic token handling
-            const constantName = 'API_TOKEN';
-            const placeholder = '<your api token>';
-            constants.push({ name: constantName, placeholder });
-            processedHeaders[key] = `f"Bearer {${constantName}}"`;
+            // Already in correct format or generic token
+            processedHeaders[key] = value.replace(/YOUR_SECRET_TOKEN|YOUR_TOKEN/g, 'YOUR_API_TOKEN');
         } else {
-            // Regular headers
-            processedHeaders[key] = `"${value}"`;
+            // Regular headers - keep as-is
+            processedHeaders[key] = value;
         }
     });
 
-    return { constants, headers: processedHeaders };
+    return processedHeaders;
 }
