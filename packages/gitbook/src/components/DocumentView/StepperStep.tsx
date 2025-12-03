@@ -36,13 +36,13 @@ export function StepperStep(props: BlockProps<DocumentBlockStepperStep>) {
             <div className="relative select-none">
                 <div
                     className={tcls(
-                        'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-original theme-muted:bg-primary-subtle tabular-nums contrast-more:bg-primary-solid',
-                        'font-medium text-contrast-primary-original theme-muted:text-primary contrast-more:text-contrast-primary-solid'
+                        'can-override-bg can-override-text flex size-[calc(1.75rem+1px)] items-center justify-center rounded-full bg-primary-solid theme-muted:bg-tint-base tabular-nums contrast-more:bg-primary-11',
+                        'font-medium text-contrast-primary-solid theme-muted:text-tint contrast-more:text-contrast-primary-11'
                     )}
                 >
                     {index + 1}
                 </div>
-                <div className="can-override-bg absolute top-9 bottom-2 left-3.5 w-px bg-primary-7 theme-muted:bg-primary-subtle" />
+                <div className="can-override-bg absolute top-9 bottom-2 left-3.5 w-px bg-primary-7 theme-muted:bg-tint-6" />
             </div>
             <Blocks
                 {...contextProps}
