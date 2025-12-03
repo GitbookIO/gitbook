@@ -71,7 +71,7 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
             const bodyString = body ? `\n${body}` : '';
 
             const httpRequest = `${method.toUpperCase()} ${decodeURI(processedPath)} HTTP/1.1
-Host: ${origin.replaceAll(/https*:\/\//g, '')}
+Host: ${origin.replace(/https*:\/\//g, '')}
 ${headerString}${bodyString}`;
 
             return httpRequest;
@@ -174,9 +174,9 @@ ${headerString}${bodyString}`;
         generate: ({ method, url: { origin, path }, headers, body }) => {
             const contentType = headers?.['Content-Type'];
             const needsJsonImport = body && isJSON(contentType) && typeof body === 'string';
-            
+
             let code = '';
-            
+
             // Import statements
             if (needsJsonImport) {
                 code += 'import json\n';
@@ -428,9 +428,9 @@ const BodyGenerators = {
                 },
                 2
             )
-                .replaceAll('"$$__TRUE__$$"', 'True')
-                .replaceAll('"$$__FALSE__$$"', 'False')
-                .replaceAll('"$$__NULL__$$"', 'None');
+                .replace(/"\\$\\$__TRUE__\\$\\$"/g, 'True')
+                .replace(/"\\$\\$__FALSE__\\$\\$"/g, 'False')
+                .replace(/"\\$\\$__NULL__\\$\\$"/g, 'None');
         } else {
             // For everything else (including JSON strings)
             body = stringifyOpenAPI(
@@ -449,9 +449,9 @@ const BodyGenerators = {
                 },
                 2
             )
-                .replaceAll('"$$__TRUE__$$"', 'True')
-                .replaceAll('"$$__FALSE__$$"', 'False')
-                .replaceAll('"$$__NULL__$$"', 'None');
+                .replace(/"\\$\\$__TRUE__\\$\\$"/g, 'True')
+                .replace(/"\\$\\$__FALSE__\\$\\$"/g, 'False')
+                .replace(/"\\$\\$__NULL__\\$\\$"/g, 'None');
         }
 
         return { body, code, headers };
@@ -554,9 +554,7 @@ function buildHeredoc(lines: string[]): string {
 function convertPathParametersToPlaceholders(urlPath: string): string {
     return urlPath.replace(/\{([^}]+)\}/g, (match, paramName) => {
         // Convert camelCase to UPPER_SNAKE_CASE
-        const placeholder = paramName
-            .replace(/([a-z])([A-Z])/g, '$1_$2')
-            .toUpperCase();
+        const placeholder = paramName.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase();
         return `YOUR_${placeholder}`;
     });
 }
@@ -578,7 +576,10 @@ function processHeadersWithPlaceholders(headers?: Record<string, string>): Recor
             processedHeaders[key] = 'Basic YOUR_API_TOKEN';
         } else if (value.includes('YOUR_') || value.includes('TOKEN')) {
             // Already in correct format or generic token
-            processedHeaders[key] = value.replace(/YOUR_SECRET_TOKEN|YOUR_TOKEN/g, 'YOUR_API_TOKEN');
+            processedHeaders[key] = value.replace(
+                /YOUR_SECRET_TOKEN|YOUR_TOKEN/g,
+                'YOUR_API_TOKEN'
+            );
         } else {
             // Regular headers - keep as-is
             processedHeaders[key] = value;
