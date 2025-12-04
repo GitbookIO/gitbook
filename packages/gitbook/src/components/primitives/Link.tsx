@@ -78,8 +78,8 @@ export function Link(props: LinkProps) {
 
     const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         const isExternalWithOrigin = isExternalLink(href, window.location.origin);
-        // Only trigger navigation context for internal links without modifier keys (i.e. open in new tab).
-        if (!isExternal && !event.ctrlKey && !event.metaKey) {
+        // Only trigger navigation context for internal links in the same window without modifier keys (i.e. open in new tab).
+        if (!isExternal && target !== '_blank' && !event.ctrlKey && !event.metaKey) {
             onNavigationClick(href);
         }
 

@@ -19,6 +19,7 @@ import {
     EmbeddableFrameButtons,
     EmbeddableFrameHeader,
     EmbeddableFrameHeaderMain,
+    EmbeddableFrameMain,
     EmbeddableFrameSubtitle,
     EmbeddableFrameTitle,
 } from '../Embeddable/EmbeddableFrame';
@@ -85,30 +86,32 @@ export function AIChat() {
                 'ai-chat mx-auto not-hydrated:hidden w-96 max-w-full pl-8 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
         >
-            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
-                <EmbeddableFrameHeader>
-                    <AIChatDynamicIcon trademark={config.trademark} />
-                    <EmbeddableFrameHeaderMain>
-                        <EmbeddableFrameTitle>
-                            {getAIChatName(language, config.trademark)}
-                        </EmbeddableFrameTitle>
-                        <AIChatSubtitle chat={chat} />
-                    </EmbeddableFrameHeaderMain>
-                    <EmbeddableFrameButtons>
-                        <AIChatControlButton />
-                        <Button
-                            onClick={() => chatController.close()}
-                            iconOnly
-                            icon="close"
-                            label={tString(language, 'close')}
-                            variant="blank"
-                            size="default"
-                        />
-                    </EmbeddableFrameButtons>
-                </EmbeddableFrameHeader>
-                <EmbeddableFrameBody>
-                    <AIChatBody chatController={chatController} chat={chat} />
-                </EmbeddableFrameBody>
+            <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
+                <EmbeddableFrameMain>
+                    <EmbeddableFrameHeader>
+                        <AIChatDynamicIcon trademark={config.trademark} />
+                        <EmbeddableFrameHeaderMain>
+                            <EmbeddableFrameTitle>
+                                {getAIChatName(language, config.trademark)}
+                            </EmbeddableFrameTitle>
+                            <AIChatSubtitle chat={chat} />
+                        </EmbeddableFrameHeaderMain>
+                        <EmbeddableFrameButtons>
+                            <AIChatControlButton />
+                            <Button
+                                onClick={() => chatController.close()}
+                                iconOnly
+                                icon="close"
+                                label={tString(language, 'close')}
+                                variant="blank"
+                                size="default"
+                            />
+                        </EmbeddableFrameButtons>
+                    </EmbeddableFrameHeader>
+                    <EmbeddableFrameBody>
+                        <AIChatBody chatController={chatController} chat={chat} />
+                    </EmbeddableFrameBody>
+                </EmbeddableFrameMain>
             </EmbeddableFrame>
         </SideSheet>
     );
@@ -119,13 +122,14 @@ export function AIChat() {
  */
 export function AIChatDynamicIcon(props: {
     trademark: boolean;
+    className?: string;
 }) {
-    const { trademark } = props;
+    const { trademark, className } = props;
     const chat = useAIChatState();
 
     return (
         <AIChatIcon
-            className="size-5 text-tint"
+            className={tcls('size-5 text-tint', className)}
             trademark={trademark}
             state={
                 chat.error

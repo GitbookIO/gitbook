@@ -72,7 +72,7 @@ export async function encodeClientTableOfContents(
                 result.push(
                     removeUndefined({
                         id: page.id,
-                        title: page.title,
+                        title: page.linkTitle || page.title,
                         href,
                         emoji: page.emoji,
                         icon: page.icon,

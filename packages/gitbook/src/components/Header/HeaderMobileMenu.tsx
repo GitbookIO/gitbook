@@ -1,13 +1,11 @@
 'use client';
-
-import { Icon } from '@gitbook/icons';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
 
 import { useScrollListener } from '../hooks/useScrollListener';
+import { Button, type ButtonProps } from '../primitives';
 
 const globalClassName = 'navigation-open';
 
@@ -16,14 +14,22 @@ const SCROLL_DISTANCE = 320;
 /**
  * Button to show/hide the table of content on mobile.
  */
-export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLButtonElement>>) {
+export function HeaderMobileMenu(props: ButtonProps) {
     const language = useLanguage();
 
     const pathname = usePathname();
     const hasScrollRef = useRef(false);
 
+    const [isOpen, setIsOpen] = useState(false);
+
     const toggleNavigation = () => {
-        document.body.classList.toggle(globalClassName);
+        if (!hasScrollRef.current && document.body.classList.contains(globalClassName)) {
+            document.body.classList.remove(globalClassName);
+            setIsOpen(false);
+        } else {
+            document.body.classList.add(globalClassName);
+            setIsOpen(true);
+        }
     };
 
     const windowRef = useRef(typeof window === 'undefined' ? null : window);
@@ -37,16 +43,15 @@ export function HeaderMobileMenu(props: Partial<React.ButtonHTMLAttributes<HTMLB
     }, [pathname]);
 
     return (
-        <button
-            {...props}
-            aria-label={tString(language, 'table_of_contents_button_label')}
+        <Button
+            icon="bars"
+            iconOnly
+            variant="blank"
+            size="default"
+            label={tString(language, 'table_of_contents_button_label')}
             onClick={toggleNavigation}
-            className={tcls(
-                'flex flex-row items-center rounded-sm straight-corners:rounded-xs px-2 py-1',
-                props.className
-            )}
-        >
-            <Icon icon="bars" className="size-4 text-inherit" />
-        </button>
+            active={isOpen}
+            {...props}
+        />
     );
 }
