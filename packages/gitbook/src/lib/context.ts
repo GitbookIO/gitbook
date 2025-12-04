@@ -120,8 +120,14 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     /** All site spaces in the current section / or entire site */
     siteSpaces: SiteSpace[];
 
+    /** Site spaces that are not hidden (visible to visitors). */
+    visibleSiteSpaces: SiteSpace[];
+
     /** Sections of the site. */
     sections: null | SiteSections;
+
+    /** Sections filtered to visible site spaces only. */
+    visibleSections: null | SiteSections;
 
     /** Customizations of the site. */
     customization: SiteCustomizationSettings;
@@ -261,9 +267,16 @@ export async function fetchSiteContextByIds(
     const sections = ids.siteSection
         ? parseSiteSectionsAndGroups(siteStructure, ids.siteSection)
         : null;
+    const visibleSections = ids.siteSection
+        ? parseVisibleSiteSectionsAndGroups(siteStructure, ids.siteSection)
+        : null;
 
     // Parse the current siteSpace and siteSpaces based on the site structure type.
-    const { siteSpaces, siteSpace }: { siteSpaces: SiteSpace[]; siteSpace: SiteSpace } = (() => {
+    const {
+        siteSpaces,
+        siteSpace,
+        visibleSiteSpaces,
+    }: { siteSpaces: SiteSpace[]; siteSpace: SiteSpace; visibleSiteSpaces: SiteSpace[] } = (() => {
         if (siteStructure.type === 'siteSpaces') {
             const siteSpaces = siteStructure.structure;
             const siteSpace = siteSpaces.find((siteSpace) => siteSpace.id === ids.siteSpace);
@@ -274,7 +287,7 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            return { siteSpaces: filterHiddenSiteSpaces(siteSpaces), siteSpace };
+            return { siteSpaces, siteSpace, visibleSiteSpaces: filterHiddenSiteSpaces(siteSpaces) };
         }
 
         if (siteStructure.type === 'sections') {
@@ -295,7 +308,11 @@ export async function fetchSiteContextByIds(
                 );
             }
 
-            return { siteSpaces: filterHiddenSiteSpaces(siteSpaces), siteSpace };
+            return {
+                siteSpaces,
+                siteSpace,
+                visibleSiteSpaces: filterHiddenSiteSpaces(siteSpaces),
+            };
         }
 
         // @ts-expect-error
@@ -327,10 +344,12 @@ export async function fetchSiteContextByIds(
         organizationId: ids.organization,
         site,
         siteSpaces,
+        visibleSiteSpaces,
         siteSpace,
         customization,
         structure: siteStructure,
         sections,
+        visibleSections,
         scripts,
         contextId: ids.contextId,
         isFallback: ids.isFallback,
@@ -434,13 +453,56 @@ function filterHiddenSiteSpaces(siteSpaces: SiteSpace[]): SiteSpace[] {
 }
 
 function parseSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
-    const sectionsAndGroups = getSiteStructureSections(structure, { ignoreGroups: false });
+    const sectionsAndGroups = getSiteStructureSections(structure);
     const section = parseCurrentSection(structure, siteSectionId);
     assert(section, `couldn't find section "${siteSectionId}" in site structure`);
     return { list: sectionsAndGroups, current: section } satisfies SiteSections;
 }
 
+function parseVisibleSiteSectionsAndGroups(structure: SiteStructure, siteSectionId: string) {
+    const { list: sectionsAndGroups, current: section } = parseSiteSectionsAndGroups(
+        structure,
+        siteSectionId
+    );
+    const visibleSectionsAndGroups = filterSectionsAndGroupsWithHiddenSiteSpaces(sectionsAndGroups);
+    return { list: visibleSectionsAndGroups, current: section } satisfies SiteSections;
+}
+
 function parseCurrentSection(structure: SiteStructure, siteSectionId: string) {
     const sections = getSiteStructureSections(structure, { ignoreGroups: true });
     return sections.find((section) => section.id === siteSectionId);
+}
+
+type SectionOrGroup = SiteSection | SiteSectionGroup;
+
+/**
+ * Filter out sections where all site spaces are hidden and groups that become empty after filtering.
+ */
+function filterSectionsAndGroupsWithHiddenSiteSpaces(
+    sectionsOrGroups: SectionOrGroup[]
+): SectionOrGroup[] {
+    return sectionsOrGroups
+        .map((entry) => {
+            if (entry.object === 'site-section') {
+                return sectionHasOnlyHiddenSiteSpaces(entry) ? null : entry;
+            }
+
+            const visibleChildren: SectionOrGroup[] = filterSectionsAndGroupsWithHiddenSiteSpaces(
+                entry.children
+            );
+
+            if (visibleChildren.length === 0) {
+                return null;
+            }
+
+            return {
+                ...entry,
+                children: visibleChildren,
+            };
+        })
+        .filter((entry): entry is SiteSection | SiteSectionGroup => Boolean(entry));
+}
+
+function sectionHasOnlyHiddenSiteSpaces(section: SiteSection) {
+    return section.siteSpaces.every((siteSpace) => siteSpace.hidden);
 }

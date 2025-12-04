@@ -19,5 +19,10 @@ export default async function Page(props: PageProps) {
         redirect(`${context.linker.toPathInSite('~gitbook/embed/page/')}`);
     }
 
-    return <EmbeddableAssistantPage />;
+    return (
+        <EmbeddableAssistantPage
+            baseURL={context.linker.toPathInSite('~gitbook/embed/')}
+            siteTitle={context.site.title}
+        />
+    );
 }

@@ -50,6 +50,12 @@ export type GitBookEmbeddableConfiguration = {
     /** Additional buttons to be displayed in the header of the GitBook embed. */
     actions: GitBookEmbeddableActionDefinition[];
 
+    /**
+     * Additional buttons to be displayed in the header of the GitBook embed.
+     * @deprecated Use `actions` instead.
+     */
+    buttons?: GitBookEmbeddableActionDefinition[];
+
     /** Message to be displayed in the welcome page. */
     greeting: {
         title: string;

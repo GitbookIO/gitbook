@@ -38,7 +38,7 @@ The standalone script provides a global `GitBook` function. See the [API Referen
 GitBook('configure', {
     button: {
         label: 'Ask',
-        icon: 'assistant' // 'assistant' | 'sparkle' | 'circle-question' | 'book'
+        icon: 'assistant' // 'assistant' | 'sparkle' | 'help' | 'book'
     },
     tabs: ['assistant', 'docs'],
     actions: [
@@ -238,16 +238,18 @@ Available in: Standalone script, NPM package, React components
 
 Custom action buttons rendered in the sidebar alongside tabs. Each action button triggers a callback when clicked.
 
+**Note**: This prop was previously named `buttons`. Use `actions` instead, it has the same functionality.
+
 - **Type**: `GitBookEmbeddableActionDefinition[]`
 - **Properties**:
-  - `icon`: `string` - Icon name (e.g., `'circle-question'`, `'book'`, `'sparkle'`, `'rocket'`, `'assistant'`)
+  - `icon`: `string` - Icon name. Any [FontAwesome icon](https://fontawesome.com/search) is supported. (e.g., `'rocket'`, `'comments'`, `'user-circle'`, ...)
   - `label`: `string` - Button label text
   - `onClick`: `() => void | Promise<void>` - Callback function when clicked
 
 ```javascript
 actions: [
     {
-        icon: 'circle-question',
+        icon: 'comments',
         label: 'Contact Support',
         onClick: () => window.open('https://support.example.com', '_blank')
     },
@@ -396,10 +398,10 @@ Available in: Standalone script only
 
 Configure the widget button for the standalone script. This option is not available when using the NPM package or React components, since they can be customized completely.
 
-- **Type**: `{ label: string, icon: 'assistant' | 'sparkle' | 'circle-question' | 'book' }`
+- **Type**: `{ label: string, icon: 'assistant' | 'sparkle' | 'help' | 'book' }`
 - **Properties**:
   - `label`: `string` - Button label text
-  - `icon`: `'assistant' | 'sparkle' | 'circle-question' | 'book'` - Icon displayed on the button
+  - `icon`: `'assistant' | 'sparkle' | 'help' | 'book'` - Icon displayed on the button. Choose from one of 4 presets.
 
 ```javascript
 button: {
