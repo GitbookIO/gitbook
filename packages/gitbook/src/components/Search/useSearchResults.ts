@@ -192,14 +192,14 @@ export function useSearchResults(props: {
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled]);
+    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled, suggestions]);
 
     const aiEnrichedResults: ResultType[] = React.useMemo(() => {
         if (!withAI) {
             return resultsState.results;
         }
         return withAskTriggers(resultsState.results, query, assistants);
-    }, [resultsState.results, query, withAI]);
+    }, [resultsState.results, query, withAI, assistants]);
 
     return { ...resultsState, results: aiEnrichedResults };
 }

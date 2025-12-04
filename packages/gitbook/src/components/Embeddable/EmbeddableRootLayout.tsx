@@ -41,7 +41,6 @@ export async function EmbeddableRootLayout({
             >
                 <AIContextProvider
                     aiMode={context.customization.ai.mode}
-                    // @ts-expect-error - TODO: suggestions is not available in the API yet, remove this expect when it's been added
                     suggestions={context.customization.ai.suggestions}
                     trademark={context.customization.trademark.enabled}
                 >
