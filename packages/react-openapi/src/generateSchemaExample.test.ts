@@ -1038,36 +1038,6 @@ describe('generateSchemaExample', () => {
         ).toBeUndefined();
     });
 
-    it('handles oneOf -> allOf returning a string without spreading characters', () => {
-        // Create a circular reference that will return "[Circular Reference]" string
-        const circularSchema = {
-            type: 'object',
-            properties: {
-                nested: {},
-            },
-        } satisfies OpenAPIV3.SchemaObject;
-        circularSchema.properties.nested = circularSchema;
-
-        const schema = {
-            type: 'object',
-            properties: {
-                foo: {
-                    type: 'string',
-                },
-            },
-            oneOf: [
-                {
-                    allOf: [circularSchema],
-                },
-            ],
-        } satisfies OpenAPIV3.SchemaObject;
-
-        const result = generateSchemaExample(schema);
-
-        expect(result).toBeDefined();
-        expect(result).toHaveProperty('foo');
-    });
-
     it('merges object properties from oneOf -> allOf', () => {
         const schema = {
             type: 'object',

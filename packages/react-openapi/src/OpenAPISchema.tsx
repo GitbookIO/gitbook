@@ -550,7 +550,7 @@ export function getSchemaAlternatives(
                 type,
                 flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
             ) ?? [],
-        ...(discriminator ? { discriminator } : {}),
+        discriminator,
     };
 }
 
@@ -653,9 +653,7 @@ function mergeAlternatives(
                                     : []),
                             ])
                         );
-                        if (latest.nullable || schemaOrRef.nullable) {
-                            latest.nullable = latest.nullable || schemaOrRef.nullable;
-                        }
+                        latest.nullable = latest.nullable || schemaOrRef.nullable;
 
                         // Preserve safe extensions and vendor extensions
                         // Always overwrite (last schema has priority)
@@ -688,6 +686,7 @@ function flattenAlternatives(
     schemasOrRefs: (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
     ancestors: Set<OpenAPIV3.SchemaObject>
 ): OpenAPIV3.SchemaObject[] {
+    // Get the parent schema's required fields from the most recent ancestor
     const latestAncestor = Array.from(ancestors).pop();
     const result: OpenAPIV3.SchemaObject[] = [];
 
@@ -706,6 +705,9 @@ function flattenAlternatives(
     return result;
 }
 
+/**
+ * Flatten a schema that is an alternative of another schema.
+ */
 function flattenSchema(
     schema: OpenAPIV3.SchemaObject,
     alternativeType: AlternativeType,

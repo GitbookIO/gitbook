@@ -1,4 +1,5 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { isPlainObject } from './contentTypeChecks';
 import { checkIsReference } from './utils';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
@@ -97,13 +98,6 @@ const genericExampleValues: Record<string, string> = {
  */
 function guessFromFormat(schema: Record<string, any>, fallback = '') {
     return genericExampleValues[schema.format] ?? fallback;
-}
-
-/**
- * Check if a value is a plain object (not null, not array)
- */
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /**
