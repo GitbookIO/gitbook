@@ -41,7 +41,7 @@ import {
 const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
 
 const overrideAIInitialState = () => {
-    const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+    const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
     if (greeting) {
         greeting.textContent = 'Good morning';
     }
@@ -1972,6 +1972,8 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+
+                    await page.evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -1985,6 +1987,8 @@ const testCases: TestsCase[] = [
 
                     await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
                     await expect(iframe.getByTestId('ai-chat')).toBeVisible();
+
+                    await page.evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2017,6 +2021,7 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
                         AI_PROMPT
                     );
+                    await page.evaluate(overrideAIResponse);
                 },
             },
             {
@@ -2037,6 +2042,7 @@ const testCases: TestsCase[] = [
                         'data-icon',
                         'book'
                     );
+                    await page.evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2063,6 +2069,7 @@ const testCases: TestsCase[] = [
                     await expect(
                         iframe.getByTestId('ai-chat-suggested-question').nth(2)
                     ).toHaveText('What can you do?');
+                    await page.evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2145,6 +2152,7 @@ const testCases: TestsCase[] = [
                     await actions.nth(3).click();
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await page.locator('#gitbook-widget-button').click();
+                    await page.evaluate(overrideAIResponse);
                 },
             },
             {
@@ -2190,6 +2198,7 @@ const testCases: TestsCase[] = [
                         timeout: 30000,
                     });
                     await page.waitForTimeout(10000);
+                    await page.evaluate(overrideAIResponse);
                 },
             },
         ],
