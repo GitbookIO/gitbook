@@ -110,9 +110,9 @@ export function SideSheet(
 
     return (
         <>
-            {isModal && withScrim ? (
+            {withScrim ? (
                 <SideSheetScrim
-                    className={isOpen ? '' : 'hidden opacity-0 backdrop-blur-none'}
+                    className={tcls(isModal && isOpen ? '' : 'hidden opacity-0 backdrop-blur-none')}
                     onClick={handleClose}
                 />
             ) : null}
@@ -138,11 +138,11 @@ export function SideSheet(
                 {...rest}
             >
                 {children}
-                {isModal && withCloseButton ? (
+                {withCloseButton ? (
                     <SideSheetCloseButton
                         className={tcls(
                             side === 'left' ? 'left-full ml-4' : 'right-full mr-4',
-                            isOpen ? 'animate-blur-in' : 'hidden animate-blur-out'
+                            isModal && isOpen ? 'animate-blur-in' : 'hidden animate-blur-out'
                         )}
                         onClick={handleClose}
                     />

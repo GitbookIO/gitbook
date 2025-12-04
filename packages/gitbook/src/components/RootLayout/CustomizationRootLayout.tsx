@@ -57,13 +57,15 @@ function preloadFont(fontData: FontData) {
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
+    /** The class name to apply to the html element. */
+    htmlClassName?: string;
     /** The class name to apply to the body element. */
-    className?: string;
+    bodyClassName?: string;
     forcedTheme?: CustomizationThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
-    const { className, context, forcedTheme, children } = props;
+    const { htmlClassName, bodyClassName, context, forcedTheme, children } = props;
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
@@ -91,7 +93,6 @@ export async function CustomizationRootLayout(props: {
             suppressHydrationWarning
             lang={customization.internationalization.locale}
             className={tcls(
-                'sheet-open:gutter-stable',
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
                 tintColor ? ' tint' : 'no-tint',
@@ -108,7 +109,8 @@ export async function CustomizationRootLayout(props: {
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
                 (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
                     ? 'dark'
-                    : ''
+                    : '',
+                htmlClassName
             )}
         >
             <head>
@@ -180,7 +182,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className={tcls(className, 'sheet-open:overflow-hidden')}>
+            <body className={tcls(bodyClassName, 'sheet-open:overflow-hidden')}>
                 <IconsProvider
                     assetsURL={GITBOOK_ICONS_URL}
                     assetsURLToken={GITBOOK_ICONS_TOKEN}
