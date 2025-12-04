@@ -129,7 +129,7 @@ export async function resolveContentRef(
             const page = resolvePageResult?.page;
             const ancestors =
                 resolvePageResult?.ancestors.map((ancestor) => ({
-                    label: ancestor.linkTitle ?? ancestor.title,
+                    label: ancestor.linkTitle || ancestor.title,
                     icon:
                         ancestor.emoji || ancestor.icon ? (
                             <PageIcon
@@ -177,7 +177,7 @@ export async function resolveContentRef(
                     parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
                         ? parentPage
                         : page;
-                text = pageOrGroup.linkTitle ?? pageOrGroup.title;
+                text = pageOrGroup.linkTitle || pageOrGroup.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
                 icon = <PageIcon page={pageOrGroup} style={iconStyle} />;
             }
