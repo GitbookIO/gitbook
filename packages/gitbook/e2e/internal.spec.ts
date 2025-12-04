@@ -1973,7 +1973,7 @@ const testCases: TestsCase[] = [
                     await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
 
-                    await page.evaluate(overrideAIInitialState);
+                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -1988,7 +1988,7 @@ const testCases: TestsCase[] = [
                     await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
                     await expect(iframe.getByTestId('ai-chat')).toBeVisible();
 
-                    await page.evaluate(overrideAIInitialState);
+                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2021,7 +2021,7 @@ const testCases: TestsCase[] = [
                     await expect(iframe.getByTestId('ai-chat-message-user').first()).toHaveText(
                         AI_PROMPT
                     );
-                    await page.evaluate(overrideAIResponse);
+                    await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
             {
@@ -2042,7 +2042,8 @@ const testCases: TestsCase[] = [
                         'data-icon',
                         'book'
                     );
-                    await page.evaluate(overrideAIInitialState);
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2069,7 +2070,7 @@ const testCases: TestsCase[] = [
                     await expect(
                         iframe.getByTestId('ai-chat-suggested-question').nth(2)
                     ).toHaveText('What can you do?');
-                    await page.evaluate(overrideAIInitialState);
+                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2152,7 +2153,7 @@ const testCases: TestsCase[] = [
                     await actions.nth(3).click();
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await page.locator('#gitbook-widget-button').click();
-                    await page.evaluate(overrideAIResponse);
+                    await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
             {
@@ -2198,7 +2199,7 @@ const testCases: TestsCase[] = [
                         timeout: 30000,
                     });
                     await page.waitForTimeout(10000);
-                    await page.evaluate(overrideAIResponse);
+                    await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
         ],
