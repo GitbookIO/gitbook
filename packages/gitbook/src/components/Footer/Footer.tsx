@@ -29,7 +29,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
             className={tcls(
                 'border-tint-subtle border-t',
                 // If the footer only contains a mode toggle, we only show it on smaller screens
-                mobileOnly ? '@7xl:hidden' : null
+                mobileOnly ? 'xl:hidden' : null
             )}
         >
             <div className="motion-safe:transition-[padding] motion-safe:duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">

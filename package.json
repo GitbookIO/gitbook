@@ -41,7 +41,7 @@
         "catalog": {
             "@tsconfig/strictest": "^2.0.6",
             "@tsconfig/node20": "^20.1.6",
-            "@gitbook/api": "0.152.0",
+            "@gitbook/api": "0.153.0",
             "@scalar/api-client-react": "^1.3.46",
             "@types/react": "^19.0.0",
             "@types/react-dom": "^19.0.0",
