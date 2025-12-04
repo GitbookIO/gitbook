@@ -114,6 +114,7 @@ export async function GET(
             'What can I ask you?',
             'Show me tips and tricks',
         ],
+        tabs: ['assistant'],
     });
         window.GitBook('open');
     </script>

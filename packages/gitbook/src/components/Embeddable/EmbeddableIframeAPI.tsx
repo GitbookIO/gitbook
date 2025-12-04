@@ -11,16 +11,12 @@ import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
 import { Button } from '../primitives';
 
-const embeddableConfiguration = createStore<
-    GitBookEmbeddableConfiguration & { baseURL: string; siteTitle: string }
->(() => ({
+const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
     tabs: [],
     actions: [],
     greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
-    baseURL: '',
-    siteTitle: '',
 }));
 
 /**
@@ -28,16 +24,11 @@ const embeddableConfiguration = createStore<
  */
 export function EmbeddableIframeAPI(props: {
     baseURL: string;
-    siteTitle: string;
 }) {
-    const { baseURL, siteTitle } = props;
+    const { baseURL } = props;
 
     const router = useRouter();
     const chatController = useAIChatController();
-
-    React.useEffect(() => {
-        embeddableConfiguration.setState({ baseURL, siteTitle });
-    }, [baseURL, siteTitle]);
 
     React.useEffect(() => {
         return chatController.on('open', () => {
@@ -99,9 +90,7 @@ export function EmbeddableIframeAPI(props: {
 /**
  * Hook to get the configuration from the parent window.
  */
-export function useEmbeddableConfiguration<
-    T = GitBookEmbeddableConfiguration & { baseURL: string; siteTitle: string },
->(
+export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
     // @ts-expect-error - This is a workaround to allow the function to be optional.
     fn: (state: GitBookEmbeddableConfiguration) => T = (state) => state
 ) {
@@ -146,9 +135,14 @@ export function EmbeddableIframeButtons() {
     );
 }
 
-export function EmbeddableIframeTabs(props: { active?: string }) {
-    const { active = 'assistant' } = props;
-    const { baseURL, siteTitle, tabs: configuredTabs, actions } = useEmbeddableConfiguration();
+export function EmbeddableIframeTabs(props: {
+    ref?: React.RefObject<HTMLDivElement | null>;
+    active?: string;
+    baseURL: string;
+    siteTitle: string;
+}) {
+    const { ref, active = 'assistant', baseURL, siteTitle } = props;
+    const { tabs: configuredTabs, actions } = useEmbeddableConfiguration();
 
     const { assistants, config } = useAI();
 
@@ -194,29 +188,27 @@ export function EmbeddableIframeTabs(props: { active?: string }) {
         }
     }, [tabs, baseURL, router, active]);
 
-    return (
-        <>
-            {tabs.length > 1 || actions.length > 0
-                ? tabs.map((tab) => (
-                      <Button
-                          key={tab.key}
-                          data-testid={`embed-tab-${tab.key}`}
-                          label={tab.label}
-                          size="default"
-                          variant="blank"
-                          icon={tab.icon}
-                          active={tab.key === active}
-                          className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
-                          iconOnly
-                          onClick={tab.onClick}
-                          tooltipProps={{
-                              contentProps: {
-                                  side: 'right',
-                              },
-                          }}
-                      />
-                  ))
-                : null}
-        </>
-    );
+    return tabs.length > 1 || actions.length > 0 ? (
+        <div className="flex flex-col gap-2" ref={ref}>
+            {tabs.map((tab) => (
+                <Button
+                    key={tab.key}
+                    data-testid={`embed-tab-${tab.key}`}
+                    label={tab.label}
+                    size="default"
+                    variant="blank"
+                    icon={tab.icon}
+                    active={tab.key === active}
+                    className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
+                    iconOnly
+                    onClick={tab.onClick}
+                    tooltipProps={{
+                        contentProps: {
+                            side: 'right',
+                        },
+                    }}
+                />
+            ))}
+        </div>
+    ) : null;
 }
