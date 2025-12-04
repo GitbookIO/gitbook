@@ -40,6 +40,29 @@ import {
 
 const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
 
+const overrideAIInitialState = () => {
+    const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+    if (greeting) {
+        greeting.textContent = 'Good morning';
+    }
+};
+const overrideAIResponse = () => {
+    const userMessage = document.querySelector('[data-testid="ai-chat-message-user"]');
+    if (userMessage) {
+        userMessage.textContent = '[Replaced message] Chat message sent by the user';
+    }
+    const assistantMessage = document.querySelectorAll(
+        '[data-testid="ai-chat-message-assistant"] .ai-response-document'
+    );
+    assistantMessage.forEach((message) => {
+        message.innerHTML = '[Replaced message] AI chat response';
+    });
+    const suggestions = document.querySelectorAll('[data-testid="ai-chat-followup-suggestion"]');
+    suggestions.forEach((suggestion) => {
+        suggestion.textContent = 'Follow-up suggestion';
+    });
+};
+
 const searchTestCases: Test[] = [
     {
         name: 'Search - AI Mode: None - Complete flow',
@@ -148,14 +171,7 @@ const searchTestCases: Test[] = [
                 timeout: 60_000,
             });
             // Override text content for visual consistency in screenshots
-            await page.evaluate(() => {
-                const suggestions = document.querySelectorAll(
-                    '[data-testid="ai-chat-followup-suggestion"]'
-                );
-                suggestions.forEach((suggestion) => {
-                    suggestion.textContent = 'Follow-up suggestion';
-                });
-            });
+            await page.evaluate(overrideAIResponse);
         },
     },
     {
@@ -170,12 +186,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
-            await page.evaluate(() => {
-                const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
-                if (greeting) {
-                    greeting.textContent = 'Good morning';
-                }
-            });
+            await page.evaluate(overrideAIInitialState);
         },
     },
     {
@@ -191,12 +202,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
-            await page.evaluate(() => {
-                const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
-                if (greeting) {
-                    greeting.textContent = 'Good morning';
-                }
-            });
+            await page.evaluate(overrideAIInitialState);
         },
     },
     {
@@ -212,12 +218,7 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
             // Override text content for visual consistency in screenshots
-            await page.evaluate(() => {
-                const greeting = document.querySelector('[data-testid="ai-chat-greeting-title"]');
-                if (greeting) {
-                    greeting.textContent = 'Good morning';
-                }
-            });
+            await page.evaluate(overrideAIInitialState);
         },
     },
     {
@@ -237,14 +238,7 @@ const searchTestCases: Test[] = [
                 timeout: 60_000,
             });
             // Override text content for visual consistency in screenshots
-            await page.evaluate(() => {
-                const suggestions = document.querySelectorAll(
-                    '[data-testid="ai-chat-followup-suggestion"]'
-                );
-                suggestions.forEach((suggestion) => {
-                    suggestion.textContent = 'Follow-up suggestion';
-                });
-            });
+            await page.evaluate(overrideAIResponse);
         },
     },
 ];
