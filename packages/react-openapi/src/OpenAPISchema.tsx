@@ -550,7 +550,7 @@ export function getSchemaAlternatives(
                 type,
                 flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
             ) ?? [],
-        discriminator,
+        ...(discriminator ? { discriminator } : {}),
     };
 }
 
@@ -653,7 +653,9 @@ function mergeAlternatives(
                                     : []),
                             ])
                         );
-                        latest.nullable = latest.nullable || schemaOrRef.nullable;
+                        if (latest.nullable || schemaOrRef.nullable) {
+                            latest.nullable = latest.nullable || schemaOrRef.nullable;
+                        }
 
                         // Preserve safe extensions and vendor extensions
                         // Always overwrite (last schema has priority)
@@ -727,6 +729,7 @@ function flattenSchema(
         ];
     }
 
+    // if a schema has allOf that can be safely merged, merge it
     if (
         (alternativeType === 'oneOf' || alternativeType === 'anyOf') &&
         schema.allOf &&
@@ -740,48 +743,34 @@ function flattenSchema(
         if (allOfSchemas.length > 0) {
             const merged = mergeAlternatives('allOf', allOfSchemas);
             if (merged && merged.length > 0) {
-                return merged.map((s) => {
-                    const required = mergeRequiredFields(s, latestAncestor);
-                    const result: OpenAPIV3.SchemaObject = {
-                        ...s,
-                        ...(required !== undefined && { required }),
-                    };
+                // Only merge if all schemas were successfully merged into one (safe to merge)
+                if (merged.length === 1) {
+                    return merged.map((s) => {
+                        const required = mergeRequiredFields(s, latestAncestor);
+                        const result: OpenAPIV3.SchemaObject = {
+                            ...s,
+                            ...(required ? { required } : {}),
+                        };
 
-                    if (schema.title && !s.title) {
-                        result.title = schema.title;
-                    }
+                        if (schema.title && !s.title) {
+                            result.title = schema.title;
+                        }
 
-                    return result;
-                });
+                        return result;
+                    });
+                }
             }
         }
     }
 
-    const title = inferSchemaTitle(schema);
     const required = mergeRequiredFields(schema, latestAncestor);
 
     return [
         {
             ...schema,
-            ...(required !== undefined && { required }),
-            ...(title ? { title } : {}),
+            ...(required ? { required } : {}),
         },
     ];
-}
-
-function inferSchemaTitle(schema: OpenAPIV3.SchemaObject): string | undefined {
-    if (schema.title) {
-        return schema.title;
-    }
-
-    if (schema.properties) {
-        const keys = Object.keys(schema.properties);
-        if (keys.length > 0) {
-            return keys[0];
-        }
-    }
-
-    return undefined;
 }
 
 /**
