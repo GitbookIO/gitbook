@@ -58,7 +58,6 @@ export function EmbeddableIframeAPI(props: {
                     chatController.postMessage({
                         message: message.message,
                     });
-                    router.push(`${baseURL}/assistant`);
                     break;
                 }
                 case 'configure': {
@@ -91,9 +90,7 @@ export function EmbeddableIframeAPI(props: {
 /**
  * Hook to get the configuration from the parent window.
  */
-export function useEmbeddableConfiguration<
-    T = GitBookEmbeddableConfiguration & { baseURL: string; siteTitle: string },
->(
+export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
     // @ts-expect-error - This is a workaround to allow the function to be optional.
     fn: (state: GitBookEmbeddableConfiguration) => T = (state) => state
 ) {

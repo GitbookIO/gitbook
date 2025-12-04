@@ -160,7 +160,7 @@ async function DescriptionForSearchToolCall(props: {
     const hasResults = toolCall.results.length > 0;
 
     return (
-        <details className={tcls('-ml-5 group flex w-full flex-col')}>
+        <details className="-ml-5 group flex w-full flex-col">
             <summary
                 className={tcls(
                     '-mx-2 flex list-none items-center gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md pr-4 pl-7 transition-colors marker:hidden',
