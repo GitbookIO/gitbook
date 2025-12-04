@@ -113,6 +113,18 @@
     background-color: currentColor;
 }
 
+#gitbook-widget-button-icon[data-icon="sparkle"] {
+    mask-image: url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/regular/sparkle.svg?v=2&token=a463935e93");
+}
+
+#gitbook-widget-button-icon[data-icon="help"] {
+    mask-image: url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/regular/circle-question.svg?v=2&token=a463935e93");
+}
+
+#gitbook-widget-button-icon[data-icon="book"] {
+    mask-image: url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/regular/book-open.svg?v=2&token=a463935e93");
+}
+
 #gitbook-widget-button.open #gitbook-widget-button-icon {
     mask-image: url('https://ka-p.fontawesome.com/releases/v6.6.0/svgs/regular/close.svg?v=2&token=a463935e93');
 }
