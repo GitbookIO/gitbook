@@ -716,19 +716,18 @@ function flattenSchema(
 ): OpenAPIV3.SchemaObject[] {
     if (schema[alternativeType] && !ancestors.has(schema)) {
         const alternatives = getSchemaAlternatives(schema, ancestors);
-        if (alternatives?.schemas && alternatives.type === alternativeType) {
-            return alternatives.schemas.map((s) => ({
-                ...s,
-                required: mergeRequiredFields(s, latestAncestor),
-            }));
+        if (alternatives?.schemas) {
+            return alternatives.schemas.map((s) => {
+                const required = mergeRequiredFields(s, latestAncestor);
+                return {
+                    ...s,
+                    ...(required ? { required } : {}),
+                };
+            });
         }
 
-        return [
-            {
-                ...schema,
-                required: mergeRequiredFields(schema, latestAncestor),
-            },
-        ];
+        const required = mergeRequiredFields(schema, latestAncestor);
+        return [{ ...schema, ...(required ? { required } : {}) }];
     }
 
     // if a schema has allOf that can be safely merged, merge it

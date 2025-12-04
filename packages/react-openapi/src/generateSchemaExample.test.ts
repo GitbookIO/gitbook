@@ -1080,4 +1080,47 @@ describe('generateSchemaExample', () => {
         expect(result).toHaveProperty('bar');
         expect(result).toHaveProperty('baz');
     });
+
+    it('merges object properties from anyOf -> allOf', () => {
+        const schema = {
+            type: 'object',
+            properties: {
+                discriminator: {
+                    type: 'string',
+                },
+            },
+            anyOf: [
+                {
+                    allOf: [
+                        {
+                            type: 'object',
+                            properties: {
+                                bar: {
+                                    type: 'string',
+                                },
+                            },
+                        },
+                        {
+                            type: 'object',
+                            properties: {
+                                baz: {
+                                    type: 'number',
+                                },
+                            },
+                        },
+                        {
+                            type: 'string', // This will return a string, but should be ignored
+                        },
+                    ],
+                },
+            ],
+        } satisfies OpenAPIV3.SchemaObject;
+
+        const result = generateSchemaExample(schema);
+
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('discriminator');
+        expect(result).toHaveProperty('bar');
+        expect(result).toHaveProperty('baz');
+    });
 });

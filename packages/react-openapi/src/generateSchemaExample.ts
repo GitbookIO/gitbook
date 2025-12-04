@@ -326,38 +326,43 @@ const getExampleFromSchema = (
 
         if (schema.anyOf !== undefined) {
             const anyOfItem = schema.anyOf[0];
-            // If anyOf[0] has allOf, process allOf items individually to merge object results
-            if (anyOfItem?.allOf !== undefined && Array.isArray(anyOfItem.allOf)) {
-                mergeAllOfIntoResponse(anyOfItem.allOf, response, anyOfItem);
-            } else {
-                const anyOfResult = getExampleFromSchema(
-                    anyOfItem,
-                    options,
-                    level + 1,
-                    undefined,
-                    undefined,
-                    resultCache
-                );
-                if (isPlainObject(anyOfResult)) {
-                    Object.assign(response, anyOfResult);
+
+            if (anyOfItem) {
+                // If anyOf[0] has allOf, process allOf items individually to merge object results
+                if (anyOfItem?.allOf !== undefined && Array.isArray(anyOfItem.allOf)) {
+                    mergeAllOfIntoResponse(anyOfItem.allOf, response, anyOfItem);
+                } else {
+                    const anyOfResult = getExampleFromSchema(
+                        anyOfItem,
+                        options,
+                        level + 1,
+                        undefined,
+                        undefined,
+                        resultCache
+                    );
+                    if (isPlainObject(anyOfResult)) {
+                        Object.assign(response, anyOfResult);
+                    }
                 }
             }
         } else if (schema.oneOf !== undefined) {
             const oneOfItem = schema.oneOf[0];
-            // If oneOf[0] has allOf, process allOf items individually to merge object results
-            if (oneOfItem?.allOf !== undefined && Array.isArray(oneOfItem.allOf)) {
-                mergeAllOfIntoResponse(oneOfItem.allOf, response, oneOfItem);
-            } else {
-                const oneOfResult = getExampleFromSchema(
-                    oneOfItem,
-                    options,
-                    level + 1,
-                    undefined,
-                    undefined,
-                    resultCache
-                );
-                if (isPlainObject(oneOfResult)) {
-                    Object.assign(response, oneOfResult);
+            if (oneOfItem) {
+                // If oneOf[0] has allOf, process allOf items individually to merge object results
+                if (oneOfItem?.allOf !== undefined && Array.isArray(oneOfItem.allOf)) {
+                    mergeAllOfIntoResponse(oneOfItem.allOf, response, oneOfItem);
+                } else {
+                    const oneOfResult = getExampleFromSchema(
+                        oneOfItem,
+                        options,
+                        level + 1,
+                        undefined,
+                        undefined,
+                        resultCache
+                    );
+                    if (isPlainObject(oneOfResult)) {
+                        Object.assign(response, oneOfResult);
+                    }
                 }
             }
         } else if (schema.allOf !== undefined) {
