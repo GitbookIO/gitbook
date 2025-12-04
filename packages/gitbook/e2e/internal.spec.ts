@@ -13,6 +13,13 @@ import type { GitBookStandalone } from '@gitbook/embed';
 import { expect } from '@playwright/test';
 import jwt from 'jsonwebtoken';
 
+// Local type augmentation for window.GitBook in test context
+declare global {
+    interface Window {
+        GitBook?: GitBookStandalone;
+    }
+}
+
 import {
     VISITOR_TOKEN_COOKIE,
     getVisitorAuthCookieName,
@@ -1992,7 +1999,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await page.evaluate(() => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const GitBook = window.GitBook as GitBookStandalone;
                         GitBook('navigateToPage', '/getting-started/quickstart');
                     });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
@@ -2009,7 +2016,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await page.evaluate((aiPrompt) => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const GitBook = window.GitBook as GitBookStandalone;
                         GitBook('postUserMessage', aiPrompt);
                     }, AI_PROMPT);
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
@@ -2024,7 +2031,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await page.evaluate(() => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const GitBook = window.GitBook as GitBookStandalone;
                         GitBook('configure', {
                             button: {
                                 label: 'Docs',
@@ -2044,7 +2051,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await page.evaluate(() => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const GitBook = window.GitBook as GitBookStandalone;
                         GitBook('configure', {
                             suggestions: [
                                 'What is GitBook?',
@@ -2070,14 +2077,14 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await page.evaluate((aiPrompt) => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const GitBook = window.GitBook as GitBookStandalone;
                         GitBook('configure', {
                             actions: [
                                 {
                                     label: 'Open internal link',
                                     icon: 'bolt',
                                     onClick: () =>
-                                        (window.GitBook as unknown as GitBookStandalone)(
+                                        (window.GitBook as GitBookStandalone)(
                                             'navigateToPage',
                                             '/getting-started/quickstart'
                                         ),
@@ -2092,17 +2099,19 @@ const testCases: TestsCase[] = [
                                 {
                                     label: 'Post message',
                                     icon: 'message',
-                                    onClick: () =>
-                                        (window.GitBook as unknown as GitBookStandalone)(
-                                            'postUserMessage',
-                                            aiPrompt
-                                        ),
+                                    onClick: () => {
+                                        const GitBook = window.GitBook as GitBookStandalone;
+                                        GitBook('postUserMessage', aiPrompt);
+                                        GitBook('navigateToAssistant');
+                                    },
                                 },
                                 {
                                     label: 'Close',
                                     icon: 'xmark',
-                                    onClick: () =>
-                                        (window.GitBook as unknown as GitBookStandalone)('close'),
+                                    onClick: () => {
+                                        const GitBook = window.GitBook as GitBookStandalone;
+                                        GitBook('close');
+                                    },
                                 },
                             ],
                         });
@@ -2148,7 +2157,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await page.evaluate(() => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        const GitBook = window.GitBook as GitBookStandalone;
                         GitBook('configure', {
                             tools: [
                                 {
