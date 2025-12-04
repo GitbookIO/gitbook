@@ -33,12 +33,8 @@ import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
 
-export function AIChat(props: { trademark: boolean }) {
-    const { trademark } = props;
-
-    const {
-        config: { suggestions },
-    } = useAI();
+export function AIChat() {
+    const { config } = useAI();
     const language = useLanguage();
     const chat = useAIChatState();
     const chatController = useAIChatController();
@@ -85,10 +81,10 @@ export function AIChat(props: { trademark: boolean }) {
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base transition-all duration-300 max-lg:circular-corners:rounded-3xl max-lg:rounded-corners:rounded-md max-lg:border lg:w-80 xl:w-96">
                 <EmbeddableFrameMain>
                     <EmbeddableFrameHeader>
-                        <AIChatDynamicIcon trademark={trademark} />
+                        <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
                             <EmbeddableFrameTitle>
-                                {getAIChatName(language, trademark)}
+                                {getAIChatName(language, config.trademark)}
                             </EmbeddableFrameTitle>
                             <AIChatSubtitle chat={chat} />
                         </EmbeddableFrameHeaderMain>
@@ -108,7 +104,7 @@ export function AIChat(props: { trademark: boolean }) {
                         <AIChatBody
                             chatController={chatController}
                             chat={chat}
-                            suggestions={suggestions}
+                            suggestions={config.suggestions}
                         />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
