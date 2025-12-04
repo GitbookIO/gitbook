@@ -100,6 +100,13 @@ function guessFromFormat(schema: Record<string, any>, fallback = '') {
 }
 
 /**
+ * Check if a value is a plain object (not null, not array)
+ */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
  * This function takes an OpenAPI schema and generates an example from it
  * Forked from : https://github.com/scalar/scalar/blob/main/packages/oas-utils/src/spec-getters/getExampleFromSchema.ts
  */
@@ -145,6 +152,23 @@ const getExampleFromSchema = (
 
         resultCache.set(schema, result);
         return result;
+    }
+
+    // Process allOf items and merge object results into the response
+    function mergeAllOfIntoResponse(
+        allOfItems: Record<string, unknown>[],
+        response: Record<string, unknown>,
+        parent: Record<string, unknown> | undefined
+    ): void {
+        const allOfResults = allOfItems
+            .map((item: Record<string, unknown>) =>
+                getExampleFromSchema(item, options, level + 1, parent, undefined, resultCache)
+            )
+            .filter(isPlainObject);
+
+        if (allOfResults.length > 0) {
+            Object.assign(response, ...allOfResults);
+        }
     }
 
     // Check if the result is already cached
@@ -307,45 +331,43 @@ const getExampleFromSchema = (
         }
 
         if (schema.anyOf !== undefined) {
-            Object.assign(
-                response,
-                getExampleFromSchema(
-                    schema.anyOf[0],
+            const anyOfItem = schema.anyOf[0];
+            // If anyOf[0] has allOf, process allOf items individually to merge object results
+            if (anyOfItem?.allOf !== undefined && Array.isArray(anyOfItem.allOf)) {
+                mergeAllOfIntoResponse(anyOfItem.allOf, response, anyOfItem);
+            } else {
+                const anyOfResult = getExampleFromSchema(
+                    anyOfItem,
                     options,
                     level + 1,
                     undefined,
                     undefined,
                     resultCache
-                )
-            );
+                );
+                if (isPlainObject(anyOfResult)) {
+                    Object.assign(response, anyOfResult);
+                }
+            }
         } else if (schema.oneOf !== undefined) {
-            Object.assign(
-                response,
-                getExampleFromSchema(
-                    schema.oneOf[0],
+            const oneOfItem = schema.oneOf[0];
+            // If oneOf[0] has allOf, process allOf items individually to merge object results
+            if (oneOfItem?.allOf !== undefined && Array.isArray(oneOfItem.allOf)) {
+                mergeAllOfIntoResponse(oneOfItem.allOf, response, oneOfItem);
+            } else {
+                const oneOfResult = getExampleFromSchema(
+                    oneOfItem,
                     options,
                     level + 1,
                     undefined,
                     undefined,
                     resultCache
-                )
-            );
+                );
+                if (isPlainObject(oneOfResult)) {
+                    Object.assign(response, oneOfResult);
+                }
+            }
         } else if (schema.allOf !== undefined) {
-            Object.assign(
-                response,
-                ...schema.allOf
-                    .map((item: Record<string, any>) =>
-                        getExampleFromSchema(
-                            item,
-                            options,
-                            level + 1,
-                            schema,
-                            undefined,
-                            resultCache
-                        )
-                    )
-                    .filter((item: any) => item !== undefined)
-            );
+            mergeAllOfIntoResponse(schema.allOf, response, schema);
         }
 
         return cache(schema, response);
