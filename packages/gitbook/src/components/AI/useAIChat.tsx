@@ -87,6 +87,19 @@ export type AIChatState = {
     error: boolean;
 };
 
+export type AIChatEvent =
+    | { type: 'open' }
+    | { type: 'postMessage'; message: string }
+    | { type: 'clear' }
+    | { type: 'close' };
+
+type AIChatEventData<T extends AIChatEvent['type']> = Omit<
+    Extract<AIChatEvent, { type: T }>,
+    'type'
+>;
+
+type AIChatEventListener = (input?: Omit<AIChatEvent, 'type'>) => void;
+
 export type AIChatController = {
     /** Open the dialog */
     open: () => void;
@@ -97,7 +110,10 @@ export type AIChatController = {
     /** Clear the conversation */
     clear: () => void;
     /** Register an event listener */
-    on: (event: 'postMessage', listener: (input: { message: string }) => void) => () => void;
+    on: <T extends AIChatEvent['type']>(
+        event: T,
+        listener: (input?: AIChatEventData<T>) => void
+    ) => () => void;
 };
 
 const AIChatControllerContext = React.createContext<AIChatController | null>(null);
@@ -125,6 +141,17 @@ export function useAIChatState(): AIChatState {
     return state;
 }
 
+function notify(
+    listeners: AIChatEventListener[] | undefined,
+    input: Omit<AIChatEvent, 'type'>
+): void {
+    if (!listeners) return;
+    // Defer event listeners to next tick so React can process state updates first
+    setTimeout(() => {
+        listeners.forEach((listener) => listener(input));
+    }, 0);
+}
+
 /**
  * Provide the controller to interact with the AI chat.
  */
@@ -140,9 +167,7 @@ export function AIChatProvider(props: {
     const language = useLanguage();
 
     // Event listeners storage
-    const eventsRef = React.useRef<Map<'postMessage', Array<(input: { message: string }) => void>>>(
-        new Map()
-    );
+    const eventsRef = React.useRef<Map<AIChatEvent['type'], AIChatEventListener[]>>(new Map());
 
     // Open AI chat and sync with search state
     const onOpen = React.useCallback(() => {
@@ -156,6 +181,8 @@ export function AIChatProvider(props: {
             scope: prev?.scope ?? 'default',
             open: false, // Close search popover when opening chat
         }));
+
+        notify(eventsRef.current.get('open'), {});
     }, [setSearchState]);
 
     // Close AI chat and clear ask parameter
@@ -169,6 +196,8 @@ export function AIChatProvider(props: {
             scope: prev?.scope ?? 'default',
             open: false,
         }));
+
+        notify(eventsRef.current.get('close'), {});
     }, [setSearchState]);
 
     // Stream a message with the AI backend
@@ -386,11 +415,7 @@ export function AIChatProvider(props: {
                 }));
             }
 
-            // Defer event listeners to next tick so React can process state updates first
-            setTimeout(() => {
-                const listeners = eventsRef.current.get('postMessage') || [];
-                listeners.forEach((listener) => listener(input));
-            }, 0);
+            notify(eventsRef.current.get('postMessage'), { message: input.message });
 
             if (query === input.message) {
                 // Return early if the message is the same as the previous message
@@ -458,9 +483,12 @@ export function AIChatProvider(props: {
     }, [setSearchState]);
 
     const onEvent = React.useCallback(
-        (event: 'postMessage', listener: (input: { message: string }) => void) => {
+        <T extends AIChatEvent['type']>(
+            event: T,
+            listener: (input?: AIChatEventData<T>) => void
+        ) => {
             const listeners = eventsRef.current.get(event) || [];
-            listeners.push(listener);
+            listeners.push(listener as AIChatEventListener);
             eventsRef.current.set(event, listeners);
             return () => {
                 const currentListeners = eventsRef.current.get(event) || [];

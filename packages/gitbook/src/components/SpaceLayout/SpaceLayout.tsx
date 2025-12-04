@@ -99,11 +99,11 @@ export function SpaceLayoutServerContext(props: SpaceLayoutProps) {
  */
 export function SpaceLayout(props: SpaceLayoutProps) {
     const { context, children } = props;
-    const { siteSpace, customization, sections, siteSpaces } = context;
+    const { siteSpace, customization, visibleSections, visibleSiteSpaces } = context;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
 
-    const withSections = Boolean(sections && sections.list.length > 1);
+    const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
     const variants = categorizeVariants(context);
 
     const withFooter =
@@ -170,8 +170,10 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                 </div>
                             )
                         }
+                        // Displays the search button and/or the space dropdown in the ToC
+                        // according to the header/variant settings.
+                        // E.g if there is no header, the search button will be displayed in the ToC.
                         innerHeader={
-                            // displays the search button and/or the space dropdown in the ToC according to the header/variant settings. E.g if there is no header, the search button will be displayed in the ToC.
                             <>
                                 {!withTopHeader && (
                                     <div className="flex gap-2">
@@ -179,32 +181,28 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                                             style={CustomizationSearchStyle.Subtle}
                                             withVariants={variants.generic.length > 1}
                                             withSiteVariants={
-                                                sections?.list.some(
+                                                visibleSections?.list.some(
                                                     (s) =>
                                                         s.object === 'site-section' &&
                                                         s.siteSpaces.length > 1
                                                 ) ?? false
                                             }
                                             withSections={withSections}
-                                            section={sections?.current}
-                                            spaceTitle={siteSpace.title}
-                                            siteSpaceId={siteSpace.id}
-                                            siteSpaceIds={siteSpaces
-                                                .filter(
-                                                    (s) =>
-                                                        s.space.language ===
-                                                        siteSpace.space.language
-                                                )
-                                                .map((s) => s.id)}
+                                            section={visibleSections?.current}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={visibleSiteSpaces}
                                             className="max-lg:hidden"
                                             viewport="desktop"
                                         />
                                     </div>
                                 )}
-                                {!withTopHeader && withSections && sections && (
+                                {!withTopHeader && withSections && visibleSections && (
                                     <SiteSectionList
                                         className={tcls('hidden', 'lg:block')}
-                                        sections={encodeClientSiteSections(context, sections)}
+                                        sections={encodeClientSiteSections(
+                                            context,
+                                            visibleSections
+                                        )}
                                     />
                                 )}
                                 {variants.generic.length > 1 ? (

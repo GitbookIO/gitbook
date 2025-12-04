@@ -35,8 +35,6 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
         short: formatDateShort(parsedDate),
     }[dateFormat];
 
-    const isSticky = true; // TODO: use parentUpdates.data.sticky once implemented
-
     return (
         <div
             className={tcls(
@@ -46,9 +44,8 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
         >
             <div
                 className={tcls(
-                    'h-fit w-40 min-w-40 shrink-0',
-                    // Date is sticky on larger screens & if enabled on the parent Updates block
-                    isSticky && 'md:sticky md:top-[calc(var(--toc-top-offset)+8px)]!'
+                    // Date is only sticky on larger screens when we use flex-row layout
+                    'h-fit w-40 min-w-40 shrink-0 md:sticky md:top-[calc(var(--toc-top-offset)+8px)]!'
                 )}
             >
                 <time

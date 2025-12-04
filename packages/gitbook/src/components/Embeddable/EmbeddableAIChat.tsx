@@ -4,6 +4,7 @@ import { useAI, useAIChatController, useAIChatState } from '@/components/AI';
 import {
     AIChatBody,
     AIChatControlButton,
+    AIChatDynamicIcon,
     AIChatSubtitle,
     getAIChatName,
 } from '@/components/AIChat';
@@ -27,10 +28,16 @@ import {
     useEmbeddableConfiguration,
 } from './EmbeddableIframeAPI';
 
+type EmbeddableAIChatProps = {
+    baseURL: string;
+    siteTitle: string;
+};
+
 /**
  * Embeddable AI chat window in an iframe.
  */
-export function EmbeddableAIChat() {
+export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
+    const { baseURL, siteTitle } = props;
     const chat = useAIChatState();
     const { config } = useAI();
     const chatController = useAIChatController();
@@ -55,14 +62,27 @@ export function EmbeddableAIChat() {
         );
     }, [trackEvent]);
 
+    const tabsRef = React.useRef<HTMLDivElement>(null);
+
     return (
         <EmbeddableFrame>
             <EmbeddableFrameSidebar>
-                <EmbeddableIframeTabs active="assistant" />
+                <EmbeddableIframeTabs
+                    ref={tabsRef}
+                    active="assistant"
+                    baseURL={baseURL}
+                    siteTitle={siteTitle}
+                />
                 <EmbeddableIframeButtons />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
+                    {!tabsRef.current ? (
+                        <AIChatDynamicIcon
+                            className="animate-blur-in-slow"
+                            trademark={config.trademark}
+                        />
+                    ) : null}
                     <EmbeddableFrameHeaderMain>
                         <EmbeddableFrameTitle>
                             {getAIChatName(language, config.trademark)}

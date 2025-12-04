@@ -59,7 +59,7 @@ export function getEmbeddableLinker(linker: GitBookLinker): GitBookLinker {
         toLinkForContent(rawURL: string): string {
             const result = linker.toLinkForContent(rawURL);
             // If the link is not relative or already an embed, return it as is
-            if (result.includes('~gitbook') || !result.startsWith('/')) {
+            if (result.includes('~gitbook/embed') || !result.startsWith('/')) {
                 return result;
             }
 

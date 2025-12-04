@@ -113,13 +113,14 @@ export function AIChat() {
  */
 export function AIChatDynamicIcon(props: {
     trademark: boolean;
+    className?: string;
 }) {
-    const { trademark } = props;
+    const { trademark, className } = props;
     const chat = useAIChatState();
 
     return (
         <AIChatIcon
-            className="size-5 text-tint"
+            className={tcls('size-5 text-tint', className)}
             trademark={trademark}
             state={
                 chat.error

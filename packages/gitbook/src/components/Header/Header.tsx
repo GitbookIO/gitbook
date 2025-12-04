@@ -25,12 +25,12 @@ export function Header(props: {
     };
 }) {
     const { context, withTopHeader, variants } = props;
-    const { siteSpace, siteSpaces, sections, customization } = context;
+    const { siteSpace, visibleSiteSpaces, visibleSections, customization } = context;
 
     const withSections = Boolean(
-        sections &&
-            (sections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
-                sections.list.some((s) => s.object === 'site-section-group'))
+        visibleSections &&
+            (visibleSections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
+                visibleSections.list.some((s) => s.object === 'site-section-group'))
     );
 
     return (
@@ -139,23 +139,22 @@ export function Header(props: {
                                 style={customization.styling.search}
                                 withVariants={variants.generic.length > 1}
                                 withSiteVariants={
-                                    sections?.list.some(
+                                    visibleSections?.list.some(
                                         (s) =>
                                             s.object === 'site-section' && s.siteSpaces.length > 1
                                     ) ?? false
                                 }
-                                withSections={sections ? sections.list.length > 1 : false}
+                                withSections={
+                                    visibleSections ? visibleSections.list.length > 1 : false
+                                }
                                 section={
-                                    sections
-                                        ? // Client-encode to avoid a serialisation issue that was causing the language selector to disappear
-                                          encodeClientSiteSections(context, sections).current
+                                    visibleSections
+                                        ? // Client-encode to avoid a serialization issue that was causing the language selector to disappear
+                                          encodeClientSiteSections(context, visibleSections).current
                                         : undefined
                                 }
-                                spaceTitle={siteSpace.title}
-                                siteSpaceId={siteSpace.id}
-                                siteSpaceIds={siteSpaces
-                                    .filter((s) => s.space.language === siteSpace.space.language)
-                                    .map((s) => s.id)}
+                                siteSpace={siteSpace}
+                                siteSpaces={visibleSiteSpaces}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                             />
                         </div>
@@ -199,9 +198,9 @@ export function Header(props: {
                 </div>
             </div>
 
-            {sections && withSections ? (
+            {visibleSections && withSections ? (
                 <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
-                    <SiteSectionTabs sections={encodeClientSiteSections(context, sections)}>
+                    <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
                         {variants.translations.length > 1 ? (
                             <TranslationsDropdown
                                 context={context}

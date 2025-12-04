@@ -40,7 +40,11 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
     return (
         <EmbeddableFrame className="site-background">
             <EmbeddableFrameSidebar>
-                <EmbeddableIframeTabs active="docs" />
+                <EmbeddableIframeTabs
+                    active="docs"
+                    baseURL={context.linker.toPathInSite('~gitbook/embed/')}
+                    siteTitle={context.site.title}
+                />
                 <EmbeddableIframeButtons />
             </EmbeddableFrameSidebar>
             <EmbeddableFrameMain data-testid="embed-docs-page">
