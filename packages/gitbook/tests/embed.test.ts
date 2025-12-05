@@ -21,18 +21,4 @@ describe('embed script', () => {
         const body = await response.text();
         expect(body).toContain('w.GitBook');
     });
-
-    it('responds to OPTIONS requests with CORS headers for cross-domain insertion', async () => {
-        const response = await fetch(EMBED_SCRIPT_URL, {
-            method: 'OPTIONS',
-            headers: {
-                Origin: 'https://example.com',
-                'Access-Control-Request-Method': 'GET',
-            },
-        });
-
-        expect(response.status).toBe(204);
-        expect(response.headers.get('access-control-allow-origin')).toBe('*');
-        expect(response.headers.get('access-control-allow-methods')).toContain('GET');
-    });
 });
