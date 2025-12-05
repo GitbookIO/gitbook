@@ -10,8 +10,9 @@ export const dynamic = 'force-static';
 const EMBEDDABLE_RESPONSE_HEADERS = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': '*',
     'Cross-Origin-Resource-Policy': 'cross-origin',
-    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+    'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
 };
 
 /**
