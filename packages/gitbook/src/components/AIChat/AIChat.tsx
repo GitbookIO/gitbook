@@ -101,7 +101,11 @@ export function AIChat() {
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>
                     <EmbeddableFrameBody>
-                        <AIChatBody chatController={chatController} chat={chat} />
+                        <AIChatBody
+                            chatController={chatController}
+                            chat={chat}
+                            suggestions={config.suggestions}
+                        />
                     </EmbeddableFrameBody>
                 </EmbeddableFrameMain>
             </EmbeddableFrame>
