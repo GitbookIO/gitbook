@@ -369,6 +369,44 @@ const getRevisionPageDocument = cache(
     }
 );
 
+/**
+ * Get the document for a page.
+ * Compared to the v1 of `getRevisionPageDocument`, it dereferences the reusable content blocks.
+ */
+const getRevisionPageDocumentV2 = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; pageId: string }
+    ) => {
+        'use cache';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getPageDocumentInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.pageId,
+                        {
+                            evaluated: 'deterministic-only',
+                            dereferenced: true,
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLifeFromResponse(res, 'max');
+
+                    return res.data;
+                }
+            );
+        });
+    }
+);
+
 const getRevisionReusableContentDocument = cache(
     async (
         input: DataFetcherInput,
