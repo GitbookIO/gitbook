@@ -82,10 +82,3 @@ export async function GET(
         }
     );
 }
-
-export function OPTIONS() {
-    return new Response(null, {
-        status: 204,
-        headers: EMBEDDABLE_RESPONSE_HEADERS,
-    });
-}
