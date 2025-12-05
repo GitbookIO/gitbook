@@ -3,12 +3,16 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { SideSheet } from '../primitives/SideSheet';
 import { PagesList } from './PagesList';
 import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
 import { encodeClientTableOfContents } from './encodeClientTableOfContents';
 
+/**
+ * Sidebar container, responsible for setting the right dimensions and position for the sidebar.
+ */
 export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
@@ -22,23 +26,33 @@ export async function TableOfContents(props: {
 
     return (
         <>
-            <aside // Sidebar container, responsible for setting the right dimensions and position for the sidebar.
+            <SideSheet
+                side="left"
                 data-testid="table-of-contents"
                 id="table-of-contents"
+                toggleClass="navigation-open"
+                withScrim={true}
+                withCloseButton={true}
                 className={tcls(
-                    'group',
+                    'group/table-of-contents',
                     'text-sm',
 
                     'grow-0',
                     'shrink-0',
-                    'basis-full',
-                    'lg:basis-72',
+
+                    'w-72',
+                    'basis-72',
                     'lg:page-no-toc:basis-56',
 
-                    'relative',
-                    'z-1',
+                    'max-lg:not-sidebar-filled:bg-tint-base',
+                    'max-lg:not-sidebar-filled:border-r',
+                    'border-tint-subtle',
+
+                    'lg:flex!',
+                    'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
+                    'lg:z-0!',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -60,29 +74,20 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-4',
-                    'pb-4',
+                    'py-6',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
+                    'max-lg:pl-8',
 
-                    'hidden',
-                    'navigation-open:flex!',
-                    'lg:flex',
-                    'lg:page-no-toc:hidden',
-                    'xl:page-no-toc:flex',
-                    'lg:site-header-none:page-no-toc:flex',
                     'flex-col',
                     'gap-4',
-
-                    'navigation-open:border-b',
-                    'border-tint-subtle',
                     className
                 )}
             >
-                {header && header}
+                {header ? header : null}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
-                        'lg:-ms-5',
+                        '-ms-5',
                         'relative flex grow flex-col overflow-hidden border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
@@ -91,6 +96,7 @@ export async function TableOfContents(props: {
                         '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                         '[html.sidebar-filled.theme-gradient_&]:border',
+                        'max-lg:sidebar-filled:border',
                         'page-no-toc:bg-transparent!',
                         'page-no-toc:border-none!',
 
@@ -99,22 +105,14 @@ export async function TableOfContents(props: {
                         'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-3xl'
                     )}
                 >
-                    {innerHeader ? (
-                        <div className="my-4 flex flex-col space-y-4 px-5 empty:hidden">
-                            {innerHeader}
-                        </div>
-                    ) : null}
+                    {innerHeader ? innerHeader : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
-                        className={tcls(
-                            'flex grow flex-col p-2 pt-4',
-                            customization.trademark.enabled && 'lg:pb-20',
-                            'hide-scrollbar overflow-y-auto'
-                        )}
+                        className="hide-scrollbar gutter-stable flex grow flex-col overflow-y-auto p-2"
                     >
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
+                            style="mb-5 page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
                         />
                         {customization.trademark.enabled ? (
                             <Trademark
@@ -124,7 +122,7 @@ export async function TableOfContents(props: {
                         ) : null}
                     </TOCScrollContainer>
                 </div>
-            </aside>
+            </SideSheet>
             <TableOfContentsScript />
         </>
     );

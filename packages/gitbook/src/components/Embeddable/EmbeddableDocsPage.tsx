@@ -79,7 +79,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                         contentClassName="p-4"
                         fadeEdges={context.sections ? [] : ['leading']}
                     >
-                        <TableOfContents className="pt-0" context={context} />
+                        <TableOfContents context={context} />
                         <PageBody
                             context={context}
                             page={page}
