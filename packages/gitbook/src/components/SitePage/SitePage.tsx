@@ -123,7 +123,7 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
  * A string concatenation of the site structure (sections and variants) titles.
  */
 function getSiteStructureTitle(context: GitBookSiteContext): string | null {
-    const { sections, siteSpace, siteSpaces } = context;
+    const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
 
     const title = [];
     if (
@@ -259,7 +259,7 @@ export async function getSitePageData(props: SitePageProps) {
         );
     }
 
-    const { customization, sections } = context;
+    const { customization, visibleSections } = context;
     const { page, ancestors } = pageTarget;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -270,7 +270,7 @@ export async function getSitePageData(props: SitePageProps) {
     );
     const withPageFeedback = customization.feedback.enabled;
 
-    const withSections = Boolean(sections && sections.list.length > 0);
+    const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
     const document = await getPageDocument(context, page);
 

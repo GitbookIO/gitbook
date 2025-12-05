@@ -32,10 +32,9 @@ export function Hint({
             className={tcls(
                 'hint',
                 'transition-colors',
-                'rounded-md',
-                hasHeading ? 'rounded-l-sm' : null,
-                'straight-corners:rounded-none',
+                'rounded-corners:rounded-md',
                 'circular-corners:rounded-xl',
+                hasHeading ? 'circular-corners:rounded-l-none rounded-corners:rounded-l-none' : '',
                 'overflow-hidden',
                 hasHeading ? ['border-l-2', hintStyle.containerWithHeader] : hintStyle.container,
 
