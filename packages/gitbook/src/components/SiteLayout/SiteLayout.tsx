@@ -56,6 +56,7 @@ export async function SiteLayout(props: {
         >
             <AIContextProvider
                 aiMode={customization.ai?.mode}
+                suggestions={context.customization.ai?.suggestions}
                 trademark={customization.trademark.enabled}
             >
                 <SpaceLayout

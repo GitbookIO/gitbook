@@ -15,6 +15,7 @@ import { useSearch } from '../Search/useSearch';
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {
     aiMode: CustomizationAIMode;
+    suggestions?: string[];
     trademark: boolean;
 };
 
@@ -49,8 +50,11 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
 const AIContext = React.createContext<AIConfig | null>(null);
 
 export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): React.ReactElement {
-    const { aiMode, trademark, children } = props;
-    const value = React.useMemo(() => ({ aiMode, trademark }), [aiMode, trademark]);
+    const { aiMode, trademark, suggestions, children } = props;
+    const value = React.useMemo(
+        () => ({ aiMode, trademark, suggestions }),
+        [aiMode, trademark, suggestions]
+    );
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
 
