@@ -4,6 +4,12 @@ import { tcls } from '@/lib/tailwind';
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import { useState } from 'react';
 
+export type TooltipProps = {
+    rootProps?: RadixTooltip.TooltipProps;
+    triggerProps?: RadixTooltip.TooltipTriggerProps;
+    contentProps?: RadixTooltip.TooltipContentProps;
+};
+
 export function Tooltip(props: {
     children: React.ReactNode;
     label?: string | React.ReactNode;

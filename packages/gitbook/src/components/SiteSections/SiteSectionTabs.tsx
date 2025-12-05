@@ -33,6 +33,7 @@ export function SiteSectionTabs(props: {
         children,
     } = props;
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const currentTriggerRef = React.useRef<HTMLButtonElement | null>(null);
     const [offset, setOffset] = React.useState<number | null>(null);
     const [value, setValue] = React.useState<string | undefined>();
@@ -41,12 +42,15 @@ export function SiteSectionTabs(props: {
 
     React.useEffect(() => {
         const trigger = currentTriggerRef.current;
-        if (!value || !trigger) {
+        const container = containerRef.current;
+        if (!value || !trigger || !container) {
             return;
         }
 
-        const triggerWidth = trigger.getBoundingClientRect().width;
-        const triggerLeft = trigger.getBoundingClientRect().left;
+        const triggerWidth = trigger.getBoundingClientRect().width - SCREEN_OFFSET;
+        const triggerLeft =
+            trigger.getBoundingClientRect().left -
+            (window.innerWidth - container.getBoundingClientRect().width) / 2;
         setOffset(triggerLeft + triggerWidth / 2);
     }, [value]);
 
@@ -58,6 +62,7 @@ export function SiteSectionTabs(props: {
                 'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]',
                 className
             )}
+            ref={containerRef}
             value={value}
             onValueChange={setValue}
             skipDelayDuration={500}
@@ -141,14 +146,14 @@ export function SiteSectionTabs(props: {
             {children}
 
             <div
-                className="fixed top-full left-0 z-20 flex w-full"
+                className="absolute top-full left-0 z-20 flex w-full"
                 style={{
                     padding: `0 ${SCREEN_OFFSET}px 0 ${SCREEN_OFFSET}px`,
                 }}
             >
                 <NavigationMenu.Viewport
                     className={tcls(
-                        'relative origin-top overflow-auto circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg transition-transform duration-250 ease-in-out',
+                        'relative origin-top overflow-auto circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint bg-tint-base shadow-lg ease-in-out',
                         '-mt-0.5 w-full md:w-max',
                         'max-h-[calc(100vh-8rem)] data-[state=closed]:animate-scale-out data-[state=open]:animate-scale-in',
                         "[&:not([style*='--radix-navigation-menu-viewport-width'])]:hidden" // The viewport width is only calculated once it's triggered, and can take a while. We hide the viewport until it's ready.
@@ -156,7 +161,7 @@ export function SiteSectionTabs(props: {
                     style={{
                         translate:
                             !isMobile && offset
-                                ? `clamp(0px, calc(${offset}px - ${SCREEN_OFFSET}px - 50%), calc(100vw - var(--radix-navigation-menu-viewport-width, 0px) - ${SCREEN_OFFSET * 3}px)) 0 0`
+                                ? `clamp(0px, calc(${offset}px - var(--radix-navigation-menu-viewport-width, 0px)/2), calc(100vw - var(--radix-navigation-menu-viewport-width, 0px) - ${SCREEN_OFFSET * 3}px)) 0 0`
                                 : '0 0 0', // TranslateZ is needed to force a stacking context, fixing a rendering bug on Safari
                         display: offset === null ? 'none' : undefined,
                     }}
