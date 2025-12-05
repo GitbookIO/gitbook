@@ -34,6 +34,6 @@ export function isFormData(contentType?: string): boolean {
     return !!contentType && contentType.toLowerCase().includes('multipart/form-data');
 }
 
-export function isPlainObject(value: unknown): boolean {
+export function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

@@ -218,7 +218,10 @@ function getStatusCodeCategory(statusCode: number | string): number | string {
     return category;
 }
 
-export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
+export function getSchemaTitle(
+    schema: OpenAPIV3.SchemaObject,
+    options?: { ignoreAlternatives?: boolean }
+): string {
     // Otherwise try to infer a nice title
     let type = 'any';
 
@@ -226,7 +229,7 @@ export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
         type = `${schema.type} · enum`;
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(schema.items)}[]`;
+        type = `${getSchemaTitle(schema.items, options)}[]`;
     } else if (Array.isArray(schema.type)) {
         type = schema.type.join(' | ');
     } else if (schema.type || schema.properties) {
@@ -242,14 +245,17 @@ export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
         }
     }
 
-    if ('anyOf' in schema) {
-        type = 'any of';
-    } else if ('oneOf' in schema) {
-        type = 'one of';
-    } else if ('allOf' in schema) {
-        type = 'all of';
-    } else if ('not' in schema) {
-        type = 'not';
+    // Skip alternative type labels if ignoreAlternatives is true (useful when rendering alternatives)
+    if (!options?.ignoreAlternatives) {
+        if ('anyOf' in schema) {
+            type = 'any of';
+        } else if ('oneOf' in schema) {
+            type = 'one of';
+        } else if ('allOf' in schema) {
+            type = 'all of';
+        } else if ('not' in schema) {
+            type = 'not';
+        }
     }
 
     return type;
