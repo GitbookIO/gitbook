@@ -7,6 +7,13 @@ import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-static';
 
+const EMBEDDABLE_RESPONSE_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Cross-Origin-Resource-Policy': 'cross-origin',
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+};
+
 /**
  * This route is used to serve the assistant.js script.
  */
@@ -69,9 +76,16 @@ export async function GET(
         `,
         {
             headers: {
+                ...EMBEDDABLE_RESPONSE_HEADERS,
                 'Content-Type': 'application/javascript',
-                'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
             },
         }
     );
+}
+
+export function OPTIONS() {
+    return new Response(null, {
+        status: 204,
+        headers: EMBEDDABLE_RESPONSE_HEADERS,
+    });
 }
