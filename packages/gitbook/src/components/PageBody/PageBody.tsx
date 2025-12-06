@@ -1,6 +1,5 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
-import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
@@ -12,6 +11,7 @@ import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
+import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
@@ -27,6 +27,7 @@ export function PageBody(props: {
     document: JSONDocument | null;
     withPageFeedback: boolean;
     insightsDisplayContext: SiteInsightsDisplayContext;
+    isSSR: boolean;
 }) {
     const { page, context, ancestors, document, withPageFeedback, insightsDisplayContext } = props;
     const { customization } = context;
@@ -84,7 +85,8 @@ export function PageBody(props: {
                     withRSSFeed={contentHasUpdates}
                 />
                 {document && !isNodeEmpty(document) ? (
-                    <React.Suspense
+                    <OptionalSuspense
+                        isSSR={props.isSSR}
                         fallback={
                             <DocumentViewSkeleton
                                 document={document}
@@ -106,7 +108,7 @@ export function PageBody(props: {
                                 withLinkPreviews,
                             }}
                         />
-                    </React.Suspense>
+                    </OptionalSuspense>
                 ) : (
                     <PageBodyBlankslate page={page} context={context} />
                 )}
