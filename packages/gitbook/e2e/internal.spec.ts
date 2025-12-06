@@ -1983,9 +1983,9 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
                     await iframe.getByTestId('embed-tab-docs').click(); // Switch to docs tab
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
-                        timeout: 20000,
-                    });
+                    const docsPage = iframe.getByTestId('embed-docs-page');
+                    await docsPage.waitFor({ state: 'visible', timeout: 10000 });
+                    await expect(docsPage).toBeVisible({ timeout: 10000 });
 
                     await iframe.getByTestId('embed-tab-assistant').click(); // Switch to assistant tab
                     await expect(iframe.getByTestId('ai-chat')).toBeVisible();
@@ -2003,9 +2003,9 @@ const testCases: TestsCase[] = [
                     });
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
-                        timeout: 20000,
-                    });
+                    const docsPage = iframe.getByTestId('embed-docs-page');
+                    await docsPage.waitFor({ state: 'visible', timeout: 10000 });
+                    await expect(docsPage).toBeVisible({ timeout: 10000 });
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
                         expect.stringContaining('getting-started/quickstart')
@@ -2129,7 +2129,9 @@ const testCases: TestsCase[] = [
 
                     await expect(actions.nth(0)).toHaveAccessibleName('Open internal link');
                     await actions.nth(0).click();
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible();
+                    const docsPage = iframe.getByTestId('embed-docs-page');
+                    await docsPage.waitFor({ state: 'visible', timeout: 10000 });
+                    await expect(docsPage).toBeVisible({ timeout: 10000 });
                     await expect(iframe.owner()).toHaveAttribute(
                         'src',
                         expect.stringContaining('getting-started/quickstart')
@@ -2218,9 +2220,9 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
-                        timeout: 20000,
-                    });
+                    const docsPage = iframe.getByTestId('embed-docs-page');
+                    await docsPage.waitFor({ state: 'visible', timeout: 10000 });
+                    await expect(docsPage).toBeVisible({ timeout: 10000 });
                 },
             },
             {
@@ -2229,9 +2231,9 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
-                        timeout: 20000,
-                    });
+                    const docsPage = iframe.getByTestId('embed-docs-page');
+                    await docsPage.waitFor({ state: 'visible', timeout: 10000 });
+                    await expect(docsPage).toBeVisible({ timeout: 10000 });
                     const tocButton = iframe.getByTestId('toc-button');
                     await expect(tocButton).toBeVisible();
                     await tocButton.click();
@@ -2244,9 +2246,9 @@ const testCases: TestsCase[] = [
                 run: async (page) => {
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
-                        timeout: 20000,
-                    });
+                    const docsPage = iframe.getByTestId('embed-docs-page');
+                    await docsPage.waitFor({ state: 'visible', timeout: 10000 });
+                    await expect(docsPage).toBeVisible({ timeout: 10000 });
                     const openInNewTabButton = iframe.getByTestId(
                         'embed-docs-page-open-in-new-tab'
                     );
