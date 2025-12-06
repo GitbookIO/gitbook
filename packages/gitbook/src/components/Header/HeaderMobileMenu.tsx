@@ -45,6 +45,7 @@ export function HeaderMobileMenu(props: ButtonProps) {
 
     return (
         <Button
+            data-testid="toc-button"
             icon="bars"
             iconOnly
             variant="blank"
