@@ -1,5 +1,31 @@
 # gitbook
 
+## 0.21.0
+
+### Minor Changes
+
+- 3553db0: Add a RSS feed to all pages with update blocks.
+
+### Patch Changes
+
+- 1430cee: Improve Docs Embed with separate Assistant and Docs tabs
+- 9c69cc4: Add customizable suggested questions
+- c51076e: Fix links to other spaces and root page in embeddable view.
+- 04a4175: Remove hidden site spaces from navigation
+- 74f8931: Fix hidden section not found
+- 344842f: Improve OpenAPI circular references
+- Updated dependencies [461e15f]
+- Updated dependencies [1430cee]
+- Updated dependencies [62438f4]
+- Updated dependencies [3e40b4d]
+- Updated dependencies [87d68ea]
+- Updated dependencies [344842f]
+  - @gitbook/openapi-parser@3.0.6
+  - @gitbook/react-openapi@1.5.4
+  - @gitbook/embed@0.2.0
+  - @gitbook/icons@0.4.0
+  - @gitbook/react-contentkit@0.7.9
+
 ## 0.20.0
 
 ### Minor Changes
