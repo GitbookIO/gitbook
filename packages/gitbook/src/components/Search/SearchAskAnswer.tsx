@@ -8,8 +8,7 @@ import { Icon } from '@gitbook/icons';
 import { readStreamableValue } from 'ai/rsc';
 import React from 'react';
 
-import { AISearchIcon } from '@gitbook/icons';
-import { AIResponseFeedback } from '../AIChat';
+import { AIResponseFeedback, AISearchIcon } from '../AIChat';
 import { HoldMessage } from '../AIChat/AIChatMessages';
 import { useTrackEvent } from '../Insights';
 import { Button, Link } from '../primitives';

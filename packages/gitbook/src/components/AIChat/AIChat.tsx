@@ -4,7 +4,6 @@ import { t, tString, useLanguage } from '@/intl/client';
 import type { TranslationLanguage } from '@/intl/translations';
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import { AIChatIcon } from '@gitbook/icons';
 import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
@@ -29,6 +28,7 @@ import { useNow } from '../hooks';
 import { Button } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { AIChatControlButton } from './AIChatControlButton';
+import { AIChatIcon } from './AIChatIcon';
 import { AIChatInput } from './AIChatInput';
 import { AIChatMessages } from './AIChatMessages';
 import AIChatSuggestedQuestions from './AIChatSuggestedQuestions';
