@@ -16,7 +16,7 @@ export default async function Page(props: PageProps) {
     const { context } = await getDynamicSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
-    return <SitePage context={context} pageParams={{ pathname }} isSSR />;
+    return <SitePage context={context} pageParams={{ pathname }} staticRoute={false} />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {

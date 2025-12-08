@@ -30,7 +30,9 @@ type EmbeddableDocsPageProps = {
 /**
  * Page component for the embed docs page.
  */
-export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps & { isSSR: boolean }) {
+export async function EmbeddableDocsPage(
+    props: EmbeddableDocsPageProps & { staticRoute: boolean }
+) {
     const { context, pageParams } = props;
     const { page, document, ancestors, withPageFeedback } = await getSitePageData({
         context,
@@ -87,7 +89,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps & { isSS
                             document={document}
                             withPageFeedback={withPageFeedback}
                             insightsDisplayContext={SiteInsightsDisplayContext.Embed}
-                            isSSR={props.isSSR}
+                            staticRoute={props.staticRoute}
                         />
                     </ScrollContainer>
                 </EmbeddableFrameBody>

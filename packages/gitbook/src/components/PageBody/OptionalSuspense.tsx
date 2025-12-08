@@ -6,13 +6,13 @@ import React from 'react';
  * causing flickering and bad UX.
  */
 export default function OptionalSuspense(props: {
-    isSSR: boolean;
+    staticRoute: boolean;
     fallback: React.ReactNode;
     children: React.ReactNode;
 }) {
-    const { isSSR, fallback, children } = props;
+    const { staticRoute, fallback, children } = props;
 
-    if (!isSSR) {
+    if (staticRoute) {
         return <>{children}</>;
     }
 

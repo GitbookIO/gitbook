@@ -14,7 +14,7 @@ export default async function Page(props: PageProps) {
     const { context } = await getEmbeddableStaticContext(params);
     const pathname = getPagePathFromParams(params);
 
-    return <EmbeddableDocsPage context={context} pageParams={{ pathname }} isSSR={false} />;
+    return <EmbeddableDocsPage context={context} pageParams={{ pathname }} staticRoute />;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {

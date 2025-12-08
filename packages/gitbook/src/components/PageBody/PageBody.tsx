@@ -27,9 +27,17 @@ export function PageBody(props: {
     document: JSONDocument | null;
     withPageFeedback: boolean;
     insightsDisplayContext: SiteInsightsDisplayContext;
-    isSSR: boolean;
+    staticRoute: boolean;
 }) {
-    const { page, context, ancestors, document, withPageFeedback, insightsDisplayContext } = props;
+    const {
+        page,
+        context,
+        ancestors,
+        document,
+        withPageFeedback,
+        insightsDisplayContext,
+        staticRoute,
+    } = props;
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
@@ -86,7 +94,7 @@ export function PageBody(props: {
                 />
                 {document && !isNodeEmpty(document) ? (
                     <OptionalSuspense
-                        isSSR={props.isSSR}
+                        staticRoute={staticRoute}
                         fallback={
                             <DocumentViewSkeleton
                                 document={document}
