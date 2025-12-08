@@ -7,8 +7,9 @@ import type { ReactNode } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import type { GitBookAssistant } from '@gitbook/browser-types';
+import { AIChatIcon, AISearchIcon } from '@gitbook/icons';
 import { useAIChatController, useAIChatState } from '.';
-import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
+import { getAIChatName } from '../AIChat';
 import { useIntegrationAssistants } from '../Integrations';
 import { useSearch } from '../Search/useSearch';
 
