@@ -243,13 +243,13 @@ export function AIChatBody(props: {
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-time-greeting"
                                 >
-                                    {greeting?.title ?? timeGreeting}
+                                    {greeting?.title || timeGreeting}
                                 </h5>
                                 <p
                                     className="animate-blur-in-slow text-tint leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
                                 >
-                                    {greeting?.subtitle ??
+                                    {greeting?.subtitle ||
                                         t(language, 'ai_chat_assistant_description')}
                                 </p>
                             </div>
