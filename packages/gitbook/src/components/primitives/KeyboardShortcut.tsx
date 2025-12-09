@@ -1,8 +1,12 @@
 'use client';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as React from 'react';
+
+export type KeyboardShortcutProps = {
+    keys: string[];
+} & React.HTMLAttributes<HTMLDivElement>;
 
 function getOperatingSystem() {
     const platform = navigator.platform.toLowerCase();
@@ -13,7 +17,7 @@ function getOperatingSystem() {
     return 'win';
 }
 
-export function KeyboardShortcut(props: { keys: string[]; className?: ClassValue }) {
+export function KeyboardShortcut(props: KeyboardShortcutProps) {
     const { keys, className } = props;
 
     const [operatingSystem, setOperatingSystem] = React.useState<string | null>(null);
