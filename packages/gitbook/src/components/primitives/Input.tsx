@@ -36,8 +36,10 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             submitButton,
             label,
             'aria-label': ariaLabel,
+            'aria-busy': ariaBusy,
             placeholder,
             keyboardShortcut,
+            disabled,
             onSubmit,
             onChange,
             ...rest
@@ -64,20 +66,26 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
         const handleSubmit = () => {
             if (hasValue) {
                 onSubmit(value);
+                setValue('');
             }
         };
 
         const input = (
             <input
-                className="peer grow resize-none overflow-visible outline-none placeholder:text-tint"
+                className="peer -m-2 max-h-64 grow resize-none p-3 outline-none placeholder:text-tint/8 aria-busy:cursor-progress"
                 ref={ref as React.Ref<HTMLInputElement>}
                 value={value}
                 onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
+                    if (event.key === 'Enter' && !event.shiftKey && value.toString().trim()) {
                         event.preventDefault();
                         handleSubmit();
                     }
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        event.currentTarget.blur();
+                    }
                 }}
+                aria-busy={ariaBusy}
                 onChange={(event) => {
                     setValue(event.target.value);
                     onChange?.(
@@ -87,6 +95,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                 }}
                 aria-label={ariaLabel ?? label}
                 placeholder={placeholder ? placeholder : label}
+                disabled={disabled}
                 {...(rest as React.InputHTMLAttributes<HTMLInputElement>)}
             />
         );
@@ -94,8 +103,13 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
         return (
             <div
                 className={tcls(
-                    'relative flex max-h-64 min-h-min gap-2 overflow-auto circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint-subtle bg-tint-base p-3 transition-[outline,border] focus-within:outline-2 focus-within:outline-primary-hover hover:cursor-text hover:border-tint-hover',
-                    multiline ? 'resize-y flex-col' : 'flex-row',
+                    'group/input relative flex min-h-min gap-2 overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl border border-tint-subtle bg-tint-base p-2 shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
+                    'depth-subtle:focus-within:-translate-y-px depth-subtle:shadow-sm depth-subtle:focus-within:shadow-lg',
+                    disabled
+                        ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle'
+                        : 'focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover',
+                    multiline ? 'flex-col' : 'flex-row',
+                    ariaBusy ? 'cursor-progress' : '',
                     className
                 )}
                 onClick={handleClick}
@@ -105,9 +119,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                     }
                 }}
             >
-                <div
-                    className={tcls('flex grow gap-2', multiline ? 'items-start' : 'items-center')}
-                >
+                <div className={tcls('flex grow gap-2', multiline ? '' : 'items-center')}>
                     {leading ? (
                         typeof leading === 'string' ? (
                             <Icon icon={leading as IconName} className="my-0.5 size-4 shrink-0" />
@@ -116,13 +128,19 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                         )
                     ) : null}
                     {multiline ? <textarea {...input.props} /> : input}
-                    {keyboardShortcut !== false ? (
-                        typeof keyboardShortcut === 'object' ? (
-                            keyboardShortcut
-                        ) : hasValue ? (
-                            <KeyboardShortcut keys={['ENTER']} />
-                        ) : null
-                    ) : null}
+
+                    <div className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
+                        {keyboardShortcut !== false ? (
+                            typeof keyboardShortcut === 'object' ? (
+                                keyboardShortcut
+                            ) : hasValue ? (
+                                <KeyboardShortcut
+                                    keys={['ENTER']}
+                                    className="hidden group-focus-within/input:block"
+                                />
+                            ) : null
+                        ) : null}
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
                     {trailing ? trailing : null}
