@@ -77,40 +77,15 @@ function OpenAPISchemaProperty(
     const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
     const content = (() => {
         if (alternatives?.schemas) {
-            const { schemas, discriminator: alternativeDiscriminator, type } = alternatives;
             return (
-                <div className="openapi-schema-alternatives">
-                    {schemas.map((alternativeSchema, index) => {
-                        // If the alternative has its own discriminator, use it.
-                        const effectiveDiscriminator =
-                            alternativeDiscriminator ||
-                            (type === 'allOf' ? discriminator : undefined);
-
-                        // If we are inheriting and using parent discriminator, pass down the value.
-                        const effectiveDiscriminatorValue =
-                            !alternativeDiscriminator && type === 'allOf'
-                                ? discriminatorValue
-                                : undefined;
-
-                        return (
-                            <div key={index} className="openapi-schema-alternative">
-                                <OpenAPISchemaAlternative
-                                    schema={alternativeSchema}
-                                    discriminator={effectiveDiscriminator}
-                                    discriminatorValue={effectiveDiscriminatorValue}
-                                    circularRefs={circularRefs}
-                                    context={context}
-                                />
-                                {index < schemas.length - 1 ? (
-                                    <OpenAPISchemaAlternativeSeparator
-                                        schema={schema}
-                                        context={context}
-                                    />
-                                ) : null}
-                            </div>
-                        );
-                    })}
-                </div>
+                <OpenAPISchemaAlternatives
+                    alternatives={alternatives}
+                    schema={schema}
+                    circularRefs={circularRefs}
+                    context={context}
+                    parentDiscriminator={discriminator}
+                    parentDiscriminatorValue={discriminatorValue}
+                />
             );
         }
 
@@ -219,36 +194,17 @@ function OpenAPIRootSchema(props: {
 
     // Handle root-level oneOf/allOf/anyOf
     if (alternatives?.schemas) {
-        const { schemas, discriminator: alternativeDiscriminator, type } = alternatives;
         return (
             <>
                 {description ? (
                     <Markdown source={description} className="openapi-schema-root-description" />
                 ) : null}
-                <div className="openapi-schema-alternatives">
-                    {schemas.map((alternativeSchema, index) => {
-                        // If the alternative has its own discriminator, use it.
-                        const effectiveDiscriminator =
-                            alternativeDiscriminator || (type === 'allOf' ? undefined : undefined);
-
-                        return (
-                            <div key={index} className="openapi-schema-alternative">
-                                <OpenAPISchemaAlternative
-                                    schema={alternativeSchema}
-                                    discriminator={effectiveDiscriminator}
-                                    circularRefs={circularRefs}
-                                    context={context}
-                                />
-                                {index < schemas.length - 1 ? (
-                                    <OpenAPISchemaAlternativeSeparator
-                                        schema={schema}
-                                        context={context}
-                                    />
-                                ) : null}
-                            </div>
-                        );
-                    })}
-                </div>
+                <OpenAPISchemaAlternatives
+                    alternatives={alternatives}
+                    schema={schema}
+                    circularRefs={circularRefs}
+                    context={context}
+                />
             </>
         );
     }
@@ -338,6 +294,66 @@ function getDiscriminatorValue(
     }
 
     return;
+}
+
+/**
+ * Render alternatives (oneOf/allOf/anyOf) for a schema.
+ */
+function OpenAPISchemaAlternatives(props: {
+    alternatives: SchemaAlternatives;
+    schema: OpenAPIV3.SchemaObject;
+    circularRefs: CircularRefsIds;
+    context: OpenAPIClientContext;
+    parentDiscriminator?: OpenAPIV3.DiscriminatorObject;
+    parentDiscriminatorValue?: string;
+}) {
+    const {
+        alternatives,
+        schema,
+        circularRefs,
+        context,
+        parentDiscriminator,
+        parentDiscriminatorValue,
+    } = props;
+
+    if (!alternatives?.schemas) {
+        return null;
+    }
+
+    const { schemas, discriminator: alternativeDiscriminator, type } = alternatives;
+
+    return (
+        <div className="openapi-schema-alternatives">
+            {schemas.map((alternativeSchema, index) => {
+                // If the alternative has its own discriminator, use it.
+                // Otherwise, for allOf, inherit from parent discriminator.
+                const effectiveDiscriminator =
+                    alternativeDiscriminator ||
+                    (type === 'allOf' ? parentDiscriminator : undefined);
+
+                // If we are inheriting and using parent discriminator, pass down the value.
+                const effectiveDiscriminatorValue =
+                    !alternativeDiscriminator && type === 'allOf'
+                        ? parentDiscriminatorValue
+                        : undefined;
+
+                return (
+                    <div key={index} className="openapi-schema-alternative">
+                        <OpenAPISchemaAlternative
+                            schema={alternativeSchema}
+                            discriminator={effectiveDiscriminator}
+                            discriminatorValue={effectiveDiscriminatorValue}
+                            circularRefs={circularRefs}
+                            context={context}
+                        />
+                        {index < schemas.length - 1 ? (
+                            <OpenAPISchemaAlternativeSeparator schema={schema} context={context} />
+                        ) : null}
+                    </div>
+                );
+            })}
+        </div>
+    );
 }
 
 /**
