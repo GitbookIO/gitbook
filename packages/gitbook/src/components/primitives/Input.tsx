@@ -11,7 +11,7 @@ export type InputProps = {
     label: string;
     leading?: IconName | React.ReactNode;
     trailing?: React.ReactNode;
-    sizing?: 'small' | 'medium'; // The `size` prop is already taken by the HTML input element.
+    sizing?: 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
     containerRef?: React.RefObject<HTMLDivElement | null>;
     /**
      * A submit button, shown to the right of the input.
@@ -40,11 +40,11 @@ export type InputProps = {
 type HybridInputElement = HTMLInputElement & HTMLTextAreaElement;
 
 const SIZE_CLASSES = {
-    small: {
+    medium: {
         container: 'p-2 circular-corners:rounded-3xl rounded-corners:rounded-lg',
         input: '-m-2 p-2',
     },
-    medium: {
+    large: {
         container: 'p-2 circular-corners:rounded-3xl rounded-corners:rounded-xl',
         input: '-m-2 p-3',
     },
@@ -160,7 +160,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             <div
                 className={tcls(
                     'group/input relative flex min-h-min gap-2 overflow-hidden border border-tint bg-tint-base shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
-                    'depth-subtle:focus-within:-translate-y-px depth-subtle:shadow-sm depth-subtle:focus-within:shadow-lg',
+                    'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:-translate-y-px depth-subtle:shadow-sm depth-subtle:focus-within:shadow-lg',
                     disabled
                         ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle'
                         : 'focus-within:border-primary-hover focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover focus-within:hover:border-primary-hover',

@@ -53,6 +53,7 @@ export function AIChatInput(props: {
             name="ai-chat-input"
             multiline
             resize
+            sizing="large"
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
             onChange={(event) => onChange(event.target.value)}

@@ -86,6 +86,7 @@ export function PageFeedbackForm(props: {
             </div>
             {rating ? (
                 <Input
+                    ref={inputRef}
                     label={tString(languages, 'was_this_helpful_comment')}
                     multiline
                     submitButton
