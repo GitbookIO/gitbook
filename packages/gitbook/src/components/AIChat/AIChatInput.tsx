@@ -24,15 +24,6 @@ export function AIChatInput(props: {
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const textarea = event.currentTarget;
-        onChange(textarea.value);
-
-        // Auto-resize
-        textarea.style.height = 'auto';
-        textarea.style.height = `${textarea.scrollHeight}px`;
-    };
-
     useEffect(() => {
         if (chat.opened && !disabled && !loading) {
             // Add a small delay to ensure the input is rendered before focusing
@@ -61,9 +52,10 @@ export function AIChatInput(props: {
             data-testid="ai-chat-input"
             name="ai-chat-input"
             multiline
+            resize
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
-            onChange={handleInput}
+            onChange={(event) => onChange(event.target.value)}
             onSubmit={() => onSubmit(value)}
             value={value}
             submitButton={{

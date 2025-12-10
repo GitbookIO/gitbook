@@ -45,7 +45,7 @@ export function KeyboardShortcut(props: KeyboardShortcutProps) {
                         break;
 
                     case 'enter':
-                        element = <Icon icon="arrow-turn-down-left" className="size-[.75em]" />;
+                        element = <Icon icon="arrow-turn-down-left" className="size-[.9em]" />;
                         break;
                 }
                 return (

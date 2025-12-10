@@ -6,10 +6,11 @@ import React, { type ButtonHTMLAttributes } from 'react';
 import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
-
 import { useTrackEvent } from '../Insights';
 import { Button, ButtonGroup } from '../primitives';
+import { Input } from '../primitives/Input';
 
+const MIN_COMMENT_LENGTH = 3;
 const MAX_COMMENT_LENGTH = 512;
 
 /**
@@ -24,7 +25,6 @@ export function PageFeedbackForm(props: {
     const trackEvent = useTrackEvent();
     const inputRef = React.useRef<HTMLTextAreaElement>(null);
     const [rating, setRating] = React.useState<PageFeedbackRating>();
-    const [comment, setComment] = React.useState('');
     const [submitted, setSubmitted] = React.useState(false);
 
     const onSubmitRating = (rating: PageFeedbackRating) => {
@@ -86,43 +86,20 @@ export function PageFeedbackForm(props: {
                 </ButtonGroup>
             </div>
             {rating ? (
-                <div className="flex flex-col gap-2">
-                    {!submitted ? (
-                        <>
-                            <textarea
-                                ref={inputRef}
-                                name="comment"
-                                className="mx-0.5 max-h-40 min-h-16 grow rounded-sm straight-corners:rounded-none bg-tint-base p-2 ring-1 ring-tint ring-inset placeholder:text-sm placeholder:text-tint contrast-more:ring-tint-12 contrast-more:placeholder:text-tint-strong"
-                                placeholder={tString(languages, 'was_this_helpful_comment')}
-                                aria-label={tString(languages, 'was_this_helpful_comment')}
-                                onChange={(e) => setComment(e.target.value)}
-                                value={comment}
-                                rows={3}
-                                maxLength={MAX_COMMENT_LENGTH}
-                            />
-                            <div className="flex items-center justify-between gap-4">
-                                <Button
-                                    size="small"
-                                    onClick={() => onSubmitComment(rating, comment)}
-                                    label={tString(languages, 'submit')}
-                                />
-                                {comment.length > MAX_COMMENT_LENGTH * 0.8 ? (
-                                    <span
-                                        className={
-                                            comment.length === MAX_COMMENT_LENGTH
-                                                ? 'text-red-500'
-                                                : ''
-                                        }
-                                    >
-                                        {comment.length} / {MAX_COMMENT_LENGTH}
-                                    </span>
-                                ) : null}
-                            </div>
-                        </>
-                    ) : (
-                        <p>{t(languages, 'was_this_helpful_thank_you')}</p>
-                    )}
-                </div>
+                <Input
+                    label={tString(languages, 'was_this_helpful_comment')}
+                    multiline
+                    submitButton
+                    rows={3}
+                    name="page-feedback-comment"
+                    onSubmit={(comment) => onSubmitComment(rating, comment as string)}
+                    maxLength={MAX_COMMENT_LENGTH}
+                    minLength={MIN_COMMENT_LENGTH}
+                    disabled={submitted}
+                    submitMessage={tString(languages, 'was_this_helpful_thank_you')}
+                    className="animate-blur-in"
+                    resize
+                />
             ) : null}
         </div>
     );
