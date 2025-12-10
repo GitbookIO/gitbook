@@ -382,7 +382,7 @@ export function OpenAPISchemaPresentation(props: {
         <div id={id} className="openapi-schema-presentation">
             <OpenAPISchemaName
                 schema={schema}
-                type={getSchemaTitle(schema)}
+                type={getSchemaTitle(schema, { ignoreAlternatives: !propertyName })}
                 propertyName={propertyName}
                 isDiscriminatorProperty={isDiscriminatorProperty}
                 required={required}
@@ -688,34 +688,90 @@ function flattenAlternatives(
 ): OpenAPIV3.SchemaObject[] {
     // Get the parent schema's required fields from the most recent ancestor
     const latestAncestor = Array.from(ancestors).pop();
+    const result: OpenAPIV3.SchemaObject[] = [];
 
-    return schemasOrRefs.reduce<OpenAPIV3.SchemaObject[]>((acc, schemaOrRef) => {
+    for (const schemaOrRef of schemasOrRefs) {
         if (checkIsReference(schemaOrRef)) {
-            return acc;
+            continue;
         }
 
-        if (schemaOrRef[alternativeType] && !ancestors.has(schemaOrRef)) {
-            const alternatives = getSchemaAlternatives(schemaOrRef, ancestors);
-            if (alternatives?.schemas) {
-                acc.push(
-                    ...alternatives.schemas.map((schema) => ({
-                        ...schema,
-                        required: mergeRequiredFields(schema, latestAncestor),
-                    }))
-                );
+        const flattened = flattenSchema(schemaOrRef, alternativeType, ancestors, latestAncestor);
+
+        if (flattened) {
+            result.push(...flattened);
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Flatten a schema that is an alternative of another schema.
+ */
+function flattenSchema(
+    schema: OpenAPIV3.SchemaObject,
+    alternativeType: AlternativeType,
+    ancestors: Set<OpenAPIV3.SchemaObject>,
+    latestAncestor: OpenAPIV3.SchemaObject | undefined
+): OpenAPIV3.SchemaObject[] {
+    if (schema[alternativeType] && !ancestors.has(schema)) {
+        const alternatives = getSchemaAlternatives(schema, ancestors);
+        if (alternatives?.schemas) {
+            return alternatives.schemas.map((s) => {
+                const required = mergeRequiredFields(s, latestAncestor);
+                return {
+                    ...s,
+                    ...(required ? { required } : {}),
+                };
+            });
+        }
+
+        const required = mergeRequiredFields(schema, latestAncestor);
+        return [{ ...schema, ...(required ? { required } : {}) }];
+    }
+
+    // if a schema has allOf that can be safely merged, merge it
+    if (
+        (alternativeType === 'oneOf' || alternativeType === 'anyOf') &&
+        schema.allOf &&
+        Array.isArray(schema.allOf) &&
+        !ancestors.has(schema)
+    ) {
+        const allOfSchemas = schema.allOf.filter(
+            (s): s is OpenAPIV3.SchemaObject => !checkIsReference(s)
+        );
+
+        if (allOfSchemas.length > 0) {
+            const merged = mergeAlternatives('allOf', allOfSchemas);
+            if (merged && merged.length > 0) {
+                // Only merge if all schemas were successfully merged into one (safe to merge)
+                if (merged.length === 1) {
+                    return merged.map((s) => {
+                        const required = mergeRequiredFields(s, latestAncestor);
+                        const result: OpenAPIV3.SchemaObject = {
+                            ...s,
+                            ...(required ? { required } : {}),
+                        };
+
+                        if (schema.title && !s.title) {
+                            result.title = schema.title;
+                        }
+
+                        return result;
+                    });
+                }
             }
-            return acc;
         }
+    }
 
-        // For direct schemas, handle required fields
-        const schema = {
-            ...schemaOrRef,
-            required: mergeRequiredFields(schemaOrRef, latestAncestor),
-        };
+    const required = mergeRequiredFields(schema, latestAncestor);
 
-        acc.push(schema);
-        return acc;
-    }, []);
+    return [
+        {
+            ...schema,
+            ...(required ? { required } : {}),
+        },
+    ];
 }
 
 /**

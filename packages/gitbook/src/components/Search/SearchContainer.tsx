@@ -58,7 +58,7 @@ export function SearchContainer({
     viewport,
     siteSpaces,
 }: SearchContainerProps) {
-    const { assistants } = useAI();
+    const { assistants, config } = useAI();
 
     const [state, setSearchState] = useSearch();
     const searchAsk = useSearchAskState();
@@ -200,7 +200,8 @@ export function SearchContainer({
         siteSpaceId: siteSpace.id,
         siteSpaceIds,
         scope: state?.scope ?? 'default',
-        withAI: withAI,
+        withAI,
+        suggestions: config.suggestions,
     });
     const searchValue = state?.query ?? (withSearchAI || !withAI ? state?.ask : null) ?? '';
 
