@@ -7,8 +7,7 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 import { useTrackEvent } from '../Insights';
-import { Button, ButtonGroup } from '../primitives';
-import { Input } from '../primitives/Input';
+import { Button, ButtonGroup, Input } from '../primitives';
 
 const MIN_COMMENT_LENGTH = 3;
 const MAX_COMMENT_LENGTH = 512;

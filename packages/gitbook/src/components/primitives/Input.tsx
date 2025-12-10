@@ -133,6 +133,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                 type="text"
                 ref={ref as React.Ref<HTMLInputElement>}
                 value={value}
+                size={1} // This will make the input have the smallest possible width (1 character) so we can grow it with flexbox
                 onKeyDown={(event) => {
                     if (event.key === 'Enter' && !event.shiftKey && value.toString().trim()) {
                         event.preventDefault();
@@ -206,7 +207,11 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                                 hasValue ? 'group-focus-within/input:flex' : ''
                             )}
                             onClick={() => {
-                                setValue('');
+                                handleChange({
+                                    target: {
+                                        value: '',
+                                    },
+                                } as React.ChangeEvent<HybridInputElement>);
                             }}
                         />
                     ) : null}
@@ -226,7 +231,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                     </div>
                 </div>
                 {trailing || submitButton || maxLength ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 empty:hidden">
                         {trailing ? trailing : null}
                         {maxLength && !submitted && value.toString().length > maxLength * 0.8 ? (
                             <span
