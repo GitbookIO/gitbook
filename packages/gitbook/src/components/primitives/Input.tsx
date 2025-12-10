@@ -51,7 +51,7 @@ const SIZE_CLASSES = {
 };
 
 /**
- * Input base component with core functionality and shared styles.
+ * Input component with core functionality (submitting, clearing, validating) and shared styles.
  */
 export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
     (props, passedRef) => {
@@ -81,40 +81,47 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             ...rest
         } = props;
 
-        const [value, setValue] = React.useState(initialValue ?? '');
+        const [internalValue, setInternalValue] = React.useState(initialValue ?? '');
         const [submitted, setSubmitted] = React.useState(false);
         const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null);
         const ref = passedRef ?? inputRef;
 
         const language = useLanguage();
+        const isControlled = 'value' in props;
+        const value = isControlled ? (initialValue ?? '') : internalValue;
         const hasValue = value.toString().trim();
         const hasValidValue =
             hasValue &&
             (maxLength ? value.toString().length <= maxLength : true) &&
             (minLength ? value.toString().length >= minLength : true);
 
-        React.useEffect(() => {
-            setValue(initialValue ?? '');
-        }, [initialValue]);
-
         const handleChange = (event: React.ChangeEvent<HybridInputElement>) => {
-            setValue(event.target.value);
+            const newValue = event.target.value;
+            if (!isControlled) {
+                setInternalValue(newValue);
+            }
             onChange?.(event);
 
-            // Auto-resize
             if (multiline && resize && 'current' in ref && ref.current) {
                 ref.current.style.height = 'auto';
                 ref.current.style.height = `${ref.current.scrollHeight}px`;
             }
         };
 
+        const handleClear = () => {
+            if (!('current' in ref) || !ref.current) return;
+
+            const syntheticEvent = {
+                target: { value: '' },
+                currentTarget: ref.current,
+            } as React.ChangeEvent<HybridInputElement>;
+
+            handleChange(syntheticEvent);
+        };
+
         const handleClick = () => {
             if (!('current' in ref)) return;
-
-            const element = ref.current;
-            if (element) {
-                element.focus();
-            }
+            ref.current?.focus();
         };
 
         const handleSubmit = () => {
@@ -124,37 +131,36 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             }
         };
 
-        const input = (
-            <input
-                className={tcls(
-                    'peer -m-2 max-h-64 grow resize-none text-left outline-none placeholder:text-tint/8 aria-busy:cursor-progress',
-                    SIZE_CLASSES[sizing].input
-                )}
-                type="text"
-                ref={ref as React.Ref<HTMLInputElement>}
-                value={value}
-                size={1} // This will make the input have the smallest possible width (1 character) so we can grow it with flexbox
-                onKeyDown={(event) => {
-                    if (event.key === 'Enter' && !event.shiftKey && value.toString().trim()) {
-                        event.preventDefault();
-                        handleSubmit();
-                    }
-                    if (event.key === 'Escape') {
-                        event.preventDefault();
-                        event.currentTarget.blur();
-                    }
-                    onKeyDown?.(event as React.KeyboardEvent<HybridInputElement>);
-                }}
-                aria-busy={ariaBusy}
-                onChange={handleChange}
-                aria-label={ariaLabel ?? label}
-                placeholder={placeholder ? placeholder : label}
-                disabled={disabled}
-                maxLength={maxLength}
-                minLength={minLength}
-                {...(rest as React.InputHTMLAttributes<HTMLInputElement>)}
-            />
+        const handleKeyDown = (event: React.KeyboardEvent<HybridInputElement>) => {
+            if (event.key === 'Enter' && !event.shiftKey && hasValue) {
+                event.preventDefault();
+                handleSubmit();
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                event.currentTarget.blur();
+            }
+            onKeyDown?.(event);
+        };
+
+        const inputClassName = tcls(
+            'peer -m-2 max-h-64 grow resize-none text-left outline-none placeholder:text-tint/8 aria-busy:cursor-progress',
+            SIZE_CLASSES[sizing].input
         );
+
+        const inputProps = {
+            className: inputClassName,
+            ref: ref as React.Ref<HTMLInputElement | HTMLTextAreaElement>,
+            value: value,
+            onKeyDown: handleKeyDown,
+            'aria-busy': ariaBusy,
+            onChange: handleChange,
+            'aria-label': ariaLabel ?? label,
+            placeholder: placeholder ?? label,
+            disabled: disabled,
+            maxLength: maxLength,
+            minLength: minLength,
+            ...rest,
+        };
 
         return (
             <div
@@ -206,33 +212,37 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                                 multiline ? 'mt-0.5' : '',
                                 hasValue ? 'group-focus-within/input:flex' : ''
                             )}
-                            onClick={() => {
-                                handleChange({
-                                    target: {
-                                        value: '',
-                                    },
-                                } as React.ChangeEvent<HybridInputElement>);
-                            }}
+                            onClick={handleClear}
                         />
                     ) : null}
-                    {multiline ? <textarea {...input.props} /> : input}
+                    {multiline ? (
+                        <textarea
+                            {...(inputProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+                        />
+                    ) : (
+                        <input
+                            {...(inputProps as React.InputHTMLAttributes<HTMLInputElement>)}
+                            type="text"
+                            size={1}
+                        />
+                    )}
 
-                    <div className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
-                        {keyboardShortcut !== false ? (
-                            typeof keyboardShortcut === 'object' ? (
+                    {keyboardShortcut !== false ? (
+                        <div className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
+                            {typeof keyboardShortcut === 'object' ? (
                                 <KeyboardShortcut {...keyboardShortcut} />
                             ) : onSubmit && !submitted && hasValue ? (
                                 <KeyboardShortcut
                                     keys={['enter']}
                                     className="hidden bg-tint-base group-focus-within/input:flex"
                                 />
-                            ) : null
-                        ) : null}
-                    </div>
+                            ) : null}
+                        </div>
+                    ) : null}
                 </div>
                 {trailing || submitButton || maxLength ? (
                     <div className="flex items-center gap-2 empty:hidden">
-                        {trailing ? trailing : null}
+                        {trailing}
                         {maxLength && !submitted && value.toString().length > maxLength * 0.8 ? (
                             <span
                                 className={tcls(
@@ -266,9 +276,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                                 disabled={disabled || !hasValidValue}
                                 iconOnly={!multiline}
                                 className="ml-auto"
-                                {...(typeof submitButton === 'object'
-                                    ? { ...submitButton }
-                                    : undefined)}
+                                {...(typeof submitButton === 'object' ? submitButton : {})}
                             />
                         ) : null}
                     </div>

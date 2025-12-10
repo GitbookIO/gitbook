@@ -56,7 +56,7 @@ export function AIChatInput(props: {
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
             onChange={(event) => onChange(event.target.value)}
-            onSubmit={() => onSubmit(value)}
+            onSubmit={(val) => onSubmit(val as string)}
             value={value}
             submitButton={{
                 label: tString(language, 'send'),
