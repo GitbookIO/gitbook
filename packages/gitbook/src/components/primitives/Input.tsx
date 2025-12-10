@@ -102,6 +102,11 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             }
             onChange?.(event);
 
+            // Reset submitted state when user edits the value to allow re-submission
+            if (submitted) {
+                setSubmitted(false);
+            }
+
             if (multiline && resize && 'current' in ref && ref.current) {
                 ref.current.style.height = 'auto';
                 ref.current.style.height = `${ref.current.scrollHeight}px`;
@@ -166,10 +171,12 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             <div
                 className={tcls(
                     'group/input relative flex min-h-min gap-2 overflow-hidden border border-tint bg-tint-base shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
-                    'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:-translate-y-px depth-subtle:shadow-sm depth-subtle:focus-within:shadow-lg',
                     disabled
-                        ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle'
-                        : 'focus-within:border-primary-hover focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover focus-within:hover:border-primary-hover',
+                        ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
+                        : [
+                              'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:-translate-y-px depth-subtle:shadow-xs',
+                              'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover depth-subtle:hover:not-focus-within:shadow-md focus-within:hover:border-primary-hover',
+                          ],
                     multiline ? 'flex-col' : 'flex-row',
                     ariaBusy ? 'cursor-progress' : '',
                     SIZE_CLASSES[sizing].container,
@@ -255,17 +262,15 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                                 {value.toString().length} / {maxLength}
                             </span>
                         ) : null}
-                        {submitted ? (
-                            submitMessage ? (
-                                typeof submitMessage === 'string' ? (
-                                    <div className="ml-auto flex animate-fade-in items-center gap-1 p-1.5 text-success-subtle">
-                                        <Icon icon="check-circle" className="size-4" />
-                                        {submitMessage}
-                                    </div>
-                                ) : (
-                                    submitMessage
-                                )
-                            ) : null
+                        {submitted && submitMessage ? (
+                            typeof submitMessage === 'string' ? (
+                                <div className="ml-auto flex animate-fade-in items-center gap-1 p-1.5 text-success-subtle">
+                                    <Icon icon="check-circle" className="size-4" />
+                                    {submitMessage}
+                                </div>
+                            ) : (
+                                submitMessage
+                            )
                         ) : submitButton ? (
                             <Button
                                 variant="primary"
