@@ -12,15 +12,12 @@ export function useSearchResultsCursor(props: { query: string; results: ResultTy
         }
     }, [query]);
 
-    // TODO: `results` is getting updated too often, causing the cursor to reset to 0 for every render.
-    // Reimplement this once we have fixed that issue.
-
-    // React.useEffect(() => {
-    //     if (results.length > 0) {
-    //         // Auto-focus the first result
-    //         setCursor(0);
-    //     }
-    // }, [results]);
+    React.useEffect(() => {
+        if (results.length > 0) {
+            // Auto-focus the first result
+            setCursor(0);
+        }
+    }, [results]);
 
     const moveBy = React.useCallback(
         (delta: number) => {
