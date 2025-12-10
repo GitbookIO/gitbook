@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import { Input } from '../primitives';
-import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
 interface SearchInputProps {
     onChange: (value: string) => void;
@@ -73,12 +72,11 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     aria-haspopup="listbox"
                     aria-expanded={value && isOpen ? 'true' : 'false'}
                     clearButton
-                    keyboardShortcut={
-                        <KeyboardShortcut
-                            className="theme-bold:border-header-link/4 theme-bold:bg-header-background theme-bold:text-header-link"
-                            keys={isOpen ? ['esc'] : ['mod', 'k']}
-                        />
-                    }
+                    keyboardShortcut={{
+                        className:
+                            'theme-bold:border-header-link/4 theme-bold:bg-header-background theme-bold:text-header-link',
+                        keys: isOpen ? ['esc'] : ['mod', 'k'],
+                    }}
                     {...rest}
                     type="text"
                 />

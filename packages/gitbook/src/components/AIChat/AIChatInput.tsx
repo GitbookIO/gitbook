@@ -5,7 +5,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useAIChatState } from '../AI/useAIChat';
 import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { Input } from '../primitives/Input';
-import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
 export function AIChatInput(props: {
     value: string;
@@ -65,11 +64,12 @@ export function AIChatInput(props: {
             className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"
             rows={1}
             keyboardShortcut={
-                !value && !disabled && !loading ? (
-                    <div className="group-focus-within/input:hidden">
-                        <KeyboardShortcut keys={['mod', 'i']} className="bg-tint-base" />
-                    </div>
-                ) : undefined
+                !value && !disabled && !loading
+                    ? {
+                          keys: ['mod', 'i'],
+                          className: 'bg-tint-base group-focus-within/input:hidden',
+                      }
+                    : undefined
             }
             disabled={disabled || loading}
             aria-busy={loading}

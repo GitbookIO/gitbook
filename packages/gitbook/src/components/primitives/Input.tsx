@@ -5,7 +5,7 @@ import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import React, { type ReactNode } from 'react';
 import { Button, type ButtonProps } from './Button';
-import { KeyboardShortcut } from './KeyboardShortcut';
+import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
 
 export type InputProps = {
     label: string;
@@ -28,7 +28,7 @@ export type InputProps = {
     /**
      * A keyboard shortcut, shown to the right of the input.
      */
-    keyboardShortcut?: boolean | ReactNode;
+    keyboardShortcut?: boolean | KeyboardShortcutProps;
 
     onSubmit?: (value: string | number | readonly string[] | undefined) => void;
     resize?: boolean;
@@ -220,7 +220,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                     <div className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
                         {keyboardShortcut !== false ? (
                             typeof keyboardShortcut === 'object' ? (
-                                keyboardShortcut
+                                <KeyboardShortcut {...keyboardShortcut} />
                             ) : onSubmit && !submitted && hasValue ? (
                                 <KeyboardShortcut
                                     keys={['enter']}
