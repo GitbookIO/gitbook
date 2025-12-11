@@ -229,7 +229,7 @@ export function AIChatBody(props: {
                 className="shrink grow basis-80 animate-fade-in-slow [container-type:size]"
                 contentClassName="p-4 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
-                fadeEdges={['leading']}
+                trailing={{ fade: false, button: true }}
                 active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
             >
                 {isEmpty ? (

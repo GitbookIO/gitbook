@@ -14,10 +14,10 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
         <li className="flex flex-col">
             <div
                 className={tcls(
-                    '-top-6 sticky z-1 flex items-center gap-3 px-3 pt-6',
+                    '-top-2 sticky z-1 flex items-center gap-3 px-3',
                     'font-semibold text-xs uppercase tracking-wide',
-                    'pb-3', // Add extra padding to make the header fade a bit nicer
-                    '-mb-1.5', // Then pull the page items a bit closer, effective bottom padding is 1.5 units / 6px.
+                    'pt-4 pb-3', // Add extra padding to make the header fade a bit nicer
+                    '-mb-1.5 mt-2', // Then pull the page items a bit closer, effective bottom padding is 1.5 units / 6px.
                     'mask-[linear-gradient(rgba(0,0,0,1)_70%,rgba(0,0,0,0))]', // Fade out effect of fixed page items. We want the fade to start past the header, this is a good approximation.
                     'bg-tint-base',
                     'sidebar-filled:bg-tint-subtle',
@@ -27,7 +27,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     'lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
                     'lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    isFirst ? '-mt-6' : ''
+                    isFirst ? '-mt-2' : ''
                 )}
             >
                 <TOCPageIcon page={page} />

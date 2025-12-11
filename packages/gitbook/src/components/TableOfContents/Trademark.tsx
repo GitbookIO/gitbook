@@ -17,7 +17,7 @@ export function Trademark(props: {
 }) {
     const { className, ...rest } = props;
     return (
-        <div className={tcls('mt-auto pr-4 pb-2 pl-2', className)}>
+        <div className={tcls('mt-auto px-2 sidebar-default:pr-4 pb-2', className)}>
             <TrademarkLink {...rest} />
         </div>
     );

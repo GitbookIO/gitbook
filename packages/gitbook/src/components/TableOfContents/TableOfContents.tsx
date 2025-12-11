@@ -74,7 +74,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-6 pb-4',
+                    'pt-4 pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
                     'max-lg:pl-8',
@@ -88,7 +88,7 @@ export async function TableOfContents(props: {
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
                         '-ms-5',
-                        'relative flex grow flex-col overflow-hidden border-tint-subtle',
+                        'relative flex min-h-0 grow flex-col border-tint-subtle',
 
                         'sidebar-filled:bg-tint-subtle',
                         'theme-muted:bg-tint-subtle',
@@ -108,10 +108,15 @@ export async function TableOfContents(props: {
                     {innerHeader ? innerHeader : null}
                     <ScrollContainer
                         data-testid="toc-scroll-container"
-                        fadeEdges={['trailing']}
                         orientation="vertical"
-                        contentClassName="flex grow flex-col p-2 gutter-stable"
+                        contentClassName="flex flex-col p-2 gutter-stable"
                         active="[data-active=true]"
+                        leading={{
+                            fade: true,
+                            button: {
+                                className: '-mt-2',
+                            },
+                        }}
                     >
                         <PagesList
                             pages={pages}
