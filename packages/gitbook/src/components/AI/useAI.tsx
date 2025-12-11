@@ -17,6 +17,10 @@ export type AIConfig = {
     aiMode: CustomizationAIMode;
     suggestions?: string[];
     trademark: boolean;
+    greeting?: {
+        title: string;
+        subtitle: string;
+    };
 };
 
 export type Assistant = Omit<GitBookAssistant, 'icon'> & {
@@ -50,10 +54,10 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
 const AIContext = React.createContext<AIConfig | null>(null);
 
 export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): React.ReactElement {
-    const { aiMode, trademark, suggestions, children } = props;
+    const { aiMode, trademark, suggestions, greeting, children } = props;
     const value = React.useMemo(
-        () => ({ aiMode, trademark, suggestions }),
-        [aiMode, trademark, suggestions]
+        () => ({ aiMode, trademark, suggestions, greeting }),
+        [aiMode, trademark, suggestions, greeting]
     );
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
