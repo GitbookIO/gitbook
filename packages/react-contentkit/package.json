@@ -1,6 +1,6 @@
 {
     "name": "@gitbook/react-contentkit",
-    "version": "0.7.7",
+    "version": "0.7.8",
     "type": "module",
     "exports": {
         ".": {
@@ -28,11 +28,15 @@
         "build": "tsdown",
         "typecheck": "tsc --noEmit",
         "dev": "bun run build -- --watch ./src",
-        "clean": "rm -rf ./dist"
+        "clean": "rm -rf ./dist",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

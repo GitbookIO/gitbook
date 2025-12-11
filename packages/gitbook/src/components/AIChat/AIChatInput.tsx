@@ -3,6 +3,7 @@ import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useAIChatState } from '../AI/useAIChat';
 import { Button, HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
@@ -19,6 +20,7 @@ export function AIChatInput(props: {
     const { value, onChange, onSubmit, disabled, loading } = props;
 
     const language = useLanguage();
+    const chat = useAIChatState();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +34,7 @@ export function AIChatInput(props: {
     };
 
     useEffect(() => {
-        if (!disabled && !loading) {
+        if (chat.opened && !disabled && !loading) {
             // Add a small delay to ensure the input is rendered before focusing
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
@@ -41,7 +43,7 @@ export function AIChatInput(props: {
 
             return () => clearTimeout(timeout);
         }
-    }, [disabled, loading]);
+    }, [disabled, loading, chat.opened]);
 
     useHotkeys(
         'mod+i',
@@ -55,7 +57,7 @@ export function AIChatInput(props: {
     );
 
     return (
-        <div className="depth-subtle:has-[textarea:focus]:-translate-y-px relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 depth-subtle:shadow-sm shadow-tint/6 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:shadow-primary-subtle has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base dark:shadow-tint-1">
+        <div className="depth-subtle:has-[textarea:focus]:-translate-y-px relative flex animate-blur-in-slow flex-col overflow-hidden circular-corners:rounded-3xl rounded-corners:rounded-xl bg-tint-base/9 depth-subtle:shadow-sm shadow-tint/6 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:shadow-primary-subtle has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base dark:shadow-tint-1">
             <textarea
                 ref={inputRef}
                 disabled={disabled || loading}
@@ -106,7 +108,7 @@ export function AIChatInput(props: {
                 </div>
             ) : null}
             <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2 py-2">
-                <HoverCardRoot>
+                <HoverCardRoot openDelay={500}>
                     <HoverCard
                         className="max-w-xs bg-tint p-2 text-sm text-tint"
                         arrow={{ className: 'fill-tint-3' }}

@@ -15,7 +15,12 @@ import { useSearch } from '../Search/useSearch';
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {
     aiMode: CustomizationAIMode;
+    suggestions?: string[];
     trademark: boolean;
+    greeting?: {
+        title: string;
+        subtitle: string;
+    };
 };
 
 export type Assistant = Omit<GitBookAssistant, 'icon'> & {
@@ -49,8 +54,11 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
 const AIContext = React.createContext<AIConfig | null>(null);
 
 export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): React.ReactElement {
-    const { aiMode, trademark, children } = props;
-    const value = React.useMemo(() => ({ aiMode, trademark }), [aiMode, trademark]);
+    const { aiMode, trademark, suggestions, greeting, children } = props;
+    const value = React.useMemo(
+        () => ({ aiMode, trademark, suggestions, greeting }),
+        [aiMode, trademark, suggestions, greeting]
+    );
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
 
@@ -88,6 +96,7 @@ export function useAI(): AIContext {
                 <AIChatIcon
                     state={chat.loading ? 'thinking' : 'default'}
                     trademark={config.trademark}
+                    className="size-4"
                 />
             ),
             open: (query?: string) => {

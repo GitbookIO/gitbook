@@ -8,7 +8,7 @@
         }
     },
     "sideEffects": false,
-    "version": "0.3.3",
+    "version": "0.3.4",
     "dependencies": {
         "@gitbook/api": "catalog:",
         "assert-never": "catalog:"
@@ -21,11 +21,15 @@
     "scripts": {
         "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "bun run build -- --watch ./src"
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

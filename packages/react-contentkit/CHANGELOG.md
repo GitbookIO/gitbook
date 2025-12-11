@@ -1,5 +1,13 @@
 # @gitbook/react-contentkit
 
+## 0.7.8
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- Updated dependencies [10995e0]
+  - @gitbook/icons@0.3.4
+
 ## 0.7.7
 
 ### Patch Changes

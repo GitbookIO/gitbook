@@ -3,6 +3,7 @@ import { getDataOrNull, getPageDocument } from '@/lib/data';
 import {
     CustomizationHeaderPreset,
     CustomizationThemeMode,
+    type RevisionPageDocument,
     SiteInsightsDisplayContext,
     type TranslationLanguage,
 } from '@gitbook/api';
@@ -17,6 +18,7 @@ import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
+import { getPageRSSURL } from '@/routes/rss';
 import { PageContextProvider } from '../PageContext';
 import { PageClientLayout } from './PageClientLayout';
 import { type PagePathParams, fetchPageData, getPathnameParam } from './fetch';
@@ -51,7 +53,7 @@ export type PageMetaLinks = {
 /**
  * Fetch and render a page.
  */
-export async function SitePage(props: SitePageProps) {
+export async function SitePage(props: SitePageProps & { staticRoute: boolean }) {
     const {
         context,
         page,
@@ -97,6 +99,7 @@ export async function SitePage(props: SitePageProps) {
                         document={document}
                         withPageFeedback={withPageFeedback}
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
+                        staticRoute={props.staticRoute}
                     />
                 </div>
                 <PageClientLayout pageMetaLinks={pageMetaLinks} />
@@ -121,7 +124,7 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
  * A string concatenation of the site structure (sections and variants) titles.
  */
 function getSiteStructureTitle(context: GitBookSiteContext): string | null {
-    const { sections, siteSpace, siteSpaces } = context;
+    const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
 
     const title = [];
     if (
@@ -155,8 +158,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     }
 
     const { page, ancestors } = pageTarget;
-    const { site, customization, revision, linker, imageResizer } = context;
-    const siteStructureTitle = getSiteStructureTitle(context);
+    const { customization, revision, linker, imageResizer } = context;
 
     const canonical = (
         pageMetaLinks?.canonical
@@ -193,20 +195,16 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     );
 
     return {
-        title: [
-            page.title,
-            // Prevent duplicate titles by comparing against the page title.
-            page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
-            page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
-        ]
-            .filter(Boolean)
-            .join(' | '),
+        title: getPageFullTitle(context, page),
         description: page.description ?? '',
         alternates: {
             canonical,
             languages: alternates?.languages,
             types: {
                 'text/markdown': `${linker.toAbsoluteURL(linker.toPathInSpace(page.path))}.md`,
+                // We always reference the RSS feed even if the page doesn't have updates blocks,
+                // It might result in 404, but we can't know here if the page has updates blocks.
+                'application/rss+xml': [{ url: getPageRSSURL(context, page), title: 'RSS Feed' }],
                 // Currently it will output with an empty "type" like <link rel="alternate" href="..." type />
                 // Team at Vercel is aware of this and will ensure it will be omitted when the value is empty in future versions of Next.js
                 // https://gitbook.slack.com/archives/C04K6MV5W1K/p1763034072958419?thread_ts=1762937203.511629&cid=C04K6MV5W1K
@@ -262,7 +260,7 @@ export async function getSitePageData(props: SitePageProps) {
         );
     }
 
-    const { customization, sections } = context;
+    const { customization, visibleSections } = context;
     const { page, ancestors } = pageTarget;
 
     const withTopHeader = customization.header.preset !== CustomizationHeaderPreset.None;
@@ -273,7 +271,7 @@ export async function getSitePageData(props: SitePageProps) {
     );
     const withPageFeedback = customization.feedback.enabled;
 
-    const withSections = Boolean(sections && sections.list.length > 0);
+    const withSections = Boolean(visibleSections && visibleSections.list.length > 0);
 
     const document = await getPageDocument(context, page);
 
@@ -382,4 +380,21 @@ function shouldResolveMetaLinks(siteId: string): boolean {
     }
 
     return Math.abs(hash % 100) < META_LINKS_PERCENTAGE_ROLLOUT;
+}
+
+/**
+ * Get the <title> for a page.
+ */
+export function getPageFullTitle(context: GitBookSiteContext, page: RevisionPageDocument) {
+    const { site } = context;
+    const siteStructureTitle = getSiteStructureTitle(context);
+
+    return [
+        page.title,
+        // Prevent duplicate titles by comparing against the page title.
+        page.title !== siteStructureTitle ? siteStructureTitle : null, // The first page of a section is often the same as the section title, so we don't need to show it.
+        page.title !== site.title ? site.title : null, // The site title can also be the same as the site title on the site's landing page.
+    ]
+        .filter(Boolean)
+        .join(' | ');
 }

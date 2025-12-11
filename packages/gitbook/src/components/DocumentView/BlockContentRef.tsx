@@ -1,9 +1,18 @@
-import { type DocumentBlockContentRef, SiteInsightsLinkPosition } from '@gitbook/api';
+import {
+    type ContentRef,
+    type DocumentBlockContentRef,
+    SiteInsightsLinkPosition,
+} from '@gitbook/api';
 
-import { Card } from '@/components/primitives';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import { Card, type CardProps } from '@/components/primitives';
+import {
+    type ResolvedContentRef,
+    resolveContentRef,
+    resolveContentRefFallback,
+} from '@/lib/references';
 
 import type { BlockProps } from './Block';
+import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 
 export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>) {
     const { block, context, style } = props;
@@ -16,51 +25,45 @@ export async function BlockContentRef(props: BlockProps<DocumentBlockContentRef>
         : null;
 
     if (!resolved) {
-        return null;
+        const fallback = resolveContentRefFallback(block.data.ref);
+        if (!fallback) {
+            return null;
+        }
+        return (
+            <NotFoundRefHoverCard context={context}>
+                <BlockContentRefCard
+                    contentRef={block.data.ref}
+                    resolved={fallback}
+                    style={style}
+                />
+            </NotFoundRefHoverCard>
+        );
     }
 
-    const isContentInOtherSpace =
-        context.contentContext?.space &&
-        'space' in block.data.ref &&
-        context.contentContext.space.id !== block.data.ref.space;
-    const kind = block?.data?.ref?.kind;
-    if ((resolved.active && kind === 'space') || isContentInOtherSpace) {
-        return <SpaceRefCard {...props} resolved={resolved} />;
-    }
+    return <BlockContentRefCard contentRef={block.data.ref} resolved={resolved} style={style} />;
+}
 
+function BlockContentRefCard(
+    props: {
+        resolved: ResolvedContentRef;
+        contentRef: ContentRef;
+    } & Omit<CardProps, 'href' | 'title'>
+) {
+    const { ref, resolved, contentRef, ...rest } = props;
     return (
         <Card
+            ref={ref}
             leadingIcon={resolved.icon ? resolved.icon : null}
             href={resolved.href}
             title={resolved.text}
-            style={style}
             insights={{
                 type: 'link_click',
                 link: {
-                    target: block.data.ref,
+                    target: contentRef,
                     position: SiteInsightsLinkPosition.Content,
                 },
             }}
-        />
-    );
-}
-
-async function SpaceRefCard(
-    props: { resolved: ResolvedContentRef } & BlockProps<DocumentBlockContentRef>
-) {
-    const { context, style, resolved } = props;
-    const spaceId = context.contentContext?.space.id;
-
-    if (!spaceId) {
-        return null;
-    }
-
-    return (
-        <Card
-            href={resolved.href}
-            title={resolved.text}
-            postTitle={resolved.subText}
-            style={style}
+            {...rest}
         />
     );
 }

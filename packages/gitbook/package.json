@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.19.2",
+    "version": "0.20.0",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -8,9 +8,9 @@
         "@gitbook/browser-types": "workspace:*",
         "@gitbook/cache-tags": "workspace:*",
         "@gitbook/colors": "workspace:*",
+        "@gitbook/embed": "workspace:*",
         "@gitbook/emoji-codepoints": "workspace:*",
         "@gitbook/expr": "workspace:*",
-        "@gitbook/embed": "workspace:*",
         "@gitbook/fonts": "workspace:*",
         "@gitbook/icons": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
@@ -19,7 +19,7 @@
         "@gitbook/react-openapi": "workspace:*",
         "@modelcontextprotocol/sdk": "1.17.5",
         "@opennextjs/aws": "^3.8.5",
-        "@opennextjs/cloudflare": "^1.11.0",
+        "@opennextjs/cloudflare": "^1.14.4",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dropdown-menu": "^2.1.12",
         "@radix-ui/react-hover-card": "^1.1.15",
@@ -36,6 +36,7 @@
         "classnames": "catalog:",
         "direction": "^2.0.1",
         "event-iterator": "^2.0.0",
+        "feed": "^5.1.0",
         "image-size": "^2.0.2",
         "js-cookie": "^3.0.5",
         "jsontoxml": "^1.0.1",
@@ -49,7 +50,7 @@
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
-        "next": "15.4.0",
+        "next": "15.4.8",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -104,7 +105,8 @@
         "ts-essentials": "^10.0.1",
         "typescript": "catalog:",
         "vercel": "^39.3.0",
-        "wrangler": "^4.43.0"
+        "wrangler": "^4.43.0",
+        "rss-parser": "^3.13.0"
     },
     "scripts": {
         "generate": "./scripts/generate.sh",

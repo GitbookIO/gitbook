@@ -8,7 +8,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.6.3",
+    "version": "0.6.4",
     "sideEffects": false,
     "dependencies": {
         "katex": "^0.16.25",
@@ -30,7 +30,8 @@
         "build": "tsdown",
         "typecheck": "tsc --noEmit",
         "dev": "bun run build -- --watch ./src",
-        "clean": "rm -rf ./dist"
+        "clean": "rm -rf ./dist",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "bin": {
         "gitbook-math": "./bin/gitbook-math.js"
@@ -39,5 +40,8 @@
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

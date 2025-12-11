@@ -23,7 +23,7 @@ export type GitBookToolDefinition = AIToolDefinition & {
 /**
  * Custom button definition to be passed to the embeddable GitBook.
  */
-export type GitBookEmbeddableButtonDefinition = {
+export type GitBookEmbeddableActionDefinition = {
     /**
      * Icon to be displayed in the button.
      */
@@ -41,16 +41,26 @@ export type GitBookEmbeddableButtonDefinition = {
 };
 
 /**
- * Overall configuration for the layout of the embeddable GitBook.
+ * Overall configuration for the layout of the GitBook embed.
  */
 export type GitBookEmbeddableConfiguration = {
+    /** Tabs to display in the embed (if enabled on the site). */
+    tabs: ('assistant' | 'docs')[];
+
+    /** Additional buttons to be displayed in the header of the GitBook embed. */
+    actions: GitBookEmbeddableActionDefinition[];
+
     /**
-     * Buttons to be displayed in the header of the embeddable GitBook.
+     * Additional buttons to be displayed in the header of the GitBook embed.
+     * @deprecated Use `actions` instead.
      */
-    buttons: GitBookEmbeddableButtonDefinition[];
+    buttons?: GitBookEmbeddableActionDefinition[];
 
     /** Message to be displayed in the welcome page. */
-    welcomeMessage: string;
+    greeting: {
+        title: string;
+        subtitle: string;
+    };
 
     /** Suggestions of questions to be displayed in the welcome page. */
     suggestions: string[];

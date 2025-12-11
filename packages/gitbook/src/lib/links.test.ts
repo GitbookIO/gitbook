@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import {
-    createLinker,
-    linkerForPublishedURL,
-    linkerWithAbsoluteURLs,
-    linkerWithOtherSpaceBasePath,
-} from './links';
+import { createLinker, linkerForPublishedURL, linkerWithAbsoluteURLs } from './links';
 
 const root = createLinker({
     host: 'docs.company.com',
@@ -122,9 +117,9 @@ describe('linkerWithAbsoluteURLs', () => {
     });
 });
 
-describe('linkerWithOtherSpaceBasePath', () => {
+describe('linker.withOtherSiteSpace', () => {
     it('should return a new linker that resolves links relative to a new spaceBasePath in the current site', () => {
-        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(root, {
+        const otherSpaceBasePathLinker = root.withOtherSiteSpace({
             spaceBasePath: '/section/variant',
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe(
@@ -133,7 +128,7 @@ describe('linkerWithOtherSpaceBasePath', () => {
     });
 
     it('should return a new linker that resolves links relative to a new spaceBasePath in the current site', () => {
-        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(root, {
+        const otherSpaceBasePathLinker = root.withOtherSiteSpace({
             spaceBasePath: '/section/variant',
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe(
@@ -142,14 +137,14 @@ describe('linkerWithOtherSpaceBasePath', () => {
     });
 
     it('should use a basepath relative to the site', () => {
-        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(siteGitBookIO, {
+        const otherSpaceBasePathLinker = siteGitBookIO.withOtherSiteSpace({
             spaceBasePath: 'a/b',
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');
     });
 
     it('should use a basepath relative to the site (with trailing slash)', () => {
-        const otherSpaceBasePathLinker = linkerWithOtherSpaceBasePath(siteGitBookIO, {
+        const otherSpaceBasePathLinker = siteGitBookIO.withOtherSiteSpace({
             spaceBasePath: '/a/b',
         });
         expect(otherSpaceBasePathLinker.toPathInSpace('some/path')).toBe('/sitename/a/b/some/path');

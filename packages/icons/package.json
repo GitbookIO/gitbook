@@ -15,13 +15,13 @@
         "./style.css": "./src/style.css"
     },
     "sideEffects": false,
-    "version": "0.3.3",
+    "version": "0.3.4",
     "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^6.6.0",
-        "@fortawesome/fontawesome-free": "^6.6.0"
+        "@fortawesome/fontawesome-svg-core": "^7.1.0",
+        "@fortawesome/fontawesome-free": "^7.1.0"
     },
     "optionalDependencies": {
-        "@gitbook/fontawesome-pro": "1.0.15"
+        "@gitbook/fontawesome-pro": "1.0.16"
     },
     "devDependencies": {
         "bun-types": "catalog:",
@@ -39,7 +39,8 @@
         "typecheck": "tsc --noEmit",
         "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist && rm -rf ./src/data",
-        "unit": "bun test"
+        "unit": "bun test",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
@@ -51,5 +52,8 @@
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

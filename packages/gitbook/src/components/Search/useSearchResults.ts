@@ -5,13 +5,12 @@ import { assert } from 'ts-essentials';
 
 import {
     type OrderedComputedResult,
-    searchAllSiteContent,
-    searchCurrentSiteSpaceContent,
-    searchSpecificSiteSpaceContent,
+    searchSiteContent,
     streamRecommendedQuestions,
 } from './server-actions';
 
 import { type Assistant, useAI } from '@/components/AI';
+import assertNever from 'assert-never';
 import { useTrackEvent } from '../Insights';
 import { isQuestion } from './isQuestion';
 import type { SearchScope } from './useSearch';
@@ -36,8 +35,9 @@ export function useSearchResults(props: {
     siteSpaceIds: string[];
     scope: SearchScope;
     withAI: boolean;
+    suggestions?: string[];
 }) {
-    const { disabled, query, siteSpaceId, siteSpaceIds, scope } = props;
+    const { disabled, query, siteSpaceId, siteSpaceIds, scope, suggestions } = props;
 
     const trackEvent = useTrackEvent();
 
@@ -78,6 +78,22 @@ export function useSearchResults(props: {
             // This is a workaround to avoid that.
             const questions = new Set<string>();
             const recommendedQuestions: ResultType[] = [];
+
+            if (suggestions && suggestions.length > 0) {
+                suggestions.forEach((question) => {
+                    questions.add(question);
+                });
+                setResultsState({
+                    results: suggestions.map((question, index) => ({
+                        type: 'recommended-question',
+                        id: `recommended-question-${index}`,
+                        question,
+                    })),
+                    fetching: false,
+                    error: false,
+                });
+                return;
+            }
 
             const timeout = setTimeout(async () => {
                 if (cancelled) {
@@ -123,23 +139,26 @@ export function useSearchResults(props: {
         const timeout = setTimeout(async () => {
             try {
                 const results = await (() => {
-                    if (scope === 'all') {
-                        // Search all content on the site
-                        return searchAllSiteContent(query);
+                    switch (scope) {
+                        case 'all':
+                            // Search all content on the site
+                            return searchSiteContent({ query, mode: 'all' });
+                        case 'default':
+                            // Search the current section's variant + matched/default variant for other sections
+                            return searchSiteContent({ query, mode: 'current', siteSpaceId });
+                        case 'extended':
+                            // Search all variants of the current section
+                            return searchSiteContent({ query, mode: 'specific', siteSpaceIds });
+                        case 'current':
+                            // Search only the current section's current variant
+                            return searchSiteContent({
+                                query,
+                                mode: 'specific',
+                                siteSpaceIds: [siteSpaceId],
+                            });
+                        default:
+                            assertNever(scope);
                     }
-                    if (scope === 'default') {
-                        // Search the current section's variant + matched/default variant for other sections
-                        return searchCurrentSiteSpaceContent(query, siteSpaceId);
-                    }
-                    if (scope === 'extended') {
-                        // Search all variants of the current section
-                        return searchSpecificSiteSpaceContent(query, siteSpaceIds);
-                    }
-                    if (scope === 'current') {
-                        // Search only the current section's current variant
-                        return searchSpecificSiteSpaceContent(query, [siteSpaceId]);
-                    }
-                    throw new Error(`Unhandled search scope: ${scope}`);
                 })();
 
                 if (cancelled) {
@@ -154,7 +173,11 @@ export function useSearchResults(props: {
                     return;
                 }
 
-                setResultsState({ results, fetching: false, error: false });
+                const aiEnrichedResults = withAI
+                    ? withAskTriggers(results, query, assistants)
+                    : results;
+
+                setResultsState({ results: aiEnrichedResults, fetching: false, error: false });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -173,16 +196,9 @@ export function useSearchResults(props: {
             cancelled = true;
             clearTimeout(timeout);
         };
-    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled]);
+    }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled, suggestions]);
 
-    const aiEnrichedResults: ResultType[] = React.useMemo(() => {
-        if (!withAI) {
-            return resultsState.results;
-        }
-        return withAskTriggers(resultsState.results, query, assistants);
-    }, [resultsState.results, query, withAI]);
-
-    return { ...resultsState, results: aiEnrichedResults };
+    return resultsState;
 }
 
 /**

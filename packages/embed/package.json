@@ -13,7 +13,7 @@
         }
     },
     "sideEffects": false,
-    "version": "0.1.4",
+    "version": "0.1.5",
     "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:",
@@ -34,11 +34,15 @@
         "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
         "clean": "rm -rf ./dist",
         "typecheck": "tsc --noEmit",
-        "dev": "bun run build -- --watch ./src"
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "files": ["dist", "README.md", "CHANGELOG.md"],
     "publishConfig": {
         "access": "public",
         "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

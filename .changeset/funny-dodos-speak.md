@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Fix webframe height issue
+Fix search results cursor

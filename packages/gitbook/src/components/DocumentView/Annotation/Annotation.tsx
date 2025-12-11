@@ -27,7 +27,7 @@ export function Annotation(props: InlineProps<DocumentInlineAnnotation>) {
                     ancestorBlocks={[]}
                     context={context}
                     nodes={fragment.nodes}
-                    style={['space-y-4']}
+                    style={['contents']}
                 />
             }
         >

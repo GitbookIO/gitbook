@@ -19,7 +19,7 @@ export default async function SiteStaticLayout({
     const withTracking = shouldTrackEvents();
 
     return (
-        <CustomizationRootLayout context={context}>
+        <CustomizationRootLayout className="site-background" context={context}>
             <SiteLayout
                 context={context}
                 withTracking={withTracking}

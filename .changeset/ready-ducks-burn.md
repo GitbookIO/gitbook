@@ -2,4 +2,4 @@
 '@gitbook/react-openapi': patch
 ---
 
-Add heredoc support for cURL JSON body
+Fix OpenAPI basic auth placeholder

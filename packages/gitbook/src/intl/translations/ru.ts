@@ -72,6 +72,8 @@ export const ru = {
     unexpected_error_title: 'Произошла ошибка',
     unexpected_error: 'Извините, произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.',
     unexpected_error_retry: 'Попробуйте снова',
+    rss_feed: 'RSS-лента',
+    open_rss_feed: 'Подписаться на ленту этой страницы',
     pdf_download: 'Экспортировать как PDF',
     pdf_goback: 'Вернуться к материалу',
     pdf_print: 'Напечатать или сохранить как PDF',

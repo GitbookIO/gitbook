@@ -31,14 +31,40 @@ type StandaloneCalls =
     // Clear the chat
     | ['clearChat']
     // Configure the embed
-    | ['configure', Partial<GitBookEmbeddableConfiguration>]
+    | ['configure', Partial<GitBookEmbeddableConfiguration & StandaloneConfiguration>]
     // Navigate to a page
     | ['navigateToPage', string]
     // Navigate to the assistant
     | ['navigateToAssistant'];
 
+type StandaloneConfiguration = {
+    /** Configure the button to open the embed */
+    button: {
+        /** Label to be displayed in the button. */
+        label: string;
+        /** Icon to be displayed in the button. */
+        icon: 'assistant' | 'sparkle' | 'help' | 'book';
+    };
+};
+
 export type GitBookStandalone = ((...args: StandaloneCalls) => void) & {
     q?: StandaloneCalls[];
+};
+
+let widgetIframe: HTMLIFrameElement | undefined;
+let _client: GitBookClient | undefined;
+let _frame: GitBookFrameClient | undefined;
+let frameOptions: GetFrameURLOptions | undefined;
+let frameConfiguration: GitBookEmbeddableConfiguration & StandaloneConfiguration = {
+    button: {
+        label: 'Ask',
+        icon: 'assistant',
+    },
+    actions: [],
+    greeting: { title: '', subtitle: '' },
+    suggestions: [],
+    tools: [],
+    tabs: ['assistant', 'docs'],
 };
 
 const widgetButton = document.createElement('button');
@@ -47,8 +73,8 @@ widgetButton.addEventListener('click', () => {
     GitBook('toggle');
 });
 widgetButton.innerHTML = `
-    <span id="gitbook-widget-button-icon"></span>
-    <span id="gitbook-widget-button-label">Ask</span>
+    <span id="gitbook-widget-button-icon" data-icon="${frameConfiguration.button.icon}"></span>
+    <span id="gitbook-widget-button-label">${frameConfiguration.button.label}</span>
 `;
 
 const widgetWindow = document.createElement('div');
@@ -57,17 +83,6 @@ widgetWindow.classList.add('hidden');
 
 document.body.appendChild(widgetButton);
 document.body.appendChild(widgetWindow);
-
-let widgetIframe: HTMLIFrameElement | undefined;
-let _client: GitBookClient | undefined;
-let _frame: GitBookFrameClient | undefined;
-let frameOptions: GetFrameURLOptions | undefined;
-let frameConfiguration: GitBookEmbeddableConfiguration = {
-    buttons: [],
-    welcomeMessage: '',
-    suggestions: [],
-    tools: [],
-};
 
 function getClient() {
     if (!_client) {
@@ -135,27 +150,31 @@ const GitBook = (...args: StandaloneCalls) => {
         case 'postUserMessage':
             getIframe().frame.postUserMessage(args[1]);
             break;
-        case 'configure':
+        case 'configure': {
+            const settings = args[1];
             frameConfiguration = {
                 ...frameConfiguration,
-                ...args[1],
+                ...settings,
             };
+            // Update the button label and icon
+            if (settings.button?.label) {
+                const label = widgetButton.querySelector('#gitbook-widget-button-label');
+                if (label) {
+                    label.textContent = settings.button.label;
+                }
+            }
+            if (settings.button?.icon) {
+                const icon = widgetButton.querySelector('#gitbook-widget-button-icon');
+                if (icon) {
+                    icon.setAttribute('data-icon', settings.button.icon);
+                }
+            }
+
             getIframe().frame.configure({
                 ...frameConfiguration,
-                buttons: [
-                    ...frameConfiguration.buttons,
-
-                    // Always include a close button
-                    {
-                        icon: 'close',
-                        label: 'Close',
-                        onClick: () => {
-                            GitBook('close');
-                        },
-                    },
-                ],
             });
             break;
+        }
         case 'clearChat':
             getIframe().frame.clearChat();
             break;
