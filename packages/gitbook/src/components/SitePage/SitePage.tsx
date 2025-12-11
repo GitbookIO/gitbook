@@ -53,7 +53,7 @@ export type PageMetaLinks = {
 /**
  * Fetch and render a page.
  */
-export async function SitePage(props: SitePageProps) {
+export async function SitePage(props: SitePageProps & { staticRoute: boolean }) {
     const {
         context,
         page,
@@ -99,6 +99,7 @@ export async function SitePage(props: SitePageProps) {
                         document={document}
                         withPageFeedback={withPageFeedback}
                         insightsDisplayContext={SiteInsightsDisplayContext.Site}
+                        staticRoute={props.staticRoute}
                     />
                 </div>
                 <PageClientLayout pageMetaLinks={pageMetaLinks} />
