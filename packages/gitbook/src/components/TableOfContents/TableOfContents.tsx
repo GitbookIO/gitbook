@@ -74,7 +74,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-4 pb-4',
+                    'pt-6 pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
                     'max-lg:pl-8',
@@ -114,14 +114,14 @@ export async function TableOfContents(props: {
                         leading={{
                             fade: true,
                             button: {
-                                className: '-mt-2',
+                                className: '-mt-4',
                             },
                         }}
                     >
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l [&>.toc-item-document:first-child]:mt-2"
+                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
                         />
                     </ScrollContainer>
                     {customization.trademark.enabled ? (

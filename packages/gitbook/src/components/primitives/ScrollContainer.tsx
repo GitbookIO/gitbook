@@ -165,13 +165,13 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     orientation === 'horizontal' ? 'overflow-x-scroll' : 'flex-col overflow-y-auto',
                     leading.fade && scrollPosition > 0
                         ? orientation === 'horizontal'
-                            ? 'mask-l-from-[calc(100%-1.5rem)]'
-                            : 'mask-t-from-[calc(100%-1.5rem)]'
+                            ? 'mask-l-from-[calc(100%-1rem)]'
+                            : 'mask-t-from-[calc(100%-1rem)]'
                         : '',
                     trailing.fade && scrollPosition < scrollSize
                         ? orientation === 'horizontal'
-                            ? 'mask-r-from-[calc(100%-1.5rem)]'
-                            : 'mask-b-from-[calc(100%-1.5rem)]'
+                            ? 'mask-r-from-[calc(100%-1rem)]'
+                            : 'mask-b-from-[calc(100%-1rem)]'
                         : '',
                     contentClassName
                 )}
@@ -192,7 +192,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     label={tString(language, 'scroll_back')}
                     {...(typeof leading.button === 'object' ? leading.button : {})}
                     className={tcls(
-                        'bg-tint-base!',
+                        'z-10 bg-tint-base!',
                         orientation === 'horizontal'
                             ? '-translate-y-1/2! top-1/2 left-0 ml-2'
                             : '-translate-x-1/2! top-0 left-1/2 mt-2',
@@ -215,7 +215,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     label={tString(language, 'scroll_further')}
                     {...(typeof trailing.button === 'object' ? trailing.button : {})}
                     className={tcls(
-                        'bg-tint-base!',
+                        'z-10 bg-tint-base!',
                         orientation === 'horizontal'
                             ? '-translate-y-1/2! top-1/2 right-0 mr-2'
                             : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
