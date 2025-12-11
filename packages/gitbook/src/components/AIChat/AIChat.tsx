@@ -83,7 +83,7 @@ export function AIChat() {
             data-testid="ai-chat"
             withScrim={true}
             className={tcls(
-                'ai-chat mx-auto not-hydrated:hidden w-96 max-w-full pl-8 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
+                'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}
         >
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
@@ -226,7 +226,7 @@ export function AIChatBody(props: {
                 contentClassName="p-4 gutter-stable flex flex-col gap-4"
                 orientation="vertical"
                 fadeEdges={['leading']}
-                active={`message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
+                active={`#message-group-${chat.messages.filter((message) => message.role === 'user').length - 1}`}
             >
                 {isEmpty ? (
                     <div className="flex grow flex-col">

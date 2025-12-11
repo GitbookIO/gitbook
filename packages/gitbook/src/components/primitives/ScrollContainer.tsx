@@ -102,7 +102,9 @@ export function ScrollContainer(props: ScrollContainerProps) {
             return;
         }
         const activeItem =
-            typeof active === 'string' ? document.getElementById(active) : active.current;
+            typeof active === 'string'
+                ? containerRef.current?.querySelector(active)
+                : active.current;
         if (!activeItem || !container.contains(activeItem)) {
             return;
         }
@@ -180,7 +182,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     orientation === 'horizontal'
                         ? '-translate-y-1/2! top-1/2 left-0 ml-2'
                         : '-translate-x-1/2! top-0 left-1/2 mt-2',
-                    'absolute not-pointer-none:block hidden scale-0 opacity-0 transition-[scale,opacity]',
+                    'absolute z-10 not-pointer-none:block hidden scale-0 opacity-0 transition-[scale,opacity]',
                     scrollPosition > 0
                         ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
                         : 'pointer-events-none'
@@ -199,7 +201,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     orientation === 'horizontal'
                         ? '-translate-y-1/2! top-1/2 right-0 mr-2'
                         : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
-                    'absolute not-pointer-none:block hidden scale-0 transition-[scale,opacity]',
+                    'absolute z-10 not-pointer-none:block hidden scale-0 transition-[scale,opacity]',
                     scrollPosition < scrollSize
                         ? 'not-pointer-none:group-hover/scroll-container:scale-100 not-pointer-none:group-hover/scroll-container:opacity-11'
                         : 'pointer-events-none'
@@ -214,7 +216,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
 /**
  * Scroll to an element in a container.
  */
-function scrollToElementInContainer(element: HTMLElement, container: HTMLElement) {
+function scrollToElementInContainer(element: Element, container: HTMLElement) {
     const containerRect = container.getBoundingClientRect();
     const rect = element.getBoundingClientRect();
 
@@ -229,6 +231,6 @@ function scrollToElementInContainer(element: HTMLElement, container: HTMLElement
             (rect.left - containerRect.left) -
             container.clientWidth / 2 +
             rect.width / 2,
-        behavior: 'smooth',
+        behavior: 'auto',
     });
 }

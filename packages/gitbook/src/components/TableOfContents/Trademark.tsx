@@ -17,33 +17,7 @@ export function Trademark(props: {
 }) {
     const { className, ...rest } = props;
     return (
-        <div
-            className={tcls(
-                'sticky',
-                'z-2',
-
-                'mt-auto',
-                'inset-x-0',
-                '-bottom-2',
-                '-mb-2',
-                'sidebar-filled:pb-2',
-                'page-no-toc:pb-0',
-
-                'pointer-events-none',
-
-                'bg-tint-base',
-                'sidebar-filled:bg-tint-subtle',
-                'theme-muted:bg-tint-subtle',
-                '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-                'lg:page-no-toc:bg-transparent',
-
-                'rounded-lg',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
-                className
-            )}
-        >
+        <div className={tcls('mt-auto pr-4 pb-2 pl-2', className)}>
             <TrademarkLink {...rest} />
         </div>
     );

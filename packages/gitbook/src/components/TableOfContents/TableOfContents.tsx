@@ -3,9 +3,9 @@ import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import type React from 'react';
 
 import { tcls } from '@/lib/tailwind';
+import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SideSheet } from '../primitives/SideSheet';
 import { PagesList } from './PagesList';
-import { TOCScrollContainer } from './TOCScroller';
 import { TableOfContentsScript } from './TableOfContentsScript';
 import { Trademark } from './Trademark';
 import { encodeClientTableOfContents } from './encodeClientTableOfContents';
@@ -74,7 +74,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'py-6',
+                    'pt-6 pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
                     'max-lg:pl-8',
@@ -106,21 +106,24 @@ export async function TableOfContents(props: {
                     )}
                 >
                     {innerHeader ? innerHeader : null}
-                    <TOCScrollContainer // The scrollview inside the sidebar
-                        className="hide-scrollbar gutter-stable flex grow flex-col overflow-y-auto p-2"
+                    <ScrollContainer
+                        fadeEdges={['trailing']}
+                        orientation="vertical"
+                        contentClassName="flex grow flex-col p-2 gutter-stable"
+                        active="[data-active=true]"
                     >
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="mb-5 page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
+                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
                         />
-                        {customization.trademark.enabled ? (
-                            <Trademark
-                                context={context}
-                                placement={SiteInsightsTrademarkPlacement.Sidebar}
-                            />
-                        ) : null}
-                    </TOCScrollContainer>
+                    </ScrollContainer>
+                    {customization.trademark.enabled ? (
+                        <Trademark
+                            context={context}
+                            placement={SiteInsightsTrademarkPlacement.Sidebar}
+                        />
+                    ) : null}
                 </div>
             </SideSheet>
             <TableOfContentsScript />
