@@ -121,7 +121,7 @@ export async function TableOfContents(props: {
                         <PagesList
                             pages={pages}
                             isRoot={true}
-                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
+                            style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l [&>.toc-item-document:first-child]:mt-2"
                         />
                     </ScrollContainer>
                     {customization.trademark.enabled ? (

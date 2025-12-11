@@ -13,7 +13,7 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const { page } = props;
 
     return (
-        <li className={tcls('flex', 'flex-col')}>
+        <li className={tcls('toc-item-link flex', 'flex-col')}>
             <Link
                 href={page.href ?? '#'}
                 classNames={['PageLinkItemStyles']}
