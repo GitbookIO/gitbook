@@ -107,6 +107,7 @@ export async function TableOfContents(props: {
                 >
                     {innerHeader ? innerHeader : null}
                     <ScrollContainer
+                        data-testid="toc-scroll-container"
                         fadeEdges={['trailing']}
                         orientation="vertical"
                         contentClassName="flex grow flex-col p-2 gutter-stable"
