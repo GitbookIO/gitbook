@@ -71,7 +71,9 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     aria-autocomplete="list"
                     aria-haspopup="listbox"
                     aria-expanded={value && isOpen ? 'true' : 'false'}
-                    clearButton
+                    clearButton={{
+                        className: 'theme-bold:hover:bg-header-link/4',
+                    }}
                     keyboardShortcut={{
                         className:
                             'theme-bold:border-header-link/4 theme-bold:bg-header-background theme-bold:text-header-link',

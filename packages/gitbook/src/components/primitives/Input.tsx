@@ -225,12 +225,14 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                             label={tString(language, 'clear')}
                             iconOnly
                             icon="circle-xmark"
+                            onClick={handleClear}
+                            {...(typeof clearButton === 'object' ? clearButton : {})}
                             className={tcls(
                                 '-m-1 -ml-0.5 hidden shrink-0 animate-fade-in p-1.5 text-tint',
                                 multiline ? 'mt-0.5' : '',
-                                hasValue ? 'group-focus-within/input:flex' : ''
+                                hasValue ? 'group-focus-within/input:flex' : '',
+                                typeof clearButton === 'object' ? clearButton.className : ''
                             )}
-                            onClick={handleClear}
                         />
                     ) : null}
                     {multiline ? (
