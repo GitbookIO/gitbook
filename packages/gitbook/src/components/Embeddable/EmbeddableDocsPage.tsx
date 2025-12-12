@@ -49,7 +49,7 @@ export async function EmbeddableDocsPage(
                 />
                 <EmbeddableIframeButtons />
             </EmbeddableFrameSidebar>
-            <EmbeddableFrameMain>
+            <EmbeddableFrameMain data-testid="embed-docs-page">
                 <div className="relative flex not-hydrated:animate-blur-in-slow flex-col">
                     <EmbeddableFrameHeader>
                         <HeaderMobileMenu className="-ml-2 page-no-toc:hidden" />
