@@ -147,7 +147,7 @@ function parseResponse<T>(
 
                 if (event.type === 'response_finish') {
                     foundResponse = true;
-                    resolveResponse({ responseId: event.response?.id ?? null });
+                    resolveResponse({ responseId: event.response.id ?? null });
                 }
             }
 
