@@ -58,7 +58,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     containerRef={containerRef as React.RefObject<HTMLDivElement | null>}
                     sizing="medium"
                     label={tString(language, withAI ? 'search_or_ask' : 'search')}
-                    className="@max-2xl:absolute inset-y-0 right-0 z-30 @max-2xl:max-w-9.5 grow theme-bold:border-header-link/4 theme-bold:bg-header-background theme-bold:text-header-link theme-bold:shadow-none! @max-2xl:focus-within:w-56 @max-2xl:focus-within:max-w-[calc(100vw-5rem)] theme-bold:focus-within:border-header-link/6 theme-bold:focus-within:bg-header-link/1 theme-bold:focus-within:ring-header-link/5 theme-bold:hover:border-header-link/5 theme-bold:hover:bg-header-link/1 @max-2xl:has-[input[aria-expanded=true]]:w-56 @max-2xl:has-[input[aria-expanded=true]]:max-w-[calc(100vw-5rem)] @max-2xl:[&_input]:opacity-0 theme-bold:[&_input]:placeholder:text-header-link/8 @max-2xl:focus-within:[&_input]:opacity-11 @max-2xl:has-[input[aria-expanded=true]]:[&_input]:opacity-11"
+                    className="@max-2xl:absolute inset-y-0 right-0 z-30 @max-2xl:max-w-9.5 grow theme-bold:border-header-link/4 theme-bold:bg-header-link/1 theme-bold:text-header-link theme-bold:shadow-none! @max-2xl:focus-within:w-56 @max-2xl:focus-within:max-w-[calc(100vw-5rem)] theme-bold:focus-within:border-header-link/6 theme-bold:focus-within:ring-header-link/5 theme-bold:hover:border-header-link/5 @max-2xl:has-[input[aria-expanded=true]]:w-56 @max-2xl:has-[input[aria-expanded=true]]:max-w-[calc(100vw-5rem)] @max-2xl:[&_input]:opacity-0 theme-bold:[&_input]:placeholder:text-header-link/8 @max-2xl:focus-within:[&_input]:opacity-11 @max-2xl:has-[input[aria-expanded=true]]:[&_input]:opacity-11"
                     placeholder={`${tString(language, withAI ? 'search_or_ask' : 'search')}…`}
                     onFocus={onFocus}
                     onKeyDown={onKeyDown}
@@ -78,7 +78,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     aria-haspopup="listbox"
                     aria-expanded={value && isOpen ? 'true' : 'false'}
                     clearButton={{
-                        className: 'theme-bold:hover:bg-header-link/4',
+                        className: 'theme-bold:text-header-link theme-bold:hover:bg-header-link/3',
                     }}
                     keyboardShortcut={{
                         className:
