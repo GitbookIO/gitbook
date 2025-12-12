@@ -17,51 +17,7 @@ export function Trademark(props: {
 }) {
     const { className, ...rest } = props;
     return (
-        <div
-            className={tcls(
-                'relative',
-                'z-2',
-                'lg:absolute',
-
-                'left-0',
-                'right-2',
-                'bottom-0',
-
-                'pointer-events-none',
-                'sidebar-filled:pl-2',
-                'sidebar-filled:pb-2',
-                'sidebar-filled:page-no-toc:p-0',
-
-                'bg-tint-base',
-                'sidebar-filled:bg-tint-subtle',
-                'theme-muted:bg-tint-subtle',
-                '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-
-                'rounded-lg',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
-
-                'before:hidden',
-                'lg:before:block',
-                'before:content-[""]',
-                'before:absolute',
-                'before:inset-x-0',
-                'before:bottom-full',
-                'before:h-8',
-                'before:bg-linear-to-b',
-                'before:from-transparent',
-                'before:to-tint-base',
-                'sidebar-filled:before:to-tint-subtle',
-                'theme-muted:before:to-tint-subtle',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-subtle',
-                '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
-                'page-no-toc:before:to-transparent!',
-
-                className
-            )}
-        >
+        <div className={tcls('mt-auto px-2 sidebar-default:pr-4 pb-2', className)}>
             <TrademarkLink {...rest} />
         </div>
     );
@@ -109,8 +65,7 @@ export function TrademarkLink(props: {
                 'hover:bg-tint',
                 'hover:text-tint-strong',
 
-                'ring-2',
-                'lg:ring-1',
+                'ring-1',
                 'ring-inset',
                 'ring-tint-subtle',
 

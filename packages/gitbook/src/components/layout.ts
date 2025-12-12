@@ -9,9 +9,9 @@ export const HEADER_HEIGHT_DESKTOP = 64 as const;
  * Style for the container to adapt between normal and full width.
  */
 export const CONTAINER_STYLE: ClassValue = [
-    'px-4',
-    'sm:px-6',
-    'md:px-8',
+    'px-4 pl-[max(env(safe-area-inset-left),1rem)] pr-[max(env(safe-area-inset-right),1rem)]',
+    'sm:px-6 sm:pl-[max(env(safe-area-inset-left),1.5rem)] sm:pr-[max(env(safe-area-inset-right),1.5rem)]',
+    'md:px-8 md:pl-[max(env(safe-area-inset-left),2rem)] md:pr-[max(env(safe-area-inset-right),2rem)]',
     'max-w-screen-2xl',
     'mx-auto',
 ];

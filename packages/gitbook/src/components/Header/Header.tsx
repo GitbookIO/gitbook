@@ -42,6 +42,7 @@ export function Header(props: {
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
+                'pt-[env(safe-area-inset-top)]',
                 'z-30',
                 'w-full',
                 'flex-none',
