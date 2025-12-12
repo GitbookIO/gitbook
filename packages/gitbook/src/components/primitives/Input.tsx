@@ -9,6 +9,7 @@ import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut
 
 export type InputProps = {
     label: string;
+    tag?: 'div' | 'span';
     leading?: IconName | React.ReactNode;
     trailing?: React.ReactNode;
     sizing?: 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
@@ -59,6 +60,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             multiline,
             value: initialValue,
             sizing = 'medium',
+            tag = 'div',
             leading,
             trailing,
             className,
@@ -133,6 +135,9 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             if (hasValue && onSubmit) {
                 onSubmit(value);
                 setSubmitted(true);
+                if (!isControlled) {
+                    setInternalValue('');
+                }
             }
         };
 
@@ -167,10 +172,12 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             ...rest,
         };
 
+        const Tag = tag;
+
         return (
-            <div
+            <Tag
                 className={tcls(
-                    'group/input relative flex min-h-min gap-2 overflow-hidden border border-tint bg-tint-base shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
+                    'group/input relative flex min-h-min gap-2 overflow-hidden border border-tint bg-tint-base align-middle shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
                     disabled
                         ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
                         : [
@@ -190,22 +197,26 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                 }}
                 ref={containerRef}
             >
-                <div
+                <Tag
                     className={tcls('flex grow gap-2', multiline ? 'items-start' : 'items-center')}
                 >
                     {leading ? (
-                        typeof leading === 'string' ? (
-                            <Icon
-                                icon={leading as IconName}
-                                className={tcls(
-                                    'ml-1 size-4 shrink-0 text-tint',
-                                    multiline ? 'my-1.5' : 'my-0.5',
-                                    clearButton && hasValue ? 'group-focus-within/input:hidden' : ''
-                                )}
-                            />
-                        ) : (
-                            leading
-                        )
+                        <Tag
+                            className={tcls(
+                                'ml-1',
+                                multiline ? 'my-1.5' : 'my-0.5',
+                                clearButton && hasValue ? 'group-focus-within/input:hidden' : ''
+                            )}
+                        >
+                            {typeof leading === 'string' ? (
+                                <Icon
+                                    icon={leading as IconName}
+                                    className="size-4 shrink-0 text-tint"
+                                />
+                            ) : (
+                                leading
+                            )}
+                        </Tag>
                     ) : null}
                     {clearButton ? (
                         <Button
@@ -235,7 +246,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                     )}
 
                     {keyboardShortcut !== false ? (
-                        <div className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
+                        <Tag className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
                             {typeof keyboardShortcut === 'object' ? (
                                 <KeyboardShortcut {...keyboardShortcut} />
                             ) : onSubmit && !submitted && hasValue ? (
@@ -244,11 +255,11 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                                     className="hidden bg-tint-base group-focus-within/input:flex"
                                 />
                             ) : null}
-                        </div>
+                        </Tag>
                     ) : null}
-                </div>
+                </Tag>
                 {trailing || submitButton || maxLength ? (
-                    <div className="flex items-center gap-2 empty:hidden">
+                    <Tag className="flex items-center gap-2 empty:hidden">
                         {trailing}
                         {maxLength && !submitted && value.toString().length > maxLength * 0.8 ? (
                             <span
@@ -264,10 +275,10 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                         ) : null}
                         {submitted && submitMessage ? (
                             typeof submitMessage === 'string' ? (
-                                <div className="ml-auto flex animate-fade-in items-center gap-1 p-1.5 text-success-subtle">
+                                <Tag className="ml-auto flex animate-fade-in items-center gap-1 p-1.5 text-success-subtle">
                                     <Icon icon="check-circle" className="size-4" />
                                     {submitMessage}
-                                </div>
+                                </Tag>
                             ) : (
                                 submitMessage
                             )
@@ -284,9 +295,9 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                                 {...(typeof submitButton === 'object' ? submitButton : {})}
                             />
                         ) : null}
-                    </div>
+                    </Tag>
                 ) : null}
-            </div>
+            </Tag>
         );
     }
 );
