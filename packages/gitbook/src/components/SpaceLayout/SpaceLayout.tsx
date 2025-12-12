@@ -174,7 +174,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                             !withTopHeader || variants.generic.length > 1 ? (
                                 <div
                                     className={tcls(
-                                        'mt-5 sidebar-default:mt-2 mb-6 flex flex-col gap-2 px-5 empty:hidden',
+                                        'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
                                         variants.generic.length > 1 ? '' : 'max-lg:hidden'
                                     )}
                                 >
