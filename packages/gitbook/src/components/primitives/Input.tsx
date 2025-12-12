@@ -40,17 +40,6 @@ export type InputProps = {
 
 type HybridInputElement = HTMLInputElement & HTMLTextAreaElement;
 
-const SIZE_CLASSES = {
-    medium: {
-        container: 'p-2 circular-corners:rounded-3xl rounded-corners:rounded-lg',
-        input: '-m-2 p-2',
-    },
-    large: {
-        container: 'p-2 circular-corners:rounded-3xl rounded-corners:rounded-xl',
-        input: '-m-2 p-3',
-    },
-};
-
 /**
  * Input component with core functionality (submitting, clearing, validating) and shared styles.
  */
@@ -96,6 +85,19 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             hasValue &&
             (maxLength ? value.toString().length <= maxLength : true) &&
             (minLength ? value.toString().length >= minLength : true);
+
+        const sizes = {
+            medium: {
+                container: `${multiline ? 'p-2' : 'px-4 py-2'} gap-2 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
+                input: '-m-2 p-2',
+                gap: 'gap-2',
+            },
+            large: {
+                container: `${multiline ? 'p-3' : 'px-6 py-3 '} gap-3 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
+                input: '-m-3 p-3',
+                gap: 'gap-3',
+            },
+        };
 
         const handleChange = (event: React.ChangeEvent<HybridInputElement>) => {
             const newValue = event.target.value;
@@ -154,7 +156,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
 
         const inputClassName = tcls(
             'peer -m-2 max-h-64 grow resize-none text-left outline-none placeholder:text-tint/8 aria-busy:cursor-progress',
-            SIZE_CLASSES[sizing].input
+            sizes[sizing].input
         );
 
         const inputProps = {
@@ -177,7 +179,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
         return (
             <Tag
                 className={tcls(
-                    'group/input relative flex min-h-min gap-2 overflow-hidden border border-tint bg-tint-base align-middle shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
+                    'group/input relative flex min-h-min overflow-hidden border border-tint bg-tint-base align-middle shadow-tint/6 ring-primary-hover transition-all dark:shadow-tint-1',
                     disabled
                         ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
                         : [
@@ -186,7 +188,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                           ],
                     multiline ? 'flex-col' : 'flex-row',
                     ariaBusy ? 'cursor-progress' : '',
-                    SIZE_CLASSES[sizing].container,
+                    sizes[sizing].container,
                     className
                 )}
                 onClick={handleClick}
@@ -198,14 +200,17 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                 ref={containerRef}
             >
                 <Tag
-                    className={tcls('flex grow gap-2', multiline ? 'items-start' : 'items-center')}
+                    className={tcls(
+                        'flex grow',
+                        sizes[sizing].gap,
+                        multiline ? 'items-start' : 'items-center'
+                    )}
                 >
                     {leading ? (
                         <Tag
                             className={tcls(
-                                'ml-1',
-                                multiline ? 'my-1.5' : 'my-0.5',
-                                clearButton && hasValue ? 'group-focus-within/input:hidden' : ''
+                                clearButton && hasValue ? 'group-focus-within/input:hidden' : '',
+                                multiline ? 'my-1.25' : ''
                             )}
                         >
                             {typeof leading === 'string' ? (
@@ -228,8 +233,8 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                             onClick={handleClear}
                             {...(typeof clearButton === 'object' ? clearButton : {})}
                             className={tcls(
-                                '-m-1 -ml-0.5 hidden shrink-0 animate-fade-in p-1.5 text-tint',
-                                multiline ? 'mt-0.5' : '',
+                                '-mx-1.5 hidden shrink-0 animate-fade-in p-1.5 text-tint',
+                                multiline ? '-my-0.25' : '-my-1.5',
                                 hasValue ? 'group-focus-within/input:flex' : '',
                                 typeof clearButton === 'object' ? clearButton.className : ''
                             )}
@@ -247,11 +252,15 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                         />
                     )}
 
-                    {keyboardShortcut !== false ? (
-                        <Tag className={multiline ? 'absolute top-2.5 right-2.5' : ''}>
+                    {keyboardShortcut !== false && onSubmit ? (
+                        <Tag
+                            className={
+                                multiline ? `absolute top-0 right-0 ${sizes[sizing].container}` : ''
+                            }
+                        >
                             {typeof keyboardShortcut === 'object' ? (
                                 <KeyboardShortcut {...keyboardShortcut} />
-                            ) : onSubmit && !submitted && hasValue ? (
+                            ) : !submitted && hasValue ? (
                                 <KeyboardShortcut
                                     keys={['enter']}
                                     className="hidden bg-tint-base group-focus-within/input:flex"

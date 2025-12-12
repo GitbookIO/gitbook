@@ -65,7 +65,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     leading={
                         <Icon
                             icon="search"
-                            className="-ml-0.5 size-4 shrink-0 text-tint theme-bold:text-header-link/8"
+                            className="size-4 shrink-0 text-tint theme-bold:text-header-link/8"
                         />
                     }
                     onChange={(event) => {
@@ -78,7 +78,8 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                     aria-haspopup="listbox"
                     aria-expanded={value && isOpen ? 'true' : 'false'}
                     clearButton={{
-                        className: 'theme-bold:text-header-link theme-bold:hover:bg-header-link/3',
+                        className:
+                            'theme-bold:text-header-link theme-bold:hover:bg-header-link/3 text-base',
                     }}
                     keyboardShortcut={{
                         className:
