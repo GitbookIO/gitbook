@@ -252,7 +252,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                         />
                     )}
 
-                    {keyboardShortcut !== false && onSubmit ? (
+                    {keyboardShortcut !== false ? (
                         <Tag
                             className={
                                 multiline ? `absolute top-0 right-0 ${sizes[sizing].container}` : ''
@@ -260,7 +260,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
                         >
                             {typeof keyboardShortcut === 'object' ? (
                                 <KeyboardShortcut {...keyboardShortcut} />
-                            ) : !submitted && hasValue ? (
+                            ) : onSubmit && !submitted && hasValue ? (
                                 <KeyboardShortcut
                                     keys={['enter']}
                                     className="hidden bg-tint-base group-focus-within/input:flex"
