@@ -61,13 +61,13 @@ export function servePagesSitemap(context: GitBookSiteContext) {
         const lastModified = page.updatedAt || page.createdAt;
 
         const url: { loc: string; priority: number; lastmod?: string } = {
-            priority: normalizedPriority,
             loc: linker.toAbsoluteURL(
                 linker.toPathForPage({
                     pages: context.revision.pages,
                     page,
                 })
             ),
+            priority: normalizedPriority,
         };
 
         if (lastModified) {
