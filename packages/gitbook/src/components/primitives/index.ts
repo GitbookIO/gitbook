@@ -13,3 +13,4 @@ export * from './Popover';
 export * from './LoadingStateProvider';
 export * from './HoverCard';
 export * from './DropdownMenu';
+export * from './Input';
