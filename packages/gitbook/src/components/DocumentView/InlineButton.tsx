@@ -22,6 +22,7 @@ export async function InlineButton(props: InlineProps<api.DocumentInlineButton>)
                 label={inline.data.label}
                 // TODO: use a variant specifically for user-defined buttons.
                 variant={inline.data.kind}
+                size="medium"
                 className="leading-normal"
                 disabled={href === undefined}
                 icon={inline.data.icon as IconName | undefined}

@@ -148,7 +148,7 @@ export function AIChatInput(props: {
                 </HoverCardRoot>
                 <Button
                     label={tString(language, 'send')}
-                    size="medium"
+                    size="small"
                     className="ml-auto"
                     disabled={disabled || !value.trim()}
                     onClick={() => onSubmit(value)}
