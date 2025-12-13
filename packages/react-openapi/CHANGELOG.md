@@ -1,5 +1,18 @@
 # @gitbook/react-openapi
 
+## 1.5.4
+
+### Patch Changes
+
+- 4766092: Fix missing properties in allOf/oneOf
+- 8761cee: Enhance discriminator handling in OpenAPISchema
+- 461e15f: Add x-gitbook-prefix and x-gitbook-token-placeholder for OpenAPI security scheme
+- 3e40b4d: Fix OpenAPI basic auth placeholder
+- 87d68ea: Fix OpenAPI oneOf/allOf merge
+- 344842f: Improve OpenAPI circular references
+- Updated dependencies [461e15f]
+  - @gitbook/openapi-parser@3.0.6
+
 ## 1.5.3
 
 ### Patch Changes

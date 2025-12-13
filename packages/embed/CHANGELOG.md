@@ -1,5 +1,16 @@
 # @gitbook/embed
 
+## 0.2.0
+
+### Minor Changes
+
+- 1430cee: Improve Docs Embed with separate Assistant and Docs tabs
+
+### Patch Changes
+
+- Updated dependencies [62438f4]
+  - @gitbook/icons@0.4.0
+
 ## 0.1.5
 
 ### Patch Changes
