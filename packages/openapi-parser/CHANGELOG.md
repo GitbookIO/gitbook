@@ -1,5 +1,11 @@
 # @gitbook/openapi-parser
 
+## 3.0.6
+
+### Patch Changes
+
+- 461e15f: Add x-gitbook-prefix and x-gitbook-token-placeholder for OpenAPI security scheme
+
 ## 3.0.5
 
 ### Patch Changes
