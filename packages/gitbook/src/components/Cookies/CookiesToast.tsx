@@ -61,10 +61,11 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'lg:chat-open:mr-80',
                 'xl:chat-open:mr-100',
                 'transition-all',
-                'duration-300'
+                'duration-300',
+                'text-sm'
             )}
         >
-            <p id={describedById} className={tcls('text-sm')}>
+            <p id={describedById}>
                 {t(
                     language,
                     'cookies_prompt',
@@ -81,10 +82,10 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 onClick={() => setShow(false)}
                 className={tcls('absolute', 'top-2', 'right-2', 'hover:bg-tint-hover')}
             />
-            <div className={tcls('mt-3', 'flex', 'flex-row', 'gap-2')}>
+            <div className="mt-3 flex flex-row gap-2 text-xs">
                 <Button
                     variant="primary"
-                    size="small"
+                    size="medium"
                     aria-label={tString(language, 'cookies_accept')}
                     onClick={() => {
                         onUpdateState(true);
@@ -93,7 +94,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 />
                 <Button
                     variant="secondary"
-                    size="small"
+                    size="medium"
                     aria-label={tString(language, 'cookies_reject')}
                     onClick={() => {
                         onUpdateState(false);
