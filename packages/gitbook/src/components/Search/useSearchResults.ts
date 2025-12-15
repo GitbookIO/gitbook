@@ -173,7 +173,11 @@ export function useSearchResults(props: {
                     return;
                 }
 
-                setResultsState({ results, fetching: false, error: false });
+                const aiEnrichedResults = withAI
+                    ? withAskTriggers(results, query, assistants)
+                    : results;
+
+                setResultsState({ results: aiEnrichedResults, fetching: false, error: false });
 
                 trackEvent({
                     type: 'search_type_query',
@@ -194,14 +198,7 @@ export function useSearchResults(props: {
         };
     }, [query, scope, trackEvent, withAI, siteSpaceId, siteSpaceIds, disabled, suggestions]);
 
-    const aiEnrichedResults: ResultType[] = React.useMemo(() => {
-        if (!withAI) {
-            return resultsState.results;
-        }
-        return withAskTriggers(resultsState.results, query, assistants);
-    }, [resultsState.results, query, withAI, assistants]);
-
-    return { ...resultsState, results: aiEnrichedResults };
+    return resultsState;
 }
 
 /**

@@ -98,6 +98,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                         chatController={chatController}
                         chat={chat}
                         suggestions={configuration.suggestions}
+                        greeting={configuration.greeting}
                     />
                 </EmbeddableFrameBody>
             </EmbeddableFrameMain>

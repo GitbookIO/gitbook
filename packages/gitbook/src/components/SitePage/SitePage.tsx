@@ -363,7 +363,7 @@ async function resolvePageMetaLinks(
  * Determine whether to resolve meta links for a site based on a percentage rollout.
  */
 function shouldResolveMetaLinks(siteId: string): boolean {
-    const META_LINKS_PERCENTAGE_ROLLOUT = 25;
+    const META_LINKS_PERCENTAGE_ROLLOUT = 50;
     const ALLOWED_SITES: Record<string, boolean> = {
         site_CZrtk: true,
     };

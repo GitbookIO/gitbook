@@ -296,7 +296,7 @@ export function AIChatProvider(props: {
                         case 'response_finish': {
                             globalState.setState((state) => ({
                                 ...state,
-                                responseId: event.responseId,
+                                responseId: event.response.id ?? null,
                                 // Mark as not loading when the response is finished
                                 // Even if the stream might continue as we receive 'response_followup_suggestion'
                                 loading: false,
