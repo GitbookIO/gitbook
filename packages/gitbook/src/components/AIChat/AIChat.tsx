@@ -197,7 +197,6 @@ export function AIChatBody(props: {
     const { chatController, chat, suggestions } = props;
     const { trademark } = useAI().config;
 
-    const [input, setInput] = React.useState('');
     const language = useLanguage();
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
@@ -266,13 +265,10 @@ export function AIChatBody(props: {
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                 <AIChatInput
-                    value={input}
-                    onChange={setInput}
                     loading={chat.loading}
                     disabled={chat.loading || chat.error}
-                    onSubmit={() => {
-                        chatController.postMessage({ message: input });
-                        setInput('');
+                    onSubmit={(value) => {
+                        chatController.postMessage({ message: value });
                     }}
                 />
             </div>

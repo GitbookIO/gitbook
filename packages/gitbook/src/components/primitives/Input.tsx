@@ -47,7 +47,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
     (props, passedRef) => {
         const {
             multiline,
-            value: initialValue,
+            value: passedValue,
             sizing = 'medium',
             tag = 'div',
             leading,
@@ -72,14 +72,13 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             ...rest
         } = props;
 
-        const [internalValue, setInternalValue] = React.useState(initialValue ?? '');
+        const [value, setValue] = React.useState(passedValue ?? '');
         const [submitted, setSubmitted] = React.useState(false);
         const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null);
         const ref = passedRef ?? inputRef;
 
         const language = useLanguage();
         const isControlled = 'value' in props;
-        const value = isControlled ? (initialValue ?? '') : internalValue;
         const hasValue = value.toString().trim();
         const hasValidValue =
             hasValue &&
@@ -102,7 +101,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
         const handleChange = (event: React.ChangeEvent<HybridInputElement>) => {
             const newValue = event.target.value;
             if (!isControlled) {
-                setInternalValue(newValue);
+                setValue(newValue);
             }
             onChange?.(event);
 
@@ -137,8 +136,8 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             if (hasValue && onSubmit) {
                 onSubmit(value);
                 setSubmitted(true);
-                if (!isControlled) {
-                    setInternalValue('');
+                if (!isControlled && 'current' in ref && ref.current) {
+                    ref.current.value = '';
                 }
             }
         };
@@ -162,7 +161,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
         const inputProps = {
             className: inputClassName,
             ref: ref as React.Ref<HTMLInputElement | HTMLTextAreaElement>,
-            value: value,
+            value: passedValue,
             onKeyDown: handleKeyDown,
             'aria-busy': ariaBusy,
             onChange: handleChange,
