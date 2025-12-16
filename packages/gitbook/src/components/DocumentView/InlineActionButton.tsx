@@ -33,19 +33,16 @@ export function InlineActionButton(
     };
 
     const icon =
-        (buttonProps.icon ?? action === 'ask')
-            ? assistants.length > 0
-                ? assistants[0]?.icon
-                : undefined
-            : 'search';
+        buttonProps.icon ??
+        (action === 'ask' ? (assistants.length > 0 ? assistants[0]?.icon : undefined) : 'search');
 
     if (!query) {
         return (
             <Input
-                tag="span"
+                inline
                 label={buttonProps.label as string}
                 sizing="medium"
-                className="inline-flex w-56 leading-normal"
+                className="inline-flex max-w-[calc(100vw-2rem)] leading-normal [transition-property:transform,opacity,box-shadow,background,border]"
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),
                 }}
@@ -55,6 +52,9 @@ export function InlineActionButton(
                 leading={icon}
                 keyboardShortcut={false}
                 onSubmit={(value) => handleSubmit(value as string)}
+                containerStyle={{
+                    width: `${buttonProps.label ? buttonProps.label.toString().length + 10 : 20}ch`,
+                }}
             />
         );
     }

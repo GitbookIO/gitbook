@@ -15,6 +15,7 @@ type CustomInputProps = {
     trailing?: React.ReactNode;
     sizing?: 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
     containerRef?: React.RefObject<HTMLDivElement | null>;
+    containerStyle?: React.CSSProperties;
     /**
      * A submit button, shown to the right of the input.
      */
@@ -63,6 +64,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         keyboardShortcut,
         onSubmit,
         containerRef,
+        containerStyle,
         resize = false,
         // HTML attributes we need to read
         value: passedValue,
@@ -153,7 +155,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     };
 
     const inputClassName = tcls(
-        'peer -m-2 max-h-64 grow resize-none text-left outline-none placeholder:text-tint/8 aria-busy:cursor-progress',
+        'peer -m-2 max-h-64 grow shrink resize-none text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis aria-busy:cursor-progress',
         sizes[sizing].input
     );
 
@@ -197,10 +199,11 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 }
             }}
             ref={containerRef}
+            style={containerStyle}
         >
             <Tag
                 className={tcls(
-                    'flex grow',
+                    'flex shrink grow',
                     sizes[sizing].gap,
                     multiline ? 'items-start' : 'items-center'
                 )}
@@ -209,14 +212,12 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     <Tag
                         className={tcls(
                             clearButton && hasValue ? 'group-focus-within/input:hidden' : '',
-                            multiline ? 'my-1.25' : ''
+                            multiline ? 'my-1.25' : '',
+                            'text-tint'
                         )}
                     >
                         {typeof leading === 'string' ? (
-                            <Icon
-                                icon={leading as IconName}
-                                className="size-4 shrink-0 text-tint"
-                            />
+                            <Icon icon={leading as IconName} className="size-4 shrink-0" />
                         ) : (
                             leading
                         )}
