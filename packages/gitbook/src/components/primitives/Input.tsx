@@ -250,6 +250,8 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     <input
                         {...inputProps}
                         ref={ref as React.RefObject<HTMLInputElement>}
+                        type="text"
+                        size={1} // Size controls the intrinsic width of the input, but we want to control the width with CSS
                         {...(htmlProps as React.InputHTMLAttributes<HTMLInputElement>)}
                     />
                 )}
