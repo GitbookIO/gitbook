@@ -49,8 +49,8 @@ type InputElement = HTMLInputElement | HTMLTextAreaElement;
  */
 export const Input = React.forwardRef<InputElement, InputProps>((props, passedRef) => {
     const {
+        // Custom props
         multiline,
-        value: passedValue,
         sizing = 'medium',
         inline = false,
         leading,
@@ -60,18 +60,22 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         submitButton,
         submitMessage,
         label,
+        keyboardShortcut,
+        onSubmit,
+        containerRef,
+        resize = false,
+        // HTML attributes we need to read
+        value: passedValue,
         'aria-label': ariaLabel,
         'aria-busy': ariaBusy,
         placeholder,
-        keyboardShortcut,
         disabled,
-        onSubmit,
         onChange,
         onKeyDown,
-        containerRef,
         maxLength,
         minLength,
-        resize = false,
+        // Rest are HTML attributes to pass through
+        ...htmlProps
     } = props;
 
     const [value, setValue] = useControlledState(passedValue, passedValue ?? '');
@@ -153,6 +157,19 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         sizes[sizing].input
     );
 
+    const inputProps = {
+        className: inputClassName,
+        value: value,
+        onKeyDown: handleKeyDown,
+        'aria-busy': ariaBusy,
+        onChange: handleChange,
+        'aria-label': ariaLabel ?? label,
+        placeholder: placeholder ?? label,
+        disabled: disabled,
+        maxLength: maxLength,
+        minLength: minLength,
+    };
+
     const Tag: React.ElementType = inline ? 'span' : 'div';
 
     return (
@@ -222,33 +239,15 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
                 {multiline ? (
                     <textarea
-                        {...props}
-                        className={inputClassName}
-                        value={value}
-                        onKeyDown={handleKeyDown}
-                        aria-busy={ariaBusy}
-                        onChange={handleChange}
-                        aria-label={ariaLabel ?? label}
-                        placeholder={placeholder ?? label}
-                        disabled={disabled}
-                        maxLength={maxLength}
-                        minLength={minLength}
-                        ref={ref as React.Ref<HTMLTextAreaElement>}
+                        {...inputProps}
+                        ref={ref as React.RefObject<HTMLTextAreaElement>}
+                        {...(htmlProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
                     />
                 ) : (
                     <input
-                        {...props}
-                        className={inputClassName}
-                        value={value}
-                        onKeyDown={handleKeyDown}
-                        aria-busy={ariaBusy}
-                        onChange={handleChange}
-                        aria-label={ariaLabel ?? label}
-                        placeholder={placeholder ?? label}
-                        disabled={disabled}
-                        maxLength={maxLength}
-                        minLength={minLength}
-                        ref={ref as React.Ref<HTMLInputElement>}
+                        {...inputProps}
+                        ref={ref as React.RefObject<HTMLInputElement>}
+                        {...(htmlProps as React.InputHTMLAttributes<HTMLInputElement>)}
                     />
                 )}
 
