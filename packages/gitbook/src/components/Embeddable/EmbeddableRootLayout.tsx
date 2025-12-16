@@ -58,7 +58,7 @@ export async function EmbeddableRootLayout({
                             {children}
                             {context.customization.trademark.enabled ? (
                                 <TrademarkLink
-                                    className="rounded-none border-tint-solid/3 border-t bg-tint-solid/1 px-4 py-2.5 text-tint/8 ring-0"
+                                    className="border-tint-solid/3 border-t bg-tint-solid/1 px-4 py-2.5 text-tint/8 ring-0"
                                     context={context}
                                     placement={SiteInsightsTrademarkPlacement.Embed}
                                 />
