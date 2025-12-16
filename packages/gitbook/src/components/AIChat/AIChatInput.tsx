@@ -7,16 +7,14 @@ import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
 import { Input } from '../primitives/Input';
 
 export function AIChatInput(props: {
-    value: string;
     disabled?: boolean;
     /**
      * When true, the input is disabled
      */
     loading: boolean;
-    onChange: (value: string) => void;
     onSubmit: (value: string) => void;
 }) {
-    const { value, onChange, onSubmit, disabled, loading } = props;
+    const { onSubmit, disabled, loading } = props;
 
     const language = useLanguage();
     const chat = useAIChatState();
@@ -55,16 +53,15 @@ export function AIChatInput(props: {
             sizing="large"
             label="Assistant chat input"
             placeholder={tString(language, 'ai_chat_input_placeholder')}
-            onChange={(event) => onChange(event.target.value)}
             onSubmit={(val) => onSubmit(val as string)}
-            value={value}
             submitButton={{
                 label: tString(language, 'send'),
             }}
             className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"
             rows={1}
+            maxLength={2048}
             keyboardShortcut={
-                !value && !disabled && !loading
+                !disabled && !loading
                     ? {
                           keys: ['mod', 'i'],
                           className: 'bg-tint-base group-focus-within/input:hidden',
@@ -102,7 +99,8 @@ export function AIChatInput(props: {
                         </div>
                     </HoverCard>
                     <HoverCardTrigger>
-                        <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
+                        {/* Negative margin to compensate for Input's padding, so the badge appears flush with the cursor */}
+                        <div className="-ml-1 flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
                             <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
                                 {t(language, 'ai_chat_context_badge')}
                             </span>{' '}

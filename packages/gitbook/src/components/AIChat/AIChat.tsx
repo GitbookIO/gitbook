@@ -193,11 +193,14 @@ export function AIChatBody(props: {
     chat: AIChatState;
     welcomeMessage?: string;
     suggestions?: string[];
+    greeting?: {
+        title: string;
+        subtitle: string;
+    };
 }) {
-    const { chatController, chat, suggestions } = props;
+    const { chatController, chat, suggestions, greeting } = props;
     const { trademark } = useAI().config;
 
-    const [input, setInput] = React.useState('');
     const language = useLanguage();
     const now = useNow(60 * 60 * 1000); // Refresh every hour for greeting
 
@@ -233,19 +236,20 @@ export function AIChatBody(props: {
                                     className="size-8 text-primary [@container(min-height:400px)]:size-16"
                                 />
                             </div>
-                            <div className="flex flex-col items-start [@container(min-height:400px)]:items-center">
+                            <div className="flex flex-col items-start gap-1 [@container(min-height:400px)]:items-center">
                                 <h5
-                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
                                     data-testid="ai-chat-time-greeting"
                                 >
-                                    {timeGreeting}
+                                    {greeting?.title || timeGreeting}
                                 </h5>
                                 <p
-                                    className="animate-blur-in-slow text-tint [@container(min-height:400px)]:text-center"
+                                    className="animate-blur-in-slow text-tint leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
                                 >
-                                    {t(language, 'ai_chat_assistant_description')}
+                                    {greeting?.subtitle ||
+                                        t(language, 'ai_chat_assistant_description')}
                                 </p>
                             </div>
                         </div>
@@ -266,13 +270,10 @@ export function AIChatBody(props: {
                 {chat.error ? <AIChatError chatController={chatController} /> : null}
 
                 <AIChatInput
-                    value={input}
-                    onChange={setInput}
                     loading={chat.loading}
                     disabled={chat.loading || chat.error}
-                    onSubmit={() => {
-                        chatController.postMessage({ message: input });
-                        setInput('');
+                    onSubmit={(value) => {
+                        chatController.postMessage({ message: value });
                     }}
                 />
             </div>
