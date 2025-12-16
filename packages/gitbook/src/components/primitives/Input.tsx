@@ -80,6 +80,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
 
     const [value, setValue] = useControlledState(passedValue, passedValue ?? '');
     const [submitted, setSubmitted] = React.useState(false);
+    const [height, setHeight] = React.useState<number>();
     const inputRef = React.useRef<InputElement>(null);
     const ref = (passedRef as React.RefObject<HTMLInputElement | HTMLTextAreaElement>) ?? inputRef;
 
@@ -116,8 +117,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         if (multiline && resize && ref.current) {
             // TODO: replace with `field-sizing: content` when more broadly supported. https://caniuse.com/?search=field-sizing
             // Reset the height to auto, then set it to the scroll height. If we don't reset, the height will only ever grow.
-            ref.current.style.height = 'auto';
-            ref.current.style.height = `${ref.current.scrollHeight}px`;
+            setHeight(ref.current.scrollHeight);
         }
     };
 
@@ -168,6 +168,9 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         disabled: disabled,
         maxLength: maxLength,
         minLength: minLength,
+        style: {
+            height: multiline && resize && hasValue && height ? `${height}px` : undefined,
+        },
     };
 
     const Tag: React.ElementType = inline ? 'span' : 'div';
@@ -274,7 +277,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     {maxLength && !submitted && value.toString().length > maxLength * 0.8 ? (
                         <span
                             className={tcls(
-                                'animate-fade-in text-xs',
+                                'shrink-0 animate-fade-in text-xs tabular-nums',
                                 value.toString().length >= maxLength
                                     ? 'text-danger-subtle'
                                     : 'text-tint-subtle'

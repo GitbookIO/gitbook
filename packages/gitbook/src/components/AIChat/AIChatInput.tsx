@@ -59,6 +59,7 @@ export function AIChatInput(props: {
             }}
             className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"
             rows={1}
+            maxLength={2048}
             keyboardShortcut={
                 !disabled && !loading
                     ? {
