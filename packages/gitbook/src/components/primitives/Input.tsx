@@ -4,6 +4,7 @@ import { tString, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { Icon, type IconName } from '@gitbook/icons';
 import React, { type ReactNode } from 'react';
+import { useControlledState } from '../hooks/useControlledState';
 import { Button, type ButtonProps } from './Button';
 import { KeyboardShortcut, type KeyboardShortcutProps } from './KeyboardShortcut';
 
@@ -72,13 +73,12 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             ...rest
         } = props;
 
-        const [value, setValue] = React.useState(passedValue ?? '');
+        const [value, setValue] = useControlledState(passedValue, passedValue ?? '');
         const [submitted, setSubmitted] = React.useState(false);
         const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null);
         const ref = passedRef ?? inputRef;
 
         const language = useLanguage();
-        const isControlled = 'value' in props;
         const hasValue = value.toString().trim();
         const hasValidValue =
             hasValue &&
@@ -100,9 +100,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
 
         const handleChange = (event: React.ChangeEvent<HybridInputElement>) => {
             const newValue = event.target.value;
-            if (!isControlled) {
-                setValue(newValue);
-            }
+            setValue(newValue);
             onChange?.(event);
 
             // Reset submitted state when user edits the value to allow re-submission
@@ -118,13 +116,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
 
         const handleClear = () => {
             if (!('current' in ref) || !ref.current) return;
-
-            const syntheticEvent = {
-                target: { value: '' },
-                currentTarget: ref.current,
-            } as React.ChangeEvent<HybridInputElement>;
-
-            handleChange(syntheticEvent);
+            setValue('');
         };
 
         const handleClick = () => {
@@ -136,9 +128,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
             if (hasValue && onSubmit) {
                 onSubmit(value);
                 setSubmitted(true);
-                if (!isControlled && 'current' in ref && ref.current) {
-                    ref.current.value = '';
-                }
+                setValue('');
             }
         };
 
@@ -161,7 +151,7 @@ export const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, In
         const inputProps = {
             className: inputClassName,
             ref: ref as React.Ref<HTMLInputElement | HTMLTextAreaElement>,
-            value: passedValue,
+            value: value,
             onKeyDown: handleKeyDown,
             'aria-busy': ariaBusy,
             onChange: handleChange,
