@@ -128,10 +128,10 @@ function parseResponse<T>(
     parse: (response: AIStreamResponse) => T | undefined | Promise<T | undefined>
 ): {
     stream: EventIterator<T>;
-    response: Promise<{ responseId: string }>;
+    response: Promise<{ responseId: string | null }>;
 } {
-    let resolveResponse: (value: { responseId: string }) => void;
-    const response = new Promise<{ responseId: string }>((resolve) => {
+    let resolveResponse: (value: { responseId: string | null }) => void;
+    const response = new Promise<{ responseId: string | null }>((resolve) => {
         resolveResponse = resolve;
     });
 
@@ -147,7 +147,7 @@ function parseResponse<T>(
 
                 if (event.type === 'response_finish') {
                     foundResponse = true;
-                    resolveResponse({ responseId: event.responseId });
+                    resolveResponse({ responseId: event.response.id ?? null });
                 }
             }
 

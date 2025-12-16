@@ -17,7 +17,12 @@ export function Trademark(props: {
 }) {
     const { className, ...rest } = props;
     return (
-        <div className={tcls('mt-auto px-2 sidebar-default:pr-4 pb-2', className)}>
+        <div
+            className={tcls(
+                'mt-auto circular-corners:rounded-2xl rounded-lg straight-corners:rounded-none px-2 sidebar-default:pr-4 pb-2',
+                className
+            )}
+        >
             <TrademarkLink {...rest} />
         </div>
     );
@@ -57,10 +62,6 @@ export function TrademarkLink(props: {
 
                 'sidebar-filled:px-3',
                 'lg:sidebar-filled:page-no-toc:px-5',
-
-                'rounded-lg',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
 
                 'hover:bg-tint',
                 'hover:text-tint-strong',

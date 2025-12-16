@@ -297,7 +297,7 @@ async function getPageDataWithFallback(args: {
 }) {
     const { context: baseContext, pagePathParams } = args;
     const { context, pageTarget } = await fetchPageData(baseContext, pagePathParams);
-    const pageMetaLinks = await (pageTarget?.page && shouldResolveMetaLinks(context.site.id)
+    const pageMetaLinks = await (pageTarget?.page
         ? resolvePageMetaLinks(context, pageTarget.page.id)
         : null);
 
@@ -357,29 +357,6 @@ async function resolvePageMetaLinks(
         canonical: null,
         alternates: [],
     };
-}
-
-/**
- * Determine whether to resolve meta links for a site based on a percentage rollout.
- */
-function shouldResolveMetaLinks(siteId: string): boolean {
-    const META_LINKS_PERCENTAGE_ROLLOUT = 25;
-    const ALLOWED_SITES: Record<string, boolean> = {
-        site_CZrtk: true,
-    };
-
-    if (ALLOWED_SITES[siteId] || process.env.NODE_ENV === 'development') {
-        return true;
-    }
-
-    // compute a simple hash of the siteId
-    let hash = 0;
-    for (let i = 0; i < siteId.length; i++) {
-        hash = (hash << 5) - hash + siteId.charCodeAt(i);
-        hash = hash & hash; // Convert to 32-bit integer
-    }
-
-    return Math.abs(hash % 100) < META_LINKS_PERCENTAGE_ROLLOUT;
 }
 
 /**

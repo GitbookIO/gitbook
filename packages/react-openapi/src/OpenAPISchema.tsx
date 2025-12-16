@@ -564,6 +564,75 @@ export function OpenAPISchemaPresentation(props: {
 }
 
 /**
+ * Process properties from a schema object into property entries.
+ */
+function processSchemaProperties(
+    schema: OpenAPIV3.SchemaObject,
+    discriminator?: OpenAPIV3.DiscriminatorObject | undefined,
+    discriminatorValue?: string | undefined,
+    allRequired?: Set<string>
+): OpenAPISchemaPropertyEntry[] {
+    const result: OpenAPISchemaPropertyEntry[] = [];
+
+    if (schema.properties) {
+        Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
+            const isDiscriminator = discriminator?.propertyName === propertyName;
+            if (checkIsReference(propertySchema)) {
+                if (!isDiscriminator || !discriminatorValue) {
+                    return;
+                }
+            }
+
+            let finalSchema = propertySchema;
+            if (isDiscriminator && discriminatorValue) {
+                finalSchema = {
+                    ...propertySchema,
+                    const: discriminatorValue,
+                    enum: [discriminatorValue],
+                };
+            }
+
+            result.push({
+                propertyName,
+                required: Array.isArray(schema.required)
+                    ? schema.required.includes(propertyName)
+                    : allRequired?.has(propertyName)
+                      ? true
+                      : undefined,
+                isDiscriminatorProperty: isDiscriminator,
+                schema: finalSchema,
+            });
+        });
+    }
+
+    if (schema.additionalProperties && !checkIsReference(schema.additionalProperties)) {
+        result.push({
+            propertyName: 'Other properties',
+            schema: schema.additionalProperties === true ? {} : schema.additionalProperties,
+        });
+    }
+
+    return result;
+}
+
+/**
+ * Merge properties into a result array, with later properties overriding earlier ones.
+ */
+function mergeProperties(
+    result: OpenAPISchemaPropertyEntry[],
+    newProperties: OpenAPISchemaPropertyEntry[]
+): void {
+    for (const prop of newProperties) {
+        const existingIndex = result.findIndex((p) => p.propertyName === prop.propertyName);
+        if (existingIndex >= 0) {
+            result[existingIndex] = prop;
+        } else {
+            result.push(prop);
+        }
+    }
+}
+
+/**
  * Get the sub-properties of a schema.
  */
 function getSchemaProperties(
@@ -596,46 +665,55 @@ function getSchemaProperties(
         return [{ propertyName: 'items', schema: items }];
     }
 
+    // Handle allOf by collecting properties from all schemas in the allOf
+    if (schema.allOf && Array.isArray(schema.allOf)) {
+        const allOfSchemas = schema.allOf.filter(
+            (s): s is OpenAPIV3.SchemaObject => !checkIsReference(s)
+        );
+
+        if (allOfSchemas.length > 0) {
+            const result: OpenAPISchemaPropertyEntry[] = [];
+            const allRequired = new Set<string>();
+
+            // Collect required fields and properties from all allOf schemas
+            for (const allOfSchema of allOfSchemas) {
+                if (Array.isArray(allOfSchema.required)) {
+                    allOfSchema.required.forEach((req) => allRequired.add(req));
+                }
+                const allOfProperties = getSchemaProperties(
+                    allOfSchema,
+                    discriminator,
+                    discriminatorValue
+                );
+                if (allOfProperties) {
+                    mergeProperties(result, allOfProperties);
+                }
+            }
+
+            // Collect required fields from the schema itself
+            if (Array.isArray(schema.required)) {
+                schema.required.forEach((req) => allRequired.add(req));
+            }
+
+            // Include direct properties from the schema itself
+            mergeProperties(
+                result,
+                processSchemaProperties(schema, discriminator, discriminatorValue, allRequired)
+            );
+
+            // Update required status for all properties
+            result.forEach((prop) => {
+                if (prop.propertyName && allRequired.has(prop.propertyName)) {
+                    prop.required = true;
+                }
+            });
+
+            return result.length > 0 ? result : null;
+        }
+    }
+
     if (schema.type === 'object' || schema.properties) {
-        const result: OpenAPISchemaPropertyEntry[] = [];
-
-        if (schema.properties) {
-            Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
-                const isDiscriminator = discriminator?.propertyName === propertyName;
-                if (checkIsReference(propertySchema)) {
-                    if (!isDiscriminator || !discriminatorValue) {
-                        return;
-                    }
-                }
-
-                let finalSchema = propertySchema;
-                if (isDiscriminator && discriminatorValue) {
-                    finalSchema = {
-                        ...propertySchema,
-                        const: discriminatorValue,
-                        enum: [discriminatorValue],
-                    };
-                }
-
-                result.push({
-                    propertyName,
-                    required: Array.isArray(schema.required)
-                        ? schema.required.includes(propertyName)
-                        : undefined,
-                    isDiscriminatorProperty: isDiscriminator,
-                    schema: finalSchema,
-                });
-            });
-        }
-
-        if (schema.additionalProperties && !checkIsReference(schema.additionalProperties)) {
-            result.push({
-                propertyName: 'Other properties',
-                schema: schema.additionalProperties === true ? {} : schema.additionalProperties,
-            });
-        }
-
-        return result;
+        return processSchemaProperties(schema, discriminator, discriminatorValue);
     }
 
     return null;
