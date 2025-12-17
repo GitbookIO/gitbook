@@ -74,7 +74,7 @@ export function PageBody(props: {
                     // Allow words to break if they are too long.
                     'break-anywhere',
                     '@container',
-                    pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
+                    pageWidthWide ? 'page-width-wide max-w-[92rem]' : 'page-width-default',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
                     page.layout.tableOfContents && hasVisibleTOCItems
                         ? 'page-has-toc'

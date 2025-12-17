@@ -62,6 +62,7 @@ export function TrademarkLink(props: {
 
                 'sidebar-filled:px-3',
                 'lg:sidebar-filled:page-no-toc:px-5',
+                'lg:page-no-toc:bg-tint-base',
 
                 'hover:bg-tint',
                 'hover:text-tint-strong',

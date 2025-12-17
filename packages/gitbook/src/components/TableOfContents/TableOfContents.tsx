@@ -41,8 +41,12 @@ export async function TableOfContents(props: {
                     'shrink-0',
 
                     'w-72',
-                    'basis-72',
-                    'lg:page-no-toc:basis-56',
+                    'lg:max-xl:w-56',
+                    'lg:page-no-toc:w-56',
+                    '4xl:page-no-toc:w-72',
+                    'lg:page-no-toc:fixed',
+                    'lg:page-no-toc:left-8',
+                    'lg:page-no-toc:ml-[max(0px,calc((100vw-96rem)/2-20rem))]',
 
                     'max-lg:not-sidebar-filled:bg-tint-base',
                     'max-lg:not-sidebar-filled:border-r',
@@ -52,7 +56,8 @@ export async function TableOfContents(props: {
                     'lg:animate-none!',
                     'lg:sticky',
                     'lg:mr-12',
-                    'lg:z-0!',
+                    // 'lg:z-0!',
+                    'lg:z-20',
 
                     // Server-side static positioning
                     'lg:top-0',
@@ -77,8 +82,10 @@ export async function TableOfContents(props: {
                     'pt-6 pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
-                    'max-lg:pl-8',
 
+                    'hidden',
+                    'navigation-open:flex!',
+                    'lg:flex',
                     'flex-col',
                     'gap-4',
                     className
