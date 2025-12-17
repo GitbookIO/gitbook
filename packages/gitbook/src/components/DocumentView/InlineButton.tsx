@@ -16,14 +16,11 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
     };
 
     const ButtonImplementation = () => {
-        // @ts-expect-error: Not added to API yet
         if ('action' in inline.data && 'query' in inline.data.action) {
             return (
                 <InlineActionButton
-                    // @ts-expect-error: Not added to API yet
                     action={inline.data.action.action}
-                    // @ts-expect-error: Not added to API yet
-                    query={inline.data.action.query}
+                    query={inline.data.action.query ?? ''}
                     buttonProps={buttonProps}
                 />
             );
@@ -46,6 +43,8 @@ export async function InlineLinkButton(
     props: InlineProps<api.DocumentInlineButton> & { buttonProps: ButtonProps }
 ) {
     const { inline, context, buttonProps } = props;
+
+    if (!('ref' in inline.data)) return;
 
     const resolved =
         context.contentContext && inline.data.ref
