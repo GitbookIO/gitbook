@@ -50,6 +50,7 @@ export function InlineActionButton(
                 clearButton={{
                     className: 'text-[1em]',
                 }}
+                maxLength={action === 'ask' ? 2048 : 512}
                 disabled={action === 'ask' && chatState.loading}
                 aria-busy={action === 'ask' && chatState.loading}
                 leading={icon}
