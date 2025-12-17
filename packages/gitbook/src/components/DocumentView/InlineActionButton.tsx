@@ -5,7 +5,7 @@ import { useSearch } from '../Search';
 import { Button, type ButtonProps, Input } from '../primitives';
 
 export function InlineActionButton(
-    props: { action: 'ask' | 'search'; query: string } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
+    props: { action: 'ask' | 'search'; query?: string } & { buttonProps: ButtonProps } // TODO: Type this properly: Pick<api.DocumentInlineButton, 'action' | 'query'> & { buttonProps: ButtonProps }
 ) {
     const { action, query, buttonProps } = props;
 
@@ -33,8 +33,9 @@ export function InlineActionButton(
     };
 
     const icon =
-        buttonProps.icon ??
-        (action === 'ask' ? (assistants.length > 0 ? assistants[0]?.icon : undefined) : 'search');
+        action === 'ask' && buttonProps.icon === 'gitbook-assistant' && assistants.length > 0
+            ? assistants[0]?.icon
+            : buttonProps.icon;
 
     if (!query) {
         return (
@@ -42,7 +43,7 @@ export function InlineActionButton(
                 inline
                 label={buttonProps.label as string}
                 sizing="medium"
-                className="inline-flex max-w-full leading-normal [transition-property:transform,opacity,box-shadow,background,border]"
+                className="inline-flex max-w-full leading-normal [transition-property:translate,opacity,box-shadow,background,border]"
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),
                 }}
