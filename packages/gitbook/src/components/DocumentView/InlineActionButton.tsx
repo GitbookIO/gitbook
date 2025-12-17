@@ -47,7 +47,9 @@ export function InlineActionButton(
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),
                 }}
-                clearButton
+                clearButton={{
+                    className: 'text-[1em]',
+                }}
                 disabled={action === 'ask' && chatState.loading}
                 aria-busy={action === 'ask' && chatState.loading}
                 leading={icon}
