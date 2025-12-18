@@ -41,7 +41,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             aria-describedby={describedById}
             className={tcls(
                 'fixed',
-                'z-10',
+                'z-50',
                 'bg-tint-base',
                 'rounded-sm',
                 'straight-corners:rounded-none',
@@ -52,9 +52,9 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'depth-flat:shadow-none',
                 'p-4',
                 'pr-8',
-                'bottom-4',
-                'right-4',
-                'left-16',
+                'bottom-[max(env(safe-area-inset-bottom),1rem)]',
+                'right-[max(env(safe-area-inset-right),1rem)]',
+                'left-[max(env(safe-area-inset-left),4rem)]',
                 'max-w-md',
                 'text-balance',
                 'sm:left-auto',

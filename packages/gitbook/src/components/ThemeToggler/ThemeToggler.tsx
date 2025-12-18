@@ -27,7 +27,11 @@ export function ThemeToggler() {
     };
 
     return (
-        <ButtonGroup role="radiogroup" className="gap-2" combinedShape={false}>
+        <ButtonGroup
+            role="radiogroup"
+            className="xl:page-no-toc:-m-2 gap-2 circular-corners:rounded-full bg-tint-base xl:page-no-toc:p-2"
+            combinedShape={false}
+        >
             <ThemeButton
                 active={mounted && theme === 'light'}
                 icon="sun-bright"
@@ -66,11 +70,7 @@ function ThemeButton(props: {
             aria-checked={active}
             variant="blank"
             size="default"
-            className={
-                active
-                    ? 'bg-primary theme-muted:bg-primary-hover text-primary-strong ring-primary hover:bg-primary contrast-more:text-primary-strong contrast-more:ring-1 [html.sidebar-filled.theme-bold.tint_&]:bg-primary-hover'
-                    : ''
-            }
+            active={active}
             icon={icon}
             iconOnly
         />

@@ -43,6 +43,11 @@ export function PageAside(props: {
                 'opacity-0',
 
                 'xl:flex',
+                'xl:page-no-toc:fixed',
+                'xl:page-no-toc:mr-[max(0px,calc((100vw-96rem)/2-20rem))]',
+                'xl:page-no-toc:right-8',
+                'xl:page-no-toc:bottom-0',
+                'z-20',
 
                 'overflow-hidden',
 
@@ -102,7 +107,7 @@ export function PageAside(props: {
                 className={tcls(
                     'flex flex-col',
                     'min-w-56 shrink-0',
-                    'overflow-hidden',
+                    'page-has-toc:overflow-hidden',
                     'w-full',
                     'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
                     'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
@@ -208,7 +213,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
         <div
             className={tcls(
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
-                'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
+                // 'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
                 'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
                 'pt-4'
             )}
