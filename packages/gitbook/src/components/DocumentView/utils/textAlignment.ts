@@ -9,11 +9,11 @@ export function getTextAlignment(textAlignment: TextAlignment | undefined): Clas
     switch (textAlignment) {
         case undefined:
         case TextAlignment.Start:
-            return ['text-start', 'justify-self-start'];
+            return ['text-start', 'self-start'];
         case TextAlignment.Center:
-            return ['text-center', 'justify-self-center'];
+            return ['text-center', 'self-center'];
         case TextAlignment.End:
-            return ['text-end', 'justify-self-end'];
+            return ['text-end', 'self-end'];
         default:
             return nullIfNever(textAlignment);
     }
