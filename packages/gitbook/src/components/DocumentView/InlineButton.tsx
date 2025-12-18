@@ -26,7 +26,11 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
             );
         }
 
-        return <InlineLinkButton {...props} buttonProps={buttonProps} />;
+        if ('ref' in inline.data) {
+            return <InlineLinkButton {...props} buttonProps={buttonProps} />;
+        }
+
+        return <Button {...buttonProps} disabled />;
     };
 
     const inlineElement = (
