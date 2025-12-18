@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.4.0
+
+### Minor Changes
+
+- 62438f4: Update to FontAwesome 7.1.0
+
 ## 0.3.4
 
 ### Patch Changes
