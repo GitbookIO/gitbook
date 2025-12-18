@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.4.1
+
+### Patch Changes
+
+- e7fb771: Fix icon rendering with explicit currentColor on icon element
+
 ## 0.4.0
 
 ### Minor Changes
