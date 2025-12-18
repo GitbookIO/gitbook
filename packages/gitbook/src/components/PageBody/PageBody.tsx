@@ -105,7 +105,7 @@ export function PageBody(props: {
                         <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
-                            style="grid [&>*+*]:mt-5"
+                            style="flex flex-col [&>*+*]:mt-5"
                             blockStyle="page-api-block:ml-0"
                             context={{
                                 mode: 'default',
