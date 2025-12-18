@@ -11,8 +11,7 @@
             "types": "./dist/icons.d.ts",
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
-        },
-        "./style.css": "./src/style.css"
+        }
     },
     "sideEffects": false,
     "version": "0.4.0",
