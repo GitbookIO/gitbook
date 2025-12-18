@@ -14,7 +14,7 @@
         }
     },
     "sideEffects": false,
-    "version": "0.4.0",
+    "version": "0.4.1",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^7.1.0",
         "@fortawesome/fontawesome-free": "^7.1.0"

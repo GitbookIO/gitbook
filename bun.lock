@@ -108,7 +108,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.21.0",
+      "version": "0.21.1",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
         "@gitbook/api": "catalog:",
@@ -218,7 +218,7 @@
     },
     "packages/icons": {
       "name": "@gitbook/icons",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js",
       },
@@ -259,7 +259,7 @@
     },
     "packages/react-contentkit": {
       "name": "@gitbook/react-contentkit",
-      "version": "0.7.9",
+      "version": "0.7.10",
       "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:*",
