@@ -40,7 +40,7 @@ export function SiteSectionList(props: { sections: ClientSiteSections; className
                     orientation="vertical"
                     style={{ maxHeight: `${MAX_ITEMS * 3 + 2}rem` }}
                     className="pb-4"
-                    active={currentSection.id}
+                    active={`#${currentSection.id}`}
                 >
                     <div className="flex w-full flex-col px-2">
                         {sectionsAndGroups.map((item) => {

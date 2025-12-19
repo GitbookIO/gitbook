@@ -79,9 +79,9 @@ export async function EmbeddableDocsPage(
                         orientation="vertical"
                         className="not-hydrated:animate-blur-in-slow"
                         contentClassName="p-4"
-                        fadeEdges={context.sections ? [] : ['leading']}
+                        leading={{ fade: !context.sections, button: true }}
                     >
-                        <TableOfContents className="pt-0" context={context} />
+                        <TableOfContents context={context} />
                         <PageBody
                             context={context}
                             page={page}
