@@ -14,7 +14,7 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
         variant: inline.data.kind,
         icon: inline.data.icon as IconName | undefined,
         size: 'medium',
-        className: 'leading-normal'
+        className: 'leading-normal',
     };
 
     const ButtonImplementation = () => {
@@ -61,13 +61,20 @@ export async function InlineLinkButton(
         resolved?.href ??
         (inline.data.ref ? resolveContentRefFallback(inline.data.ref)?.href : undefined);
 
-    const button = <Button {...buttonProps} insights={{
-        type: 'link_click',
-        link: {
-            target: inline.data.ref,
-            position: api.SiteInsightsLinkPosition.Content,
-        },
-    }} href={href} disabled={href === undefined} />;
+    const button = (
+        <Button
+            {...buttonProps}
+            insights={{
+                type: 'link_click',
+                link: {
+                    target: inline.data.ref,
+                    position: api.SiteInsightsLinkPosition.Content,
+                },
+            }}
+            href={href}
+            disabled={href === undefined}
+        />
+    );
 
     if (inline.data.ref && !resolved) {
         return <NotFoundRefHoverCard context={context}>{button}</NotFoundRefHoverCard>;
