@@ -48,7 +48,6 @@ export function HeaderMobileMenu(props: ButtonProps) {
             icon="bars"
             iconOnly
             variant="blank"
-            size="default"
             label={tString(language, 'table_of_contents_button_label')}
             onClick={toggleNavigation}
             active={isOpen}

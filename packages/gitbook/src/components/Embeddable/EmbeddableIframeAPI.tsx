@@ -113,7 +113,7 @@ export function EmbeddableIframeButtons() {
             {actions.map((action, index) => (
                 <Button
                     key={action.label}
-                    size="default"
+                    size="large"
                     variant="blank"
                     icon={action?.icon ?? 'square-question'}
                     label={action?.label}
@@ -195,7 +195,7 @@ export function EmbeddableIframeTabs(props: {
                     key={tab.key}
                     data-testid={`embed-tab-${tab.key}`}
                     label={tab.label}
-                    size="default"
+                    size="large"
                     variant="blank"
                     icon={tab.icon}
                     active={tab.key === active}
