@@ -11,11 +11,10 @@
             "types": "./dist/icons.d.ts",
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
-        },
-        "./style.css": "./src/style.css"
+        }
     },
     "sideEffects": false,
-    "version": "0.3.4",
+    "version": "0.4.1",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^7.1.0",
         "@fortawesome/fontawesome-free": "^7.1.0"

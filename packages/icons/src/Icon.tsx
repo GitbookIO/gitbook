@@ -63,6 +63,7 @@ export const Icon = React.forwardRef(function Icon(
                 WebkitMaskRepeat: 'no-repeat',
                 maskPosition: 'center',
                 WebkitMaskPosition: 'center',
+                backgroundColor: 'currentColor',
                 ...(size ? { width: size, height: size } : {}),
                 ...rest.style,
             }}

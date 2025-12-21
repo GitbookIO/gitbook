@@ -29,7 +29,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 
-import '@gitbook/icons/style.css';
 import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
