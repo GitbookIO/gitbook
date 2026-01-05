@@ -1968,6 +1968,7 @@ const testCases: TestsCase[] = [
                     await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     await button.click(); // Toggle the window off again
+                },
             },
             {
                 name: 'Change standalone button label and icon',
