@@ -182,7 +182,6 @@ export function SideSheetCloseButton(props: { className?: ClassValue; onClick?: 
         <Button
             icon="xmark"
             variant="secondary"
-            size="default"
             iconOnly
             label={tString(language, 'close')}
             className={tcls('absolute top-4 bg-tint-base! transition-discrete', className)}
