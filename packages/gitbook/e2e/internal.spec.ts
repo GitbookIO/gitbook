@@ -2217,8 +2217,7 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-                    const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
+                    await expect(page.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
                 },
@@ -2228,14 +2227,13 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-                    const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
+                    await expect(page.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
-                    const tocButton = iframe.getByTestId('toc-button');
+                    const tocButton = page.getByTestId('toc-button');
                     await expect(tocButton).toBeVisible();
                     await tocButton.click();
-                    await expect(iframe.getByTestId('table-of-contents')).toBeVisible();
+                    await expect(page.getByTestId('table-of-contents')).toBeVisible();
                 },
             },
             {
@@ -2243,13 +2241,10 @@ const testCases: TestsCase[] = [
                 url: '',
                 run: async (page) => {
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-                    const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
+                    await expect(page.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
-                    const openInNewTabButton = iframe.getByTestId(
-                        'embed-docs-page-open-in-new-tab'
-                    );
+                    const openInNewTabButton = page.getByTestId('embed-docs-page-open-in-new-tab');
                     await expect(openInNewTabButton).toBeVisible();
                     // Intercept the new page event without navigating
                     const [newPage] = await Promise.all([
