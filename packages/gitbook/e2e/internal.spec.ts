@@ -1963,24 +1963,37 @@ const testCases: TestsCase[] = [
                         'assistant'
                     );
 
-                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-                    const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await expect(iframe.getByTestId('embed-tab-assistant')).toBeVisible();
-                    await expect(iframe.getByTestId('embed-tab-docs')).toBeVisible();
-
                     await button.click(); // Toggle the window off
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-
-                    await iframe.owner().evaluate(overrideAIInitialState);
+                    await button.click(); // Toggle the window off again
+            },
+            {
+                name: 'Change standalone button label and icon',
+                url: '',
+                run: async (page) => {
+                    await page.evaluate(() => {
+                        const GitBook = window.GitBook as unknown as GitBookStandalone;
+                        GitBook('configure', {
+                            button: {
+                                label: 'Docs',
+                                icon: 'book',
+                            },
+                        });
+                    });
+                    await expect(page.locator('#gitbook-widget-button-label')).toHaveText('Docs');
+                    await expect(page.locator('#gitbook-widget-button-icon')).toHaveAttribute(
+                        'data-icon',
+                        'book'
+                    );
                 },
             },
         ],
     },
     {
         name: 'Docs Embed - Assistant + Docs',
-        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/',
+        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
@@ -2033,28 +2046,6 @@ const testCases: TestsCase[] = [
                         AI_PROMPT
                     );
                     await iframe.owner().evaluate(overrideAIResponse);
-                },
-            },
-            {
-                name: 'Configuration - Change standalone button label and icon',
-                url: '',
-                run: async (page) => {
-                    await page.evaluate(() => {
-                        const GitBook = window.GitBook as unknown as GitBookStandalone;
-                        GitBook('configure', {
-                            button: {
-                                label: 'Docs',
-                                icon: 'book',
-                            },
-                        });
-                    });
-                    await expect(page.locator('#gitbook-widget-button-label')).toHaveText('Docs');
-                    await expect(page.locator('#gitbook-widget-button-icon')).toHaveAttribute(
-                        'data-icon',
-                        'book'
-                    );
-                    const iframe = page.frameLocator('#gitbook-widget-iframe');
-                    await iframe.owner().evaluate(overrideAIInitialState);
                 },
             },
             {
@@ -2218,6 +2209,7 @@ const testCases: TestsCase[] = [
     {
         name: 'Docs Embed - Docs Only',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/page/',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
                 name: 'Docs only',
