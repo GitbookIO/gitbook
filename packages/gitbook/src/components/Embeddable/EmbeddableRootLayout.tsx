@@ -9,7 +9,7 @@ import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { GitBookSiteContext } from '@/lib/context';
 import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
-import { TrademarkLink } from '../TableOfContents/Trademark';
+import { Trademark } from '../TableOfContents/Trademark';
 import { NavigationLoader } from '../primitives/NavigationLoader';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
 
@@ -57,8 +57,8 @@ export async function EmbeddableRootLayout({
                         <div className="fixed inset-0 flex flex-col">
                             {children}
                             {context.customization.trademark.enabled ? (
-                                <TrademarkLink
-                                    className="border-tint-solid/3 border-t bg-tint-solid/1 px-4 py-2.5 text-tint/8 ring-0"
+                                <Trademark
+                                    className="rounded-none! border-x-0 border-t border-b-0 bg-tint-solid/1 depth-flat:bg-tint-solid/1 px-4 py-2.5 text-tint/8"
                                     context={context}
                                     placement={SiteInsightsTrademarkPlacement.Embed}
                                 />

@@ -100,9 +100,9 @@ export async function TableOfContents(props: {
                         'page-no-toc:bg-transparent!',
                         'page-no-toc:border-none!',
 
-                        'sidebar-filled:rounded-xl',
+                        'sidebar-filled:rounded-2xl',
                         'straight-corners:rounded-none',
-                        'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-3xl'
+                        'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-4xl'
                     )}
                 >
                     {innerHeader ? innerHeader : null}
@@ -128,6 +128,7 @@ export async function TableOfContents(props: {
                         <Trademark
                             context={context}
                             placement={SiteInsightsTrademarkPlacement.Sidebar}
+                            className="m-2 mt-auto sidebar-default:mr-4"
                         />
                     ) : null}
                 </div>

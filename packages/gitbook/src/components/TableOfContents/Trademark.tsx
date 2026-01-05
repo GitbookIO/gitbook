@@ -1,37 +1,16 @@
 import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
-import { getSpaceLanguage, t } from '@/intl/server';
+import { getSpaceLanguage, tString } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSpaceContext } from '@/lib/context';
-import { Link } from '../primitives';
+import { Button } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
  */
 export function Trademark(props: {
-    context: GitBookSpaceContext;
-    placement: SiteInsightsTrademarkPlacement;
-    className?: string;
-}) {
-    const { className, ...rest } = props;
-    return (
-        <div
-            className={tcls(
-                'mt-auto circular-corners:rounded-2xl rounded-lg straight-corners:rounded-none px-2 sidebar-default:pr-4 pb-2',
-                className
-            )}
-        >
-            <TrademarkLink {...rest} />
-        </div>
-    );
-}
-
-/**
- * Trademark link to the GitBook.
- */
-export function TrademarkLink(props: {
     context: GitBookSpaceContext;
     placement: SiteInsightsTrademarkPlacement;
     className?: string;
@@ -46,8 +25,10 @@ export function TrademarkLink(props: {
     url.searchParams.set('utm_campaign', space.id);
 
     return (
-        <Link
+        <Button
             target="_blank"
+            variant="secondary"
+            size="large"
             href={url.toString()}
             className={tcls(
                 'text-sm',
@@ -59,29 +40,21 @@ export function TrademarkLink(props: {
                 'items-center',
                 'px-5',
                 'py-4',
+                'gap-3',
+                'whitespace-normal',
 
-                'sidebar-filled:px-3',
-                'lg:sidebar-filled:page-no-toc:px-5',
-
-                'hover:bg-tint',
-                'hover:text-tint-strong',
-
-                'ring-1',
-                'ring-inset',
-                'ring-tint-subtle',
-
-                'transition-colors',
-                'pointer-events-auto',
+                'bg-transparent',
+                'depth-subtle:shadow-none',
+                'border-tint-subtle',
 
                 className
             )}
+            icon={<Icon icon="gitbook" className="size-5 shrink-0" />}
+            label={tString(language, 'powered_by_gitbook')}
             insights={{
                 type: 'trademark_click',
                 placement,
             }}
-        >
-            <Icon icon="gitbook" className={tcls('size-5', 'shrink-0')} />
-            <span className={tcls('ml-3')}>{t(language, 'powered_by_gitbook')}</span>
-        </Link>
+        />
     );
 }
