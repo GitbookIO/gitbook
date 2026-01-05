@@ -417,14 +417,15 @@ export async function waitForIcons(page: Page) {
                 return true;
             }
 
-            // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
-            const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
-            const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
-            const url = urlMatch?.[1];
+            const maskImage = icon.querySelector('[data-testid="mask-image"]');
+            if (!maskImage) {
+                throw new Error('No mask-image element');
+            }
 
+            const url = maskImage.getAttribute('href');
             // If URL is invalid we throw an error.
             if (!url) {
-                throw new Error('No mask-image');
+                throw new Error('No mask-image url');
             }
 
             // If the URL is already queued for loading, we return the state.

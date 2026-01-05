@@ -51,23 +51,36 @@ export const Icon = React.forwardRef(function Icon(
 
     const [iconStyle, icon] = getIconStyle(propIconStyle, propIcon);
     const url = getIconAssetURL(context, iconStyle, icon);
+    const maskId = React.useId();
 
     return (
         <svg
             ref={ref}
             {...rest}
             style={{
-                maskImage: `url(${url})`,
-                WebkitMaskImage: `url(${url})`,
-                maskRepeat: 'no-repeat',
-                WebkitMaskRepeat: 'no-repeat',
-                maskPosition: 'center',
-                WebkitMaskPosition: 'center',
-                backgroundColor: 'currentColor',
                 ...(size ? { width: size, height: size } : {}),
                 ...rest.style,
             }}
             className={`gb-icon ${className}`}
-        />
+        >
+            <title>{icon}</title>
+            <defs>
+                <mask
+                    id={maskId}
+                    style={{
+                        maskType: 'alpha',
+                    }}
+                >
+                    <image
+                        data-testid="mask-image"
+                        href={url}
+                        width="100%"
+                        height="100%"
+                        preserveAspectRatio="xMidYMid meet"
+                    />
+                </mask>
+            </defs>
+            <rect width="100%" height="100%" fill="currentColor" mask={`url(#${maskId})`} />
+        </svg>
     );
 });
