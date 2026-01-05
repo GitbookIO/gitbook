@@ -417,7 +417,7 @@ export async function waitForIcons(page: Page) {
                 return true;
             }
 
-            const maskImage = icon.querySelector('data-testid="mask-image"');
+            const maskImage = icon.querySelector('[data-testid="mask-image"]');
             if (!maskImage) {
                 throw new Error('No mask-image element');
             }
