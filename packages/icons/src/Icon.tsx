@@ -72,6 +72,7 @@ export const Icon = React.forwardRef(function Icon(
                     }}
                 >
                     <image
+                        data-testid="mask-image"
                         href={url}
                         width="100%"
                         height="100%"
