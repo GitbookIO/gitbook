@@ -1948,11 +1948,11 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'Docs Embed - GitBook (Assistant + Docs)',
+        name: 'Docs Embed - Basic',
         contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/demo/',
         tests: [
             {
-                name: 'Basic functionality',
+                name: 'Standalone UX',
                 url: '',
                 run: async (page) => {
                     const button = page.locator('#gitbook-widget-button');
@@ -1976,6 +1976,13 @@ const testCases: TestsCase[] = [
                     await iframe.owner().evaluate(overrideAIInitialState);
                 },
             },
+        ],
+    },
+    {
+        name: 'Docs Embed - Assistant + Docs',
+        contentBaseURL: 'https://gitbook.com/docs/~gitbook/embed/',
+        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
+        tests: [
             {
                 name: 'Switch between tabs',
                 url: '',
@@ -2210,7 +2217,7 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Docs Only',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/page/',
         tests: [
             {
                 name: 'Docs only',
