@@ -14,7 +14,7 @@ export type ButtonProps = {
     variant?: 'primary' | 'secondary' | 'blank' | 'header';
     icon?: IconName | React.ReactNode;
     iconOnly?: boolean;
-    size?: 'default' | 'medium' | 'small' | 'xsmall';
+    size?: 'large' | 'medium' | 'small' | 'xsmall';
     className?: ClassValue;
     label?: string | React.ReactNode;
     trailing?: React.ReactNode;
@@ -29,11 +29,12 @@ export const variantClasses = {
         'bg-primary-original',
         'text-contrast-primary-original',
         'hover:bg-primary-solid-hover',
+        'hover:border-primary-solid-hover',
         'hover:text-contrast-primary-solid-hover',
-        'border-0',
+        'border-primary-original',
         'contrast-more:bg-primary-solid',
         'contrast-more:text-contrast-primary-solid',
-        'contrast-more:border',
+        'disabled:border-primary-2',
         'disabled:bg-primary-subtle',
         'disabled:text-primary/8',
     ],
@@ -102,7 +103,7 @@ export const Button = React.forwardRef<
         {
             href,
             variant = 'primary',
-            size = 'default',
+            size = 'medium',
             className,
             insights,
             target,
@@ -119,13 +120,17 @@ export const Button = React.forwardRef<
         ref
     ) => {
         const sizes = {
-            default: ['text-base', 'font-semibold', iconOnly ? 'px-2' : 'px-5', 'py-2'],
-            medium: ['text-sm', iconOnly ? 'px-2' : 'px-3.5', 'py-1.5'],
-            small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
-            xsmall: ['text-xs', 'py-1', iconOnly ? 'px-1.5' : 'px-2'],
+            large: ['text-base font-semibold py-3', iconOnly ? 'px-3' : 'px-[1.5em]ÛŸ'],
+            medium: ['py-2', iconOnly ? 'text-base px-2' : 'px-[1em]'],
+            small: ['text-sm py-1.5', iconOnly ? 'px-1.5' : 'px-[.75em]'],
+            xsmall: [
+                'text-xs py-1',
+                iconOnly ? 'px-1.5' : 'px-[.5em]',
+                'rounded-corners:rounded-lg',
+            ],
         };
 
-        const sizeClasses = sizes[size] || sizes.default;
+        const sizeClasses = sizes[size] || sizes.large;
 
         const domClassName = tcls(
             variantClasses[variant],
