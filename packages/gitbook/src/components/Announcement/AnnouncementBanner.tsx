@@ -91,7 +91,6 @@ export function AnnouncementBanner(props: {
                                 icon="close"
                                 label={tString(language, 'close')}
                                 variant="blank"
-                                size="default"
                                 onClick={dismissAnnouncement}
                                 className={`absolute top-0 right-0 mt-2 mr-2 circular-corners:rounded-lg rounded-sm straight-corners:rounded-none p-1.5 transition-all hover:ring-1 ${style.close}`}
                             />

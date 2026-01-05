@@ -1,5 +1,46 @@
 # gitbook
 
+## 0.21.1
+
+### Patch Changes
+
+- Updated dependencies [e7fb771]
+  - @gitbook/icons@0.4.1
+  - @gitbook/react-contentkit@0.7.10
+
+## 0.21.0
+
+### Minor Changes
+
+- 3553db0: Add a RSS feed to all pages with update blocks.
+
+### Patch Changes
+
+- f478ddc: Add Input component
+- 3817289: Fix overflowing section groups
+- 86e7aa6: Fix search results cursor
+- 1430cee: Improve Docs Embed with separate Assistant and Docs tabs
+- ed9e8fe: Add support for button actions
+- 9c69cc4: Add customizable suggested questions
+- c51076e: Fix links to other spaces and root page in embeddable view.
+- 6278a18: Support `greeting` and fix suggested questions if there are no custom ones defined
+- 04a4175: Remove hidden site spaces from navigation
+- 74f8931: Fix hidden section not found
+- 344842f: Improve OpenAPI circular references
+- Updated dependencies [4766092]
+- Updated dependencies [8761cee]
+- Updated dependencies [461e15f]
+- Updated dependencies [1430cee]
+- Updated dependencies [62438f4]
+- Updated dependencies [3e40b4d]
+- Updated dependencies [87d68ea]
+- Updated dependencies [344842f]
+  - @gitbook/react-openapi@1.5.4
+  - @gitbook/openapi-parser@3.0.6
+  - @gitbook/embed@0.2.0
+  - @gitbook/icons@0.4.0
+  - @gitbook/react-contentkit@0.7.9
+
 ## 0.20.0
 
 ### Minor Changes

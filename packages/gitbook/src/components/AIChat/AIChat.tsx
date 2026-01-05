@@ -104,7 +104,6 @@ export function AIChat() {
                                 icon="close"
                                 label={tString(language, 'close')}
                                 variant="blank"
-                                size="default"
                             />
                         </EmbeddableFrameButtons>
                     </EmbeddableFrameHeader>

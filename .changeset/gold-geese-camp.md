@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Add Input component
+Update button sizing
