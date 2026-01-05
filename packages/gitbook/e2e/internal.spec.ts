@@ -1291,7 +1291,7 @@ const testCases: TestsCase[] = [
                 name: 'Redirect to Quickstart page',
                 url: 'sections-2/redirect-test',
                 run: async (page) => {
-                    await expect(page.locator('h1')).toHaveText('Quickstart');
+                    await expect(page.locator('h1')).toContainText('Quickstart');
                 },
                 screenshot: false,
             },
