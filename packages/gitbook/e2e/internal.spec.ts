@@ -1325,7 +1325,7 @@ const testCases: TestsCase[] = [
                 name: 'Link in same site has the share link token preserved',
                 url: '8tNo6MeXg7CkFMzSSz81/link-in-same-site',
                 run: async (page) => {
-                    const linkToDifferentPage = page.getByRole('link');
+                    const linkToDifferentPage = page.getByRole('link', { name: 'Other Page' });
                     await linkToDifferentPage.click();
                     await page.waitForURL((url) =>
                         url.pathname.includes(
@@ -1341,7 +1341,7 @@ const testCases: TestsCase[] = [
                 name: 'Link to different site should not have the share link token preserved',
                 url: '8tNo6MeXg7CkFMzSSz81/link-in-different-site',
                 run: async (page) => {
-                    const linkToDifferentSite = page.getByRole('link');
+                    const linkToDifferentSite = page.getByRole('link', { name: 'Basics' });
                     await linkToDifferentSite.click();
                     await page.waitForURL(
                         (url) =>
