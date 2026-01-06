@@ -1963,9 +1963,8 @@ const testCases: TestsCase[] = [
                         'assistant'
                     );
 
-                    await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-                    await button.click(); // Toggle the window off again for the screenshot
+                    await button.click(); // Toggle the window off for the screenshot
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                 },
             },
