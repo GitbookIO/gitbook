@@ -112,6 +112,7 @@ export function EmbeddableIframeButtons() {
             )}
             {actions.map((action, index) => (
                 <Button
+                    data-testid="embed-action"
                     key={action.label}
                     size="large"
                     variant="blank"

@@ -75,7 +75,7 @@ export function EmbeddableAIChat(props: EmbeddableAIChatProps) {
                 />
                 <EmbeddableIframeButtons />
             </EmbeddableFrameSidebar>
-            <EmbeddableFrameMain>
+            <EmbeddableFrameMain data-testid="ai-chat">
                 <EmbeddableFrameHeader>
                     {!tabsRef.current ? (
                         <AIChatDynamicIcon

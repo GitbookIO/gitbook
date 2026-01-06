@@ -87,7 +87,7 @@ export function AIChat() {
             )}
         >
             <EmbeddableFrame className="relative shrink-0 border-tint-subtle border-l to-tint-base">
-                <EmbeddableFrameMain>
+                <EmbeddableFrameMain data-testid="ai-chat">
                     <EmbeddableFrameHeader>
                         <AIChatDynamicIcon trademark={config.trademark} />
                         <EmbeddableFrameHeaderMain>
@@ -247,13 +247,14 @@ export function AIChatBody(props: {
                                 <h5
                                     className="animate-blur-in-slow font-bold text-lg text-tint-strong leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.5s' }}
-                                    data-testid="ai-chat-time-greeting"
+                                    data-testid="ai-chat-greeting-title"
                                 >
                                     {greeting?.title || timeGreeting}
                                 </h5>
                                 <p
                                     className="animate-blur-in-slow text-tint leading-tight [@container(min-height:400px)]:text-center"
                                     style={{ animationDelay: '.6s' }}
+                                    data-testid="ai-chat-greeting-subtitle"
                                 >
                                     {greeting?.subtitle ||
                                         t(language, 'ai_chat_assistant_description')}
