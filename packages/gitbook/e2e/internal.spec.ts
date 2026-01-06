@@ -1963,11 +1963,10 @@ const testCases: TestsCase[] = [
                         'assistant'
                     );
 
-                    await button.click(); // Toggle the window off
-                    await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     await button.click(); // Toggle the window off again for the screenshot
+                    await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                 },
             },
             {
@@ -1986,7 +1985,7 @@ const testCases: TestsCase[] = [
                     const button = page.locator('#gitbook-widget-button');
                     await expect(button).toBeVisible();
                     button.click();
-
+                    await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await expect(page.locator('#gitbook-widget-button-label')).toHaveText('Docs');
                     await expect(page.locator('#gitbook-widget-button-icon')).toHaveAttribute(
                         'data-icon',
