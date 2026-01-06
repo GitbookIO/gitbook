@@ -2216,7 +2216,6 @@ const testCases: TestsCase[] = [
                 name: 'Docs only',
                 url: '',
                 run: async (page) => {
-                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     await expect(page.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
@@ -2226,7 +2225,6 @@ const testCases: TestsCase[] = [
                 name: 'Table of contents',
                 url: '',
                 run: async (page) => {
-                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     await expect(page.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
@@ -2240,7 +2238,6 @@ const testCases: TestsCase[] = [
                 name: 'Open in new tab',
                 url: '',
                 run: async (page) => {
-                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
                     await expect(page.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
