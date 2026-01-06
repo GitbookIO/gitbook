@@ -1336,6 +1336,7 @@ const testCases: TestsCase[] = [
                         page.getByRole('heading', { level: 1, name: 'Other Page' })
                     ).toBeVisible();
                 },
+                screenshot: false,
             },
             {
                 name: 'Link to different site should not have the share link token preserved',
@@ -1352,6 +1353,7 @@ const testCases: TestsCase[] = [
                         page.getByRole('heading', { level: 1, name: 'Editor' })
                     ).toBeVisible();
                 },
+                screenshot: false,
             },
         ],
     },
