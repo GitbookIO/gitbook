@@ -455,7 +455,8 @@ export async function waitForIcons(page: Page) {
  */
 async function waitForTOCScrolling(page: Page) {
     const viewport = await page.viewportSize();
-    if (viewport && viewport.width >= 1024) {
+    if (viewport && viewport.width >= 1024 && !page.url().includes('~gitbook/embed/demo')) {
+        // The embed demo is an iframe, which means the viewport is only a fraction of the main document. So there is no open TOC to scroll to.
         const toc = page.getByTestId('table-of-contents');
         await expect(toc).toBeVisible();
         await page.evaluate(() => {
