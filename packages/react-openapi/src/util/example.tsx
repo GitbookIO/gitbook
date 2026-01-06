@@ -121,6 +121,10 @@ function getSyntaxFromMediaType(mediaType: string): string {
         return 'json';
     }
 
+    if (mediaType.includes('yaml')) {
+        return 'yaml';
+    }
+
     if (mediaType === 'application/xml') {
         return 'xml';
     }

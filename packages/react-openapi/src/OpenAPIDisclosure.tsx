@@ -1,5 +1,5 @@
 'use client';
-import clsx from 'clsx';
+import clsx from 'classnames';
 import type React from 'react';
 import { useState } from 'react';
 import { Button, Disclosure, DisclosurePanel } from 'react-aria-components';
@@ -13,9 +13,10 @@ export function OpenAPIDisclosure(props: {
     children: React.ReactNode;
     label: string | ((isExpanded: boolean) => string);
     className?: string;
+    defaultExpanded?: boolean;
 }): React.JSX.Element {
-    const { icon, header, label, children, className } = props;
-    const [isExpanded, setIsExpanded] = useState(false);
+    const { icon, header, label, children, className, defaultExpanded = false } = props;
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
     return (
         <Disclosure
@@ -34,13 +35,15 @@ export function OpenAPIDisclosure(props: {
             >
                 {header}
                 <div className="openapi-disclosure-trigger-label">
-                    <span>{typeof label === 'function' ? label(isExpanded) : label}</span>
+                    {label ? (
+                        <span>{typeof label === 'function' ? label(isExpanded) : label}</span>
+                    ) : null}
                     {icon}
                 </div>
             </Button>
-            <DisclosurePanel className="openapi-disclosure-panel">
-                {isExpanded ? children : null}
-            </DisclosurePanel>
+            {isExpanded ? (
+                <DisclosurePanel className="openapi-disclosure-panel">{children}</DisclosurePanel>
+            ) : null}
         </Disclosure>
     );
 }

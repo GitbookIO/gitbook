@@ -1,5 +1,209 @@
 # gitbook
 
+## 0.21.1
+
+### Patch Changes
+
+- Updated dependencies [e7fb771]
+  - @gitbook/icons@0.4.1
+  - @gitbook/react-contentkit@0.7.10
+
+## 0.21.0
+
+### Minor Changes
+
+- 3553db0: Add a RSS feed to all pages with update blocks.
+
+### Patch Changes
+
+- f478ddc: Add Input component
+- 3817289: Fix overflowing section groups
+- 86e7aa6: Fix search results cursor
+- 1430cee: Improve Docs Embed with separate Assistant and Docs tabs
+- ed9e8fe: Add support for button actions
+- 9c69cc4: Add customizable suggested questions
+- c51076e: Fix links to other spaces and root page in embeddable view.
+- 6278a18: Support `greeting` and fix suggested questions if there are no custom ones defined
+- 04a4175: Remove hidden site spaces from navigation
+- 74f8931: Fix hidden section not found
+- 344842f: Improve OpenAPI circular references
+- Updated dependencies [4766092]
+- Updated dependencies [8761cee]
+- Updated dependencies [461e15f]
+- Updated dependencies [1430cee]
+- Updated dependencies [62438f4]
+- Updated dependencies [3e40b4d]
+- Updated dependencies [87d68ea]
+- Updated dependencies [344842f]
+  - @gitbook/react-openapi@1.5.4
+  - @gitbook/openapi-parser@3.0.6
+  - @gitbook/embed@0.2.0
+  - @gitbook/icons@0.4.0
+  - @gitbook/react-contentkit@0.7.9
+
+## 0.20.0
+
+### Minor Changes
+
+- 1d92dc1: Update site layout and blocks with container queries and better transitions
+
+### Patch Changes
+
+- 8fdc5c8: Fix webframe height issue
+- 9022d87: Add breadcrumbs to search results
+- 0c01832: SearchInput fixes — Translate Clear button, Bold theme color, "Esc" keyboard shortcut
+- 1d1f0a7: Fix search container shadow
+- 2aa4f2e: Update dropdown menu styling
+- a49781e: Printable collapsed code block
+- 7d6a316: Revert contentref anchor title
+- e27986b: Reword "Everywhere" search scope to "All docs"
+- 758b34d: Move the "Ask <query>" to the bottom of search results if query is not a question
+- 0ae7cfd: Improve AI Search branding
+- f9f8011: Add alt text support to card covers
+- ebbb476: Improve ancestor label in references
+- 1b0613e: Tweak language dropdown styling
+- 3355960: Fix ToggeableLinkItem display
+- c31e564: Fix icon resolution for page group
+- 55c0b03: Support translations and generic variants together
+- 3876f70: Edgeless Assistant window on `depth: flat` sites
+- 683bb8f: Add confirmation to "Copy MCP URL" page action
+- 4534ea8: Implement unique title tags for sections & variants
+- 6d56df7: Treat pages without visible TOC items as `no-toc`
+- 8606f22: Add padding to TOC page group items
+- 3676d64: Update search scope UI
+- c32d449: Fix OpenAPI path display
+- 8ce7322: Add OpenAPI servers selection
+- 2c3066e: Improve OAuth2 scopes handling in OpenAPI
+- 6b1c9fe: Fix opacity of ScrollContainer buttons on bold themes
+- Updated dependencies [b4a021a]
+- Updated dependencies [a512c90]
+- Updated dependencies [df1966d]
+- Updated dependencies [b45feaf]
+- Updated dependencies [10995e0]
+- Updated dependencies [f9f8011]
+- Updated dependencies [10995e0]
+- Updated dependencies [8ce7322]
+- Updated dependencies [2c3066e]
+  - @gitbook/react-openapi@1.5.3
+  - @gitbook/openapi-parser@3.0.5
+  - @gitbook/react-contentkit@0.7.8
+  - @gitbook/browser-types@0.1.3
+  - @gitbook/cache-tags@0.3.4
+  - @gitbook/react-math@0.6.4
+  - @gitbook/colors@0.4.3
+  - @gitbook/embed@0.1.5
+  - @gitbook/fonts@0.1.3
+  - @gitbook/icons@0.3.4
+  - @gitbook/expr@1.2.4
+
+## 0.19.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+- 75543b1: Update minimum Node version in .npmrc
+- 511f1cf: Add scroll margin to Expandable
+- Updated dependencies [6142d6b]
+  - @gitbook/emoji-codepoints@0.2.2
+  - @gitbook/react-contentkit@0.7.7
+  - @gitbook/openapi-parser@3.0.4
+  - @gitbook/browser-types@0.1.2
+  - @gitbook/react-openapi@1.5.2
+  - @gitbook/cache-tags@0.3.3
+  - @gitbook/react-math@0.6.3
+  - @gitbook/colors@0.4.2
+  - @gitbook/fonts@0.1.2
+  - @gitbook/icons@0.3.3
+  - @gitbook/expr@1.2.3
+
+## 0.19.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+- Updated dependencies [bdde392]
+- Updated dependencies [295f03d]
+  - @gitbook/react-contentkit@0.7.6
+  - @gitbook/browser-types@0.1.1
+  - @gitbook/cache-tags@0.3.2
+  - @gitbook/colors@0.4.1
+  - @gitbook/emoji-codepoints@0.2.1
+  - @gitbook/expr@1.2.2
+  - @gitbook/fonts@0.1.1
+  - @gitbook/icons@0.3.2
+  - @gitbook/openapi-parser@3.0.3
+  - @gitbook/react-math@0.6.2
+  - @gitbook/react-openapi@1.5.1
+
+## 0.19.0
+
+### Minor Changes
+
+- ed7d47d: Show a toolbar for authenticated users with access to the current site.
+- 50c1be3: Move inline expression evaluation from API to GBO
+- 56e46ce: Add Italian translation
+- b932e4e: Scope search across sections and variants
+
+### Patch Changes
+
+- 162cfe4: Hide sections if only one is present
+- 1456251: Unify section display condition
+- 9344431: Fix missing geo data in site insights because of incorrect proxying of events.
+- eea8f1e: Enhance OpenAPI security scopes handling
+- 2b8a2d2: Add stable scroll gutter to search container
+- b498521: Fix robots.txt preventing favicon from being indexed.
+- ceb32b1: Redo search scope UI
+- 8e99871: Highlight discriminator properties in oneOf, allOf, anyOf objects
+- 2fc2127: Make search accessible
+- f3e4041: Adapt OpenAPI code samples to prefill API key using visitor data
+- 6815dd1: Fix markdownPageURL for PageActions
+- c06b3dd: Improve default site icon
+- cba583a: Use sitespace title instead of space title in search
+- e434442: Support nested site section groups
+- 469b332: Add support for inline expressions rendering with visitor data on GBO side
+- 0ef5dc8: Update to column width sizing
+- 1e4e54e: Fix rounded outline items
+- 379d486: Expose "Best match" when site has translations
+- c21693f: Improve screen reader accessibility for hints
+- badf3a9: Add alt text to inline image
+- c23d4ef: Fix crash for card cover defined without objectFit
+- d74f8a7: Improve wide page width layout
+- b8388e5: Add scrollcontainer component
+- b85eccd: Refactor section tabs
+- 1e53f46: Fix button content truncate
+- 7a504b7: Fix OpenAPI response dropdown & vertical overflow
+- a4c3399: Fix OpenAPI alternatives not showing
+- Updated dependencies [a629900]
+- Updated dependencies [eea8f1e]
+- Updated dependencies [8e99871]
+- Updated dependencies [f3e4041]
+- Updated dependencies [319a1e5]
+- Updated dependencies [529f940]
+- Updated dependencies [754cc11]
+- Updated dependencies [d7948e3]
+- Updated dependencies [a4c3399]
+  - @gitbook/expr@1.2.1
+  - @gitbook/react-openapi@1.5.0
+
+## 0.18.0
+
+### Minor Changes
+
+- 262afa3: Expose a MCP server for the docs site under /~gitbook/mcp
+
+### Patch Changes
+
+- Updated dependencies [262afa3]
+  - @gitbook/icons@0.3.1
+  - @gitbook/react-openapi@1.4.3
+  - @gitbook/react-contentkit@0.7.5
+
+## 0.17.2
+
+### Patch Changes
+
+- @gitbook/react-openapi@1.4.2
+
 ## 0.17.1
 
 ### Patch Changes

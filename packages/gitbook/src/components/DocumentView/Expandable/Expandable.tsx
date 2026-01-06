@@ -25,7 +25,11 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     id = context.getId ? context.getId(id) : id;
 
     return (
-        <Details id={id} open={context.mode === 'print'} className={style}>
+        <Details
+            id={id}
+            open={context.mode === 'print'}
+            className={tcls('scroll-mt-(--content-scroll-margin)', style)}
+        >
             <summary
                 className={tcls(
                     'cursor-pointer',
@@ -47,7 +51,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     className={tcls(
                         'inline-block',
                         'size-3',
-                        'mr-2',
+                        'mr-3',
                         'mb-1',
                         'transition-transform',
                         'shrink-0',
@@ -92,7 +96,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 document={document}
                 ancestorBlocks={[...ancestorBlocks, block]}
                 context={context}
-                style={['px-10', 'pb-5', 'space-y-4']}
+                style="space-y-4 px-10 pb-5"
             />
         </Details>
     );

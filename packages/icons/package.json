@@ -11,38 +11,48 @@
             "types": "./dist/icons.d.ts",
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
-        },
-        "./style.css": {
-            "default": "./src/style.css"
         }
     },
-    "version": "0.3.0",
+    "sideEffects": false,
+    "version": "0.4.1",
     "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^6.6.0",
-        "@fortawesome/fontawesome-free": "^6.6.0"
+        "@fortawesome/fontawesome-svg-core": "^7.1.0",
+        "@fortawesome/fontawesome-free": "^7.1.0"
     },
     "optionalDependencies": {
-        "@gitbook/fontawesome-pro": "1.0.11"
+        "@gitbook/fontawesome-pro": "1.0.16"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "bun-types": "catalog:",
+        "@types/react": "catalog:",
+        "react": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "peerDependencies": {
         "react": "*"
     },
     "scripts": {
         "generate": "bun ./bin/gen-list.js",
-        "build": "tsc --project tsconfig.build.json",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
+        "dev": "bun run build -- --watch ./src",
         "clean": "rm -rf ./dist && rm -rf ./src/data",
-        "unit": "bun test"
+        "unit": "bun test",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
     "bin": {
         "gitbook-icons": "./bin/gitbook-icons.js"
     },
-    "files": ["dist", "src", "bin", "README.md", "CHANGELOG.md"],
+    "files": ["dist", "bin", "README.md", "CHANGELOG.md"],
     "engines": {
         "node": ">=20.0.0"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
     }
 }

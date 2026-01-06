@@ -2,6 +2,7 @@ import type { AnyObject, OpenAPIV3, OpenAPIV3_1 } from '@gitbook/openapi-parser'
 import type { OpenAPIUniversalContext } from './context';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
+import type { OpenAPICustomSecurityScheme, OpenAPIOperationData } from './types';
 
 export function checkIsReference(input: unknown): input is OpenAPIV3.ReferenceObject {
     return typeof input === 'object' && !!input && '$ref' in input;
@@ -217,7 +218,10 @@ function getStatusCodeCategory(statusCode: number | string): number | string {
     return category;
 }
 
-export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
+export function getSchemaTitle(
+    schema: OpenAPIV3.SchemaObject,
+    options?: { ignoreAlternatives?: boolean }
+): string {
     // Otherwise try to infer a nice title
     let type = 'any';
 
@@ -225,7 +229,7 @@ export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
         type = `${schema.type} · enum`;
         // check array AND schema.items as this is sometimes null despite what the type indicates
     } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(schema.items)}[]`;
+        type = `${getSchemaTitle(schema.items, options)}[]`;
     } else if (Array.isArray(schema.type)) {
         type = schema.type.join(' | ');
     } else if (schema.type || schema.properties) {
@@ -241,15 +245,56 @@ export function getSchemaTitle(schema: OpenAPIV3.SchemaObject): string {
         }
     }
 
-    if ('anyOf' in schema) {
-        type = 'any of';
-    } else if ('oneOf' in schema) {
-        type = 'one of';
-    } else if ('allOf' in schema) {
-        type = 'all of';
-    } else if ('not' in schema) {
-        type = 'not';
+    // Skip alternative type labels if ignoreAlternatives is true (useful when rendering alternatives)
+    if (!options?.ignoreAlternatives) {
+        if ('anyOf' in schema) {
+            type = 'any of';
+        } else if ('oneOf' in schema) {
+            type = 'one of';
+        } else if ('allOf' in schema) {
+            type = 'all of';
+        } else if ('not' in schema) {
+            type = 'not';
+        }
     }
 
     return type;
+}
+
+export type OperationSecurityInfo = {
+    key: string;
+    label: string;
+    schemes: OpenAPICustomSecurityScheme[];
+};
+
+/**
+ * Extract security information for an operation based on its security requirements and the spec security schemes.
+ */
+export function extractOperationSecurityInfo(args: {
+    securityRequirement: OpenAPIV3.OperationObject['security'];
+    securities: OpenAPIOperationData['securities'];
+}): OperationSecurityInfo[] {
+    const { securityRequirement, securities } = args;
+    const securitiesMap = new Map(securities);
+
+    // When no security requirement include every schemes
+    if (!securityRequirement || securityRequirement.length === 0) {
+        return securities.map(([key, security]) => ({
+            key,
+            label: key,
+            schemes: [security],
+        }));
+    }
+
+    return securityRequirement.map((requirement, idx) => {
+        const schemeKeys = Object.keys(requirement);
+
+        return {
+            key: `security-${idx}`,
+            label: schemeKeys.join(' & '),
+            schemes: schemeKeys
+                .map((schemeKey) => securitiesMap.get(schemeKey))
+                .filter((s): s is OpenAPICustomSecurityScheme => s !== undefined),
+        };
+    });
 }

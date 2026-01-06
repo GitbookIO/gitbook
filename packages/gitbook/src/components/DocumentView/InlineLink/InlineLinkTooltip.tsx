@@ -1,37 +1,9 @@
 'use client';
-import dynamic from 'next/dynamic';
-import React from 'react';
+import { tcls } from '@/lib/tailwind';
+import { Icon } from '@gitbook/icons';
+import { Fragment } from 'react';
+import { Button, HoverCard, HoverCardRoot, HoverCardTrigger, StyledLink } from '../../primitives';
 
-const LoadingValueContext = React.createContext<React.ReactNode>(null);
-
-// To avoid polluting the RSC payload with the tooltip implementation,
-// we lazily load it on the client side. This way, the tooltip is only loaded
-// when the user interacts with the link, and it doesn't block the initial render.
-
-const InlineLinkTooltipImpl = dynamic(
-    () => import('./InlineLinkTooltipImpl').then((mod) => mod.InlineLinkTooltipImpl),
-    {
-        // Disable server-side rendering for this component, it's only
-        // visible on user interaction.
-        ssr: false,
-        loading: () => {
-            // The fallback should be the children (the content of the link),
-            // but as next/dynamic is aiming for feature parity with React.lazy,
-            // it doesn't support passing children to the loading component.
-            // https://github.com/vercel/next.js/issues/7906
-            const children = React.useContext(LoadingValueContext);
-            return <>{children}</>;
-        },
-    }
-);
-
-/**
- * Tooltip for inline links. It's lazily loaded to avoid blocking the initial render
- * and polluting the RSC payload.
- *
- * The link text and href have already been rendered on the server for good SEO,
- * so we can be as lazy as possible with the tooltip.
- */
 export function InlineLinkTooltip(props: {
     isSamePage: boolean;
     isExternal: boolean;
@@ -45,28 +17,79 @@ export function InlineLinkTooltip(props: {
     openInNewTabLabel: string;
     children: React.ReactNode;
 }) {
-    const { children, ...rest } = props;
-    const [shouldLoad, setShouldLoad] = React.useState(false);
+    const { isSamePage, isExternal, openInNewTabLabel, target, breadcrumbs, children } = props;
 
-    // Once the browser is idle, we set shouldLoad to true.
-    // NOTE: to be slightly more performant, we could load when a link is hovered.
-    // But I found this was too much of a delay for the tooltip to appear.
-    // Loading on idle is a good compromise, as it allows the initial render to be fast,
-    // while still loading the tooltip in the background and not polluting the RSC payload.
-    React.useEffect(() => {
-        if ('requestIdleCallback' in window) {
-            (window as globalThis.Window).requestIdleCallback(() => setShouldLoad(true));
-        } else {
-            // fallback for old browsers
-            setTimeout(() => setShouldLoad(true), 2000);
-        }
-    }, []);
+    return (
+        <HoverCardRoot>
+            <HoverCardTrigger>{children}</HoverCardTrigger>
+            <HoverCard className="p-4">
+                <div className="flex items-start gap-4">
+                    <div className="flex flex-col">
+                        {breadcrumbs && breadcrumbs.length > 0 ? (
+                            <div className="mb-1 flex grow flex-wrap items-center gap-x-2 gap-y-0.5 font-semibold text-tint text-xs uppercase leading-tight tracking-wide">
+                                {breadcrumbs.map((crumb, index) => {
+                                    const Tag = crumb.href ? StyledLink : 'div';
 
-    return shouldLoad ? (
-        <LoadingValueContext.Provider value={children}>
-            <InlineLinkTooltipImpl {...rest}>{children}</InlineLinkTooltipImpl>
-        </LoadingValueContext.Provider>
-    ) : (
-        children
+                                    return (
+                                        <Fragment key={crumb.label}>
+                                            {index !== 0 ? (
+                                                <Icon
+                                                    icon="chevron-right"
+                                                    className="size-3 text-tint-subtle"
+                                                />
+                                            ) : null}
+                                            <Tag
+                                                className={tcls(
+                                                    'flex gap-1',
+                                                    crumb.href &&
+                                                        'links-default:text-tint no-underline hover:underline contrast-more:underline contrast-more:decoration-current'
+                                                )}
+                                                href={crumb.href ?? '#'}
+                                            >
+                                                {crumb.icon ? (
+                                                    <span className="mt-0.5 text-tint-subtle empty:hidden">
+                                                        {crumb.icon}
+                                                    </span>
+                                                ) : null}
+                                                {crumb.label}
+                                            </Tag>
+                                        </Fragment>
+                                    );
+                                })}
+                            </div>
+                        ) : null}
+                        <div
+                            className={tcls(
+                                'flex gap-2 leading-snug',
+                                isExternal && 'wrap-anywhere text-sm'
+                            )}
+                        >
+                            {target.icon ? (
+                                <div className="mt-1 text-tint-subtle empty:hidden">
+                                    {target.icon}
+                                </div>
+                            ) : null}
+                            <h5 className="font-semibold">{target.text}</h5>
+                        </div>
+                    </div>
+                    {!isSamePage && target.href ? (
+                        <Button
+                            className={tcls(
+                                '-mx-2 -my-2 ml-auto',
+                                breadcrumbs?.length === 0 ? 'place-self-center' : null
+                            )}
+                            variant="blank"
+                            href={target.href}
+                            target="_blank"
+                            label={openInNewTabLabel}
+                            size="small"
+                            icon="arrow-up-right-from-square"
+                            iconOnly={true}
+                        />
+                    ) : null}
+                </div>
+                {target.subText ? <p className="mt-1 text-sm text-tint">{target.subText}</p> : null}
+            </HoverCard>
+        </HoverCardRoot>
     );
 }

@@ -1,61 +1,77 @@
 import type { OpenAPIV3 } from '@gitbook/openapi-parser';
+import { Fragment } from 'react';
 import { InteractiveSection } from './InteractiveSection';
 import { Markdown } from './Markdown';
 import { OpenAPICopyButton } from './OpenAPICopyButton';
+import { OpenAPIRequiredScopes, OpenAPISchemaScopes } from './OpenAPIRequiredScopes';
 import { OpenAPISchemaName } from './OpenAPISchemaName';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
-import type { OpenAPIOperationData, OpenAPISecurityWithRequired } from './types';
-import { createStateKey, resolveDescription } from './utils';
+import type { OpenAPICustomSecurityScheme } from './types';
+import type { OpenAPIOperationData } from './types';
+import { createStateKey, extractOperationSecurityInfo, resolveDescription } from './utils';
 
 /**
  * Present securities authorization that can be used for this operation.
  */
 export function OpenAPISecurities(props: {
+    securityRequirement: OpenAPIV3.OperationObject['security'];
     securities: OpenAPIOperationData['securities'];
     context: OpenAPIClientContext;
 }) {
-    const { securities, context } = props;
+    const { securityRequirement, securities, context } = props;
 
-    if (securities.length === 0) {
+    if (!securities || securities.length === 0) {
         return null;
     }
 
+    const tabsData = extractOperationSecurityInfo({ securityRequirement, securities });
+    const stateKey = createStateKey('securities', context.blockKey);
+
     return (
-        <InteractiveSection
-            header={t(context.translation, 'authorizations')}
-            stateKey={createStateKey('securities', context.blockKey)}
-            toggeable
-            defaultOpened={false}
-            toggleIcon={context.icons.chevronRight}
-            selectIcon={context.icons.chevronDown}
-            className="openapi-securities"
-            tabs={securities.map(([key, security]) => {
-                const description = resolveDescription(security);
-                return {
-                    key: key,
-                    label: key,
+        <>
+            <OpenAPIRequiredScopes context={context} stateKey={stateKey} securities={tabsData} />
+            <InteractiveSection
+                header={t(context.translation, 'authorizations')}
+                stateKey={stateKey}
+                toggleIcon={context.icons.chevronRight}
+                selectIcon={context.icons.chevronDown}
+                className="openapi-securities"
+                tabs={tabsData.map(({ key, label, schemes }) => ({
+                    key,
+                    label,
                     body: (
                         <div className="openapi-schema">
-                            <div className="openapi-schema-presentation">
-                                {getLabelForType(security, context)}
-
-                                {description ? (
-                                    <Markdown
-                                        source={description}
-                                        className="openapi-securities-description"
-                                    />
-                                ) : null}
-                            </div>
+                            {schemes.map((security, index) => {
+                                // OAuth2 description is already rendered in OpenAPISchemaOAuth2Item
+                                const description =
+                                    security.type !== 'oauth2'
+                                        ? resolveDescription(security)
+                                        : undefined;
+                                return (
+                                    <div
+                                        key={`${key}-${index}`}
+                                        className="openapi-schema-presentation"
+                                    >
+                                        {getLabelForType(security, context)}
+                                        {description ? (
+                                            <Markdown
+                                                source={description}
+                                                className="openapi-securities-description"
+                                            />
+                                        ) : null}
+                                    </div>
+                                );
+                            })}
                         </div>
                     ),
-                };
-            })}
-        />
+                }))}
+            />
+        </>
     );
 }
 
-function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPIClientContext) {
+function getLabelForType(security: OpenAPICustomSecurityScheme, context: OpenAPIClientContext) {
     switch (security.type) {
         case 'apiKey':
             return (
@@ -79,7 +95,6 @@ function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPI
             }
 
             if (security.scheme === 'bearer') {
-                const description = resolveDescription(security);
                 return (
                     <>
                         <OpenAPISchemaName
@@ -89,7 +104,7 @@ function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPI
                             required={security.required}
                         />
                         {/** Show a default description if none is provided */}
-                        {!description ? (
+                        {!security.description ? (
                             <Markdown
                                 source={`Bearer authentication header of the form Bearer ${'&lt;token&gt;'}.`}
                                 className="openapi-securities-description"
@@ -124,22 +139,24 @@ function getLabelForType(security: OpenAPISecurityWithRequired, context: OpenAPI
 
 function OpenAPISchemaOAuth2Flows(props: {
     context: OpenAPIClientContext;
-    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean };
+    security: OpenAPICustomSecurityScheme & { flows?: OpenAPIV3.OAuth2SecurityScheme['flows'] };
 }) {
     const { context, security } = props;
 
-    const flows = Object.entries(security.flows ?? {});
+    const flows = security.flows ? Object.entries(security.flows) : [];
 
     return (
         <div className="openapi-securities-oauth-flows">
             {flows.map(([name, flow], index) => (
-                <OpenAPISchemaOAuth2Item
-                    key={index}
-                    flow={flow}
-                    name={name}
-                    context={context}
-                    security={security}
-                />
+                <Fragment key={index}>
+                    <OpenAPISchemaOAuth2Item
+                        flow={flow}
+                        name={name}
+                        context={context}
+                        security={security}
+                    />
+                    {index < flows.length - 1 ? <hr /> : null}
+                </Fragment>
             ))}
         </div>
     );
@@ -151,7 +168,7 @@ function OpenAPISchemaOAuth2Item(props: {
     >];
     name: string;
     context: OpenAPIClientContext;
-    security: OpenAPIV3.OAuth2SecurityScheme & { required?: boolean };
+    security: OpenAPICustomSecurityScheme & { flows?: OpenAPIV3.OAuth2SecurityScheme['flows'] };
 }) {
     const { flow, context, security, name } = props;
 
@@ -159,7 +176,9 @@ function OpenAPISchemaOAuth2Item(props: {
         return null;
     }
 
-    const scopes = Object.entries(flow?.scopes ?? {});
+    const scopes = !security.scopes?.length && flow.scopes ? Object.entries(flow.scopes) : [];
+
+    const description = resolveDescription(security);
 
     return (
         <div>
@@ -170,7 +189,9 @@ function OpenAPISchemaOAuth2Item(props: {
                 required={security.required}
             />
             <div className="openapi-securities-oauth-content openapi-markdown">
-                {security.description ? <Markdown source={security.description} /> : null}
+                {description ? (
+                    <Markdown source={description} className="openapi-securities-description" />
+                ) : null}
                 {'authorizationUrl' in flow && flow.authorizationUrl ? (
                     <span>
                         Authorization URL:{' '}
@@ -211,19 +232,7 @@ function OpenAPISchemaOAuth2Item(props: {
                     </span>
                 ) : null}
                 {scopes.length ? (
-                    <div>
-                        {t(context.translation, 'available_scopes')}:{' '}
-                        <ul>
-                            {scopes.map(([key, value]) => (
-                                <li key={key}>
-                                    <OpenAPICopyButton value={key} context={context} withTooltip>
-                                        <code>{key}</code>
-                                    </OpenAPICopyButton>
-                                    : {value}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    <OpenAPISchemaScopes scopes={scopes} context={context} isOAuth2 />
                 ) : null}
             </div>
         </div>

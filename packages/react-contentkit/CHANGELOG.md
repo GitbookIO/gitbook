@@ -1,5 +1,51 @@
 # @gitbook/react-contentkit
 
+## 0.7.10
+
+### Patch Changes
+
+- Updated dependencies [e7fb771]
+  - @gitbook/icons@0.4.1
+
+## 0.7.9
+
+### Patch Changes
+
+- Updated dependencies [62438f4]
+  - @gitbook/icons@0.4.0
+
+## 0.7.8
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- Updated dependencies [10995e0]
+  - @gitbook/icons@0.3.4
+
+## 0.7.7
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+- Updated dependencies [6142d6b]
+  - @gitbook/icons@0.3.3
+
+## 0.7.6
+
+### Patch Changes
+
+- bdde392: Fix web frame height calculation
+- 295f03d: Republish packages
+- Updated dependencies [295f03d]
+  - @gitbook/icons@0.3.2
+
+## 0.7.5
+
+### Patch Changes
+
+- Updated dependencies [262afa3]
+  - @gitbook/icons@0.3.1
+
 ## 0.7.4
 
 ### Patch Changes

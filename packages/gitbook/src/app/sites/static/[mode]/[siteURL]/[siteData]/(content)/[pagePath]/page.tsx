@@ -18,7 +18,7 @@ export default async function Page(props: PageProps) {
     const { context } = await getStaticSiteContext(params);
     const pathname = getPagePathFromParams(params);
 
-    return <SitePage context={context} pageParams={{ pathname }} />;
+    return <SitePage context={context} pageParams={{ pathname }} staticRoute />;
 }
 
 export async function generateViewport(props: PageProps): Promise<Viewport> {

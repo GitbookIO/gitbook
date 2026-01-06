@@ -1,29 +1,42 @@
 {
     "name": "@gitbook/react-contentkit",
-    "version": "0.7.4",
+    "version": "0.7.10",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "development": "./src/index.ts",
             "default": "./dist/index.js"
         }
     },
+    "sideEffects": false,
     "dependencies": {
-        "classnames": "^2.5.1",
+        "classnames": "catalog:",
         "@gitbook/api": "catalog:",
-        "@gitbook/icons": "workspace:*"
+        "@gitbook/icons": "workspace:*",
+        "usehooks-ts": "catalog:"
     },
     "peerDependencies": {
         "react": "*"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "@types/react": "catalog:",
+        "react": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w",
-        "clean": "rm -rf ./dist"
+        "dev": "bun run build -- --watch ./src",
+        "clean": "rm -rf ./dist",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "README.md", "CHANGELOG.md"],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
+    }
 }

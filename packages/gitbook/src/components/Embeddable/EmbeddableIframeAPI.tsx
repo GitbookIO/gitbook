@@ -4,15 +4,17 @@ import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitb
 import { createChannel } from 'bidc';
 import React from 'react';
 
-import { useAIChatController } from '@/components/AI';
+import { useAI, useAIChatController } from '@/components/AI';
+import { CustomizationAIMode } from '@gitbook/api';
 import { useRouter } from 'next/navigation';
 import { createStore, useStore } from 'zustand';
 import { integrationsAssistantTools } from '../Integrations';
 import { Button } from '../primitives';
 
 const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() => ({
-    buttons: [],
-    welcomeMessage: '',
+    tabs: [],
+    actions: [],
+    greeting: { title: '', subtitle: '' },
     suggestions: [],
     tools: [],
 }));
@@ -27,6 +29,12 @@ export function EmbeddableIframeAPI(props: {
 
     const router = useRouter();
     const chatController = useAIChatController();
+
+    React.useEffect(() => {
+        return chatController.on('open', () => {
+            router.push(`${baseURL}/assistant`);
+        });
+    }, [router, baseURL, chatController]);
 
     React.useEffect(() => {
         if (window.parent === window) {
@@ -93,23 +101,114 @@ export function useEmbeddableConfiguration<T = GitBookEmbeddableConfiguration>(
  * Display the buttons defined by the parent window.
  */
 export function EmbeddableIframeButtons() {
-    const buttons = useEmbeddableConfiguration((state) => state.buttons);
+    const { actions: configuredActions, buttons: configuredButtons = [] } =
+        useEmbeddableConfiguration((state) => state);
+    const actions = configuredActions.length > 0 ? configuredActions : configuredButtons;
 
     return (
         <>
-            {buttons.map((button) => (
+            {actions.length > 0 && (
+                <hr className="my-2 border-0 border-tint-subtle border-b first:hidden" />
+            )}
+            {actions.map((action, index) => (
                 <Button
-                    key={button.label}
-                    size="default"
+                    key={action.label}
+                    size="large"
                     variant="blank"
-                    icon={button.icon}
-                    label={button.label}
+                    icon={action?.icon ?? 'square-question'}
+                    label={action?.label}
                     iconOnly
+                    className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
+                    disabled={!action.onClick}
                     onClick={() => {
-                        button.onClick();
+                        action.onClick?.();
                     }}
+                    tooltipProps={{
+                        contentProps: {
+                            side: 'right',
+                        },
+                    }}
+                    style={{ animationDelay: `${index * 100}ms` }}
                 />
             ))}
         </>
     );
+}
+
+export function EmbeddableIframeTabs(props: {
+    ref?: React.RefObject<HTMLDivElement | null>;
+    active?: string;
+    baseURL: string;
+    siteTitle: string;
+}) {
+    const { ref, active = 'assistant', baseURL, siteTitle } = props;
+    const { tabs: configuredTabs, actions } = useEmbeddableConfiguration();
+
+    const { assistants, config } = useAI();
+
+    const router = useRouter();
+
+    const tabs = [
+        config.aiMode === CustomizationAIMode.Assistant &&
+        assistants[0] &&
+        (configuredTabs.includes('assistant') || configuredTabs.length === 0)
+            ? {
+                  key: 'assistant',
+                  label: assistants[0].label,
+                  icon: assistants[0].icon,
+                  onClick: () => {
+                      router.push(`${baseURL}/assistant`);
+                  },
+              }
+            : null,
+        configuredTabs.includes('docs') || configuredTabs.length === 0
+            ? {
+                  key: 'docs',
+                  label: siteTitle,
+                  icon: 'book-open',
+                  onClick: () => {
+                      router.push(`${baseURL}/page/`);
+                  },
+              }
+            : null,
+    ].filter((tab) => tab !== null);
+
+    // Override the active tab if it doesn't match the configured tabs
+    React.useEffect(() => {
+        const hasAssistant = tabs.find((tab) => tab.key === 'assistant');
+        const hasDocs = tabs.find((tab) => tab.key === 'docs');
+        if (!hasAssistant && !hasDocs) {
+            // No valid tabs, do not redirect
+            return;
+        }
+        if (active === 'assistant' && !hasAssistant) {
+            router.replace(`${baseURL}/page`);
+        } else if (active === 'docs' && !hasDocs) {
+            router.replace(`${baseURL}/assistant`);
+        }
+    }, [tabs, baseURL, router, active]);
+
+    return tabs.length > 1 || actions.length > 0 ? (
+        <div className="flex flex-col gap-2" ref={ref}>
+            {tabs.map((tab) => (
+                <Button
+                    key={tab.key}
+                    data-testid={`embed-tab-${tab.key}`}
+                    label={tab.label}
+                    size="large"
+                    variant="blank"
+                    icon={tab.icon}
+                    active={tab.key === active}
+                    className="not-hydrated:animate-blur-in-slow [&_.button-leading-icon]:size-5"
+                    iconOnly
+                    onClick={tab.onClick}
+                    tooltipProps={{
+                        contentProps: {
+                            side: 'right',
+                        },
+                    }}
+                />
+            ))}
+        </div>
+    ) : null;
 }

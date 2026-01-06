@@ -1,21 +1,26 @@
 'use client';
 
 import { CustomizationAIMode } from '@gitbook/api';
-import { Icon, type IconName, IconStyle } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import * as React from 'react';
 import type { ReactNode } from 'react';
 
 import { tString, useLanguage } from '@/intl/client';
 import type { GitBookAssistant } from '@gitbook/browser-types';
 import { useAIChatController, useAIChatState } from '.';
-import { AIChatIcon, getAIChatName } from '../AIChat';
+import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
 import { useIntegrationAssistants } from '../Integrations';
 import { useSearch } from '../Search/useSearch';
 
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {
     aiMode: CustomizationAIMode;
+    suggestions?: string[];
     trademark: boolean;
+    greeting?: {
+        title: string;
+        subtitle: string;
+    };
 };
 
 export type Assistant = Omit<GitBookAssistant, 'icon'> & {
@@ -49,8 +54,11 @@ export type Assistant = Omit<GitBookAssistant, 'icon'> & {
 const AIContext = React.createContext<AIConfig | null>(null);
 
 export function AIContextProvider(props: React.PropsWithChildren<AIConfig>): React.ReactElement {
-    const { aiMode, trademark, children } = props;
-    const value = React.useMemo(() => ({ aiMode, trademark }), [aiMode, trademark]);
+    const { aiMode, trademark, suggestions, greeting, children } = props;
+    const value = React.useMemo(
+        () => ({ aiMode, trademark, suggestions, greeting }),
+        [aiMode, trademark, suggestions, greeting]
+    );
     return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 }
 
@@ -88,6 +96,7 @@ export function useAI(): AIContext {
                 <AIChatIcon
                     state={chat.loading ? 'thinking' : 'default'}
                     trademark={config.trademark}
+                    className="size-4"
                 />
             ),
             open: (query?: string) => {
@@ -104,16 +113,7 @@ export function useAI(): AIContext {
         assistants.push({
             id: 'gitbook-ai-search',
             label: tString(language, 'ai_chat_context_badge'),
-            icon: (
-                <div className="relative">
-                    <Icon icon="search" className="size-4" />
-                    <Icon
-                        icon="sparkle"
-                        iconStyle={IconStyle.Solid}
-                        className="absolute top-[2.5px] left-[2.6px] size-2"
-                    />
-                </div>
-            ),
+            icon: <AISearchIcon />,
             open: (query?: string) => {
                 if (query) {
                     setSearchState((prev) =>
@@ -137,7 +137,7 @@ export function useAI(): AIContext {
                     setSearchState((prev) => ({
                         ask: null, // Reset ask as we assume the assistant will handle it
                         query: prev?.query ?? null,
-                        global: prev?.global ?? false,
+                        scope: prev?.scope ?? 'default',
                         open: false,
                     }));
                     assistant.open(query);

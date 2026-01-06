@@ -5,6 +5,7 @@ import { Annotation } from './Annotation/Annotation';
 import type { DocumentContextProps } from './DocumentView';
 import { Emoji } from './Emoji';
 import { InlineButton } from './InlineButton';
+import { InlineExpression } from './InlineExpression';
 import { InlineIcon } from './InlineIcon';
 import { InlineImage } from './InlineImage';
 import { InlineLink } from './InlineLink';
@@ -51,9 +52,7 @@ export function Inline<T extends DocumentInline>(props: InlineProps<T>) {
         case 'icon':
             return <InlineIcon {...contextProps} inline={inline} />;
         case 'expression':
-            // The GitBook API should take care of evaluating expressions.
-            // We should never need to render them.
-            return null;
+            return <InlineExpression {...contextProps} inline={inline} />;
         default:
             return nullIfNever(inline);
     }

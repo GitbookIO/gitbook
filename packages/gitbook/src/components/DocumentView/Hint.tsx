@@ -3,6 +3,9 @@ import { Icon, type IconName } from '@gitbook/icons';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
+import { getSpaceLanguage, tString } from '@/intl/server';
+import { languages } from '@/intl/translations';
+import { isHeadingBlock } from '@/lib/document';
 import { Block, type BlockProps } from './Block';
 import { Blocks } from './Blocks';
 import { getBlockTextStyle } from './spacing';
@@ -16,17 +19,22 @@ export function Hint({
     const hintStyle = HINT_STYLES[block.data.style] ?? HINT_STYLES.info;
     const firstNode = block.nodes[0]!;
     const firstLine = getBlockTextStyle(firstNode);
-    const hasHeading = ['heading-1', 'heading-2', 'heading-3'].includes(firstNode.type);
+    const hasHeading = isHeadingBlock(firstNode);
+
+    const language = contextProps.context.contentContext
+        ? getSpaceLanguage(contextProps.context.contentContext)
+        : languages.en;
+
+    const label = tString(language, `hint_${block.data.style}`);
 
     return (
         <div
             className={tcls(
                 'hint',
                 'transition-colors',
-                'rounded-md',
-                hasHeading ? 'rounded-l-sm' : null,
-                'straight-corners:rounded-none',
+                'rounded-corners:rounded-md',
                 'circular-corners:rounded-xl',
+                hasHeading ? 'circular-corners:rounded-l-none rounded-corners:rounded-l-none' : '',
                 'overflow-hidden',
                 hasHeading ? ['border-l-2', hintStyle.containerWithHeader] : hintStyle.container,
 
@@ -38,6 +46,8 @@ export function Hint({
 
                 style
             )}
+            aria-label={label}
+            role="note"
         >
             <div
                 className={tcls(
@@ -55,9 +65,9 @@ export function Hint({
             {hasHeading ? (
                 <Block
                     style={tcls(
-                        'w-full items-start py-4! pl-3 text-[1em] *:flex-none',
+                        'w-full items-start py-4! pl-3 text-[1em]! *:flex-none',
                         // Heading hash styles
-                        'flip-heading-hash pr-8',
+                        'flip-heading-hash pr-8 [&_.hash]:bg-transparent',
                         hintStyle.header
                     )}
                     ancestorBlocks={[...ancestorBlocks, block]}

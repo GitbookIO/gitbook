@@ -1,13 +1,25 @@
 # @gitbook/emoji-codepoints
 
+## 0.2.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
+## 0.2.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 0.2.0
 
 ### Minor Changes
 
--   57adb3e: Second release to fix publishing with changeset
+- 57adb3e: Second release to fix publishing with changeset
 
 ## 0.1.0
 
 ### Minor Changes
 
--   5f8a8fe: Initial release
+- 5f8a8fe: Initial release

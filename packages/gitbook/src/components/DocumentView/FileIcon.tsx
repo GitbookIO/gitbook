@@ -9,7 +9,7 @@ export function FileIcon(props: { contentType: SimplifiedFileType | null; classN
     const { contentType, className } = props;
 
     switch (contentType) {
-        case 'pdf':
+        case 'PDF':
             return <Icon icon="file-pdf" className={className} />;
         case 'image':
             return <Icon icon="file-image" className={className} />;

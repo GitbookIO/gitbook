@@ -1,5 +1,30 @@
 # @gitbook/openapi-parser
 
+## 3.0.6
+
+### Patch Changes
+
+- 461e15f: Add x-gitbook-prefix and x-gitbook-token-placeholder for OpenAPI security scheme
+
+## 3.0.5
+
+### Patch Changes
+
+- df1966d: Bump Scalar
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
+## 3.0.4
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
+## 3.0.3
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
 ## 3.0.2
 
 ### Patch Changes

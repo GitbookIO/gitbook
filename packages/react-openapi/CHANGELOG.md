@@ -1,5 +1,86 @@
 # @gitbook/react-openapi
 
+## 1.5.4
+
+### Patch Changes
+
+- 4766092: Fix missing properties in allOf/oneOf
+- 8761cee: Enhance discriminator handling in OpenAPISchema
+- 461e15f: Add x-gitbook-prefix and x-gitbook-token-placeholder for OpenAPI security scheme
+- 3e40b4d: Fix OpenAPI basic auth placeholder
+- 87d68ea: Fix OpenAPI oneOf/allOf merge
+- 344842f: Improve OpenAPI circular references
+- Updated dependencies [461e15f]
+  - @gitbook/openapi-parser@3.0.6
+
+## 1.5.3
+
+### Patch Changes
+
+- b4a021a: Add heredoc support for cURL JSON body
+- a512c90: Re-arrange OpenAPI Scopes for OAuth2
+- df1966d: Bump Scalar
+- b45feaf: Disable OpenAPI "Try it" when no servers are defined
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+- f9f8011: Add alt text support to card covers
+- 8ce7322: Add OpenAPI servers selection
+- 2c3066e: Improve OAuth2 scopes handling in OpenAPI
+- Updated dependencies [df1966d]
+- Updated dependencies [10995e0]
+- Updated dependencies [10995e0]
+  - @gitbook/openapi-parser@3.0.5
+  - @gitbook/expr@1.2.4
+
+## 1.5.2
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+- Updated dependencies [6142d6b]
+  - @gitbook/openapi-parser@3.0.4
+  - @gitbook/expr@1.2.3
+
+## 1.5.1
+
+### Patch Changes
+
+- 295f03d: Republish packages
+- Updated dependencies [295f03d]
+  - @gitbook/expr@1.2.2
+  - @gitbook/openapi-parser@3.0.3
+
+## 1.5.0
+
+### Minor Changes
+
+- 529f940: Fix OpenAPISecurities and code sample not using operation security requirements
+
+### Patch Changes
+
+- eea8f1e: Enhance OpenAPI security scopes handling
+- 8e99871: Highlight discriminator properties in oneOf, allOf, anyOf objects
+- f3e4041: Adapt OpenAPI code samples to prefill API key using visitor data
+- 319a1e5: Ensure operation security requirements inherits from spec-level when not defined
+- 754cc11: Fix merge logic for allOf alternatives
+- d7948e3: Fix OpenAPI response showing as JSON instead of YAML when it should
+- a4c3399: Fix OpenAPI alternatives not showing
+- Updated dependencies [a629900]
+  - @gitbook/expr@1.2.1
+
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies [6da3655]
+  - @gitbook/expr@1.2.0
+
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies [3548fa6]
+  - @gitbook/expr@1.1.1
+
 ## 1.4.1
 
 ### Patch Changes

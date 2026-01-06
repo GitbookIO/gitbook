@@ -5,8 +5,9 @@ export const ButtonStyles = [
     'group/button',
     'inline-flex',
     'items-center',
+    'align-middle',
     'gap-2',
-    'rounded-md',
+    'rounded-xl',
     'straight-corners:rounded-none',
     'circular-corners:rounded-3xl',
 
@@ -22,9 +23,13 @@ export const ButtonStyles = [
     'shadow-tint/6',
     'dark:shadow-tint-1',
 
+    'not-focus-visible:outline-0',
     'contrast-more:border-tint-12',
-    'contrast-more:hover:border-2',
+    'contrast-more:hover:outline-2',
+    'contrast-more:hover:outline-tint-12',
     'contrast-more:hover:border-tint-12',
+    'contrast-more:focus-visible:border-tint-12',
+    'contrast-more:focus-visible:outline-tint-12',
 
     'hover:depth-subtle:-translate-y-px',
     'focus-visible:depth-subtle:-translate-y-px',
@@ -35,6 +40,8 @@ export const ButtonStyles = [
     'grow-0',
     'shrink-0',
     'truncate',
+    'max-w-full',
+    'align-middle',
 
     'disabled:cursor-not-allowed',
     'disabled:translate-y-0!',

@@ -7,8 +7,10 @@ import {
 } from '@/components/SiteLayout';
 import type { VisitorAuthClaims } from '@/lib/adaptive';
 import type { GitBookSiteContext } from '@/lib/context';
-import { CustomizationAIMode } from '@gitbook/api';
+import { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { SpaceLayoutServerContext } from '../SpaceLayout';
+import { TrademarkLink } from '../TableOfContents/Trademark';
+import { NavigationLoader } from '../primitives/NavigationLoader';
 import { EmbeddableIframeAPI } from './EmbeddableIframeAPI';
 
 type EmbeddableRootLayoutProps = {
@@ -29,12 +31,17 @@ export async function EmbeddableRootLayout({
     return (
         <CustomizationRootLayout context={context}>
             <SiteLayoutClientContexts
-                forcedTheme={context.customization.themes.default}
+                forcedTheme={
+                    context.customization.themes.toggeable
+                        ? undefined
+                        : context.customization.themes.default
+                }
                 externalLinksTarget={context.customization.externalLinks.target}
                 contextId={context.contextId}
             >
                 <AIContextProvider
-                    aiMode={CustomizationAIMode.Assistant}
+                    aiMode={context.customization.ai.mode}
+                    suggestions={context.customization.ai.suggestions}
                     trademark={context.customization.trademark.enabled}
                 >
                     <SpaceLayoutServerContext
@@ -46,9 +53,19 @@ export async function EmbeddableRootLayout({
                             asEmbeddable: true,
                         }}
                     >
-                        <div className="fixed inset-0 flex flex-col">{children}</div>
+                        <NavigationLoader />
+                        <div className="fixed inset-0 flex flex-col">
+                            {children}
+                            {context.customization.trademark.enabled ? (
+                                <TrademarkLink
+                                    className="border-tint-solid/3 border-t bg-tint-solid/1 px-4 py-2.5 text-tint/8 ring-0"
+                                    context={context}
+                                    placement={SiteInsightsTrademarkPlacement.Embed}
+                                />
+                            ) : null}
+                        </div>
                         <EmbeddableIframeAPI
-                            baseURL={context.linker.toPathInSpace('~gitbook/embed/')}
+                            baseURL={context.linker.toPathInSite('~gitbook/embed/')}
                         />
                     </SpaceLayoutServerContext>
                 </AIContextProvider>

@@ -1,12 +1,12 @@
 {
     "name": "@gitbook/emoji-codepoints",
     "description": "Optimized mapping of codepoints to the fully qualified emoji codepoints",
-    "version": "0.2.0",
+    "version": "0.2.2",
     "private": true,
     "exports": "./dist/index.ts",
-    "dependencies": {},
+    "sideEffects": false,
     "devDependencies": {
-        "emoji-assets": "^8.0.0"
+        "emoji-assets": "^9.0.0"
     },
     "scripts": {
         "generate": "bun ./build.ts",

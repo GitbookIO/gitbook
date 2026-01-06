@@ -1,38 +1,28 @@
 import { t, tString, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { Button, HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
-import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+import { useAIChatState } from '../AI/useAIChat';
+import { HoverCard, HoverCardRoot, HoverCardTrigger } from '../primitives';
+import { Input } from '../primitives/Input';
 
 export function AIChatInput(props: {
-    value: string;
     disabled?: boolean;
     /**
      * When true, the input is disabled
      */
     loading: boolean;
-    onChange: (value: string) => void;
     onSubmit: (value: string) => void;
 }) {
-    const { value, onChange, onSubmit, disabled, loading } = props;
+    const { onSubmit, disabled, loading } = props;
 
     const language = useLanguage();
+    const chat = useAIChatState();
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const textarea = event.currentTarget;
-        onChange(textarea.value);
-
-        // Auto-resize
-        textarea.style.height = 'auto';
-        textarea.style.height = `${textarea.scrollHeight}px`;
-    };
-
     useEffect(() => {
-        if (!disabled && !loading) {
+        if (chat.opened && !disabled && !loading) {
             // Add a small delay to ensure the input is rendered before focusing
             // This fixes inconsistent focus behaviour across browsers
             const timeout = setTimeout(() => {
@@ -41,7 +31,7 @@ export function AIChatInput(props: {
 
             return () => clearTimeout(timeout);
         }
-    }, [disabled, loading]);
+    }, [disabled, loading, chat.opened]);
 
     useHotkeys(
         'mod+i',
@@ -55,58 +45,34 @@ export function AIChatInput(props: {
     );
 
     return (
-        <div className="depth-subtle:has-[textarea:focus]:-translate-y-px relative flex flex-col overflow-hidden circular-corners:rounded-2xl rounded-corners:rounded-md bg-tint-base/9 depth-subtle:shadow-sm shadow-tint/6 ring-1 ring-tint-subtle backdrop-blur-lg transition-all depth-subtle:has-[textarea:focus]:shadow-lg has-[textarea:focus]:shadow-primary-subtle has-[textarea:focus]:ring-2 has-[textarea:focus]:ring-primary-hover contrast-more:bg-tint-base dark:shadow-tint-1">
-            <textarea
-                ref={inputRef}
-                disabled={disabled || loading}
-                data-loading={loading}
-                data-testid="ai-chat-input"
-                className={tcls(
-                    'resize-none',
-                    'focus:outline-hidden',
-                    'focus:ring-0',
-                    'w-full',
-                    'px-3',
-                    'py-3',
-                    'pb-12',
-                    'h-auto',
-                    'bg-transparent',
-                    'peer',
-                    'max-h-64',
-                    'placeholder:text-tint/8',
-                    'transition-colors',
-                    'disabled:bg-tint-subtle',
-                    'delay-300',
-                    'disabled:delay-0',
-                    'disabled:cursor-not-allowed',
-                    'data-[loading=true]:cursor-progress',
-                    'data-[loading=true]:opacity-50'
-                )}
-                value={value}
-                rows={1}
-                placeholder={tString(language, 'ai_chat_input_placeholder')}
-                onChange={handleInput}
-                onKeyDown={(event) => {
-                    if (event.key === 'Escape') {
-                        event.preventDefault();
-                        event.currentTarget.blur();
-                        return;
-                    }
-
-                    if (event.key === 'Enter' && !event.shiftKey && value.trim()) {
-                        event.preventDefault();
-                        event.currentTarget.style.height = 'auto';
-                        onSubmit(value);
-                    }
-                }}
-            />
-            {!disabled ? (
-                <div className="absolute top-2.5 right-3 animate-[fadeIn_0.2s_0.5s_ease-in-out_both] peer-focus:hidden">
-                    <KeyboardShortcut keys={['mod', 'i']} className="bg-tint-base" />
-                </div>
-            ) : null}
-            <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2 py-2">
-                <HoverCardRoot>
+        <Input
+            data-testid="ai-chat-input"
+            name="ai-chat-input"
+            multiline
+            resize
+            sizing="large"
+            label="Assistant chat input"
+            placeholder={tString(language, 'ai_chat_input_placeholder')}
+            onSubmit={(val) => onSubmit(val as string)}
+            submitButton={{
+                label: tString(language, 'send'),
+            }}
+            className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"
+            rows={1}
+            maxLength={2048}
+            keyboardShortcut={
+                !disabled && !loading
+                    ? {
+                          keys: ['mod', 'i'],
+                          className: 'bg-tint-base group-focus-within/input:hidden',
+                      }
+                    : undefined
+            }
+            disabled={disabled || loading}
+            aria-busy={loading}
+            ref={inputRef}
+            trailing={
+                <HoverCardRoot openDelay={500}>
                     <HoverCard
                         className="max-w-xs bg-tint p-2 text-sm text-tint"
                         arrow={{ className: 'fill-tint-3' }}
@@ -133,25 +99,19 @@ export function AIChatInput(props: {
                         </div>
                     </HoverCard>
                     <HoverCardTrigger>
-                        <div className="flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
+                        {/* Negative margin to compensate for Input's padding, so the badge appears flush with the cursor */}
+                        <div className="-ml-1 flex cursor-help items-center gap-1 circular-corners:rounded-2xl rounded-corners:rounded-md px-2.5 py-1.5 text-tint/7 text-xs transition-all hover:bg-tint">
                             <span className="-ml-1 circular-corners:rounded-2xl rounded-corners:rounded-sm bg-tint-11/7 px-1 py-0.5 font-mono font-semibold text-[0.65rem] text-contrast-tint-11 leading-none">
                                 {t(language, 'ai_chat_context_badge')}
                             </span>{' '}
                             <span className="leading-none">
                                 {t(language, 'ai_chat_context_title')}
                             </span>
-                            <Icon icon="question-circle" className="size-3" />
+                            <Icon icon="question-circle" className="size-3 shrink-0" />
                         </div>
                     </HoverCardTrigger>
                 </HoverCardRoot>
-                <Button
-                    label={tString(language, 'send')}
-                    size="medium"
-                    className="ml-auto"
-                    disabled={disabled || !value.trim()}
-                    onClick={() => onSubmit(value)}
-                />
-            </div>
-        </div>
+            }
+        />
     );
 }

@@ -202,6 +202,20 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Handle redirects
         //
         if ('redirect' in siteURLData) {
+            // When it is a server action, we cannot just return a redirect response as it may cause CORS issues on redirect.
+            // For these cases, we return a 303 response with an `X-Action-Redirect` header that the client can handle.
+            // This is what server actions do when returning a redirect response.
+            const isServerAction = request.headers.has('next-action') && request.method === 'POST';
+            const createRedirectResponse = (url: string) =>
+                isServerAction
+                    ? new NextResponse(null, {
+                          status: 303,
+                          headers: {
+                              'X-Action-Redirect': `${url};push`,
+                              'Content-Security-Policy': getContentSecurityPolicy(),
+                          },
+                      })
+                    : NextResponse.redirect(url);
             // biome-ignore lint/suspicious/noConsole: we want to log the redirect
             console.log('redirect', siteURLData.redirect);
             if (siteURLData.target === 'content') {
@@ -221,10 +235,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
                 // as it might contain a VA token
                 contentRedirect.search = request.nextUrl.search;
 
-                return NextResponse.redirect(contentRedirect);
+                return createRedirectResponse(contentRedirect.toString());
             }
 
-            return NextResponse.redirect(siteURLData.redirect);
+            return createRedirectResponse(siteURLData.redirect);
         }
 
         cookies.push(
@@ -284,6 +298,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
+            isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : undefined,
         };
 
         const requestHeaders = new Headers(request.headers);
@@ -296,16 +311,41 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         requestHeaders.set(MiddlewareHeaders.SiteURLData, JSON.stringify(stableSiteURLData));
 
         // Preview of customization/theme
-        const customization = siteRequestURL.searchParams.get('customization');
+        const customizationCookie = request.cookies.get(MiddlewareHeaders.Customization);
+        const customization =
+            siteRequestURL.searchParams.get('customization') ??
+            (customizationCookie ? decodeURIComponent(customizationCookie.value) : undefined);
         if (customization && validateSerializedCustomization(customization)) {
             routeType = 'dynamic';
             // We need to encode the customization headers, otherwise it will fail for some customization values containing non ASCII chars on vercel.
             requestHeaders.set(MiddlewareHeaders.Customization, encodeURIComponent(customization));
+            cookies.push({
+                name: MiddlewareHeaders.Customization,
+                value: encodeURIComponent(customization),
+                options: {
+                    httpOnly: true,
+                    sameSite: 'lax',
+                    maxAge: 10 * 60, // 10 minutes
+                    path: '/url/preview', // Only send the cookie to preview routes
+                },
+            });
         }
-        const theme = siteRequestURL.searchParams.get('theme');
+        const theme =
+            siteRequestURL.searchParams.get('theme') ??
+            request.cookies.get(MiddlewareHeaders.Theme)?.value;
         if (theme === CustomizationThemeMode.Dark || theme === CustomizationThemeMode.Light) {
             routeType = 'dynamic';
             requestHeaders.set(MiddlewareHeaders.Theme, theme);
+            cookies.push({
+                name: MiddlewareHeaders.Theme,
+                value: theme,
+                options: {
+                    httpOnly: true,
+                    sameSite: 'lax',
+                    maxAge: 10 * 60, // 10 minutes
+                    path: '/url/preview', // Only send the cookie to preview routes
+                },
+            });
         }
 
         // We support forcing dynamic routes by setting a `gitbook-dynamic-route` cookie
@@ -343,7 +383,11 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         ].join('/');
 
         const rewrittenURL = new URL(`/${route}`, request.nextUrl.toString());
-        rewrittenURL.search = request.nextUrl.search; // Preserve the original search params
+        // Preserve the original search params but remove fallback=true if present
+        rewrittenURL.search = request.nextUrl.search;
+        if (rewrittenURL.searchParams.has('fallback')) {
+            rewrittenURL.searchParams.delete('fallback');
+        }
 
         const response = NextResponse.rewrite(rewrittenURL, {
             request: {
@@ -516,6 +560,11 @@ function getSiteURLFromRequest(request: NextRequest): URLWithMode | null {
     return null;
 }
 
+const RSS_PATH_REGEX = /^((\S+)\/)?rss\.xml$/;
+const MARKDOWN_PATH_REGEX = /\.md$/;
+const LLMS_FULL_PATH_REGEX = /^llms-full\.txt\/\d+$/;
+const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
+
 /**
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
@@ -530,33 +579,44 @@ function encodePathInSiteContent(rawPathname: string): {
         return { pathname };
     }
 
+    // If the pathname is a RSS feed (/.../rss.xml), we rewrite it to ~gitbook/rss/:pathname
+    const rssMatch = pathname.match(RSS_PATH_REGEX);
+    if (rssMatch) {
+        return {
+            pathname: `~gitbook/rss/${encodePagePath(rssMatch[2])}`,
+            routeType: 'static',
+        };
+    }
+
     // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
-    if (pathname.match(/\.md$/)) {
+    if (pathname.match(MARKDOWN_PATH_REGEX)) {
         const pagePathWithoutMD = pathname.slice(0, -3);
         return {
-            pathname: `~gitbook/markdown/${encodeURIComponent(pagePathWithoutMD)}`,
+            pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
             // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
             routeType: 'static',
         };
     }
 
     // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
-    if (pathname.match(/^llms-full\.txt\/\d+$/)) {
+    if (pathname.match(LLMS_FULL_PATH_REGEX)) {
         return { pathname, routeType: 'static' };
     }
 
     // If the pathname is an embedded page
-    const embedPage = pathname.match(/^~gitbook\/embed\/page\/(\S+)$/);
+    const embedPage = pathname.match(EMBED_PAGE_PATH_REGEX);
     if (embedPage) {
         return {
-            pathname: `~gitbook/embed/page/${encodeURIComponent(embedPage[1]!)}`,
+            pathname: `~gitbook/embed/page/${encodePagePath(embedPage[1])}`,
         };
     }
 
     switch (pathname) {
+        case '~gitbook/embed':
         case '~gitbook/embed/assistant':
         case '~gitbook/icon':
             return { pathname };
+        case '~gitbook/mcp':
         case 'llms.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
@@ -570,8 +630,12 @@ function encodePathInSiteContent(rawPathname: string): {
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };
         default:
-            return { pathname: encodeURIComponent(pathname || '/') };
+            return { pathname: encodePagePath(pathname) };
     }
+}
+
+function encodePagePath(path: string | undefined): string {
+    return encodeURIComponent(path || '/');
 }
 
 /**

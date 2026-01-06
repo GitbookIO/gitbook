@@ -18,6 +18,7 @@ export type ResponseCookie = {
         sameSite: boolean | 'lax' | 'strict' | 'none' | undefined;
         secure: boolean;
         maxAge: number;
+        path: string;
     }>;
 };
 
@@ -454,7 +455,7 @@ export function serveVisitorClaimsDataRequest(request: NextRequest, siteRequestU
     });
 
     if (!visitorToken && !Object.keys(unsignedClaims).length) {
-        return NextResponse.json({});
+        return NextResponse.json({ visitor: { claims: { unsigned: {} } } });
     }
 
     const visitorClaims = {

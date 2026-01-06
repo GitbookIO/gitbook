@@ -12,13 +12,19 @@ export type OpenAPIServerVariableWithCustomProperties = OpenAPIV3.ServerVariable
  * OpenAPI ServerObject type extended to provide x-gitbook prefill custom properties at the variable level.
  */
 export type OpenAPIServerWithCustomProperties = Omit<OpenAPIV3.ServerObject, 'variables'> & {
+    name?: string;
     variables?: {
         [variable: string]: OpenAPIServerVariableWithCustomProperties;
     };
 } & OpenAPICustomPrefillProperties;
 
-export type OpenAPISecurityWithRequired = OpenAPIV3.SecuritySchemeObject &
-    OpenAPICustomPrefillProperties & { required?: boolean };
+export type OpenAPISecurityScope = [string, string | undefined];
+
+export type OpenAPICustomSecurityScheme = OpenAPIV3.SecuritySchemeObject &
+    OpenAPICustomPrefillProperties & {
+        required?: boolean;
+        scopes?: OpenAPISecurityScope[] | null;
+    };
 
 export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     path: string;
@@ -31,7 +37,7 @@ export interface OpenAPIOperationData extends OpenAPICustomSpecProperties {
     operation: OpenAPIV3.OperationObject<OpenAPICustomOperationProperties>;
 
     /** Securities that should be used for this operation */
-    securities: [string, OpenAPISecurityWithRequired][];
+    securities: [string, OpenAPICustomSecurityScheme][];
 }
 
 export interface OpenAPIWebhookData extends OpenAPICustomSpecProperties {

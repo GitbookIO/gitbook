@@ -81,6 +81,9 @@ const config: Config = {
                 ],
                 var: ['var(--font-family)'],
             },
+            fontSize: {
+                xxs: ['0.625rem', { lineHeight: '0.75rem' }],
+            },
             colors: {
                 // Dynamic colors matching the customization settings
 
@@ -320,12 +323,18 @@ const config: Config = {
                 'fadeOut-slow': 'fadeOut 500ms ease both',
                 appear: 'appear 200ms ease both allow-discrete',
 
+                blurIn: 'blurIn 200ms ease-out both',
+                'blurIn-slow': 'blurIn 500ms ease-out both',
+                blurOut: 'blurOut 200ms ease-in both',
+                'blurOut-slow': 'blurOut 500ms ease-in both',
+
                 enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
                 exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
                 heightIn: 'heightIn 200ms ease both',
+                crawl: 'crawl 2s ease-in-out infinite',
             },
             keyframes: {
                 bounceSmall: {
@@ -487,13 +496,44 @@ const config: Config = {
                     from: { opacity: '1', transform: 'rotateX(0deg) scale(1)' },
                     to: { opacity: '0', transform: 'rotateX(-10deg) scale(0.95)' },
                 },
+                blurIn: {
+                    '0%': { filter: 'blur(6px)', opacity: '0', transform: 'scale(0.95)' },
+                    '100%': { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                },
+                blurOut: {
+                    from: { filter: 'blur(0px)', opacity: '1', transform: 'scale(1)' },
+                    to: { filter: 'blur(16px)', opacity: '0', transform: 'scale(0.95)' },
+                },
                 fadeOut: {
                     from: { opacity: '1' },
                     to: { opacity: '0' },
                 },
                 heightIn: {
-                    from: { height: '0' },
-                    to: { height: 'max-content' },
+                    from: { height: '0', opacity: '0' },
+                    to: { height: 'max-content', opacity: '1' },
+                },
+                crawl: {
+                    '0%': {
+                        scale: '0 1',
+                        translate: '0 0',
+                    },
+                    '40%': {
+                        scale: '1 1',
+                        translate: '100% 0',
+                    },
+                    '100%': {
+                        scale: '0 1',
+                        translate: '100% 0',
+                    },
+                },
+                orbit: {
+                    '0%': {
+                        transform: 'rotate(0deg) translateX(10%) rotate(0deg) translateX(-10%)',
+                    },
+                    '100%': {
+                        transform:
+                            'rotate(360deg) translateX(10%) rotate(-360deg) translateX(-10%)',
+                    },
                 },
             },
             boxShadow: {
@@ -516,6 +556,7 @@ const config: Config = {
             xl: '1280px',
             '2xl': '1536px',
             '3xl': '1920px',
+            '4xl': '2144px',
         },
     },
     plugins: [
@@ -535,7 +576,7 @@ const config: Config = {
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
-            addVariant('chat-open', 'body:has(.ai-chat) &');
+            addVariant('chat-open', 'body:has(.ai-chat:not(.hidden)) &');
 
             /**
              * Variant when a header is displayed.
@@ -550,6 +591,8 @@ const config: Config = {
                 'announcement',
                 'html:not(.announcement-hidden):has(#announcement-banner) &'
             );
+
+            addVariant('hydrated', 'html.hydrated:not(.route-change) &');
 
             // Variant to target first-of-type in a column
             addVariant('column-first-of-type', '.group\\/column > &:first-of-type'); // optional for group-based variants

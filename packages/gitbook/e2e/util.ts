@@ -143,12 +143,22 @@ export const headerLinks: CustomizationHeaderItem[] = [
 
 export async function waitForCookiesDialog(page: Page) {
     const dialog = page.getByTestId('cookies-dialog');
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({
+        // Cookies dialog may take some times to appear
+        timeout: 10_000,
+    });
 }
 
 export async function waitForNotFound(_page: Page, response: Response | null) {
     expect(response).not.toBeNull();
     expect(response?.status()).toBe(404);
+}
+
+export async function waitForCoverImages(page: Page) {
+    // Wait for cover images to exist (not the shimmer placeholder)
+    await expect(page.locator('img[alt="Page cover"]').first()).toBeVisible({
+        timeout: 10_000,
+    });
 }
 
 /**
@@ -336,6 +346,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
         pageActions: {
             externalAI: true,
             markdown: true,
+            mcp: true,
         },
         trademark: {
             enabled: true,
@@ -406,14 +417,15 @@ export async function waitForIcons(page: Page) {
                 return true;
             }
 
-            // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
-            const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
-            const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
-            const url = urlMatch?.[1];
+            const maskImage = icon.querySelector('[data-testid="mask-image"]');
+            if (!maskImage) {
+                throw new Error('No mask-image element');
+            }
 
+            const url = maskImage.getAttribute('href');
             // If URL is invalid we throw an error.
             if (!url) {
-                throw new Error('No mask-image');
+                throw new Error('No mask-image url');
             }
 
             // If the URL is already queued for loading, we return the state.

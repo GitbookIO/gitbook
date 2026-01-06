@@ -14,6 +14,7 @@ import type {
     SearchSpaceResult,
     SiteSection,
     SiteSectionGroup,
+    SiteSpace,
     Space,
 } from '@gitbook/api';
 import { createStreamableValue } from 'ai/rsc';
@@ -63,38 +64,6 @@ export interface AskAnswerResult {
     body?: React.ReactNode;
     followupQuestions: string[];
     sources: AskAnswerSource[];
-}
-
-/**
- * Server action to search content in the entire site.
- */
-export async function searchAllSiteContent(query: string): Promise<OrderedComputedResult[]> {
-    return traceErrorOnly('Search.searchAllSiteContent', async () => {
-        const context = await getServerActionBaseContext();
-        return searchSiteContent(context, {
-            query,
-            scope: { mode: 'all' },
-        });
-    });
-}
-
-/**
- * Server action to search content in a space.
- */
-export async function searchSiteSpaceContent(query: string): Promise<OrderedComputedResult[]> {
-    return traceErrorOnly('Search.searchSiteSpaceContent', async () => {
-        const context = await getServerActionBaseContext();
-        const siteURLData = await getSiteURLDataFromMiddleware();
-
-        return await searchSiteContent(context, {
-            query,
-            // If we have a siteSectionId that means its a sections site use `current` mode
-            // which searches in the current space + all default spaces of sections
-            scope: siteURLData.siteSection
-                ? { mode: 'current', siteSpaceId: siteURLData.siteSpace }
-                : { mode: 'specific', siteSpaceIds: [siteURLData.siteSpace] },
-        });
-    });
 }
 
 /**
@@ -229,68 +198,72 @@ export async function streamRecommendedQuestions(args: { siteSpaceId?: string })
 /**
  * Search for content in a site by scoping the search to all content, a specific spaces or current space.
  */
-async function searchSiteContent(
-    context: GitBookBaseContext,
-    args: {
-        query: string;
-        scope:
-            | { mode: 'all' }
-            | { mode: 'current'; siteSpaceId: string }
-            | { mode: 'specific'; siteSpaceIds: string[] };
-    }
-): Promise<OrderedComputedResult[]> {
-    const { dataFetcher } = context;
-    const siteURLData = await getSiteURLDataFromMiddleware();
+export async function searchSiteContent({
+    query,
+    ...scope
+}: {
+    query: string;
+} & (
+    | { mode: 'all' }
+    | { mode: 'current'; siteSpaceId: string }
+    | { mode: 'specific'; siteSpaceIds: string[] }
+)): Promise<OrderedComputedResult[]> {
+    return traceErrorOnly(`Search.searchSiteContent.${scope.mode}`, async () => {
+        if (query.length <= 1) {
+            return [];
+        }
 
-    const { scope, query } = args;
+        const [context, { organization, site, shareKey }] = await Promise.all([
+            getServerActionBaseContext(),
+            getSiteURLDataFromMiddleware(),
+        ]);
 
-    if (query.length <= 1) {
-        return [];
-    }
+        const [searchResults, { structure }] = await Promise.all([
+            throwIfDataError(
+                context.dataFetcher.searchSiteContent({
+                    organizationId: organization,
+                    siteId: site,
+                    query,
+                    scope,
+                })
+            ),
+            throwIfDataError(
+                context.dataFetcher.getPublishedContentSite({
+                    organizationId: organization,
+                    siteId: site,
+                    siteShareKey: shareKey,
+                })
+            ),
+        ]);
 
-    const [searchResults, { structure }] = await Promise.all([
-        throwIfDataError(
-            dataFetcher.searchSiteContent({
-                organizationId: siteURLData.organization,
-                siteId: siteURLData.site,
-                query,
-                scope,
-            })
-        ),
-        throwIfDataError(
-            dataFetcher.getPublishedContentSite({
-                organizationId: siteURLData.organization,
-                siteId: siteURLData.site,
-                siteShareKey: siteURLData.shareKey,
-            })
-        ),
-    ]);
+        return (
+            await Promise.all(
+                searchResults.map((spaceItem) => {
+                    const found = findSiteSpaceBy(
+                        structure,
+                        (siteSpace) => siteSpace.space.id === spaceItem.id
+                    );
+                    const siteSection = found?.siteSection;
+                    const siteSectionGroup = found?.siteSectionGroup;
 
-    return (
-        await Promise.all(
-            searchResults.map((spaceItem) => {
-                const found = findSiteSpaceBy(
-                    structure,
-                    (siteSpace) => siteSpace.space.id === spaceItem.id
-                );
-                const siteSection = found?.siteSection;
-                const siteSectionGroup = found?.siteSectionGroup;
-
-                return Promise.all(
-                    spaceItem.pages.map((pageItem) =>
-                        transformSitePageResult(context, {
-                            pageItem,
-                            spaceItem,
-                            space: found?.siteSpace.space,
-                            spaceURL: found?.siteSpace.urls.published,
-                            siteSection: siteSection ?? undefined,
-                            siteSectionGroup: (siteSectionGroup as SiteSectionGroup) ?? undefined,
-                        })
-                    )
-                );
-            })
-        )
-    ).flat(2);
+                    return Promise.all(
+                        spaceItem.pages.map((pageItem) =>
+                            transformSitePageResult(context, {
+                                pageItem,
+                                spaceItem,
+                                siteSpace: found?.siteSpace,
+                                space: found?.siteSpace.space,
+                                spaceURL: found?.siteSpace.urls.published,
+                                siteSection: siteSection ?? undefined,
+                                siteSectionGroup:
+                                    (siteSectionGroup as SiteSectionGroup) ?? undefined,
+                            })
+                        )
+                    );
+                })
+            )
+        ).flat(2);
+    });
 }
 
 async function transformAnswer(
@@ -355,7 +328,7 @@ async function transformAnswer(
                         wrapBlocksInSuspense: false,
                         withLinkPreviews: false, // We don't want to render link previews in the AI answer.
                     }}
-                    style={['space-y-5']}
+                    style="space-y-5 *:origin-top-left *:animate-blur-in-slow"
                 />
             ) : null,
         followupQuestions: answer.followupQuestions,
@@ -369,12 +342,13 @@ async function transformSitePageResult(
         pageItem: SearchPageResult;
         spaceItem: SearchSpaceResult;
         space?: Space;
+        siteSpace?: SiteSpace;
         spaceURL?: string;
         siteSection?: SiteSection;
         siteSectionGroup?: SiteSectionGroup;
     }
 ): Promise<OrderedComputedResult[]> {
-    const { pageItem, spaceItem, space, spaceURL, siteSection, siteSectionGroup } = args;
+    const { pageItem, spaceItem, spaceURL, siteSection, siteSectionGroup, siteSpace } = args;
     const { linker } = context;
 
     const page: ComputedPageResult = {
@@ -395,11 +369,21 @@ async function transformSitePageResult(
                 icon: siteSection?.icon as IconName,
                 label: siteSection.title,
             },
-            (!siteSection || siteSection?.siteSpaces.length > 1) && space
+            (siteSection?.siteSpaces?.filter(
+                // If a space is the only one in its langauge, it's a translation variant and we don't want to show it.
+                (space) =>
+                    siteSection?.siteSpaces?.filter(
+                        // Check if there are other spaces in the same language within the section.
+                        (s) => s.space.language === space.space.language
+                    ).length > 1 // We only want to show the space if there are other spaces in the same language within the section.
+            ).length ?? 0) > 1 && siteSpace
                 ? {
-                      label: space?.title,
+                      label: siteSpace.title,
                   }
                 : undefined,
+            ...pageItem.ancestors.map((ancestor) => ({
+                label: ancestor.title,
+            })),
         ].filter((item) => item !== undefined),
     };
 

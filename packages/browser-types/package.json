@@ -8,17 +8,29 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "0.1.0",
+    "sideEffects": false,
+    "version": "0.1.3",
     "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "bun-types": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
-        "typecheck": "tsc --noEmit"
+        "build": "tsdown",
+        "typecheck": "tsc --noEmit",
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "README.md", "CHANGELOG.md"],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
+    }
 }

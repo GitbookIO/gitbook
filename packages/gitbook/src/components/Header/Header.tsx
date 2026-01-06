@@ -3,6 +3,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { CONTAINER_STYLE, HEADER_HEIGHT_DESKTOP } from '@/components/layout';
 import { getSpaceLanguage, t } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
+import type { SiteSpace } from '@gitbook/api';
 import { SearchContainer } from '../Search';
 import { SiteSectionTabs, encodeClientSiteSections } from '../SiteSections';
 import { HeaderLink } from './HeaderLink';
@@ -18,10 +19,19 @@ import { TranslationsDropdown } from './SpacesDropdown';
 export function Header(props: {
     context: GitBookSiteContext;
     withTopHeader?: boolean;
-    withVariants?: 'generic' | 'translations';
+    variants: {
+        generic: SiteSpace[];
+        translations: SiteSpace[];
+    };
 }) {
-    const { context, withTopHeader, withVariants } = props;
-    const { siteSpace, siteSpaces, sections, customization } = context;
+    const { context, withTopHeader, variants } = props;
+    const { siteSpace, visibleSiteSpaces, visibleSections, customization } = context;
+
+    const withSections = Boolean(
+        visibleSections &&
+            (visibleSections.list.length > 1 || // Show section tabs if there are at least 2 sections or at least 1 section group
+                visibleSections.list.some((s) => s.object === 'site-section-group'))
+    );
 
     return (
         <header
@@ -69,13 +79,19 @@ export function Header(props: {
                             'py-3',
                             'min-h-16',
                             'sm:h-16',
-                            CONTAINER_STYLE
+                            CONTAINER_STYLE,
+                            'transition-[max-width] duration-300',
+                            '@container/header'
                         )}
                     >
                         <div
                             className={tcls(
-                                'flex max-w-full lg:basis-72',
-                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4'
+                                'flex max-w-full',
+                                'min-w-0 shrink items-center justify-start gap-2 lg:gap-4',
+                                'search' in customization.styling &&
+                                    customization.styling.search === 'prominent'
+                                    ? 'lg:@2xl:basis-72'
+                                    : null
                             )}
                         >
                             <HeaderMobileMenu
@@ -85,8 +101,8 @@ export function Header(props: {
                                     'theme-bold:text-header-link',
                                     'hover:bg-tint-hover',
                                     'hover:theme-bold:bg-header-link/3',
-                                    withVariants === 'generic'
-                                        ? 'xl:hidden'
+                                    variants.generic.length > 1
+                                        ? 'lg:hidden'
                                         : 'page-no-toc:hidden lg:hidden'
                                 )}
                             />
@@ -98,37 +114,53 @@ export function Header(props: {
                                 'flex',
                                 'grow-0',
                                 'shrink-0',
-                                'md:basis-56',
+                                '@2xl:basis-56',
                                 'justify-self-end',
                                 'items-center',
                                 'gap-2',
+                                'transition-[margin] duration-300',
                                 'search' in customization.styling &&
                                     customization.styling.search === 'prominent'
                                     ? [
-                                          'md:grow-[0.8]',
-                                          'lg:basis-40',
-                                          'md:max-w-[40%]',
-                                          'lg:max-w-lg',
-                                          'lg:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
-                                          'xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
-                                          'md:mr-auto',
+                                          '@2xl:grow-[0.8]',
+                                          '@4xl:basis-40',
+                                          '@2xl:max-w-[40%]',
+                                          '@4xl:max-w-lg',
+                                          'lg:@2xl:ml-[max(calc((100%-18rem-48rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem)
+                                          'not-chat-open:xl:ml-[max(calc((100%-18rem-48rem-14rem-3rem)/2),1.5rem)]', // container (100%) - sidebar (18rem) - content (48rem) - outline (14rem) - margin (3rem)
+                                          '@2xl:mr-auto',
                                           'order-last',
-                                          'md:order-[unset]',
+                                          '@2xl:order-[unset]',
                                       ]
                                     : ['order-last']
                             )}
                         >
                             <SearchContainer
                                 style={customization.styling.search}
-                                isMultiVariants={siteSpaces.length > 1}
-                                spaceTitle={siteSpace.title}
-                                siteSpaceId={siteSpace.id}
+                                withVariants={variants.generic.length > 1}
+                                withSiteVariants={
+                                    visibleSections?.list.some(
+                                        (s) =>
+                                            s.object === 'site-section' && s.siteSpaces.length > 1
+                                    ) ?? false
+                                }
+                                withSections={
+                                    visibleSections ? visibleSections.list.length > 1 : false
+                                }
+                                section={
+                                    visibleSections
+                                        ? // Client-encode to avoid a serialization issue that was causing the language selector to disappear
+                                          encodeClientSiteSections(context, visibleSections).current
+                                        : undefined
+                                }
+                                siteSpace={siteSpace}
+                                siteSpaces={visibleSiteSpaces}
                                 viewport={!withTopHeader ? 'mobile' : undefined}
                             />
                         </div>
 
                         {customization.header.links.length > 0 ||
-                        (!sections && withVariants === 'translations') ? (
+                        (!withSections && variants.translations.length > 1) ? (
                             <HeaderLinks>
                                 {customization.header.links.length > 0 ? (
                                     <>
@@ -148,11 +180,15 @@ export function Header(props: {
                                         />
                                     </>
                                 ) : null}
-                                {!sections && withVariants === 'translations' ? (
+                                {!withSections && variants.translations.length > 1 ? (
                                     <TranslationsDropdown
                                         context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
                                         className="flex! theme-bold:text-header-link hover:theme-bold:bg-header-link/3"
                                     />
                                 ) : null}
@@ -162,43 +198,22 @@ export function Header(props: {
                 </div>
             </div>
 
-            {sections ? (
-                <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
-                    <div
-                        className={tcls(
-                            'w-full',
-                            'overflow-x-auto',
-                            'no-scrollbar',
-                            '-mb-4 pb-4', // Positive padding / negative margin allows the navigation menu indicator to show in a scroll viewƒ
-                            !sections ? ['hidden', 'page-no-toc:flex'] : 'flex'
-                        )}
-                    >
-                        <div
-                            className={tcls(
-                                CONTAINER_STYLE,
-                                'grow',
-                                'flex',
-                                'items-end',
-                                'page-default-width:2xl:px-[calc((100%-1536px+4rem)/2)]'
-                            )}
-                        >
-                            {sections.list.some((s) => s.object === 'site-section-group') || // If there's even a single group, show the tabs
-                            sections.list.length > 1 ? ( // Otherwise, show the tabs if there's more than one section
-                                <SiteSectionTabs
-                                    sections={encodeClientSiteSections(context, sections)}
-                                />
-                            ) : null}
-                            {withVariants === 'translations' ? (
-                                <div className="site-background before:contents[] -mr-4 sm:-mr-6 md:-mr-8 sticky inset-y-0 right-0 z-10 ml-6 flex h-full items-center py-2 pr-4 before:mr-4 before:h-full before:border-tint before:border-l sm:pr-6 md:pr-8">
-                                    <TranslationsDropdown
-                                        context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={siteSpaces}
-                                    />
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
+            {visibleSections && withSections ? (
+                <div className="transition-[padding] duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
+                    <SiteSectionTabs sections={encodeClientSiteSections(context, visibleSections)}>
+                        {variants.translations.length > 1 ? (
+                            <TranslationsDropdown
+                                context={context}
+                                siteSpace={
+                                    variants.translations.find(
+                                        (space) => space.id === siteSpace.id
+                                    ) ?? siteSpace
+                                }
+                                siteSpaces={variants.translations}
+                                className="my-2 ml-2 self-start"
+                            />
+                        ) : null}
+                    </SiteSectionTabs>
                 </div>
             ) : null}
         </header>

@@ -1,8 +1,12 @@
 'use client';
 
-import { type ClassValue, tcls } from '@/lib/tailwind';
+import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
 import * as React from 'react';
+
+export type KeyboardShortcutProps = {
+    keys: string[];
+} & React.HTMLAttributes<HTMLDivElement>;
 
 function getOperatingSystem() {
     const platform = navigator.platform.toLowerCase();
@@ -13,7 +17,7 @@ function getOperatingSystem() {
     return 'win';
 }
 
-export function KeyboardShortcut(props: { keys: string[]; className?: ClassValue }) {
+export function KeyboardShortcut(props: KeyboardShortcutProps) {
     const { keys, className } = props;
 
     const [operatingSystem, setOperatingSystem] = React.useState<string | null>(null);
@@ -28,7 +32,7 @@ export function KeyboardShortcut(props: { keys: string[]; className?: ClassValue
             className={tcls(
                 'shortcut hidden justify-end gap-0.5 whitespace-nowrap text-tint text-xs [font-feature-settings:"calt","case"] contrast-more:text-tint-strong md:flex',
                 operatingSystem
-                    ? 'motion-safe:animate-fade-in motion-reduce:opacity-100'
+                    ? 'motion-safe:animate-fade-in motion-reduce:opacity-11'
                     : 'opacity-0'
             )}
         >
@@ -41,7 +45,7 @@ export function KeyboardShortcut(props: { keys: string[]; className?: ClassValue
                         break;
 
                     case 'enter':
-                        element = <Icon icon="arrow-turn-down-left" className="size-[.75em]" />;
+                        element = <Icon icon="arrow-turn-down-left" className="size-[.9em]" />;
                         break;
                 }
                 return (

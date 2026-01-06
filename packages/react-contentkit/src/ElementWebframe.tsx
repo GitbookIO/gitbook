@@ -3,9 +3,12 @@
 import type { ContentKitWebFrame } from '@gitbook/api';
 import React from 'react';
 
+import { Icon } from '@gitbook/icons';
 import { useContentKitClientContext } from './context';
 import { resolveDynamicBinding } from './dynamic';
 import type { ContentKitClientElementProps } from './types';
+
+const MIN_HEIGHT = 32; // minimum height for the iframe in pixels
 
 export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWebFrame>) {
     const { element } = props;
@@ -47,9 +50,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         [renderer.security]
     );
 
-    //
-    // Listen to message coming from the webframe
-    //
+    // Listen to messages coming from the webframe
     React.useEffect(() => {
         const callback = (event: MessageEvent) => {
             if (!iframeRef.current) {
@@ -83,7 +84,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
                     // https://docs.embed.ly/reference/provider-height-resizing
                     const parsed = JSON.parse(message);
                     if (parsed.context === 'iframe.resize' && typeof parsed.height === 'number') {
-                        const width = contentWindow.outerWidth;
+                        const width = iframeRef.current.clientWidth;
                         const height = parsed.height;
 
                         setSize({
@@ -145,9 +146,7 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         };
     }, [renderer, sendMessage]);
 
-    //
     // Send data to the webframe
-    //
     React.useEffect(() => {
         if (!element.data) {
             return;
@@ -161,11 +160,21 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
         return sendMessage({ state });
     }, [element.data, renderer.state, sendMessage]);
 
+    const height = size.height ? Math.max(size.height, MIN_HEIGHT) : undefined;
+
+    const aspectRatio =
+        size.aspectRatio ||
+        element.aspectRatio ||
+        (iframeRef.current?.clientWidth && height
+            ? iframeRef.current.clientWidth / height
+            : undefined);
+
     if (!mounted) {
-        return null;
+        return <Icon icon="spinner" className="contentkit-button-loading" style={{ height }} />;
     }
 
-    const aspectRatio = size.aspectRatio || element.aspectRatio;
+    // only use height measurement if no aspect ratio is defined
+    const useHeightMeasurement = !aspectRatio && height;
 
     return (
         <iframe
@@ -174,13 +183,11 @@ export function ElementWebframe(props: ContentKitClientElementProps<ContentKitWe
             title={element.source.url}
             allowFullScreen
             allow="clipboard-write"
-            className="contentkit-webframe"
+            className="contentkit-webframe h-full w-full max-w-full border-none"
             style={{
-                width: '100%',
-                maxWidth: '100%',
                 aspectRatio,
-                height: size.height ? Math.max(size.height, 32) : '100%',
-                border: 'none',
+                height: useHeightMeasurement ? height : undefined,
+                maxHeight: height,
             }}
         />
     );

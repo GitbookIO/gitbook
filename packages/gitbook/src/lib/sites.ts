@@ -1,6 +1,7 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { SiteSection, SiteSectionGroup, SiteSpace, SiteStructure } from '@gitbook/api';
 import { joinPath } from './paths';
+import { flattenSectionsFromGroup } from './utils';
 
 /**
  * Get all sections from a site structure.
@@ -22,7 +23,9 @@ export function getSiteStructureSections(
     return siteStructure.type === 'sections'
         ? ignoreGroups
             ? siteStructure.structure.flatMap((item) =>
-                  item.object === 'site-section-group' ? item.sections : item
+                  item.object === 'site-section-group'
+                      ? flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(item.children)
+                      : item
               )
             : siteStructure.structure
         : [];
@@ -41,7 +44,9 @@ export function listAllSiteSpaces(siteStructure: SiteStructure) {
             return section.siteSpaces;
         }
 
-        return section.sections.flatMap((subSection) => subSection.siteSpaces);
+        return flattenSectionsFromGroup<SiteSection | SiteSectionGroup>(section.children)
+            .filter((subSection): subSection is SiteSection => subSection.object === 'site-section')
+            .flatMap((subSection) => subSection.siteSpaces);
     });
 }
 
@@ -80,13 +85,13 @@ export function findSiteSpaceBy(
                 };
             }
         } else {
-            const found = findSiteSpaceByIdInSections(sectionOrGroup.sections, predicate);
+            const found = findSiteSpaceByIdInGroupChildren(
+                sectionOrGroup.children,
+                predicate,
+                sectionOrGroup
+            );
             if (found) {
-                return {
-                    siteSpace: found.siteSpace,
-                    siteSection: found.siteSection,
-                    siteSectionGroup: sectionOrGroup,
-                };
+                return found;
             }
         }
     }
@@ -136,14 +141,30 @@ export function getFallbackSiteSpacePath(context: GitBookSiteContext, siteSpace:
     return siteSpacePath;
 }
 
-function findSiteSpaceByIdInSections(
-    sections: SiteSection[],
-    predicate: (siteSpace: SiteSpace) => boolean
-): { siteSpace: SiteSpace; siteSection: SiteSection } | null {
-    for (const siteSection of sections) {
-        const siteSpace = siteSection.siteSpaces.find(predicate) ?? null;
-        if (siteSpace) {
-            return { siteSpace, siteSection };
+function findSiteSpaceByIdInGroupChildren(
+    children: (SiteSection | SiteSectionGroup)[],
+    predicate: (siteSpace: SiteSpace) => boolean,
+    parentGroup: SiteSectionGroup
+): {
+    siteSpace: SiteSpace;
+    siteSection: SiteSection;
+    siteSectionGroup: SiteSectionGroup;
+} | null {
+    for (const child of children) {
+        if (child.object === 'site-section') {
+            const siteSpace = child.siteSpaces.find(predicate) ?? null;
+            if (siteSpace) {
+                return {
+                    siteSpace,
+                    siteSection: child,
+                    siteSectionGroup: parentGroup,
+                };
+            }
+        } else if (child.object === 'site-section-group') {
+            const found = findSiteSpaceByIdInGroupChildren(child.children, predicate, child);
+            if (found) {
+                return found;
+            }
         }
     }
 

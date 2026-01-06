@@ -46,7 +46,7 @@ export async function PageBodyBlankslate(props: {
                     <Card
                         key={child.id}
                         leadingIcon={icon}
-                        title={child.title}
+                        title={child.linkTitle || child.title}
                         href={resolved.href}
                         insights={{
                             type: 'link_click',
@@ -62,7 +62,14 @@ export async function PageBodyBlankslate(props: {
                 pages: context.revision.pages,
                 page: child,
             });
-            return <Card key={child.id} title={child.title} leadingIcon={icon} href={href} />;
+            return (
+                <Card
+                    key={child.id}
+                    title={child.linkTitle || child.title}
+                    leadingIcon={icon}
+                    href={href}
+                />
+            );
         })
     );
 

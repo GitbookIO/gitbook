@@ -1,5 +1,6 @@
+import type * as api from '@gitbook/api';
 import type { headers as nextHeaders } from 'next/headers';
-import { GITBOOK_API_URL, GITBOOK_DISABLE_TRACKING } from './env';
+import { GITBOOK_API_PUBLIC_URL, GITBOOK_DISABLE_TRACKING } from './env';
 
 /**
  * Return true if events should be tracked on the site.
@@ -28,6 +29,17 @@ export function shouldTrackEvents(headers?: Awaited<ReturnType<typeof nextHeader
 export async function serveProxyAnalyticsEvent(req: Request) {
     const requestURL = new URL(req.url);
 
+    // Fill geolocation data from request headers either from OpenNext or Vercel
+    const country =
+        req.headers.get('x-open-next-country') || req.headers.get('x-vercel-ip-country');
+    const latitude =
+        req.headers.get('x-open-next-latitude') || req.headers.get('x-vercel-ip-latitude');
+    const longitude =
+        req.headers.get('x-open-next-longitude') || req.headers.get('x-vercel-ip-longitude');
+    // OpenNext doesn't provide continent info, we add it manually in our custom worker
+    const continent =
+        req.headers.get('x-open-next-continent') || req.headers.get('x-vercel-ip-continent');
+
     const org = requestURL.searchParams.get('o');
     const site = requestURL.searchParams.get('s');
     if (!org || !site) {
@@ -36,12 +48,36 @@ export async function serveProxyAnalyticsEvent(req: Request) {
             headers: { 'content-type': 'text/plain' },
         });
     }
-    const url = new URL(`${GITBOOK_API_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
+
+    const body = (await req.json()) as { events: api.SiteInsightsEvent[] };
+    // Here we should filter every event that is older than 5 minutes as the API will reject them anyway, we might as well do it here
+    const filteredEvents = body.events.filter((event) => {
+        const eventDate = event.timestamp ? new Date(event.timestamp) : Date.now();
+        const now = new Date();
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+        return eventDate > fiveMinutesAgo;
+    });
+
+    if (filteredEvents.length === 0) {
+        return new Response('No valid events to process', {
+            status: 400,
+            headers: { 'content-type': 'text/plain' },
+        });
+    }
+
+    // We make the request to the public API URL to ensure the request is properly enriched by the router..
+    const url = new URL(`${GITBOOK_API_PUBLIC_URL}/v1/orgs/${org}/sites/${site}/insights/events`);
     return await fetch(url.toString(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            ...(country ? { 'x-location-country': country } : {}),
+            ...(latitude ? { 'x-location-latitude': latitude } : {}),
+            ...(longitude ? { 'x-location-longitude': longitude } : {}),
+            ...(continent ? { 'x-location-continent': continent } : {}),
         },
-        body: req.body,
+        body: JSON.stringify({
+            events: filteredEvents,
+        }),
     });
 }

@@ -173,4 +173,13 @@ export interface GitBookDataFetcher {
         integrationName: string;
         request: api.RenderIntegrationUI;
     }): Promise<DataFetcherResponse<api.ContentKitRenderOutput>>;
+
+    /**
+     * List revision page meta links.
+     */
+    listRevisionPageMetaLinks(params: {
+        spaceId: string;
+        revisionId: string;
+        pageId: string;
+    }): Promise<DataFetcherResponse<api.RevisionPageMetaLinks>>;
 }

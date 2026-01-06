@@ -4,22 +4,32 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "development": "./src/index.ts",
             "default": "./dist/index.js"
         }
     },
-    "version": "0.3.1",
+    "sideEffects": false,
+    "version": "0.3.4",
     "dependencies": {
         "@gitbook/api": "catalog:",
-        "assert-never": "^1.2.1"
+        "assert-never": "catalog:"
     },
     "devDependencies": {
-        "typescript": "^5.5.3"
+        "bun-types": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsdown",
         "typecheck": "tsc --noEmit",
-        "dev": "tsc -w"
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "src", "README.md", "CHANGELOG.md"]
+    "files": ["dist", "README.md", "CHANGELOG.md"],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
+    }
 }

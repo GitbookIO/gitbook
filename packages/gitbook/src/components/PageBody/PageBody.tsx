@@ -1,10 +1,9 @@
 import type { GitBookSiteContext } from '@/lib/context';
 import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } from '@gitbook/api';
-import React from 'react';
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, hasMoreThan, isNodeEmpty } from '@/lib/document';
+import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -12,13 +11,14 @@ import { TrackPageViewEvent } from '../Insights';
 import { PageFeedbackForm } from '../PageFeedback';
 import { CurrentPageProvider } from '../hooks/useCurrentPage';
 import { DateRelative, SuspenseLoadedHint } from '../primitives';
+import OptionalSuspense from './OptionalSuspense';
 import { PageBodyBlankslate } from './PageBodyBlankslate';
 import { PageCover } from './PageCover';
 import { PageFooterNavigation } from './PageFooterNavigation';
 import { PageHeader } from './PageHeader';
 import { PreservePageLayout } from './PreservePageLayout';
 
-const LINK_PREVIEW_MAX_COUNT = 100;
+const LINK_PREVIEW_MAX_COUNT = 500;
 
 export function PageBody(props: {
     context: GitBookSiteContext;
@@ -27,11 +27,25 @@ export function PageBody(props: {
     document: JSONDocument | null;
     withPageFeedback: boolean;
     insightsDisplayContext: SiteInsightsDisplayContext;
+    staticRoute: boolean;
 }) {
-    const { page, context, ancestors, document, withPageFeedback, insightsDisplayContext } = props;
+    const {
+        page,
+        context,
+        ancestors,
+        document,
+        withPageFeedback,
+        insightsDisplayContext,
+        staticRoute,
+    } = props;
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+
+    // Update blocks can only be at the top level of the document, so we optimize the check.
+    const contentHasUpdates = document
+        ? hasTopLevelBlock(document, (block) => block.type === 'updates')
+        : false;
 
     // Render link previews only if there are less than LINK_PREVIEW_MAX_COUNT links in the document.
     const withLinkPreviews = document
@@ -46,17 +60,25 @@ export function PageBody(props: {
     const language = getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
+    const hasVisibleTOCItems =
+        context.revision.pages.filter(
+            (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
+        ).length > 0;
+
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
             <main
                 className={tcls(
                     'relative min-w-0 flex-1',
-                    'mx-auto max-w-screen-2xl py-8',
+                    'max-w-screen-2xl py-8',
                     // Allow words to break if they are too long.
                     'break-anywhere',
-                    pageWidthWide ? 'page-width-wide 2xl:px-8' : 'page-width-default',
+                    '@container',
+                    pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
-                    page.layout.tableOfContents ? 'page-has-toc' : 'page-no-toc'
+                    page.layout.tableOfContents && hasVisibleTOCItems
+                        ? 'page-has-toc'
+                        : 'page-no-toc'
                 )}
             >
                 <PreservePageLayout siteWidthWide={siteWidthWide} />
@@ -64,9 +86,15 @@ export function PageBody(props: {
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
 
-                <PageHeader context={context} page={page} ancestors={ancestors} />
+                <PageHeader
+                    context={context}
+                    page={page}
+                    ancestors={ancestors}
+                    withRSSFeed={contentHasUpdates}
+                />
                 {document && !isNodeEmpty(document) ? (
-                    <React.Suspense
+                    <OptionalSuspense
+                        staticRoute={staticRoute}
                         fallback={
                             <DocumentViewSkeleton
                                 document={document}
@@ -77,15 +105,18 @@ export function PageBody(props: {
                         <SuspenseLoadedHint />
                         <DocumentView
                             document={document}
-                            style="grid [&>*+*]:mt-5"
+                            style="flex flex-col [&>*+*]:mt-5"
                             blockStyle="page-api-block:ml-0"
                             context={{
                                 mode: 'default',
-                                contentContext: context,
+                                contentContext: {
+                                    ...context,
+                                    page,
+                                },
                                 withLinkPreviews,
                             }}
                         />
-                    </React.Suspense>
+                    </OptionalSuspense>
                 ) : (
                     <PageBodyBlankslate page={page} context={context} />
                 )}

@@ -5,7 +5,7 @@ on:
       branches:
         - main
 env:
-    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
+    BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
@@ -182,9 +182,9 @@ jobs:
                   SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/
                   ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
                   ARGOS_BUILD_NAME: 'customers-v2'
-    pagespeed-testing-v2:
+    browserless-testing-v2-vercel:
         runs-on: ubuntu-latest
-        name: PageSpeed Testing v1
+        name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
         steps:
             - name: Checkout
@@ -195,8 +195,26 @@ jobs:
               run: bun install --frozen-lockfile
               env:
                   PUPPETEER_SKIP_DOWNLOAD: 1
-            - name: Run pagespeed tests
-              run: bun ./packages/gitbook/tests/pagespeed-testing.ts
+            - name: Run tests
+              run: cd ./packages/gitbook && bun e2e-browserless
               env:
                   BASE_URL: ${{needs.deploy-v2-vercel.outputs.deployment-url}}
-                  PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+                  SITE_BASE_URL: ${{ needs.deploy-v2-vercel.outputs.deployment-url }}/url/
+    # browserless-testing-v2-cloudflare:
+    #     runs-on: ubuntu-latest
+    #     name: Browserless Testing v2 (Cloudflare)
+    #     needs: deploy-v2-cloudflare
+    #     steps:
+    #         - name: Checkout
+    #           uses: actions/checkout@v4
+    #         - name: Setup Bun
+    #           uses: ./.github/composite/setup-bun
+    #         - name: Install dependencies
+    #           run: bun install --frozen-lockfile
+    #           env:
+    #               PUPPETEER_SKIP_DOWNLOAD: 1
+    #         - name: Run tests
+    #           run: cd ./packages/gitbook && bun e2e-browserless
+    #           env:
+    #               BASE_URL: ${{needs.deploy-v2-cloudflare.outputs.deployment-url}}
+    #               SITE_BASE_URL: ${{ needs.deploy-v2-cloudflare.outputs.deployment-url }}/url/

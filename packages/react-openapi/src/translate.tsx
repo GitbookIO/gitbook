@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { isValidElement } from 'react';
 
 import type { Translation, TranslationKey } from './translations';
 
@@ -72,7 +72,7 @@ function reactToString(el: React.ReactNode): string {
         return el.map(reactToString).join('');
     }
 
-    if (typeof el === 'object' && 'props' in el) {
+    if (isValidElement<{ children: string[] }>(el)) {
         return el.props.children.map(reactToString).join('');
     }
 

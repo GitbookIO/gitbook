@@ -11,6 +11,9 @@
         },
         "typecheck": {
             "dependsOn": ["^typecheck", "generate"]
+        },
+        "publish-to-npm": {
+            "dependsOn": []
         }
     }
 }

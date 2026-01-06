@@ -9,47 +9,40 @@ import { DynamicTabs, type TabsItem } from './DynamicTabs';
 export function Tabs(props: BlockProps<DocumentBlockTabs>) {
     const { block, ancestorBlocks, document, style, context } = props;
 
-    const tabs: TabsItem[] = [];
-    const tabsBody: React.ReactNode[] = [];
-
-    block.nodes.forEach((tab, index) => {
-        tabs.push({
-            id: tab.meta?.id ?? tab.key!,
-            title: tab.data.title ?? '',
-        });
-
-        tabsBody.push(
-            <Blocks
-                key={tab.key ?? index}
-                nodes={tab.nodes}
-                document={document}
-                ancestorBlocks={[...ancestorBlocks, block, tab]}
-                context={context}
-                blockStyle={tcls('flip-heading-hash')}
-                style={tcls('w-full', 'space-y-4')}
-            />
-        );
-    });
-
-    if (context.mode === 'print') {
-        // When printing, we display the tab, one after the other
-        return (
-            <>
-                {tabs.map((tab, index) => (
-                    <DynamicTabs
-                        key={tab.id}
-                        id={block.key!}
-                        block={block}
-                        tabs={[tab]}
-                        tabsBody={[tabsBody[index]]}
-                        style={style}
-                    />
-                ))}
-            </>
-        );
+    if (!block.key) {
+        throw new Error('Tabs block is missing a key');
     }
 
-    return (
-        <DynamicTabs id={block.key!} block={block} tabs={tabs} tabsBody={tabsBody} style={style} />
-    );
+    const id = block.key;
+
+    const tabs: TabsItem[] = block.nodes.map((tab) => {
+        if (!tab.key) {
+            throw new Error('Tab block is missing a key');
+        }
+
+        return {
+            id: tab.meta?.id ?? tab.key,
+            title: tab.data.title ?? '',
+            body: (
+                <Blocks
+                    key={tab.key}
+                    nodes={tab.nodes}
+                    document={document}
+                    ancestorBlocks={[...ancestorBlocks, block, tab]}
+                    context={context}
+                    blockStyle="flip-heading-hash"
+                    style="w-full space-y-4"
+                />
+            ),
+        };
+    });
+
+    // When printing, we display the tab, one after the other
+    if (context.mode === 'print') {
+        return tabs.map((tab) => {
+            return <DynamicTabs key={tab.id} id={id} tabs={[tab]} className={tcls(style)} />;
+        });
+    }
+
+    return <DynamicTabs id={id} tabs={tabs} className={tcls(style)} />;
 }

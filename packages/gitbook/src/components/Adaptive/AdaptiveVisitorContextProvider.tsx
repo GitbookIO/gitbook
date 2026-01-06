@@ -4,19 +4,14 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { OpenAPIPrefillContextProvider } from '@gitbook/react-openapi';
 import * as React from 'react';
 import { createContext, useContext } from 'react';
-
-export type AdaptiveVisitorClaimsData = {
-    visitor: {
-        claims: Record<string, unknown> & { unsigned: Record<string, unknown> };
-    };
-};
+import type { AdaptiveVisitorClaims } from './types';
 
 /**
  * In-memory cache of visitor claim readers keyed by contextId.
  */
 const adaptiveVisitorReaderCache = new Map<
     string,
-    ReturnType<typeof createResourceReader<AdaptiveVisitorClaimsData | null>>
+    ReturnType<typeof createResourceReader<AdaptiveVisitorClaims | null>>
 >();
 
 function createResourceReader<T>(promise: Promise<T>) {
@@ -52,7 +47,7 @@ function getAdaptiveVisitorClaimsReader(url: string, contextId: string) {
                 if (!res.ok) {
                     return null;
                 }
-                return await res.json<AdaptiveVisitorClaimsData>();
+                return await res.json<AdaptiveVisitorClaims>();
             } catch {
                 return null;
             }
@@ -64,7 +59,7 @@ function getAdaptiveVisitorClaimsReader(url: string, contextId: string) {
     return reader;
 }
 
-export type AdaptiveVisitorContextValue = () => AdaptiveVisitorClaimsData | null;
+export type AdaptiveVisitorContextValue = () => AdaptiveVisitorClaims | null;
 
 const AdaptiveVisitorContext = createContext<AdaptiveVisitorContextValue>(() => null);
 

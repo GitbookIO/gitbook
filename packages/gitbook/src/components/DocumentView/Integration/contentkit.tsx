@@ -27,7 +27,10 @@ export const contentKitServerContext: ContentKitServerContext = {
     codeBlock: (props) => {
         return <PlainCodeBlock code={props.code} syntax={props.syntax} />;
     },
+    // For some reason, Next thinks that this function is used in a client component
+    // it's likely an issue with the compiler not being able to track the usage of this function properly
     markdown: async ({ className, markdown }) => {
+        'use server';
         const parsed = await parseMarkdown(markdown);
         return <div className={className} dangerouslySetInnerHTML={{ __html: parsed }} />;
     },

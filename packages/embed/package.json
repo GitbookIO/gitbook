@@ -5,27 +5,44 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "default": "./dist/index.js",
-            "standalone": "./dist/standalone/index.js",
-            "react": "./dist/react/index.js"
+            "default": "./dist/index.js"
+        },
+        "./react": {
+            "types": "./dist/react/index.d.ts",
+            "default": "./dist/react/index.js"
         }
     },
-    "version": "0.1.1",
+    "sideEffects": false,
+    "version": "0.2.0",
     "dependencies": {
         "@gitbook/api": "catalog:",
         "@gitbook/icons": "workspace:",
         "bidc": "catalog:"
     },
     "peerDependencies": {
-        "react": "^18.0.0"
+        "react": "*"
     },
     "devDependencies": {
-        "typescript": "^5.5.3",
-        "react": "^19.0.0"
+        "@types/react": "catalog:",
+        "tsdown": "catalog:",
+        "typescript": "catalog:",
+        "react": "catalog:"
     },
     "scripts": {
-        "build": "tsc && bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
-        "typecheck": "tsc --noEmit"
+        "build": "bun run build-lib && bun run build-standalone",
+        "build-lib": "tsdown",
+        "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
+        "clean": "rm -rf ./dist",
+        "typecheck": "tsc --noEmit",
+        "dev": "bun run build -- --watch ./src",
+        "publish-to-npm": "../../scripts/publish-if-new.sh"
     },
-    "files": ["dist", "README.md", "CHANGELOG.md", "standalone"]
+    "files": ["dist", "README.md", "CHANGELOG.md"],
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "url": "https://github.com/GitbookIO/gitbook"
+    }
 }

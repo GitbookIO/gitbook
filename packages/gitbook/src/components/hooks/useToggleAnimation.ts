@@ -1,6 +1,6 @@
 'use client';
 
-import { stagger, useAnimate } from 'framer-motion';
+import { stagger, useAnimate } from 'motion/react';
 import React, { useLayoutEffect } from 'react';
 
 const show = {
