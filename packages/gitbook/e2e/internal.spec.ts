@@ -2203,7 +2203,6 @@ const testCases: TestsCase[] = [
                     await expect(toolConfirmation).toBeVisible({
                         timeout: 30000,
                     });
-                    await page.waitForTimeout(10000);
                     await iframe.owner().evaluate(overrideAIResponse);
                 },
             },
