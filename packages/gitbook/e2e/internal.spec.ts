@@ -1967,7 +1967,7 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('#gitbook-widget-window')).not.toBeVisible();
                     await button.click(); // Toggle the window on
                     await expect(page.locator('#gitbook-widget-window')).toBeVisible();
-                    await button.click(); // Toggle the window off again
+                    await button.click(); // Toggle the window off again for the screenshot
                 },
             },
             {
@@ -1983,6 +1983,10 @@ const testCases: TestsCase[] = [
                             },
                         });
                     });
+                    const button = page.locator('#gitbook-widget-button');
+                    await expect(button).toBeVisible();
+                    button.click();
+
                     await expect(page.locator('#gitbook-widget-button-label')).toHaveText('Docs');
                     await expect(page.locator('#gitbook-widget-button-icon')).toHaveAttribute(
                         'data-icon',
@@ -2209,14 +2213,16 @@ const testCases: TestsCase[] = [
     },
     {
         name: 'Docs Embed - Docs Only',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/page/',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/~gitbook/embed/demo/',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         tests: [
             {
                 name: 'Docs only',
                 url: '',
                 run: async (page) => {
-                    await expect(page.getByTestId('embed-docs-page')).toBeVisible({
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
                 },
@@ -2225,23 +2231,29 @@ const testCases: TestsCase[] = [
                 name: 'Table of contents',
                 url: '',
                 run: async (page) => {
-                    await expect(page.getByTestId('embed-docs-page')).toBeVisible({
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
-                    const tocButton = page.getByTestId('toc-button');
+                    const tocButton = iframe.getByTestId('toc-button');
                     await expect(tocButton).toBeVisible();
                     await tocButton.click();
-                    await expect(page.getByTestId('table-of-contents')).toBeVisible();
+                    await expect(iframe.getByTestId('table-of-contents')).toBeVisible();
                 },
             },
             {
                 name: 'Open in new tab',
                 url: '',
                 run: async (page) => {
-                    await expect(page.getByTestId('embed-docs-page')).toBeVisible({
+                    await expect(page.locator('#gitbook-widget-window')).toBeVisible();
+                    const iframe = page.frameLocator('#gitbook-widget-iframe');
+                    await expect(iframe.getByTestId('embed-docs-page')).toBeVisible({
                         timeout: 20000,
                     });
-                    const openInNewTabButton = page.getByTestId('embed-docs-page-open-in-new-tab');
+                    const openInNewTabButton = iframe.getByTestId(
+                        'embed-docs-page-open-in-new-tab'
+                    );
                     await expect(openInNewTabButton).toBeVisible();
                     // Intercept the new page event without navigating
                     const [newPage] = await Promise.all([
