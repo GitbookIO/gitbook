@@ -84,7 +84,7 @@ export async function TableOfContents(props: {
                     className
                 )}
             >
-                {header ? header : null}
+                {header}
                 <div // The actual sidebar, either shown with a filled bg or transparent.
                     className={tcls(
                         '-ms-5',
@@ -105,7 +105,7 @@ export async function TableOfContents(props: {
                         'page-has-toc:[html.sidebar-filled.circular-corners_&]:rounded-4xl'
                     )}
                 >
-                    {innerHeader ? innerHeader : null}
+                    {innerHeader}
                     <ScrollContainer
                         data-testid="toc-scroll-container"
                         orientation="vertical"

@@ -192,7 +192,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     label={tString(language, 'scroll_back')}
                     {...(typeof leading.button === 'object' ? leading.button : {})}
                     className={tcls(
-                        'z-10 bg-tint-base!',
+                        'bg-tint-base!',
                         orientation === 'horizontal'
                             ? '-translate-y-1/2! top-1/2 left-0 ml-2'
                             : '-translate-x-1/2! top-0 left-1/2 mt-2',
@@ -215,7 +215,7 @@ export function ScrollContainer(props: ScrollContainerProps) {
                     label={tString(language, 'scroll_further')}
                     {...(typeof trailing.button === 'object' ? trailing.button : {})}
                     className={tcls(
-                        'z-10 bg-tint-base!',
+                        'bg-tint-base!',
                         orientation === 'horizontal'
                             ? '-translate-y-1/2! top-1/2 right-0 mr-2'
                             : '-translate-x-1/2! bottom-0 left-1/2 mb-2',
@@ -249,6 +249,8 @@ function scrollToElementInContainer(element: Element, container: HTMLElement) {
             (rect.left - containerRect.left) -
             container.clientWidth / 2 +
             rect.width / 2,
+        // Use 'auto' to avoid additional scroll animations when scrolling to an element
+        // as this may be called during layout/initialization when the page is not fully loaded.
         behavior: 'auto',
     });
 }

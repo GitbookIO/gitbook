@@ -65,6 +65,8 @@ export function SideSheet(
     // Determine actual open state: controlled (from prop) or uncontrolled (from internal state)
     const isOpen = openState !== undefined ? openState : open;
 
+    const asideRef = React.useRef<HTMLElement>(null);
+
     const handleClose = React.useCallback(() => {
         if (openState !== undefined) {
             // Controlled mode: parent manages state, notify via callback with new state
@@ -108,6 +110,65 @@ export function SideSheet(
         return () => observer.disconnect();
     }, [toggleClass, openState, onOpenChange]);
 
+    // Handle Escape key press to close the modal sheet
+    React.useEffect(() => {
+        if (!isModal || !isOpen) {
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                handleClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isModal, isOpen, handleClose]);
+
+    // Focus trapping: prevent Tab from leaving the modal
+    React.useEffect(() => {
+        if (!isModal || !isOpen || !asideRef.current) {
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            const aside = asideRef.current;
+            if (!aside) {
+                return;
+            }
+
+            const focusable = aside.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            const current = document.activeElement as HTMLElement;
+
+            if (!aside.contains(current)) {
+                // Focus escaped, bring it back
+                (event.shiftKey ? last : first)?.focus();
+                event.preventDefault();
+            } else if (event.shiftKey && current === first) {
+                // Shift+Tab at first element, wrap to last
+                last?.focus();
+                event.preventDefault();
+            } else if (!event.shiftKey && current === last) {
+                // Tab at last element, wrap to first
+                first?.focus();
+                event.preventDefault();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isModal, isOpen]);
+
     return (
         <>
             {withScrim ? (
@@ -118,6 +179,7 @@ export function SideSheet(
             ) : null}
 
             <aside
+                ref={asideRef}
                 className={tcls(
                     'side-sheet',
                     isOpen
@@ -156,15 +218,11 @@ export function SideSheet(
 export function SideSheetScrim(props: { className?: ClassValue; onClick?: () => void }) {
     const { className, onClick } = props;
     return (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: global escape key handler is used to close the modal sheet
         <div
             id="side-sheet-scrim"
             onClick={() => {
                 onClick?.();
-            }}
-            onKeyUp={(e) => {
-                if (e.key === 'Escape') {
-                    onClick?.();
-                }
             }}
             className={tcls(
                 'fixed inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6',
