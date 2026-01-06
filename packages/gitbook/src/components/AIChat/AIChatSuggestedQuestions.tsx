@@ -19,9 +19,13 @@ export default function AIChatSuggestedQuestions(props: {
               ];
 
     return (
-        <div className="flex flex-col items-start gap-2 self-start">
+        <div
+            className="flex flex-col items-start gap-2 self-start"
+            data-testid="ai-chat-suggested-questions"
+        >
             {suggestions.map((question, index) => (
                 <Button
+                    data-testid="ai-chat-suggested-question"
                     key={question}
                     variant="blank"
                     size="medium"
