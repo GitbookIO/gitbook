@@ -65,7 +65,7 @@ function ThemeButton(props: {
             label={title}
             aria-checked={active}
             variant="blank"
-            size="default"
+            size="medium"
             className={
                 active
                     ? 'bg-primary theme-muted:bg-primary-hover text-primary-strong ring-primary hover:bg-primary contrast-more:text-primary-strong contrast-more:ring-1 [html.sidebar-filled.theme-bold.tint_&]:bg-primary-hover'

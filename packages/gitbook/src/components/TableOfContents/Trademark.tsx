@@ -62,7 +62,10 @@ export function Trademark(props: {
                 className
             )}
         >
-            <TrademarkLink {...rest} />
+            <TrademarkLink
+                className="circular-corners:rounded-2xl rounded-lg straight-corners:rounded-none"
+                {...rest}
+            />
         </div>
     );
 }
@@ -101,10 +104,6 @@ export function TrademarkLink(props: {
 
                 'sidebar-filled:px-3',
                 'lg:sidebar-filled:page-no-toc:px-5',
-
-                'rounded-lg',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
 
                 'hover:bg-tint',
                 'hover:text-tint-strong',

@@ -16,7 +16,6 @@ export function EmbeddableDocsPageControlButtons(props: { href: string }) {
             target="_blank"
             iconOnly
             variant="blank"
-            size="default"
         />
     );
 }
