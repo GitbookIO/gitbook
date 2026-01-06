@@ -13,8 +13,9 @@ export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
+    className?: string;
 }) {
-    const { innerHeader, context, header } = props;
+    const { innerHeader, context, header, className } = props;
     const { customization, revision } = context;
 
     const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
@@ -59,7 +60,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
-                    'pt-6',
+                    'pt-4',
                     'pb-4',
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
@@ -74,7 +75,8 @@ export async function TableOfContents(props: {
                     'gap-4',
 
                     'navigation-open:border-b',
-                    'border-tint-subtle'
+                    'border-tint-subtle',
+                    className
                 )}
             >
                 {header && header}
@@ -104,13 +106,14 @@ export async function TableOfContents(props: {
                     ) : null}
                     <TOCScrollContainer // The scrollview inside the sidebar
                         className={tcls(
-                            'flex grow flex-col p-2',
+                            'flex grow flex-col p-2 pt-4',
                             customization.trademark.enabled && 'lg:pb-20',
                             'hide-scrollbar overflow-y-auto'
                         )}
                     >
                         <PagesList
                             pages={pages}
+                            isRoot={true}
                             style="page-no-toc:hidden border-tint-subtle sidebar-list-line:border-l"
                         />
                         {customization.trademark.enabled ? (

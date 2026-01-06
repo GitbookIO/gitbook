@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import type { PrefillInputContextData } from '../OpenAPIPrefillContextProvider';
 import type { OpenAPIOperationData } from '../types';
-import { resolveTryItPrefillForOperation } from './tryit-prefill';
+import {
+    resolvePrefillCodePlaceholderFromSecurityScheme,
+    resolveTryItPrefillForOperation,
+    resolveURLWithPrefillCodePlaceholdersFromServer,
+} from './tryit-prefill';
 
 describe('resolveTryItPrefillForOperation', () => {
     describe('prefill authentication info', () => {
@@ -307,5 +311,194 @@ describe('resolveTryItPrefillForOperation', () => {
                 ],
             });
         });
+    });
+});
+
+describe('resolvePrefillCodePlaceholderFromSecurityScheme (integration style)', () => {
+    it('should return placeholder for bearer token scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+                'x-gitbook-prefill': '{{ visitor.claims.apiToken }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.apiToken)]__$$');
+    });
+
+    it('should return placeholder for basic auth scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'basic',
+                'x-gitbook-prefill': '{{ visitor.claims.basicAuth }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.basicAuth)]__$$');
+    });
+
+    it('should build placeholder for apiKey scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'apiKey',
+                in: 'header',
+                name: 'X-API-KEY',
+                'x-gitbook-prefill': '{{ visitor.claims.apiKey }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.apiKey)]__$$');
+    });
+
+    it('should return placeholder with default value if provided', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+                'x-gitbook-prefill': '{{ visitor.claims.missing }}',
+            },
+            defaultPlaceholderValue: 'YOUR_API_TOKEN',
+        });
+
+        expect(result).toBe(
+            `$$__X-GITBOOK-PREFILL[(visitor.claims.missing) ?? 'YOUR_API_TOKEN']__$$`
+        );
+    });
+
+    it('should concatenate text and expression in prefill', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+                'x-gitbook-prefill': 'Bearer {{ visitor.claims.apiToken }}',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[("Bearer " + visitor.claims.apiToken)]__$$');
+    });
+
+    it('should handle multiple expressions in prefill', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'basic',
+                'x-gitbook-prefill': '{{ visitor.claims.username }}:{{ visitor.claims.password }}',
+            },
+        });
+
+        expect(result).toBe(
+            '$$__X-GITBOOK-PREFILL[(visitor.claims.username + ":" + visitor.claims.password)]__$$'
+        );
+    });
+
+    it('should return empty default value if no prefill property exists', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+            },
+            defaultPlaceholderValue: 'YOUR_API_TOKEN',
+        });
+
+        expect(result).toBe('YOUR_API_TOKEN');
+    });
+
+    it('should return empty string if no prefill property exists', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'http',
+                scheme: 'bearer',
+            },
+        });
+
+        expect(result).toBe('');
+    });
+
+    it('should prioritize x-gitbook-prefill over x-gitbook-token-placeholder when both are present', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'apiKey',
+                in: 'header',
+                'x-gitbook-prefill': '{{ visitor.claims.apiToken }}',
+                'x-gitbook-token-placeholder': 'API_TOKEN_KEY',
+            },
+        });
+
+        expect(result).toBe('$$__X-GITBOOK-PREFILL[(visitor.claims.apiToken)]__$$');
+    });
+
+    it('should return x-gitbook-token-placeholder for apiKey scheme', () => {
+        const result = resolvePrefillCodePlaceholderFromSecurityScheme({
+            security: {
+                type: 'apiKey',
+                in: 'header',
+                name: 'X-API-KEY',
+                'x-gitbook-token-placeholder': 'YOUR_API_KEY_HERE',
+            },
+        });
+
+        expect(result).toBe('YOUR_API_KEY_HERE');
+    });
+});
+
+describe('resolveURLWithPrefillCodePlaceholdersFromServer', () => {
+    it('should return a simple URL when no prefills are present', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://api.example.com/v1',
+        });
+
+        expect(result).toBe('https://api.example.com/v1');
+    });
+
+    it('should replace a variable with its default when no prefill is set', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://{region}.example.com',
+            variables: {
+                region: { default: 'us-east-1' },
+            },
+        });
+
+        expect(result).toBe('https://us-east-1.example.com');
+    });
+
+    it('should return a placeholder for variable-level prefill only', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://{region}.example.com',
+            variables: {
+                region: { default: 'us-east-1', 'x-gitbook-prefill': '{{ user.region }}' },
+            },
+        });
+
+        expect(result).toBe(
+            `$$__X-GITBOOK-PREFILL[(\`https://\${(user.region ?? 'us-east-1')}.example.com\`)]__$$`
+        );
+    });
+
+    it('should wrap full URL when URL-level prefill exists', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://api.example.com/v1',
+            'x-gitbook-prefill': '{{ user.baseUrl }}',
+        });
+
+        expect(result).toBe(
+            "$$__X-GITBOOK-PREFILL[(user.baseUrl ?? 'https://api.example.com/v1')]__$$"
+        );
+    });
+
+    it('should combine variable-level and URL-level prefills correctly', () => {
+        const result = resolveURLWithPrefillCodePlaceholdersFromServer({
+            url: 'https://{region}.example.com/{version}',
+            'x-gitbook-prefill': '{{ user.baseUrl }}',
+            variables: {
+                region: { default: 'us-east-1', 'x-gitbook-prefill': '{{ user.region }}' },
+                version: { default: 'v1' },
+            },
+        });
+
+        expect(result).toBe(
+            "$$__X-GITBOOK-PREFILL[(user.baseUrl ?? `https://${(user.region ?? 'us-east-1')}.example.com/v1`)]__$$"
+        );
     });
 });

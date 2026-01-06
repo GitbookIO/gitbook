@@ -21,6 +21,12 @@ export function getRecordValue<T extends number | string | boolean | string[] | 
     return record.values[definitionId];
 }
 
+type RecordCardCover = {
+    contentRef: ContentRefFile | ContentRefURL | null;
+    objectFit?: CardsImageObjectFit;
+    alt?: string;
+};
+
 /**
  * Get the covers for a record card.
  * Returns both the light and dark covers with their content refs and optional object fit.
@@ -31,10 +37,7 @@ export function getRecordCardCovers(
     record: DocumentTableRecord,
     view: DocumentTableViewCards
 ): {
-    [key in 'light' | 'dark']: {
-        contentRef: ContentRefFile | ContentRefURL | null;
-        objectFit?: CardsImageObjectFit;
-    };
+    [key in 'light' | 'dark']: RecordCardCover;
 } {
     const lightValue = view.coverDefinition
         ? (getRecordValue(record, view.coverDefinition) as DocumentTableImageRecord | string[])
@@ -53,10 +56,9 @@ export function getRecordCardCovers(
 /**
  * Process a cover value and return the content ref and object fit.
  */
-function processCoverValue(value: DocumentTableImageRecord | string[] | null | undefined): {
-    contentRef: ContentRefFile | ContentRefURL | null;
-    objectFit?: CardsImageObjectFit;
-} {
+function processCoverValue(
+    value: DocumentTableImageRecord | string[] | null | undefined
+): RecordCardCover {
     if (!value) {
         return { contentRef: null };
     }
@@ -71,16 +73,19 @@ function processCoverValue(value: DocumentTableImageRecord | string[] | null | u
         }
     }
 
+    const imageValue = value as DocumentTableImageRecord | null | undefined;
+
     // Check if it's the new schema with objectFit
-    if (value && typeof value === 'object' && 'ref' in value && 'objectFit' in value) {
+    if (imageValue && typeof imageValue === 'object' && 'ref' in imageValue) {
         return {
-            contentRef: value.ref,
-            objectFit: value.objectFit,
+            contentRef: imageValue.ref,
+            objectFit: imageValue.objectFit,
+            alt: imageValue.alt,
         };
     }
 
     // It's a direct ContentRef
-    return { contentRef: value as ContentRefFile | ContentRefURL };
+    return { contentRef: imageValue || null };
 }
 
 /**

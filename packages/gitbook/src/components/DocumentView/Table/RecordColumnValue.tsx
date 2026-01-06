@@ -229,7 +229,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                                 },
                                             },
                                         }}
-                                        priority="lazy"
+                                        loading="lazy"
                                     />
                                 ) : (
                                     <FileIcon
@@ -404,7 +404,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     size: image.file?.dimensions,
                                 },
                             }}
-                            priority="lazy"
+                            loading="lazy"
                         />
                         {image.text}
                     </StyledLink>

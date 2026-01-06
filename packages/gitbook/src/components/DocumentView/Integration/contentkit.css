@@ -156,8 +156,10 @@
 
 /** Text input */
 .contentkit-textinput {
-    @apply w-full rounded border border-tint text-tint-strong placeholder:text-tint flex resize-none flex-1 px-2 py-1.5 text-sm bg-transparent whitespace-pre-line;
-    @apply focus:outline-primary focus:border-primary;
+    @apply w-full circular-corners:rounded-3xl ring-primary-hover rounded-corners:rounded-lg border border-tint text-tint-strong transition-all placeholder:text-tint/8 flex resize-none flex-1 px-2 py-1.5 text-sm bg-tint-base whitespace-pre-line;
+    @apply shadow-tint/6 depth-subtle:focus-within:-translate-y-px depth-subtle:shadow-sm depth-subtle:focus-within:shadow-lg dark:shadow-tint-1;
+    @apply focus:border-primary-hover focus:shadow-primary-subtle focus:ring-2 hover:border-tint-hover focus:hover:border-primary-hover;
+    @apply disabled:cursor-not-allowed disabled:border-tint-subtle disabled:bg-tint-subtle;
 }
 
 /** Form */

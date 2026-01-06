@@ -1,5 +1,41 @@
 # @gitbook/icons
 
+## 0.4.1
+
+### Patch Changes
+
+- e7fb771: Fix icon rendering with explicit currentColor on icon element
+
+## 0.4.0
+
+### Minor Changes
+
+- 62438f4: Update to FontAwesome 7.1.0
+
+## 0.3.4
+
+### Patch Changes
+
+- 10995e0: Use NPM Trusted publishing for publishing the package.
+
+## 0.3.3
+
+### Patch Changes
+
+- 6142d6b: Mark as sideEffects, fix all package bundles
+
+## 0.3.2
+
+### Patch Changes
+
+- 295f03d: Republish packages
+
+## 0.3.1
+
+### Patch Changes
+
+- 262afa3: Fix types for custom icons and update list of icons
+
 ## 0.3.0
 
 ### Minor Changes

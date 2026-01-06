@@ -67,6 +67,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         pageActions: {
             externalAI: true,
             markdown: true,
+            mcp: true,
         },
         trademark: {
             enabled: true,
@@ -76,4 +77,35 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
         },
         socialPreview: {},
     };
+}
+
+/**
+ * Recursively flatten all sections from nested groups
+ */
+export function flattenSectionsFromGroup<T extends { id: string; object: string; children?: T[] }>(
+    children: T[]
+): T[] {
+    const sections: T[] = [];
+
+    for (const child of children) {
+        if (child.object === 'site-section') {
+            sections.push(child);
+        } else if (child.object === 'site-section-group' && child.children) {
+            sections.push(...flattenSectionsFromGroup(child.children));
+        }
+    }
+
+    return sections;
+}
+
+/**
+ * Recursively find a section by ID within a group and its nested children
+ */
+export function findSectionInGroup<T extends { id: string; object: string; children?: T[] }>(
+    group: { children: T[] },
+    sectionId: string
+): T | null {
+    return (
+        flattenSectionsFromGroup(group.children).find((section) => section.id === sectionId) ?? null
+    );
 }

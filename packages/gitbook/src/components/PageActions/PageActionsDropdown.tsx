@@ -1,30 +1,41 @@
 'use client';
 
-import {
-    CopyMarkdown,
-    GitEditLink,
-    OpenAIAssistant,
-    OpenInLLM,
-    ViewAsMarkdown,
-    ViewAsPDF,
-} from '@/components/PageActions/PageActions';
 import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { useAI } from '../AI';
+import {
+    ActionCopyMCPURL,
+    ActionCopyMarkdown,
+    ActionOpenAssistant,
+    ActionOpenEditOnGit,
+    ActionOpenInLLM,
+    ActionOpenMCP,
+    ActionViewAsMarkdown,
+    ActionViewAsPDF,
+    ActionViewAsRSS,
+} from './PageActions';
 
-interface PageActionsDropdownProps {
-    markdownPageUrl: string;
-    className?: string;
-    actions: SiteCustomizationSettings['pageActions'];
+export type PageActionsDropdownURLs = {
+    html: string;
+    markdown: string;
+    mcp?: string;
+    pdf?: string;
+    rss?: string;
     editOnGit?: {
         provider: GitSyncState['installationProvider'];
         url: string;
     };
-    pdfUrl?: string;
+};
+
+interface PageActionsDropdownProps {
+    siteTitle: string;
+    urls: PageActionsDropdownURLs;
+    className?: string;
+    actions: SiteCustomizationSettings['pageActions'];
 }
 
 /**
@@ -32,19 +43,14 @@ interface PageActionsDropdownProps {
  */
 export function PageActionsDropdown(props: PageActionsDropdownProps) {
     const ref = useRef<HTMLDivElement>(null);
-    const assistants = useAI().assistants.filter(
-        (assistant) => assistant.ui === true && assistant.pageAction
-    );
     const language = useLanguage();
 
-    const defaultActions = [assistants.length > 0, props.actions.markdown, props.editOnGit].filter(
-        Boolean
-    );
-    const dropdownActions = [props.actions.externalAI, props.pdfUrl].filter(Boolean);
+    const defaultAction = usePageDefaultAction(props);
+    const dropdownActions = getPageDropdownActions(props);
 
-    return [...defaultActions, ...dropdownActions].length > 0 ? (
+    return defaultAction || dropdownActions.length > 0 ? (
         <ButtonGroup ref={ref} className={props.className}>
-            {defaultActions.length > 0 ? <DefaultAction {...props} /> : null}
+            {defaultAction}
             {dropdownActions.length > 0 ? (
                 <DropdownMenu
                     align="end"
@@ -57,18 +63,15 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
                                     className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
                                 />
                             }
-                            label={tString(
-                                language,
-                                defaultActions.some(Boolean) ? 'more' : 'actions'
-                            )}
-                            iconOnly={defaultActions.some(Boolean)}
+                            label={tString(language, defaultAction ? 'more' : 'actions')}
+                            iconOnly={!!defaultAction}
                             size="xsmall"
                             variant="secondary"
                             className="bg-tint-base text-sm"
                         />
                     }
                 >
-                    <PageActionsDropdownMenuContent {...props} />
+                    {dropdownActions}
                 </DropdownMenu>
             ) : null}
         </ButtonGroup>
@@ -76,94 +79,110 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
 }
 
 /**
- * The content of the dropdown menu.
+ * Return the list of actions to show in the dropdown menu.
  */
-function PageActionsDropdownMenuContent(props: PageActionsDropdownProps) {
-    const { markdownPageUrl, actions } = props;
+function getPageDropdownActions(props: PageActionsDropdownProps): React.ReactNode[] {
+    const { siteTitle, urls, actions } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
 
-    return (
-        <>
-            {assistants.map((assistant) => (
-                <OpenAIAssistant
-                    key={assistant.label}
-                    assistant={assistant}
+    return [
+        ...assistants.map((assistant) => (
+            <ActionOpenAssistant
+                key={assistant.label}
+                assistant={assistant}
+                type="dropdown-menu-item"
+            />
+        )),
+
+        actions.markdown ? (
+            <React.Fragment key="markdown">
+                <DropdownMenuSeparator className="first:hidden" />
+                <ActionCopyMarkdown
+                    isDefaultAction={!assistants.length}
+                    markdownPageURL={urls.markdown}
                     type="dropdown-menu-item"
                 />
-            ))}
+                <ActionViewAsMarkdown markdownPageURL={urls.markdown} type="dropdown-menu-item" />
+            </React.Fragment>
+        ) : null,
 
-            {actions.markdown ? (
-                <>
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <CopyMarkdown
-                        isDefaultAction={!assistants.length}
-                        markdownPageUrl={markdownPageUrl}
+        actions.externalAI ? (
+            <React.Fragment key="externalAI">
+                <DropdownMenuSeparator className="first:hidden" />
+                <ActionOpenInLLM provider="chatgpt" url={urls.html} type="dropdown-menu-item" />
+                <ActionOpenInLLM provider="claude" url={urls.html} type="dropdown-menu-item" />
+            </React.Fragment>
+        ) : null,
+
+        actions.mcp && urls.mcp ? (
+            <React.Fragment key="mcp">
+                <DropdownMenuSeparator className="first:hidden" />
+                <ActionCopyMCPURL mcpURL={urls.mcp} type="dropdown-menu-item" />
+                <ActionOpenMCP
+                    provider="vscode"
+                    mcpURL={urls.mcp}
+                    siteTitle={siteTitle}
+                    type="dropdown-menu-item"
+                />
+            </React.Fragment>
+        ) : null,
+
+        urls.editOnGit || urls.pdf || urls.rss ? (
+            <React.Fragment key="editOnGit">
+                <DropdownMenuSeparator className="first:hidden" />
+                {urls.editOnGit ? (
+                    <ActionOpenEditOnGit
                         type="dropdown-menu-item"
+                        provider={urls.editOnGit.provider}
+                        url={urls.editOnGit.url}
                     />
-                    <ViewAsMarkdown markdownPageUrl={markdownPageUrl} type="dropdown-menu-item" />
-                </>
-            ) : null}
-
-            {actions.externalAI ? (
-                <>
-                    <DropdownMenuSeparator className="first:hidden" />
-                    <OpenInLLM provider="chatgpt" url={markdownPageUrl} type="dropdown-menu-item" />
-                    <OpenInLLM provider="claude" url={markdownPageUrl} type="dropdown-menu-item" />
-                </>
-            ) : null}
-
-            {props.editOnGit || props.pdfUrl ? (
-                <>
-                    <DropdownMenuSeparator className="first:hidden" />
-                    {props.editOnGit ? (
-                        <GitEditLink
-                            type="dropdown-menu-item"
-                            provider={props.editOnGit.provider}
-                            url={props.editOnGit.url}
-                        />
-                    ) : null}
-                    {props.pdfUrl ? (
-                        <ViewAsPDF url={props.pdfUrl} type="dropdown-menu-item" />
-                    ) : null}
-                </>
-            ) : null}
-        </>
-    );
+                ) : null}
+                {urls.rss ? <ActionViewAsRSS url={urls.rss} type="dropdown-menu-item" /> : null}
+                {urls.pdf ? <ActionViewAsPDF url={urls.pdf} type="dropdown-menu-item" /> : null}
+            </React.Fragment>
+        ) : null,
+    ].filter(Boolean);
 }
 
 /**
  * A default action shown as a quick-access button beside the dropdown menu
  */
-function DefaultAction(props: PageActionsDropdownProps) {
-    const { markdownPageUrl, actions } = props;
+function usePageDefaultAction(props: PageActionsDropdownProps) {
+    const { urls, actions } = props;
     const assistants = useAI().assistants.filter(
         (assistant) => assistant.ui === true && assistant.pageAction
     );
 
-    const assistant = assistants[0];
-    if (assistant) {
-        return <OpenAIAssistant assistant={assistant} type="button" />;
+    if (urls.rss) {
+        return <ActionViewAsRSS url={urls.rss} type="button" />;
     }
 
-    if (props.editOnGit) {
+    const assistant = assistants[0];
+    if (assistant) {
+        return <ActionOpenAssistant assistant={assistant} type="button" />;
+    }
+
+    if (urls.editOnGit) {
         return (
-            <GitEditLink
+            <ActionOpenEditOnGit
                 type="button"
-                provider={props.editOnGit.provider}
-                url={props.editOnGit.url}
+                provider={urls.editOnGit.provider}
+                url={urls.editOnGit.url}
             />
         );
     }
 
     if (actions.markdown) {
         return (
-            <CopyMarkdown
+            <ActionCopyMarkdown
                 isDefaultAction={!assistant}
-                markdownPageUrl={markdownPageUrl}
+                markdownPageURL={urls.markdown}
                 type="button"
             />
         );
     }
+
+    return null;
 }

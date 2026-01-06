@@ -15,22 +15,28 @@ export function AIChatFollowupSuggestions(props: {
     }
 
     return (
-        <div className="mt-auto flex w-full flex-wrap justify-end gap-2">
-            {chat.followUpSuggestions.map((suggestion, index) => (
-                <Button
-                    key={index}
-                    onClick={() => {
-                        chatController.postMessage({ message: suggestion });
-                    }}
-                    label={suggestion}
-                    className="whitespace-normal! max-w-full animate-[present_500ms_both] text-left ring-1 ring-tint-subtle"
-                    size="medium"
-                    variant="blank"
-                    style={{
-                        animationDelay: `${250 + Math.min(index * 50, 150)}ms`,
-                    }}
-                />
-            ))}
+        <div className="flex grow flex-col">
+            <div
+                className="sticky bottom-0 mt-auto flex flex-col items-start gap-2"
+                data-testid="ai-chat-followup-suggestions"
+            >
+                {chat.followUpSuggestions.map((suggestion, index) => (
+                    <Button
+                        data-testid="ai-chat-followup-suggestion"
+                        key={index}
+                        onClick={() => {
+                            chatController.postMessage({ message: suggestion });
+                        }}
+                        label={suggestion}
+                        className="starting:h-0 max-w-full origin-left animate-blur-in-slow whitespace-normal border-none bg-primary-11/1 px-3 py-1.5 starting:py-0 text-left transition-all transition-discrete duration-500 *:whitespace-normal hover:bg-primary-hover"
+                        size="medium"
+                        variant="blank"
+                        style={{
+                            animationDelay: `${250 + Math.min(index * 50, 150)}ms`,
+                        }}
+                    />
+                ))}
+            </div>
         </div>
     );
 }

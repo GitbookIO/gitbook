@@ -1,7 +1,6 @@
 'use client';
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
-import { tcls } from '@/lib/tailwind';
 import type { Assistant } from '../AI';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
@@ -24,7 +23,7 @@ export function AIChatButton(props: {
             iconOnly={!showLabel}
             size="medium"
             variant="header"
-            className={tcls('h-9 px-2.5')}
+            className="@max-2xl:px-2.5 @max-2xl:[&_.button-content]:hidden [&_.button-leading-icon]:my-0.5"
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', assistant.label)}
@@ -38,7 +37,7 @@ export function AIChatButton(props: {
             }
             onClick={() => assistant.open()}
         >
-            {showLabel ? <span className="max-md:hidden">{t(language, 'ask')}</span> : null}
+            {showLabel ? t(language, 'ask') : null}
         </Button>
     );
 }

@@ -26,7 +26,12 @@ export function OpenAPISpec(props: {
     return (
         <>
             {securities.length > 0 ? (
-                <OpenAPISecurities key="securities" securities={securities} context={context} />
+                <OpenAPISecurities
+                    key="securities"
+                    securityRequirement={operation.security}
+                    securities={securities}
+                    context={context}
+                />
             ) : null}
 
             {parameterGroups.map((group) => {
@@ -86,7 +91,8 @@ function groupParameters(
             const label = getParameterGroupName(parameter.in, context);
             const group = groups.find((group) => group.key === key);
             if (group) {
-                group.parameters.push(parameter);
+                // Use spread to avoid type issues with complex union type in OpenAPI.Parameters
+                group.parameters = [...group.parameters, parameter] as OpenAPI.Parameters;
             } else {
                 groups.push({
                     key,

@@ -10,23 +10,23 @@ export async function serveRobotsTxt(context: GitBookSiteContext) {
     const isRoot = checkIsRootSiteContext(context);
     const isIndexable = await isSiteIndexable(context);
 
+    const sitemapPath = linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml');
+    const sitemapUrl = linker.toAbsoluteURL(sitemapPath);
+
     const lines = isIndexable
         ? [
               'User-agent: *',
-              // Disallow other dynamic routes / search queries
-              'Disallow: /*?',
-              // Allow image resizing and icon generation routes for favicons and search results
+              // Disallow only internal search
+              'Disallow: /*?*q=*',
+              'Disallow: /*?*ask=*',
+              // Allow dynamic assets (may include ?)
               'Allow: /~gitbook/image?*',
               'Allow: /~gitbook/icon?*',
+              'Allow: /favicon.ico',
               'Allow: /',
-              `Sitemap: ${linker.toAbsoluteURL(linker.toPathInSpace(isRoot ? '/sitemap.xml' : '/sitemap-pages.xml'))}`,
+              `Sitemap: ${sitemapUrl}`,
           ]
         : ['User-agent: *', 'Disallow: /'];
 
-    const robotsTxt = lines.join('\n');
-    return new Response(robotsTxt, {
-        headers: {
-            'Content-Type': 'text/plain',
-        },
-    });
+    return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain' } });
 }

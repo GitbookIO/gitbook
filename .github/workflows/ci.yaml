@@ -4,8 +4,9 @@ on:
     push:
         branches:
             - main
+            - changeset-release/main
 env:
-    NPM_TOKEN_READONLY: ${{ secrets.NPM_TOKEN_READONLY }}
+    BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
 jobs:
     format:
         runs-on: ubuntu-latest
@@ -41,7 +42,7 @@ jobs:
         name: Build (Open Source)
         timeout-minutes: 6
         env:
-            NPM_TOKEN_READONLY: ''
+            BUN_NPM_TOKEN: ''
         steps:
             - name: Checkout
               uses: actions/checkout@v4

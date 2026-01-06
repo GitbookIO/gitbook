@@ -39,7 +39,7 @@ function ToolCallSummary(props: { toolCall: AIToolCall; context: GitBookSiteCont
     const { toolCall, context } = props;
 
     return (
-        <div className="flex origin-left animate-scale-in-slow items-start gap-2 text-sm text-tint-subtle">
+        <div className="mt-2 flex origin-top-left animate-blur-in-slow items-start gap-2 text-sm text-tint-subtle">
             <Icon
                 icon={getIconForToolCall(toolCall)}
                 className="mt-1 size-3 shrink-0 text-tint-subtle/8"
@@ -160,7 +160,7 @@ async function DescriptionForSearchToolCall(props: {
     const hasResults = toolCall.results.length > 0;
 
     return (
-        <details className={tcls('-ml-5 group flex w-full flex-col', hasResults ? 'gap-2' : '')}>
+        <details className="-ml-5 group flex w-full flex-col">
             <summary
                 className={tcls(
                     '-mx-2 flex list-none items-center gap-2 circular-corners:rounded-2xl rounded-corners:rounded-md pr-4 pl-7 transition-colors marker:hidden',
@@ -187,7 +187,7 @@ async function DescriptionForSearchToolCall(props: {
                 ) : null}
             </summary>
             {hasResults ? (
-                <div className="hide-scrollbar mt-1 max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all transition-discrete duration-500 group-open:max-h-96 group-open:opacity-11">
+                <div className="hide-scrollbar mt-4 max-h-0 overflow-y-auto circular-corners:rounded-2xl rounded-corners:rounded-lg border border-tint-subtle p-2 opacity-0 transition-all transition-discrete duration-500 group-open:max-h-96 group-open:opacity-11">
                     <ol className="space-y-1">
                         {searchResultsWithHrefs.map((result, index) => (
                             <li

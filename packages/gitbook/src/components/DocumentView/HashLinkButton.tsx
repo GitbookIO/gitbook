@@ -1,6 +1,7 @@
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import type { DocumentBlockHeading, DocumentBlockTabs } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
+import { Link } from '../primitives';
 import { getBlockTextStyle } from './spacing';
 
 /**
@@ -28,6 +29,8 @@ export function HashLinkButton(props: {
                 'h-[1em]',
                 'border-0',
                 'opacity-0',
+                'site-background',
+                'rounded',
                 'group-hover/hash:opacity-[0]',
                 'group-focus/hash:opacity-[0]',
                 'md:group-hover/hash:opacity-[1]',
@@ -35,10 +38,10 @@ export function HashLinkButton(props: {
                 className
             )}
         >
-            <a
+            <Link
                 href={`#${id}`}
                 aria-label={label}
-                className={tcls('inline-flex', 'h-full', 'items-start', textStyle.lineHeight)}
+                className={tcls('inline-flex h-full items-start', textStyle.lineHeight)}
             >
                 <Icon
                     icon="hashtag"
@@ -52,7 +55,7 @@ export function HashLinkButton(props: {
                         iconClassName
                     )}
                 />
-            </a>
+            </Link>
         </div>
     );
 }

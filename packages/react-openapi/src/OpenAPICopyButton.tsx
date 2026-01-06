@@ -1,7 +1,9 @@
 'use client';
 
+import clsx from 'classnames';
 import { useState } from 'react';
-import { Button, type ButtonProps, Tooltip, TooltipTrigger } from 'react-aria-components';
+import { Button, type ButtonProps } from 'react-aria-components';
+import { OpenAPITooltip } from './OpenAPITooltip';
 import type { OpenAPIClientContext } from './context';
 import { t } from './translate';
 
@@ -36,13 +38,7 @@ export function OpenAPICopyButton(
     };
 
     return (
-        <TooltipTrigger
-            isOpen={isOpen}
-            onOpenChange={setIsOpen}
-            isDisabled={!withTooltip}
-            closeDelay={200}
-            delay={200}
-        >
+        <OpenAPITooltip isDisabled={!withTooltip} isOpen={isOpen} onOpenChange={setIsOpen}>
             <Button
                 type="button"
                 preventFocusOnPress
@@ -50,23 +46,22 @@ export function OpenAPICopyButton(
                     handleCopy();
                     onPress?.(e);
                 }}
-                className={`openapi-copy-button ${className}`}
+                className={clsx('openapi-copy-button', className)}
                 {...props}
             >
                 {children}
             </Button>
 
-            <Tooltip
-                isOpen={isOpen}
-                onOpenChange={setIsOpen}
-                placement="top"
-                offset={4}
-                className="openapi-tooltip"
-            >
-                {copied
-                    ? t(context.translation, 'copied')
-                    : label || t(context.translation, 'copy_to_clipboard')}
-            </Tooltip>
-        </TooltipTrigger>
+            <OpenAPITooltip.Content isOpen={isOpen} onOpenChange={setIsOpen}>
+                {copied ? (
+                    <>
+                        {context.icons.check}
+                        {t(context.translation, 'copied')}
+                    </>
+                ) : (
+                    label || t(context.translation, 'copy_to_clipboard')
+                )}
+            </OpenAPITooltip.Content>
+        </OpenAPITooltip>
     );
 }

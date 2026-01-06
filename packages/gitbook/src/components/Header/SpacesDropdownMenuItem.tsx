@@ -1,26 +1,39 @@
 'use client';
 
-import type { Space } from '@gitbook/api';
-
 import { joinPath } from '@/lib/paths';
-import { useCurrentPagePath } from '../hooks';
+import { useCurrentPageMetadata, useCurrentPagePath } from '../hooks';
 import { DropdownMenuItem } from '../primitives/DropdownMenu';
 
 interface VariantSpace {
-    id: Space['id'];
-    title: Space['title'];
+    id: string;
+    title: string;
     url: string;
     isActive: boolean;
+    spaceId: string;
 }
 
-// When switching to a different variant space, we reconstruct the URL by swapping the space path.
-function useVariantSpaceHref(variantSpaceUrl: string, currentSpacePath: string, active = false) {
+/**
+ * Return the href for a variant space, taking into account the current page path and metadata.
+ */
+function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: string, active = false) {
     const currentPathname = useCurrentPagePath();
+    const { metaLinks } = useCurrentPageMetadata();
+
+    // We first check if there is an alternate link for the variant space in the current page metadata.
+    const pageHasAlternateForVariant = metaLinks?.alternates.find(
+        (alt) => alt.space?.id === variantSpace.spaceId
+    );
+    if (pageHasAlternateForVariant) {
+        return pageHasAlternateForVariant.href;
+    }
+
+    // If there is no alternate link, we reconstruct the URL by swapping the space path.
 
     // We need to ensure that the variant space URL is not the same as the current space path.
     // If it is, we return only the variant space URL to redirect to the root of the variant space.
     // This is necessary in case the currentPathname is the same as the variantSpaceUrl,
     // otherwise we would redirect to the same space if the variant space that we are switching to is the default one.
+    const variantSpaceUrl = variantSpace.url;
     if (!active && currentPathname.startsWith(`${currentSpacePath}/`)) {
         return variantSpaceUrl;
     }
@@ -44,7 +57,7 @@ export function SpacesDropdownMenuItem(props: {
     currentSpacePath: string;
 }) {
     const { variantSpace, active, currentSpacePath } = props;
-    const variantHref = useVariantSpaceHref(variantSpace.url, currentSpacePath, active);
+    const variantHref = useVariantSpaceHref(variantSpace, currentSpacePath, active);
 
     return (
         <DropdownMenuItem key={variantSpace.id} href={variantHref} active={active}>

@@ -51,11 +51,13 @@ type UnwrappedBlocksProps<TBlock extends DocumentBlock> = DocumentContextProps &
  * Ideally we'd rely on the block type to determine if it can be full width, but
  * the block's `fullWidth` property does not differentiate between `undefined` and `false`.
  * So instead we hardcode a list of blocks that can be full width. */
-const FULL_WIDTH_BLOCKS = [
+const FULL_WIDTH_BLOCKS: DocumentBlock['type'][] = [
     'table',
     'tabs',
     'integration',
-    'openapi',
+    'openapi-operation',
+    'openapi-schemas',
+    'openapi-webhook',
     'images',
     'embed',
     'columns',
@@ -63,6 +65,8 @@ const FULL_WIDTH_BLOCKS = [
     'content-ref',
     'hint',
 ];
+
+const LIST_BLOCKS: DocumentBlock['type'][] = ['list-ordered', 'list-tasks', 'list-unordered'];
 
 /**
  * Renders a list of blocks without a wrapper element.
@@ -85,11 +89,12 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 key={node.key || `${node.type}-${index}`}
                 block={node}
                 style={[
-                    'mx-auto page-width-wide:mx-0 w-full decoration-primary/6 print:break-inside-avoid',
+                    'mx-auto page-width-wide:mx-0 w-full decoration-primary/6',
                     node.data && 'fullWidth' in node.data && node.data.fullWidth
                         ? 'max-w-screen-xl'
                         : 'max-w-3xl',
-                    FULL_WIDTH_BLOCKS.includes(node.type) && 'page-width-wide:max-w-screen-2xl',
+                    !LIST_BLOCKS.includes(node.type) && 'print:break-inside-avoid',
+                    FULL_WIDTH_BLOCKS.includes(node.type) && 'page-width-wide:max-w-full',
                     blockStyle,
                 ]}
                 isEstimatedOffscreen={isOffscreen}

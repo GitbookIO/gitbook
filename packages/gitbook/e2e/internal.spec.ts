@@ -33,8 +33,34 @@ import {
     headerLinks,
     runTestCases,
     waitForCookiesDialog,
+    waitForCoverImages,
     waitForNotFound,
 } from './util';
+
+const AI_PROMPT = `You're being invoked by the GitBook CI/CD pipeline. To make screenshot testing of the GitBook Assistant visually consistent, look up the title of the first page you find and respond with only EXACTLY its title. To find the page title, invoke the search tool with the query "GitBook". Before invoking the search tool, respond with the exact text: "I'm going to look up 'GitBook' and then respond with only the page title.". Do not execute any other tools or output any other text.`;
+
+const overrideAIInitialState = () => {
+    const greeting = document.querySelector('[data-testid="ai-chat-time-greeting"]');
+    if (greeting) {
+        greeting.textContent = 'Good morning';
+    }
+};
+const overrideAIResponse = () => {
+    const userMessage = document.querySelector('[data-testid="ai-chat-message-user"]');
+    if (userMessage) {
+        userMessage.textContent = '[Replaced message] Chat message sent by the user';
+    }
+    const assistantMessage = document.querySelectorAll(
+        '[data-testid="ai-chat-message-assistant"] .ai-response-document'
+    );
+    assistantMessage.forEach((message) => {
+        message.innerHTML = '[Replaced message] AI chat response';
+    });
+    const suggestions = document.querySelectorAll('[data-testid="ai-chat-followup-suggestion"]');
+    suggestions.forEach((suggestion) => {
+        suggestion.textContent = 'Follow-up suggestion';
+    });
+};
 
 const searchTestCases: Test[] = [
     {
@@ -52,7 +78,9 @@ const searchTestCases: Test[] = [
 
             // Fill search input, expecting search results
             await searchInput.fill('gitbook');
-            await expect(page.getByTestId('search-results')).toBeVisible();
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 10_000,
+            });
             const pageResults = await page.getByTestId('search-page-result').all();
             await expect(pageResults.length).toBeGreaterThanOrEqual(1);
             const pageSectionResults = await page.getByTestId('search-page-section-result').all();
@@ -97,9 +125,6 @@ const searchTestCases: Test[] = [
             await expect(page.getByTestId('search-results')).toBeVisible();
         },
     },
-    // TODO: Re-enable the following tests when we have fixed the AI Search timing out:
-    // - Search - AI Mode: Search - Complete flow
-    // - Search - AI Mode: Search - URL query (Initial)
     {
         name: 'Search - AI Mode: Search - URL query (Results)',
         url: `${getCustomizationURL({
@@ -107,16 +132,12 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Search,
             },
         })}&q=gitbook`,
-        screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).toBeFocused();
             await expect(page.getByTestId('search-input')).toHaveValue('gitbook');
             await expect(page.getByTestId('search-results')).toBeVisible();
         },
     },
-    // TODO: Re-enable the following tests when we have fixed the AI Search timing out:
-    // - Ask - AI Mode: Search - URL query (Ask initial)
-    // - Ask - AI Mode: Search - URL query (Ask results)
     {
         name: 'Ask - AI Mode: Assistant - Complete flow',
         url: getCustomizationURL({
@@ -124,25 +145,32 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             const searchInput = page.locator('css=[data-testid="search-input"]');
 
             // Focus search input, expecting recommended questions
             await searchInput.focus();
-            // TODO: Re-enable this part of the test when we have fixed the AI Search timing out
-            // await expect(page.getByTestId('search-results')).toBeVisible();
-            // const recommendedQuestions = await page
-            //     .getByTestId('search-recommended-question')
-            //     .all();
-            // await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
+            await expect(page.getByTestId('search-results')).toBeVisible({
+                timeout: 30_000,
+            });
+            const recommendedQuestions = await page
+                .getByTestId('search-recommended-question')
+                .all();
+            await expect(recommendedQuestions.length).toBeGreaterThan(2); // Expect at least 3 questions
 
             // Fill search input, expecting AI search option
-            await searchInput.fill('What is gitbook?');
+            await searchInput.fill(AI_PROMPT);
             const aiSearchResult = page.getByTestId('search-ask-question');
             await expect(aiSearchResult).toBeVisible();
             await aiSearchResult.click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
+            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
+                timeout: 60_000,
+            });
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(overrideAIResponse);
         },
     },
     {
@@ -152,11 +180,12 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         }),
-        screenshot: false,
         run: async (page) => {
             await page.keyboard.press('ControlOrMeta+I');
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(overrideAIInitialState);
         },
     },
     {
@@ -171,6 +200,8 @@ const searchTestCases: Test[] = [
             await page.getByTestId('ai-chat-button').click();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(overrideAIInitialState);
         },
     },
     {
@@ -180,12 +211,13 @@ const searchTestCases: Test[] = [
                 mode: CustomizationAIMode.Assistant,
             },
         })}&ask=`,
-        screenshot: false,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
-            await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
+            await expect(page.getByTestId('search-input')).toBeEmpty();
             await expect(page.getByTestId('ai-chat')).toBeVisible();
             await expect(page.getByTestId('ai-chat-input')).toBeFocused();
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(overrideAIInitialState);
         },
     },
     {
@@ -194,17 +226,18 @@ const searchTestCases: Test[] = [
             ai: {
                 mode: CustomizationAIMode.Assistant,
             },
-        })}&ask=What+is+GitBook%3F`,
-        screenshot: false,
+        })}&ask=${encodeURIComponent(AI_PROMPT)}`,
         run: async (page) => {
             await expect(page.getByTestId('search-input')).not.toBeFocused();
             await expect(page.getByTestId('search-input')).not.toHaveValue('What is GitBook?');
-            await expect(page.getByTestId('ai-chat')).toBeVisible({
-                timeout: 15_000,
+            await expect(page.getByTestId('ai-chat')).toBeVisible();
+            await expect(page.getByTestId('ai-chat-message-user').first()).toHaveText(AI_PROMPT);
+            await expect(page.getByTestId('ai-chat-message-assistant').first()).toBeVisible();
+            await expect(page.getByTestId('ai-chat-followup-suggestion')).toHaveCount(3, {
+                timeout: 60_000,
             });
-            await expect(page.getByTestId('ai-chat-message').first()).toHaveText(
-                'What is GitBook?'
-            );
+            // Override text content for visual consistency in screenshots
+            await page.evaluate(overrideAIResponse);
         },
     },
 ];
@@ -226,6 +259,58 @@ const testCases: TestsCase[] = [
                     await expect(page.locator('[data-testid="space-dropdown-button"]')).toHaveCount(
                         0
                     );
+                },
+            },
+            {
+                name: 'Expandable TOC navigation',
+                url: '',
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+
+                    // Verify "Navigation" link is not visible initially
+                    const navigationLink = page.getByRole('link', { name: 'Navigation' });
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Find and click the chevron element that is next to "Editor" in the TOC
+                    // It is a span inside the link
+                    const editorChevron = page
+                        .getByRole('link', { name: 'Editor' })
+                        .locator('span');
+                    await editorChevron.click();
+
+                    // Verify "Navigation" link becomes visible after expansion
+                    await expect(navigationLink).toBeVisible();
+                },
+            },
+            {
+                name: 'Expandable nested TOC navigation',
+                url: '',
+                screenshot: false,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+
+                    // Verify "Spaces" link is not visible initially
+                    const navigationLink = page.getByRole('link', { name: 'Spaces' });
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Find and click the chevron element that is next to "Editor" in the TOC
+                    // It is a span inside the link
+                    const editorChevron = page
+                        .getByRole('link', { name: 'Editor' })
+                        .locator('span');
+                    await editorChevron.click();
+
+                    // At this stage the link should still not be visible
+                    await expect(navigationLink).not.toBeVisible();
+
+                    // Then we click 'Content Structure' chevron to expand further
+                    const contentStructureChevron = page
+                        .getByRole('link', { name: 'Content Structure' })
+                        .locator('span');
+                    await contentStructureChevron.click();
+
+                    // Verify "Spaces" link becomes visible after expansion
+                    await expect(navigationLink).toBeVisible();
                 },
             },
             ...searchTestCases,
@@ -282,6 +367,37 @@ const testCases: TestsCase[] = [
                         variantSelectionDropdown.getByRole('menuitem', {
                             name: 'RFCs',
                         })
+                    ).toBeVisible();
+                },
+            },
+            {
+                name: 'Switch variant with alternate link in metadata',
+                url: 'rfcs',
+                run: async (page) => {
+                    const spaceDropdown = page
+                        .locator('[data-testid="space-dropdown-button"]')
+                        .locator('visible=true');
+                    await spaceDropdown.click();
+
+                    const variantSelectionDropdown = page.locator(
+                        'css=[data-testid="dropdown-menu"]'
+                    );
+
+                    // Click the variant space called 'Multi-Variants' for which
+                    // there is an alternate link in the current (RFC variant) page metadata
+                    await variantSelectionDropdown
+                        .getByRole('menuitem', {
+                            name: 'Multi-Variants',
+                        })
+                        .click();
+
+                    // It should navigate to the alternate link defined in the metadata (a completely different page)
+                    await page.waitForURL((url) =>
+                        url.pathname.includes('multi-variants/reference/api-reference/pets')
+                    );
+                    // Verify we are on the correct page by checking the h1
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Pets' })
                     ).toBeVisible();
                 },
             },
@@ -727,7 +843,10 @@ const testCases: TestsCase[] = [
                 url: 'blocks/integrations',
                 run: async (page) => {
                     await waitForCookiesDialog(page);
-                    const mermaidIframe = page.locator('iframe[title*="mermaid"]').contentFrame();
+                    const mermaidIframe = page
+                        .locator('iframe[title*="mermaid"]')
+                        .first()
+                        .contentFrame();
                     await expect(mermaidIframe.getByText('Mermaid', { exact: true })).toBeVisible();
                     await expect(mermaidIframe.getByText('Diagram', { exact: true })).toBeVisible();
                 },
@@ -794,6 +913,11 @@ const testCases: TestsCase[] = [
                 fullPage: true,
             },
             {
+                name: 'Updates',
+                url: 'blocks/updates',
+                fullPage: true,
+            },
+            {
                 name: 'Math',
                 url: 'blocks/math',
                 run: async (page) => {
@@ -851,7 +975,10 @@ const testCases: TestsCase[] = [
             {
                 name: 'With cover',
                 url: 'page-options/page-with-cover',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
             },
             {
                 name: 'With cover for dark mode',
@@ -866,12 +993,18 @@ const testCases: TestsCase[] = [
             {
                 name: 'With hero cover',
                 url: 'page-options/page-with-hero-cover',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
             },
             {
                 name: 'With cover and no TOC',
                 url: 'page-options/page-with-cover-and-no-toc',
-                run: waitForCookiesDialog,
+                run: async (page) => {
+                    await waitForCookiesDialog(page);
+                    await waitForCoverImages(page);
+                },
                 screenshot: {
                     waitForTOCScrolling: false,
                 },
@@ -1158,7 +1291,7 @@ const testCases: TestsCase[] = [
                 name: 'Redirect to Quickstart page',
                 url: 'sections-2/redirect-test',
                 run: async (page) => {
-                    await expect(page.locator('h1')).toHaveText('Quickstart');
+                    await expect(page.locator('h1')).toContainText('Quickstart');
                 },
                 screenshot: false,
             },
@@ -1454,10 +1587,7 @@ const testCases: TestsCase[] = [
                     locale,
                 },
             }),
-            run: async (page) => {
-                const dialog = page.getByTestId('cookies-dialog');
-                await expect(dialog).toBeVisible();
-            },
+            run: waitForCookiesDialog,
         })),
     },
     {

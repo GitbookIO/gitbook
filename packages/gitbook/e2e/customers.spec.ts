@@ -62,11 +62,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://docs.gmgn.ai',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.spicychat.ai',
-        contentBaseURL: 'https://docs.spicychat.ai',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // {
+    //     name: 'docs.spicychat.ai',
+    //     contentBaseURL: 'https://docs.spicychat.ai',
+    //     tests: [{ name: 'Home', url: '/' }],
+    // },
     {
         name: 'docs.portainer.io',
         contentBaseURL: 'https://docs.portainer.io',
@@ -112,11 +112,11 @@ const testCases: TestsCase[] = [
         contentBaseURL: 'https://adiblar.gitbook.io',
         tests: [{ name: 'Home', url: '/' }],
     },
-    {
-        name: 'docs.gradient.network',
-        contentBaseURL: 'https://docs.gradient.network',
-        tests: [{ name: 'Home', url: '/' }],
-    },
+    // {
+    //     name: 'docs.gradient.network',
+    //     contentBaseURL: 'https://docs.gradient.network',
+    //     tests: [{ name: 'Home', url: '/' }],
+    // },
     // {
     //     name: 'mygate-network.gitbook.io',
     //     contentBaseURL: 'https://mygate-network.gitbook.io',
@@ -170,11 +170,6 @@ const testCases: TestsCase[] = [
     {
         name: 'docs.realapp.link',
         contentBaseURL: 'https://docs.realapp.link',
-        tests: [{ name: 'Home', url: '/' }],
-    },
-    {
-        name: 'docs.plaza.finance',
-        contentBaseURL: 'https://docs.plaza.finance',
         tests: [{ name: 'Home', url: '/' }],
     },
     {

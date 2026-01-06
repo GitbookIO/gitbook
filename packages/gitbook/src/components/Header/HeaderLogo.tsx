@@ -3,6 +3,7 @@ import type { GitBookSiteContext } from '@/lib/context';
 import { Image } from '@/components/utils';
 import { tcls } from '@/lib/tailwind';
 
+import { resolveContentRef } from '@/lib/references';
 import { Link } from '../primitives';
 import { CurrentContentIcon } from './CurrentContentIcon';
 
@@ -18,9 +19,13 @@ export async function HeaderLogo(props: HeaderLogoProps) {
     const { context } = props;
     const { customization, linker } = context;
 
+    const primaryLink = customization.header.primaryLink
+        ? await resolveContentRef(customization.header.primaryLink, context)
+        : null;
+
     return (
         <Link
-            href={linker.toPathInSite('')}
+            href={primaryLink?.href ?? linker.toPathInSite('')}
             className={tcls('group/headerlogo', 'min-w-0', 'shrink', 'flex', 'items-center')}
         >
             {customization.header.logo ? (
@@ -46,7 +51,7 @@ export async function HeaderLogo(props: HeaderLogoProps) {
                             width: 260,
                         },
                     ]}
-                    priority="high"
+                    preload
                     style={tcls(
                         'overflow-hidden',
                         'shrink',

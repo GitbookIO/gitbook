@@ -1,10 +1,12 @@
 import { type DocumentBlockFile, SiteInsightsLinkPosition } from '@gitbook/api';
 
+import { t } from '@/intl/translate';
 import { getSimplifiedContentType } from '@/lib/files';
 import { resolveContentRef } from '@/lib/references';
-import { tcls } from '@/lib/tailwind';
 
-import { Link } from '../primitives';
+import { getSpaceLanguage } from '@/intl/server';
+import { Button, Link } from '../primitives';
+import { DownloadButton } from '../primitives/DownloadButton';
 import type { BlockProps } from './Block';
 import { Caption } from './Caption';
 import { FileIcon } from './FileIcon';
@@ -12,67 +14,70 @@ import { FileIcon } from './FileIcon';
 export async function File(props: BlockProps<DocumentBlockFile>) {
     const { block, context } = props;
 
-    const contentRef = context.contentContext
-        ? await resolveContentRef(block.data.ref, context.contentContext)
-        : null;
+    if (!context.contentContext) {
+        return null;
+    }
+
+    const contentRef = await resolveContentRef(block.data.ref, context.contentContext);
     const file = contentRef?.file;
 
     if (!file) {
         return null;
     }
 
+    const language = getSpaceLanguage(context.contentContext);
     const contentType = getSimplifiedContentType(file.contentType);
+    const insights = {
+        type: 'link_click' as const,
+        link: {
+            target: block.data.ref,
+            position: SiteInsightsLinkPosition.Content,
+        },
+    };
 
     return (
         <Caption {...props} withBorder>
-            <Link
-                href={file.downloadURL}
-                download={file.name}
-                insights={{
-                    type: 'link_click',
-                    link: {
-                        target: block.data.ref,
-                        position: SiteInsightsLinkPosition.Content,
-                    },
-                }}
-                className={tcls('group/file', 'flex', 'flex-row', 'items-center', 'px-5', 'py-3')}
-            >
-                <div
-                    className={tcls(
-                        'min-w-14',
-                        'mr-5',
-                        'pr-5',
-                        'flex',
-                        'flex-col',
-                        'items-center',
-                        'gap-1',
-                        'border-r',
-                        'border-tint-subtle'
-                    )}
-                >
-                    <div>
-                        <FileIcon
-                            contentType={contentType}
-                            className={tcls('size-5', 'text-primary')}
-                        />
+            <div className="flex flex-wrap items-center gap-5 px-5 py-3">
+                <div className="flex min-w-14 flex-col items-center gap-1 border-tint-subtle border-r pr-5">
+                    <FileIcon contentType={contentType} className="size-5 text-primary" />
+                    <div className="text-hint text-xs">{getHumanFileSize(file.size)}</div>
+                </div>
+                <div className="min-w-24 flex-1">
+                    <div className="text-base">
+                        <Link
+                            href={file.downloadURL}
+                            target="_blank"
+                            insights={insights}
+                            className="hover:underline"
+                        >
+                            {file.name}
+                        </Link>
                     </div>
-                    <div
-                        className={tcls(
-                            'text-xs',
-                            'text-tint',
-                            'group-hover/file:text-tint-strong'
-                        )}
+                    <div className="text-sm opacity-9 dark:opacity-8">{contentType}</div>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                    <DownloadButton
+                        icon="download"
+                        size="xsmall"
+                        variant="secondary"
+                        downloadUrl={file.downloadURL}
+                        filename={file.name}
+                        insights={insights}
                     >
-                        {getHumanFileSize(file.size)}
-                    </div>
+                        {t(language, 'download')}
+                    </DownloadButton>
+                    <Button
+                        icon="arrow-up-right-from-square"
+                        size="xsmall"
+                        variant="secondary"
+                        href={file.downloadURL}
+                        target="_blank"
+                        insights={insights}
+                    >
+                        {t(language, 'open')}
+                    </Button>
                 </div>
-                <div>
-                    <div className={tcls('text-base')}>{file.name}</div>
-                    <div className={tcls('text-sm', 'opacity-9', 'dark:opacity-8')}>
-                        {contentType}
-                    </div>
-                </div>
-            </Link>
+            </div>
         </Caption>
     );
 }

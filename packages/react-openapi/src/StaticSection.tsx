@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { type ComponentPropsWithoutRef, forwardRef } from 'react';
 
 export function Section(props: ComponentPropsWithoutRef<'div'>) {

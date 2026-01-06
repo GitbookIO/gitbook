@@ -14,7 +14,7 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
     },
     ref: React.Ref<HTMLAnchorElement>
 ) {
-    const { query, item, active } = props;
+    const { query, item, active, ...rest } = props;
     const language = useLanguage();
 
     const breadcrumbs =
@@ -41,6 +41,8 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                     spaceId: item.spaceId,
                 },
             }}
+            aria-label={tString(language, 'search_page_result_title', item.title)}
+            {...rest}
         >
             {breadcrumbs.length > 0 ? (
                 <div
@@ -52,13 +54,13 @@ export const SearchPageResultItem = React.forwardRef(function SearchPageResultIt
                         'transition-colors',
                         'font-normal',
                         'uppercase',
-                        'leading-none',
+                        'leading-snug',
                         'tracking-wider',
                         'mb-1',
                         'flex',
                         'flex-wrap',
                         'gap-x-2',
-                        'gap-y-1',
+                        'gap-y-0',
                         'items-center'
                     )}
                 >

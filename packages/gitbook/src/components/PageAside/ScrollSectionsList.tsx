@@ -7,7 +7,6 @@ import { tcls } from '@/lib/tailwind';
 
 import { useBodyLoaded } from '@/components/primitives';
 import { HEADER_HEIGHT_DESKTOP } from '../layout';
-import { AsideSectionHighlight } from './AsideSectionHighlight';
 
 /**
  * The threshold at which we consider a section as intersecting the viewport.
@@ -44,7 +43,7 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
 
     return (
         <ul
-            className="relative flex flex-col overflow-y-auto border-tint-subtle sidebar-list-line:border-l pb-5 xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2"
+            className="relative flex flex-col border-tint-subtle sidebar-list-line:border-l pb-5 xl:max-2xl:page-api-block:mt-0 xl:max-2xl:page-api-block:p-2"
             ref={scrollContainerRef}
         >
             {sections.map((section) => (
@@ -62,22 +61,6 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                     )}
                     ref={activeId === section.id ? activeItemRef : null}
                 >
-                    {activeId === section.id && (
-                        <AsideSectionHighlight
-                            className={tcls(
-                                'sidebar-list-default:hidden',
-                                section?.depth > 1
-                                    ? [
-                                          'sidebar-list-default:rounded-l-none',
-                                          'sidebar-list-line:rounded-l-none',
-                                      ]
-                                    : [
-                                          'sidebar-list-default:ml-3',
-                                          'contrast-more:sidebar-list-default:ml-0',
-                                      ]
-                            )}
-                        />
-                    )}
                     <a
                         href={`#${section.id}`}
                         className={tcls(
@@ -104,13 +87,17 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                             'contrast-more:hover:ring-inset',
                             'contrast-more:hover:ring-current',
 
+                            'sidebar-list-line:border-l-2',
+                            'border-transparent',
+                            'sidebar-list-line:-left-px',
+
                             section.depth > 1 && [
                                 'subitem',
                                 'sidebar-list-line:pl-6',
                                 'opacity-8',
                                 'contrast-more:opacity-11',
 
-                                'sidebar-list-default:rounded-l-none',
+                                'sidebar-list-default:rounded-l-none!',
                                 'sidebar-list-default:border-l',
                                 'sidebar-list-default:border-tint',
                             ],
@@ -120,17 +107,20 @@ export function ScrollSectionsList({ sections }: { sections: DocumentSection[] }
                                 'hover:text-primary',
                                 'contrast-more:text-primary',
                                 'contrast-more:hover:text-primary-strong',
-                                'sidebar-list-line:ml-px',
-
                                 'hover:bg-primary-hover',
+
                                 'theme-muted:hover:bg-primary-active',
                                 '[html.sidebar-filled.theme-bold.tint_&]:hover:bg-primary-active',
                                 'theme-gradient:hover:bg-primary-active',
-
                                 'tint:font-semibold',
                                 'contrast-more:font-semibold',
 
+                                'sidebar-list-line:border-primary-9',
                                 'sidebar-list-default:border-tint',
+
+                                'sidebar-list-pill:bg-primary',
+                                '[html.theme-muted.sidebar-list-pill_&]:bg-primary-hover',
+                                '[html.theme-gradient.sidebar-list-pill_&]:bg-primary-active',
                             ]
                         )}
                     >

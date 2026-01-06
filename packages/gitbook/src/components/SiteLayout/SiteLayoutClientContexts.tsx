@@ -22,12 +22,17 @@ export function SiteLayoutClientContexts(props: {
     useClearRouterCache(contextId);
 
     return (
-        <NuqsAdapter>
-            <ThemeProvider attribute="class" enableSystem forcedTheme={forcedTheme}>
+        <ThemeProvider
+            attribute="class"
+            disableTransitionOnChange
+            enableSystem
+            forcedTheme={forcedTheme}
+        >
+            <NuqsAdapter>
                 <LinkSettingsContext.Provider value={{ externalLinksTarget }}>
                     <SearchContextProvider>{children}</SearchContextProvider>
                 </LinkSettingsContext.Provider>
-            </ThemeProvider>
-        </NuqsAdapter>
+            </NuqsAdapter>
+        </ThemeProvider>
     );
 }

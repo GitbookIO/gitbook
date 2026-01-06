@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from '@gitbook/icons';
+import { Icon, type IconName } from '@gitbook/icons';
 import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import { createContext, useCallback, useContext, useState } from 'react';
 
@@ -23,6 +23,11 @@ const DropdownMenuContext = createContext<{
     open: false,
     setOpen: () => {},
 });
+
+const DROPDOWN_CONTENT_OUTER_CLASS =
+    'z-50 flex max-h-(--radix-dropdown-menu-content-available-height) min-w-28 xs:min-w-40 max-w-(--radix-dropdown-menu-content-available-width) origin-top animate-scale-in flex-col pt-2 data-[state=closed]:animate-scale-out';
+const DROPDOWN_CONTENT_INNER_CLASS =
+    'flex flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg';
 
 /**
  * Button with a dropdown.
@@ -82,14 +87,9 @@ export function DropdownMenu(props: {
                         onMouseLeave={() => setHovered(false)}
                         align={align}
                         side={side}
-                        className="z-40 animate-scale-in border-tint pt-2"
+                        className={DROPDOWN_CONTENT_OUTER_CLASS}
                     >
-                        <div
-                            className={tcls(
-                                'flex max-h-[30rem] min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto circular-corners:rounded-xl rounded-md straight-corners:rounded-none border border-tint bg-tint-base p-2 shadow-lg sm:min-w-52 sm:max-w-80',
-                                className
-                            )}
-                        >
+                        <div className={tcls(DROPDOWN_CONTENT_INNER_CLASS, className)}>
                             {children}
                         </div>
                     </RadixDropdownMenu.Content>
@@ -146,13 +146,23 @@ export function DropdownMenuItem(
         active?: boolean;
         className?: ClassValue;
         children: React.ReactNode;
+        leadingIcon?: IconName | React.ReactNode;
     } & LinkInsightsProps &
         RadixDropdownMenu.DropdownMenuItemProps
 ) {
-    const { children, active = false, href, className, insights, target, ...rest } = props;
+    const {
+        children,
+        active = false,
+        href,
+        className,
+        insights,
+        target,
+        leadingIcon,
+        ...rest
+    } = props;
 
     const itemClassName = tcls(
-        'rounded-xs straight-corners:rounded-xs circular-corners:rounded-lg px-3 py-1 text-sm flex gap-2 items-center',
+        'rounded-sm straight-corners:rounded-none circular-corners:rounded-lg px-3 py-1 text-sm flex gap-2 items-center',
         active
             ? 'bg-primary text-primary-strong data-highlighted:bg-primary-hover'
             : 'data-highlighted:bg-tint-hover',
@@ -161,10 +171,22 @@ export function DropdownMenuItem(
         className
     );
 
+    const icon = leadingIcon ? (
+        typeof leadingIcon === 'string' ? (
+            <Icon
+                icon={leadingIcon as IconName}
+                className={tcls('size-4 shrink-0', active ? 'text-primary' : 'text-tint-subtle')}
+            />
+        ) : (
+            leadingIcon
+        )
+    ) : null;
+
     if (href) {
         return (
             <RadixDropdownMenu.Item {...rest} asChild>
                 <Link href={href} insights={insights} className={itemClassName} target={target}>
+                    {icon}
                     {children}
                 </Link>
             </RadixDropdownMenu.Item>
@@ -173,6 +195,7 @@ export function DropdownMenuItem(
 
     return (
         <RadixDropdownMenu.Item {...rest} className={tcls('px-3 py-1', itemClassName, className)}>
+            {icon}
             {children}
         </RadixDropdownMenu.Item>
     );
@@ -191,11 +214,9 @@ export function DropdownSubMenu(props: { children: React.ReactNode; label: React
                 <RadixDropdownMenu.SubContent
                     hideWhenDetached
                     collisionPadding={8}
-                    className="z-40 animate-present"
+                    className={DROPDOWN_CONTENT_OUTER_CLASS}
                 >
-                    <div className="flex max-h-96 min-w-40 max-w-[40vw] flex-col gap-1 overflow-auto rounded-lg straight-corners:rounded-sm bg-tint-base p-2 shadow-lg ring-1 ring-tint-subtle sm:min-w-52 sm:max-w-80">
-                        {children}
-                    </div>
+                    <div className={DROPDOWN_CONTENT_INNER_CLASS}>{children}</div>
                 </RadixDropdownMenu.SubContent>
             </RadixDropdownMenu.Portal>
         </RadixDropdownMenu.Sub>

@@ -2,9 +2,19 @@ import { Icon } from '@gitbook/icons';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
-import { Link, type LinkInsightsProps } from './Link';
+import { Link, type LinkInsightsProps, type LinkProps } from './Link';
 
-export async function Card(
+export type CardProps = {
+    href: string;
+    leadingIcon?: React.ReactNode;
+    preTitle?: string;
+    title: string;
+    postTitle?: string;
+    style?: ClassValue;
+} & LinkInsightsProps &
+    Omit<LinkProps, 'href' | 'className' | 'classNames' | 'insights' | 'style'>;
+
+export function Card(
     props: {
         href: string;
         leadingIcon?: React.ReactNode;
@@ -12,12 +22,20 @@ export async function Card(
         title: string;
         postTitle?: string;
         style?: ClassValue;
-    } & LinkInsightsProps
+    } & LinkInsightsProps &
+        Omit<LinkProps, 'href' | 'className' | 'classNames' | 'insights' | 'style'>
 ) {
-    const { title, leadingIcon, href, preTitle, postTitle, style, insights } = props;
+    const { ref, title, leadingIcon, href, preTitle, postTitle, style, insights, ...rest } = props;
 
     return (
-        <Link href={href} className={tcls(style)} classNames={['CardStyles']} insights={insights}>
+        <Link
+            ref={ref}
+            href={href}
+            className={tcls(style)}
+            classNames={['CardStyles']}
+            insights={insights}
+            {...rest}
+        >
             {leadingIcon}
             <span className={tcls('flex', 'flex-col', 'flex-1')}>
                 {preTitle ? (

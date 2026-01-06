@@ -1,5 +1,5 @@
 import type { OpenAPISchema } from '@gitbook/openapi-parser';
-import clsx from 'clsx';
+import clsx from 'classnames';
 import { OpenAPIExample } from '../OpenAPIExample';
 import { OpenAPIRootSchema } from '../OpenAPISchemaServer';
 import { StaticSection } from '../StaticSection';

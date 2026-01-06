@@ -39,6 +39,9 @@ export function getOpenAPIContext(args: {
             chevronDown: <Icon icon="chevron-down" />,
             chevronRight: <Icon icon="chevron-right" />,
             plus: <Icon icon="plus" />,
+            copy: <Icon icon="copy" />,
+            check: <Icon icon="check" />,
+            lock: <Icon icon="lock" />,
         },
         renderCodeBlock: (codeProps) => <PlainCodeBlock {...codeProps} />,
         renderDocument: (documentProps) => (

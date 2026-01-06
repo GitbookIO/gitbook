@@ -2,14 +2,12 @@
     "main": "do.js",
     "name": "gitbook-open-v2-do",
     "compatibility_date": "2025-04-14",
+    "keep_names": false,
     "compatibility_flags": [
         "nodejs_compat",
         "allow_importable_env",
         "global_fetch_strictly_public"
     ],
-    "observability": {
-        "enabled": true
-    },
     "env": {
         "preview": {
             "vars": {

@@ -9,9 +9,13 @@ import type { HighlightLine, HighlightToken, RenderedInline } from './highlight'
  */
 export function plainHighlight(
     block: DocumentBlockCode,
-    inlines: RenderedInline[]
+    inlines: RenderedInline[],
+    options?: {
+        evaluateInlineExpression?: (expr: string) => string;
+    }
 ): HighlightLine[] {
     const inlinesCopy = Array.from(inlines);
+
     return block.nodes.map((lineBlock) => {
         const tokens: HighlightToken[] = lineBlock.nodes.map((node) => {
             if (node.object === 'text') {
@@ -20,6 +24,14 @@ export function plainHighlight(
                     content: getNodeText(node),
                 };
             }
+
+            if (node.type === 'expression') {
+                return {
+                    type: 'plain',
+                    content: options?.evaluateInlineExpression?.(node.data.expression) ?? '',
+                };
+            }
+
             const inline = inlinesCopy.shift();
             return {
                 type: 'annotation',

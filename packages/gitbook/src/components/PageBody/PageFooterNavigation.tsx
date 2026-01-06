@@ -43,7 +43,7 @@ export async function PageFooterNavigation(props: {
                 <NavigationCard
                     icon="chevron-left"
                     label={t(language, 'previous_page')}
-                    title={previous.title}
+                    title={previous.linkTitle || previous.title}
                     href={previousHref}
                     insights={{
                         type: 'link_click',
@@ -62,7 +62,7 @@ export async function PageFooterNavigation(props: {
                 <NavigationCard
                     icon="chevron-right"
                     label={t(language, 'next_page')}
-                    title={next.title}
+                    title={next.linkTitle || next.title}
                     href={nextHref}
                     insights={{
                         type: 'link_click',

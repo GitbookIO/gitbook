@@ -1,14 +1,12 @@
-import { OpenAPICopyButton } from './OpenAPICopyButton';
+import { OpenAPIPathItem } from './OpenAPIPathItem';
+import { OpenAPIPathMultipleServers } from './OpenAPIPathMultipleServers';
 import { type OpenAPIUniversalContext, getOpenAPIClientContext } from './context';
+import { formatPath } from './formatPath';
 import type { OpenAPIOperationData } from './types';
 import { getDefaultServerURL } from './util/server';
 
-/**
- * Display the path of an operation.
- */
-export function OpenAPIPath(props: {
+export type OpenAPIPathProps = {
     data: OpenAPIOperationData;
-    context: OpenAPIUniversalContext;
     /** Whether to show the server URL.
      * @default true
      */
@@ -18,73 +16,27 @@ export function OpenAPIPath(props: {
      * @default true
      */
     canCopy?: boolean;
-}) {
-    const { data, context, withServer = true, canCopy = true } = props;
-    const { method, path, operation } = data;
-
-    const server = getDefaultServerURL(data.servers);
-    const formattedPath = formatPath(path);
-
-    const element = (() => {
-        return (
-            <>
-                {withServer ? <span className="openapi-path-server">{server}</span> : null}
-                {formattedPath}
-            </>
-        );
-    })();
-
-    return (
-        <div className="openapi-path">
-            <div className={`openapi-method openapi-method-${method}`}>{method}</div>
-
-            <OpenAPICopyButton
-                value={`${withServer ? server : ''}${path}`}
-                className="openapi-path-title"
-                data-deprecated={operation.deprecated}
-                isDisabled={!canCopy}
-                context={getOpenAPIClientContext(context)}
-            >
-                {element}
-            </OpenAPICopyButton>
-        </div>
-    );
-}
+};
 
 /**
- * Format the path by wrapping placeholders in <span> tags.
+ * Display the path of an operation.
  */
-function formatPath(path: string) {
-    // Matches placeholders like {id}, {userId}, etc.
-    const regex = /\{\s*(\w+)\s*\}|:\w+/g;
+export function OpenAPIPath(props: OpenAPIPathProps & { context: OpenAPIUniversalContext }) {
+    const { data, withServer = true, context } = props;
+    const { path } = data;
+    const clientContext = getOpenAPIClientContext(context);
 
-    const parts: (string | React.JSX.Element)[] = [];
-    let lastIndex = 0;
-
-    //Wrap the variables in <span> tags and maintain either {variable} or :variable
-    path.replace(regex, (match, _, offset) => {
-        if (offset > lastIndex) {
-            parts.push(path.slice(lastIndex, offset));
-        }
-        parts.push(
-            <span key={`offset-${offset}`} className="openapi-path-variable">
-                {match}
-            </span>
-        );
-        lastIndex = offset + match.length;
-        return match;
-    });
-
-    if (lastIndex < path.length) {
-        parts.push(path.slice(lastIndex));
+    if (withServer && data.servers.length > 1) {
+        return <OpenAPIPathMultipleServers {...props} context={clientContext} />;
     }
 
-    const formattedPath = parts.map((part, index) => {
-        if (typeof part === 'string') {
-            return <span key={`part-${index}`}>{part}</span>;
-        }
-        return part;
-    });
+    const formattedPath = formatPath(path);
+    const defaultServer = getDefaultServerURL(data.servers);
 
-    return formattedPath;
+    return (
+        <OpenAPIPathItem {...props} value={`${defaultServer}${path}`} context={clientContext}>
+            {withServer ? <span className="openapi-path-server">{defaultServer}</span> : null}
+            {formattedPath}
+        </OpenAPIPathItem>
+    );
 }

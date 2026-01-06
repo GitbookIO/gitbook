@@ -10,12 +10,7 @@ import {
     getRevisionReusableContent,
     ignoreDataThrownError,
 } from '@/lib/data';
-import {
-    type GitBookLinker,
-    createLinker,
-    linkerWithAbsoluteURLs,
-    linkerWithOtherSpaceBasePath,
-} from '@/lib/links';
+import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import type {
     ContentRef,
     RevisionFile,
@@ -63,6 +58,10 @@ export interface ResolvedContentRef {
     };
     /** Resolve OpenAPI spec filesystem. */
     openAPIFilesystem?: Filesystem;
+    /**
+     * Space that the content ref belongs to (if applicable).
+     */
+    space?: Space;
 }
 
 export interface ResolveContentRefOptions {
@@ -108,6 +107,7 @@ export async function resolveContentRef(
                     text: file.name,
                     active: false,
                     file,
+                    space,
                 };
             }
             return null;
@@ -116,7 +116,7 @@ export async function resolveContentRef(
         case 'anchor':
         case 'page': {
             if (contentRef.space && contentRef.space !== space.id) {
-                return resolveContentRefInSpace(contentRef.space, context, contentRef);
+                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
             }
 
             const resolvePageResult =
@@ -129,8 +129,14 @@ export async function resolveContentRef(
             const page = resolvePageResult?.page;
             const ancestors =
                 resolvePageResult?.ancestors.map((ancestor) => ({
-                    label: ancestor.title,
-                    icon: <PageIcon page={ancestor} style={iconStyle} />,
+                    label: ancestor.linkTitle || ancestor.title,
+                    icon:
+                        ancestor.emoji || ancestor.icon ? (
+                            <PageIcon
+                                page={{ emoji: ancestor.emoji, icon: ancestor.icon }}
+                                style={iconStyle}
+                            />
+                        ) : null,
                     href: linker.toPathForPage({ page: ancestor, pages: revision.pages }),
                 })) ?? [];
             if (!page) {
@@ -147,9 +153,9 @@ export async function resolveContentRef(
 
             // Compute the text to display for the link
             if (anchor) {
-                text = page.title;
+                text = page.linkTitle || page.title;
                 ancestors.push({
-                    label: page.title,
+                    label: page.linkTitle || page.title,
                     icon: <PageIcon page={page} style={iconStyle} />,
                     href,
                 });
@@ -165,14 +171,15 @@ export async function resolveContentRef(
                 }
             } else {
                 const parentPage = (resolvePageResult?.ancestors || []).slice(-1).pop();
-                // When the looked up ref was a page group we use the page group title as resolved ref text.
-                // Otherwise use the resolved page title.
-                text =
+                // When the looked up ref was a page group we use the page group to resolve title and icon.
+                // Otherwise use the resolved page title and icon.
+                const pageOrGroup =
                     parentPage && contentRef.page === parentPage.id && parentPage.type === 'group'
-                        ? parentPage.title
-                        : page.title;
+                        ? parentPage
+                        : page;
+                text = pageOrGroup.linkTitle || pageOrGroup.title;
                 emoji = isCurrentPage ? undefined : page.emoji;
-                icon = <PageIcon page={page} style={iconStyle} />;
+                icon = <PageIcon page={pageOrGroup} style={iconStyle} />;
             }
 
             return {
@@ -184,6 +191,7 @@ export async function resolveContentRef(
                 icon,
                 page,
                 active: !anchor && page.id === activePage?.id,
+                space,
             };
         }
 
@@ -197,11 +205,7 @@ export async function resolveContentRef(
                     : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
-                return {
-                    href: getGitBookAppHref(`/s/${contentRef.space}`),
-                    text: 'space',
-                    active: false,
-                };
+                return null;
             }
 
             return {
@@ -303,6 +307,22 @@ export async function resolveContentRef(
 }
 
 /**
+ * Fallback to resolve a content ref.
+ * Called if we can't resolve the content ref to have a potential fallback to display to the
+ * user instead of not found.
+ */
+export function resolveContentRefFallback(contentRef: ContentRef): ResolvedContentRef | null {
+    if ('space' in contentRef && contentRef.space) {
+        return {
+            href: getGitBookAppHref(`/s/${contentRef.space}`),
+            text: 'space',
+            active: false,
+        };
+    }
+    return null;
+}
+
+/**
  * This function is used to get the best possible target space while resolving a content ref.
  * It will try to return the space in the site context if it exists to avoid cross-site links.
  */
@@ -339,7 +359,8 @@ async function getBestTargetSpace(
 async function resolveContentRefInSpace(
     spaceId: string,
     context: GitBookAnyContext,
-    contentRef: ContentRef
+    contentRef: ContentRef,
+    options: ResolveContentRefOptions = {}
 ) {
     const ctx = await createContextForSpace(spaceId, context);
 
@@ -347,17 +368,35 @@ async function resolveContentRefInSpace(
         return null;
     }
 
-    const resolved = await resolveContentRef(contentRef, ctx.spaceContext);
+    const resolved = await resolveContentRef(contentRef, ctx.spaceContext, options);
 
     if (!resolved) {
         return null;
     }
 
+    // Prefer the variant title when available, then the section title, then fallback to the space title.
+    const ancestorLabel = (() => {
+        if ('site' in context) {
+            const foundSiteSpace = findSiteSpaceBy(
+                context.structure,
+                (siteSpace) => siteSpace.space.id === spaceId
+            );
+
+            return (
+                foundSiteSpace?.siteSpace.title ??
+                foundSiteSpace?.siteSection?.title ??
+                ctx.spaceContext.space.title
+            );
+        }
+
+        return ctx.spaceContext.space.title;
+    })();
+
     return {
         ...resolved,
         ancestors: [
             {
-                label: ctx.spaceContext.space.title,
+                label: ancestorLabel,
                 href: ctx.baseURL.toString(),
             },
             ...(resolved.ancestors ?? []),
@@ -404,7 +443,7 @@ async function createContextForSpace(
 
     if (bestTargetSpace?.siteSpace && 'site' in context) {
         // If we found the space ID in the current site context, we can resolve links relative to it in the site.
-        linker = linkerWithOtherSpaceBasePath(context.linker, {
+        linker = context.linker.withOtherSiteSpace({
             spaceBasePath: getFallbackSiteSpacePath(context, bestTargetSpace.siteSpace),
         });
     } else {
