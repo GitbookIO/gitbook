@@ -189,9 +189,9 @@ export function SideSheet(
                         : side === 'left'
                           ? 'hydrated:animate-exit-to-left'
                           : 'hydrated:animate-exit-to-right',
-                    'fixed inset-y-0 z-41', // Above the side sheet scrim on z-40
+                    'absolute inset-y-0 z-41', // Above the side sheet scrim on z-40
                     side === 'left' ? 'left-0' : 'right-0',
-                    withCloseButton ? 'max-w-[calc(100vw-5rem)]' : 'max-w-[calc(100vw-3rem)]',
+                    withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
                     isOpen ? '' : 'hidden',
                     className
                 )}
@@ -225,7 +225,7 @@ export function SideSheetScrim(props: { className?: ClassValue; onClick?: () => 
                 onClick?.();
             }}
             className={tcls(
-                'fixed inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6',
+                'absolute inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6',
                 className
             )}
         />

@@ -17,9 +17,10 @@ export async function TableOfContents(props: {
     context: GitBookSiteContext;
     header?: React.ReactNode; // Displayed outside the scrollable TOC as a sticky header
     innerHeader?: React.ReactNode; // Displayed outside the scrollable TOC, directly above the page list
+    withTrademark?: boolean;
     className?: string;
 }) {
-    const { innerHeader, context, header, className } = props;
+    const { innerHeader, context, header, className, withTrademark = true } = props;
     const { customization, revision } = context;
 
     const pages = await encodeClientTableOfContents(context, revision.pages, revision.pages);
@@ -124,7 +125,7 @@ export async function TableOfContents(props: {
                             style="page-no-toc:hidden grow border-tint-subtle sidebar-list-line:border-l"
                         />
                     </ScrollContainer>
-                    {customization.trademark.enabled ? (
+                    {withTrademark && customization.trademark.enabled ? (
                         <Trademark
                             context={context}
                             placement={SiteInsightsTrademarkPlacement.Sidebar}

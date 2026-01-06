@@ -80,8 +80,9 @@ export async function EmbeddableDocsPage(
                         className="not-hydrated:animate-blur-in-slow"
                         contentClassName="p-4"
                         leading={{ fade: !context.sections, button: true }}
+                        trailing={{ fade: false, button: true }}
                     >
-                        <TableOfContents context={context} />
+                        <TableOfContents context={context} withTrademark={false} />
                         <PageBody
                             context={context}
                             page={page}
