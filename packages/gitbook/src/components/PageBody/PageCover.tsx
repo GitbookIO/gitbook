@@ -85,6 +85,7 @@ export async function PageCover(props: {
                 'overflow-hidden',
                 // Negative margin to balance the container padding
                 '-mx-4',
+                'transition-all',
                 as === 'full'
                     ? [
                           'sm:-mx-6',
@@ -100,8 +101,10 @@ export async function PageCover(props: {
                           'sm:mx-auto',
                           'max-w-3xl ',
                           'page-width-wide:max-w-screen-2xl',
-                          'sm:rounded-md',
+                          'sm:rounded-corners:rounded-xl',
+                          'sm:circular-corners:rounded-3xl',
                           'mb-8',
+                          'max-sm:-mt-8',
                       ]
             )}
         >
