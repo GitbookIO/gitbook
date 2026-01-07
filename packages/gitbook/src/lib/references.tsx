@@ -367,13 +367,12 @@ async function resolveContentRefInSpace(
         shareKey: (() => {
             // If the space is found in the current site, we use the current share key to generate links.
             if ('site' in context) {
-                const foundSiteSpace = findSiteSpaceBy(
+                return findSiteSpaceBy(
                     context.structure,
                     (siteSpace) => siteSpace.space.id === spaceId
-                );
-                if (foundSiteSpace) {
-                    return context.shareKey;
-                }
+                )
+                    ? context.shareKey
+                    : undefined;
             }
 
             return context.space.id === spaceId ? context.shareKey : undefined;
