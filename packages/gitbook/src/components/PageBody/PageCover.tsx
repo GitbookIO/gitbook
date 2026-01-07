@@ -92,6 +92,9 @@ export async function PageCover(props: {
                           'md:-mx-8',
                           'lg:-mr-8',
                           'lg:-ml-12',
+                          // Round the bottom corners when the page is wider than the image
+                          '4xl:rounded-corners:rounded-b-xl',
+                          '4xl:circular-corners:rounded-b-3xl',
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
                               ? 'xl:-ml-76'
