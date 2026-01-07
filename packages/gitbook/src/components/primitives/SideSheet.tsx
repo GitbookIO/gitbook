@@ -66,6 +66,11 @@ export function SideSheet(
     const isOpen = openState !== undefined ? openState : open;
 
     const asideRef = React.useRef<HTMLElement>(null);
+    const previousIsMobileRef = React.useRef(isMobile);
+    const shouldSkipAnimations = previousIsMobileRef.current !== isMobile;
+    React.useEffect(() => {
+        previousIsMobileRef.current = isMobile;
+    }, [isMobile]);
 
     const handleClose = React.useCallback(() => {
         if (openState !== undefined) {
@@ -182,17 +187,20 @@ export function SideSheet(
                 ref={asideRef}
                 className={tcls(
                     'side-sheet',
-                    isOpen
-                        ? side === 'left'
-                            ? 'hydrated:animate-enter-from-left'
-                            : 'hydrated:animate-enter-from-right'
-                        : side === 'left'
-                          ? 'hydrated:animate-exit-to-left'
-                          : 'hydrated:animate-exit-to-right',
-                    'absolute inset-y-0 z-41', // Above the side sheet scrim on z-40
+                    'fixed inset-y-0 z-41', // Above the side sheet scrim on z-40
                     side === 'left' ? 'left-0' : 'right-0',
                     withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
                     isOpen ? '' : 'hidden',
+                    isOpen && !shouldSkipAnimations
+                        ? side === 'left'
+                            ? 'hydrated:animate-enter-from-left'
+                            : 'hydrated:animate-enter-from-right'
+                        : '',
+                    !isOpen && !shouldSkipAnimations
+                        ? side === 'left'
+                            ? 'hydrated:animate-exit-to-left'
+                            : 'hydrated:animate-exit-to-right'
+                        : '',
                     className
                 )}
                 aria-expanded={isOpen}
@@ -225,7 +233,7 @@ export function SideSheetScrim(props: { className?: ClassValue; onClick?: () => 
                 onClick?.();
             }}
             className={tcls(
-                'absolute inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6',
+                'fixed inset-0 z-40 items-start bg-tint-base/3 not-hydrated:opacity-0 starting:opacity-0 backdrop-blur-md starting:backdrop-blur-none transition-[opacity,display,backdrop-filter] transition-discrete duration-250 dark:bg-tint-base/6',
                 className
             )}
         />
