@@ -90,15 +90,22 @@ export async function PageCover(props: {
                     ? [
                           'sm:-mx-6',
                           'md:-mx-8',
-                          'lg:-mr-8',
-                          'lg:-ml-12',
-                          // Round the bottom corners when the page is wider than the image
-                          '4xl:rounded-corners:rounded-b-xl',
-                          '4xl:circular-corners:rounded-b-3xl',
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
-                              ? 'xl:-ml-76'
-                              : null,
+                              ? [
+                                    'xl:-ml-76',
+                                    // Round the bottom corners once the page is wider than the image
+                                    '2xl:circular-corners:rounded-b-3xl 2xl:rounded-corners:rounded-b-xl',
+                                ]
+                              : [
+                                    'lg:-ml-12',
+                                    // Round the bottom left corner once the sidebar is shown next to it
+                                    'lg:rounded-corners:rounded-bl-xl',
+                                    'lg:circular-corners:rounded-bl-3xl',
+                                    // Round the bottom right corner once the page is wider than the image
+                                    '2xl:rounded-corners:rounded-br-xl',
+                                    '2xl:circular-corners:rounded-br-3xl',
+                                ],
                       ]
                     : [
                           'sm:mx-auto',
