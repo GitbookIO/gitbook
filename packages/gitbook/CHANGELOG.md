@@ -1,5 +1,19 @@
 # gitbook
 
+## 0.21.2
+
+### Patch Changes
+
+- ca68236: Fix 404 when accessing rss.xml for the root page.
+- 695e99f: Update button sizing
+- 99d788e: Update page cover styling
+- ebf3b2b: Fix an issue where content refs to spaces outside of site was resolving with share links
+- a7f58ab: Fix embed tab button size regression
+- 360b525: Switch icon masking method to fix visual cutoffs in FA7
+- Updated dependencies [360b525]
+  - @gitbook/icons@0.4.2
+  - @gitbook/react-contentkit@0.7.11
+
 ## 0.21.1
 
 ### Patch Changes
