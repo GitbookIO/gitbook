@@ -83,6 +83,11 @@ export function getPagePathFromParams(params: RouteParams) {
     // If decoding the param fails, return a 404 instead of crashing
     try {
         const decoded = decodeURIComponent(params.pagePath);
+
+        // For the root page, we encode '/' to avoid an empty param being passed.
+        if (decoded === '/') {
+            return '';
+        }
         return decoded;
     } catch (error) {
         console.error(
