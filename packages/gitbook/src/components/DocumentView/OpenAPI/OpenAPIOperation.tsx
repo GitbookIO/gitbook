@@ -5,8 +5,7 @@ import { tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from '../Block';
 
-import './scalar.css';
-import './style.css';
+import OpenAPIStyles from '@/components/DocumentView/OpenAPI/OpenAPIStyles';
 import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
 import { getOpenAPIContext } from './context';
 
@@ -47,10 +46,13 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
     }
 
     return (
-        <BaseOpenAPIOperation
-            data={data}
-            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
-            className="openapi-block"
-        />
+        <>
+            <OpenAPIStyles />
+            <BaseOpenAPIOperation
+                data={data}
+                context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
+                className="openapi-block"
+            />
+        </>
     );
 }
