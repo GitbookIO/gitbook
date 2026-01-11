@@ -28,8 +28,8 @@ export function AIChatFollowupSuggestions(props: {
                             chatController.postMessage({ message: suggestion });
                         }}
                         label={suggestion}
-                        className="starting:h-0 max-w-full origin-left animate-blur-in-slow whitespace-normal border-none bg-primary-11/1 px-3 py-1.5 starting:py-0 text-left transition-all transition-discrete duration-500 *:whitespace-normal hover:bg-primary-hover"
-                        size="medium"
+                        className="starting:h-0 max-w-full origin-left animate-blur-in-slow whitespace-normal border-none bg-primary-11/1 starting:py-0 text-left transition-all transition-discrete duration-500 *:whitespace-normal hover:bg-primary-hover"
+                        size="small"
                         variant="blank"
                         style={{
                             animationDelay: `${250 + Math.min(index * 50, 150)}ms`,

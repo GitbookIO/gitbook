@@ -13,7 +13,7 @@ type CustomInputProps = {
     inline?: boolean;
     leading?: IconName | React.ReactNode;
     trailing?: React.ReactNode;
-    sizing?: 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
+    sizing?: 'small' | 'medium' | 'large'; // The `size` prop is already taken by the HTML input element.
     containerRef?: React.RefObject<HTMLDivElement | null>;
     containerStyle?: React.CSSProperties;
     /**
@@ -94,15 +94,26 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         (minLength ? value.toString().length >= minLength : true);
 
     const sizes = {
+        small: {
+            container: `${multiline ? 'p-1.5' : 'px-2.5 py-1.5'} text-sm gap-1.5 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
+            input: '-m-1.5 p-1.5',
+            gap: 'gap-2',
+            leading: 'size-text-base',
+            trailing: '-my-1 -mr-1.5',
+        },
         medium: {
-            container: `${multiline ? 'p-2' : 'px-4 py-2'} gap-2 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
+            container: `${multiline ? 'p-2' : 'px-3 py-2'} gap-2 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
             input: '-m-2 p-2',
             gap: 'gap-2',
+            leading: 'size-text-lg',
+            trailing: '-my-1 -mr-1.5',
         },
         large: {
-            container: `${multiline ? 'p-3' : 'px-6 py-3 '} gap-3 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
+            container: `${multiline ? 'p-3' : 'px-3.5 py-3 '} gap-3 circular-corners:rounded-3xl rounded-corners:rounded-xl`,
             input: '-m-3 p-3',
             gap: 'gap-3',
+            leading: 'size-text-2xl',
+            trailing: '-my-2.5 -mr-2.5',
         },
     };
 
@@ -155,7 +166,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     };
 
     const inputClassName = tcls(
-        'peer -m-2 max-h-64 grow shrink resize-none text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis aria-busy:cursor-progress',
+        'peer -m-2 max-h-64 grow shrink resize-none leading-normal text-left outline-none placeholder:text-tint/8 placeholder-shown:text-ellipsis aria-busy:cursor-progress',
         sizes[sizing].input
     );
 
@@ -185,7 +196,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     ? 'cursor-not-allowed border-tint-subtle bg-tint-subtle opacity-7'
                     : [
                           'depth-subtle:focus-within:-translate-y-px depth-subtle:hover:-translate-y-px depth-subtle:shadow-xs',
-                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover depth-subtle:hover:not-focus-within:shadow-md focus-within:hover:border-primary-hover',
+                          'focus-within:border-primary-hover focus-within:depth-subtle:shadow-lg focus-within:shadow-primary-subtle focus-within:ring-2 hover:cursor-text hover:border-tint-hover hover:not-focus-within:bg-tint-subtle depth-subtle:hover:not-focus-within:shadow-md focus-within:hover:border-primary-hover',
                       ],
                 multiline ? 'flex-col' : 'flex-row',
                 ariaBusy ? 'cursor-progress' : '',
@@ -212,12 +223,15 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     <Tag
                         className={tcls(
                             clearButton && hasValue ? 'group-focus-within/input:hidden' : '',
-                            multiline ? 'my-1.25' : '',
-                            'text-tint'
+                            multiline ? 'h-text-2xl' : '',
+                            'flex items-center text-tint'
                         )}
                     >
                         {typeof leading === 'string' ? (
-                            <Icon icon={leading as IconName} className="size-4 shrink-0" />
+                            <Icon
+                                icon={leading as IconName}
+                                className={tcls('shrink-0', sizes[sizing].leading)}
+                            />
                         ) : (
                             leading
                         )}
@@ -226,17 +240,19 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 {clearButton ? (
                     <Button
                         variant="blank"
-                        size="medium"
+                        size={sizing}
                         label={tString(language, 'clear')}
                         iconOnly
                         icon="circle-xmark"
                         onClick={handleClear}
                         {...(typeof clearButton === 'object' ? clearButton : {})}
                         className={tcls(
-                            '-mx-1.5 hidden shrink-0 animate-fade-in p-1.5 text-tint',
-                            multiline ? '-my-0.25' : '-my-1.5',
+                            'hidden shrink-0 animate-fade-in text-tint',
                             hasValue ? 'group-focus-within/input:flex' : '',
-                            typeof clearButton === 'object' ? clearButton.className : ''
+                            typeof clearButton === 'object' ? clearButton.className : '',
+                            sizing === 'small' ? '-ml-1.75 -my-1 -mr-2 p-1' : '',
+                            sizing === 'medium' ? '-ml-2.25 -my-1.5 -mr-2 p-1.5' : '',
+                            sizing === 'large' ? '-mx-2 -my-2 p-2' : ''
                         )}
                     />
                 ) : null}
@@ -275,7 +291,12 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                 ) : null}
             </Tag>
             {trailing || submitButton || maxLength ? (
-                <Tag className="flex items-center gap-2 empty:hidden">
+                <Tag
+                    className={tcls(
+                        'flex items-center gap-2 empty:hidden',
+                        !multiline ? sizes[sizing].trailing : ''
+                    )}
+                >
                     {trailing}
                     {maxLength && !submitted && value.toString().length > maxLength * 0.8 ? (
                         <span
@@ -301,13 +322,25 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
                     ) : submitButton ? (
                         <Button
                             variant="primary"
-                            size="medium"
+                            size={(() => {
+                                switch (sizing) {
+                                    case 'small':
+                                        return 'xsmall';
+                                    case 'medium':
+                                        return 'xsmall';
+                                    case 'large':
+                                        return 'medium';
+                                }
+                            })()}
                             label={tString(language, 'submit')}
                             onClick={handleSubmit}
                             icon={multiline ? undefined : 'arrow-right'}
                             disabled={disabled || !hasValidValue}
                             iconOnly={!multiline}
-                            className="ml-auto"
+                            className={tcls(
+                                'ml-auto',
+                                sizing === 'large' ? 'rounded-corners:rounded-lg' : ''
+                            )}
                             {...(typeof submitButton === 'object' ? submitButton : {})}
                         />
                     ) : null}

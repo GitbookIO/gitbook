@@ -96,7 +96,7 @@ export function useAI(): AIContext {
                 <AIChatIcon
                     state={chat.loading ? 'thinking' : 'default'}
                     trademark={config.trademark}
-                    className="size-4"
+                    className="size-text-lg"
                 />
             ),
             open: (query?: string) => {

@@ -387,7 +387,7 @@ function PageActionWrapper(props: {
                 size="xsmall"
                 variant="secondary"
                 label={label ?? shortLabel}
-                className="bg-tint-base text-sm"
+                className="bg-tint-base"
                 onClick={onClick}
                 href={href}
                 target={href ? target : undefined}

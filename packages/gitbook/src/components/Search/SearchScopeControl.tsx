@@ -1,6 +1,6 @@
 'use client';
 
-import { t, useLanguage } from '@/intl/client';
+import { t, tString, useLanguage } from '@/intl/client';
 import type { SiteSection } from '@gitbook/api';
 import { Button, DropdownChevron, DropdownMenu, DropdownMenuItem } from '../primitives';
 import { useSearch } from './useSearch';
@@ -56,21 +56,16 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
             button={
                 <Button
                     variant="blank"
-                    size="medium"
-                    className="px-2 text-tint-strong"
+                    size="small"
+                    className="text-tint-strong"
                     icon={isExtended ? undefined : section?.icon}
-                >
-                    <div className="flex items-center gap-2">
-                        {t(
-                            language,
-                            isExtended
-                                ? 'search_scope_section_all'
-                                : 'search_scope_section_current',
-                            section?.title ?? ''
-                        )}
-                        <DropdownChevron />
-                    </div>
-                </Button>
+                    label={tString(
+                        language,
+                        isExtended ? 'search_scope_section_all' : 'search_scope_section_current',
+                        section?.title ?? ''
+                    )}
+                    trailing={<DropdownChevron />}
+                />
             }
         >
             <DropdownMenuItem
@@ -120,20 +115,16 @@ function SearchScopeVariantControl(props: SearchScopeControlProps & { isExtended
     return (
         <DropdownMenu
             button={
-                <Button variant="blank" size="medium" className="px-2">
-                    <div className="flex items-center gap-2">
-                        <span className="text-tint-strong">
-                            {t(
-                                language,
-                                isExtended
-                                    ? 'search_scope_variant_all'
-                                    : 'search_scope_variant_current',
-                                spaceTitle ?? ''
-                            )}
-                        </span>
-                        <DropdownChevron />
-                    </div>
-                </Button>
+                <Button
+                    variant="blank"
+                    size="small"
+                    label={tString(
+                        language,
+                        isExtended ? 'search_scope_variant_all' : 'search_scope_variant_current',
+                        spaceTitle ?? ''
+                    )}
+                    trailing={<DropdownChevron />}
+                />
             }
         >
             <DropdownMenuItem
