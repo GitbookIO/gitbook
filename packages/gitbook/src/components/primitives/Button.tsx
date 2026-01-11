@@ -120,14 +120,10 @@ export const Button = React.forwardRef<
         ref
     ) => {
         const sizes = {
-            large: ['text-base font-semibold py-3', iconOnly ? 'px-3' : 'px-[1.5em]'],
-            medium: ['py-2', iconOnly ? 'text-base px-2' : 'px-[1em]'],
-            small: ['text-sm py-1.5', iconOnly ? 'px-1.5' : 'px-[.75em]'],
-            xsmall: [
-                'text-xs py-1',
-                iconOnly ? 'px-1.5' : 'px-[.5em]',
-                'rounded-corners:rounded-lg',
-            ],
+            large: ['font-semibold p-3', iconOnly ? '' : 'px-5'],
+            medium: ['p-2', iconOnly ? '' : 'px-4'],
+            small: ['p-1.5 text-sm/normal', iconOnly ? '' : 'px-3'],
+            xsmall: ['p-1 text-sm/tight rounded-corners:rounded-lg', iconOnly ? '' : 'px-2'],
         };
 
         const sizeClasses = sizes[size] || sizes.large;
@@ -140,13 +136,20 @@ export const Button = React.forwardRef<
         );
         const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
+        const iconSizeClasses = {
+            large: ['size-text-2xl', iconOnly && ''],
+            medium: ['size-text-lg my-[.1875em]', iconOnly && 'mx-[.1875em]'],
+            small: ['my-text-1/4 size-text-base', iconOnly && 'mx-text-1/4'],
+            xsmall: ['my-text-1/8 size-text-base', iconOnly && 'mx-text-1/8'],
+        };
         let iconElement = null;
         if (icon) {
             if (React.isValidElement(icon)) {
                 type IconElement = React.ReactElement<React.SVGProps<SVGSVGElement>>;
                 iconElement = React.cloneElement(icon as IconElement, {
                     className: tcls(
-                        'button-leading-icon size-[1em] shrink-0',
+                        'button-leading-icon shrink-0',
+                        iconSizeClasses[size],
                         (icon as IconElement).props.className
                     ),
                 });
@@ -154,7 +157,7 @@ export const Button = React.forwardRef<
                 iconElement = (
                     <Icon
                         icon={icon as IconName}
-                        className={tcls('button-leading-icon size-[1em] shrink-0')}
+                        className={tcls('button-leading-icon shrink-0', iconSizeClasses[size])}
                     />
                 );
             }

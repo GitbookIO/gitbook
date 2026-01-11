@@ -28,8 +28,8 @@ export default function AIChatSuggestedQuestions(props: {
                     data-testid="ai-chat-suggested-question"
                     key={question}
                     variant="blank"
-                    size="medium"
-                    className="max-w-full animate-blur-in-slow border-none bg-primary-solid/1 px-3 py-1.5 hover:bg-primary-hover"
+                    size="small"
+                    className="max-w-full animate-blur-in-slow border-none bg-primary-solid/1 hover:bg-primary-hover"
                     style={{
                         animationDelay: `${1000 + index * 100}ms`,
                     }}
