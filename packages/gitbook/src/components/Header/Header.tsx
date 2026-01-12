@@ -211,7 +211,7 @@ export function Header(props: {
                                     ) ?? siteSpace
                                 }
                                 siteSpaces={variants.translations}
-                                className="my-2 ml-2 self-start"
+                                className="my-1.5 ml-2 self-start"
                             />
                         ) : null}
                     </SiteSectionTabs>
