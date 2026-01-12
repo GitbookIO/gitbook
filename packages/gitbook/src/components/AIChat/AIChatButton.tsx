@@ -6,6 +6,8 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
 
+const MOBILE_BREAKPOINT = 672; // 42rem, equal to Tailwind's @max-2xl container breakpoint
+
 /**
  * Button to open/close the AI chat.
  */
@@ -16,7 +18,7 @@ export function AIChatButton(props: {
 }) {
     const { assistant, showLabel = true, withShortcut = true } = props;
     const language = useLanguage();
-    const isMobile = useIsMobile(672, '#header-content');
+    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '#header-content');
 
     return (
         <Button
