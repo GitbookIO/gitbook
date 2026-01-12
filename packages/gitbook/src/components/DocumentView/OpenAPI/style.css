@@ -54,6 +54,11 @@
     @apply font-semibold font-mono truncate;
 }
 
+.openapi-description.openapi-markdown,
+.openapi-description.openapi-markdown code {
+    @apply prose-sm;
+}
+
 /* Markdown Elements */
 .openapi-markdown blockquote {
     @apply !ps-3;
@@ -77,7 +82,7 @@
 
 /* Markdown Base */
 .openapi-markdown {
-    @apply prose prose-sm text-tint-strong dark:prose-invert max-w-none whitespace-normal;
+    @apply prose [&_p]:my-2! text-tint-strong dark:prose-invert max-w-none whitespace-normal;
 }
 
 .openapi-markdown > *:first-child {
@@ -156,7 +161,7 @@
 }
 
 .openapi-schema-root-description.openapi-markdown {
-    @apply text-balance mt-1.5 text-[0.813rem]! text-tint overflow-hidden font-normal! select-text;
+    @apply prose-sm text-balance mt-1.5 text-[0.813rem]! text-tint overflow-hidden font-normal! select-text [&_strong]:font-semibold [&_strong]:text-inherit;
 }
 
 .openapi-section-schemas > .openapi-section-body > .openapi-schema-root-description {
@@ -275,7 +280,7 @@
 
 /* Schema Description */
 .openapi-schema-description.openapi-markdown {
-    @apply text-tint overflow-hidden text-pretty font-normal! select-text;
+    @apply prose-sm text-tint overflow-hidden text-pretty font-normal! select-text [&_strong]:font-semibold [&_strong]:text-inherit;
 }
 
 .openapi-schema-description.openapi-markdown pre:has(code) {
@@ -297,7 +302,7 @@
 .openapi-schema-example,
 .openapi-schema-pattern,
 .openapi-schema-default {
-    @apply text-sm text-tint;
+    @apply prose-sm text-tint;
 }
 
 .openapi-schema-example code,
@@ -318,7 +323,7 @@
 
 .openapi-securities-oauth-content,
 .openapi-securities-scopes {
-    @apply prose prose-sm text-sm *:text-tint;
+    @apply prose *:prose-sm! *:text-tint;
 }
 
 .openapi-securities-oauth-content {
@@ -342,7 +347,7 @@
 }
 
 .openapi-securities-description.openapi-markdown {
-    @apply text-tint font-normal! select-text text-pretty;
+    @apply prose-sm text-tint font-normal! select-text text-pretty;
 }
 
 .openapi-securities-label {
@@ -373,7 +378,7 @@
 }
 
 .openapi-requestbody-description.openapi-markdown {
-    @apply text-tint font-normal! text-pretty select-text;
+    @apply prose-sm text-tint font-normal! text-pretty select-text [&_strong]:font-semibold [&_strong]:text-inherit;
 }
 
 /* Responses */
@@ -391,7 +396,7 @@
 }
 
 .openapi-response-description.openapi-markdown {
-    @apply text-left leading-tight text-tint select-text;
+    @apply text-left prose-sm leading-tight text-tint select-text [&_strong]:font-semibold [&_strong]:text-inherit;
 }
 
 .openapi-disclosure-group-trigger[aria-expanded="false"] .openapi-response-description.openapi-markdown {
