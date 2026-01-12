@@ -68,7 +68,7 @@
     }
   
     & strong {
-      color: 'inherit';
+      color: inherit;
       font-weight: var(--font-weight-semibold);
     }
   
@@ -322,7 +322,7 @@
       padding-inline-start: 1.1428571em;
     }
 
-    & pre:has(code){
+    & pre:has(code) {
       color: var(--tw-prose-pre-code);
       background-color: var(--tw-prose-pre-bg);
     }
