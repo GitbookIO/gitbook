@@ -55,6 +55,7 @@ export function AIChatInput(props: {
             placeholder={tString(language, 'ai_chat_input_placeholder')}
             onSubmit={(val) => onSubmit(val as string)}
             submitButton={{
+                size: 'small',
                 label: tString(language, 'send'),
             }}
             className="animate-blur-in-slow bg-tint-base/9 backdrop-blur-lg contrast-more:bg-tint-base"

@@ -546,6 +546,22 @@ const config: Config = {
                 '102': '1.02',
                 '104': '1.04',
             },
+            spacing: {
+                text: {
+                    // Spacing dependent on the text size
+                    DEFAULT: '1em',
+                    '1/8': '0.125em',
+                    '1/6': '0.166em',
+                    '1/4': '0.25em',
+                    '1/2': '0.5em',
+                    xs: '0.75em',
+                    sm: '0.875em',
+                    base: '1em',
+                    lg: '1.125em',
+                    xl: '1.25em',
+                    '2xl': '1.5em',
+                },
+            },
         },
         opacity: opacity(),
         screens: {
