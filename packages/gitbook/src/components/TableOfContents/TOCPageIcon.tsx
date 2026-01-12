@@ -21,9 +21,10 @@ export function TOCPageIcon({ page }: { page: Pick<RevisionPage, 'emoji' | 'icon
                     ? [
                           'theme-bold-no-tint:text-primary-subtle',
                           'theme-gradient-no-tint:text-primary-subtle',
-                          'theme-bold-tint:text-tint-strong',
-                          'theme-gradient-tint:text-tint-strong',
-                          'group-aria-current-page/toclink:text-inherit',
+                          'theme-bold-tint:text-tint-subtle',
+                          'theme-gradient-tint:text-tint-subtle',
+
+                          'group-aria-current-page/toclink:text-inherit!',
                       ]
                     : '',
 
