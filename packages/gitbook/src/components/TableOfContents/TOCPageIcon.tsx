@@ -19,17 +19,11 @@ export function TOCPageIcon({ page }: { page: Pick<RevisionPage, 'emoji' | 'icon
 
                 !page.emoji
                     ? [
-                          'theme-gradient:bg-linear-to-b',
-                          'theme-bold:bg-linear-to-b',
-                          'theme-gradient:bg-fixed',
-                          'theme-bold:bg-fixed',
-
-                          'no-tint:from-primary-7',
-                          'no-tint:to-primary-10',
-                          'tint:from-tint-7',
-                          'tint:to-tint-10',
-
-                          'group-aria-current-page/toclink:bg-none!',
+                          'theme-bold-no-tint:text-primary-subtle',
+                          'theme-gradient-no-tint:text-primary-subtle',
+                          'theme-bold-tint:text-tint-strong',
+                          'theme-gradient-tint:text-tint-strong',
+                          'group-aria-current-page/toclink:text-inherit',
                       ]
                     : '',
 
