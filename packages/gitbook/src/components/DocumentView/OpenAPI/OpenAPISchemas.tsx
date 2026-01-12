@@ -2,11 +2,8 @@ import { resolveOpenAPISchemasBlock } from '@/lib/openapi/resolveOpenAPISchemasB
 import { tcls } from '@/lib/tailwind';
 import { OpenAPISchemas as BaseOpenAPISchemas } from '@gitbook/react-openapi';
 
-import type { BlockProps } from '../Block';
-
-import './scalar.css';
-import './style.css';
 import type { OpenAPISchemasBlock } from '@/lib/openapi/types';
+import type { BlockProps } from '../Block';
 import { getOpenAPIContext } from './context';
 
 /**
