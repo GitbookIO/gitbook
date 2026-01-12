@@ -3,10 +3,8 @@ import { OpenAPIOperation as BaseOpenAPIOperation } from '@gitbook/react-openapi
 import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from '../Block';
-
-import OpenAPIStyles from '@/components/DocumentView/OpenAPI/OpenAPIStyles';
 import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
+import type { BlockProps } from '../Block';
 import { getOpenAPIContext } from './context';
 
 /**
@@ -46,13 +44,10 @@ async function OpenAPIOperationBody(props: BlockProps<AnyOpenAPIOperationsBlock>
     }
 
     return (
-        <>
-            <OpenAPIStyles />
-            <BaseOpenAPIOperation
-                data={data}
-                context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
-                className="openapi-block"
-            />
-        </>
+        <BaseOpenAPIOperation
+            data={data}
+            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
+            className="openapi-block"
+        />
     );
 }

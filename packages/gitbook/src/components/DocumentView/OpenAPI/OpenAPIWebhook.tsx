@@ -3,10 +3,8 @@ import { OpenAPIWebhook as BaseOpenAPIWebhook } from '@gitbook/react-openapi';
 import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from '../Block';
-
-import OpenAPIStyles from '@/components/DocumentView/OpenAPI/OpenAPIStyles';
 import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
+import type { BlockProps } from '../Block';
 import { getOpenAPIContext } from './context';
 
 /**
@@ -48,13 +46,10 @@ async function OpenAPIWebhookBody(props: BlockProps<OpenAPIWebhookBlock>) {
     }
 
     return (
-        <>
-            <OpenAPIStyles />
-            <BaseOpenAPIWebhook
-                data={data}
-                context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
-                className="openapi-block"
-            />
-        </>
+        <BaseOpenAPIWebhook
+            data={data}
+            context={getOpenAPIContext({ props, specUrl, context: context.contentContext })}
+            className="openapi-block"
+        />
     );
 }

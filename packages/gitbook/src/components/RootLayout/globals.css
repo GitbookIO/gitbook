@@ -4,10 +4,6 @@
 
 @import './prose.css';
 
-/* Prevent flash of unstyled OpenAPI blocks while the OpenAPI styles are lazy-loaded. */
-body:not(.openapi-styles-loaded) .openapi-block {
-    display: none;
-}
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
