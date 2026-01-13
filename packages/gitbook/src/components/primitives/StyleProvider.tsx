@@ -3,7 +3,6 @@ import type { ClassValue } from '@/lib/tailwind';
 
 import { RecordCardStyles } from '../DocumentView/Table/styles';
 import {
-    PageLinkItemStyles,
     ToggleableLinkItemActiveStyles,
     ToggleableLinkItemStyles,
 } from '../TableOfContents/styles';
@@ -14,7 +13,6 @@ const styles = {
     CardStyles,
     ButtonStyles,
     RecordCardStyles,
-    PageLinkItemStyles,
     ToggleableLinkItemStyles,
     ToggleableLinkItemActiveStyles,
 };
