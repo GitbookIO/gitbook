@@ -28,6 +28,14 @@ export async function PageHeader(props: {
 
     const hasAncestors = ancestors.length > 0;
 
+    // Show page actions if *any* of the actions are enabled
+    const hasPageActions = [
+        ...Object.values(context.customization.pageActions),
+        context.customization.pdf.enabled,
+        context.customization.git.showEditLink,
+        withRSSFeed,
+    ].some(Boolean);
+
     return (
         <header
             className={tcls(
@@ -41,8 +49,7 @@ export async function PageHeader(props: {
                 hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >
-            {page.layout.tableOfContents ? (
-                // Show page actions if *any* of the actions are enabled
+            {page.layout.tableOfContents && hasPageActions ? (
                 <PageActionsDropdown
                     siteTitle={context.site.title}
                     urls={getPageActionsURLs({ context, page, withRSSFeed })}
