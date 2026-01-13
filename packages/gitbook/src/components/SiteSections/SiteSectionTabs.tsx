@@ -187,7 +187,7 @@ const SectionTab = React.forwardRef(function SectionTab(
     return (
         <Button
             ref={ref}
-            size="medium"
+            size="small"
             variant="blank"
             {...rest}
             icon={icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
@@ -195,9 +195,9 @@ const SectionTab = React.forwardRef(function SectionTab(
             trailing={isGroup ? <DropdownChevron /> : null}
             active={isActive}
             className={tcls(
-                'group/dropdown relative my-2 overflow-visible px-3 py-1',
+                'group/dropdown relative my-1.5 overflow-visible',
                 isActive
-                    ? 'after:contents-[] after:-bottom-2 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9'
+                    ? 'after:contents-[] after:-bottom-1.5 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9'
                     : ''
             )}
             href={url}

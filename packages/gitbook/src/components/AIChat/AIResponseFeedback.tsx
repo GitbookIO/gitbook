@@ -36,7 +36,7 @@ export function AIResponseFeedback(props: {
                     'animate-fade-in overflow-hidden text-tint-subtle transition-all',
                     rating !== null && rating !== 1 && 'px-0 text-[0rem] opacity-0'
                 )}
-                size="medium"
+                size="small"
                 style={{ animationDelay: '.5s', animationDuration: '.5s' }}
                 onClick={() => handleRating(1)}
                 disabled={rating !== null}
@@ -52,7 +52,7 @@ export function AIResponseFeedback(props: {
                     'animate-fade-in overflow-hidden text-tint-subtle transition-all',
                     rating !== null && rating !== -1 && 'px-0 text-[0rem] opacity-0'
                 )}
-                size="medium"
+                size="small"
                 style={{ animationDelay: '.7s', animationDuration: '.5s' }}
                 onClick={() => handleRating(-1)}
                 disabled={rating !== null}

@@ -60,14 +60,14 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
                             icon={
                                 <Icon
                                     icon="chevron-down"
-                                    className="size-3 transition-transform group-data-[state=open]/button:rotate-180"
+                                    className="size-text-sm transition-transform group-data-[state=open]/button:rotate-180"
                                 />
                             }
                             label={tString(language, defaultAction ? 'more' : 'actions')}
                             iconOnly={!!defaultAction}
                             size="xsmall"
                             variant="secondary"
-                            className="bg-tint-base text-sm"
+                            className="bg-tint-base"
                         />
                     }
                 >

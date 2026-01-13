@@ -77,15 +77,16 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             <Button
                 iconOnly
                 icon="close"
+                size="small"
                 label={tString(language, 'close')}
                 variant="blank"
                 onClick={() => setShow(false)}
                 className={tcls('absolute', 'top-2', 'right-2', 'hover:bg-tint-hover')}
             />
-            <div className="mt-3 flex flex-row gap-2 text-xs">
+            <div className="mt-3 flex flex-row gap-2">
                 <Button
                     variant="primary"
-                    size="medium"
+                    size="small"
                     aria-label={tString(language, 'cookies_accept')}
                     onClick={() => {
                         onUpdateState(true);
@@ -94,7 +95,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 />
                 <Button
                     variant="secondary"
-                    size="medium"
+                    size="small"
                     aria-label={tString(language, 'cookies_reject')}
                     onClick={() => {
                         onUpdateState(false);

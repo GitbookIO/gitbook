@@ -44,7 +44,7 @@ export function AIChatToolConfirmations(props: {
                         tabIndex={index}
                         label={tool.label}
                         className="w-full justify-center"
-                        size={index === 0 ? 'large' : 'medium'}
+                        size={index === 0 ? 'medium' : 'small'}
                         variant={index === 0 ? 'primary' : 'secondary'}
                         icon={tool.icon}
                     />

@@ -1319,6 +1319,46 @@ const testCases: TestsCase[] = [
         ],
     },
     {
+        name: 'Navigation of links on a share links site',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/api-multi-versions-share-links/',
+        tests: [
+            {
+                name: 'Link in same site has the share link token preserved',
+                url: '8tNo6MeXg7CkFMzSSz81/link-in-same-site',
+                run: async (page) => {
+                    const linkToDifferentPage = page.getByRole('link', { name: 'Other Page' });
+                    await linkToDifferentPage.click();
+                    await page.waitForURL((url) =>
+                        url.pathname.includes(
+                            '/api-multi-versions-share-links/8tNo6MeXg7CkFMzSSz81/3.0/other-page'
+                        )
+                    );
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Other Page' })
+                    ).toBeVisible();
+                },
+                screenshot: false,
+            },
+            {
+                name: 'Link to different site should not have the share link token preserved',
+                url: '8tNo6MeXg7CkFMzSSz81/link-in-different-site',
+                run: async (page) => {
+                    const linkToDifferentSite = page.getByRole('link', { name: 'Basics' });
+                    await linkToDifferentSite.click();
+                    await page.waitForURL(
+                        (url) =>
+                            url.toString() ===
+                            'https://gitbook-open-e2e-sites.gitbook.io/sections/sections-4/basics/editor'
+                    );
+                    await expect(
+                        page.getByRole('heading', { level: 1, name: 'Editor' })
+                    ).toBeVisible();
+                },
+                screenshot: false,
+            },
+        ],
+    },
+    {
         name: 'Visitor Auth - Space',
         contentBaseURL: 'https://gitbook.gitbook.io/gbo-va-space/',
         tests: [
