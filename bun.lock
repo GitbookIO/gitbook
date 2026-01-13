@@ -7,7 +7,7 @@
       "devDependencies": {
         "@biomejs/biome": "^1.9.4",
         "@changesets/cli": "^2.29.8",
-        "turbo": "^2.6.3",
+        "turbo": "^2.7.4",
         "vercel": "^39.4.2",
       },
     },
@@ -108,7 +108,7 @@
     },
     "packages/gitbook": {
       "name": "gitbook",
-      "version": "0.21.2",
+      "version": "0.21.3",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
         "@gitbook/api": "catalog:",
@@ -300,7 +300,7 @@
     },
     "packages/react-openapi": {
       "name": "@gitbook/react-openapi",
-      "version": "1.5.5",
+      "version": "1.5.6",
       "dependencies": {
         "@gitbook/expr": "workspace:*",
         "@gitbook/openapi-parser": "workspace:*",
@@ -328,7 +328,7 @@
         "typescript": "catalog:",
       },
       "peerDependencies": {
-        "react": "*",
+        "react": ">=17",
         "react-dom": "*",
       },
     },

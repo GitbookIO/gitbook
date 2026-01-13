@@ -1,5 +1,12 @@
 # gitbook
 
+## 0.21.3
+
+### Patch Changes
+
+- Updated dependencies [bf63045]
+  - @gitbook/react-openapi@1.5.6
+
 ## 0.21.2
 
 ### Patch Changes
