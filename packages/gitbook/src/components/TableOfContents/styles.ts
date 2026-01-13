@@ -1,26 +1,6 @@
-export const PageLinkItemStyles = [
-    'flex',
-    'justify-start',
-    'items-center',
-    'gap-3',
-    'p-1.5',
-    'pl-3',
-    'text-sm',
-    'transition-colors',
-    'duration-100',
-    'text-tint-strong/7',
-    'rounded-md',
-    'straight-corners:rounded-none',
-    'circular-corners:rounded-xl',
-    'before:content-none',
-    'font-normal',
-    'hover:bg-tint',
-    'hover:text-tint-strong',
-];
-
 export const ToggleableLinkItemStyles = [
     'group/toclink toclink relative transition-colors',
-    'flex flex-row justify-between',
+    'flex flex-row justify-start items-center gap-3',
     'circular-corners:rounded-2xl rounded-md straight-corners:rounded-none p-1.5 pl-3',
     'text-balance font-normal text-sm text-tint-strong/7 hover:bg-tint-hover hover:text-tint-strong contrast-more:text-tint-strong',
     'contrast-more:hover:text-tint-strong contrast-more:hover:ring-1 contrast-more:hover:ring-tint-12',
