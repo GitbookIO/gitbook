@@ -1,13 +1,13 @@
 'use client';
 
-import { Icon, type IconName } from '@gitbook/icons';
+import type { IconName } from '@gitbook/icons';
 import { motion } from 'motion/react';
 import React from 'react';
 
 import { type ClassValue, tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
 import { useToggleAnimation } from '../hooks';
-import { Link } from '../primitives';
+import { Link, ToggleChevron } from '../primitives';
 import { ScrollContainer } from '../primitives/ScrollContainer';
 import { SectionIcon } from './SectionIcon';
 import type {
@@ -199,21 +199,18 @@ export function SiteSectionGroupItem(props: {
                         isActiveGroup && 'hover:bg-tint-hover'
                     )}
                 >
-                    <Icon
-                        icon="chevron-right"
+                    <ToggleChevron
+                        open={isOpen}
+                        type="right-to-down"
                         className={tcls(
-                            'grid',
                             'shrink-0',
                             'size-3',
                             'm-1',
                             'transition-opacity',
                             'text-current',
-                            'transition-transform',
                             'opacity-6',
                             'group-hover:opacity-11',
-                            'contrast-more:opacity-11',
-
-                            isOpen ? 'rotate-90' : 'rotate-0'
+                            'contrast-more:opacity-11'
                         )}
                     />
                 </span>

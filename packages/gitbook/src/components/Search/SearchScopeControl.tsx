@@ -2,7 +2,7 @@
 
 import { t, tString, useLanguage } from '@/intl/client';
 import type { SiteSection } from '@gitbook/api';
-import { Button, DropdownChevron, DropdownMenu, DropdownMenuItem } from '../primitives';
+import { Button, DropdownMenu, DropdownMenuItem, ToggleChevron } from '../primitives';
 import { useSearch } from './useSearch';
 
 interface SearchScopeControlProps {
@@ -64,7 +64,7 @@ function SearchScopeSectionControl(props: SearchScopeControlProps & { isExtended
                         isExtended ? 'search_scope_section_all' : 'search_scope_section_current',
                         section?.title ?? ''
                     )}
-                    trailing={<DropdownChevron />}
+                    trailing={<ToggleChevron />}
                 />
             }
         >
@@ -123,7 +123,7 @@ function SearchScopeVariantControl(props: SearchScopeControlProps & { isExtended
                         isExtended ? 'search_scope_variant_all' : 'search_scope_variant_current',
                         spaceTitle ?? ''
                     )}
-                    trailing={<DropdownChevron />}
+                    trailing={<ToggleChevron />}
                 />
             }
         >
