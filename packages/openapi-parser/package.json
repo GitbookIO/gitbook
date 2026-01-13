@@ -8,7 +8,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "3.0.6",
+    "version": "3.0.7",
     "sideEffects": false,
     "dependencies": {
         "@scalar/json-magic": "^0.8.10",
