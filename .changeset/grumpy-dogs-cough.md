@@ -2,4 +2,4 @@
 "gitbook": patch
 ---
 
-Don't show Page Actions dropdown if no options are turned on for it
+Better conditional display of page actions
