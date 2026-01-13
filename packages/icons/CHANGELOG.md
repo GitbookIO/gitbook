@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.4.2
+
+### Patch Changes
+
+- 360b525: Switch icon masking method to fix visual cutoffs in FA7
+
 ## 0.4.1
 
 ### Patch Changes
