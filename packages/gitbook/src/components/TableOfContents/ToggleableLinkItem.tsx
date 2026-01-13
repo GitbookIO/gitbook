@@ -139,7 +139,7 @@ function Toggler(props: {
             icon={
                 <ToggleChevron
                     open={isOpen}
-                    type="right-to-down"
+                    orientation="right-to-down"
                     className="m-0! size-3! opacity-6 group-hover:opacity-11"
                 />
             }

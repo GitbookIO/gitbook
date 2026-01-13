@@ -7,12 +7,12 @@ import { Icon, type IconName } from '@gitbook/icons';
  */
 export function ToggleChevron(props: {
     open?: boolean;
-    type?: 'down-to-up' | 'right-to-down'; // The direction of the chevron when open.
+    orientation?: 'down-to-up' | 'right-to-down'; // The direction of the chevron when open.
     className?: ClassValue;
 }) {
     const {
         open,
-        type = 'down-to-up',
+        orientation = 'down-to-up',
         className = 'opacity-6 group-hover/dropdown:opacity-11',
     } = props;
 
@@ -31,10 +31,10 @@ export function ToggleChevron(props: {
 
     return (
         <Icon
-            icon={classes[type].icon as IconName}
+            icon={classes[orientation].icon as IconName}
             className={tcls(
                 'shrink-0',
-                open ? classes[type].animation : classes[type].autoAnimation,
+                open ? classes[orientation].animation : classes[orientation].autoAnimation,
                 'size-3',
                 'transition-all',
                 className

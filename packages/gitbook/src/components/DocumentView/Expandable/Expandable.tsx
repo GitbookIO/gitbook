@@ -48,7 +48,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                 )}
             >
                 <ToggleChevron
-                    type="right-to-down"
+                    orientation="right-to-down"
                     open={context.mode === 'print'}
                     className={tcls(
                         'inline-block',
