@@ -295,10 +295,10 @@ const testCases: TestsCase[] = [
                     await expect(navigationLink).not.toBeVisible();
 
                     // Find and click the chevron element that is next to "Editor" in the TOC
-                    // It is a span inside the link
+                    // It is a button inside the link
                     const editorChevron = page
                         .getByRole('link', { name: 'Editor' })
-                        .locator('span');
+                        .locator('button');
                     await editorChevron.click();
 
                     // At this stage the link should still not be visible
@@ -307,7 +307,7 @@ const testCases: TestsCase[] = [
                     // Then we click 'Content Structure' chevron to expand further
                     const contentStructureChevron = page
                         .getByRole('link', { name: 'Content Structure' })
-                        .locator('span');
+                        .locator('button');
                     await contentStructureChevron.click();
 
                     // Verify "Spaces" link becomes visible after expansion
