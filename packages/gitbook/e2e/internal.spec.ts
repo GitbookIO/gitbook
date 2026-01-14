@@ -273,10 +273,10 @@ const testCases: TestsCase[] = [
                     await expect(navigationLink).not.toBeVisible();
 
                     // Find and click the chevron element that is next to "Editor" in the TOC
-                    // It is a span inside the link
+                    // It is a button inside the link
                     const editorChevron = page
                         .getByRole('link', { name: 'Editor' })
-                        .locator('span');
+                        .locator('button');
                     await editorChevron.click();
 
                     // Verify "Navigation" link becomes visible after expansion
