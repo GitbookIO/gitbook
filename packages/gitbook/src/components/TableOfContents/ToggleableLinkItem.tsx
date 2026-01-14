@@ -142,6 +142,7 @@ function Toggler(props: {
     return (
         <span
             className={tcls(
+                'ml-auto',
                 'group',
                 'relative',
                 'rounded-full',
@@ -169,7 +170,7 @@ function Toggler(props: {
                 icon="chevron-right"
                 className={tcls(
                     'm-1 grid size-3 shrink-0 text-current opacity-6 transition',
-                    'group-hover:opacity-11 contrast-more:opacity-11',
+                    'group-hover/toclink:opacity-11 contrast-more:opacity-11',
                     isOpen ? 'rotate-90' : 'rotate-0'
                 )}
             />
