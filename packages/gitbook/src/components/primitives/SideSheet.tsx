@@ -7,6 +7,8 @@ import React from 'react';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from './Button';
 
+const ANIMATION_DURATION = 300;
+
 /**
  * SideSheet - A slide-in panel component that can appear from the left or right side.
  *
@@ -58,6 +60,7 @@ export function SideSheet(
 
     const isMobile = useIsMobile();
     const isModal = modal === 'mobile' ? isMobile : modal;
+    const asideRef = React.useRef<HTMLElement>(null);
 
     // Internal state for uncontrolled mode (only used when open prop is undefined)
     const [open, setOpen] = React.useState(openState ?? false);
@@ -65,12 +68,25 @@ export function SideSheet(
     // Determine actual open state: controlled (from prop) or uncontrolled (from internal state)
     const isOpen = openState !== undefined ? openState : open;
 
-    const asideRef = React.useRef<HTMLElement>(null);
-    const previousIsMobileRef = React.useRef(isMobile);
-    const shouldSkipAnimations = previousIsMobileRef.current !== isMobile;
+    const wasOpenRef = React.useRef(false);
+    const [shouldHide, setShouldHide] = React.useState(!isOpen);
+
+    // Track if component has been opened to prevent initial animation
     React.useEffect(() => {
-        previousIsMobileRef.current = isMobile;
-    }, [isMobile]);
+        if (isOpen) {
+            wasOpenRef.current = true;
+            setShouldHide(false);
+        } else if (wasOpenRef.current) {
+            // Delay hiding until after exit animation completes
+            const timer = setTimeout(() => {
+                setShouldHide(true);
+            }, ANIMATION_DURATION);
+            return () => clearTimeout(timer);
+        } else {
+            // Never been opened, hide immediately
+            setShouldHide(true);
+        }
+    }, [isOpen]);
 
     const handleClose = React.useCallback(() => {
         if (openState !== undefined) {
@@ -190,13 +206,13 @@ export function SideSheet(
                     'fixed inset-y-0 z-41', // Above the side sheet scrim on z-40
                     side === 'left' ? 'left-0' : 'right-0',
                     withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
-                    isOpen ? '' : 'hidden',
-                    isOpen && !shouldSkipAnimations
+                    shouldHide ? 'hidden' : '',
+                    isOpen
                         ? side === 'left'
                             ? 'hydrated:animate-enter-from-left'
                             : 'hydrated:animate-enter-from-right'
                         : '',
-                    !isOpen && !shouldSkipAnimations
+                    !isOpen && wasOpenRef.current
                         ? side === 'left'
                             ? 'hydrated:animate-exit-to-left'
                             : 'hydrated:animate-exit-to-right'

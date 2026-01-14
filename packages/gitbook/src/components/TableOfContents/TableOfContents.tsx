@@ -77,6 +77,7 @@ export async function TableOfContents(props: {
                     'lg:page-no-toc:[html[style*="--outline-height"]_&]:top-(--outline-height)!',
 
                     'pt-6 pb-4',
+                    'supports-[-webkit-touch-callout]:pb-[env(safe-area-inset-bottom)]', // Override bottom padding on iOS since we have a transparent bottom bar
                     'lg:sidebar-filled:pr-6',
                     'lg:page-no-toc:pr-0',
                     'max-lg:pl-8',
