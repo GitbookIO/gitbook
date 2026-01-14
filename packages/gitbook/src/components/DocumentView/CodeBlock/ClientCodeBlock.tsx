@@ -6,7 +6,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useAdaptiveVisitor } from '@/components/Adaptive';
 import { useInViewportListener } from '@/components/hooks/useInViewportListener';
 import { useScrollListener } from '@/components/hooks/useScrollListener';
-import { Button } from '@/components/primitives';
+import { Button, ToggleChevron } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
 import { tcls } from '@/lib/tailwind';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -183,7 +183,7 @@ function CodeBlockExpandable(props: {
             </div>
             <div className="pointer-events-none absolute bottom-0 flex w-full justify-center">
                 <Button
-                    icon={isExpanded ? 'chevron-up' : 'chevron-down'}
+                    icon={<ToggleChevron open={isExpanded} />}
                     size="xsmall"
                     variant="blank"
                     type="button"
