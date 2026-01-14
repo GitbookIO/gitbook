@@ -41,7 +41,8 @@ export async function TableOfContents(props: {
                     'grow-0',
                     'shrink-0',
 
-                    'w-80',
+                    'w-4/5',
+                    'md:w-1/2',
                     'lg:w-72',
                     'basis-72',
                     'lg:page-no-toc:basis-56',
