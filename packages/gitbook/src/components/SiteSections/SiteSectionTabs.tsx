@@ -4,7 +4,7 @@ import type { IconName } from '@gitbook/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
-import { Button, DropdownChevron, Link } from '@/components/primitives';
+import { Button, Link, ToggleChevron } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -192,7 +192,7 @@ const SectionTab = React.forwardRef(function SectionTab(
             {...rest}
             icon={icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
             label={title}
-            trailing={isGroup ? <DropdownChevron /> : null}
+            trailing={isGroup ? <ToggleChevron /> : null}
             active={isActive}
             className={tcls(
                 'group/dropdown relative my-1.5 overflow-visible',

@@ -10,6 +10,7 @@ import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 
 import { assert } from 'ts-essentials';
 import { Link, type LinkInsightsProps } from '.';
+import { ToggleChevron } from './ToggleChevron';
 
 export type DropdownButtonProps<E extends HTMLElement = HTMLElement> = Omit<
     Partial<DetailedHTMLProps<HTMLAttributes<E>, E>>,
@@ -100,26 +101,6 @@ export function DropdownMenu(props: {
 }
 
 /**
- * Animated chevron to display in the dropdown button.
- */
-export function DropdownChevron() {
-    return (
-        <Icon
-            icon="chevron-down"
-            className={tcls(
-                'shrink-0',
-                'opacity-6',
-                'size-3',
-                'transition-all',
-                'group-hover/dropdown:opacity-11',
-                'group-data-[state=open]/dropdown:opacity-11',
-                'group-data-[state=open]/dropdown:rotate-180'
-            )}
-        />
-    );
-}
-
-/**
  * Button with a chevron for use in dropdowns.
  */
 export function DropdownButton(props: {
@@ -131,7 +112,7 @@ export function DropdownButton(props: {
     return (
         <div className={tcls('group/dropdown', 'flex', 'items-center', className)}>
             {children}
-            <DropdownChevron />
+            <ToggleChevron />
         </div>
     );
 }

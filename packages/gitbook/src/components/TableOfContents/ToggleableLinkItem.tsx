@@ -1,13 +1,8 @@
 'use client';
-
-import { Icon } from '@gitbook/icons';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
-
-import { tcls } from '@/lib/tailwind';
-
 import { useCurrentPagePath } from '../hooks';
-import { Link, type LinkInsightsProps, type LinkProps } from '../primitives';
+import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -135,42 +130,28 @@ function Toggler(props: {
     isOpen: boolean;
     onToggle: () => void;
 }) {
-    const { isLinkActive, isOpen, onToggle } = props;
+    const { isOpen, onToggle } = props;
     return (
-        <span
-            className={tcls(
-                'group',
-                'relative',
-                'rounded-full',
-                'straight-corners:rounded-xs',
-                'w-5',
-                'h-5',
-                'after:grid-area-1-1',
-                'after:absolute',
-                'after:-top-1',
-                'after:grid',
-                'after:-left-1',
-                'after:w-7',
-                'after:h-7',
-                'hover:bg-tint-active',
-                'hover:text-current',
-                isLinkActive && 'hover:bg-tint-hover'
-            )}
+        <Button
+            icon={
+                <ToggleChevron
+                    open={isOpen}
+                    orientation="right-to-down"
+                    className="m-0! size-3! opacity-6 group-hover:opacity-11"
+                />
+            }
             onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 onToggle();
             }}
-        >
-            <Icon
-                icon="chevron-right"
-                className={tcls(
-                    'm-1 grid size-3 shrink-0 text-current opacity-6 transition',
-                    'group-hover:opacity-11 contrast-more:opacity-11',
-                    isOpen ? 'rotate-90' : 'rotate-0'
-                )}
-            />
-        </span>
+            label={undefined}
+            size="xsmall"
+            iconOnly
+            variant="blank"
+            className="ml-auto text-current hover:bg-tint-base"
+            tabIndex={-1} // Prevent focus on the button since it's already inside a clickable link that performs the same toggle action.
+        />
     );
 }
 

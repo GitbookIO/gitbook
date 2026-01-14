@@ -1,5 +1,32 @@
 # gitbook
 
+## 0.21.3
+
+### Patch Changes
+
+- Updated dependencies [bf63045]
+  - @gitbook/react-openapi@1.5.6
+
+## 0.21.2
+
+### Patch Changes
+
+- ca68236: Fix 404 when accessing rss.xml for the root page.
+- 21851d3: Round page cover corners on extrawide screens
+- 695e99f: Update button sizing
+- 7517e98: Clean up button and input across the app
+- 99d788e: Update page cover styling
+- ebf3b2b: Fix an issue where content refs to spaces outside of site was resolving with share links
+- 35efc9d: Fix TOCPageIcons backgrounds on gradient and bold themes
+- a7f58ab: Fix embed tab button size regression
+- 360b525: Switch icon masking method to fix visual cutoffs in FA7
+- Updated dependencies [985c1b4]
+- Updated dependencies [360b525]
+  - @gitbook/openapi-parser@3.0.7
+  - @gitbook/icons@0.4.2
+  - @gitbook/react-openapi@1.5.5
+  - @gitbook/react-contentkit@0.7.11
+
 ## 0.21.1
 
 ### Patch Changes

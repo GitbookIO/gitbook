@@ -12,11 +12,13 @@ import { TOCPageIcon } from './TOCPageIcon';
 export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const { page } = props;
 
+    const isExternal = page.target.kind === 'url';
+
     return (
         <li className={tcls('flex', 'flex-col')}>
             <Link
                 href={page.href ?? '#'}
-                classNames={['PageLinkItemStyles']}
+                classNames={['ToggleableLinkItemStyles']}
                 insights={{
                     type: 'link_click',
                     link: {
@@ -27,21 +29,24 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
             >
                 <TOCPageIcon page={page} />
                 {page.title}
-                <Icon
-                    icon="arrow-up-right-from-square"
-                    className={tcls(
-                        'size-3',
-                        'mr-1',
-                        'mt-1',
-                        'place-self-start',
-                        'shrink-0',
-                        'text-current',
-                        'transition-colors',
-                        '[&>path]:transition-opacity',
-                        '[&>path]:opacity-[0.4]',
-                        'group-hover:[&>path]:opacity-11'
-                    )}
-                />
+                {isExternal ? (
+                    <Icon
+                        icon="arrow-up-right"
+                        className={tcls(
+                            'size-3',
+                            'ml-auto',
+                            'mr-1',
+                            'mt-1',
+                            'place-self-start',
+                            'shrink-0',
+                            'text-current',
+                            'transition-all',
+                            'opacity-6',
+                            'group-hover/toclink:opacity-11',
+                            'contrast-more:opacity-11'
+                        )}
+                    />
+                ) : null}
             </Link>
         </li>
     );

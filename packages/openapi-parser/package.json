@@ -8,12 +8,12 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "3.0.6",
+    "version": "3.0.7",
     "sideEffects": false,
     "dependencies": {
-        "@scalar/json-magic": "^0.8.1",
-        "@scalar/openapi-parser": "^0.23.2",
-        "@scalar/openapi-types": "^0.5.1"
+        "@scalar/json-magic": "^0.8.10",
+        "@scalar/openapi-parser": "^0.23.12",
+        "@scalar/openapi-types": "^0.5.3"
     },
     "devDependencies": {
         "@tsconfig/strictest": "catalog:",

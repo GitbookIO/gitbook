@@ -1,5 +1,18 @@
 # @gitbook/react-openapi
 
+## 1.5.6
+
+### Patch Changes
+
+- bf63045: Compile JSX
+
+## 1.5.5
+
+### Patch Changes
+
+- Updated dependencies [985c1b4]
+  - @gitbook/openapi-parser@3.0.7
+
 ## 1.5.4
 
 ### Patch Changes
