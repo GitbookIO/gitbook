@@ -51,7 +51,7 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     return defaultAction || dropdownActions.length > 0 ? (
         <ButtonGroup ref={ref} className={props.className}>
             {defaultAction}
-            {dropdownActions.length > 0 ? (
+            {!defaultAction || dropdownActions.length > 1 ? (
                 <DropdownMenu
                     align="end"
                     className="!min-w-60 max-w-max"
