@@ -11,8 +11,13 @@ import type { PageMetaLinks } from './SitePage';
  */
 export function PageClientLayout({
     pageMetaLinks,
+    currentPage
 }: {
     pageMetaLinks: PageMetaLinks | null;
+    currentPage: {
+        id: string;
+        spaceId: string;
+    } | null;
 }) {
     // We use this hook in the page layout to ensure the elements for the blocks
     // are rendered before we scroll to a hash or to the top of the page
@@ -21,7 +26,7 @@ export function PageClientLayout({
     // The page metadata such as meta links are generated on the server side,
     // but need to be registered on the client side in other parts of the layout
     // such as the SpaceDropdown.
-    useRegisterPageMetadata({ pageMetaLinks });
+    useRegisterPageMetadata({ pageMetaLinks, currentPage });
 
     useStripFallbackQueryParam();
     return null;
@@ -44,6 +49,8 @@ function useStripFallbackQueryParam() {
         if (searchParams?.has('fallback')) {
             const params = new URLSearchParams(searchParams.toString());
             params.delete('fallback');
+            params.delete('fallbackPageID');
+            params.delete('fallbackSpaceID');
             router.push(`${pathname}?${params.toString()}${window.location.hash ?? ''}`);
         }
     }, [router, pathname, searchParams]);
@@ -54,9 +61,13 @@ function useStripFallbackQueryParam() {
  */
 function useRegisterPageMetadata(metadata: {
     pageMetaLinks: PageMetaLinks | null;
+    currentPage: {
+        id: string;
+        spaceId: string;
+    } | null;
 }) {
-    const { pageMetaLinks } = metadata;
+    const { pageMetaLinks, currentPage } = metadata;
     React.useEffect(() => {
-        currentPageMetadataStore.setState({ metaLinks: pageMetaLinks });
-    }, [pageMetaLinks]);
+        currentPageMetadataStore.setState({ metaLinks: pageMetaLinks, currentPage });
+    }, [pageMetaLinks, currentPage]);
 }

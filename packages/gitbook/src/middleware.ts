@@ -282,6 +282,13 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // (customization override, theme, etc)
         let routeType: 'dynamic' | 'static' = 'static';
 
+        // Extract fallback pageID and spaceID from the URL
+        // These are used when switching variant spaces to redirect to a specific page if the current path doesn't exist in the new variant.
+        // Because there is no link between every variant, we need to pass a stable spaceID/pageID to redirect to.
+        // They are the first alternate link in the page metadata of the previous variant. 
+        const fallbackPageID = requestURL.searchParams.get('fallbackPageID');
+        const fallbackSpaceID = requestURL.searchParams.get('fallbackSpaceID');
+
         // We pick only stable data from the siteURL data to prevent re-rendering of
         // the root layout when changing pages..
         const stableSiteURLData: SiteURLData = {
@@ -298,7 +305,12 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             apiToken: siteURLData.apiToken,
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
-            isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : undefined,
+            fallback: {
+                isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : false,
+                ...(fallbackPageID ? { pageID: fallbackPageID } : {}),
+                ...(fallbackSpaceID ? { spaceID: fallbackSpaceID } : {}),
+            }
+            
         };
 
         const requestHeaders = new Headers(request.headers);

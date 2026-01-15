@@ -27,6 +27,25 @@ import { GITBOOK_URL } from './env';
 import { type ImageResizer, createImageResizer } from './images';
 import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links';
 
+type FallbackData = {
+    /**
+         * 
+         */
+        isFallback: boolean;
+
+        /**
+         * Space ID of the main space.
+         * Only provided for a computed space.
+         */
+        spaceID?: string;
+
+        /**
+         * page ID of the main revision.
+         * Only provided for a computed revision.
+         */
+        pageID?: string;
+};
+
 /**
  * Data about the site URL. Provided by the middleware.
  * These data are stable between pages in the same site space.
@@ -52,11 +71,10 @@ export type SiteURLData = Pick<
     imagesContextId: string;
 
     /**
-     * Whether this request is a fallback rendering.
-     * We use this when switching variant as we don't know if the page exists in the other variant.
-     * By knowing it's a fallback, we can redirect to the space base path instead of returning a 404.
+     * Necessary data to properly handle fallback rendering.
+     * This is used when switching between variants to avoid fetching every revision every time.
      */
-    isFallback?: boolean;
+    fallback?: FallbackData;
 };
 
 /**
@@ -142,7 +160,7 @@ export type GitBookSiteContext = GitBookSpaceContext & {
     contextId?: string;
 
     /** Whether this request is a fallback rendering. */
-    isFallback: boolean;
+    fallback: FallbackData;
 };
 
 /**
@@ -221,7 +239,7 @@ export async function fetchSiteContextByURLLookup(
         changeRequest: data.changeRequest,
         revision: data.revision,
         contextId: data.contextId,
-        isFallback: data.isFallback ?? false,
+        fallback: data.fallback ?? { isFallback: false },
     });
 }
 
@@ -240,7 +258,7 @@ export async function fetchSiteContextByIds(
         changeRequest: string | undefined;
         revision: string | undefined;
         contextId?: string;
-        isFallback: boolean;
+        fallback: FallbackData;
     }
 ): Promise<GitBookSiteContext> {
     const { dataFetcher } = baseContext;
@@ -352,7 +370,7 @@ export async function fetchSiteContextByIds(
         visibleSections,
         scripts,
         contextId: ids.contextId,
-        isFallback: ids.isFallback,
+        fallback: ids.fallback,
     };
 }
 

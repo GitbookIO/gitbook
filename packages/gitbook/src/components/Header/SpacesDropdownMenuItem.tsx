@@ -17,7 +17,7 @@ interface VariantSpace {
  */
 function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: string, active = false) {
     const currentPathname = useCurrentPagePath();
-    const { metaLinks } = useCurrentPageMetadata();
+    const { metaLinks, currentPage } = useCurrentPageMetadata();
 
     // We first check if there is an alternate link for the variant space in the current page metadata.
     const pageHasAlternateForVariant = metaLinks?.alternates.find(
@@ -26,6 +26,15 @@ function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: strin
     if (pageHasAlternateForVariant) {
         return pageHasAlternateForVariant.href;
     }
+
+    const firstAlternate = metaLinks?.alternates[0];
+    const computed = firstAlternate ? {
+        pageID: firstAlternate.pageID,
+        spaceID: firstAlternate.space?.id
+    } : {
+        pageID: currentPage?.id,
+        spaceID: currentPage?.spaceId
+    };
 
     // If there is no alternate link, we reconstruct the URL by swapping the space path.
 
@@ -44,7 +53,16 @@ function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: strin
 
         targetUrl.searchParams.set('fallback', 'true');
 
+        if(computed?.spaceID && computed?.pageID) {
+            targetUrl.searchParams.set('fallbackPageID', computed.pageID);
+            targetUrl.searchParams.set('fallbackSpaceID', computed.spaceID);
+        }
+
         return targetUrl.toString();
+    }
+
+    if(computed?.spaceID && computed?.pageID) {
+        return `${joinPath(variantSpaceUrl, currentPathname)}?fallback=true&fallbackPageID=${computed.pageID}&fallbackSpaceID=${computed.spaceID}`;
     }
 
     // Fallback when the URL path is a relative path (in development mode)

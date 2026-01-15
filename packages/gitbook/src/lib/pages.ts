@@ -117,6 +117,50 @@ export function resolvePageId(
 }
 
 /**
+ * 
+ * Resolve a page by its related space ID and page ID from the revision pages.
+ * Related pages are pages that are linked via meta links alternates.
+ * It uses the metaLinks alternates to find the matching computed page.
+ * It always use the first alternate to resolve the parent page.
+ * 
+ * @param rootPages 
+ * @param relatedSpaceId Space ID of the parent page (i.e. )
+ * @param relatedPageId 
+ * @returns 
+ */
+export function resolveFallbackPage(
+    rootPages: Revision['pages'],
+    relatedSpaceId: string,
+    relatedPageId: string
+): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined {
+    const iteratePages = (
+        pages: RevisionPage[],
+        ancestors: AncestorRevisionPage[]
+    ): { page: RevisionPageDocument; ancestors: AncestorRevisionPage[] } | undefined => {
+        for (const page of pages) {
+            if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
+                continue;
+            }
+
+            if(page.type === RevisionPageType.Document) {
+                const metaLinksAlternates = page.metaLinks?.alternates;
+                if(metaLinksAlternates && metaLinksAlternates.length > 0 && metaLinksAlternates[0]?.kind !== "url") {
+                    if(metaLinksAlternates[0]?.space === relatedSpaceId && metaLinksAlternates[0]?.page === relatedPageId) {
+                        return resolvePageDocument(page, ancestors);
+                    }
+                }
+            }
+
+            const result = iteratePages(page.pages, [...ancestors, page]);
+            if (result) {
+                return result;
+            }
+        }
+    };
+    return iteratePages(rootPages, []);
+}
+
+/**
  * Resolve the next/previous page before another one.
  * It ignores hidden pages as this is used for navigation purpose.
  */
@@ -220,7 +264,7 @@ function resolvePageDocument(
         return;
     }
     if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
-        return undefined;
+        return undefined; 
     }
 
     return { page, ancestors };
