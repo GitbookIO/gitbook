@@ -28,13 +28,15 @@ function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: strin
     }
 
     const firstAlternate = metaLinks?.alternates[0];
-    const computed = firstAlternate ? {
-        pageID: firstAlternate.pageID,
-        spaceID: firstAlternate.space?.id
-    } : {
-        pageID: currentPage?.id,
-        spaceID: currentPage?.spaceId
-    };
+    const computed = firstAlternate
+        ? {
+              pageID: firstAlternate.pageID,
+              spaceID: firstAlternate.space?.id,
+          }
+        : {
+              pageID: currentPage?.id,
+              spaceID: currentPage?.spaceId,
+          };
 
     // If there is no alternate link, we reconstruct the URL by swapping the space path.
 
@@ -53,7 +55,7 @@ function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: strin
 
         targetUrl.searchParams.set('fallback', 'true');
 
-        if(computed?.spaceID && computed?.pageID) {
+        if (computed?.spaceID && computed?.pageID) {
             targetUrl.searchParams.set('fallbackPageID', computed.pageID);
             targetUrl.searchParams.set('fallbackSpaceID', computed.spaceID);
         }
@@ -61,7 +63,7 @@ function useVariantSpaceHref(variantSpace: VariantSpace, currentSpacePath: strin
         return targetUrl.toString();
     }
 
-    if(computed?.spaceID && computed?.pageID) {
+    if (computed?.spaceID && computed?.pageID) {
         return `${joinPath(variantSpaceUrl, currentPathname)}?fallback=true&fallbackPageID=${computed.pageID}&fallbackSpaceID=${computed.spaceID}`;
     }
 

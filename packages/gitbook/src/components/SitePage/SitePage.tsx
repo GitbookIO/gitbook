@@ -106,7 +106,10 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                         staticRoute={props.staticRoute}
                     />
                 </div>
-                <PageClientLayout pageMetaLinks={pageMetaLinks} currentPage={{ id: page.id, spaceId: context.space.id }} />
+                <PageClientLayout
+                    pageMetaLinks={pageMetaLinks}
+                    currentPage={{ id: page.id, spaceId: context.space.id }}
+                />
             </div>
         </PageContextProvider>
     );
@@ -354,7 +357,13 @@ async function resolvePageMetaLinks(
         return {
             canonical: resolvedCanonical ?? null,
             alternates: resolvedAlternates.filter(
-                (alt): alt is { href: string; space: AlternateLinkSpace | null, pageID: string | undefined } => !!alt.href
+                (
+                    alt
+                ): alt is {
+                    href: string;
+                    space: AlternateLinkSpace | null;
+                    pageID: string | undefined;
+                } => !!alt.href
             ),
         };
     }

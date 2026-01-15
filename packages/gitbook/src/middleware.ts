@@ -285,7 +285,7 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
         // Extract fallback pageID and spaceID from the URL
         // These are used when switching variant spaces to redirect to a specific page if the current path doesn't exist in the new variant.
         // Because there is no link between every variant, we need to pass a stable spaceID/pageID to redirect to.
-        // They are the first alternate link in the page metadata of the previous variant. 
+        // They are the first alternate link in the page metadata of the previous variant.
         const fallbackPageID = requestURL.searchParams.get('fallbackPageID');
         const fallbackSpaceID = requestURL.searchParams.get('fallbackSpaceID');
 
@@ -306,11 +306,10 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
             imagesContextId: imagesContextId,
             contextId: siteURLData.contextId,
             fallback: {
-                isFallback: requestURL.searchParams.get('fallback') === 'true' ? true : false,
+                isFallback: requestURL.searchParams.get('fallback') === 'true',
                 ...(fallbackPageID ? { pageID: fallbackPageID } : {}),
                 ...(fallbackSpaceID ? { spaceID: fallbackSpaceID } : {}),
-            }
-            
+            },
         };
 
         const requestHeaders = new Headers(request.headers);

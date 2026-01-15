@@ -29,21 +29,21 @@ import { type GitBookLinker, createLinker, linkerForPublishedURL } from './links
 
 type FallbackData = {
     /**
-         * 
-         */
-        isFallback: boolean;
+     *
+     */
+    isFallback: boolean;
 
-        /**
-         * Space ID of the main space.
-         * Only provided for a computed space.
-         */
-        spaceID?: string;
+    /**
+     * Space ID of the main space.
+     * Only provided for a computed space.
+     */
+    spaceID?: string;
 
-        /**
-         * page ID of the main revision.
-         * Only provided for a computed revision.
-         */
-        pageID?: string;
+    /**
+     * page ID of the main revision.
+     * Only provided for a computed revision.
+     */
+    pageID?: string;
 };
 
 /**

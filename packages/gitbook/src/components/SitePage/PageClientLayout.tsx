@@ -11,7 +11,7 @@ import type { PageMetaLinks } from './SitePage';
  */
 export function PageClientLayout({
     pageMetaLinks,
-    currentPage
+    currentPage,
 }: {
     pageMetaLinks: PageMetaLinks | null;
     currentPage: {

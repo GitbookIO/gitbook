@@ -117,16 +117,16 @@ export function resolvePageId(
 }
 
 /**
- * 
+ *
  * Resolve a page by its related space ID and page ID from the revision pages.
  * Related pages are pages that are linked via meta links alternates.
  * It uses the metaLinks alternates to find the matching computed page.
  * It always use the first alternate to resolve the parent page.
- * 
- * @param rootPages 
+ *
+ * @param rootPages
  * @param relatedSpaceId Space ID of the parent page (i.e. )
- * @param relatedPageId 
- * @returns 
+ * @param relatedPageId
+ * @returns
  */
 export function resolveFallbackPage(
     rootPages: Revision['pages'],
@@ -142,10 +142,17 @@ export function resolveFallbackPage(
                 continue;
             }
 
-            if(page.type === RevisionPageType.Document) {
+            if (page.type === RevisionPageType.Document) {
                 const metaLinksAlternates = page.metaLinks?.alternates;
-                if(metaLinksAlternates && metaLinksAlternates.length > 0 && metaLinksAlternates[0]?.kind !== "url") {
-                    if(metaLinksAlternates[0]?.space === relatedSpaceId && metaLinksAlternates[0]?.page === relatedPageId) {
+                if (
+                    metaLinksAlternates &&
+                    metaLinksAlternates.length > 0 &&
+                    metaLinksAlternates[0]?.kind !== 'url'
+                ) {
+                    if (
+                        metaLinksAlternates[0]?.space === relatedSpaceId &&
+                        metaLinksAlternates[0]?.page === relatedPageId
+                    ) {
                         return resolvePageDocument(page, ancestors);
                     }
                 }
@@ -264,7 +271,7 @@ function resolvePageDocument(
         return;
     }
     if (page.type === RevisionPageType.Link || page.type === RevisionPageType.Computed) {
-        return undefined; 
+        return undefined;
     }
 
     return { page, ancestors };

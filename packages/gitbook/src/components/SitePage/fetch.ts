@@ -36,7 +36,8 @@ export async function fetchPageData(context: GitBookSiteContext, params: PagePar
  * If the path can't be found, we try to resolve it from the API to handle redirects.
  */
 async function resolvePage(context: GitBookSiteContext, params: PagePathParams | PageIdParams) {
-    const { organizationId, site, space, revision, shareKey, linker, revisionId, fallback } = context;
+    const { organizationId, site, space, revision, shareKey, linker, revisionId, fallback } =
+        context;
 
     if ('pageId' in params) {
         return resolvePageId(revision.pages, params.pageId);
@@ -100,12 +101,9 @@ async function resolvePage(context: GitBookSiteContext, params: PagePathParams |
         );
         if (resolved) {
             return resolvePageId(revision.pages, resolved.id);
-        } else if(fallback.isFallback && fallback.pageID && fallback.spaceID) {
-            return resolveFallbackPage(
-                revision.pages,
-                fallback.spaceID,
-                fallback.pageID
-            );
+            // biome-ignore lint/style/noUselessElse: Not useless
+        } else if (fallback.isFallback && fallback.pageID && fallback.spaceID) {
+            return resolveFallbackPage(revision.pages, fallback.spaceID, fallback.pageID);
         }
     }
 
