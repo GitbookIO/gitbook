@@ -11,10 +11,9 @@ import assertNever from 'assert-never';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import { Button, Link } from '../primitives';
+import { Button, Link, ToggleChevron } from '../primitives';
 import {
     type DropdownButtonProps,
-    DropdownChevron,
     DropdownMenu,
     DropdownMenuItem,
 } from '../primitives/DropdownMenu';
@@ -177,7 +176,7 @@ function HeaderItemLink(props: Omit<HeaderLinkNavItemProps, 'linkStyle'>) {
             {...rest}
         >
             {title}
-            {isDropdown ? <DropdownChevron /> : null}
+            {isDropdown ? <ToggleChevron /> : null}
         </Link>
     );
 }
@@ -195,7 +194,7 @@ function HeaderItemDropdown(
             {...rest}
         >
             {title}
-            <DropdownChevron />
+            <ToggleChevron />
         </span>
     );
 }

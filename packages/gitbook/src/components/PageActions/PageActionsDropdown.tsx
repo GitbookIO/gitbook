@@ -4,9 +4,9 @@ import { Button, ButtonGroup } from '@/components/primitives/Button';
 import { DropdownMenu, DropdownMenuSeparator } from '@/components/primitives/DropdownMenu';
 import { tString, useLanguage } from '@/intl/client';
 import type { GitSyncState, SiteCustomizationSettings } from '@gitbook/api';
-import { Icon } from '@gitbook/icons';
 import React, { useRef } from 'react';
 import { useAI } from '../AI';
+import { ToggleChevron } from '../primitives';
 import {
     ActionCopyMCPURL,
     ActionCopyMarkdown,
@@ -51,18 +51,13 @@ export function PageActionsDropdown(props: PageActionsDropdownProps) {
     return defaultAction || dropdownActions.length > 0 ? (
         <ButtonGroup ref={ref} className={props.className}>
             {defaultAction}
-            {dropdownActions.length > 0 ? (
+            {!defaultAction || dropdownActions.length > 1 ? (
                 <DropdownMenu
                     align="end"
                     className="!min-w-60 max-w-max"
                     button={
                         <Button
-                            icon={
-                                <Icon
-                                    icon="chevron-down"
-                                    className="size-text-sm transition-transform group-data-[state=open]/button:rotate-180"
-                                />
-                            }
+                            icon={<ToggleChevron className="size-text-sm" />}
                             label={tString(language, defaultAction ? 'more' : 'actions')}
                             iconOnly={!!defaultAction}
                             size="xsmall"

@@ -4,6 +4,7 @@ import { Icon } from '@gitbook/icons';
 import { getNodeFragmentByType } from '@/lib/document';
 import { tcls } from '@/lib/tailwind';
 
+import { ToggleChevron } from '@/components/primitives';
 import type { BlockProps } from '../Block';
 import { Blocks } from '../Blocks';
 import { Inlines } from '../Inlines';
@@ -46,14 +47,14 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
                     '[&::-webkit-details-marker]:hidden'
                 )}
             >
-                <Icon
-                    icon="chevron-right"
+                <ToggleChevron
+                    orientation="right-to-down"
+                    open={context.mode === 'print'}
                     className={tcls(
                         'inline-block',
                         'size-3',
                         'mr-3',
                         'mb-1',
-                        'transition-transform',
                         'shrink-0',
                         'group-open/expandable:rotate-90'
                     )}

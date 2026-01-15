@@ -10,12 +10,8 @@ import type React from 'react';
 import { resolveContentRef } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 
-import {
-    DropdownChevron,
-    DropdownMenu,
-    DropdownMenuItem,
-    DropdownSubMenu,
-} from '../primitives/DropdownMenu';
+import { ToggleChevron } from '../primitives';
+import { DropdownMenu, DropdownMenuItem, DropdownSubMenu } from '../primitives/DropdownMenu';
 import styles from './headerLinks.module.css';
 
 /**
@@ -44,7 +40,7 @@ export function HeaderLinkMore(props: {
         >
             <span className="sr-only">{label}</span>
             <Icon icon="ellipsis" className={tcls('size-4')} />
-            <DropdownChevron />
+            <ToggleChevron />
         </button>
     );
 

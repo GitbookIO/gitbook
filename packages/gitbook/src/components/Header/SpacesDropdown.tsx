@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { Button, type ButtonProps } from '../primitives';
-import { DropdownChevron, DropdownMenu } from '../primitives/DropdownMenu';
+import { Button, type ButtonProps, ToggleChevron } from '../primitives';
+import { DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
 
 // Memoized regex for checking if a string starts with an emoji
@@ -37,7 +37,7 @@ export function SpacesDropdown(props: {
                     data-testid="space-dropdown-button"
                     size="small"
                     variant={variant}
-                    trailing={<DropdownChevron />}
+                    trailing={<ToggleChevron />}
                     className={tcls('bg-tint-base', className)}
                 >
                     <span className="button-content">{siteSpace.title}</span>
