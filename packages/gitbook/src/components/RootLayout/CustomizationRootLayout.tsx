@@ -23,7 +23,7 @@ import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
-import { getSpaceLanguage } from '@/intl/server';
+import { getSpaceLanguage, getSpaceLocale } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
@@ -66,6 +66,7 @@ export async function CustomizationRootLayout(props: {
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
+    const locale = getSpaceLocale(context);
     const language = getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
@@ -88,7 +89,7 @@ export async function CustomizationRootLayout(props: {
     return (
         <html
             suppressHydrationWarning
-            lang={customization.internationalization.locale}
+            lang={locale}
             className={tcls(
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
