@@ -40,7 +40,7 @@ export function SideSheet(
         /** Called when the open state changes. Receives the new state (true/false). Only used in controlled mode. */
         onOpenChange?: (open: boolean) => void;
         /** Show a backdrop overlay when modal */
-        withScrim?: boolean;
+        withOverlay?: boolean;
         /** Show a close button when modal */
         withCloseButton?: boolean;
     } & React.HTMLAttributes<HTMLDivElement>
@@ -52,7 +52,7 @@ export function SideSheet(
         toggleClass,
         open: openState,
         modal = 'mobile',
-        withScrim,
+        withOverlay,
         withCloseButton,
         onOpenChange,
         ...rest
@@ -192,8 +192,8 @@ export function SideSheet(
 
     return (
         <>
-            {withScrim ? (
-                <SideSheetScrim
+            {withOverlay ? (
+                <SideSheetOverlay
                     className={tcls(isModal && isOpen ? '' : 'hidden opacity-0 backdrop-blur-none')}
                     onClick={handleClose}
                 />
@@ -203,7 +203,7 @@ export function SideSheet(
                 ref={asideRef}
                 className={tcls(
                     'side-sheet',
-                    'fixed inset-y-0 z-41', // Above the side sheet scrim on z-40
+                    'fixed inset-y-0 z-41', // Above the side sheet overlay on z-40
                     side === 'left' ? 'left-0' : 'right-0',
                     withCloseButton ? 'max-w-[calc(100%-4rem)]' : 'max-w-[calc(100%-3rem)]',
                     shouldHide ? 'hidden' : '',
@@ -239,12 +239,12 @@ export function SideSheet(
 }
 
 /** Backdrop overlay shown behind the modal sheet */
-export function SideSheetScrim(props: { className?: ClassValue; onClick?: () => void }) {
+export function SideSheetOverlay(props: { className?: ClassValue; onClick?: () => void }) {
     const { className, onClick } = props;
     return (
         // biome-ignore lint/a11y/useKeyWithClickEvents: global escape key handler is used to close the modal sheet
         <div
-            id="side-sheet-scrim"
+            id="side-sheet-overlay"
             onClick={() => {
                 onClick?.();
             }}

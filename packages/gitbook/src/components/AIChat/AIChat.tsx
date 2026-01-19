@@ -80,7 +80,7 @@ export function AIChat() {
                     chatController.close();
                 }
             }}
-            withScrim={true}
+            withOverlay={true}
             className={tcls(
                 'ai-chat mx-auto ml-8 not-hydrated:hidden w-96 transition-[width] duration-300 ease-quint lg:max-xl:w-80'
             )}

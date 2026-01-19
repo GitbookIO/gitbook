@@ -32,7 +32,7 @@ export async function TableOfContents(props: {
                 data-testid="table-of-contents"
                 id="table-of-contents"
                 toggleClass="navigation-open"
-                withScrim={true}
+                withOverlay={true}
                 withCloseButton={true}
                 className={tcls(
                     'group/table-of-contents',
