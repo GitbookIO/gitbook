@@ -1,4 +1,5 @@
 import { isProxyRootRequest } from '../proxy';
+import { DataFetcherError } from './errors';
 
 /**
  * For a given GitBook URL, return a list of alternative URLs that could be matched against to lookup the content.
@@ -124,6 +125,48 @@ export function getURLLookupAlternatives(input: URL) {
 export function normalizeURL(url: URL) {
     const result = new URL(url);
     result.pathname = url.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '');
+    return result;
+}
+
+/**
+ * This function checks if the URL path contains invalid characters that should not be present in a valid URL path.
+ * If such characters are found, it indicates that the URL is malformed or potentially malicious and should be rejected.
+ * https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding
+ * "%" itself is excluded because it could be multiple encoding.
+ */
+function containInvalidURLCharacters(segment: string): boolean {
+    const invalidCharacters = [':', '/', '?', '#', '[', ']', '@', '!', '$', '&', "'", '(', ')', '*', '+', ',', ';', '='];
+    return invalidCharacters.some((char) => segment.includes(char));
+}
+
+/**
+ * Decode the url path component, we redirect URLs with encoded path components
+ * so that we don't end up with multiple URLs for the same content (especially important because of caching).
+ * If after decoding the path contains invalid characters, we throw an error.
+ * We limit the number of decoding iterations to avoid potential DoS attacks with double-encoding.
+ */
+export function decodeURLPath(url: URL, i = 0): URL {
+    const decoded = new URL(url);
+    decoded.pathname = url.pathname.split('/').map(segment => {
+        const result = decodeURIComponent(segment)
+        if (containInvalidURLCharacters(result)) {
+            throw new DataFetcherError(`URL path contains invalid characters: ${url.toString()}`, 400);
+        }
+        return result;
+    }).join('/');
+    let result = decoded;
+    if(decoded.pathname !== url.pathname) {
+        result = normalizeURL(decoded);
+    }
+    //TODO: Do we want to allow more than 3 iterations? Maybe even only 1?
+    // We limit to 3 iterations of decoding to avoid potential DoS attacks with double-encoding
+    if(result.pathname.includes('%') && i < 3) {
+        return decodeURLPath(result, i + 1);
+    }
+    // If we are over 3 iterations and still have encoded characters, we consider the URL invalid
+    if(result.pathname.includes('%') && i >= 3) {
+        throw new DataFetcherError(`URL path is malformed: ${url.toString()}`, 400);
+    }
     return result;
 }
 
