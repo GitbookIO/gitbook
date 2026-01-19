@@ -37,30 +37,31 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
         label: 'HTTP',
         syntax: 'http',
         generate: ({ method, url: { origin, path }, headers = {}, body }: CodeSampleInput) => {
+            // Process URL and headers to use consistent placeholder format
+            const processedPath = convertPathParametersToPlaceholders(path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
+
             if (body) {
                 // if we had a body add a content length header
                 const bodyContent = body ? stringifyOpenAPI(body) : '';
                 // handle unicode chars with a text encoder
                 const encoder = new TextEncoder();
 
-                const bodyString = BodyGenerators.getHTTPBody(body, headers);
+                const bodyString = BodyGenerators.getHTTPBody(body, processedHeaders);
 
                 if (bodyString) {
                     body = bodyString;
                 }
 
-                headers = {
-                    ...headers,
-                    'Content-Length': encoder.encode(bodyContent).length.toString(),
-                };
+                processedHeaders['Content-Length'] = encoder.encode(bodyContent).length.toString();
             }
 
-            if (!headers.hasOwnProperty('Accept')) {
-                headers.Accept = '*/*';
+            if (!processedHeaders.hasOwnProperty('Accept')) {
+                processedHeaders.Accept = '*/*';
             }
 
-            const headerString = headers
-                ? `${Object.entries(headers)
+            const headerString = processedHeaders
+                ? `${Object.entries(processedHeaders)
                       .map(([key, value]) =>
                           key.toLowerCase() !== 'host' ? `${key}: ${value}` : ''
                       )
@@ -69,8 +70,8 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             const bodyString = body ? `\n${body}` : '';
 
-            const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${origin.replaceAll(/https*:\/\//g, '')}
+            const httpRequest = `${method.toUpperCase()} ${decodeURI(processedPath)} HTTP/1.1
+Host: ${origin.replace(/https*:\/\//g, '')}
 ${headerString}${bodyString}`;
 
             return httpRequest;
@@ -87,15 +88,23 @@ ${headerString}${bodyString}`;
                 lines.push(`--request ${method.toUpperCase()}`);
             }
 
-            lines.push(`--url '${origin}${path}'`);
+            // Process URL and headers to use consistent placeholder format
+            const processedUrl = convertPathParametersToPlaceholders(origin + path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
+
+            lines.push(`--url '${processedUrl}'`);
 
             if (body) {
-                const bodyContent = BodyGenerators.getCurlBody(body, headers);
+                const bodyContent = BodyGenerators.getCurlBody(body, processedHeaders);
 
                 if (bodyContent) {
                     body = bodyContent.body;
                     headers = bodyContent.headers;
+                } else {
+                    headers = processedHeaders;
                 }
+            } else {
+                headers = processedHeaders;
             }
 
             if (headers && Object.keys(headers).length > 0) {
@@ -122,18 +131,26 @@ ${headerString}${bodyString}`;
         generate: ({ method, url: { origin, path }, headers, body }) => {
             let code = '';
 
+            // Process URL and headers to use consistent placeholder format
+            const processedUrl = convertPathParametersToPlaceholders(origin + path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
+
             if (body) {
-                const lines = BodyGenerators.getJavaScriptBody(body, headers);
+                const lines = BodyGenerators.getJavaScriptBody(body, processedHeaders);
 
                 if (lines) {
                     // add the generated code to the top
                     code += lines.code;
                     body = lines.body;
                     headers = lines.headers;
+                } else {
+                    headers = processedHeaders;
                 }
+            } else {
+                headers = processedHeaders;
             }
 
-            code += `const response = await fetch('${origin}${path}', {
+            code += `const response = await fetch('${processedUrl}', {
     method: '${method.toUpperCase()}',\n`;
 
             if (headers && Object.keys(headers).length > 0) {
@@ -156,7 +173,19 @@ ${headerString}${bodyString}`;
         syntax: 'python',
         generate: ({ method, url: { origin, path }, headers, body }) => {
             const contentType = headers?.['Content-Type'];
-            let code = `${isJSON(contentType) ? 'import json\n' : ''}import requests\n\n`;
+            const needsJsonImport = body && isJSON(contentType) && typeof body === 'string';
+
+            let code = '';
+
+            // Import statements
+            if (needsJsonImport) {
+                code += 'import json\n';
+            }
+            code += 'import requests\n\n';
+
+            // Process headers and URL to use consistent placeholder format
+            const processedUrl = convertPathParametersToPlaceholders(origin + path);
+            const processedHeaders = processHeadersWithPlaceholders(headers);
 
             if (body) {
                 const lines = BodyGenerators.getPythonBody(body, headers);
@@ -170,16 +199,25 @@ ${headerString}${bodyString}`;
             }
 
             code += `response = requests.${method.toLowerCase()}(\n`;
-            code += indent(`"${origin}${path}",\n`, 4);
+            code += indent(`"${processedUrl}",\n`, 4);
 
-            if (headers && Object.keys(headers).length > 0) {
-                code += indent(`headers=${stringifyOpenAPI(headers)},\n`, 4);
+            if (processedHeaders && Object.keys(processedHeaders).length > 0) {
+                code += indent(`headers={\n`, 4);
+                Object.entries(processedHeaders).forEach(([key, value], index, array) => {
+                    const isLast = index === array.length - 1;
+                    code += indent(`"${key}": "${value}"${isLast ? '' : ','}\n`, 8);
+                });
+                code += indent(`},\n`, 4);
             }
 
             if (body) {
                 if (body === 'files') {
                     code += indent(`files=${body}\n`, 4);
-                } else if (isJSON(contentType)) {
+                } else if (isJSON(contentType) && isPlainObject(body)) {
+                    // Use json parameter for dict objects
+                    code += indent(`json=${body}\n`, 4);
+                } else if (isJSON(contentType) && needsJsonImport) {
+                    // Use data=json.dumps() for JSON strings
                     code += indent(`data=json.dumps(${body})\n`, 4);
                 } else {
                     code += indent(`data=${body}\n`, 4);
@@ -372,7 +410,8 @@ const BodyGenerators = {
         } else if (isYAML(contentType)) {
             code += `yamlBody = \"\"\"\n${indent(yaml.dump(body), 4)}\"\"\"\n\n`;
             body = 'yamlBody';
-        } else {
+        } else if (isJSON(contentType) && isPlainObject(body)) {
+            // For dict objects, return as-is to use with json= parameter
             body = stringifyOpenAPI(
                 body,
                 (_key, value) => {
@@ -389,9 +428,30 @@ const BodyGenerators = {
                 },
                 2
             )
-                .replaceAll('"$$__TRUE__$$"', 'True')
-                .replaceAll('"$$__FALSE__$$"', 'False')
-                .replaceAll('"$$__NULL__$$"', 'None');
+                .replace(/"\\$\\$__TRUE__\\$\\$"/g, 'True')
+                .replace(/"\\$\\$__FALSE__\\$\\$"/g, 'False')
+                .replace(/"\\$\\$__NULL__\\$\\$"/g, 'None');
+        } else {
+            // For everything else (including JSON strings)
+            body = stringifyOpenAPI(
+                body,
+                (_key, value) => {
+                    switch (value) {
+                        case true:
+                            return '$$__TRUE__$$';
+                        case false:
+                            return '$$__FALSE__$$';
+                        case null:
+                            return '$$__NULL__$$';
+                        default:
+                            return value;
+                    }
+                },
+                2
+            )
+                .replace(/"\\$\\$__TRUE__\\$\\$"/g, 'True')
+                .replace(/"\\$\\$__FALSE__\\$\\$"/g, 'False')
+                .replace(/"\\$\\$__NULL__\\$\\$"/g, 'None');
         }
 
         return { body, code, headers };
@@ -486,4 +546,45 @@ function buildHeredoc(lines: string[]): string {
         }
     }
     return result;
+}
+
+/**
+ * Converts path parameters from {paramName} to YOUR_PARAM_NAME format
+ */
+function convertPathParametersToPlaceholders(urlPath: string): string {
+    return urlPath.replace(/\{([^}]+)\}/g, (match, paramName) => {
+        // Convert camelCase to UPPER_SNAKE_CASE
+        const placeholder = paramName.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase();
+        return `YOUR_${placeholder}`;
+    });
+}
+
+/**
+ * Processes headers to use consistent placeholder format
+ */
+function processHeadersWithPlaceholders(headers?: Record<string, string>): Record<string, string> {
+    if (!headers) {
+        return {};
+    }
+
+    const processedHeaders: Record<string, string> = {};
+
+    Object.entries(headers).forEach(([key, value]) => {
+        if (key === 'Authorization' && value.includes('Bearer')) {
+            processedHeaders[key] = 'Bearer YOUR_API_TOKEN';
+        } else if (key === 'Authorization' && value.includes('Basic')) {
+            processedHeaders[key] = 'Basic YOUR_API_TOKEN';
+        } else if (value.includes('YOUR_') || value.includes('TOKEN')) {
+            // Already in correct format or generic token
+            processedHeaders[key] = value.replace(
+                /YOUR_SECRET_TOKEN|YOUR_TOKEN/g,
+                'YOUR_API_TOKEN'
+            );
+        } else {
+            // Regular headers - keep as-is
+            processedHeaders[key] = value;
+        }
+    });
+
+    return processedHeaders;
 }
