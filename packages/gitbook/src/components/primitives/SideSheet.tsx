@@ -73,19 +73,20 @@ export function SideSheet(
 
     // Track if component has been opened to prevent initial animation
     React.useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
         if (isOpen) {
             wasOpenRef.current = true;
             setShouldHide(false);
         } else if (wasOpenRef.current) {
-            // Delay hiding until after exit animation completes
-            const timer = setTimeout(() => {
+            timer = setTimeout(() => {
                 setShouldHide(true);
             }, ANIMATION_DURATION);
-            return () => clearTimeout(timer);
         } else {
-            // Never been opened, hide immediately
             setShouldHide(true);
         }
+        return () => {
+            if (timer) clearTimeout(timer);
+        };
     }, [isOpen]);
 
     const handleClose = React.useCallback(() => {
