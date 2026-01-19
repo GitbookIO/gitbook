@@ -86,6 +86,31 @@ export async function CustomizationRootLayout(props: {
     preloadFont(fontData);
     preloadFont(monospaceFontData);
 
+    // @ts-expect-error - socialAccounts is not yet supported in the API
+    customization.socialAccounts = [
+        {
+            platform: 'twitter',
+            handle: 'gitbook',
+            display: {
+                footer: true,
+            },
+        },
+        {
+            platform: 'linkedin',
+            handle: 'company/gitbook',
+            display: {
+                footer: true,
+            },
+        },
+        {
+            platform: 'github',
+            handle: 'gitbook',
+            display: {
+                footer: true,
+            },
+        },
+    ];
+
     return (
         <html
             suppressHydrationWarning

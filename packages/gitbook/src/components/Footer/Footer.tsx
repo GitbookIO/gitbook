@@ -8,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 import { ThemeToggler } from '../ThemeToggler';
 import { CONTAINER_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
+import { SocialLink } from './SocialLink';
 
 const FOOTER_COLUMNS = 4;
 
@@ -95,7 +96,6 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                 </div>
                             ) : null
                         }
-
                         {
                             // Theme Toggle
                             customization.themes.toggeable ? (
@@ -106,7 +106,6 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                 </div>
                             ) : null
                         }
-
                         {
                             // Navigation groups (split into equal columns)
                             customization.footer.groups?.length > 0 ? (
@@ -137,6 +136,25 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             ) : null
                         }
 
+                        {
+                            // Social Links
+                            // @ts-expect-error - socialAccounts is not yet supported in the API
+                            customization.socialAccounts.filter(
+                                (account) => account.display?.footer
+                            ).length > 0 ? (
+                                <div className="col-span-full flex w-full grow items-center justify-center gap-2">
+                                    {
+                                        // @ts-expect-error - socialAccounts is not yet supported in the API
+                                        customization.socialAccounts?.map((account) => (
+                                            <SocialLink
+                                                account={account}
+                                                target={customization.externalLinks.target}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                            ) : null
+                        }
                         {
                             // Legal
                             customization.footer.copyright ? (
