@@ -613,6 +613,7 @@ function encodePathInSiteContent(
             return { pathname };
         case '~gitbook/mcp':
         case 'llms.txt':
+        case 'llms-full.txt':
         case 'sitemap.xml':
         case 'sitemap-pages.xml':
         case 'robots.txt':
