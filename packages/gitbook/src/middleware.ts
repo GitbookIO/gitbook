@@ -593,6 +593,11 @@ function encodePathInSiteContent(
         };
     }
 
+    // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
+    if (pathname.match(LLMS_FULL_PATH_REGEX)) {
+        return { pathname, routeType: 'static' };
+    }
+
     // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
     if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
         const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
@@ -601,11 +606,6 @@ function encodePathInSiteContent(
             // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
             routeType: 'static',
         };
-    }
-
-    // We skip encoding for paginated llms-full.txt pages (i.e. llms-full.txt/100)
-    if (pathname.match(LLMS_FULL_PATH_REGEX)) {
-        return { pathname, routeType: 'static' };
     }
 
     // If the pathname is an embedded page
