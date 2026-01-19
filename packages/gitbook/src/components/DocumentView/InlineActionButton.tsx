@@ -43,7 +43,7 @@ export function InlineActionButton(
                 inline
                 label={buttonProps.label as string}
                 sizing="medium"
-                className="inline-flex max-w-full leading-normal [transition-property:translate,opacity,box-shadow,background,border]"
+                className="inline-flex max-w-full grow"
                 submitButton={{
                     label: tString(language, action === 'ask' ? 'send' : 'search'),
                 }}
