@@ -77,7 +77,8 @@
         "usehooks-ts": "catalog:",
         "warn-once": "^0.1.1",
         "zod": "^3",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "negotiator": "^1.0.0"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
@@ -94,6 +95,7 @@
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@types/rison": "^0.0.9",
+        "@types/negotiator": "^0.6.4",
         "bun-types": "catalog:",
         "deepmerge": "^4.3.1",
         "env-cmd": "^10.1.0",

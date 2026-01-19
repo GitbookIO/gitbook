@@ -1,4 +1,5 @@
 import { CustomizationThemeMode } from '@gitbook/api';
+import Negotiator from 'negotiator';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import rison from 'rison';
@@ -360,7 +361,8 @@ async function serveSiteRoutes(requestURL: URL, request: NextRequest) {
 
         const siteURLWithoutProtocol = `${siteCanonicalURL.host}${siteURLData.basePath}`;
         const { pathname, routeType: routeTypeFromPathname } = encodePathInSiteContent(
-            siteURLData.pathname
+            siteURLData.pathname,
+            request
         );
         routeType = routeTypeFromPathname ?? routeType;
 
@@ -569,7 +571,10 @@ const EMBED_PAGE_PATH_REGEX = /^~gitbook\/embed\/page(\/(\S*))?$/;
  * Encode path in a site content.
  * Special paths are not encoded and passed to be handled by the route handlers.
  */
-function encodePathInSiteContent(rawPathname: string): {
+function encodePathInSiteContent(
+    rawPathname: string,
+    request: Request
+): {
     pathname: string;
     routeType?: 'static' | 'dynamic';
 } {
@@ -589,8 +594,8 @@ function encodePathInSiteContent(rawPathname: string): {
     }
 
     // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
-    if (pathname.match(MARKDOWN_PATH_REGEX)) {
-        const pagePathWithoutMD = pathname.slice(0, -3);
+    if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
+        const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
         return {
             pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
             // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
@@ -665,4 +670,17 @@ async function writeResponseCookies<R extends NextResponse>(
     });
 
     return response;
+}
+
+const MARKDOWN_MEDIA_TYPES = ['text/plain', 'text/markdown', 'text/x-markdown'];
+
+/**
+ * Test if a request is requesting a markdown version of the page.
+ */
+function isMarkdownPreferred(request: Request): boolean {
+    const negotiator = new Negotiator({
+        headers: Object.fromEntries(request.headers.entries()),
+    });
+    const mediaTypes = negotiator.mediaTypes();
+    return MARKDOWN_MEDIA_TYPES.some((mediaType) => mediaTypes.includes(mediaType));
 }

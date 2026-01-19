@@ -156,6 +156,7 @@
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
+        "negotiator": "^1.0.0",
         "next": "15.4.10",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
@@ -195,6 +196,7 @@
         "@types/jsontoxml": "^1.0.5",
         "@types/jsonwebtoken": "^9.0.6",
         "@types/mdast": "^4.0.4",
+        "@types/negotiator": "^0.6.4",
         "@types/node": "^20",
         "@types/object-hash": "^3.0.6",
         "@types/parse-cache-control": "^1.0.4",
@@ -1531,6 +1533,8 @@
     "@types/mdast": ["@types/mdast@4.0.4", "", { "dependencies": { "@types/unist": "*" } }, "sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA=="],
 
     "@types/ms": ["@types/ms@0.7.34", "", {}, "sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g=="],
+
+    "@types/negotiator": ["@types/negotiator@0.6.4", "", {}, "sha512-elf6BsTq+AkyNsb2h5cGNst2Mc7dPliVoAPm1fXglC/BM3f2pFA40BaSSv3E5lyHteEawVKLP+8TwiY1DMNb3A=="],
 
     "@types/node": ["@types/node@20.19.1", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-jJD50LtlD2dodAEO653i3YF04NWak6jN3ky+Ri3Em3mGR39/glWiboM/IePaRbgwSfqM1TpGXfAg8ohn/4dTgA=="],
 
