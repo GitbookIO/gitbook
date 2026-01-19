@@ -15,7 +15,7 @@ import { notFound } from 'next/navigation';
 import * as React from 'react';
 
 import { DocumentView } from '@/components/DocumentView';
-import { TrademarkLink } from '@/components/TableOfContents/Trademark';
+import { Trademark } from '@/components/TableOfContents/Trademark';
 import type { PolymorphicComponentProp } from '@/components/utils/types';
 import { getSpaceLanguage } from '@/intl/server';
 import { tString } from '@/intl/translate';
@@ -148,7 +148,7 @@ export async function PDFPage(props: {
                 total={total}
                 trademark={
                     customization.trademark.enabled ? (
-                        <TrademarkLink
+                        <Trademark
                             context={context}
                             placement={SiteInsightsTrademarkPlacement.Pdf}
                         />
