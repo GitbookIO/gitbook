@@ -9,7 +9,7 @@ describe('llms.txt', () => {
 
         expect(response.status).toBe(200);
         expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Text page');
+        expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 
     it('should expose a llms.txt file with the accept header', async () => {
@@ -24,7 +24,7 @@ describe('llms.txt', () => {
 
         expect(response.status).toBe(200);
         expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Text page');
+        expect(await response.text()).toContain('# E2E Tests GitBook Open');
     });
 });
 
@@ -36,7 +36,7 @@ describe('llms-full.txt', () => {
 
         expect(response.status).toBe(200);
         expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Text page');
+        expect(await response.text()).toContain('# Welcome');
     });
 
     it('should expose a llms-full.txt file with the accept header', async () => {
@@ -51,6 +51,6 @@ describe('llms-full.txt', () => {
 
         expect(response.status).toBe(200);
         expect(response.headers.get('content-type')).toContain('text/markdown');
-        expect(await response.text()).toContain('# Text page');
+        expect(await response.text()).toContain('# Welcome');
     });
 });
