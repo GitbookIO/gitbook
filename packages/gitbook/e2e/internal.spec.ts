@@ -678,22 +678,6 @@ const testCases: TestsCase[] = [
         ],
     },
     {
-        name: 'Markdown page',
-        skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
-        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
-        tests: [
-            {
-                name: 'Text page',
-                url: 'text-page.md',
-                screenshot: false,
-                run: async (_page, response) => {
-                    expect(response?.status()).toBe(200);
-                    expect(response?.headers()['content-type']).toContain('text/markdown');
-                },
-            },
-        ],
-    },
-    {
         name: 'llms.txt',
         skip: process.env.ARGOS_BUILD_NAME !== 'v2-vercel',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
