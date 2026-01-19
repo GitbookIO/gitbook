@@ -598,16 +598,6 @@ function encodePathInSiteContent(
         return { pathname, routeType: 'static' };
     }
 
-    // If the pathname is a markdown file, we rewrite it to ~gitbook/markdown/:pathname
-    if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
-        const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
-        return {
-            pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
-            // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
-            routeType: 'static',
-        };
-    }
-
     // If the pathname is an embedded page
     const embedPage = pathname.match(EMBED_PAGE_PATH_REGEX);
     if (embedPage) {
@@ -634,8 +624,19 @@ function encodePathInSiteContent(
         case '~gitbook/pdf':
             // PDF routes are always dynamic as they depend on the search params.
             return { pathname, routeType: 'dynamic' };
-        default:
+        default: {
+            // If the pathname is a markdown file or the request is accepting markdown,
+            // we rewrite it to ~gitbook/markdown/:pathname
+            if (pathname.match(MARKDOWN_PATH_REGEX) || isMarkdownPreferred(request)) {
+                const pagePathWithoutMD = pathname.replace(MARKDOWN_PATH_REGEX, '');
+                return {
+                    pathname: `~gitbook/markdown/${encodePagePath(pagePathWithoutMD)}`,
+                    // The markdown content is always static and doesn't depend on the dynamic parameter (customization, theme, etc)
+                    routeType: 'static',
+                };
+            }
             return { pathname: encodePagePath(pathname) };
+        }
     }
 }
 
@@ -672,7 +673,7 @@ async function writeResponseCookies<R extends NextResponse>(
     return response;
 }
 
-const MARKDOWN_MEDIA_TYPES = ['text/plain', 'text/markdown', 'text/x-markdown'];
+const MARKDOWN_MEDIA_TYPES = ['text/markdown'];
 
 /**
  * Test if a request is requesting a markdown version of the page.
