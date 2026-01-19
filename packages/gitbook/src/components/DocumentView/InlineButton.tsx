@@ -14,7 +14,6 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
         variant: inline.data.kind,
         icon: inline.data.icon as IconName | undefined,
         size: 'medium',
-        className: 'leading-normal',
     };
 
     const ButtonImplementation = () => {
@@ -37,9 +36,7 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
 
     const inlineElement = (
         // Set the leading to have some vertical space between adjacent buttons
-        <span className="inline-button leading-12 [&:has(+.inline-button)]:mr-2">
-            <ButtonImplementation />
-        </span>
+        <ButtonImplementation />
     );
 
     return inlineElement;
