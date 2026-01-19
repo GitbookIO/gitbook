@@ -9,6 +9,7 @@ import { getTextAlignment } from './utils';
 export function Paragraph(props: BlockProps<DocumentBlockParagraph>) {
     const { block, style, ...contextProps } = props;
 
+    // InlineActionButtons use flex-grow to take the available width. This requires the parent to be a flex container.
     const inlineButtonStyle =
         'has-[.button,input]:flex has-[.button,input]:flex-wrap has-[.button,input]:gap-2';
 
