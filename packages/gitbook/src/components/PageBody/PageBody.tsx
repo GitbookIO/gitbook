@@ -106,7 +106,7 @@ export function PageBody(props: {
                         <DocumentView
                             document={document}
                             style="flex flex-col [&>*+*]:mt-5"
-                            blockStyle="page-api-block:ml-0"
+                            blockStyle="page-api-block:ml-0 has-[.button,input]:flex has-[.button,input]:flex-wrap has-[.button,input]:gap-2"
                             context={{
                                 mode: 'default',
                                 contentContext: {
