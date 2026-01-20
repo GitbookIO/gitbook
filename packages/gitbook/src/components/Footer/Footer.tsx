@@ -96,6 +96,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                 </div>
                             ) : null
                         }
+
                         {
                             // Theme Toggle
                             customization.themes.toggeable ? (
@@ -106,6 +107,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                 </div>
                             ) : null
                         }
+
                         {
                             // Navigation groups (split into equal columns)
                             customization.footer.groups?.length > 0 ? (
@@ -152,6 +154,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                 </div>
                             ) : null
                         }
+
                         {
                             // Legal
                             customization.footer.copyright ? (
