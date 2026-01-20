@@ -8,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 import { ThemeToggler } from '../ThemeToggler';
 import { CONTAINER_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
+import { SocialLink } from './SocialLink';
 
 const FOOTER_COLUMNS = 4;
 
@@ -133,6 +134,25 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                             )
                                         )}
                                     </div>
+                                </div>
+                            ) : null
+                        }
+
+                        {
+                            // Social Links
+                            customization.socialAccounts.filter(
+                                (account) => account.display?.footer
+                            ).length > 0 ? (
+                                <div className="col-span-full flex w-full grow items-center justify-center gap-2">
+                                    {customization.socialAccounts
+                                        .filter((account) => account.display?.footer)
+                                        .map((account) => (
+                                            <SocialLink
+                                                key={`${account.platform}-${account.handle}`}
+                                                account={account}
+                                                target={customization.externalLinks.target}
+                                            />
+                                        ))}
                                 </div>
                             ) : null
                         }
