@@ -355,6 +355,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             url: 'https://www.gitbook.com/privacy',
         },
         socialPreview: {},
+        socialAccounts: [],
     };
 
     const encoded = rison.encode_object(deepMerge(DEFAULT_CUSTOMIZATION, partial));
