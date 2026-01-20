@@ -71,5 +71,7 @@ export function getAssetURL(location: Partial<IconsAssetsLocation>, path: string
  */
 export function getIconAssetURL(context: IconsContextType, style: string, icon: string): string {
     const location = context.assetsByStyles?.[style] ?? context;
-    return getAssetURL(location, `svgs/${style}/${icon}.svg`);
+    // Ensure icon is always a string to prevent [object Object]
+    const iconName = typeof icon === 'string' ? icon : String(icon);
+    return getAssetURL(location, `svgs/${style}/${iconName}.svg`);
 }

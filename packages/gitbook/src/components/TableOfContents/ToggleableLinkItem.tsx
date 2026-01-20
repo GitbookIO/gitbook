@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'motion/react';
 import React, { useRef } from 'react';
 import { useCurrentPagePath } from '../hooks';
 import { Button, Link, type LinkInsightsProps, type LinkProps, ToggleChevron } from '../primitives';
-import { useScrollToActiveTOCItem } from './TOCScroller';
 
 /**
  * Client component for a page document to toggle its children and be marked as active.
@@ -76,8 +75,6 @@ function LinkItem(
     }
 ) {
     const { isActive, href, insights, children, onActiveClick } = props;
-    const anchorRef = useRef<HTMLAnchorElement>(null);
-    useScrollToActiveTOCItem({ anchorRef, isActive });
 
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
         if (isActive && onActiveClick) {
@@ -88,7 +85,7 @@ function LinkItem(
 
     return (
         <Link
-            ref={anchorRef}
+            data-active={isActive}
             href={href}
             insights={insights}
             aria-current={isActive ? 'page' : undefined}
