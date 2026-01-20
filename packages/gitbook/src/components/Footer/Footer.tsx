@@ -138,20 +138,17 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
                         {
                             // Social Links
-                            // @ts-expect-error - socialAccounts is not yet supported in the API
                             customization.socialAccounts.filter(
                                 (account) => account.display?.footer
                             ).length > 0 ? (
                                 <div className="col-span-full flex w-full grow items-center justify-center gap-2">
-                                    {
-                                        // @ts-expect-error - socialAccounts is not yet supported in the API
-                                        customization.socialAccounts?.map((account) => (
-                                            <SocialLink
-                                                account={account}
-                                                target={customization.externalLinks.target}
-                                            />
-                                        ))
-                                    }
+                                    {customization.socialAccounts?.map((account) => (
+                                        <SocialLink
+                                            key={`${account.platform}-${account.handle}`}
+                                            account={account}
+                                            target={customization.externalLinks.target}
+                                        />
+                                    ))}
                                 </div>
                             ) : null
                         }

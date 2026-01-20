@@ -1,4 +1,8 @@
-import type { SiteExternalLinksTarget, SiteSocialAccountPlatform } from '@gitbook/api';
+import {
+    type SiteExternalLinksTarget,
+    type SiteSocialAccount,
+    SiteSocialAccountPlatform,
+} from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import { Button } from '../primitives';
 
@@ -59,6 +63,21 @@ const SOCIAL_PLATFORMS: Record<SiteSocialAccountPlatform, SocialPlatformData> = 
         label: 'Reddit',
         icon: 'reddit',
         href: 'https://reddit.com/@$handle',
+    },
+    [SiteSocialAccountPlatform.Bluesky]: {
+        label: 'Bluesky',
+        icon: 'bluesky',
+        href: 'https://bsky.app/profile/$handle',
+    },
+    [SiteSocialAccountPlatform.Mastodon]: {
+        label: 'Mastodon',
+        icon: 'mastodon',
+        href: 'https://mastodon.social/@$handle',
+    },
+    [SiteSocialAccountPlatform.Threads]: {
+        label: 'Threads',
+        icon: 'threads',
+        href: 'https://threads.net/@$handle',
     },
     [SiteSocialAccountPlatform.Medium]: {
         label: 'Medium',
