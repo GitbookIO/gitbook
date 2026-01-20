@@ -110,6 +110,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
         customization.themes.toggeable ||
         customization.footer.copyright ||
         customization.footer.logo ||
+        customization.socialAccounts.filter((account) => account.display?.footer).length > 0 ||
         customization.footer.groups?.length;
 
     return (
