@@ -144,13 +144,15 @@ export function Footer(props: { context: GitBookSiteContext }) {
                                 (account) => account.display?.footer
                             ).length > 0 ? (
                                 <div className="col-span-full flex w-full grow items-center justify-center gap-2">
-                                    {customization.socialAccounts?.map((account) => (
-                                        <SocialLink
-                                            key={`${account.platform}-${account.handle}`}
-                                            account={account}
-                                            target={customization.externalLinks.target}
-                                        />
-                                    ))}
+                                    {customization.socialAccounts
+                                        .filter((account) => account.display?.footer)
+                                        .map((account) => (
+                                            <SocialLink
+                                                key={`${account.platform}-${account.handle}`}
+                                                account={account}
+                                                target={customization.externalLinks.target}
+                                            />
+                                        ))}
                                 </div>
                             ) : null
                         }
