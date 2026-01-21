@@ -23,6 +23,7 @@
         "react": "*"
     },
     "devDependencies": {
+        "bun-types": "catalog:",
         "@types/react": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:",
@@ -33,6 +34,7 @@
         "build-lib": "tsdown",
         "build-standalone": "bun build src/standalone/index.ts --bundle --minify --outdir=standalone",
         "clean": "rm -rf ./dist",
+        "unit": "bun test",
         "typecheck": "tsc --noEmit",
         "dev": "bun run build -- --watch ./src",
         "publish-to-npm": "../../scripts/publish-if-new.sh"

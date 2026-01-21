@@ -43,7 +43,7 @@ export function createGitBook(options: CreateGitBookOptions) {
             url.pathname = `${url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`}~gitbook/embed`;
 
             if (frameOptions.visitor?.token) {
-                url.searchParams.set('token', frameOptions.visitor.token);
+                url.searchParams.set('jwt_token', frameOptions.visitor.token);
             }
 
             if (frameOptions.visitor?.unsignedClaims) {
