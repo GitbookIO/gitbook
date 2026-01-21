@@ -13,6 +13,14 @@ import { cache } from '../cache';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
+// We should bump this version when we do breaking changes to the API client.
+// What is considered a breaking change is subjective, but generally:
+// Adding a required property to an existing object, changing the type of an existing property, removing an existing property.
+// We have to do it because otherwise Next.js cache might return cached data that is incompatible with the new code expectations.
+// Especially because typescript types may lead us to think that we are getting the right data when in fact the cached data is old.
+// Right now it's only passed to getPublishedContentSite, but we should use expand its usage to wherever we cache API data and breaking changes happen.
+const API_VERSION = '0.158';
+
 interface DataFetcherInput {
     /**
      * API token.
@@ -51,11 +59,15 @@ export function createDataFetcher(
         // API that are tied to the token
         //
         getPublishedContentSite(params) {
-            return getPublishedContentSite(input, {
-                organizationId: params.organizationId,
-                siteId: params.siteId,
-                siteShareKey: params.siteShareKey,
-            });
+            return getPublishedContentSite(
+                input,
+                {
+                    organizationId: params.organizationId,
+                    siteId: params.siteId,
+                    siteShareKey: params.siteShareKey,
+                },
+                API_VERSION
+            );
         },
         getSiteRedirectBySource(params) {
             return getSiteRedirectBySource(input, {
@@ -535,7 +547,8 @@ const getLatestOpenAPISpecVersionContent = cache(
 const getPublishedContentSite = cache(
     async (
         input: DataFetcherInput,
-        params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
+        params: { organizationId: string; siteId: string; siteShareKey: string | undefined },
+        _apiVersion: string
     ) => {
         'use cache';
         cacheTag(
