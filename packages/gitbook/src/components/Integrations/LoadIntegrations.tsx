@@ -1,8 +1,5 @@
 'use client';
 
-import * as React from 'react';
-import * as zustand from 'zustand';
-
 import { isCookiesTrackingDisabled, setCookiesTracking } from '@/components/Insights';
 import type {
     GitBookGlobal,
@@ -10,6 +7,8 @@ import type {
     GitBookIntegrationEventCallback,
     GitBookIntegrationTool,
 } from '@gitbook/browser-types';
+import * as React from 'react';
+import * as zustand from 'zustand';
 import type { Assistant } from '../AI';
 
 const events = new Map<GitBookIntegrationEvent, GitBookIntegrationEventCallback[]>();
@@ -140,10 +139,17 @@ export function useCustomCookieBanner(): CustomCookieBannerStore {
 /**
  * Dispatch the `load` event to all integrations.
  */
-export function LoadIntegrations() {
+export function LoadIntegrations(props: { scripts?: Array<{ script: string }> }) {
+    const { scripts = [] } = props;
+    const hasScripts = scripts.length > 0;
     React.useEffect(() => {
-        dispatchGitBookIntegrationEvent('load');
-    }, []);
+        // Only dispatch 'load' event when there are scripts to load
+        if (hasScripts) {
+            dispatchGitBookIntegrationEvent('load');
+        }
+
+        integrationsStore.setState({ loaded: true });
+    }, [hasScripts]);
     return null;
 }
 
@@ -152,9 +158,4 @@ export function LoadIntegrations() {
  */
 function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: unknown[]) {
     events.get(type)?.forEach((handler) => handler(...args));
-
-    // Mark integrations as loaded when the 'load' event is dispatched
-    if (type === 'load') {
-        integrationsStore.setState({ loaded: true });
-    }
 }
