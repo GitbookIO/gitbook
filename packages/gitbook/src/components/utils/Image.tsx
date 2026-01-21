@@ -33,7 +33,11 @@ export type ImageResponsiveSize = {
     width: number;
 };
 
-const MAX_DPR = 4;
+/**
+ * Maximum device pixel ratio (DPR) to generate in srcSet.
+ * Limit to 3 to align with routes/image.ts
+ */
+const MAX_DPR = 3;
 
 interface ImageCommonProps {
     /**
