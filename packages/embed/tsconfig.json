@@ -15,7 +15,9 @@
         "isolatedModules": true,
         "jsx": "react-jsx",
         "incremental": true,
-        "types": []
+        "types": [
+            "bun-types" // add Bun global
+        ]
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],
     "exclude": ["node_modules"]
