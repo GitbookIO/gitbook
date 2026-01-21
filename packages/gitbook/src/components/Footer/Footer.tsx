@@ -144,9 +144,9 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             // Social Links
                             socialLinks.length > 0 ? (
                                 <div className="col-span-full flex w-full grow items-center justify-center gap-2">
-                                    {socialLinks.map((account, index) => (
+                                    {socialLinks.map((account) => (
                                         <SocialLink
-                                            key={index}
+                                            key={`${account.platform}-${account.handle}`}
                                             account={account}
                                             target={customization.externalLinks.target}
                                         />

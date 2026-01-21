@@ -1,4 +1,8 @@
-import * as api from '@gitbook/api';
+import {
+    type SiteExternalLinksTarget,
+    type SiteSocialAccount,
+    SiteSocialAccountPlatform,
+} from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import { Button } from '../primitives';
 
@@ -9,83 +13,80 @@ type SocialPlatformData = {
     href: string;
 };
 
-const SOCIAL_PLATFORMS: Record<api.SiteSocialAccountPlatform, SocialPlatformData> = {
-    [api.SiteSocialAccountPlatform.Twitter]: {
+const SOCIAL_PLATFORMS: Record<SiteSocialAccountPlatform, SocialPlatformData> = {
+    [SiteSocialAccountPlatform.Twitter]: {
         label: 'X/Twitter',
         icon: 'x-twitter',
         href: 'https://x.com/$handle',
     },
-    [api.SiteSocialAccountPlatform.Instagram]: {
+    [SiteSocialAccountPlatform.Instagram]: {
         label: 'Instagram',
         icon: 'instagram',
         href: 'https://instagram.com/$handle',
     },
-    [api.SiteSocialAccountPlatform.Facebook]: {
+    [SiteSocialAccountPlatform.Facebook]: {
         label: 'Facebook',
         icon: 'facebook',
         href: 'https://facebook.com/$handle',
     },
-    [api.SiteSocialAccountPlatform.Linkedin]: {
+    [SiteSocialAccountPlatform.Linkedin]: {
         label: 'LinkedIn',
         icon: 'linkedin',
         href: 'https://linkedin.com/$handle',
     },
-    [api.SiteSocialAccountPlatform.Github]: {
+    [SiteSocialAccountPlatform.Github]: {
         label: 'GitHub',
         icon: 'github',
         href: 'https://github.com/$handle',
     },
-    [api.SiteSocialAccountPlatform.Discord]: {
+    [SiteSocialAccountPlatform.Discord]: {
         label: 'Discord',
         icon: 'discord',
         href: 'https://discord.com/$handle',
     },
-    [api.SiteSocialAccountPlatform.Slack]: {
+    [SiteSocialAccountPlatform.Slack]: {
         label: 'Slack',
         icon: 'slack',
         href: 'https://join.slack.com/t/$handle',
     },
-    [api.SiteSocialAccountPlatform.Youtube]: {
+    [SiteSocialAccountPlatform.Youtube]: {
         label: 'YouTube',
         icon: 'youtube',
         href: 'https://youtube.com/@$handle',
     },
-    [api.SiteSocialAccountPlatform.Tiktok]: {
+    [SiteSocialAccountPlatform.Tiktok]: {
         label: 'TikTok',
         icon: 'tiktok',
         href: 'https://tiktok.com/@$handle',
     },
-    [api.SiteSocialAccountPlatform.Reddit]: {
+    [SiteSocialAccountPlatform.Reddit]: {
         label: 'Reddit',
         icon: 'reddit',
         href: 'https://reddit.com/@$handle',
     },
-    [api.SiteSocialAccountPlatform.Bluesky]: {
+    [SiteSocialAccountPlatform.Bluesky]: {
         label: 'Bluesky',
         icon: 'bluesky',
         href: 'https://bsky.app/profile/$handle',
     },
-    [api.SiteSocialAccountPlatform.Mastodon]: {
+    [SiteSocialAccountPlatform.Mastodon]: {
         label: 'Mastodon',
         icon: 'mastodon',
         href: 'https://mastodon.social/@$handle',
     },
-    [api.SiteSocialAccountPlatform.Threads]: {
+    [SiteSocialAccountPlatform.Threads]: {
         label: 'Threads',
         icon: 'threads',
         href: 'https://threads.net/@$handle',
     },
-    [api.SiteSocialAccountPlatform.Medium]: {
+    [SiteSocialAccountPlatform.Medium]: {
         label: 'Medium',
         icon: 'medium',
         href: 'https://medium.com/@$handle',
     },
 };
 
-export function SocialLink(props: {
-    account: api.SiteSocialAccount;
-    target: api.SiteExternalLinksTarget;
-}) {
+export function SocialLink(props: { account: SiteSocialAccount; target: SiteExternalLinksTarget }) {
     const { account, target } = props;
     const platform = SOCIAL_PLATFORMS[account.platform];
 
