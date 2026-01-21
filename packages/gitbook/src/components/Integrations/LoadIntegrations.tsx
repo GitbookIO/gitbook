@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as zustand from 'zustand';
 
+import { setCookiesTracking } from '@/components/Insights';
 import type {
     GitBookGlobal,
     GitBookIntegrationEvent,
@@ -25,6 +26,26 @@ export const integrationsAssistantTools = zustand.createStore<{
 });
 
 export const integrationAssistants = zustand.createStore<Array<Assistant>>(() => []);
+
+// Store to track when integrations have been loaded
+export const integrationsStore = zustand.createStore<{
+    loaded: boolean;
+}>(() => {
+    return {
+        loaded: false,
+    };
+});
+
+type CustomCookieBannerStore = {
+    hasCustomCookieBanner: boolean;
+};
+
+// Store for custom cookie banner registration
+export const customCookieBannerStore = zustand.createStore<CustomCookieBannerStore>(() => {
+    return {
+        hasCustomCookieBanner: false,
+    };
+});
 
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
@@ -65,6 +86,23 @@ if (typeof window !== 'undefined') {
                 integrationAssistants.setState((state) => state.filter((a) => a.id !== id), true);
             };
         },
+        registerCookieBanner: (handler) => {
+            customCookieBannerStore.setState((state) => ({
+                ...state,
+                hasCustomCookieBanner: true,
+            }));
+
+            handler({
+                onApprove: () => {
+                    setCookiesTracking(true);
+                    window.location.reload();
+                },
+                onReject: () => {
+                    setCookiesTracking(false);
+                    window.location.reload();
+                },
+            });
+        },
     };
     window.GitBook = gitbookGlobal;
 }
@@ -74,6 +112,20 @@ if (typeof window !== 'undefined') {
  */
 export function useIntegrationAssistants(): Array<Assistant> {
     return zustand.useStore(integrationAssistants);
+}
+
+/**
+ * Hook to check if integrations have been loaded.
+ */
+export function useIntegrationsLoaded(): boolean {
+    return zustand.useStore(integrationsStore, (state) => state.loaded);
+}
+
+/**
+ * Hook to check if a custom cookie banner is registered.
+ */
+export function useCustomCookieBanner(): CustomCookieBannerStore {
+    return zustand.useStore(customCookieBannerStore);
 }
 
 /**
@@ -89,6 +141,11 @@ export function LoadIntegrations() {
 /**
  * Client function to dispatch a GitBook event.
  */
-function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: any[]) {
+function dispatchGitBookIntegrationEvent(type: GitBookIntegrationEvent, ...args: unknown[]) {
     events.get(type)?.forEach((handler) => handler(...args));
+
+    // Mark integrations as loaded when the 'load' event is dispatched
+    if (type === 'load') {
+        integrationsStore.setState({ loaded: true });
+    }
 }
