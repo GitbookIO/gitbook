@@ -3,7 +3,7 @@
 import * as React from 'react';
 import * as zustand from 'zustand';
 
-import { setCookiesTracking } from '@/components/Insights';
+import { isCookiesTrackingDisabled, setCookiesTracking } from '@/components/Insights';
 import type {
     GitBookGlobal,
     GitBookIntegrationEvent,
@@ -46,6 +46,9 @@ export const customCookieBannerStore = zustand.createStore<CustomCookieBannerSto
         hasCustomCookieBanner: false,
     };
 });
+
+// Track if we've already invoked a cookie banner handler on this page load
+let hasInvokedCookieBanner = false;
 
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
@@ -92,6 +95,12 @@ if (typeof window !== 'undefined') {
                 hasCustomCookieBanner: true,
             }));
 
+            // Only invoke the handler once per page load and if the cookie preference hasn't been set yet
+            if (hasInvokedCookieBanner || isCookiesTrackingDisabled() !== undefined) {
+                return;
+            }
+
+            hasInvokedCookieBanner = true;
             handler({
                 onApprove: () => {
                     setCookiesTracking(true);
