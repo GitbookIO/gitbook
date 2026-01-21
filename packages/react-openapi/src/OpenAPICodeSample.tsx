@@ -10,6 +10,7 @@ import { type OpenAPIContext, getOpenAPIClientContext } from './context';
 import { generateMediaTypeExamples, generateSchemaExample } from './generateSchemaExample';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
+import { mergeHeaders } from './util/headers';
 import { getDefaultServerURL } from './util/server';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
@@ -125,10 +126,9 @@ function generateCodeSamples(props: {
     const mediaTypeRendererFactories = Object.entries(requestBody?.content ?? {}).map(
         ([mediaType, mediaTypeObject]) => {
             return (generator: CodeSampleGenerator) => {
-                const mediaTypeHeaders = {
-                    ...genericHeaders,
+                const mediaTypeHeaders = mergeHeaders(genericHeaders, {
                     'Content-Type': mediaType,
-                };
+                });
                 return {
                     mediaType,
                     element: context.renderCodeBlock({
