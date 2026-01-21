@@ -35,9 +35,8 @@ const testCases: TestsCase[] = [
                         return typeof window !== 'undefined' && window.GitBook !== undefined;
                     });
                     await page.evaluate(() => {
-                        window.GitBook?.registerCookieBanner(({ onApprove }) => {
-                            // Custom cookie banner handler - just approve for testing
-                            onApprove();
+                        window.GitBook?.registerCookieBanner(() => {
+                            // Custom cookie banner handler - no-op for testing to avoid reload
                         });
                     });
 

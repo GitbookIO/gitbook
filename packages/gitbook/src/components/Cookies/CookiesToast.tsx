@@ -22,6 +22,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
     React.useEffect(() => {
         // Always wait for integrations to load, and if a custom banner is registered, hide the built-in banner
         if (!integrationsLoaded || hasCustomCookieBanner) {
+            setShow(false);
             return;
         }
 
