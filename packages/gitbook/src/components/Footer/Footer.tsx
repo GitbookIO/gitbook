@@ -24,6 +24,8 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
     const mobileOnly = !hasLogo && !hasGroups && !hasCopyright && hasThemeToggle;
 
+    const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
+
     return (
         <footer
             id="site-footer"
@@ -140,19 +142,15 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
                         {
                             // Social Links
-                            customization.socialAccounts.filter(
-                                (account) => account.display?.footer
-                            ).length > 0 ? (
+                            socialLinks.length > 0 ? (
                                 <div className="col-span-full flex w-full grow items-center justify-center gap-2">
-                                    {customization.socialAccounts
-                                        .filter((account) => account.display?.footer)
-                                        .map((account) => (
-                                            <SocialLink
-                                                key={`${account.platform}-${account.handle}`}
-                                                account={account}
-                                                target={customization.externalLinks.target}
-                                            />
-                                        ))}
+                                    {socialLinks.map((account) => (
+                                        <SocialLink
+                                            key={`${account.platform}-${account.handle}`}
+                                            account={account}
+                                            target={customization.externalLinks.target}
+                                        />
+                                    ))}
                                 </div>
                             ) : null
                         }
