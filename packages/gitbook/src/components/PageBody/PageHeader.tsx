@@ -22,10 +22,6 @@ export async function PageHeader(props: {
     const { context, page, ancestors, withRSSFeed } = props;
     const { revision, linker } = context;
 
-    if (!page.layout.title && !page.layout.description) {
-        return null;
-    }
-
     const hasAncestors = ancestors.length > 0;
 
     // Show page actions if *any* of the actions are enabled
@@ -35,6 +31,21 @@ export async function PageHeader(props: {
         context.customization.git.showEditLink,
         withRSSFeed,
     ].some(Boolean);
+
+    /* When title and description are hidden, only display the page actions if there are any. */
+    if (!page.layout.title && !page.layout.description) {
+        if (!hasPageActions) {
+            return null;
+        }
+        return (
+            <PageActionsDropdown
+                siteTitle={context.site.title}
+                urls={getPageActionsURLs({ context, page, withRSSFeed })}
+                actions={context.customization.pageActions}
+                className="absolute top-8 right-0"
+            />
+        );
+    }
 
     return (
         <header
@@ -49,7 +60,7 @@ export async function PageHeader(props: {
                 hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >
-            {page.layout.tableOfContents && hasPageActions ? (
+            {hasPageActions ? (
                 <PageActionsDropdown
                     siteTitle={context.site.title}
                     urls={getPageActionsURLs({ context, page, withRSSFeed })}
