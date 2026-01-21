@@ -13,14 +13,6 @@ import { cache } from '../cache';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
-// We should bump this version when we do breaking changes to the API client.
-// What is considered a breaking change is subjective, but generally:
-// Adding a required property to an existing object, changing the type of an existing property, removing an existing property.
-// We have to do it because otherwise Next.js cache might return cached data that is incompatible with the new code expectations.
-// Especially because typescript types may lead us to think that we are getting the right data when in fact the cached data is old.
-// Right now it's only passed to getPublishedContentSite, but we should use expand its usage to wherever we cache API data and breaking changes happen.
-const API_VERSION = '0.158';
-
 interface DataFetcherInput {
     /**
      * API token.
@@ -66,7 +58,11 @@ export function createDataFetcher(
                     siteId: params.siteId,
                     siteShareKey: params.siteShareKey,
                 },
-                API_VERSION
+                // This api version is used to invalidate cache when we do breaking changes to the API client.
+                // Something not backward compatible like changing the shape of the data returned by the API.
+                // We should bump this version when we do breaking changes to this specific endpoint returned data.
+                // DO NOT BUMP IT for other non-breaking changes.
+                '0.158'
             );
         },
         getSiteRedirectBySource(params) {
