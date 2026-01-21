@@ -3,6 +3,7 @@ import type { DocumentTableViewGrid } from '@gitbook/api';
 import { tcls } from '@/lib/tailwind';
 
 import { RecordRow } from './RecordRow';
+import { RowGroupVirtualized, VIRTUALIZATION_THRESHOLD } from './RowGroupVirtualized';
 import type { TableViewProps } from './Table';
 import styles from './table.module.css';
 import { getColumnAlignment } from './utils';
@@ -13,7 +14,7 @@ import { getColumnAlignment } from './utils';
      3. Auto-size is turned off without setting a width, we then default to a fixed width of 100px
 */
 export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
-    const { block, view, records, style, context } = props;
+    const { block, view, records, style, context, isOffscreen } = props;
 
     /* Calculate how many columns are auto-sized vs fixed width */
     const columnWidths = context.mode === 'print' ? undefined : view.columnWidths;
@@ -28,6 +29,9 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
         view.columns.some(
             (columnId) => (block.data.definition[columnId]?.title.trim().length ?? 0) > 0
         );
+
+    const shouldVirtualize =
+        context.mode !== 'print' && !isOffscreen && records.length >= VIRTUALIZATION_THRESHOLD;
 
     return (
         <div className={tcls(style, styles.tableWrapper)}>
@@ -73,20 +77,29 @@ export function ViewGrid(props: TableViewProps<DocumentTableViewGrid>) {
                         </div>
                     </div>
                 )}
-                <div
-                    role="rowgroup"
-                    className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}
-                >
-                    {records.map((record) => (
-                        <RecordRow
-                            key={record[0]}
-                            record={record}
-                            autoSizedColumns={autoSizedColumns}
-                            fixedColumns={fixedColumns}
-                            {...props}
-                        />
-                    ))}
-                </div>
+                {shouldVirtualize ? (
+                    <RowGroupVirtualized
+                        autoSizedColumns={autoSizedColumns}
+                        fixedColumns={fixedColumns}
+                        tableWidth={tableWidth}
+                        {...props}
+                    />
+                ) : (
+                    <div
+                        role="rowgroup"
+                        className={tcls('flex', 'flex-col', tableWidth, '[&>*+*]:border-t')}
+                    >
+                        {records.map((record) => (
+                            <RecordRow
+                                key={record[0]}
+                                record={record}
+                                autoSizedColumns={autoSizedColumns}
+                                fixedColumns={fixedColumns}
+                                {...props}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
