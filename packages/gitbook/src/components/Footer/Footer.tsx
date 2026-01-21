@@ -8,6 +8,7 @@ import { tcls } from '@/lib/tailwind';
 import { ThemeToggler } from '../ThemeToggler';
 import { CONTAINER_STYLE } from '../layout';
 import { FooterLinksGroup } from './FooterLinksGroup';
+import { SocialLink } from './SocialLink';
 
 const FOOTER_COLUMNS = 4;
 
@@ -22,6 +23,11 @@ export function Footer(props: { context: GitBookSiteContext }) {
     const hasThemeToggle = customization.themes.toggeable;
 
     const mobileOnly = !hasLogo && !hasGroups && !hasCopyright && hasThemeToggle;
+
+    const socialAccounts =
+        'socialAccounts' in customization
+            ? customization.socialAccounts.filter((account) => account.display.footer)
+            : [];
 
     return (
         <footer
@@ -139,10 +145,15 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
                         {
                             // Social Links
-                            customization.socialAccounts.filter((account) => account.display.footer)
-                                .length > 0 ? (
+                            socialAccounts.length > 0 ? (
                                 <div className="col-span-full flex w-full grow items-center justify-center gap-2">
-                                    Social links are working
+                                    {socialAccounts.map((account) => (
+                                        <SocialLink
+                                            key={`${account.platform}-${account.handle}`}
+                                            account={account}
+                                            target={customization.externalLinks.target}
+                                        />
+                                    ))}
                                 </div>
                             ) : null
                         }
