@@ -105,12 +105,13 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
     const variants = categorizeVariants(context);
+    const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
 
     const withFooter =
         customization.themes.toggeable ||
         customization.footer.copyright ||
         customization.footer.logo ||
-        customization.socialAccounts.filter((account) => account.display?.footer).length > 0 ||
+        socialLinks.length > 0 ||
         customization.footer.groups?.length;
 
     return (
