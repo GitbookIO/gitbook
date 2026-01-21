@@ -11,16 +11,18 @@ import * as zustand from 'zustand';
  */
 export const currentPageMetadataStore = zustand.create<{
     metaLinks: PageMetaLinks | null;
+    currentPage: {
+        id: string;
+        spaceId: string;
+    } | null;
 }>(() => ({
     metaLinks: null,
+    currentPage: null,
 }));
 
 /**
  * Return the metadata for the current page.
  */
 export function useCurrentPageMetadata() {
-    const metaLinks = zustand.useStore(currentPageMetadataStore, (state) => state.metaLinks);
-    return {
-        metaLinks,
-    };
+    return zustand.useStore(currentPageMetadataStore, (state) => state);
 }

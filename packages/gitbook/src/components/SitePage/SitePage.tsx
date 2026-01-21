@@ -47,6 +47,11 @@ export type PageMetaLinks = {
          * Space the alternate link points to, if any.
          */
         space: AlternateLinkSpace | null;
+
+        /**
+         * The page ID the alternate link points to, if any.
+         */
+        pageID?: string;
     }>;
 };
 
@@ -66,7 +71,6 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
         pageMetaLinks,
     } = await getSitePageData(props);
     const headerOffset = { sectionsHeader: withSections, topHeader: withTopHeader };
-
     return (
         <PageContextProvider pageId={page.id} spaceId={context.space.id} title={page.title}>
             {/* Using `contents` makes the children of this div according to its parent — which keeps them in a single flex row with the TOC by default.
@@ -102,7 +106,10 @@ export async function SitePage(props: SitePageProps & { staticRoute: boolean }) 
                         staticRoute={props.staticRoute}
                     />
                 </div>
-                <PageClientLayout pageMetaLinks={pageMetaLinks} />
+                <PageClientLayout
+                    pageMetaLinks={pageMetaLinks}
+                    currentPage={{ id: page.id, spaceId: context.space.id }}
+                />
             </div>
         </PageContextProvider>
     );
@@ -151,7 +158,7 @@ export async function generateSitePageMetadata(props: SitePageProps): Promise<Me
     });
 
     if (!pageTarget) {
-        if (context.isFallback) {
+        if (context.fallback.isFallback) {
             redirect(context.linker.toPathInSpace('/'));
         }
         notFound();
@@ -246,12 +253,13 @@ export async function getSitePageData(props: SitePageProps) {
             redirect(context.linker.toPathInSpace(pathname));
         } else {
             // If the page is not found and we are in fallback mode, return a redirect to the basepath
-            if (context.isFallback) {
+            if (context.fallback.isFallback) {
                 redirect(context.linker.toPathInSpace('/'));
             }
             notFound();
         }
     } else if (getPagePath(context.revision.pages, pageTarget.page) !== rawPathname) {
+        // If the resolved page path doesn't match the requested pathname, redirect to the correct one
         redirect(
             context.linker.toPathForPage({
                 pages: context.revision.pages,
@@ -337,6 +345,7 @@ async function resolvePageMetaLinks(
                 space: resolved?.space
                     ? { id: resolved.space.id, language: resolved.space.language }
                     : null,
+                pageID: resolved?.page?.id,
             }))
         );
 
@@ -348,7 +357,13 @@ async function resolvePageMetaLinks(
         return {
             canonical: resolvedCanonical ?? null,
             alternates: resolvedAlternates.filter(
-                (alt): alt is { href: string; space: AlternateLinkSpace | null } => !!alt.href
+                (
+                    alt
+                ): alt is {
+                    href: string;
+                    space: AlternateLinkSpace | null;
+                    pageID: string | undefined;
+                } => !!alt.href
             ),
         };
     }
