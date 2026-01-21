@@ -23,9 +23,6 @@ export function Footer(props: { context: GitBookSiteContext }) {
 
     const mobileOnly = !hasLogo && !hasGroups && !hasCopyright && hasThemeToggle;
 
-    const socialAccounts = customization.socialAccounts.filter((account) => account.display.footer);
-    console.log(socialAccounts, 'socialAccounts');
-
     return (
         <footer
             id="site-footer"
