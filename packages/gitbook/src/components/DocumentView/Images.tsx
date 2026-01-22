@@ -1,7 +1,7 @@
 import type { DocumentBlockImage, DocumentBlockImages, JSONDocument, Length } from '@gitbook/api';
 
 import { Image, type ImageResponsiveSize } from '@/components/utils';
-import { resolveContentRef } from '@/lib/references';
+import { resolveContentRefInDocument } from '@/lib/references';
 import { type ClassValue, tcls } from '@/lib/tailwind';
 
 import type { BlockProps } from './Block';
@@ -81,12 +81,14 @@ async function ImageBlock(props: {
     isEstimatedOffscreen: boolean;
     withFrame?: boolean;
 }) {
-    const { block, context, isEstimatedOffscreen, withFrame } = props;
+    const { document, block, context, isEstimatedOffscreen, withFrame } = props;
 
     const [src, darkSrc] = await Promise.all([
-        context.contentContext ? resolveContentRef(block.data.ref, context.contentContext) : null,
+        context.contentContext
+            ? resolveContentRefInDocument(document, block.data.ref, context.contentContext)
+            : null,
         block.data.refDark && context.contentContext
-            ? resolveContentRef(block.data.refDark, context.contentContext)
+            ? resolveContentRefInDocument(document, block.data.refDark, context.contentContext)
             : null,
     ]);
 
