@@ -11,6 +11,19 @@ import {
 } from '@/lib/images';
 import { NextResponse } from 'next/server';
 
+const FORMATS = [
+    {
+        format: 'avif' as const,
+        regexp: /image\/avif/,
+        maxAllowedEdge: 1600,
+    },
+    {
+        format: 'webp' as const,
+        regexp: /image\/webp/,
+        maxAllowedEdge: 1920,
+    },
+];
+
 /**
  * Resize an image using the Cloudflare Image API.
  */
@@ -104,15 +117,16 @@ export async function serveResizedImage(
 
     // We test if we can use AVIF based on the accept header and constraints from Cloudflare
     // @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
-    if (accept && /image\/avif/.test(accept) && longestEdgeValue <= 1600) {
-        const dpr = chooseDPR(longestEdgeValue, 1600, options.dpr);
-        if (options.dpr === dpr) {
-            options.format = 'avif';
-        }
-    } else if (accept && /image\/webp/.test(accept) && longestEdgeValue <= 1920) {
-        const dpr = chooseDPR(longestEdgeValue, 1920, options.dpr);
-        if (options.dpr === dpr) {
-            options.format = 'avif';
+    if (accept) {
+        for (const entry of FORMATS) {
+            if (entry.regexp.test(accept) && longestEdgeValue <= entry.maxAllowedEdge) {
+                const wantedDpr = options.dpr ?? 1;
+                const dpr = chooseDPR(longestEdgeValue, entry.maxAllowedEdge, wantedDpr);
+                if (dpr === wantedDpr) {
+                    options.format = entry.format;
+                    break;
+                }
+            }
         }
     }
 
@@ -134,10 +148,10 @@ export async function serveResizedImage(
  * Choose the DPR allowed to resize an image on Cloudflare.
  * @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
  */
-function chooseDPR(longestEdgeValue: number, maxAllowedSize: number, wantedDpr?: number): number {
-    const maxDprBySize = Math.floor(maxAllowedSize / longestEdgeValue);
+function chooseDPR(longestEdgeValue: number, maxAllowedEdge: number, wantedDpr: number): number {
+    const maxDprBySize = Math.floor(maxAllowedEdge / longestEdgeValue);
     // Ensure that the DPR is within the allowed range
-    return Math.max(1, Math.min(maxDprBySize, wantedDpr ?? 1));
+    return Math.max(1, Math.min(maxDprBySize, wantedDpr));
 }
 
 /**
