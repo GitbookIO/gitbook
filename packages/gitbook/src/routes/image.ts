@@ -101,14 +101,19 @@ export async function serveResizedImage(
 
     // Check the Accept header to handle content negotiation
     const accept = request.headers.get('accept');
-    // We use transform image, max size for avif should be 1600
-    // https://developers.cloudflare.com/images/transform-images/#limits-per-format
+
+    // We test if we can use AVIF based on the accept header and constraints from Cloudflare
+    // @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
     if (accept && /image\/avif/.test(accept) && longestEdgeValue <= 1600) {
-        options.format = 'avif';
-        options.dpr = chooseDPR(longestEdgeValue, 1600, options.dpr);
+        const dpr = chooseDPR(longestEdgeValue, 1600, options.dpr);
+        if (options.dpr === dpr) {
+            options.format = 'avif';
+        }
     } else if (accept && /image\/webp/.test(accept) && longestEdgeValue <= 1920) {
-        options.format = 'webp';
-        options.dpr = chooseDPR(longestEdgeValue, 1920, options.dpr);
+        const dpr = chooseDPR(longestEdgeValue, 1920, options.dpr);
+        if (options.dpr === dpr) {
+            options.format = 'avif';
+        }
     }
 
     try {
@@ -126,16 +131,13 @@ export async function serveResizedImage(
 }
 
 /**
- * Choose the appropriate device pixel ratio (DPR) based on the longest edge of the image.
- * This function ensures that the DPR is within a reasonable range (1 to 3).
- * This is only used for AVIF/WebP formats to avoid issues with Cloudflare resizing.
- * It means that dpr may not be respected for avif/webp formats, but it will also improve the cache hit ratio.
+ * Choose the DPR allowed to resize an image on Cloudflare.
+ * @see https://developers.cloudflare.com/images/transform-images/#limits-per-format
  */
 function chooseDPR(longestEdgeValue: number, maxAllowedSize: number, wantedDpr?: number): number {
     const maxDprBySize = Math.floor(maxAllowedSize / longestEdgeValue);
-    const clampedDpr = Math.min(wantedDpr ?? 1, 3); // Limit to a maximum of 3, default to 1 if not specified
     // Ensure that the DPR is within the allowed range
-    return Math.max(1, Math.min(maxDprBySize, clampedDpr));
+    return Math.max(1, Math.min(maxDprBySize, wantedDpr ?? 1));
 }
 
 /**
