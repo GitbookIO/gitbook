@@ -95,7 +95,10 @@ export function createDataFetcher(
             });
         },
         getRevisionPageDocument(params) {
-            if (isRollout({ discriminator: params.spaceId, percentageRollout: 10 })) {
+            if (
+                ['lit7E3qYkBZs0ttOdClR'].includes(params.spaceId) &&
+                isRollout({ discriminator: params.spaceId, percentageRollout: 10 })
+            ) {
                 return getRevisionPageDocumentV2(input, {
                     spaceId: params.spaceId,
                     revisionId: params.revisionId,
