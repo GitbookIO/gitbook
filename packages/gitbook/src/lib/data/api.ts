@@ -96,7 +96,7 @@ export function createDataFetcher(
         },
         getRevisionPageDocument(params) {
             if (
-                ['lit7E3qYkBZs0ttOdClR'].includes(params.spaceId) &&
+                ['lit7E3qYkBZs0ttOdClR'].includes(params.spaceId) ||
                 isRollout({ discriminator: params.spaceId, percentageRollout: 10 })
             ) {
                 return getRevisionPageDocumentV2(input, {
