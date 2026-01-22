@@ -80,6 +80,9 @@ export interface ResolveContentRefOptions {
 
 /**
  * Resolve a content reference from within a document.
+ * It wraps the normal resolution of content refs, to handle parts of the document
+ * that have been composed of reusable blocks from spaces outside the current site,
+ * and leverage the meta token to resolve them.
  */
 export async function resolveContentRefInDocument(
     document: JSONDocument,
