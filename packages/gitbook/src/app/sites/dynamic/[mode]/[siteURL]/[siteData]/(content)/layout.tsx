@@ -23,7 +23,8 @@ export default async function SiteDynamicLayout({
 
     return (
         <CustomizationRootLayout
-            className="site-background"
+            htmlClassName="sheet-open:gutter-stable"
+            bodyClassName="site-background"
             forcedTheme={forcedTheme}
             context={context}
         >

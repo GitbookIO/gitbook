@@ -96,36 +96,6 @@ async function ImageBlock(props: {
 
     return (
         <div className={tcls('relative', 'overflow-hidden')}>
-            {/* Frame grid */}
-            {withFrame && (
-                <div
-                    className={tcls(
-                        'absolute',
-                        '-top-0.5',
-                        '-left-0.5',
-                        'right-px',
-                        'bottom-px',
-                        'opacity-40',
-                        'dark:opacity-[0.1]',
-                        'bg-[length:24px_24px,24px_24px]',
-                        'bg-[linear-gradient(to_right,_rgb(234,235,238)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(234,235,238)_1px,_transparent_1px)]',
-                        'dark:bg-[linear-gradient(to_right,_rgb(122,128,139)_1px,_transparent_1px),linear-gradient(to_bottom,_rgb(122,128,139)_1px,_transparent_1px)]',
-                        'bg-repeat'
-                    )}
-                />
-            )}
-
-            {/* Shadow overlay */}
-            {withFrame && (
-                <div
-                    className={tcls(
-                        'pointer-events-none absolute inset-0 rounded-2xl',
-                        'shadow-[inset_0_0_10px_10px_rgba(255,255,255,0.9)]',
-                        'dark:shadow-[inset_0_0_10px_10px_rgb(29,29,29)]'
-                    )}
-                />
-            )}
-
             <Caption {...props} fit>
                 <Image
                     alt={block.data.alt ?? ''}

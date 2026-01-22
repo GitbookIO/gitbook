@@ -10,18 +10,18 @@ const testCases: TestsCase[] = [
             { name: 'OpenAPI', url: '/snyk-api/reference/apps', run: waitForCookiesDialog },
         ],
     },
-    // {
-    //     name: 'Nexthink',
-    //     contentBaseURL: 'https://docs.nexthink.com',
-    //     tests: [
-    //         {
-    //             name: 'Home',
-    //             url: '/',
-    //             screenshot: { waitForTOCScrolling: false },
-    //             run: waitForCookiesDialog,
-    //         },
-    //     ],
-    // },
+    {
+        name: 'Nexthink',
+        contentBaseURL: 'https://docs.nexthink.com',
+        tests: [
+            {
+                name: 'Home',
+                url: '/',
+                screenshot: { waitForTOCScrolling: false },
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
     {
         name: 'asiksupport-stg.dto.kemkes.go.id',
         contentBaseURL: 'https://asiksupport-stg.dto.kemkes.go.id',
@@ -36,11 +36,6 @@ const testCases: TestsCase[] = [
         name: 'faq.deltaemulator.com',
         contentBaseURL: 'https://faq.deltaemulator.com',
         tests: [{ name: 'Home', url: '/' }],
-    },
-    {
-        name: 'docs.dify.ai',
-        contentBaseURL: 'https://docs.dify.ai',
-        tests: [{ name: 'Home', url: '/', run: waitForCookiesDialog }],
     },
     {
         name: 'seeddao.gitbook.io',

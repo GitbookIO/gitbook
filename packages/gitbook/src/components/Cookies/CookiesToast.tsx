@@ -41,7 +41,7 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             aria-describedby={describedById}
             className={tcls(
                 'fixed',
-                'z-10',
+                'z-50',
                 'bg-tint-base',
                 'rounded-sm',
                 'straight-corners:rounded-none',
@@ -52,19 +52,20 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
                 'depth-flat:shadow-none',
                 'p-4',
                 'pr-8',
-                'bottom-4',
-                'right-4',
-                'left-16',
+                'bottom-[max(env(safe-area-inset-bottom),1rem)]',
+                'right-[max(env(safe-area-inset-right),1rem)]',
+                'left-[max(env(safe-area-inset-left),4rem)]',
                 'max-w-md',
                 'text-balance',
                 'sm:left-auto',
                 'lg:chat-open:mr-80',
                 'xl:chat-open:mr-100',
                 'transition-all',
-                'duration-300'
+                'duration-300',
+                'text-sm'
             )}
         >
-            <p id={describedById} className={tcls('text-sm')}>
+            <p id={describedById}>
                 {t(
                     language,
                     'cookies_prompt',
@@ -76,12 +77,13 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
             <Button
                 iconOnly
                 icon="close"
+                size="small"
                 label={tString(language, 'close')}
                 variant="blank"
                 onClick={() => setShow(false)}
                 className={tcls('absolute', 'top-2', 'right-2', 'hover:bg-tint-hover')}
             />
-            <div className={tcls('mt-3', 'flex', 'flex-row', 'gap-2')}>
+            <div className="mt-3 flex flex-row gap-2">
                 <Button
                     variant="primary"
                     size="small"

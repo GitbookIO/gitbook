@@ -3,11 +3,8 @@ import { OpenAPIWebhook as BaseOpenAPIWebhook } from '@gitbook/react-openapi';
 import { resolveOpenAPIWebhookBlock } from '@/lib/openapi/resolveOpenAPIWebhookBlock';
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from '../Block';
-
-import './scalar.css';
-import './style.css';
 import type { OpenAPIWebhookBlock } from '@/lib/openapi/types';
+import type { BlockProps } from '../Block';
 import { getOpenAPIContext } from './context';
 
 /**

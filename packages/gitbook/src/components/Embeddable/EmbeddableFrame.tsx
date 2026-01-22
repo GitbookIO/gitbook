@@ -28,10 +28,14 @@ export const EmbeddableFrame = React.forwardRef<HTMLDivElement, EmbeddableFrameP
     }
 );
 
-export function EmbeddableFrameMain(props: { children: React.ReactNode }) {
-    const { children } = props;
+export function EmbeddableFrameMain(props: React.ComponentProps<'div'>) {
+    const { children, ...rest } = props;
 
-    return <div className="flex flex-1 flex-col overflow-hidden">{children}</div>;
+    return (
+        <div className="flex flex-1 flex-col overflow-hidden" {...rest}>
+            {children}
+        </div>
+    );
 }
 
 export function EmbeddableFrameHeader(props: {
@@ -92,7 +96,7 @@ export function EmbeddableFrameSidebar(props: { children: React.ReactNode }) {
     const { children } = props;
 
     return (
-        <div className="flex w-13 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0">
+        <div className="flex w-15 shrink-0 origin-top not-hydrated:animate-blur-in-slow flex-col gap-2 overflow-hidden border-tint-solid/3 border-r bg-tint-solid/1 p-2 transition-all transition-discrete duration-300 empty:hidden empty:w-0 empty:px-0">
             {children}
         </div>
     );

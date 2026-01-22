@@ -3,11 +3,8 @@ import { OpenAPIOperation as BaseOpenAPIOperation } from '@gitbook/react-openapi
 import { resolveOpenAPIOperationBlock } from '@/lib/openapi/resolveOpenAPIOperationBlock';
 import { tcls } from '@/lib/tailwind';
 
-import type { BlockProps } from '../Block';
-
-import './scalar.css';
-import './style.css';
 import type { AnyOpenAPIOperationsBlock } from '@/lib/openapi/types';
+import type { BlockProps } from '../Block';
 import { getOpenAPIContext } from './context';
 
 /**

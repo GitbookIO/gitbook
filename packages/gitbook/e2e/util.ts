@@ -355,6 +355,7 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             url: 'https://www.gitbook.com/privacy',
         },
         socialPreview: {},
+        socialAccounts: [],
     };
 
     const encoded = rison.encode_object(deepMerge(DEFAULT_CUSTOMIZATION, partial));
@@ -417,14 +418,15 @@ export async function waitForIcons(page: Page) {
                 return true;
             }
 
-            // url("https://ka-p.fontawesome.com/releases/v6.6.0/svgs/light/moon.svg?v=2&token=a463935e93")
-            const maskImage = window.getComputedStyle(icon).getPropertyValue('mask-image');
-            const urlMatch = maskImage.match(/url\("([^"]+)"\)/);
-            const url = urlMatch?.[1];
+            const maskImage = icon.querySelector('[data-testid="mask-image"]');
+            if (!maskImage) {
+                throw new Error('No mask-image element');
+            }
 
+            const url = maskImage.getAttribute('href');
             // If URL is invalid we throw an error.
             if (!url) {
-                throw new Error('No mask-image');
+                throw new Error('No mask-image url');
             }
 
             // If the URL is already queued for loading, we return the state.
@@ -454,7 +456,8 @@ export async function waitForIcons(page: Page) {
  */
 async function waitForTOCScrolling(page: Page) {
     const viewport = await page.viewportSize();
-    if (viewport && viewport.width >= 1024) {
+    if (viewport && viewport.width >= 1024 && !page.url().includes('~gitbook/embed/demo')) {
+        // The embed demo is an iframe, which means the viewport is only a fraction of the main document. So there is no open TOC to scroll to.
         const toc = page.getByTestId('table-of-contents');
         await expect(toc).toBeVisible();
         await page.evaluate(() => {

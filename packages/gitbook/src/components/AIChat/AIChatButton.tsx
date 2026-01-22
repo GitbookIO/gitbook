@@ -2,8 +2,11 @@
 import { useLanguage } from '@/intl/client';
 import { t } from '@/intl/translate';
 import type { Assistant } from '../AI';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { Button } from '../primitives';
 import { KeyboardShortcut } from '../primitives/KeyboardShortcut';
+
+const MOBILE_BREAKPOINT = 672; // 42rem, equal to Tailwind's @max-2xl container breakpoint
 
 /**
  * Button to open/close the AI chat.
@@ -15,15 +18,15 @@ export function AIChatButton(props: {
 }) {
     const { assistant, showLabel = true, withShortcut = true } = props;
     const language = useLanguage();
+    const isMobile = useIsMobile(MOBILE_BREAKPOINT, '#header-content');
 
     return (
         <Button
             icon={assistant.icon}
             data-testid="ai-chat-button"
-            iconOnly={!showLabel}
+            iconOnly={!showLabel || isMobile}
             size="medium"
             variant="header"
-            className="h-9 px-2.5 @max-2xl:[&_.button-content]:hidden"
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', assistant.label)}

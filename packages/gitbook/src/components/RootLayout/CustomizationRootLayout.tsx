@@ -23,13 +23,12 @@ import * as ReactDOM from 'react-dom';
 
 import { type FontData, getFontData } from '@/fonts';
 import { fontNotoColorEmoji, fonts } from '@/fonts/default';
-import { getSpaceLanguage } from '@/intl/server';
+import { getSpaceLanguage, getSpaceLocale } from '@/intl/server';
 import { getAssetURL } from '@/lib/assets';
 import { tcls } from '@/lib/tailwind';
 
 import { RootLayoutClientContexts } from './RootLayoutClientContexts';
 
-import '@gitbook/icons/style.css';
 import './globals.css';
 import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
@@ -57,16 +56,19 @@ function preloadFont(fontData: FontData) {
  * It takes care of setting the theme and the language.
  */
 export async function CustomizationRootLayout(props: {
+    /** The class name to apply to the html element. */
+    htmlClassName?: string;
     /** The class name to apply to the body element. */
-    className?: string;
+    bodyClassName?: string;
     forcedTheme?: CustomizationThemeMode | null;
     context: GitBookAnyContext;
     children: React.ReactNode;
 }) {
-    const { className, context, forcedTheme, children } = props;
+    const { htmlClassName, bodyClassName, context, forcedTheme, children } = props;
     const customization =
         'customization' in context ? context.customization : defaultCustomization();
 
+    const locale = getSpaceLocale(context);
     const language = getSpaceLanguage(context);
     const tintColor = getTintColor(customization);
     const mixColor = getTintMixColor(customization.styling.primaryColor, tintColor);
@@ -89,7 +91,7 @@ export async function CustomizationRootLayout(props: {
     return (
         <html
             suppressHydrationWarning
-            lang={customization.internationalization.locale}
+            lang={locale}
             className={tcls(
                 customization.styling.corners && `${customization.styling.corners}-corners`,
                 'theme' in customization.styling && `theme-${customization.styling.theme}`,
@@ -107,7 +109,8 @@ export async function CustomizationRootLayout(props: {
                 // Set the dark/light class statically to avoid flashing and make it work when JS is disabled
                 (forcedTheme ?? customization.themes.default) === CustomizationThemeMode.Dark
                     ? 'dark'
-                    : ''
+                    : '',
+                htmlClassName
             )}
         >
             <head>
@@ -179,7 +182,7 @@ export async function CustomizationRootLayout(props: {
                     }
                 `}</style>
             </head>
-            <body className={className}>
+            <body className={tcls(bodyClassName, 'sheet-open:overflow-hidden')}>
                 <IconsProvider
                     assetsURL={GITBOOK_ICONS_URL}
                     assetsURLToken={GITBOOK_ICONS_TOKEN}

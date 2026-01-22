@@ -1,76 +1,16 @@
 import type { SiteInsightsTrademarkPlacement } from '@gitbook/api';
 import { Icon } from '@gitbook/icons';
 
-import { getSpaceLanguage, t } from '@/intl/server';
+import { getSpaceLanguage, tString } from '@/intl/server';
 import { tcls } from '@/lib/tailwind';
 
 import type { GitBookSpaceContext } from '@/lib/context';
-import { Link } from '../primitives';
+import { Button } from '../primitives';
 
 /**
  * Trademark link to the GitBook.
  */
 export function Trademark(props: {
-    context: GitBookSpaceContext;
-    placement: SiteInsightsTrademarkPlacement;
-    className?: string;
-}) {
-    const { className, ...rest } = props;
-    return (
-        <div
-            className={tcls(
-                'relative',
-                'z-2',
-                'lg:absolute',
-
-                'left-0',
-                'right-2',
-                'bottom-0',
-
-                'pointer-events-none',
-                'sidebar-filled:pl-2',
-                'sidebar-filled:pb-2',
-                'sidebar-filled:page-no-toc:p-0',
-
-                'bg-tint-base',
-                'sidebar-filled:bg-tint-subtle',
-                'theme-muted:bg-tint-subtle',
-                '[html.sidebar-filled.theme-muted_&]:bg-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
-
-                'rounded-lg',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
-
-                'before:hidden',
-                'lg:before:block',
-                'before:content-[""]',
-                'before:absolute',
-                'before:inset-x-0',
-                'before:bottom-full',
-                'before:h-8',
-                'before:bg-linear-to-b',
-                'before:from-transparent',
-                'before:to-tint-base',
-                'sidebar-filled:before:to-tint-subtle',
-                'theme-muted:before:to-tint-subtle',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-subtle',
-                '[html.sidebar-filled.theme-muted_&]:before:to-tint-base',
-                '[html.sidebar-filled.theme-bold.tint_&]:before:to-tint-base',
-                'page-no-toc:before:to-transparent!',
-
-                className
-            )}
-        >
-            <TrademarkLink {...rest} />
-        </div>
-    );
-}
-
-/**
- * Trademark link to the GitBook.
- */
-export function TrademarkLink(props: {
     context: GitBookSpaceContext;
     placement: SiteInsightsTrademarkPlacement;
     className?: string;
@@ -85,8 +25,10 @@ export function TrademarkLink(props: {
     url.searchParams.set('utm_campaign', space.id);
 
     return (
-        <Link
+        <Button
             target="_blank"
+            variant="secondary"
+            size="large"
             href={url.toString()}
             className={tcls(
                 'text-sm',
@@ -98,34 +40,21 @@ export function TrademarkLink(props: {
                 'items-center',
                 'px-5',
                 'py-4',
+                'gap-3',
+                'whitespace-normal',
 
-                'sidebar-filled:px-3',
-                'lg:sidebar-filled:page-no-toc:px-5',
-
-                'rounded-lg',
-                'straight-corners:rounded-none',
-                'circular-corners:rounded-2xl',
-
-                'hover:bg-tint',
-                'hover:text-tint-strong',
-
-                'ring-2',
-                'lg:ring-1',
-                'ring-inset',
-                'ring-tint-subtle',
-
-                'transition-colors',
-                'pointer-events-auto',
+                'bg-transparent',
+                'depth-subtle:shadow-none',
+                'border-tint-subtle',
 
                 className
             )}
+            icon={<Icon icon="gitbook" className="size-5 shrink-0" />}
+            label={tString(language, 'powered_by_gitbook')}
             insights={{
                 type: 'trademark_click',
                 placement,
             }}
-        >
-            <Icon icon="gitbook" className={tcls('size-5', 'shrink-0')} />
-            <span className={tcls('ml-3')}>{t(language, 'powered_by_gitbook')}</span>
-        </Link>
+        />
     );
 }

@@ -30,7 +30,9 @@ type EmbeddableDocsPageProps = {
 /**
  * Page component for the embed docs page.
  */
-export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
+export async function EmbeddableDocsPage(
+    props: EmbeddableDocsPageProps & { staticRoute: boolean }
+) {
     const { context, pageParams } = props;
     const { page, document, ancestors, withPageFeedback } = await getSitePageData({
         context,
@@ -47,7 +49,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                 />
                 <EmbeddableIframeButtons />
             </EmbeddableFrameSidebar>
-            <EmbeddableFrameMain>
+            <EmbeddableFrameMain data-testid="embed-docs-page">
                 <div className="relative flex not-hydrated:animate-blur-in-slow flex-col">
                     <EmbeddableFrameHeader>
                         <HeaderMobileMenu className="-ml-2 page-no-toc:hidden" />
@@ -77,9 +79,10 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                         orientation="vertical"
                         className="not-hydrated:animate-blur-in-slow"
                         contentClassName="p-4"
-                        fadeEdges={context.sections ? [] : ['leading']}
+                        leading={{ fade: !context.sections, button: true }}
+                        trailing={{ fade: false, button: true }}
                     >
-                        <TableOfContents className="pt-0" context={context} />
+                        <TableOfContents context={context} withTrademark={false} />
                         <PageBody
                             context={context}
                             page={page}
@@ -87,6 +90,7 @@ export async function EmbeddableDocsPage(props: EmbeddableDocsPageProps) {
                             document={document}
                             withPageFeedback={withPageFeedback}
                             insightsDisplayContext={SiteInsightsDisplayContext.Embed}
+                            staticRoute={props.staticRoute}
                         />
                     </ScrollContainer>
                 </EmbeddableFrameBody>

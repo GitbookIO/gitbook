@@ -11,17 +11,16 @@
             "types": "./dist/icons.d.ts",
             "development": "./src/icons.ts",
             "default": "./dist/icons.js"
-        },
-        "./style.css": "./src/style.css"
+        }
     },
     "sideEffects": false,
-    "version": "0.3.4",
+    "version": "0.4.2",
     "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^6.6.0",
-        "@fortawesome/fontawesome-free": "^6.6.0"
+        "@fortawesome/fontawesome-svg-core": "^7.1.0",
+        "@fortawesome/fontawesome-free": "^7.1.0"
     },
     "optionalDependencies": {
-        "@gitbook/fontawesome-pro": "1.0.15"
+        "@gitbook/fontawesome-pro": "1.0.16"
     },
     "devDependencies": {
         "bun-types": "catalog:",

@@ -362,7 +362,22 @@ async function resolveContentRefInSpace(
     contentRef: ContentRef,
     options: ResolveContentRefOptions = {}
 ) {
-    const ctx = await createContextForSpace(spaceId, context);
+    const ctx = await createContextForSpace(spaceId, {
+        ...context,
+        shareKey: (() => {
+            // If the space is found in the current site, we use the current share key to generate links.
+            if ('site' in context) {
+                return findSiteSpaceBy(
+                    context.structure,
+                    (siteSpace) => siteSpace.space.id === spaceId
+                )
+                    ? context.shareKey
+                    : undefined;
+            }
+
+            return context.space.id === spaceId ? context.shareKey : undefined;
+        })(),
+    });
 
     if (!ctx) {
         return null;
@@ -381,7 +396,6 @@ async function resolveContentRefInSpace(
                 context.structure,
                 (siteSpace) => siteSpace.space.id === spaceId
             );
-
             return (
                 foundSiteSpace?.siteSpace.title ??
                 foundSiteSpace?.siteSection?.title ??

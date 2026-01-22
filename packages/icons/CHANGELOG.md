@@ -1,5 +1,23 @@
 # @gitbook/icons
 
+## 0.4.2
+
+### Patch Changes
+
+- 360b525: Switch icon masking method to fix visual cutoffs in FA7
+
+## 0.4.1
+
+### Patch Changes
+
+- e7fb771: Fix icon rendering with explicit currentColor on icon element
+
+## 0.4.0
+
+### Minor Changes
+
+- 62438f4: Update to FontAwesome 7.1.0
+
 ## 0.3.4
 
 ### Patch Changes

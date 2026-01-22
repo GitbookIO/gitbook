@@ -3,7 +3,7 @@ import { type SiteURLData, fetchSiteContextByURLLookup, getBaseContext } from '@
 import { getDynamicCustomizationSettings } from '@/lib/customization';
 import type { SiteAPIToken } from '@gitbook/api';
 import { jwtDecode } from 'jwt-decode';
-import { forbidden } from 'next/navigation';
+import { forbidden, notFound } from 'next/navigation';
 import rison from 'rison';
 
 export type RouteParamMode = 'url-host' | 'url';
@@ -80,14 +80,32 @@ export async function getDynamicSiteContext(params: RouteLayoutParams) {
  * Get the decoded page path from the params.
  */
 export function getPagePathFromParams(params: RouteParams) {
-    const decoded = decodeURIComponent(params.pagePath);
-    return decoded;
+    // If decoding the param fails, return a 404 instead of crashing
+    try {
+        const decoded = decodeURIComponent(params.pagePath);
+
+        // For the root page, we encode '/' to avoid an empty param being passed.
+        if (decoded === '/') {
+            return '';
+        }
+        return decoded;
+    } catch (error) {
+        console.error(
+            `Returning 404 after failing to decode page path ${params.pagePath}: ${error}`
+        );
+        notFound();
+    }
 }
 
 function getSiteURLFromParams(params: RouteLayoutParams) {
-    const decoded = decodeURIComponent(params.siteURL);
-    const url = new URL(`https://${decoded}`);
-    return url;
+    try {
+        const decoded = decodeURIComponent(params.siteURL);
+        const url = new URL(`https://${decoded}`);
+        return url;
+    } catch (error) {
+        console.error(`Returning 404 after failing to decode site URL ${params.siteURL}: ${error}`);
+        notFound();
+    }
 }
 
 function getModeFromParams(mode: string): RouteParamMode {
@@ -102,6 +120,13 @@ function getModeFromParams(mode: string): RouteParamMode {
  * Get the decoded site data from the params.
  */
 function getSiteURLDataFromParams(params: RouteLayoutParams): SiteURLData {
-    const decoded = decodeURIComponent(params.siteData);
-    return rison.decode(decoded);
+    try {
+        const decoded = decodeURIComponent(params.siteData);
+        return rison.decode(decoded);
+    } catch (error) {
+        console.error(
+            `Returning 404 after failing to decode site data ${params.siteData}: ${error}`
+        );
+        notFound();
+    }
 }

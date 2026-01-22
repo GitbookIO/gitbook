@@ -7,7 +7,7 @@
             "default": "./dist/index.js"
         }
     },
-    "version": "1.5.3",
+    "version": "1.5.6",
     "sideEffects": false,
     "dependencies": {
         "@gitbook/expr": "workspace:*",
@@ -42,7 +42,7 @@
         "react-dom": "catalog:"
     },
     "peerDependencies": {
-        "react": "*",
+        "react": ">=17",
         "react-dom": "*"
     },
     "scripts": {

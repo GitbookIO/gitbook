@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import type { GitBookSiteContext } from '@/lib/context';
 import { getSiteSpaceURL } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
-import { Button, type ButtonProps } from '../primitives';
-import { DropdownChevron, DropdownMenu } from '../primitives/DropdownMenu';
+import { Button, type ButtonProps, ToggleChevron } from '../primitives';
+import { DropdownMenu } from '../primitives/DropdownMenu';
 import { SpacesDropdownMenuItems } from './SpacesDropdownMenuItem';
 
 // Memoized regex for checking if a string starts with an emoji
@@ -35,9 +35,9 @@ export function SpacesDropdown(props: {
                 <Button
                     icon={icon}
                     data-testid="space-dropdown-button"
-                    size="medium"
+                    size="small"
                     variant={variant}
-                    trailing={<DropdownChevron />}
+                    trailing={<ToggleChevron />}
                     className={tcls('bg-tint-base', className)}
                 >
                     <span className="button-content">{siteSpace.title}</span>
@@ -77,7 +77,7 @@ export function TranslationsDropdown(props: {
             siteSpaces={siteSpaces}
             variant="blank"
             className={tcls(
-                '-mx-2 bg-transparent px-2 md:py-1 lg:max-w-64 max-md:[&_.button-content]:hidden',
+                '-mx-3 bg-transparent lg:max-w-64 max-md:[&_.button-content]:hidden',
                 hasEmojiPrefix
                     ? 'md:[&_.button-leading-icon]:hidden' // If the title starts with an emoji, don't show the icon (on desktop)
                     : '',

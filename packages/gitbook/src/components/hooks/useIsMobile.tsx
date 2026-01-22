@@ -2,10 +2,30 @@
 
 import * as React from 'react';
 
-export function useIsMobile(breakpoint = 1024): boolean {
+export function useIsMobile(breakpoint = 1024, container?: string): boolean {
     const [isMobile, setIsMobile] = React.useState(false);
 
     React.useEffect(() => {
+        if (container) {
+            const containerElement = document.querySelector(container);
+            if (containerElement) {
+                // In the case of a container we need a ResizeObserver, since the matchMedia listener might fire at different times than the container size changes.
+                const observer = new ResizeObserver((entries) => {
+                    entries.forEach((entry) => {
+                        console.log('checked', entry.contentRect.width < breakpoint);
+                        setIsMobile(entry.contentRect.width < breakpoint);
+                    });
+                });
+                observer.observe(containerElement);
+                return () => observer.disconnect();
+            }
+
+            // Warn if no container was found.
+            console.warn(
+                `Container element not found: "${container}". Falling back to window resize listener.`
+            );
+        }
+
         // Use matchMedia for a single, efficient listener.
         // 0.02px fudge keeps it safely below the breakpoint (mirrors Tailwind’s 639.98px).
         const query = `(max-width: ${breakpoint - 0.02}px)`;
@@ -23,7 +43,7 @@ export function useIsMobile(breakpoint = 1024): boolean {
         return () => {
             media.removeEventListener('change', handleChange);
         };
-    }, [breakpoint]);
+    }, [breakpoint, container]);
 
     return isMobile;
 }

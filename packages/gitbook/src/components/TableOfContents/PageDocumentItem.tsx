@@ -32,20 +32,15 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
                                 'my-2',
                                 'border-tint-subtle',
                                 'sidebar-list-default:border-l',
-                                'sidebar-list-line:border-l'
+                                'sidebar-list-line:border-l',
+                                'break-anywhere'
                             )}
                         />
                     ) : null
                 }
             >
-                {page.emoji || page.icon ? (
-                    <span className="flex items-center gap-3">
-                        <TOCPageIcon page={page} />
-                        {page.title}
-                    </span>
-                ) : (
-                    page.title
-                )}
+                <TOCPageIcon page={page} />
+                {page.title}
             </ToggleableLinkItem>
         </li>
     );

@@ -1,6 +1,6 @@
 {
     "name": "gitbook",
-    "version": "0.20.0",
+    "version": "0.21.3",
     "private": true,
     "dependencies": {
         "@cloudflare/workers-types": "^4.20251011.0",
@@ -19,7 +19,7 @@
         "@gitbook/react-openapi": "workspace:*",
         "@modelcontextprotocol/sdk": "1.17.5",
         "@opennextjs/aws": "^3.8.5",
-        "@opennextjs/cloudflare": "^1.11.0",
+        "@opennextjs/cloudflare": "^1.14.4",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dropdown-menu": "^2.1.12",
         "@radix-ui/react-hover-card": "^1.1.15",
@@ -28,7 +28,6 @@
         "@radix-ui/react-tooltip": "^1.1.8",
         "@sindresorhus/fnv1a": "^3.1.0",
         "@tailwindcss/container-queries": "^0.1.1",
-        "@tailwindcss/typography": "^0.5.16",
         "@tusbar/cache-control": "^1.0.2",
         "ai": "^4.2.2",
         "assert-never": "catalog:",
@@ -50,7 +49,7 @@
         "micromark-extension-frontmatter": "^2.0.0",
         "micromark-extension-gfm": "^3.0.0",
         "motion": "^12.23.24",
-        "next": "15.4.0",
+        "next": "15.4.10",
         "next-themes": "^0.4.6",
         "nuqs": "^2.2.3",
         "object-hash": "^3.0.0",
@@ -78,7 +77,8 @@
         "usehooks-ts": "catalog:",
         "warn-once": "^0.1.1",
         "zod": "^3",
-        "zustand": "^5.0.3"
+        "zustand": "^5.0.3",
+        "negotiator": "^1.0.0"
     },
     "devDependencies": {
         "@argos-ci/playwright": "^5.0.9",
@@ -95,6 +95,7 @@
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@types/rison": "^0.0.9",
+        "@types/negotiator": "^0.6.4",
         "bun-types": "catalog:",
         "deepmerge": "^4.3.1",
         "env-cmd": "^10.1.0",

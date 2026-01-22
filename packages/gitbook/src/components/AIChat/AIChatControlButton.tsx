@@ -22,7 +22,6 @@ export function AIChatControlButton() {
             icon="trash-can"
             label={t(language, 'ai_chat_clear_conversation')}
             variant="blank"
-            size="default"
             className="animate-blur-in-slow"
         />
     ) : null;

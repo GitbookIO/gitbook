@@ -42,6 +42,7 @@ export function Header(props: {
                 `h-[${HEADER_HEIGHT_DESKTOP}px]`,
                 'sticky',
                 'top-0',
+                'pt-[env(safe-area-inset-top)]',
                 'z-30',
                 'w-full',
                 'flex-none',
@@ -69,6 +70,7 @@ export function Header(props: {
             >
                 <div className="transition-all duration-300 lg:chat-open:pr-80 xl:chat-open:pr-96">
                     <div
+                        id="header-content"
                         className={tcls(
                             'gap-4',
                             'lg:gap-6',
@@ -210,7 +212,7 @@ export function Header(props: {
                                     ) ?? siteSpace
                                 }
                                 siteSpaces={variants.translations}
-                                className="my-2 ml-2 self-start"
+                                className="my-1.5 ml-2 self-start"
                             />
                         ) : null}
                     </SiteSectionTabs>

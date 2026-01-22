@@ -4,7 +4,7 @@ import type { IconName } from '@gitbook/icons';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
-import { Button, DropdownChevron, Link } from '@/components/primitives';
+import { Button, Link, ToggleChevron } from '@/components/primitives';
 import { tcls } from '@/lib/tailwind';
 import { findSectionInGroup } from '@/lib/utils';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -18,7 +18,7 @@ import type {
 } from './encodeClientSiteSections';
 
 const SCREEN_OFFSET = 16; // 1rem
-const MAX_ITEMS_PER_COLUMN = 5; // number of items per column
+const MAX_ITEMS_PER_COLUMN = 8; // number of items per column
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
@@ -76,8 +76,12 @@ export function SiteSectionTabs(props: {
                         ? 'md:-mr-8 -mr-4 sm:-mr-6'
                         : 'after:contents[] after:absolute after:inset-y-2 after:right-0 after:border-transparent after:border-r after:transition-colors'
                 )}
-                active={currentSection.id}
-                trailingEdgeScrollClassName={children ? 'after:border-tint' : ''}
+                active={`#${currentSection.id}`}
+                trailing={{
+                    fade: true,
+                    button: true,
+                    className: children ? 'after:border-tint' : '',
+                }}
             >
                 <NavigationMenu.List
                     className={tcls(
@@ -183,17 +187,17 @@ const SectionTab = React.forwardRef(function SectionTab(
     return (
         <Button
             ref={ref}
-            size="medium"
+            size="small"
             variant="blank"
             {...rest}
             icon={icon ? <SectionIcon isActive={isActive} icon={icon} /> : null}
             label={title}
-            trailing={isGroup ? <DropdownChevron /> : null}
+            trailing={isGroup ? <ToggleChevron /> : null}
             active={isActive}
             className={tcls(
-                'group/dropdown relative my-2 overflow-visible px-3 py-1',
+                'group/dropdown relative my-1.5 overflow-visible',
                 isActive
-                    ? 'after:contents-[] after:-bottom-2 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9'
+                    ? 'after:contents-[] after:-bottom-1.5 bg-transparent text-primary-subtle after:absolute after:inset-x-3 after:h-0.5 after:bg-primary-9'
                     : ''
             )}
             href={url}
@@ -223,7 +227,7 @@ function SectionGroupTileList(props: {
             {hasSections && (
                 <ul
                     className={tcls(
-                        'flex grid-flow-row flex-col gap-x-2 gap-y-1 p-2 md:grid',
+                        'flex min-w-48 grid-flow-row flex-col gap-x-2 gap-y-1 self-start p-3 md:grid',
                         hasGroups ? 'bg-tint-base' : ''
                     )}
                     style={{
@@ -244,7 +248,7 @@ function SectionGroupTileList(props: {
             {hasGroups && (
                 <ul
                     className={tcls(
-                        'flex grid-flow-col flex-col items-start gap-x-2 gap-y-4 p-2 md:grid md:gap-y-1',
+                        'flex min-w-48 flex-col items-start justify-start gap-x-8 gap-y-2 p-3 md:flex-row md:gap-y-8',
                         hasSections
                             ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
                             : ''
@@ -276,7 +280,7 @@ function SectionGroupTile(props: {
         const { url, icon, title, description } = child;
         const isActive = child.id === currentSection.id;
         return (
-            <li className="group/section-tile flex w-full shrink grow md:w-68">
+            <li className="group/section-tile flex shrink-0 grow md:max-w-68">
                 <Link
                     href={url}
                     className={tcls(
@@ -317,7 +321,7 @@ function SectionGroupTile(props: {
     const { title, icon, children } = child;
 
     return (
-        <li className="flex w-full shrink grow flex-col gap-1">
+        <li className="flex shrink-0 flex-col gap-1">
             <div className="mt-3 mb-2 flex gap-2.5 px-3 font-semibold text-tint-subtle text-xs uppercase tracking-wider">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
@@ -327,7 +331,7 @@ function SectionGroupTile(props: {
             <ul
                 className="flex grid-flow-row flex-col gap-x-2 gap-y-1 md:grid"
                 style={{
-                    gridTemplateColumns: `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, 1fr))`,
+                    gridTemplateColumns: `repeat(${Math.ceil(children.length / MAX_ITEMS_PER_COLUMN)}, minmax(0, auto))`,
                 }}
             >
                 {children.map((nestedChild) => (

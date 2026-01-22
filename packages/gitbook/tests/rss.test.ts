@@ -19,4 +19,12 @@ it('should not expose a RSS feed for a page without updates', async () => {
     );
     const response = await fetch(feedURL);
     expect(response.status).toBe(404);
+    expect(await response.text()).toBe('No updates found in page');
+});
+
+it('should not expose a RSS feed for a page without updates (root page)', async () => {
+    const feedURL = getContentTestURL('https://gitbook.gitbook.io/test-gitbook-open/rss.xml');
+    const response = await fetch(feedURL);
+    expect(response.status).toBe(404);
+    expect(await response.text()).toBe('No updates found in page');
 });

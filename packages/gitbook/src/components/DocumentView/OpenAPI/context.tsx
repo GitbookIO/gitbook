@@ -9,7 +9,6 @@ import { PlainCodeBlock } from '../CodeBlock';
 import { DocumentView } from '../DocumentView';
 import { Heading } from '../Heading';
 
-import './scalar.css';
 import './style.css';
 import { DEFAULT_LOCALE, getSpaceLocale } from '@/intl/server';
 import type { GitBookAnyContext } from '@/lib/context';

@@ -2,7 +2,7 @@
 
 import type { GitBookEmbeddableConfiguration, ParentToFrameMessage } from '@gitbook/embed';
 import { createChannel } from 'bidc';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { useAI, useAIChatController } from '@/components/AI';
 import { CustomizationAIMode } from '@gitbook/api';
@@ -19,6 +19,12 @@ const embeddableConfiguration = createStore<GitBookEmbeddableConfiguration>(() =
     tools: [],
 }));
 
+// biome-ignore lint/suspicious/noExplicitAny: expected
+function log(...data: any[]) {
+    // biome-ignore lint/suspicious/noConsole: expected
+    console.log(...data);
+}
+
 /**
  * Expose the API to communicate with the parent window.
  */
@@ -30,24 +36,32 @@ export function EmbeddableIframeAPI(props: {
     const router = useRouter();
     const chatController = useAIChatController();
 
+    // Live ref to avoid adding them as dependencies
+    const refs = useRef({ router, chatController, baseURL });
+    useEffect(() => {
+        refs.current = { router, chatController, baseURL };
+    });
+
     React.useEffect(() => {
         return chatController.on('open', () => {
+            const { baseURL, router } = refs.current;
             router.push(`${baseURL}/assistant`);
         });
-    }, [router, baseURL, chatController]);
+    }, [chatController]);
 
     React.useEffect(() => {
         if (window.parent === window) {
             return;
         }
 
-        console.log('[gitbook] create channel with parent window');
+        log('[gitbook] create channel with parent window');
         const channel = createChannel();
 
         channel.receive((payload) => {
+            const { baseURL, router, chatController } = refs.current;
             const message = payload as ParentToFrameMessage;
 
-            console.log('[gitbook] received message', message);
+            log('[gitbook] received message', message);
 
             switch (message.type) {
                 case 'clearChat': {
@@ -79,10 +93,10 @@ export function EmbeddableIframeAPI(props: {
         });
 
         return () => {
-            console.log('[gitbook] cleanup');
+            log('[gitbook] cleanup');
             channel.cleanup();
         };
-    }, [chatController, router, baseURL]);
+    }, []);
 
     return null;
 }
@@ -112,8 +126,9 @@ export function EmbeddableIframeButtons() {
             )}
             {actions.map((action, index) => (
                 <Button
+                    data-testid="embed-action"
                     key={action.label}
-                    size="default"
+                    size="large"
                     variant="blank"
                     icon={action?.icon ?? 'square-question'}
                     label={action?.label}
@@ -195,7 +210,7 @@ export function EmbeddableIframeTabs(props: {
                     key={tab.key}
                     data-testid={`embed-tab-${tab.key}`}
                     label={tab.label}
-                    size="default"
+                    size="large"
                     variant="blank"
                     icon={tab.icon}
                     active={tab.key === active}

@@ -1,44 +1,81 @@
 import { resolveContentRef, resolveContentRefFallback } from '@/lib/references';
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
-import { Button } from '../primitives';
+import { Button, type ButtonProps } from '../primitives';
 import type { InlineProps } from './Inline';
+import { InlineActionButton } from './InlineActionButton';
 import { NotFoundRefHoverCard } from './NotFoundRefHoverCard';
 
-export async function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
-    const { inline, context } = props;
+export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
+    const { inline } = props;
 
-    const resolved = context.contentContext
-        ? await resolveContentRef(inline.data.ref, context.contentContext)
-        : null;
+    const buttonProps: ButtonProps = {
+        label: inline.data.label,
+        variant: inline.data.kind,
+        icon: inline.data.icon as IconName | undefined,
+        size: 'medium',
+    };
 
-    const href = resolved?.href ?? resolveContentRefFallback(inline.data.ref)?.href;
+    const ButtonImplementation = () => {
+        if ('action' in inline.data && 'query' in inline.data.action) {
+            return (
+                <InlineActionButton
+                    action={inline.data.action.action}
+                    query={inline.data.action.query ?? ''}
+                    buttonProps={buttonProps}
+                />
+            );
+        }
+
+        if ('ref' in inline.data) {
+            return <InlineLinkButton {...props} buttonProps={buttonProps} />;
+        }
+
+        return <Button {...buttonProps} disabled />;
+    };
 
     const inlineElement = (
         // Set the leading to have some vertical space between adjacent buttons
-        <span className="inline-button leading-12 [&:has(+.inline-button)]:mr-2">
-            <Button
-                href={href}
-                label={inline.data.label}
-                // TODO: use a variant specifically for user-defined buttons.
-                variant={inline.data.kind}
-                className="leading-normal"
-                disabled={href === undefined}
-                icon={inline.data.icon as IconName | undefined}
-                insights={{
-                    type: 'link_click',
-                    link: {
-                        target: inline.data.ref,
-                        position: api.SiteInsightsLinkPosition.Content,
-                    },
-                }}
-            />
-        </span>
+        <ButtonImplementation />
     );
 
-    if (!resolved) {
-        return <NotFoundRefHoverCard context={context}>{inlineElement}</NotFoundRefHoverCard>;
+    return inlineElement;
+}
+
+export async function InlineLinkButton(
+    props: InlineProps<api.DocumentInlineButton> & { buttonProps: ButtonProps }
+) {
+    const { inline, context, buttonProps } = props;
+
+    if (!('ref' in inline.data)) return;
+
+    const resolved =
+        context.contentContext && inline.data.ref
+            ? await resolveContentRef(inline.data.ref, context.contentContext)
+            : null;
+
+    const href =
+        resolved?.href ??
+        (inline.data.ref ? resolveContentRefFallback(inline.data.ref)?.href : undefined);
+
+    const button = (
+        <Button
+            {...buttonProps}
+            insights={{
+                type: 'link_click',
+                link: {
+                    target: inline.data.ref,
+                    position: api.SiteInsightsLinkPosition.Content,
+                },
+            }}
+            href={href}
+            disabled={href === undefined}
+        />
+    );
+
+    if (inline.data.ref && !resolved) {
+        return <NotFoundRefHoverCard context={context}>{button}</NotFoundRefHoverCard>;
     }
 
-    return inlineElement;
+    return button;
 }

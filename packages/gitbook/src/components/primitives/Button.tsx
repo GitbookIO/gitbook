@@ -14,7 +14,7 @@ export type ButtonProps = {
     variant?: 'primary' | 'secondary' | 'blank' | 'header';
     icon?: IconName | React.ReactNode;
     iconOnly?: boolean;
-    size?: 'default' | 'medium' | 'small' | 'xsmall';
+    size?: 'large' | 'medium' | 'small' | 'xsmall';
     className?: ClassValue;
     label?: string | React.ReactNode;
     trailing?: React.ReactNode;
@@ -29,11 +29,12 @@ export const variantClasses = {
         'bg-primary-original',
         'text-contrast-primary-original',
         'hover:bg-primary-solid-hover',
+        'hover:border-primary-solid-hover',
         'hover:text-contrast-primary-solid-hover',
-        'border-0',
+        'border-primary-original',
         'contrast-more:bg-primary-solid',
         'contrast-more:text-contrast-primary-solid',
-        'contrast-more:border',
+        'disabled:border-primary-2',
         'disabled:bg-primary-subtle',
         'disabled:text-primary/8',
     ],
@@ -102,7 +103,7 @@ export const Button = React.forwardRef<
         {
             href,
             variant = 'primary',
-            size = 'default',
+            size = 'medium',
             className,
             insights,
             target,
@@ -119,13 +120,13 @@ export const Button = React.forwardRef<
         ref
     ) => {
         const sizes = {
-            default: ['text-base', 'font-semibold', iconOnly ? 'px-2' : 'px-5', 'py-2'],
-            medium: ['text-sm', iconOnly ? 'px-2' : 'px-3.5', 'py-1.5'],
-            small: ['text-xs', 'py-2', iconOnly ? 'px-2' : 'px-3'],
-            xsmall: ['text-xs', 'py-1', iconOnly ? 'px-1.5' : 'px-2'],
+            large: ['font-semibold p-3', iconOnly ? '' : 'px-5'],
+            medium: ['p-2', iconOnly ? '' : 'px-4'],
+            small: ['p-1.5 text-sm/normal', iconOnly ? '' : 'px-3'],
+            xsmall: ['p-1 text-sm/tight rounded-corners:rounded-lg', iconOnly ? '' : 'px-2'],
         };
 
-        const sizeClasses = sizes[size] || sizes.default;
+        const sizeClasses = sizes[size] || sizes.large;
 
         const domClassName = tcls(
             variantClasses[variant],
@@ -135,13 +136,20 @@ export const Button = React.forwardRef<
         );
         const buttonOnlyClassNames = useClassnames(['ButtonStyles']);
 
+        const iconSizeClasses = {
+            large: ['size-text-2xl', iconOnly && ''],
+            medium: ['size-text-lg my-[.1875em]', iconOnly && 'mx-[.1875em]'],
+            small: ['my-text-1/4 size-text-base', iconOnly && 'mx-text-1/4'],
+            xsmall: ['my-text-1/8 size-text-base', iconOnly && 'mx-text-1/8'],
+        };
         let iconElement = null;
         if (icon) {
             if (React.isValidElement(icon)) {
                 type IconElement = React.ReactElement<React.SVGProps<SVGSVGElement>>;
                 iconElement = React.cloneElement(icon as IconElement, {
                     className: tcls(
-                        'button-leading-icon size-[1em] shrink-0',
+                        'button-leading-icon shrink-0',
+                        iconSizeClasses[size],
                         (icon as IconElement).props.className
                     ),
                 });
@@ -149,7 +157,7 @@ export const Button = React.forwardRef<
                 iconElement = (
                     <Icon
                         icon={icon as IconName}
-                        className={tcls('button-leading-icon size-[1em] shrink-0')}
+                        className={tcls('button-leading-icon shrink-0', iconSizeClasses[size])}
                     />
                 );
             }

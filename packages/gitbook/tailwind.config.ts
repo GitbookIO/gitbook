@@ -1,5 +1,4 @@
 import containerQueries from '@tailwindcss/container-queries';
-import typography from '@tailwindcss/typography';
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
@@ -328,10 +327,10 @@ const config: Config = {
                 blurOut: 'blurOut 200ms ease-in both',
                 'blurOut-slow': 'blurOut 500ms ease-in both',
 
-                enterFromLeft: 'enterFromLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
-                enterFromRight: 'enterFromRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
-                exitToLeft: 'exitToLeft 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
-                exitToRight: 'exitToRight 250ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                enterFromLeft: 'enterFromLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                enterFromRight: 'enterFromRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToLeft: 'exitToLeft 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
+                exitToRight: 'exitToRight 300ms cubic-bezier(0.83, 0, 0.17, 1) both',
 
                 heightIn: 'heightIn 200ms ease both',
                 crawl: 'crawl 2s ease-in-out infinite',
@@ -474,18 +473,18 @@ const config: Config = {
                 },
                 enterFromRight: {
                     from: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
                 },
                 enterFromLeft: {
                     from: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
-                    to: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    to: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
                 },
                 exitToRight: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
                     to: { opacity: '0', transform: 'translateX(50%)', display: 'none' },
                 },
                 exitToLeft: {
-                    from: { opacity: '1', transform: 'translateX(0)', display: 'block' },
+                    from: { opacity: '1', transform: 'translateX(0)', display: 'inherit' },
                     to: { opacity: '0', transform: 'translateX(-50%)', display: 'none' },
                 },
                 scaleIn: {
@@ -546,6 +545,22 @@ const config: Config = {
                 '102': '1.02',
                 '104': '1.04',
             },
+            spacing: {
+                text: {
+                    // Spacing dependent on the text size
+                    DEFAULT: '1em',
+                    '1/8': '0.125em',
+                    '1/6': '0.166em',
+                    '1/4': '0.25em',
+                    '1/2': '0.5em',
+                    xs: '0.75em',
+                    sm: '0.875em',
+                    base: '1em',
+                    lg: '1.125em',
+                    xl: '1.25em',
+                    '2xl': '1.5em',
+                },
+            },
         },
         opacity: opacity(),
         screens: {
@@ -576,7 +591,11 @@ const config: Config = {
              * Variant when the Table of Content navigation is open.
              */
             addVariant('navigation-open', 'body.navigation-open &');
-            addVariant('chat-open', 'body:has(.ai-chat:not(.hidden)) &');
+            addVariant('chat-open', 'body:has(.ai-chat[aria-expanded="true"]) &');
+            addVariant(
+                'sheet-open',
+                'html:has(.side-sheet[aria-modal="true"][aria-expanded="true"]) &, &:has(.side-sheet[aria-modal="true"][aria-expanded="true"])'
+            );
 
             /**
              * Variant when a header is displayed.
@@ -671,7 +690,6 @@ const config: Config = {
             });
         }),
         containerQueries,
-        typography,
     ],
 };
 export default config;

@@ -105,11 +105,13 @@ export function SpaceLayout(props: SpaceLayoutProps) {
 
     const withSections = Boolean(visibleSections && visibleSections.list.length > 1);
     const variants = categorizeVariants(context);
+    const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
 
     const withFooter =
         customization.themes.toggeable ||
         customization.footer.copyright ||
         customization.footer.logo ||
+        socialLinks.length > 0 ||
         customization.footer.groups?.length;
 
     return (
@@ -128,7 +130,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:justify-center',
                         CONTAINER_STYLE,
                         'site-width-wide:max-w-screen-4xl',
-                        'hydrated:transition-[max-width] duration-300',
+                        'transition-[max-width] duration-300',
 
                         // Ensure the footer is display below the viewport even if the content is not enough
                         withFooter && [
@@ -141,79 +143,82 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                     <TableOfContents
                         context={context}
                         header={
-                            withTopHeader ? null : (
-                                <div
-                                    className={tcls(
-                                        'hidden',
-                                        'pr-4',
-                                        'mt-2',
-                                        'lg:flex',
-                                        'grow-0',
-                                        'dark:shadow-light/1',
-                                        'text-base/tight',
-                                        'items-center'
-                                    )}
-                                >
-                                    <HeaderLogo context={context} />
-                                    {variants.translations.length > 1 ? (
-                                        <TranslationsDropdown
-                                            context={context}
-                                            siteSpace={
-                                                variants.translations.find(
-                                                    (space) => space.id === siteSpace.id
-                                                ) ?? siteSpace
-                                            }
-                                            siteSpaces={variants.translations}
-                                            className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
-                                        />
-                                    ) : null}
-                                </div>
-                            )
+                            <div
+                                className={tcls(
+                                    'pr-4',
+                                    'flex',
+                                    withTopHeader ? 'lg:hidden' : '',
+                                    'grow-0',
+                                    'dark:shadow-light/1',
+                                    'text-base/tight',
+                                    'items-center'
+                                )}
+                            >
+                                <HeaderLogo context={context} />
+                                {variants.translations.length > 1 ? (
+                                    <TranslationsDropdown
+                                        context={context}
+                                        siteSpace={
+                                            variants.translations.find(
+                                                (space) => space.id === siteSpace.id
+                                            ) ?? siteSpace
+                                        }
+                                        siteSpaces={variants.translations}
+                                        className="[&_.button-leading-icon]:block! ml-auto py-2 [&_.button-content]:hidden"
+                                    />
+                                ) : null}
+                            </div>
                         }
                         // Displays the search button and/or the space dropdown in the ToC
                         // according to the header/variant settings.
                         // E.g if there is no header, the search button will be displayed in the ToC.
                         innerHeader={
-                            <>
-                                {!withTopHeader && (
-                                    <div className="flex gap-2">
-                                        <SearchContainer
-                                            style={CustomizationSearchStyle.Subtle}
-                                            withVariants={variants.generic.length > 1}
-                                            withSiteVariants={
-                                                visibleSections?.list.some(
-                                                    (s) =>
-                                                        s.object === 'site-section' &&
-                                                        s.siteSpaces.length > 1
-                                                ) ?? false
-                                            }
-                                            withSections={withSections}
-                                            section={visibleSections?.current}
-                                            siteSpace={siteSpace}
-                                            siteSpaces={visibleSiteSpaces}
-                                            className="max-lg:hidden"
-                                            viewport="desktop"
+                            !withTopHeader || variants.generic.length > 1 ? (
+                                <div
+                                    className={tcls(
+                                        'my-5 sidebar-default:mt-2 flex flex-col gap-2 px-5 empty:hidden',
+                                        variants.generic.length > 1 ? '' : 'max-lg:hidden'
+                                    )}
+                                >
+                                    {!withTopHeader && (
+                                        <div className="flex gap-2 max-lg:hidden">
+                                            <SearchContainer
+                                                style={CustomizationSearchStyle.Subtle}
+                                                withVariants={variants.generic.length > 1}
+                                                withSiteVariants={
+                                                    visibleSections?.list.some(
+                                                        (s) =>
+                                                            s.object === 'site-section' &&
+                                                            s.siteSpaces.length > 1
+                                                    ) ?? false
+                                                }
+                                                withSections={withSections}
+                                                section={visibleSections?.current}
+                                                siteSpace={siteSpace}
+                                                siteSpaces={visibleSiteSpaces}
+                                                viewport="desktop"
+                                            />
+                                        </div>
+                                    )}
+                                    {!withTopHeader && withSections && visibleSections && (
+                                        <SiteSectionList
+                                            className="hidden lg:block"
+                                            sections={encodeClientSiteSections(
+                                                context,
+                                                visibleSections
+                                            )}
                                         />
-                                    </div>
-                                )}
-                                {!withTopHeader && withSections && visibleSections && (
-                                    <SiteSectionList
-                                        className={tcls('hidden', 'lg:block')}
-                                        sections={encodeClientSiteSections(
-                                            context,
-                                            visibleSections
-                                        )}
-                                    />
-                                )}
-                                {variants.generic.length > 1 ? (
-                                    <SpacesDropdown
-                                        context={context}
-                                        siteSpace={siteSpace}
-                                        siteSpaces={variants.generic}
-                                        className="w-full px-3 py-2"
-                                    />
-                                ) : null}
-                            </>
+                                    )}
+                                    {variants.generic.length > 1 ? (
+                                        <SpacesDropdown
+                                            context={context}
+                                            siteSpace={siteSpace}
+                                            siteSpaces={variants.generic}
+                                            className="w-full px-3"
+                                        />
+                                    ) : null}
+                                </div>
+                            ) : null
                         }
                     />
                     {children}

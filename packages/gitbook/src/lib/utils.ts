@@ -76,6 +76,7 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             url: 'https://www.gitbook.com/privacy',
         },
         socialPreview: {},
+        socialAccounts: [],
     };
 }
 

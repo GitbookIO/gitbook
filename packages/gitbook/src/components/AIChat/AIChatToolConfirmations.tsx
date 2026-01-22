@@ -37,13 +37,14 @@ export function AIChatToolConfirmations(props: {
                     style={{ animationDelay: `${0.5 + index * 0.1}s` }}
                 >
                     <Button
+                        data-testid="ai-chat-tool-confirmation"
                         onClick={() => {
                             tool.confirm();
                         }}
                         tabIndex={index}
                         label={tool.label}
                         className="w-full justify-center"
-                        size={index === 0 ? 'default' : 'medium'}
+                        size={index === 0 ? 'medium' : 'small'}
                         variant={index === 0 ? 'primary' : 'secondary'}
                         icon={tool.icon}
                     />

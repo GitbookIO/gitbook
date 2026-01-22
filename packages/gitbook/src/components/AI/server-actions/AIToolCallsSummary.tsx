@@ -39,7 +39,10 @@ function ToolCallSummary(props: { toolCall: AIToolCall; context: GitBookSiteCont
     const { toolCall, context } = props;
 
     return (
-        <div className="mt-2 flex origin-top-left animate-blur-in-slow items-start gap-2 text-sm text-tint-subtle">
+        <div
+            data-testid="ai-chat-tool-summary"
+            className="mt-2 flex origin-top-left animate-blur-in-slow items-start gap-2 text-sm text-tint-subtle"
+        >
             <Icon
                 icon={getIconForToolCall(toolCall)}
                 className="mt-1 size-3 shrink-0 text-tint-subtle/8"
