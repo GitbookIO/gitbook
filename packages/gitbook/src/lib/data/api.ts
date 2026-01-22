@@ -10,6 +10,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { cache } from '../cache';
+import { isRollout } from '../rollout';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
@@ -94,6 +95,13 @@ export function createDataFetcher(
             });
         },
         getRevisionPageDocument(params) {
+            if (isRollout({ discriminator: params.spaceId, percentageRollout: 10 })) {
+                return getRevisionPageDocumentV2(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                });
+            }
             return getRevisionPageDocument(input, {
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
