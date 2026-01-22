@@ -37,7 +37,7 @@ export function OpenAPIMediaTypeContent(props: {
         return null;
     }
 
-    const examples = item?.examples;
+    const examples = item.examples;
 
     if (!examples || !examples.length) {
         return null;
