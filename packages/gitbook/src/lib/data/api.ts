@@ -51,11 +51,19 @@ export function createDataFetcher(
         // API that are tied to the token
         //
         getPublishedContentSite(params) {
-            return getPublishedContentSite(input, {
-                organizationId: params.organizationId,
-                siteId: params.siteId,
-                siteShareKey: params.siteShareKey,
-            });
+            return getPublishedContentSite(
+                input,
+                {
+                    organizationId: params.organizationId,
+                    siteId: params.siteId,
+                    siteShareKey: params.siteShareKey,
+                },
+                // This api version is used to invalidate cache when we do breaking changes to the API client.
+                // Something not backward compatible like changing the shape of the data returned by the API.
+                // We should bump this version when we do breaking changes to this specific endpoint returned data.
+                // DO NOT BUMP IT for other non-breaking changes.
+                '0.158'
+            );
         },
         getSiteRedirectBySource(params) {
             return getSiteRedirectBySource(input, {
@@ -535,7 +543,8 @@ const getLatestOpenAPISpecVersionContent = cache(
 const getPublishedContentSite = cache(
     async (
         input: DataFetcherInput,
-        params: { organizationId: string; siteId: string; siteShareKey: string | undefined }
+        params: { organizationId: string; siteId: string; siteShareKey: string | undefined },
+        _apiVersion: string
     ) => {
         'use cache';
         cacheTag(
