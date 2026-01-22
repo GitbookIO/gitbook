@@ -31,9 +31,15 @@ export function OpenAPIMediaTypeContent(props: {
     const { stateKey, items, selectIcon, context } = props;
     const state = useMediaTypesState(stateKey, items[0]?.key);
 
-    const examples = items.find((item) => item.key === state.key)?.examples ?? [];
+    const item = items.find((item) => item.key === state.key) ?? items[0];
 
-    if (!items.length && !examples.length) {
+    if (!item) {
+        return null;
+    }
+
+    const examples = item?.examples;
+
+    if (!examples || !examples.length) {
         return null;
     }
 
