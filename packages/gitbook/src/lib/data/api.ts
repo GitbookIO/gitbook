@@ -406,7 +406,7 @@ const getRevisionPageDocumentV2 = cache(
                         params.pageId,
                         {
                             evaluated: 'deterministic-only',
-                            dereferenced: true,
+                            dereferenced: 'reusable-contents',
                         },
                         {
                             ...noCacheFetchOptions,
