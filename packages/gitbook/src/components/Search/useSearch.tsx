@@ -7,7 +7,7 @@ import {
     parseAsStringLiteral,
     useQueryStates,
 } from 'nuqs';
-import React, { useState } from 'react';
+import React from 'react';
 import type { LinkProps } from '../primitives';
 
 export type SearchScope =
@@ -69,15 +69,6 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         history: 'replace',
     });
 
-    const [initialRawState] = useState(rawState);
-
-    React.useEffect(() => {
-        const normalized = normalizeRawState(initialRawState);
-        if (normalized !== initialRawState) {
-            setRawState(normalized);
-        }
-    }, [initialRawState, setRawState]);
-
     // Local UI state for the popover open/close (not in URL)
     const [open, setIsOpen] = React.useState(() => normalizeRawState(rawState).q !== null);
 
@@ -87,9 +78,9 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
             return null;
         }
         return {
-            query: rawState.q,
-            ask: rawState.ask,
-            scope: rawState.scope,
+            query: normalized.q,
+            ask: normalized.ask,
+            scope: normalized.scope,
             open,
         };
     }, [rawState, open]);
