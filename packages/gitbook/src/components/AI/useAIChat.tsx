@@ -13,7 +13,7 @@ import type { IconName } from '@gitbook/icons';
 import * as React from 'react';
 import { useTrackEvent } from '../Insights';
 import { integrationsAssistantTools } from '../Integrations';
-import { useSearch } from '../Search';
+import { useSetSearchState } from '../Search';
 import { type RenderAIMessageOptions, streamAIChatResponse } from './server-actions';
 import { useAIMessageContextRef } from './useAIMessageContext';
 
@@ -163,7 +163,7 @@ export function AIChatProvider(props: {
 
     const messageContextRef = useAIMessageContextRef();
     const trackEvent = useTrackEvent();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
     const language = useLanguage();
 
     // Event listeners storage

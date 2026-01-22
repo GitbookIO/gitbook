@@ -16,7 +16,7 @@ import { SearchAskProvider } from './SearchAskContext';
 import { SearchInput } from './SearchInput';
 import { SearchResults, type SearchResultsRef } from './SearchResults';
 import { SearchScopeControl } from './SearchScopeControl';
-import { useSearch } from './useSearch';
+import { useSearchState, useSetSearchState } from './useSearch';
 import { useSearchResults } from './useSearchResults';
 import { useSearchResultsCursor } from './useSearchResultsCursor';
 
@@ -60,7 +60,8 @@ export function SearchContainer({
 }: SearchContainerProps) {
     const { assistants, config } = useAI();
 
-    const [state, setSearchState] = useSearch();
+    const state = useSearchState();
+    const setSearchState = useSetSearchState();
     const searchAsk = useSearchAskState();
     const router = useRouter();
     const trackEvent = useTrackEvent();
@@ -82,7 +83,7 @@ export function SearchContainer({
         initialRef.current = true;
 
         // For simplicity we're only triggering the first assistant
-        assistants[0]?.open(state?.ask ?? undefined);
+        assistants[0]?.open(state.ask ?? undefined);
     }, [state?.ask, assistants.length, assistants[0]?.open]);
 
     const onClose = React.useCallback(
