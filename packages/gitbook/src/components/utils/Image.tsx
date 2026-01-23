@@ -33,7 +33,7 @@ export type ImageResponsiveSize = {
     width: number;
 };
 
-const MAX_DPR = 4;
+const MAX_DPR = 3;
 
 interface ImageCommonProps {
     /**
