@@ -41,19 +41,21 @@ export async function getImageSize(
     }
 }
 
+export type CloudflareResizeImageOptions = CloudflareImageOptions & {
+    signal?: AbortSignal;
+    /**
+     * Bypass the check to see if the image can be resized.
+     * This is useful for some format that are not supported by @next/og and need to be transformed
+     */
+    bypassSkipCheck?: boolean;
+};
+
 /**
  * Execute a Cloudflare Image Resize operation on an image.
  */
 export async function resizeImage(
     input: string,
-    options: CloudflareImageOptions & {
-        signal?: AbortSignal;
-        /**
-         * Bypass the check to see if the image can be resized.
-         * This is useful for some format that are not supported by @next/og and need to be transformed
-         */
-        bypassSkipCheck?: boolean;
-    }
+    options: CloudflareResizeImageOptions
 ): Promise<Response> {
     const action = checkIsSizableImageURL(input);
     if (action === SizableImageAction.Skip && !options.bypassSkipCheck) {

@@ -9,6 +9,7 @@ import {
     resizeImage,
     verifyImageSignature,
 } from '@/lib/images';
+import type { CloudflareResizeImageOptions } from '@/lib/images/resizer';
 import { NextResponse } from 'next/server';
 
 const FORMATS = [
@@ -83,10 +84,12 @@ export async function serveResizedImage(
         return NextResponse.redirect(url, 302);
     }
 
+    const defaultFormat = getOriginalFormatFromURL(url);
+
     // Cloudflare-specific options are in the cf object.
     const options: CloudflareImageOptions = {
         fit: 'scale-down',
-        format: 'jpeg',
+        format: defaultFormat,
         quality: 100,
     };
 
@@ -130,18 +133,48 @@ export async function serveResizedImage(
         }
     }
 
+    return resizeImageWithFallback(url, options, defaultFormat);
+}
+
+/**
+ * Try to resize the image in an optimized format.
+ * If not possible, fallback to a default format.
+ */
+async function resizeImageWithFallback(
+    url: string,
+    options: CloudflareResizeImageOptions,
+    formatFallback: 'jpeg' | 'png'
+) {
     try {
         const response = await resizeImage(url, options);
         if (!response.ok) {
             throw new Error(`Failed to resize image, received status code ${response.status}`);
         }
-
         return response;
     } catch (error) {
+        if (options.format !== formatFallback) {
+            return resizeImageWithFallback(
+                url,
+                { ...options, format: formatFallback },
+                formatFallback
+            );
+        }
+
         // Redirect to the original image if resizing fails
         console.warn('Error while resizing image, redirecting to original', error);
         return NextResponse.redirect(url, 302);
     }
+}
+
+/**
+ * Get the original format from URL.
+ */
+function getOriginalFormatFromURL(url: string) {
+    const urlObj = new URL(url);
+    if (urlObj.pathname.endsWith('.png')) {
+        return 'png';
+    }
+    return 'jpeg';
 }
 
 /**
