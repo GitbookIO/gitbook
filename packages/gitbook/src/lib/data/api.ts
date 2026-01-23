@@ -10,6 +10,7 @@ import { getCacheTag, getComputedContentSourceCacheTags } from '@gitbook/cache-t
 import { parse as parseCacheControl } from '@tusbar/cache-control';
 import { unstable_cacheLife as cacheLife, unstable_cacheTag as cacheTag } from 'next/cache';
 import { cache } from '../cache';
+import { isRollout } from '../rollout';
 import { DataFetcherError, wrapCacheDataFetcherError } from './errors';
 import type { GitBookDataFetcher } from './types';
 
@@ -94,6 +95,16 @@ export function createDataFetcher(
             });
         },
         getRevisionPageDocument(params) {
+            if (
+                ['lit7E3qYkBZs0ttOdClR'].includes(params.spaceId) ||
+                isRollout({ discriminator: params.spaceId, percentageRollout: 10 })
+            ) {
+                return getRevisionPageDocumentV2(input, {
+                    spaceId: params.spaceId,
+                    revisionId: params.revisionId,
+                    pageId: params.pageId,
+                });
+            }
             return getRevisionPageDocument(input, {
                 spaceId: params.spaceId,
                 revisionId: params.revisionId,
@@ -361,6 +372,44 @@ const getRevisionPageDocument = cache(
                         params.pageId,
                         {
                             evaluated: 'deterministic-only',
+                        },
+                        {
+                            ...noCacheFetchOptions,
+                        }
+                    );
+
+                    cacheTag(...getCacheTagsFromResponse(res));
+                    cacheLifeFromResponse(res, 'max');
+
+                    return res.data;
+                }
+            );
+        });
+    }
+);
+
+/**
+ * Get the document for a page.
+ * Compared to the v1 of `getRevisionPageDocument`, it dereferences the reusable content blocks.
+ */
+const getRevisionPageDocumentV2 = cache(
+    async (
+        input: DataFetcherInput,
+        params: { spaceId: string; revisionId: string; pageId: string }
+    ) => {
+        'use cache';
+        return wrapCacheDataFetcherError(async () => {
+            return trace(
+                `getRevisionPageDocument(${params.spaceId}, ${params.revisionId}, ${params.pageId})`,
+                async () => {
+                    const api = apiClient(input);
+                    const res = await api.spaces.getPageDocumentInRevisionById(
+                        params.spaceId,
+                        params.revisionId,
+                        params.pageId,
+                        {
+                            evaluated: 'deterministic-only',
+                            dereferenced: 'reusable-contents',
                         },
                         {
                             ...noCacheFetchOptions,

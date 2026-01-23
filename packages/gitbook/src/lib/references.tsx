@@ -13,6 +13,7 @@ import {
 import { type GitBookLinker, createLinker, linkerWithAbsoluteURLs } from '@/lib/links';
 import type {
     ContentRef,
+    JSONDocument,
     RevisionFile,
     RevisionPageDocument,
     RevisionReusableContent,
@@ -78,6 +79,42 @@ export interface ResolveContentRefOptions {
 }
 
 /**
+ * Resolve a content reference from within a document.
+ * It wraps the normal resolution of content refs, to handle parts of the document
+ * that have been composed of reusable blocks from spaces outside the current site,
+ * and leverage the meta token to resolve them.
+ */
+export async function resolveContentRefInDocument(
+    document: JSONDocument,
+    contentRef: ContentRef,
+    context: GitBookAnyContext,
+    options: ResolveContentRefOptions = {}
+): Promise<ResolvedContentRef | null> {
+    if (isContentRefInDifferentSpace(contentRef, context)) {
+        const withinSite = !!getBestTargetSpaceFromSite(context, contentRef.space);
+        if (!withinSite) {
+            // When the content ref points to some content outside the current site,
+            // we use the potentially provided token to resolve the content ref in the target space.
+            // This is the case when the document is composed of reusable blocks from spaces outside the current site.
+            const token = document.meta?.token;
+            if (token) {
+                const dataFetch = context.dataFetcher.withToken({ apiToken: token });
+                return resolveContentRef(
+                    contentRef,
+                    {
+                        ...context,
+                        dataFetcher: dataFetch,
+                    },
+                    options
+                );
+            }
+        }
+    }
+
+    return resolveContentRef(contentRef, context, options);
+}
+
+/**
  * Resolve a content reference to be rendered.
  */
 export async function resolveContentRef(
@@ -115,7 +152,7 @@ export async function resolveContentRef(
 
         case 'anchor':
         case 'page': {
-            if (contentRef.space && contentRef.space !== space.id) {
+            if (isContentRefInDifferentSpace(contentRef, context)) {
                 return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
             }
 
@@ -196,13 +233,12 @@ export async function resolveContentRef(
         }
 
         case 'space': {
-            const targetSpace =
-                contentRef.space === context.space.id
-                    ? {
-                          space: context.space,
-                          siteSpace: 'siteSpace' in context ? context.siteSpace : null,
-                      }
-                    : await getBestTargetSpace(context, contentRef.space);
+            const targetSpace = !isContentRefInDifferentSpace(contentRef, context)
+                ? {
+                      space: context.space,
+                      siteSpace: 'siteSpace' in context ? context.siteSpace : null,
+                  }
+                : await getBestTargetSpace(context, contentRef.space);
 
             if (!targetSpace) {
                 return null;
@@ -238,11 +274,12 @@ export async function resolveContentRef(
             };
         }
 
+        // TODO-DEREF: Remove this once we have rolled out the new reusable content deref in the API.
         case 'reusable-content': {
             // Figure out which space and revision the reusable content is in.
             const container = await (async () => {
                 // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
-                if (!contentRef.space || contentRef.space === context.space.id) {
+                if (!isContentRefInDifferentSpace(contentRef, context)) {
                     return context;
                 }
 
@@ -307,6 +344,16 @@ export async function resolveContentRef(
 }
 
 /**
+ * Return true if a content ref points to another space than the current one.
+ */
+export function isContentRefInDifferentSpace<Ref extends ContentRef>(
+    contentRef: Ref,
+    context: GitBookAnyContext
+): contentRef is Ref & { space: string } {
+    return 'space' in contentRef && !!contentRef.space && contentRef.space !== context.space.id;
+}
+
+/**
  * Fallback to resolve a content ref.
  * Called if we can't resolve the content ref to have a potential fallback to display to the
  * user instead of not found.
@@ -330,20 +377,14 @@ async function getBestTargetSpace(
     context: GitBookAnyContext,
     spaceId: string
 ): Promise<{ space: Space; siteSpace: SiteSpace | null } | undefined> {
-    const { dataFetcher } = context;
-
     // In the context of sites, we try to find our target space in the site structure.
     // because the url of this space will be in the same site.
-    if ('site' in context) {
-        const found = findSiteSpaceBy(
-            context.structure,
-            (siteSpace) => siteSpace.space.id === spaceId
-        );
-        if (found) {
-            return { space: found.siteSpace.space, siteSpace: found.siteSpace };
-        }
+    const inSite = getBestTargetSpaceFromSite(context, spaceId);
+    if (inSite) {
+        return inSite;
     }
 
+    const { dataFetcher } = context;
     const fetchedSpace = await getDataOrNull(
         dataFetcher.getSpace({
             spaceId,
@@ -354,6 +395,26 @@ async function getBestTargetSpace(
 
     // Else we try return the fetched space from the API.
     return fetchedSpace ? { space: fetchedSpace, siteSpace: null } : undefined;
+}
+
+/**
+ * Find the best target space for a content ref, from the current site.
+ */
+function getBestTargetSpaceFromSite(
+    context: GitBookAnyContext,
+    spaceId: string
+): { space: Space; siteSpace: SiteSpace | null } | undefined {
+    if ('site' in context) {
+        const found = findSiteSpaceBy(
+            context.structure,
+            (siteSpace) => siteSpace.space.id === spaceId
+        );
+        if (found) {
+            return { space: found.siteSpace.space, siteSpace: found.siteSpace };
+        }
+    }
+
+    return undefined;
 }
 
 async function resolveContentRefInSpace(

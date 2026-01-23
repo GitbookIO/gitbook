@@ -4,8 +4,8 @@ import { getSpaceLanguage, tString } from '@/intl/server';
 import { type TranslationLanguage, languages } from '@/intl/translations';
 import {
     type ResolvedContentRef,
-    resolveContentRef,
     resolveContentRefFallback,
+    resolveContentRefInDocument,
 } from '@/lib/references';
 import { Icon } from '@gitbook/icons';
 import { StyledLink } from '../../primitives';
@@ -15,10 +15,10 @@ import { NotFoundRefHoverCard } from '../NotFoundRefHoverCard';
 import { InlineLinkTooltip } from './InlineLinkTooltip';
 
 export async function InlineLink(props: InlineProps<DocumentInlineLink>) {
-    const { inline, document, context, ancestorInlines } = props;
+    const { document, inline, context, ancestorInlines } = props;
 
     const resolved = context.contentContext
-        ? await resolveContentRef(inline.data.ref, context.contentContext, {
+        ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext, {
               // We don't want to resolve the anchor text here, as it can be very expensive and will block rendering if there is a lot of anchors link.
               resolveAnchorText: false,
           })
