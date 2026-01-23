@@ -1,6 +1,6 @@
 'use client';
 
-import { isCookiesTrackingDisabled, setCookiesTracking } from '@/components/Insights';
+import { setCookiesTracking } from '@/components/Insights';
 import type {
     GitBookGlobal,
     GitBookIntegrationEvent,
@@ -45,9 +45,6 @@ export const customCookieBannerStore = zustand.createStore<CustomCookieBannerSto
         hasCustomCookieBanner: false,
     };
 });
-
-// Track if we've already invoked a cookie banner handler on this page load
-let hasInvokedCookieBanner = false;
 
 if (typeof window !== 'undefined') {
     const gitbookGlobal: GitBookGlobal = {
@@ -94,12 +91,6 @@ if (typeof window !== 'undefined') {
                 hasCustomCookieBanner: true,
             }));
 
-            // Only invoke the handler once per page load and if the cookie preference hasn't been set yet
-            if (hasInvokedCookieBanner || isCookiesTrackingDisabled() !== undefined) {
-                return;
-            }
-
-            hasInvokedCookieBanner = true;
             handler({
                 onApprove: () => {
                     setCookiesTracking(true);
@@ -139,17 +130,14 @@ export function useCustomCookieBanner(): CustomCookieBannerStore {
 /**
  * Dispatch the `load` event to all integrations.
  */
-export function LoadIntegrations(props: { scripts?: Array<{ script: string }> }) {
-    const { scripts = [] } = props;
-    const hasScripts = scripts.length > 0;
+export function LoadIntegrations() {
     React.useEffect(() => {
         // Only dispatch 'load' event when there are scripts to load
-        if (hasScripts) {
-            dispatchGitBookIntegrationEvent('load');
-        }
+
+        dispatchGitBookIntegrationEvent('load');
 
         integrationsStore.setState({ loaded: true });
-    }, [hasScripts]);
+    }, []);
     return null;
 }
 

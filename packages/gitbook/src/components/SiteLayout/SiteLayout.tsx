@@ -68,7 +68,7 @@ export async function SiteLayout(props: {
                 </SpaceLayout>
             </AIContextProvider>
 
-            <LoadIntegrations scripts={scripts} />
+            <LoadIntegrations />
             {scripts.length > 0
                 ? scripts.map(({ script }) => <script key={script} async src={script} />)
                 : null}
