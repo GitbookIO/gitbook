@@ -1,7 +1,7 @@
 'use client';
 import { tString, useLanguage } from '@/intl/client';
 import { useAI, useAIChatController, useAIChatState } from '../AI';
-import { useSearch } from '../Search';
+import { useSetSearchState } from '../Search';
 import { Button, type ButtonProps, Input } from '../primitives';
 
 export function InlineActionButton(
@@ -12,7 +12,7 @@ export function InlineActionButton(
     const { assistants } = useAI();
     const chatController = useAIChatController();
     const chatState = useAIChatState();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
     const language = useLanguage();
 
     const handleSubmit = (value: string) => {

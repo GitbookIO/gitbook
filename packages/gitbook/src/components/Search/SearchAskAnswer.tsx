@@ -14,7 +14,7 @@ import { useTrackEvent } from '../Insights';
 import { Button, Link } from '../primitives';
 import { useSearchAskContext } from './SearchAskContext';
 import { type AskAnswerResult, type AskAnswerSource, streamAskQuestion } from './server-actions';
-import { useSearch, useSearchLink } from './useSearch';
+import { useSearchLink, useSetSearchState } from './useSearch';
 
 export type SearchAskState =
     | {
@@ -130,7 +130,7 @@ function TransitionAnswerBody(props: {
     }, [answer]);
 
     const language = useLanguage();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
 
     return display ? (
         <div className={tcls('flex w-full flex-col gap-4')}>

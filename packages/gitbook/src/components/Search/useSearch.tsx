@@ -1,6 +1,12 @@
 'use client';
 
-import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
+import {
+    type Values,
+    parseAsBoolean,
+    parseAsString,
+    parseAsStringLiteral,
+    useQueryStates,
+} from 'nuqs';
 import React from 'react';
 import type { LinkProps } from '../primitives';
 
@@ -36,13 +42,24 @@ export type UpdateSearchState = (
     update: React.SetStateAction<SearchState | null>
 ) => Promise<URLSearchParams>;
 
+const SetSearchStateContext = React.createContext<UpdateSearchState | undefined>(undefined);
+const SearchStateContext = React.createContext<SearchState | null | undefined>(undefined);
+
 /**
- * Context to share the search state updater so all consumers use the same instance.
+ * Normalize the raw state to handle legacy formats.
  */
-export const SearchContext = React.createContext<{
-    state: SearchState | null;
-    setState: UpdateSearchState;
-} | null>(null);
+function normalizeRawState(values: Values<typeof keyMap>) {
+    // Convert legacy format: q=query&ask=true -> ask=query&q=null
+    if (values.ask === 'true' && values.q) {
+        return { ...values, q: null, ask: values.q };
+    }
+    // Handle legacy global=true
+    if (values.global === true) {
+        return { ...values, scope: 'all' as const, global: null };
+    }
+
+    return values;
+}
 
 export function SearchContextProvider(props: React.PropsWithChildren): React.ReactElement {
     const { children } = props;
@@ -52,38 +69,18 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         history: 'replace',
     });
 
-    React.useEffect(() => {
-        // Handle legacy ask=true format by converting it to the new format
-        if (rawState?.ask === 'true' && rawState?.q) {
-            // Convert legacy format: q=query&ask=true -> ask=query&q=null
-            setRawState({
-                q: null,
-                ask: rawState.q,
-            });
-        }
-
-        // Handle legacy global=true
-        if (rawState?.global === true) {
-            setRawState({
-                scope: 'all',
-                global: null, // Remove the legacy parameter
-            });
-        }
-    }, [rawState, setRawState]);
-
     // Local UI state for the popover open/close (not in URL)
-    const [open, setIsOpen] = React.useState(() => {
-        return rawState?.q !== null;
-    });
+    const [open, setIsOpen] = React.useState(() => normalizeRawState(rawState).q !== null);
 
     const state = React.useMemo<SearchState | null>(() => {
-        if (rawState === null || (rawState.q === null && rawState.ask === null)) {
+        const normalized = normalizeRawState(rawState);
+        if (normalized.q === null && normalized.ask === null) {
             return null;
         }
         return {
-            query: rawState.q,
-            ask: rawState.ask,
-            scope: rawState.scope,
+            query: normalized.q,
+            ask: normalized.ask,
+            scope: normalized.scope,
             open,
         };
     }, [rawState, open]);
@@ -116,18 +113,29 @@ export function SearchContextProvider(props: React.PropsWithChildren): React.Rea
         [setRawState]
     );
 
-    return <SearchContext.Provider value={{ state, setState }}>{children}</SearchContext.Provider>;
+    return (
+        <SearchStateContext.Provider value={state}>
+            <SetSearchStateContext.Provider value={setState}>
+                {children}
+            </SetSearchStateContext.Provider>
+        </SearchStateContext.Provider>
+    );
 }
 
-/**
- * Hook to access the current search query and update it.
- */
-export function useSearch(): [SearchState | null, UpdateSearchState] {
-    const ctx = React.useContext(SearchContext);
-    if (!ctx) {
-        throw new Error('useSearch must be used within SearchContextProvider');
+export function useSetSearchState() {
+    const setState = React.useContext(SetSearchStateContext);
+    if (setState === undefined) {
+        throw new Error('useSetSearchState must be used within SearchContextProvider');
     }
-    return [ctx.state, ctx.setState];
+    return setState;
+}
+
+export function useSearchState() {
+    const state = React.useContext(SearchStateContext);
+    if (state === undefined) {
+        throw new Error('useSearchState must be used within SearchContextProvider');
+    }
+    return state;
 }
 
 /**
@@ -137,7 +145,7 @@ export function useSearchLink(): (
     params: Partial<SearchState>,
     callback?: () => void
 ) => LinkProps {
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
 
     return React.useCallback(
         (params, callback) => {
