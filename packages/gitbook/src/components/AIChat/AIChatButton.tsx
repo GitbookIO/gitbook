@@ -27,7 +27,8 @@ export function AIChatButton(props: {
             iconOnly={!showLabel || isMobile}
             size="medium"
             variant="header"
-            label={
+            ariaLabel={t(language, 'ai_chat_ask', assistant.label)} // Explicit accessible name string
+            label={ // This 'label' prop is now primarily for the Tooltip content
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', assistant.label)}
                     {withShortcut ? (
