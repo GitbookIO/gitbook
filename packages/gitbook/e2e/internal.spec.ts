@@ -1129,7 +1129,7 @@ const testCases: TestsCase[] = [
         tests: [
             {
                 name: 'All cases',
-                url: '/',
+                url: '',
             },
         ],
     },
