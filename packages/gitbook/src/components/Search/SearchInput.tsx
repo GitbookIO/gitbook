@@ -68,9 +68,7 @@ export const SearchInput = React.forwardRef<HTMLDivElement, SearchInputProps>(
                             className="size-text-lg shrink-0 text-tint theme-bold:text-header-link/8"
                         />
                     }
-                    onChange={(event) => {
-                        onChange(event.target.value);
-                    }}
+                    onValueChange={onChange}
                     value={value}
                     maxLength={512}
                     autoComplete="off"
