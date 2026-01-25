@@ -47,7 +47,7 @@ function parseServerURL(url: string) {
 }
 
 /**
- * Check if any server has a valid host (URL starts with http:// or https://).
+ * Check if any server has a host that can be used in an HTTP request.
  * This is used to determine if the "Try it" button should be shown.
  */
 export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
@@ -57,13 +57,12 @@ export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
 
     return servers.some((server) => {
         const url = interpolateServerURL(server);
-        // Check if URL starts with http:// or https:// (has a valid host)
         return isValidServerURL(url);
     });
 }
 
 /**
- * Check if the server URL is valid (starts with http:// or https://, or is a valid domain).
+ * Check if the server URL is valid for making direct HTTP requests.
  */
 export function isValidServerURL(url: string): boolean {
     // Check if URL starts with http:// or https://

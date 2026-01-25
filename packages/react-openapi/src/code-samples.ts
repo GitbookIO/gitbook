@@ -70,9 +70,9 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             const bodyString = body ? `\n${body}` : '';
 
-            // Only include Host header if origin has a valid host (starts with http:// or https://)
+            // Only include Host header if origin is considered a valid server URL
             const hasValidHost = isValidServerURL(origin);
-            const hostLine = hasValidHost ? `Host: ${origin.replaceAll(/https*:\/\//g, '')}\n` : '';
+            const hostLine = hasValidHost ? `Host: ${origin.replaceAll(/https?:\/\//g, '')}\n` : '';
 
             const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
 ${hostLine}${headerString}${bodyString}`;

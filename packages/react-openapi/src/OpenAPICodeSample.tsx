@@ -216,7 +216,7 @@ function OpenAPICodeSampleFooter(props: {
     const hasMultipleMediaTypes =
         renderers.length > 1 || renderers.some((renderer) => renderer.examples.length > 0);
 
-    // Check if any server has a valid host (http:// or https://) - performant early check
+    // Check if any server has a host that can be used in an HTTP request
     const hasValidHost = hasValidServerHost(servers);
 
     if (hideTryItPanel && !hasMultipleMediaTypes) {
