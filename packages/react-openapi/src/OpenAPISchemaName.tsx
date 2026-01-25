@@ -82,8 +82,11 @@ function getAdditionalItems(schema: OpenAPIV3.SchemaObject, context: OpenAPIClie
         additionalItems += ` · ${tString(context.translation, 'max').toLowerCase()}: ${schema.maximum || schema.maxLength || schema.maxItems}`;
     }
 
-    if (schema.nullable) {
-        additionalItems = ` | ${tString(context.translation, 'nullable').toLowerCase()}`;
+    // Check for nullable in both OpenAPI 3.0 (nullable: true) and OpenAPI 3.1 (type: ['null', ...])
+    const isNullable =
+        schema.nullable || (Array.isArray(schema.type) && schema.type.includes('null'));
+    if (isNullable) {
+        additionalItems = ` · ${tString(context.translation, 'nullable').toLowerCase()}`;
     }
 
     return additionalItems;
