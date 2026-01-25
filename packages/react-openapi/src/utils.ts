@@ -254,7 +254,7 @@ export function getEffectiveArrayType(schema: OpenAPIV3.SchemaObject | OpenAPIV3
 }
 
 export function getSchemaTitle(
-    schema: OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject,
+    schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject,
     options?: { ignoreAlternatives?: boolean }
 ): string {
     // Otherwise try to infer a nice title

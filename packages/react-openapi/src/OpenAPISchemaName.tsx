@@ -86,7 +86,7 @@ function getAdditionalItems(schema: OpenAPIV3.SchemaObject, context: OpenAPIClie
     const isNullable =
         schema.nullable || (Array.isArray(schema.type) && schema.type.includes('null'));
     if (isNullable) {
-        additionalItems = ` · ${tString(context.translation, 'nullable').toLowerCase()}`;
+        additionalItems += ` · ${tString(context.translation, 'nullable').toLowerCase()}`;
     }
 
     return additionalItems;
