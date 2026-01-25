@@ -13,6 +13,7 @@ import {
 } from './contentTypeChecks';
 import { json2xml } from './json2xml';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
+import { isValidServerURL } from './util/server';
 
 export interface CodeSampleInput {
     method: string;
@@ -69,9 +70,12 @@ export const codeSampleGenerators: CodeSampleGenerator[] = [
 
             const bodyString = body ? `\n${body}` : '';
 
+            // Only include Host header if origin has a valid host (starts with http:// or https://)
+            const hasValidHost = isValidServerURL(origin);
+            const hostLine = hasValidHost ? `Host: ${origin.replaceAll(/https*:\/\//g, '')}\n` : '';
+
             const httpRequest = `${method.toUpperCase()} ${decodeURI(path)} HTTP/1.1
-Host: ${origin.replaceAll(/https*:\/\//g, '')}
-${headerString}${bodyString}`;
+${hostLine}${headerString}${bodyString}`;
 
             return httpRequest;
         },

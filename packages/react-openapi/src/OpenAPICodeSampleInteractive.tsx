@@ -18,6 +18,14 @@ export function OpenAPIMediaTypeExamplesSelector(props: {
     const state = useSelectState(stateKey, renderers[0].mediaType);
     const selected = renderers.find((r) => r.mediaType === state.key) || renderers[0];
 
+    const hasMultipleMediaTypes = renderers.length >= 2;
+    const hasMultipleExamples = selected.examples.length >= 2;
+
+    // Only render the wrapper div if at least one selector will render
+    if (!hasMultipleMediaTypes && !hasMultipleExamples) {
+        return null;
+    }
+
     return (
         <div className="openapi-codesample-selectors">
             <MediaTypeSelector selectIcon={selectIcon} stateKey={stateKey} renderers={renderers} />
