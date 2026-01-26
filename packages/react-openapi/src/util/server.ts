@@ -57,14 +57,15 @@ export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
 
     return servers.some((server) => {
         const url = interpolateServerURL(server);
-        return isValidServerURL(url);
+        return isValidServerHost(url);
     });
 }
 
 /**
- * Check if the server URL is valid for making direct HTTP requests.
+ * Check if the server host/URL is valid for making direct HTTP requests.
+ * Accepts both full URLs (with protocol) and hostnames (without protocol).
  */
-export function isValidServerURL(url: string): boolean {
+export function isValidServerHost(url: string): boolean {
     // Check if URL starts with http:// or https://
     if (url.startsWith('http://') || url.startsWith('https://')) {
         return true;
