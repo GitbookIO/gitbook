@@ -2,6 +2,7 @@ import type { OpenAPIV3 } from '@gitbook/openapi-parser';
 import type React from 'react';
 import type { OpenAPIClientContext } from './context';
 import { t, tString } from './translate';
+import { getEffectiveArrayType } from './utils';
 
 interface OpenAPISchemaNameProps {
     schema?: OpenAPIV3.SchemaObject;
@@ -83,8 +84,8 @@ function getAdditionalItems(schema: OpenAPIV3.SchemaObject, context: OpenAPIClie
     }
 
     // Check for nullable in both OpenAPI 3.0 (nullable: true) and OpenAPI 3.1 (type: ['null', ...])
-    const isNullable =
-        schema.nullable || (Array.isArray(schema.type) && schema.type.includes('null'));
+    const schemaArrayInfo = getEffectiveArrayType(schema);
+    const isNullable = schema.nullable || schemaArrayInfo.hasNull;
     if (isNullable) {
         additionalItems += ` · ${tString(context.translation, 'nullable').toLowerCase()}`;
     }
