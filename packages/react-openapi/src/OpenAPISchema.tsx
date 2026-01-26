@@ -664,8 +664,7 @@ function getSchemaProperties(
                 items.type === 'number' ||
                 items.type === 'boolean' ||
                 items.type === 'integer') &&
-            !items.enum &&
-            !Array.isArray(items.type)
+            !items.enum
         ) {
             return null;
         }
