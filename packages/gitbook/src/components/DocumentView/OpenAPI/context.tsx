@@ -42,7 +42,7 @@ export function getOpenAPIContext(args: {
             check: <Icon icon="check" />,
             lock: <Icon icon="lock" />,
         },
-        renderCodeBlock: (codeProps) => <PlainCodeBlock {...codeProps} />,
+        renderCodeBlock: (codeProps) => <PlainCodeBlock {...codeProps} themeKey="openapi" />,
         renderDocument: (documentProps) => (
             <DocumentView
                 document={documentProps.document as JSONDocument}

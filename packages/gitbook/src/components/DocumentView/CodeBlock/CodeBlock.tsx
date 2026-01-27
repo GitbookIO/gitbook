@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import type { DocumentBlockCode } from '@gitbook/api';
+import type { DocumentBlockCode, SiteCustomizationSettings } from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
 
@@ -13,8 +13,12 @@ import { type RenderedInline, getInlines, highlight } from './highlight';
 /**
  * Render a code block, can be client-side or server-side.
  */
-export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
-    const { block, document, style, isEstimatedOffscreen, context } = props;
+export async function CodeBlock(
+    props: BlockProps<DocumentBlockCode> & {
+        themeKey?: keyof SiteCustomizationSettings['styling']['codeTheme'];
+    }
+) {
+    const { block, document, style, isEstimatedOffscreen, context, themeKey = 'default' } = props;
     const inlines = getInlines(block);
 
     let hasInlineExpression = false;
@@ -53,7 +57,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
     // Get code themes from customization
     const themes =
         context.contentContext && 'customization' in context.contentContext
-            ? context.contentContext.customization.styling.codeTheme.default
+            ? context.contentContext.customization.styling.codeTheme[themeKey]
             : undefined;
 
     if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
