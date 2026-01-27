@@ -34,6 +34,7 @@ import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
+import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
@@ -117,6 +118,8 @@ export async function CustomizationRootLayout(props: {
                 {customization.privacyPolicy.url ? (
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
+
+                <OperatingSystemClassScript />
 
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
