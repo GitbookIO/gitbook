@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 
+// This function has to be pure because we do a `.toString()` on it.
 function setOperatingSystemClass() {
     if (typeof navigator === 'undefined') return;
 
