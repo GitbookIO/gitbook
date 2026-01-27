@@ -2,11 +2,10 @@
 
 import * as React from 'react';
 
-const OS_MAC_CLASS = 'os-mac';
-
 function setOperatingSystemClass() {
     if (typeof navigator === 'undefined') return;
 
+    const OS_MAC_CLASS = 'os-mac';
     const platform = navigator.platform.toLowerCase();
     const isMac = platform.includes('mac');
     const root = document.documentElement;
