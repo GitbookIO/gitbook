@@ -89,7 +89,8 @@ export async function serveResizedImage(
     // Cloudflare-specific options are in the cf object.
     const options: CloudflareImageOptions = {
         fit: 'scale-down',
-        format: defaultFormat,
+        // For GIF, we will use webp as default format for resizing.
+        format: defaultFormat === 'gif' ? 'webp' : defaultFormat,
         quality: 100,
     };
 
@@ -133,7 +134,12 @@ export async function serveResizedImage(
         }
     }
 
-    return resizeImageWithFallback(url, options, defaultFormat);
+    return resizeImageWithFallback(
+        url,
+        options,
+        // For GIF, we won't fallback to any format, we will just serve the original
+        defaultFormat === 'gif' ? null : defaultFormat
+    );
 }
 
 /**
@@ -143,7 +149,7 @@ export async function serveResizedImage(
 async function resizeImageWithFallback(
     url: string,
     options: CloudflareResizeImageOptions,
-    formatFallback: 'jpeg' | 'png'
+    formatFallback: 'jpeg' | 'png' | null
 ) {
     try {
         const response = await resizeImage(url, options);
@@ -152,7 +158,7 @@ async function resizeImageWithFallback(
         }
         return response;
     } catch (error) {
-        if (options.format !== formatFallback) {
+        if (formatFallback && options.format !== formatFallback) {
             return resizeImageWithFallback(
                 url,
                 { ...options, format: formatFallback },
@@ -171,7 +177,11 @@ async function resizeImageWithFallback(
  */
 function getOriginalFormatFromURL(url: string) {
     const urlObj = new URL(url);
-    if (urlObj.pathname.endsWith('.png')) {
+    const pathname = urlObj.pathname.toLowerCase();
+    if (pathname.endsWith('.gif')) {
+        return 'gif';
+    }
+    if (pathname.endsWith('.png')) {
         return 'png';
     }
     return 'jpeg';
