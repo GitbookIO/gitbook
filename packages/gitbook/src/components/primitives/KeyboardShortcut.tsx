@@ -2,7 +2,7 @@
 
 import { tcls } from '@/lib/tailwind';
 import { Icon } from '@gitbook/icons';
-import * as React from 'react';
+import type * as React from 'react';
 
 export type KeyboardShortcutProps = {
     keys: string[];
@@ -39,9 +39,7 @@ export function KeyboardShortcut(props: KeyboardShortcutProps) {
                         key={index}
                         className={tcls(
                             'flex h-5 min-w-5 items-center justify-center rounded-md border border-tint-subtle px-1',
-                            key === 'mod'
-                                ? 'text-xs [html.os-mac_&]:text-sm'
-                                : 'uppercase',
+                            key === 'mod' ? 'text-xs [html.os-mac_&]:text-sm' : 'uppercase',
                             className
                         )}
                     >
