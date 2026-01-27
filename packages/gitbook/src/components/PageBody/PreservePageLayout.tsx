@@ -11,9 +11,10 @@ import * as React from 'react';
  * 3. Page 2 with full width block: `body:has(.site-width-wide)` is true
  *
  * This component ensures that the layout is preserved while transitioning between the 2 page states (in step 2).
+ * It also preserves the page TOC state (page-has-toc/page-no-toc) to prevent logo sizing issues during navigation.
  */
-export function PreservePageLayout(props: { siteWidthWide: boolean }) {
-    const { siteWidthWide } = props;
+export function PreservePageLayout(props: { siteWidthWide: boolean; pageHasToc: boolean }) {
+    const { siteWidthWide, pageHasToc } = props;
 
     React.useLayoutEffect(() => {
         // We use the header as it's an element preserved between page transitions
@@ -28,7 +29,15 @@ export function PreservePageLayout(props: { siteWidthWide: boolean }) {
         } else {
             header.classList.remove('site-width-wide');
         }
-    }, [siteWidthWide]);
+
+        if (pageHasToc) {
+            header.classList.add('page-has-toc');
+            header.classList.remove('page-no-toc');
+        } else {
+            header.classList.add('page-no-toc');
+            header.classList.remove('page-has-toc');
+        }
+    }, [siteWidthWide, pageHasToc]);
 
     return null;
 }
