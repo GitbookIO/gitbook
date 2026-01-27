@@ -138,7 +138,7 @@ export async function CustomizationRootLayout(props: {
                         undefined
                     }
                 >{`
-                    :root {
+                    :root, .light, .dark [data-color-scheme$="light"] {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
                         ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
@@ -165,7 +165,7 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('success', successColor.light)}
                     }
 
-                    .dark {
+                    .dark, :not(.dark) [data-color-scheme^="dark"] {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
                         ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}

@@ -50,10 +50,18 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
             return { inline, body };
         });
 
+    // Get code themes from customization
+    const themes =
+        context.contentContext && 'customization' in context.contentContext
+            ? context.contentContext.customization.styling.codeTheme.default
+            : undefined;
+
     if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
         // In v2, we render the code block server-side
-        const lines = await highlight(block, richInlines);
-        return <CodeBlockRenderer block={block} style={style} lines={lines} />;
+        const theme = await highlight(block, richInlines, {
+            themes: themes,
+        });
+        return <CodeBlockRenderer block={block} style={style} theme={theme} />;
     }
 
     const variables = context.contentContext
@@ -74,6 +82,7 @@ export async function CodeBlock(props: BlockProps<DocumentBlockCode>) {
                 inlines={richInlines}
                 inlineExprVariables={variables}
                 mode={context.mode}
+                themes={themes}
             />
         </React.Suspense>
     );
