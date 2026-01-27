@@ -25,7 +25,7 @@ export function SitePageNotFound() {
     useEffect(() => {
         if (fallback) {
             router.replace(basePath);
-        }else if (ask) {
+        } else if (ask) {
             // This is a workaround to prevent an infinite loop when the ask parameter is present.
             // If it is present while we are on a 404 page, Next.js will fetch the RSC of the page again,
             // trigerring the page to rerender and the assistant to start again, causing the infinite loop.

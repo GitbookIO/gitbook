@@ -86,7 +86,6 @@ export function SearchContainer({
         if (isLoaded) {
             assistants[0]?.open(state.ask ?? undefined);
             initialRef.current = true;
-
         }
     }, [state?.ask, assistants.length, assistants[0]?.open, isLoaded]);
 
