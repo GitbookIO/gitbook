@@ -65,6 +65,8 @@ export function PageBody(props: {
             (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
         ).length > 0;
 
+    const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
+
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
             <main
@@ -76,12 +78,10 @@ export function PageBody(props: {
                     '@container',
                     pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
-                    page.layout.tableOfContents && hasVisibleTOCItems
-                        ? 'page-has-toc'
-                        : 'page-no-toc'
+                    pageHasToc ? 'page-has-toc' : 'page-no-toc'
                 )}
             >
-                <PreservePageLayout siteWidthWide={siteWidthWide} />
+                <PreservePageLayout siteWidthWide={siteWidthWide} pageHasToc={pageHasToc} />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
