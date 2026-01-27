@@ -653,18 +653,18 @@ it('should support multiple code tokens in an annotation', async () => {
                                 content: 'hello',
                             },
                         },
-                {
-                    type: 'shiki',
-                    token: {
-                        content: '.',
-                    },
-                },
-                {
-                    type: 'shiki',
-                    token: {
-                        content: 'world',
-                    },
-                },
+                        {
+                            type: 'shiki',
+                            token: {
+                                content: '.',
+                            },
+                        },
+                        {
+                            type: 'shiki',
+                            token: {
+                                content: 'world',
+                            },
+                        },
                         {
                             type: 'shiki',
                             token: {
