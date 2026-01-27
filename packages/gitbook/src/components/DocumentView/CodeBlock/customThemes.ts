@@ -7,31 +7,56 @@ export const customThemes: Record<string, ThemeRegistration> = {
         bg: 'rgb(var(--tint-2))',
         fg: 'rgb(var(--tint-12))',
         colors: {
-            comment: 'rgb(var(--neutral-9))',
-            constant: 'rgb(var(--warning-10))',
-            constantEscape: 'rgb(var(--success-10))',
-            string: 'rgb(var(--success-10))',
-            keyword: 'rgb(var(--danger-10))',
-            keywordOperator: 'rgb(var(--tint-11))',
-            keywordRegexpOperator: 'rgb(var(--primary-10))',
-            keywordRegexpQuantifier: 'rgb(var(--warning-10))',
-            variableLanguage: 'rgb(var(--danger-10))',
-            parameter: 'rgb(var(--warning-10))',
-            variable: 'rgb(var(--tint-12))',
-            function: 'rgb(var(--primary-10))',
-            typeCustom: 'rgb(var(--primary-10))',
-            typePrimitive: 'rgb(var(--warning-10))',
-            typeOther: 'rgb(var(--tint-12))',
-            entityTag: 'rgb(var(--primary-10))',
-            punctuation: 'rgb(var(--tint-11))',
-            link: 'rgb(var(--primary-10))',
-            preprocessor: 'rgb(var(--danger-10))',
-            diffInserted: 'rgb(var(--success-10))',
-            diffDeleted: 'rgb(var(--danger-10))',
-            diffChanged: 'rgb(var(--tint-12))',
-            markup: 'rgb(var(--primary-10))',
-            other: 'rgb(var(--tint-11))',
-            invalid: 'rgb(var(--danger-10))',
+            basic: {
+                comment: 'rgb(var(--neutral-9))',
+                string: 'rgb(var(--success-10))',
+                constant: 'rgb(var(--warning-10))',
+                escape: 'rgb(var(--success-10))',
+            },
+            keyword: {
+                default: 'rgb(var(--danger-10))',
+                operator: 'rgb(var(--tint-11))',
+                regexpOperator: 'rgb(var(--primary-10))',
+                regexpQuantifier: 'rgb(var(--warning-10))',
+            },
+            variable: {
+                default: 'rgb(var(--tint-12))',
+                language: 'rgb(var(--danger-10))',
+                parameter: 'rgb(var(--warning-10))',
+            },
+            function: {
+                default: 'rgb(var(--primary-10))',
+                support: 'rgb(var(--primary-10))',
+            },
+            type: {
+                custom: 'rgb(var(--primary-10))',
+                primitive: 'rgb(var(--warning-10))',
+                other: 'rgb(var(--tint-12))',
+                classMeta: 'rgb(var(--tint-12))',
+            },
+            entity: {
+                tag: 'rgb(var(--warning-10))',
+                attributeId: 'rgb(var(--primary-10))',
+                label: 'rgb(var(--danger-10))',
+            },
+            markup: {
+                default: 'rgb(var(--primary-10))',
+                code: 'rgb(var(--success-10))',
+                link: 'rgb(var(--primary-10))',
+                linkUrl: 'rgb(var(--warning-10))',
+                separator: 'rgb(var(--tint-7))',
+            },
+            diff: {
+                inserted: 'rgb(var(--success-10))',
+                deleted: 'rgb(var(--danger-10))',
+                changed: 'rgb(var(--tint-12))',
+            },
+            other: {
+                punctuation: 'rgb(var(--tint-11))',
+                preprocessor: 'rgb(var(--danger-10))',
+                default: 'rgb(var(--tint-11))',
+                invalid: 'rgb(var(--danger-10))',
+            },
         },
     }),
     'default-dark': createTheme({
@@ -40,113 +65,272 @@ export const customThemes: Record<string, ThemeRegistration> = {
         bg: 'rgb(var(--tint-2))',
         fg: 'rgb(var(--tint-12))',
         colors: {
-            //         --shiki-token-comment: rgb(var(--neutral-9));
-
-            // --shiki-token-constant: rgb(var(--warning-11));
-            // --shiki-token-string: rgb(var(--warning-11));
-            // --shiki-token-string-expression: rgb(var(--success-11));
-            // --shiki-token-keyword: rgb(var(--danger-11));
-            // --shiki-token-parameter: rgb(var(--warning-11));
-            // --shiki-token-function: rgb(var(--primary-11));
-            comment: 'rgb(var(--neutral-11))',
-            constant: 'rgb(var(--warning-11))',
-            constantEscape: 'rgb(var(--success-10))',
-            string: 'rgb(var(--warning-11))',
-            keyword: 'rgb(var(--danger-11))',
-            keywordOperator: 'rgb(var(--tint-11))',
-            keywordRegexpOperator: 'rgb(var(--primary-10))',
-            keywordRegexpQuantifier: 'rgb(var(--warning-10))',
-            variableLanguage: 'rgb(var(--danger-10))',
-            parameter: 'rgb(var(--warning-11))',
-            variable: 'rgb(var(--tint-12))',
-            function: 'rgb(var(--primary-11))',
-            typeCustom: 'rgb(var(--primary-11))',
-            typePrimitive: 'rgb(var(--warning-11))',
-            typeOther: 'rgb(var(--tint-12))',
-            entityTag: 'rgb(var(--primary-11))',
-            punctuation: 'rgb(var(--tint-11))',
-            link: 'rgb(var(--primary-11))',
-            preprocessor: 'rgb(var(--danger-11))',
-            diffInserted: 'rgb(var(--success-11))',
-            diffDeleted: 'rgb(var(--danger-11))',
-            diffChanged: 'rgb(var(--tint-12))',
-            markup: 'rgb(var(--primary-11))',
-            other: 'rgb(var(--tint-11))',
-            invalid: 'rgb(var(--danger-11))',
+            basic: {
+                comment: 'rgb(var(--neutral-9))',
+                string: 'rgb(var(--success-11))',
+                constant: 'rgb(var(--warning-11))',
+                escape: 'rgb(var(--success-11))',
+            },
+            keyword: {
+                default: 'rgb(var(--danger-11))',
+                operator: 'rgb(var(--tint-11))',
+                regexpOperator: 'rgb(var(--primary-11))',
+                regexpQuantifier: 'rgb(var(--warning-11))',
+            },
+            variable: {
+                default: 'rgb(var(--tint-12))',
+                language: 'rgb(var(--danger-11))',
+                parameter: 'rgb(var(--warning-11))',
+            },
+            function: {
+                default: 'rgb(var(--primary-11))',
+                support: 'rgb(var(--primary-11))',
+            },
+            type: {
+                custom: 'rgb(var(--primary-11))',
+                primitive: 'rgb(var(--warning-11))',
+                other: 'rgb(var(--tint-12))',
+                classMeta: 'rgb(var(--tint-12))',
+            },
+            entity: {
+                tag: 'rgb(var(--warning-11))',
+                attributeId: 'rgb(var(--primary-11))',
+                label: 'rgb(var(--danger-11))',
+            },
+            markup: {
+                default: 'rgb(var(--primary-11))',
+                code: 'rgb(var(--success-11))',
+                link: 'rgb(var(--primary-11))',
+                linkUrl: 'rgb(var(--warning-11))',
+                separator: 'rgb(var(--tint-7))',
+            },
+            diff: {
+                inserted: 'rgb(var(--success-11))',
+                deleted: 'rgb(var(--danger-11))',
+                changed: 'rgb(var(--tint-12))',
+            },
+            other: {
+                punctuation: 'rgb(var(--tint-12))',
+                preprocessor: 'rgb(var(--danger-11))',
+                default: 'rgb(var(--tint-12))',
+                invalid: 'rgb(var(--danger-11))',
+            },
         },
     }),
-    // 'default-dark': {
-    //     name: 'default-dark',
-    //     type: 'dark',
-    //     settings: [],
-    //     bg: 'rgb(var(--tint-2))',
-    //     fg: 'rgb(var(--tint-12))',
-    // },
-    // 'monochrome-light': {
-    //     name: 'monochrome-light',
-    //     type: 'light',
-    // },
-    // 'monochrome-dark': {
-    //     name: 'monochrome-dark',
-    //     type: 'dark',
-    // },
+    'monochrome-light': createTheme({
+        name: 'monochrome-light',
+        type: 'light',
+        bg: 'rgb(var(--tint-2))',
+        fg: 'rgb(var(--tint-12))',
+        colors: {
+            basic: {
+                comment: 'rgb(var(--tint-9))',
+                string: 'rgb(var(--primary-12))',
+                constant: 'rgb(var(--primary-11))',
+                escape: 'rgb(var(--tint-12))',
+            },
+            keyword: {
+                default: 'rgb(var(--primary-10))',
+                operator: 'rgb(var(--primary-11))',
+                regexpOperator: 'rgb(var(--primary-10))',
+                regexpQuantifier: 'rgb(var(--primary-11))',
+            },
+            variable: {
+                default: 'rgb(var(--tint-12))',
+                language: 'rgb(var(--primary-10))',
+                parameter: 'rgb(var(--tint-11))',
+            },
+            function: {
+                default: 'rgb(var(--primary-9))',
+                support: 'rgb(var(--primary-9))',
+            },
+            type: {
+                custom: 'rgb(var(--primary-10))',
+                primitive: 'rgb(var(--primary-11))',
+                other: 'rgb(var(--primary-10))',
+                classMeta: 'rgb(var(--tint-12))',
+            },
+            entity: {
+                tag: 'rgb(var(--primary-11))',
+                attributeId: 'rgb(var(--primary-9))',
+                label: 'rgb(var(--primary-10))',
+            },
+            markup: {
+                default: 'rgb(var(--primary-10))',
+                code: 'rgb(var(--tint-12))',
+                link: 'rgb(var(--primary-10))',
+                linkUrl: 'rgb(var(--primary-11))',
+                separator: 'rgb(var(--tint-7))',
+            },
+            diff: {
+                inserted: 'rgb(var(--success-11))',
+                deleted: 'rgb(var(--danger-11))',
+                changed: 'rgb(var(--tint-12))',
+            },
+            other: {
+                punctuation: 'rgb(var(--tint-10))',
+                preprocessor: 'rgb(var(--primary-10))',
+                default: 'rgb(var(--primary-11))',
+                invalid: 'rgb(var(--danger-11))',
+            },
+        },
+    }),
+    'monochrome-dark': createTheme({
+        name: 'monochrome-dark',
+        type: 'dark',
+        bg: 'rgb(var(--tint-2))',
+        fg: 'rgb(var(--tint-12))',
+        colors: {
+            basic: {
+                comment: 'rgb(var(--tint-9))',
+                string: 'rgb(var(--primary-12))',
+                constant: 'rgb(var(--primary-11))',
+                escape: 'rgb(var(--tint-12))',
+            },
+            keyword: {
+                default: 'rgb(var(--primary-11))',
+                operator: 'rgb(var(--primary-11))',
+                regexpOperator: 'rgb(var(--primary-10))',
+                regexpQuantifier: 'rgb(var(--primary-11))',
+            },
+            variable: {
+                default: 'rgb(var(--tint-12))',
+                language: 'rgb(var(--primary-10))',
+                parameter: 'rgb(var(--tint-9))',
+            },
+            function: {
+                default: 'rgb(var(--primary-9))',
+                support: 'rgb(var(--primary-9))',
+            },
+            type: {
+                custom: 'rgb(var(--primary-10))',
+                primitive: 'rgb(var(--primary-11))',
+                other: 'rgb(var(--primary-10))',
+                classMeta: 'rgb(var(--tint-12))',
+            },
+            entity: {
+                tag: 'rgb(var(--primary-11))',
+                attributeId: 'rgb(var(--primary-9))',
+                label: 'rgb(var(--primary-10))',
+            },
+            markup: {
+                default: 'rgb(var(--primary-10))',
+                code: 'rgb(var(--tint-12))',
+                link: 'rgb(var(--primary-10))',
+                linkUrl: 'rgb(var(--primary-11))',
+                separator: 'rgb(var(--tint-7))',
+            },
+            diff: {
+                inserted: 'rgb(var(--success-11))',
+                deleted: 'rgb(var(--danger-11))',
+                changed: 'rgb(var(--tint-12))',
+            },
+            other: {
+                punctuation: 'rgb(var(--tint-10))',
+                preprocessor: 'rgb(var(--primary-10))',
+                default: 'rgb(var(--primary-11))',
+                invalid: 'rgb(var(--danger-11))',
+            },
+        },
+    }),
 };
 
 /**
  * Color category mappings for syntax highlighting.
- * Maps semantic categories to full color values (can be CSS vars, hex, etc.).
+ * Organized into logical groups for better readability.
  */
 export type ColorCategories = {
-    /** Comments (//, /*, #, etc.) */
-    comment: string;
-    /** Constants: numeric, language constants (true, false, null), character constants */
-    constant: string;
-    /** Escape sequences in strings (\n, \t, etc.) - should match string color */
-    constantEscape: string;
-    /** String literals ("...", '...', `...`) */
-    string: string;
-    /** Keywords: control flow (if, else, for, while, return), storage (const, let, var, function, class) */
-    keyword: string;
-    /** Operators (+, -, *, /, =, ==, etc.) */
-    keywordOperator: string;
-    /** Regexp operators (|, ^, $) */
-    keywordRegexpOperator: string;
-    /** Regexp quantifiers (*, +, ?, {n}) */
-    keywordRegexpQuantifier: string;
-    /** Language variables (this, self, super) */
-    variableLanguage: string;
-    /** Function/method parameters */
-    parameter: string;
-    /** Regular variables */
-    variable: string;
-    /** Function/method invocations (calls) */
-    function: string;
-    /** Custom type names (DocumentBlockCode, HighlightLine, etc.) */
-    typeCustom: string;
-    /** Primitive types (number, boolean, string, etc.) */
-    typePrimitive: string;
-    /** Other types (support.type, support.class, namespaces) */
-    typeOther: string;
-    /** HTML/XML tags and attributes */
-    entityTag: string;
-    /** Punctuation (., ,, ;, :, {}, [], (), etc.) */
-    punctuation: string;
-    /** Links in markup */
-    link: string;
-    /** Preprocessor directives (#include, #define, etc.) */
-    preprocessor: string;
-    /** Diff: inserted lines */
-    diffInserted: string;
-    /** Diff: deleted lines */
-    diffDeleted: string;
-    /** Diff: changed lines */
-    diffChanged: string;
-    /** Markup elements (bold, italic, headings, etc.) */
-    markup: string;
-    /** Other/miscellaneous elements */
-    other: string;
-    /** Invalid syntax/errors */
-    invalid: string;
+    /** Basic syntax elements */
+    basic: {
+        /** Comments (//, /*, #, etc.) */
+        comment: string;
+        /** String literals ("...", '...', `...`) */
+        string: string;
+        /** Constants: numeric, language constants (true, false, null), character constants */
+        constant: string;
+        /** Escape sequences in strings (\n, \t, etc.) */
+        escape: string;
+    };
+    /** Keywords and operators */
+    keyword: {
+        /** Control flow (if, else, for, while, return), storage (const, let, var, function, class) */
+        default: string;
+        /** Operators (+, -, *, /, =, ==, etc.) */
+        operator: string;
+        /** Regexp operators (|, ^, $) */
+        regexpOperator: string;
+        /** Regexp quantifiers (*, +, ?, {n}) */
+        regexpQuantifier: string;
+    };
+    /** Variables and parameters */
+    variable: {
+        /** Regular variables */
+        default: string;
+        /** Language variables (this, self, super) */
+        language: string;
+        /** Function/method parameters */
+        parameter: string;
+    };
+    /** Functions */
+    function: {
+        /** User-defined function/method invocations */
+        default: string;
+        /** Built-in/library support functions */
+        support: string;
+    };
+    /** Types and classes */
+    type: {
+        /** Custom type names (DocumentBlockCode, HighlightLine, etc.) */
+        custom: string;
+        /** Primitive types (number, boolean, string, etc.) */
+        primitive: string;
+        /** Other types (support.type, support.class, namespaces) */
+        other: string;
+        /** Class meta contexts (meta.class) */
+        classMeta: string;
+    };
+    /** Entities (tags, attributes, labels) */
+    entity: {
+        /** HTML/XML tags and attributes */
+        tag: string;
+        /** Attribute IDs (entity.other.attribute-name.id) */
+        attributeId: string;
+        /** Labels (entity.name.label) */
+        label: string;
+    };
+    /** Markup elements */
+    markup: {
+        /** Markup elements (bold, italic, headings, lists, quotes, etc.) */
+        default: string;
+        /** Inline code in markup */
+        code: string;
+        /** Links in markup */
+        link: string;
+        /** Link URLs in markup */
+        linkUrl: string;
+        /** Separators (meta.separator) */
+        separator: string;
+    };
+    /** Diff highlighting */
+    diff: {
+        /** Inserted lines */
+        inserted: string;
+        /** Deleted lines */
+        deleted: string;
+        /** Changed lines */
+        changed: string;
+    };
+    /** Other syntax elements */
+    other: {
+        /** Punctuation (., ,, ;, :, {}, [], (), etc.) */
+        punctuation: string;
+        /** Preprocessor directives (#include, #define, etc.) */
+        preprocessor: string;
+        /** Other/miscellaneous elements */
+        default: string;
+        /** Invalid syntax/errors */
+        invalid: string;
+    };
 };
 
 /**
@@ -175,14 +359,14 @@ function createTheme(options: {
             {
                 scope: ['comment'],
                 settings: {
-                    foreground: colors.comment,
+                    foreground: colors.basic.comment,
                 },
             },
             // Constants: language constants (true, false, null, etc.)
             {
                 scope: ['constant.language'],
                 settings: {
-                    foreground: colors.constant,
+                    foreground: colors.basic.constant,
                 },
             },
             // Constants: numeric
@@ -196,28 +380,28 @@ function createTheme(options: {
                     'constant.sha.git-rebase',
                 ],
                 settings: {
-                    foreground: colors.constant,
+                    foreground: colors.basic.constant,
                 },
             },
             // Constants: regexp
             {
                 scope: ['constant.regexp'],
                 settings: {
-                    foreground: colors.constant,
+                    foreground: colors.basic.constant,
                 },
             },
             // Constants: character
             {
                 scope: ['constant.character', 'constant.other.option'],
                 settings: {
-                    foreground: colors.constant,
+                    foreground: colors.basic.constant,
                 },
             },
-            // Constants: escape sequences (should match string color)
+            // Constants: escape sequences
             {
                 scope: ['constant.character.escape'],
                 settings: {
-                    foreground: colors.constantEscape,
+                    foreground: colors.basic.escape,
                 },
             },
             // Constants: other
@@ -233,14 +417,14 @@ function createTheme(options: {
                     'constant.other.character-class.set.regexp',
                 ],
                 settings: {
-                    foreground: colors.constant,
+                    foreground: colors.basic.constant,
                 },
             },
             // Constants: variable constants
             {
                 scope: ['variable.other.constant'],
                 settings: {
-                    foreground: colors.constant,
+                    foreground: colors.basic.constant,
                 },
             },
             // Strings
@@ -268,19 +452,19 @@ function createTheme(options: {
                     'support.other.parenthesis.regexp',
                 ],
                 settings: {
-                    foreground: colors.string,
+                    foreground: colors.basic.string,
                 },
             },
             // String expressions (template literals, interpolated)
+            // Only color the punctuation, not the expression content
             {
                 scope: [
                     'punctuation.definition.template-expression.begin',
                     'punctuation.definition.template-expression.end',
                     'punctuation.section.embedded',
-                    'meta.template.expression',
                 ],
                 settings: {
-                    foreground: colors.string,
+                    foreground: colors.variable.parameter,
                 },
             },
             // Keywords: control flow
@@ -305,7 +489,7 @@ function createTheme(options: {
                     'keyword.operator.wordlike',
                 ],
                 settings: {
-                    foreground: colors.keyword,
+                    foreground: colors.keyword.default,
                 },
             },
             // Keywords: storage (const, let, var, function, class, etc.)
@@ -342,49 +526,49 @@ function createTheme(options: {
                     'storage.type.primitive.groovy',
                 ],
                 settings: {
-                    foreground: colors.keyword,
+                    foreground: colors.keyword.default,
                 },
             },
             // Keywords: general
             {
                 scope: ['keyword'],
                 settings: {
-                    foreground: colors.keyword,
+                    foreground: colors.keyword.default,
                 },
             },
             // Keywords: operators (default)
             {
                 scope: ['keyword.operator'],
                 settings: {
-                    foreground: colors.keywordOperator,
+                    foreground: colors.keyword.operator,
                 },
             },
             // Keywords: regexp operators
             {
                 scope: ['keyword.operator.or.regexp', 'keyword.control.anchor.regexp'],
                 settings: {
-                    foreground: colors.keywordRegexpOperator,
+                    foreground: colors.keyword.regexpOperator,
                 },
             },
             // Keywords: regexp quantifiers
             {
                 scope: ['keyword.operator.quantifier.regexp'],
                 settings: {
-                    foreground: colors.keywordRegexpQuantifier,
+                    foreground: colors.keyword.regexpQuantifier,
                 },
             },
             // Variable language (this, self, super, etc.)
             {
                 scope: ['variable.language'],
                 settings: {
-                    foreground: colors.variableLanguage,
+                    foreground: colors.variable.language,
                 },
             },
             // Parameters
             {
                 scope: ['variable.parameter'],
                 settings: {
-                    foreground: colors.parameter,
+                    foreground: colors.variable.parameter,
                 },
             },
             // Variables (regular variables, not parameters)
@@ -397,31 +581,37 @@ function createTheme(options: {
                     'meta.object-literal.key',
                 ],
                 settings: {
-                    foreground: colors.variable,
+                    foreground: colors.variable.default,
                 },
             },
-            // Functions: invocations (calls)
+            // Functions: invocations (calls) - user-defined functions
             {
                 scope: [
                     'meta.function-call',
                     'meta.method-call',
                     'entity.name.function',
                     'entity.name.method',
-                    'support.function',
                     'support.constant.handlebars',
                     'source.powershell variable.other.member',
                     'entity.name.operator.custom-literal',
-                    'support.function.git-rebase',
+                    'keyword.other.special-method',
                 ],
                 settings: {
-                    foreground: colors.function,
+                    foreground: colors.function.default,
+                },
+            },
+            // Support functions: built-in/library functions
+            {
+                scope: ['support.function', 'support.function.git-rebase'],
+                settings: {
+                    foreground: colors.function.support,
                 },
             },
             // Types: custom type names (DocumentBlockCode, HighlightLine, etc.) - must come first
             {
                 scope: ['entity.name.type', 'entity.name.class', 'entity.other.inherited-class'],
                 settings: {
-                    foreground: colors.typeCustom,
+                    foreground: colors.type.custom,
                 },
             },
             // Types: primitive (number, boolean, string, etc.) - must come before support.type
@@ -434,7 +624,7 @@ function createTheme(options: {
                     'support.type',
                 ],
                 settings: {
-                    foreground: colors.typePrimitive,
+                    foreground: colors.type.primitive,
                 },
             },
             // Types: other (support.class, etc.)
@@ -447,12 +637,31 @@ function createTheme(options: {
                     'meta.type.cast.expr',
                     'meta.type.new.expr',
                     'support.constant.math',
-                    'support.constant.dom',
                     'support.constant.json',
                     'punctuation.separator.namespace.ruby',
                 ],
                 settings: {
-                    foreground: colors.typeOther,
+                    foreground: colors.type.other,
+                },
+            },
+            // Class meta contexts
+            {
+                scope: ['meta.class'],
+                settings: {
+                    foreground: colors.type.classMeta,
+                },
+            },
+            // DOM constants and namespace references (ReactDOM, window.document, etc.)
+            {
+                scope: [
+                    'support.constant.dom',
+                    'variable.other.object',
+                    'variable.other.object.property',
+                    'entity.name.class.jsx',
+                    'support.class.builtin',
+                ],
+                settings: {
+                    foreground: colors.variable.parameter,
                 },
             },
             // Entity names: tags, attributes
@@ -467,7 +676,14 @@ function createTheme(options: {
                     'meta.structure.dictionary.key.python',
                 ],
                 settings: {
-                    foreground: colors.entityTag,
+                    foreground: colors.entity.tag,
+                },
+            },
+            // Attribute IDs (typically styled like functions)
+            {
+                scope: ['entity.other.attribute-name.id', 'punctuation.definition.entity'],
+                settings: {
+                    foreground: colors.entity.attributeId,
                 },
             },
             // Punctuation
@@ -481,14 +697,26 @@ function createTheme(options: {
                     'punctuation.section.embedded.end.php',
                 ],
                 settings: {
-                    foreground: colors.punctuation,
+                    foreground: colors.other.punctuation,
                 },
             },
-            // Links
+            // Links: link text
             {
-                scope: ['markup.underline.link', 'string.other.link'],
+                scope: [
+                    'markup.underline.link',
+                    'string.other.link',
+                    'punctuation.definition.string.end.markdown',
+                    'punctuation.definition.string.begin.markdown',
+                ],
                 settings: {
-                    foreground: colors.link,
+                    foreground: colors.markup.link,
+                },
+            },
+            // Links: link URLs
+            {
+                scope: ['meta.link'],
+                settings: {
+                    foreground: colors.markup.linkUrl,
                 },
             },
             // Preprocessor
@@ -499,43 +727,82 @@ function createTheme(options: {
                     'meta.preprocessor.numeric',
                 ],
                 settings: {
-                    foreground: colors.preprocessor,
+                    foreground: colors.other.preprocessor,
                 },
             },
             // Diff: inserted
             {
                 scope: ['markup.inserted', 'markup.inserted.diff'],
                 settings: {
-                    foreground: colors.diffInserted,
+                    foreground: colors.diff.inserted,
                 },
             },
             // Diff: deleted
             {
                 scope: ['markup.deleted', 'markup.deleted.diff'],
                 settings: {
-                    foreground: colors.diffDeleted,
+                    foreground: colors.diff.deleted,
                 },
             },
             // Diff: changed
             {
                 scope: ['markup.changed', 'markup.changed.diff', 'meta.diff.header'],
                 settings: {
-                    foreground: colors.diffChanged,
+                    foreground: colors.diff.changed,
                 },
             },
-            // Other markup
+            // Markup: bold (with bold font style)
+            {
+                scope: ['markup.bold', 'punctuation.definition.bold'],
+                settings: {
+                    foreground: colors.markup.default,
+                    fontStyle: 'bold',
+                },
+            },
+            // Markup: italic (with italic font style)
+            {
+                scope: ['markup.italic', 'punctuation.definition.italic'],
+                settings: {
+                    foreground: colors.markup.default,
+                    fontStyle: 'italic',
+                },
+            },
+            // Markup: inline code
+            {
+                scope: ['markup.raw.inline'],
+                settings: {
+                    foreground: colors.markup.code,
+                },
+            },
+            // Markup: headings, lists, quotes, underline, strikethrough
             {
                 scope: [
-                    'markup.underline',
-                    'markup.bold',
                     'markup.heading',
-                    'markup.italic',
-                    'markup.strikethrough',
-                    'markup.inline.raw',
+                    'markup.heading punctuation.definition.heading',
+                    'entity.name.section',
                     'header',
+                    'markup.list',
+                    'markup.quote',
+                    'markup.underline',
+                    'markup.strikethrough',
                 ],
                 settings: {
-                    foreground: colors.markup,
+                    foreground: colors.markup.default,
+                },
+            },
+            // Separator
+            {
+                scope: ['meta.separator'],
+                settings: {
+                    background: colors.markup.separator,
+                    foreground: fg,
+                },
+            },
+            // Labels
+            {
+                scope: ['entity.name.label'],
+                settings: {
+                    foreground: colors.entity.label,
                 },
             },
             // Other
@@ -548,17 +815,16 @@ function createTheme(options: {
                     'storage.modifier.import.java',
                     'variable.language.wildcard.java',
                     'storage.modifier.package.java',
-                    'entity.name.label',
                 ],
                 settings: {
-                    foreground: colors.other,
+                    foreground: colors.other.default,
                 },
             },
             // Invalid
             {
                 scope: ['invalid'],
                 settings: {
-                    foreground: colors.invalid,
+                    foreground: colors.other.invalid,
                 },
             },
         ],
