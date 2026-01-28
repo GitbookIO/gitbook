@@ -80,6 +80,8 @@ export const no: TranslationLanguage = {
     pdf_download: 'Eksporter som PDF',
     pdf_goback: 'Gå tilbake til innhold',
     pdf_print: 'Skriv ut eller lagre som PDF',
+    pdf_images_loading: 'Bilder lastes (${1}/${2})',
+    pdf_images_loaded: 'Alle bilder lastet',
     pdf_page_of: '${1} av ${2}',
     pdf_mode_only_page: 'Kun denne siden',
     pdf_mode_all: 'Alle sider',

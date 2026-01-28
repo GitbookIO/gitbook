@@ -77,6 +77,8 @@ export const en = {
     pdf_download: 'Export as PDF',
     pdf_goback: 'Go back to content',
     pdf_print: 'Print or Save as PDF',
+    pdf_images_loading: 'Images loading (${1}/${2})',
+    pdf_images_loaded: 'All images loaded',
     pdf_page_of: '${1} of ${2}',
     pdf_mode_only_page: 'Only this page',
     pdf_mode_all: 'All pages',

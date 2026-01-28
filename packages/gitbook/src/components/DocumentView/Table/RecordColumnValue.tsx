@@ -230,7 +230,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                                 },
                                             },
                                         }}
-                                        loading="lazy"
+                                        loading={context.mode === 'print' ? 'eager' : 'lazy'}
                                     />
                                 ) : (
                                     <FileIcon
@@ -410,7 +410,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                                     size: image.file?.dimensions,
                                 },
                             }}
-                            loading="lazy"
+                            loading={context.mode === 'print' ? 'eager' : 'lazy'}
                         />
                         {image.text}
                     </StyledLink>
