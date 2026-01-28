@@ -19,6 +19,16 @@ export function defaultCustomization(): api.SiteCustomizationSettings {
             icons: api.CustomizationIconsStyle.Regular,
             links: api.CustomizationLinksStyle.Default,
             depth: api.CustomizationDepth.Subtle,
+            codeTheme: {
+                default: {
+                    light: api.CustomizationCodeTheme.DefaultLight,
+                    dark: api.CustomizationCodeTheme.DefaultDark,
+                },
+                openapi: {
+                    light: api.CustomizationCodeTheme.DefaultLight,
+                    dark: api.CustomizationCodeTheme.DefaultDark,
+                },
+            },
             sidebar: {
                 background: api.CustomizationSidebarBackgroundStyle.Default,
                 list: api.CustomizationSidebarListStyle.Default,

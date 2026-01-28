@@ -527,7 +527,7 @@
 .openapi-panel,
 .openapi-codesample,
 .openapi-response-examples {
-    @apply border shrink min-h-40 overflow-hidden rounded-lg straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
+    @apply border shrink min-h-32 overflow-hidden rounded-lg straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
 }
 
 .openapi-response-examples-panel {
@@ -541,7 +541,9 @@
 .openapi-panel pre,
 .openapi-codesample pre,
 .openapi-response-examples pre {
-    @apply bg-transparent border-none rounded-none shrink shadow-none;
+    @apply border-none rounded-none shrink shadow-none;
+    /* Override the code block's background to transparent so it matches with the header and footer */
+    @apply bg-transparent!
 }
 
 .openapi-panel-heading {
