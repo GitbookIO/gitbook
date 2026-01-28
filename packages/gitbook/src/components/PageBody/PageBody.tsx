@@ -109,7 +109,11 @@ export function PageBody(props: {
                         : 'page-width-default'
                 )}
             >
-                <PreservePageLayout siteWidthWide={siteWidthWide} layoutMode={layoutMode} hasTOC={hasTOC} />
+                <PreservePageLayout
+                    siteWidthWide={siteWidthWide}
+                    layoutMode={layoutMode}
+                    hasTOC={hasTOC}
+                />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}

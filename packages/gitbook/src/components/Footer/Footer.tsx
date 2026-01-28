@@ -48,7 +48,7 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 >
                     <div
                         className={tcls(
-                            'mx-auto flex max-w-3xl flex-col justify-between gap-12 layout-full-width:max-w-screen-2xl @xs:grid @4xl:max-w-none!',
+                            'mx-auto flex @xs:grid @4xl:max-w-none! layout-full-width:max-w-screen-2xl max-w-3xl flex-col justify-between gap-12',
                             'grid-cols-[auto_auto]',
                             '@4xl:grid-cols-[18rem_minmax(auto,48rem)_auto]',
                             '@7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
