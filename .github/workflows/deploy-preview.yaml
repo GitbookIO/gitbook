@@ -1,7 +1,9 @@
 name: Preview
 on:
+    pull_request:
+        types: [opened, synchronize, reopened, ready_for_review]
     pull_request_target:
-        types: [opened, synchronize, reopened, labeled]
+        types: [opened, synchronize, reopened, labeled, ready_for_review]
     push:
         branches:
             - main
@@ -12,10 +14,14 @@ jobs:
         if: >-
             ${{
                 github.event_name == 'push' ||
-                github.event.pull_request.author_association == 'MEMBER' ||
-                github.event.pull_request.author_association == 'OWNER' ||
-                github.event.pull_request.author_association == 'COLLABORATOR' ||
-                contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')
+                (github.event_name == 'pull_request' &&
+                    github.event.pull_request.head.repo.full_name == github.repository) ||
+                (github.event_name == 'pull_request_target' &&
+                    github.event.pull_request.head.repo.full_name != github.repository &&
+                    (github.event.pull_request.author_association == 'MEMBER' ||
+                        github.event.pull_request.author_association == 'OWNER' ||
+                        github.event.pull_request.author_association == 'COLLABORATOR' ||
+                        contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')))
             }}
         environment:
           name: 2v-preview
@@ -44,10 +50,14 @@ jobs:
         if: >-
             ${{
                 github.event_name == 'push' ||
-                github.event.pull_request.author_association == 'MEMBER' ||
-                github.event.pull_request.author_association == 'OWNER' ||
-                github.event.pull_request.author_association == 'COLLABORATOR' ||
-                contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')
+                (github.event_name == 'pull_request' &&
+                    github.event.pull_request.head.repo.full_name == github.repository) ||
+                (github.event_name == 'pull_request_target' &&
+                    github.event.pull_request.head.repo.full_name != github.repository &&
+                    (github.event.pull_request.author_association == 'MEMBER' ||
+                        github.event.pull_request.author_association == 'OWNER' ||
+                        github.event.pull_request.author_association == 'COLLABORATOR' ||
+                        contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')))
             }}
         environment:
           name: 2c-preview
@@ -86,7 +96,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always() && github.event_name == 'pull_request_target'
+        if: always() && github.event_name != 'push'
         needs:
             - deploy-v2-vercel
             - deploy-v2-cloudflare
