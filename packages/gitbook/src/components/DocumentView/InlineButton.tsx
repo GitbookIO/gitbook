@@ -1,4 +1,4 @@
-import { resolveContentRef, resolveContentRefFallback } from '@/lib/references';
+import { resolveContentRefFallback, resolveContentRefInDocument } from '@/lib/references';
 import * as api from '@gitbook/api';
 import type { IconName } from '@gitbook/icons';
 import { Button, type ButtonProps } from '../primitives';
@@ -45,13 +45,13 @@ export function InlineButton(props: InlineProps<api.DocumentInlineButton>) {
 export async function InlineLinkButton(
     props: InlineProps<api.DocumentInlineButton> & { buttonProps: ButtonProps }
 ) {
-    const { inline, context, buttonProps } = props;
+    const { document, inline, context, buttonProps } = props;
 
     if (!('ref' in inline.data)) return;
 
     const resolved =
         context.contentContext && inline.data.ref
-            ? await resolveContentRef(inline.data.ref, context.contentContext)
+            ? await resolveContentRefInDocument(document, inline.data.ref, context.contentContext)
             : null;
 
     const href =

@@ -32,15 +32,37 @@ type CustomInputProps = {
      * A keyboard shortcut, shown to the right of the input.
      */
     keyboardShortcut?: boolean | KeyboardShortcutProps;
-
-    onSubmit?: (value: string | number | readonly string[] | undefined) => void;
+    /**
+     * Callback invoked when the user submits the input by pressing Enter.
+     * Only called if the input has a non-empty value.
+     */
+    onSubmit?: (value: string) => void;
+    /**
+     * Controlled value of the input. When provided, the input becomes a controlled component.
+     */
+    value?: string;
+    /**
+     * Callback invoked whenever the input value changes.
+     * Used to update the parent component's state in controlled mode.
+     */
+    onValueChange?: (value: string) => void;
+    /**
+     * When true, automatically resizes the textarea vertically to fit its content.
+     * Only applies when multiline is true.
+     */
     resize?: boolean;
 };
 
 export type InputProps = CustomInputProps &
     (
-        | ({ multiline?: false } & React.InputHTMLAttributes<HTMLInputElement>)
-        | ({ multiline: true } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)
+        | ({ multiline?: false } & Omit<
+              React.InputHTMLAttributes<HTMLInputElement>,
+              'value' | 'onChange'
+          >)
+        | ({ multiline: true } & Omit<
+              React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+              'value' | 'onChange'
+          >)
     );
 
 type InputElement = HTMLInputElement | HTMLTextAreaElement;
@@ -72,7 +94,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         'aria-busy': ariaBusy,
         placeholder,
         disabled,
-        onChange,
+        onValueChange,
         onKeyDown,
         maxLength,
         minLength,
@@ -80,7 +102,7 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         ...htmlProps
     } = props;
 
-    const [value, setValue] = useControlledState(passedValue, passedValue ?? '');
+    const [value, setValue] = useControlledState(passedValue, passedValue ?? '', onValueChange);
     const [submitted, setSubmitted] = React.useState(false);
     const [height, setHeight] = React.useState<number>();
     const inputRef = React.useRef<InputElement>(null);
@@ -120,7 +142,6 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
     const handleChange = (event: React.ChangeEvent<InputElement>) => {
         const newValue = event.target.value;
         setValue(newValue);
-        onChange?.(event as React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>);
 
         // Reset submitted state when user edits the value to allow re-submission
         if (submitted) {

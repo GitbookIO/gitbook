@@ -218,8 +218,43 @@ function getStatusCodeCategory(statusCode: number | string): number | string {
     return category;
 }
 
+/**
+ * Extract non-null types from a union type array.
+ * Returns the types excluding 'null' and whether null was present.
+ */
+export function extractNonNullTypes(types: string[]): { nonNullTypes: string[]; hasNull: boolean } {
+    const nonNullTypes = types.filter((t) => t !== 'null');
+    const hasNull = nonNullTypes.length < types.length;
+    return { nonNullTypes, hasNull };
+}
+
+/**
+ * Get the effective array type from a schema, handling union types.
+ * Returns the array type if present, or null if not an array.
+ * Handles both OpenAPI 3.0 (type: 'array') and OpenAPI 3.1 (type: ['null', 'array']) nullable arrays.
+ */
+export function getEffectiveArrayType(schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject): {
+    isArray: boolean;
+    hasNull: boolean;
+    items?: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject;
+} {
+    if (Array.isArray(schema.type)) {
+        const { nonNullTypes, hasNull } = extractNonNullTypes(schema.type);
+        if (nonNullTypes.includes('array')) {
+            return { isArray: true, hasNull, items: schema.items };
+        }
+        return { isArray: false, hasNull };
+    }
+
+    if (schema.type === 'array') {
+        return { isArray: true, hasNull: false, items: schema.items };
+    }
+
+    return { isArray: false, hasNull: false };
+}
+
 export function getSchemaTitle(
-    schema: OpenAPIV3.SchemaObject,
+    schema: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject,
     options?: { ignoreAlternatives?: boolean }
 ): string {
     // Otherwise try to infer a nice title
@@ -227,21 +262,48 @@ export function getSchemaTitle(
 
     if (schema.enum || schema['x-enumDescriptions'] || schema['x-gitbook-enum']) {
         type = `${schema.type} · enum`;
-        // check array AND schema.items as this is sometimes null despite what the type indicates
-    } else if (schema.type === 'array' && !!schema.items) {
-        type = `${getSchemaTitle(schema.items, options)}[]`;
-    } else if (Array.isArray(schema.type)) {
-        type = schema.type.join(' | ');
-    } else if (schema.type || schema.properties) {
-        type = schema.type ?? 'object';
+    } else {
+        // Handle union types (OpenAPI 3.1 nullable)
+        const arrayInfo = getEffectiveArrayType(schema);
 
-        if (schema.format) {
-            type += ` · ${schema.format}`;
-        }
+        if (arrayInfo.isArray && !!schema.items) {
+            // Handle array type (nullable is handled separately in getAdditionalItems)
+            let itemsTitle: string;
+            if (checkIsReference(schema.items)) {
+                // Extract schema name from $ref (e.g., #/components/schemas/ProductPayoutSplitDto -> ProductPayoutSplitDto)
+                const refPath = schema.items.$ref;
+                const schemaName = refPath?.split('/').pop() ?? 'object';
+                itemsTitle = schemaName;
+            } else {
+                itemsTitle = getSchemaTitle(schema.items, options);
+            }
+            type = `${itemsTitle}[]`;
+        } else if (Array.isArray(schema.type)) {
+            // Handle other union types (non-array)
+            // For nullable union types, we show the non-null types only
+            // since nullable is handled separately in getAdditionalItems
+            const { nonNullTypes } = extractNonNullTypes(schema.type);
+            if (nonNullTypes.length === 1) {
+                // Single non-null type - show just that type
+                type = nonNullTypes[0] ?? 'any';
+            } else if (nonNullTypes.length > 1) {
+                // Multiple non-null types - join them (excluding null)
+                type = nonNullTypes.join(' | ');
+            } else {
+                // Only null types - fallback to 'any'
+                type = 'any';
+            }
+        } else if (schema.type || schema.properties) {
+            type = schema.type ?? 'object';
 
-        // Only add the title if it's an object (no need for the title of a string, number, etc.)
-        if (type === 'object' && schema.title) {
-            type += ` · ${schema.title.replaceAll(' ', '')}`;
+            if (schema.format) {
+                type += ` · ${schema.format}`;
+            }
+
+            // Only add the title if it's an object (no need for the title of a string, number, etc.)
+            if (type === 'object' && schema.title) {
+                type += ` · ${schema.title.replaceAll(' ', '')}`;
+            }
         }
     }
 

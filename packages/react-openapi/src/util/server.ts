@@ -45,3 +45,31 @@ function parseServerURL(url: string) {
     }
     return result;
 }
+
+/**
+ * Check if any server has a host that can be used in an HTTP request.
+ * This is used to determine if the "Try it" button should be shown.
+ */
+export function hasValidServerHost(servers: OpenAPIV3.ServerObject[]): boolean {
+    if (servers.length === 0) {
+        return false;
+    }
+
+    return servers.some((server) => {
+        const url = interpolateServerURL(server);
+        return isValidServerHost(url);
+    });
+}
+
+/**
+ * Check if the server host/URL is valid for making direct HTTP requests.
+ * Accepts both full URLs (with protocol) and hostnames (without protocol).
+ */
+export function isValidServerHost(url: string): boolean {
+    // Check if URL starts with http:// or https://
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return true;
+    }
+
+    return /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(url);
+}

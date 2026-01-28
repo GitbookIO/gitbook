@@ -12,7 +12,7 @@ import { StyledLink } from '@/components/primitives';
 import { Image } from '@/components/utils';
 import { getNodeFragmentByName } from '@/lib/document';
 import { getSimplifiedContentType } from '@/lib/files';
-import { resolveContentRef } from '@/lib/references';
+import { resolveContentRefInDocument } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import { filterOutNullable } from '@/lib/typescript';
 import type { BlockProps } from '../Block';
@@ -176,7 +176,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             const files = await Promise.all(
                 value.map((fileId) =>
                     context.contentContext
-                        ? resolveContentRef(
+                        ? resolveContentRefInDocument(
+                              document,
                               {
                                   kind: 'file',
                                   file: fileId,
@@ -250,7 +251,7 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
             const resolved =
                 value && context.contentContext
-                    ? await resolveContentRef(value, context.contentContext, {
+                    ? await resolveContentRefInDocument(document, value, context.contentContext, {
                           resolveAnchorText: true,
                           iconStyle: ['mr-2', 'text-tint-subtle'],
                       })
@@ -293,7 +294,11 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
                         user: userId,
                     };
                     const resolved = context.contentContext
-                        ? await resolveContentRef(contentRef, context.contentContext)
+                        ? await resolveContentRefInDocument(
+                              document,
+                              contentRef,
+                              context.contentContext
+                          )
                         : null;
                     if (!resolved) {
                         return null;
@@ -366,7 +371,8 @@ export async function RecordColumnValue<Tag extends React.ElementType = 'div'>(
             }
 
             const image = context.contentContext
-                ? await resolveContentRef(
+                ? await resolveContentRefInDocument(
+                      document,
                       'ref' in value ? value.ref : value,
                       context.contentContext
                   )

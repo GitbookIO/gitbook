@@ -1,12 +1,13 @@
 import type { DocumentBlockReusableContent } from '@gitbook/api';
 
 import { getDataOrNull } from '@/lib/data';
-import { resolveContentRef } from '@/lib/references';
+import { resolveContentRefInDocument } from '@/lib/references';
 import type { BlockProps } from './Block';
 import { UnwrappedBlocks } from './Blocks';
 
+// TODO-DEREF: Remove this once we have rolled out the new reusable content deref in the API.
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {
-    const { block, context, ancestorBlocks } = props;
+    const { document, block, context, ancestorBlocks } = props;
 
     if (!context.contentContext) {
         throw new Error('Expected a content context to render a reusable content block');
@@ -16,7 +17,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         ? context.contentContext.dataFetcher.withToken({ apiToken: block.meta.token })
         : context.contentContext.dataFetcher;
 
-    const resolved = await resolveContentRef(block.data.ref, {
+    const resolved = await resolveContentRefInDocument(document, block.data.ref, {
         ...context.contentContext,
         dataFetcher,
     });
@@ -30,7 +31,7 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         return null;
     }
 
-    const document = await getDataOrNull(
+    const reusableContentDocument = await getDataOrNull(
         dataFetcher.getRevisionReusableContentDocument({
             spaceId: reusableContent.context.space.id,
             revisionId: reusableContent.context.revisionId,
@@ -38,14 +39,14 @@ export async function ReusableContent(props: BlockProps<DocumentBlockReusableCon
         })
     );
 
-    if (!document) {
+    if (!reusableContentDocument) {
         return null;
     }
 
     return (
         <UnwrappedBlocks
-            nodes={document.nodes}
-            document={document}
+            nodes={reusableContentDocument.nodes}
+            document={reusableContentDocument}
             ancestorBlocks={[...ancestorBlocks, block]}
             context={{
                 ...context,

@@ -10,7 +10,7 @@ import type { GitBookAssistant } from '@gitbook/browser-types';
 import { useAIChatController, useAIChatState } from '.';
 import { AIChatIcon, AISearchIcon, getAIChatName } from '../AIChat';
 import { useIntegrationAssistants } from '../Integrations';
-import { useSearch } from '../Search/useSearch';
+import { useSetSearchState } from '../Search/useSearch';
 
 // Unify assistants configuration context with the assistants hook in one place
 export type AIConfig = {
@@ -84,7 +84,7 @@ export function useAI(): AIContext {
     const chat = useAIChatState();
     const chatController = useAIChatController();
     const language = useLanguage();
-    const [, setSearchState] = useSearch();
+    const setSearchState = useSetSearchState();
 
     const assistants: Assistant[] = [];
 

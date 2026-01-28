@@ -1,6 +1,6 @@
 import { LinkBox, LinkOverlay } from '@/components/primitives';
 import { Image } from '@/components/utils';
-import { type ResolvedContentRef, resolveContentRef } from '@/lib/references';
+import { type ResolvedContentRef, resolveContentRefInDocument } from '@/lib/references';
 import { tcls } from '@/lib/tailwind';
 import {
     CardsImageObjectFit,
@@ -18,7 +18,7 @@ export async function RecordCard(
         record: TableRecordKV;
     }
 ) {
-    const { view, record, context, block, isOffscreen } = props;
+    const { view, record, context, block, isOffscreen, document } = props;
 
     const { dark, light } = getRecordCardCovers(record[1], view);
     const targetRef = view.targetDefinition
@@ -27,13 +27,13 @@ export async function RecordCard(
 
     const [lightCover, darkCover, target] = await Promise.all([
         light.contentRef && context.contentContext
-            ? resolveContentRef(light.contentRef, context.contentContext)
+            ? resolveContentRefInDocument(document, light.contentRef, context.contentContext)
             : null,
         dark.contentRef && context.contentContext
-            ? resolveContentRef(dark.contentRef, context.contentContext)
+            ? resolveContentRefInDocument(document, dark.contentRef, context.contentContext)
             : null,
         targetRef && context.contentContext
-            ? resolveContentRef(targetRef, context.contentContext)
+            ? resolveContentRefInDocument(document, targetRef, context.contentContext)
             : null,
     ]);
 

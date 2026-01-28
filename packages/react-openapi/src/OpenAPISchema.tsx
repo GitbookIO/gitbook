@@ -16,7 +16,13 @@ import { retrocycle } from './decycle';
 import { getDisclosureLabel } from './getDisclosureLabel';
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import { tString } from './translate';
-import { checkIsReference, getSchemaTitle, resolveDescription, resolveFirstExample } from './utils';
+import {
+    checkIsReference,
+    getEffectiveArrayType,
+    getSchemaTitle,
+    resolveDescription,
+    resolveFirstExample,
+} from './utils';
 
 type CircularRefsIds = Map<OpenAPIV3.SchemaObject, string>;
 
@@ -641,7 +647,8 @@ function getSchemaProperties(
     discriminatorValue?: string | undefined
 ): null | OpenAPISchemaPropertyEntry[] {
     // check array AND schema.items as this is sometimes null despite what the type indicates
-    if (schema.type === 'array' && schema.items && !checkIsReference(schema.items)) {
+    const arrayInfo = getEffectiveArrayType(schema);
+    if (arrayInfo.isArray && schema.items && !checkIsReference(schema.items)) {
         const items = schema.items;
         const itemProperties = getSchemaProperties(items, discriminator, discriminatorValue);
         if (itemProperties) {

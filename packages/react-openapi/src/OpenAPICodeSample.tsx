@@ -11,7 +11,7 @@ import { generateMediaTypeExamples, generateSchemaExample } from './generateSche
 import { stringifyOpenAPI } from './stringifyOpenAPI';
 import type { OpenAPIOperationData } from './types';
 import { mergeHeaders } from './util/headers';
-import { getDefaultServerURL } from './util/server';
+import { getDefaultServerURL, hasValidServerHost } from './util/server';
 import {
     resolvePrefillCodePlaceholderFromSecurityScheme,
     resolveURLWithPrefillCodePlaceholdersFromServer,
@@ -216,11 +216,14 @@ function OpenAPICodeSampleFooter(props: {
     const hasMultipleMediaTypes =
         renderers.length > 1 || renderers.some((renderer) => renderer.examples.length > 0);
 
+    // Check if any server has a host that can be used in an HTTP request
+    const hasValidHost = hasValidServerHost(servers);
+
     if (hideTryItPanel && !hasMultipleMediaTypes) {
         return null;
     }
 
-    if (!validateHttpMethod(method) || (!hasMultipleMediaTypes && servers.length === 0)) {
+    if (!validateHttpMethod(method) || (!hasMultipleMediaTypes && !hasValidHost)) {
         return null;
     }
 
@@ -237,7 +240,7 @@ function OpenAPICodeSampleFooter(props: {
             ) : (
                 <span />
             )}
-            {!hideTryItPanel && servers.length > 0 && (
+            {!hideTryItPanel && hasValidHost && (
                 <ScalarApiButton
                     context={getOpenAPIClientContext(context)}
                     method={method}

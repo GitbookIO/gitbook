@@ -77,23 +77,7 @@ All pull-requests will be tested against both visual and performances testing to
 
 ## Fonts and Icons
 
-GitBook Open uses fontawesome. During development, your local environment will use the free version. However, only the pro version will be accepted by CI. If you see the following error:
-
-```
-The GitBook icon is missing. It indicates that the dependencies were installed without the correct font-awesome package. These changes have probably been persisted in the Bun lockfile. Read the README for more information.
-```
-
-It means that you've changed the GBO dependencies and bundled in the free version. Only GitBook staff can help with this - if you're not on the GitBook team, please ping us in the PR and we'll help get things moving.
-
-If you are GitBook staff, you'll need our NPM token in your local environment.
-
-```
-.env.local
-
-BUN_NPM_TOKEN=xxx
-```
-
-and then reinstall dependencies.
+GitBook Open uses fontawesome. For self-hosting and local development, for licensing reasons, only the icons from the free version should be used.
 
 ## Contributing
 

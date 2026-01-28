@@ -1124,6 +1124,16 @@ const testCases: TestsCase[] = [
         ]),
     },
     {
+        name: 'Reusable contents',
+        contentBaseURL: 'https://gitbook-open-e2e-sites.gitbook.io/reusable-contents/',
+        tests: [
+            {
+                name: 'All cases',
+                url: '',
+            },
+        ],
+    },
+    {
         name: 'Page actions',
         contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
         tests: [
