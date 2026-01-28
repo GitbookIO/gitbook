@@ -527,7 +527,7 @@
 .openapi-panel,
 .openapi-codesample,
 .openapi-response-examples {
-    @apply border shrink min-h-40 overflow-hidden rounded-lg straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
+    @apply border shrink min-h-32 overflow-hidden rounded-lg straight-corners:rounded-none circular-corners:rounded-xl bg-tint-subtle border-tint-subtle shadow-sm;
 }
 
 .openapi-response-examples-panel {
