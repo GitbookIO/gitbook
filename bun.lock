@@ -225,8 +225,8 @@
         "gitbook-icons": "./bin/gitbook-icons.js",
       },
       "dependencies": {
-        "@fortawesome/fontawesome-free": "^7.1.0",
         "@fortawesome/fontawesome-svg-core": "^7.1.0",
+        "@gitbook/fontawesome-pro": "1.0.16",
       },
       "devDependencies": {
         "@types/react": "catalog:",
@@ -234,9 +234,6 @@
         "react": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:",
-      },
-      "optionalDependencies": {
-        "@gitbook/fontawesome-pro": "1.0.16",
       },
       "peerDependencies": {
         "react": "*",
@@ -724,8 +721,6 @@
     "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.5.10", "", { "dependencies": { "tslib": "2" } }, "sha512-af3qATX+m4Rnd9+wHcjJ4w2ijq+rAVP3CCinJQvFv1kgSu1W6jypUmvleJxcewdxmutM8dmIRZFxO/IQBZmP2Q=="],
 
     "@fortawesome/fontawesome-common-types": ["@fortawesome/fontawesome-common-types@7.1.0", "", {}, "sha512-l/BQM7fYntsCI//du+6sEnHOP6a74UixFyOYUyz2DLMXKx+6DEhfR3F2NYGE45XH1JJuIamacb4IZs9S0ZOWLA=="],
-
-    "@fortawesome/fontawesome-free": ["@fortawesome/fontawesome-free@7.1.0", "", {}, "sha512-+WxNld5ZCJHvPQCr/GnzCTVREyStrAJjisUPtUxG5ngDA8TMlPnKp6dddlTpai4+1GNmltAeuk1hJEkBohwZYA=="],
 
     "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.1.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.1.0" } }, "sha512-fNxRUk1KhjSbnbuBxlWSnBLKLBNun52ZBTcs22H/xEEzM6Ap81ZFTQ4bZBxVQGQgVY0xugKGoRcCbaKjLQ3XZA=="],
 
