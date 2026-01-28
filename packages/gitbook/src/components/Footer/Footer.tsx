@@ -21,10 +21,10 @@ export function Footer(props: { context: GitBookSiteContext }) {
     const hasGroups = groupCount > 0;
     const hasCopyright = customization.footer.copyright;
     const hasThemeToggle = customization.themes.toggeable;
-
-    const mobileOnly = !hasLogo && !hasGroups && !hasCopyright && hasThemeToggle;
-
     const socialLinks = customization.socialAccounts.filter((account) => account.display?.footer);
+
+    const mobileOnly =
+        !hasLogo && !hasGroups && !hasCopyright && !socialLinks.length && hasThemeToggle;
 
     return (
         <footer
