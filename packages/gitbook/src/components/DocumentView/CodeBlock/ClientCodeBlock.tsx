@@ -1,6 +1,6 @@
 'use client';
 
-import type { DocumentBlockCode } from '@gitbook/api';
+import type { CustomizationThemedCodeTheme, DocumentBlockCode } from '@gitbook/api';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useAdaptiveVisitor } from '@/components/Adaptive';
@@ -8,18 +8,19 @@ import { useInViewportListener } from '@/components/hooks/useInViewportListener'
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { Button, ToggleChevron } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
 import { CodeBlockRenderer } from './CodeBlockRenderer';
-import type { HighlightLine, RenderedInline } from './highlight';
+import type { HighlightTheme, RenderedInline } from './highlight';
 import { plainHighlight } from './plain-highlight';
 
 type ClientBlockProps = Pick<BlockProps<DocumentBlockCode>, 'block' | 'style'> & {
     inlines: RenderedInline[];
     inlineExprVariables: InlineExpressionVariables;
     mode: BlockProps<DocumentBlockCode>['context']['mode'];
+    themes?: CustomizationThemedCodeTheme;
 };
 
 export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
@@ -29,7 +30,7 @@ export const CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT = 10;
  * It allows us to defer some load to avoid blocking the rendering of the whole page with block highlighting.
  */
 export function ClientCodeBlock(props: ClientBlockProps) {
-    const { block, mode, style, inlines, inlineExprVariables } = props;
+    const { block, mode, style, inlines, inlineExprVariables, themes } = props;
     const blockRef = useRef<HTMLDivElement>(null);
     const isInViewportRef = useRef(false);
     const [isInViewport, setIsInViewport] = useState(false);
@@ -40,17 +41,17 @@ export function ClientCodeBlock(props: ClientBlockProps) {
         visitorClaims,
         variables: inlineExprVariables,
     });
-    const plainLines = useMemo(
-        () => plainHighlight(block, inlines, { evaluateInlineExpression }),
-        [block, inlines, evaluateInlineExpression]
+    const plainTheme = useMemo(
+        () => plainHighlight(block, inlines, { evaluateInlineExpression, themes }),
+        [block, inlines, evaluateInlineExpression, themes]
     );
-    const [lines, setLines] = useState<null | HighlightLine[]>(null);
+    const [theme, setTheme] = useState<null | HighlightTheme>(null);
     const [highlighting, setHighlighting] = useState(false);
 
     // Preload the highlighter when the block is mounted.
     useEffect(() => {
-        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block));
-    }, [block]);
+        import('./highlight').then(({ preloadHighlight }) => preloadHighlight(block, themes));
+    }, [block, themes]);
 
     // When user scrolls, we need to wait for the scroll to finish before running the highlight
     const isScrollingRef = useRef(false);
@@ -99,14 +100,16 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             if (typeof window !== 'undefined') {
                 setHighlighting(true);
                 import('./highlight').then(({ highlight }) => {
-                    highlight(block, inlines, { evaluateInlineExpression }).then((lines) => {
-                        if (cancelled) {
-                            return;
-                        }
+                    highlight(block, inlines, { evaluateInlineExpression, themes }).then(
+                        (theme) => {
+                            if (cancelled) {
+                                return;
+                            }
 
-                        setLines(lines);
-                        setHighlighting(false);
-                    });
+                            setTheme(theme);
+                            setHighlighting(false);
+                        }
+                    );
                 });
             }
 
@@ -116,12 +119,12 @@ export function ClientCodeBlock(props: ClientBlockProps) {
         }
 
         // Otherwise if the block is not in viewport, we reset to the plain lines
-        setLines(null);
-    }, [isInViewport, block, inlines, evaluateInlineExpression]);
+        setTheme(null);
+    }, [isInViewport, block, inlines, evaluateInlineExpression, themes]);
 
     const expandable = block.data.expandable;
 
-    const numberOfLinesOfCode = lines?.length ?? plainLines.length;
+    const numberOfLinesOfCode = theme?.lines.length ?? plainTheme.lines.length;
     const collapsedLineCount =
         block.data.collapsedLineCount || CODE_BLOCK_DEFAULT_COLLAPSED_LINE_COUNT;
     const isExpandable = Boolean(
@@ -136,16 +139,17 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             aria-busy={highlighting}
             block={block}
             style={style}
-            lines={lines ?? plainLines}
+            theme={theme ?? plainTheme}
             id={codeBlockBodyId}
         />
     );
 
     return isExpandable ? (
         <CodeBlockExpandable
-            lines={lines ?? plainLines}
+            theme={theme ?? plainTheme}
             controls={codeBlockBodyId}
             collapsedLineCount={collapsedLineCount}
+            style={style}
         >
             {renderer}
         </CodeBlockExpandable>
@@ -156,21 +160,25 @@ export function ClientCodeBlock(props: ClientBlockProps) {
 
 function CodeBlockExpandable(props: {
     children: React.ReactNode;
-    lines: HighlightLine[];
+    theme: HighlightTheme;
     collapsedLineCount: number;
     controls?: string;
+    style?: ClassValue;
 }) {
-    const { children, controls, lines = [], collapsedLineCount } = props;
+    const { children, controls, theme, collapsedLineCount, style } = props;
     const [isExpanded, setIsExpanded] = useState(false);
     const language = useLanguage();
     return (
-        <div className="group/codeblock-expandable relative">
+        <div
+            className={tcls('group/codeblock-expandable relative', style)}
+            data-follow-color-scheme="true"
+            aria-expanded={isExpanded}
+        >
             <div
                 className={tcls(
-                    isExpanded
-                        ? '[&_pre]:after:opacity-0'
-                        : '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden [&_pre]:after:opacity-100',
-                    '[&_pre]:after:pointer-events-none [&_pre]:after:absolute [&_pre]:after:inset-0 [&_pre]:after:z-1 [&_pre]:after:bg-gradient-to-t [&_pre]:after:from-0% [&_pre]:after:from-tint-2 [&_pre]:after:to-70% [&_pre]:after:to-transparent [&_pre]:after:content-[""]'
+                    !isExpanded
+                        ? '[&_pre]:h-[calc(2rem+var(--line-count)*var(--line-height))] [&_pre]:overflow-y-hidden'
+                        : ''
                 )}
                 style={
                     {
@@ -181,7 +189,7 @@ function CodeBlockExpandable(props: {
             >
                 {children}
             </div>
-            <div className="pointer-events-none absolute bottom-0 flex w-full justify-center">
+            <div className="pointer-events-none absolute bottom-2 flex w-full justify-center">
                 <Button
                     icon={<ToggleChevron open={isExpanded} />}
                     size="xsmall"
@@ -194,7 +202,7 @@ function CodeBlockExpandable(props: {
                 >
                     {isExpanded
                         ? t(language, 'code_block_expanded')
-                        : t(language, 'code_block_collapsed', lines.length)}
+                        : t(language, 'code_block_collapsed', theme.lines.length)}
                 </Button>
             </div>
         </div>

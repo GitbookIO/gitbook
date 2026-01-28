@@ -60,8 +60,7 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
                 {...contextProps}
                 nodes={block.nodes}
                 ancestorBlocks={[...ancestorBlocks, block]}
-                // Remove padding-top from headings when they're the first child (similar to column-first-of-type pattern)
-                style="[&>*:first-child]:!pt-0 flex-1 space-y-4"
+                style="[&>*:first-child]:!pt-0 flex flex-1 flex-col [&>*+*]:mt-5"
             />
         </div>
     );

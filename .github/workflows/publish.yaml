@@ -4,9 +4,6 @@ on:
     push:
         branches:
             - main
-
-env:
-    BUN_NPM_TOKEN: ${{ secrets.NPM_TOKEN_READONLY }}
     
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 

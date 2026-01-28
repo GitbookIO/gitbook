@@ -34,6 +34,7 @@ import type { GitBookAnyContext } from '@/lib/context';
 import { GITBOOK_FONTS_URL, GITBOOK_ICONS_TOKEN, GITBOOK_ICONS_URL } from '@/lib/env';
 import { defaultCustomization } from '@/lib/utils';
 import { AnnouncementDismissedScript } from '../Announcement';
+import { OperatingSystemClassScript } from './OperatingSystemClassScript';
 
 function preloadFont(fontData: FontData) {
     if (fontData.type === 'custom') {
@@ -118,6 +119,8 @@ export async function CustomizationRootLayout(props: {
                     <link rel="privacy-policy" href={customization.privacyPolicy.url} />
                 ) : null}
 
+                <OperatingSystemClassScript />
+
                 {/* Inject custom font @font-face rules */}
                 {fontData.type === 'custom' ? <style>{fontData.fontFaceRules}</style> : null}
                 {monospaceFontData.type === 'custom' ? (
@@ -135,7 +138,7 @@ export async function CustomizationRootLayout(props: {
                         undefined
                     }
                 >{`
-                    :root {
+                    :root, .light, .dark [data-color-scheme$="light"], .dark [data-follow-color-scheme="true"]:has([data-color-scheme$="light"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.light)}
                         ${generateColorVariable('tint', tintColor ? tintColor.light : DEFAULT_TINT_COLOR, { mix: mixColor && { color: mixColor.color.light, ratio: mixColor.ratio.light } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR)}
@@ -162,7 +165,7 @@ export async function CustomizationRootLayout(props: {
                         ${generateColorVariable('success', successColor.light)}
                     }
 
-                    .dark {
+                    .dark, :root:not(.dark) [data-color-scheme^="dark"], :root:not(.dark) [data-follow-color-scheme="true"]:has([data-color-scheme^="dark"]) {
                         ${generateColorVariable('primary', customization.styling.primaryColor.dark, { darkMode: true })}
                         ${generateColorVariable('tint', tintColor ? tintColor.dark : DEFAULT_TINT_COLOR, { darkMode: true, mix: mixColor && { color: mixColor?.color.dark, ratio: mixColor.ratio.dark } })}
                         ${generateColorVariable('neutral', DEFAULT_TINT_COLOR, { darkMode: true })}
