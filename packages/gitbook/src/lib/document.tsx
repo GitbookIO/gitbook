@@ -33,6 +33,20 @@ export function hasFullWidthBlock(document: JSONDocument): boolean {
 }
 
 /**
+ * Check if the document contains an OpenAPI block at the top level.
+ */
+export function hasOpenAPIBlock(document: JSONDocument): boolean {
+    return hasTopLevelBlock(document, (block) => {
+        return (
+            block.type === 'swagger' ||
+            block.type === 'openapi-operation' ||
+            block.type === 'openapi-schemas' ||
+            block.type === 'openapi-webhook'
+        );
+    });
+}
+
+/**
  * Check if a top level block matches a predicate.
  */
 export function hasTopLevelBlock(

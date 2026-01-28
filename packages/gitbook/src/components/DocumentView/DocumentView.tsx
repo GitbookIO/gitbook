@@ -71,6 +71,8 @@ export function DocumentView(
                 style,
                 // Preserve adjacent whitespace and new lines.
                 'whitespace-pre-wrap',
+                // In OpenAPI mode, add left padding for sidebar offset
+                'layout-openapi:pl-12',
             ]}
             context={context}
             isOffscreen={isOffscreen}
@@ -85,7 +87,7 @@ export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle
     const { document, blockStyle } = props;
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 layout-openapi:pl-12">
             {document.nodes.map((block) => (
                 <BlockSkeleton
                     key={block.key!}
@@ -95,6 +97,10 @@ export function DocumentViewSkeleton(props: { document: JSONDocument; blockStyle
                         block.data && 'fullWidth' in block.data && block.data.fullWidth
                             ? 'max-w-screen-xl'
                             : 'max-w-3xl',
+                        // Expand in OpenAPI mode, cap at 64rem in full-width mode
+                        'layout-openapi:max-w-full',
+                        'layout-full-width:max-w-5xl',
+                        'layout-full-width:mx-auto',
                         blockStyle,
                     ]}
                 />

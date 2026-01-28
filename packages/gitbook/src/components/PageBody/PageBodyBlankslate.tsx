@@ -79,6 +79,9 @@ export async function PageBodyBlankslate(props: {
                 'grid',
                 'max-w-3xl',
                 'page-width-wide:max-w-screen-2xl',
+                // Expand to full width in OpenAPI and full-width layout modes
+                'layout-openapi:max-w-full',
+                'layout-full-width:max-w-full',
                 'w-full',
                 'mx-auto',
                 'gap-4',
