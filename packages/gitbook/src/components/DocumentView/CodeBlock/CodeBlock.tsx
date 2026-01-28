@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-import type { DocumentBlockCode, SiteCustomizationSettings } from '@gitbook/api';
+import type {
+    CustomizationThemedCodeTheme,
+    DocumentBlockCode,
+    SiteCustomizationSettings,
+} from '@gitbook/api';
 
 import { getNodeFragmentByType } from '@/lib/document';
 
@@ -16,9 +20,18 @@ import { type RenderedInline, getInlines, highlight } from './highlight';
 export async function CodeBlock(
     props: BlockProps<DocumentBlockCode> & {
         themeKey?: keyof SiteCustomizationSettings['styling']['codeTheme'];
+        themes?: CustomizationThemedCodeTheme;
     }
 ) {
-    const { block, document, style, isEstimatedOffscreen, context, themeKey = 'default' } = props;
+    const {
+        block,
+        document,
+        style,
+        isEstimatedOffscreen,
+        context,
+        themeKey = 'default',
+        themes: providedThemes,
+    } = props;
     const inlines = getInlines(block);
 
     let hasInlineExpression = false;
@@ -56,9 +69,12 @@ export async function CodeBlock(
 
     // Get code themes from customization
     const themes =
-        context.contentContext && 'customization' in context.contentContext
+        providedThemes ??
+        (context.contentContext && 'customization' in context.contentContext
             ? context.contentContext.customization.styling.codeTheme[themeKey]
-            : undefined;
+            : undefined);
+
+    console.log(themeKey, themes, context.contentContext);
 
     if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
         // In v2, we render the code block server-side

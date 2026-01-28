@@ -1,4 +1,8 @@
-import type { JSONDocument, SiteCustomizationSettings } from '@gitbook/api';
+import type {
+    CustomizationThemedCodeTheme,
+    JSONDocument,
+    SiteCustomizationSettings,
+} from '@gitbook/api';
 import { useId } from 'react';
 
 import { CodeBlock } from './CodeBlock';
@@ -12,8 +16,9 @@ export function PlainCodeBlock(props: {
     code: string;
     syntax: string;
     themeKey?: keyof SiteCustomizationSettings['styling']['codeTheme'];
+    themes?: CustomizationThemedCodeTheme;
 }) {
-    const { code, syntax, themeKey } = props;
+    const { code, syntax, themeKey, themes } = props;
     const id = useId();
 
     const block = convertCodeStringToBlock({ key: id, code, syntax });
@@ -31,6 +36,7 @@ export function PlainCodeBlock(props: {
                 mode: 'default',
             }}
             themeKey={themeKey}
+            themes={themes}
             block={block}
             ancestorBlocks={[]}
             // We optimize perf by default

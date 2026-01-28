@@ -541,7 +541,7 @@
 .openapi-panel pre,
 .openapi-codesample pre,
 .openapi-response-examples pre {
-    @apply bg-transparent border-none rounded-none shrink shadow-none;
+    @apply border-none rounded-none shrink shadow-none;
 }
 
 .openapi-panel-heading {
