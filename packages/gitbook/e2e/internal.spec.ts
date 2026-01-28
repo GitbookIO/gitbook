@@ -8,6 +8,7 @@ import {
     CustomizationIconsStyle,
     CustomizationSidebarListStyle,
     CustomizationThemeMode,
+    SiteSocialAccountPlatform,
 } from '@gitbook/api';
 import type { GitBookStandalone } from '@gitbook/embed';
 import { expect } from '@playwright/test';
@@ -1145,6 +1146,36 @@ const testCases: TestsCase[] = [
                         externalAI: false,
                     },
                 }),
+                run: waitForCookiesDialog,
+            },
+        ],
+    },
+    {
+        name: 'Social links',
+        contentBaseURL: 'https://gitbook.gitbook.io/test-gitbook-open/',
+        tests: [
+            {
+                name: 'With social links',
+                url: getCustomizationURL({
+                    socialAccounts: [
+                        {
+                            platform: SiteSocialAccountPlatform.Github,
+                            display: { footer: true },
+                            handle: 'GitbookIO',
+                        },
+                        {
+                            platform: SiteSocialAccountPlatform.Linkedin,
+                            display: { footer: true },
+                            handle: 'gitbook',
+                        },
+                        {
+                            platform: SiteSocialAccountPlatform.Twitter,
+                            display: { footer: false },
+                            handle: 'GitBookIO',
+                        },
+                    ],
+                }),
+                fullPage: true,
                 run: waitForCookiesDialog,
             },
         ],
