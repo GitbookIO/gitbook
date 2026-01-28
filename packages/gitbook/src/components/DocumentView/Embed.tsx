@@ -60,7 +60,7 @@ export async function Embed(props: BlockProps<gitbookAPI.DocumentBlockEmbed>) {
                                 sources={{ light: { src: embed.icon } }}
                                 sizes={[{ width: 20 }]}
                                 resize={context.contentContext.imageResizer}
-                                loading="lazy"
+                                loading={context.mode === 'print' ? 'eager' : 'lazy'}
                             />
                         ) : null
                     }

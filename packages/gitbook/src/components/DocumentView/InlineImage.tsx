@@ -51,7 +51,7 @@ export async function InlineImage(props: InlineProps<DocumentInlineImage>) {
                           }
                         : null,
                 }}
-                loading="lazy"
+                loading={context.mode === 'print' ? 'eager' : 'lazy'}
                 style={[size === 'line' ? ['max-h-lh', 'h-lh', 'w-auto'] : null]}
                 inline
                 zoom={!isInLink}

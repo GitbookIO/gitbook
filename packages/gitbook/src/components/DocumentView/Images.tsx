@@ -115,7 +115,7 @@ async function ImageBlock(props: {
                               }
                             : null,
                     }}
-                    loading={isEstimatedOffscreen ? 'lazy' : 'eager'}
+                    loading={isEstimatedOffscreen && context.mode !== 'print' ? 'lazy' : 'eager'}
                     zoom
                     inlineStyle={{
                         maxWidth: '100%',

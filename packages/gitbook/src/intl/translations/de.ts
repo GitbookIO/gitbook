@@ -79,6 +79,8 @@ export const de = {
     pdf_download: 'Als PDF exportieren',
     pdf_goback: 'Zurück zum Inhalt',
     pdf_print: 'Drucken oder als PDF speichern',
+    pdf_images_loading: 'Bilder werden geladen (${1}/${2})',
+    pdf_images_loaded: 'Alle Bilder geladen',
     pdf_page_of: '${1} von ${2}',
     pdf_mode_only_page: 'Nur diese Seite',
     pdf_mode_all: 'Alle Seiten',
