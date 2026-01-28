@@ -144,22 +144,21 @@ export const Button = React.forwardRef<
         };
         let iconElement = null;
         if (icon) {
-            if (React.isValidElement(icon)) {
-                type IconElement = React.ReactElement<React.SVGProps<SVGSVGElement>>;
-                iconElement = React.cloneElement(icon as IconElement, {
-                    className: tcls(
-                        'button-leading-icon shrink-0',
-                        iconSizeClasses[size],
-                        (icon as IconElement).props.className
-                    ),
-                });
-            } else {
+            if (typeof icon === 'string') {
                 iconElement = (
                     <Icon
                         icon={icon as IconName}
                         className={tcls('button-leading-icon shrink-0', iconSizeClasses[size])}
                     />
                 );
+            } else if (React.isValidElement<React.SVGProps<SVGSVGElement>>(icon)) {
+                iconElement = React.cloneElement(icon, {
+                    className: tcls(
+                        'button-leading-icon shrink-0',
+                        iconSizeClasses[size],
+                        icon.props.className
+                    ),
+                });
             }
         }
 
