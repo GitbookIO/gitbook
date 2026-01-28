@@ -1,9 +1,6 @@
 name: Preview
 on:
-    pull_request:
-        types: [opened, synchronize, reopened, ready_for_review]
     pull_request_target:
-        types: [opened, synchronize, reopened, labeled, ready_for_review]
     push:
         branches:
             - main
@@ -11,18 +8,6 @@ jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
-        if: >-
-            ${{
-                github.event_name == 'push' ||
-                (github.event_name == 'pull_request' &&
-                    github.event.pull_request.head.repo.full_name == github.repository) ||
-                (github.event_name == 'pull_request_target' &&
-                    github.event.pull_request.head.repo.full_name != github.repository &&
-                    (github.event.pull_request.author_association == 'MEMBER' ||
-                        github.event.pull_request.author_association == 'OWNER' ||
-                        github.event.pull_request.author_association == 'COLLABORATOR' ||
-                        contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')))
-            }}
         environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -47,18 +32,6 @@ jobs:
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
-        if: >-
-            ${{
-                github.event_name == 'push' ||
-                (github.event_name == 'pull_request' &&
-                    github.event.pull_request.head.repo.full_name == github.repository) ||
-                (github.event_name == 'pull_request_target' &&
-                    github.event.pull_request.head.repo.full_name != github.repository &&
-                    (github.event.pull_request.author_association == 'MEMBER' ||
-                        github.event.pull_request.author_association == 'OWNER' ||
-                        github.event.pull_request.author_association == 'COLLABORATOR' ||
-                        contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')))
-            }}
         environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -134,7 +107,6 @@ jobs:
         name: Visual Testing v2
         needs: deploy-v2-vercel
         timeout-minutes: 15
-        if: ${{ needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -159,7 +131,6 @@ jobs:
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 15
-        if: ${{ needs.deploy-v2-cloudflare.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -184,7 +155,6 @@ jobs:
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
         timeout-minutes: 15
-        if: ${{ needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -209,7 +179,6 @@ jobs:
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 15
-        if: ${{ needs.deploy-v2-cloudflare.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -233,7 +202,6 @@ jobs:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
-        if: ${{ needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
