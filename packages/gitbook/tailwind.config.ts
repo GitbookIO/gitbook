@@ -678,6 +678,16 @@ const config: Config = {
             addVariant('page-api-block', 'body:has(.openapi-block) &');
 
             /**
+             * Layout mode variants for controlling the page structure.
+             * - layout-default: 3-column layout (TOC + Content + Outline)
+             * - layout-openapi: 2-column layout (TOC + Content, no Outline)
+             * - layout-full-width: 1-column layout (Content only, no TOC or Outline)
+             */
+            addVariant('layout-default', 'body:has(.layout-default) &');
+            addVariant('layout-openapi', 'body:has(.layout-openapi) &');
+            addVariant('layout-full-width', 'body:has(.layout-full-width) &');
+
+            /**
              * Variant when the page is displayed in print mode.
              */
             addVariant('print-mode', 'body:has(.print-mode) &');

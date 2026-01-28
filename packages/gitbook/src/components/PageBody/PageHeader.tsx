@@ -52,11 +52,15 @@ export async function PageHeader(props: {
             className={tcls(
                 'max-w-3xl',
                 'page-width-wide:max-w-screen-2xl',
+                // Expand in OpenAPI mode, cap at 64rem in full-width mode
+                'layout-openapi:max-w-full',
+                'layout-openapi:pl-12',
+                'layout-full-width:max-w-5xl',
+                'layout-full-width:mx-auto',
                 'mx-auto',
                 'mb-6',
                 'space-y-3',
                 'page-api-block:ml-0',
-                'page-api-block:max-w-full',
                 hasAncestors ? 'page-has-ancestors' : 'page-no-ancestors'
             )}
         >

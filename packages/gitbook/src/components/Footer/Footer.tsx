@@ -48,16 +48,12 @@ export function Footer(props: { context: GitBookSiteContext }) {
                 >
                     <div
                         className={tcls(
-                            'mx-auto flex @xs:grid @4xl:max-w-none! max-w-3xl site-width-wide:max-w-screen-2xl flex-col justify-between gap-12',
+                            'mx-auto flex max-w-3xl flex-col justify-between gap-12 layout-full-width:max-w-screen-2xl @xs:grid @4xl:max-w-none!',
                             'grid-cols-[auto_auto]',
                             '@4xl:grid-cols-[18rem_minmax(auto,48rem)_auto]',
                             '@7xl:grid-cols-[18rem_minmax(auto,48rem)_14rem]',
-                            '@4xl:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_auto]',
-                            '@7xl:site-width-wide:grid-cols-[18rem_minmax(auto,80rem)_14rem]',
-                            '@4xl:page-no-toc:grid-cols-[minmax(auto,48rem)_auto]',
-                            '@7xl:page-no-toc:grid-cols-[14rem_minmax(auto,48rem)_14rem]',
-                            '@4xl:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[minmax(auto,90rem)_auto]',
-                            '@7xl:[body:has(.site-width-wide,.page-no-toc)_&]:grid-cols-[14rem_minmax(auto,90rem)_14rem]'
+                            '@4xl:layout-full-width:grid-cols-[minmax(auto,90rem)_auto]',
+                            '@7xl:layout-full-width:grid-cols-[14rem_minmax(auto,90rem)_14rem]'
                         )}
                     >
                         {
@@ -115,10 +111,22 @@ export function Footer(props: { context: GitBookSiteContext }) {
                             customization.footer.groups?.length > 0 ? (
                                 <div
                                     className={tcls(
-                                        '@4xl:page-has-toc:col-span-1 @7xl:page-no-toc:col-span-1 col-span-2 @4xl:page-has-toc:col-start-2 @7xl:page-no-toc:col-start-2'
+                                        'col-span-2',
+                                        '@4xl:layout-default:col-span-1',
+                                        '@4xl:layout-default:col-start-2',
+                                        '@4xl:layout-openapi:col-span-1',
+                                        '@4xl:layout-openapi:col-start-2',
+                                        '@7xl:layout-full-width:col-span-1',
+                                        '@7xl:layout-full-width:col-start-2'
                                     )}
                                 >
-                                    <div className="mx-auto flex max-w-3xl site-width-wide:max-w-screen-2xl @xl:flex-row flex-col @xl:gap-6 gap-10">
+                                    <div
+                                        className={tcls(
+                                            'mx-auto flex max-w-3xl flex-col gap-10',
+                                            'layout-full-width:max-w-screen-2xl',
+                                            '@xl:flex-row @xl:gap-6'
+                                        )}
+                                    >
                                         {partition(customization.footer.groups, FOOTER_COLUMNS).map(
                                             (column, columnIndex) => (
                                                 <div

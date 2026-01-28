@@ -35,6 +35,11 @@ export async function PageFooterNavigation(props: {
                 'gap-2',
                 'max-w-3xl',
                 'page-width-wide:max-w-screen-2xl',
+                // Expand in OpenAPI mode, cap at 64rem in full-width mode
+                'layout-openapi:max-w-full',
+                'layout-openapi:pl-12',
+                'layout-full-width:max-w-5xl',
+                'layout-full-width:mx-auto',
                 'mx-auto',
                 'text-tint'
             )}
