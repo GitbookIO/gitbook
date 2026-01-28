@@ -1,13 +1,22 @@
 name: Preview
 on:
-    pull_request:
+    pull_request_target:
+        types: [opened, synchronize, reopened, labeled]
     push:
-      branches:
-        - main
+        branches:
+            - main
 jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
+        if: >-
+            ${{
+                github.event_name == 'push' ||
+                github.event.pull_request.author_association == 'MEMBER' ||
+                github.event.pull_request.author_association == 'OWNER' ||
+                github.event.pull_request.author_association == 'COLLABORATOR' ||
+                contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')
+            }}
         environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -16,6 +25,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Deploy to Vercel
               id: deploy
               uses: ./.github/composite/deploy-vercel
@@ -29,6 +41,14 @@ jobs:
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
+        if: >-
+            ${{
+                github.event_name == 'push' ||
+                github.event.pull_request.author_association == 'MEMBER' ||
+                github.event.pull_request.author_association == 'OWNER' ||
+                github.event.pull_request.author_association == 'COLLABORATOR' ||
+                contains(github.event.pull_request.labels.*.name, 'safe-to-deploy')
+            }}
         environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -37,6 +57,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Deploy to Cloudflare
               id: deploy
               uses: ./.github/composite/deploy-cloudflare
@@ -63,7 +86,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always() && !startsWith(github.ref, 'refs/heads/main')
+        if: always() && github.event_name == 'pull_request_target'
         needs:
             - deploy-v2-vercel
             - deploy-v2-cloudflare
@@ -101,9 +124,13 @@ jobs:
         name: Visual Testing v2
         needs: deploy-v2-vercel
         timeout-minutes: 15
+        if: ${{ needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -122,9 +149,13 @@ jobs:
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 15
+        if: ${{ needs.deploy-v2-cloudflare.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -143,9 +174,13 @@ jobs:
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
         timeout-minutes: 15
+        if: ${{ needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -164,9 +199,13 @@ jobs:
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
         timeout-minutes: 15
+        if: ${{ needs.deploy-v2-cloudflare.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -184,9 +223,13 @@ jobs:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
+        if: ${{ needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
