@@ -8,7 +8,7 @@ import { useInViewportListener } from '@/components/hooks/useInViewportListener'
 import { useScrollListener } from '@/components/hooks/useScrollListener';
 import { Button, ToggleChevron } from '@/components/primitives';
 import { t, useLanguage } from '@/intl/client';
-import { tcls } from '@/lib/tailwind';
+import { type ClassValue, tcls } from '@/lib/tailwind';
 import { useDebounceCallback } from 'usehooks-ts';
 import type { BlockProps } from '../Block';
 import { type InlineExpressionVariables, useEvaluateInlineExpression } from '../InlineExpression';
@@ -149,6 +149,7 @@ export function ClientCodeBlock(props: ClientBlockProps) {
             theme={theme ?? plainTheme}
             controls={codeBlockBodyId}
             collapsedLineCount={collapsedLineCount}
+            style={style}
         >
             {renderer}
         </CodeBlockExpandable>
@@ -162,12 +163,17 @@ function CodeBlockExpandable(props: {
     theme: HighlightTheme;
     collapsedLineCount: number;
     controls?: string;
+    style?: ClassValue;
 }) {
-    const { children, controls, theme, collapsedLineCount } = props;
+    const { children, controls, theme, collapsedLineCount, style } = props;
     const [isExpanded, setIsExpanded] = useState(false);
     const language = useLanguage();
     return (
-        <div className="group/codeblock-expandable relative" aria-expanded={isExpanded}>
+        <div
+            className={tcls('group/codeblock-expandable relative', style)}
+            data-follow-color-scheme="true"
+            aria-expanded={isExpanded}
+        >
             <div
                 className={tcls(
                     !isExpanded
@@ -183,7 +189,7 @@ function CodeBlockExpandable(props: {
             >
                 {children}
             </div>
-            <div className="pointer-events-none absolute bottom-0 flex w-full justify-center">
+            <div className="pointer-events-none absolute bottom-2 flex w-full justify-center">
                 <Button
                     icon={<ToggleChevron open={isExpanded} />}
                     size="xsmall"

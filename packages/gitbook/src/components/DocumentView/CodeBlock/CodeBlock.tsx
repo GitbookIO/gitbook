@@ -74,8 +74,6 @@ export async function CodeBlock(
             ? context.contentContext.customization.styling.codeTheme[themeKey]
             : undefined);
 
-    console.log(themeKey, themes, context.contentContext);
-
     if (!isEstimatedOffscreen && !hasInlineExpression && !block.data.expandable) {
         // In v2, we render the code block server-side
         const theme = await highlight(block, richInlines, {

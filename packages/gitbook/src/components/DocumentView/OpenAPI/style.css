@@ -542,6 +542,8 @@
 .openapi-codesample pre,
 .openapi-response-examples pre {
     @apply border-none rounded-none shrink shadow-none;
+    /* Override the code block's background to transparent so it matches with the header and footer */
+    @apply bg-transparent!
 }
 
 .openapi-panel-heading {
