@@ -79,6 +79,8 @@ export const it: TranslationLanguage = {
     pdf_download: 'Esporta in PDF',
     pdf_goback: 'Torna al contenuto',
     pdf_print: 'Stampa o salva come PDF',
+    pdf_images_loading: 'Caricamento immagini (${1}/${2})',
+    pdf_images_loaded: 'Tutte le immagini caricate',
     pdf_page_of: '${1} di ${2}',
     pdf_mode_only_page: 'Solo questa pagina',
     pdf_mode_all: 'Tutte le pagine',

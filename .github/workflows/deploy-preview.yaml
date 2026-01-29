@@ -19,7 +19,7 @@ jobs:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
         needs: approval
-        if: ${{ needs.approval.result == 'success' || needs.approval.result == 'skipped' }}
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -44,7 +44,7 @@ jobs:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
         needs: approval
-        if: ${{ needs.approval.result == 'success' || needs.approval.result == 'skipped' }}
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -118,6 +118,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -141,6 +142,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -164,6 +166,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -187,6 +190,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -210,6 +214,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4

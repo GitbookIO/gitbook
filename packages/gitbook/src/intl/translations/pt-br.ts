@@ -78,6 +78,8 @@ export const pt_br = {
     pdf_download: 'Exportar como PDF',
     pdf_goback: 'Voltar ao conteúdo',
     pdf_print: 'Imprimir ou salvar como PDF',
+    pdf_images_loading: 'Carregando imagens (${1}/${2})',
+    pdf_images_loaded: 'Todas as imagens carregadas',
     pdf_page_of: '${1} de ${2}',
     pdf_mode_only_page: 'Somente esta página',
     pdf_mode_all: 'Todas as páginas',

@@ -31,7 +31,7 @@ export async function Drawing(props: BlockProps<DocumentBlockDrawing>) {
                 alt="Drawing"
                 sizes={imageBlockSizes}
                 zoom
-                loading="lazy"
+                loading={context.mode === 'print' ? 'eager' : 'lazy'}
             />
         </Caption>
     );
