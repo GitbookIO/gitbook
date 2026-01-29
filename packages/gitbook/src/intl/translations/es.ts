@@ -80,6 +80,8 @@ export const es: TranslationLanguage = {
     pdf_download: 'Exportar como PDF',
     pdf_goback: 'Volver al contenido',
     pdf_print: 'Imprimir o Guardar como PDF',
+    pdf_images_loading: 'Cargando imágenes (${1}/${2})',
+    pdf_images_loaded: 'Todas las imágenes cargadas',
     pdf_page_of: '${1} de ${2}',
     pdf_mode_only_page: 'Solo esta página',
     pdf_mode_all: 'Todas las páginas',

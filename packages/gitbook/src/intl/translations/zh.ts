@@ -77,6 +77,8 @@ export const zh: TranslationLanguage = {
     pdf_download: '导出为 PDF',
     pdf_goback: '返回内容',
     pdf_print: '打印或另存为 PDF',
+    pdf_images_loading: '图片加载中 (${1}/${2})',
+    pdf_images_loaded: '图片已全部加载',
     pdf_page_of: '${1} / ${2}',
     pdf_mode_only_page: '仅本页',
     pdf_mode_all: '所有页面',

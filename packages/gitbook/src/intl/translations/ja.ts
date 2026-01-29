@@ -79,6 +79,8 @@ export const ja: TranslationLanguage = {
     pdf_download: 'PDFとしてエクスポート',
     pdf_goback: 'コンテンツに戻る',
     pdf_print: '印刷するかPDFとして保存',
+    pdf_images_loading: '画像を読み込み中 (${1}/${2})',
+    pdf_images_loaded: '画像の読み込み完了',
     pdf_page_of: '${1} / ${2}',
     pdf_mode_only_page: 'このページのみ',
     pdf_mode_all: '全てのページ',

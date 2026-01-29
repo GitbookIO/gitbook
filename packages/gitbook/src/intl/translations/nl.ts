@@ -79,6 +79,8 @@ export const nl: TranslationLanguage = {
     pdf_download: 'Exporteer als PDF',
     pdf_goback: 'Ga terug naar inhoud',
     pdf_print: 'Print of opslaan als PDF',
+    pdf_images_loading: 'Afbeeldingen laden (${1}/${2})',
+    pdf_images_loaded: 'Alle afbeeldingen geladen',
     pdf_page_of: '${1} van ${2}',
     pdf_mode_only_page: 'Alleen deze pagina',
     pdf_mode_all: "Alle pagina's",
