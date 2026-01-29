@@ -118,6 +118,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -141,6 +142,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing v2 (Cloudflare)
         needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -164,6 +166,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -187,6 +190,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Visual Testing Customers v2 (Cloudflare)
         needs: deploy-v2-cloudflare
+        if: ${{ always() && needs.deploy-v2-cloudflare.result == 'success' }}
         timeout-minutes: 15
         steps:
             - name: Checkout
@@ -210,6 +214,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Browserless Testing v2 (Vercel)
         needs: deploy-v2-vercel
+        if: ${{ always() && needs.deploy-v2-vercel.result == 'success' }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
