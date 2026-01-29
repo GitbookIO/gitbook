@@ -9,6 +9,8 @@ import { UnwrappedBlocks } from './Blocks';
 export async function ReusableContent(props: BlockProps<DocumentBlockReusableContent>) {
     const { document, block, context, ancestorBlocks } = props;
 
+    console.error('Reusable content should be handled at the API level, this should not be called');
+
     if (!context.contentContext) {
         throw new Error('Expected a content context to render a reusable content block');
     }

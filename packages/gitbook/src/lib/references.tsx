@@ -280,6 +280,10 @@ export async function resolveContentRef(
 
         // TODO-DEREF: Remove this once we have rolled out the new reusable content deref in the API.
         case 'reusable-content': {
+            console.error(
+                'Reusable content should be handled at the API level, this should not be called'
+            );
+
             // Figure out which space and revision the reusable content is in.
             const container = await (async () => {
                 // without a space on the content ref, or if the space is the same as the current one, we can use the current revision.
