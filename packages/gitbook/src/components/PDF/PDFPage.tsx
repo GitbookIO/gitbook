@@ -169,7 +169,7 @@ async function PDFSpaceIntro(props: {
 
     return (
         <PrintPage isFirst>
-            <div className="fleex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-12">
                 <h1 className="font-bold text-6xl">{customization.title ?? space.title}</h1>
             </div>
         </PrintPage>
