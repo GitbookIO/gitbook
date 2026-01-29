@@ -5,9 +5,21 @@ on:
         branches:
             - main
 jobs:
+    approval:
+        # Ensure that external contributors' PRs are manually approved before deployment
+        name: Approve Preview Deployment
+        runs-on: ubuntu-latest
+        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork }}
+        environment:
+          name: preview-approval
+        steps:
+            - name: Approval gate
+              run: echo "Preview deployment approved."
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
+        needs: approval
+        if: ${{ needs.approval.result == 'success' || needs.approval.result == 'skipped' }}
         environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -31,6 +43,8 @@ jobs:
     deploy-v2-cloudflare:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
+        needs: approval
+        if: ${{ needs.approval.result == 'success' || needs.approval.result == 'skipped' }}
         environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
