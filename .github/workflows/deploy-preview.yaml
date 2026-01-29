@@ -1,6 +1,6 @@
 name: Preview
 on:
-    pull_request_target:
+    pull_request_target: {}
     push:
       branches:
         - main
