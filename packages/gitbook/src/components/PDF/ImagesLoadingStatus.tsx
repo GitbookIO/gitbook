@@ -23,7 +23,7 @@ export function ImagesLoadingStatus(props: {
                             `${state.loadedImages}`,
                             `${state.totalImages}`
                         );
-                    case 'loaded':
+                    case 'ready':
                         return tString(language, 'pdf_images_loaded');
                     default:
                         assertNever(state);
@@ -80,11 +80,40 @@ function useImagesLoadingState() {
 
         let raf: number;
 
-        const observer = new MutationObserver(() => {
+        const observer = new MutationObserver((mutationsList) => {
             cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => {
-                calculateImageStatus();
-                attachListeners(Array.from(document.images));
+                const newImages: HTMLImageElement[] = [];
+                let shouldRecalculate = false;
+                for (const mutation of mutationsList) {
+                    if (mutation.type !== 'childList') {
+                        continue;
+                    }
+                    if (mutation.removedNodes.length > 0) {
+                        // Images may have been removed; recalculate counts.
+                        shouldRecalculate = true;
+                    }
+                    mutation.addedNodes.forEach((node) => {
+                        if (node instanceof HTMLImageElement) {
+                            newImages.push(node);
+                            shouldRecalculate = true;
+                        } else if (node instanceof HTMLElement) {
+                            const nestedImages = Array.from(
+                                node.getElementsByTagName('img')
+                            ) as HTMLImageElement[];
+                            if (nestedImages.length > 0) {
+                                newImages.push(...nestedImages);
+                                shouldRecalculate = true;
+                            }
+                        }
+                    });
+                }
+                if (newImages.length > 0) {
+                    attachListeners(newImages);
+                }
+                if (shouldRecalculate) {
+                    calculateImageStatus();
+                }
             });
         });
 
@@ -105,7 +134,7 @@ function useImagesLoadingState() {
     }
 
     return {
-        status: totalImages === loadedImages ? 'loaded' : 'loading',
+        status: totalImages === loadedImages ? 'ready' : 'loading',
         totalImages,
         loadedImages,
     } as const;
