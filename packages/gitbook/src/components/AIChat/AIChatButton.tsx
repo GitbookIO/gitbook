@@ -27,7 +27,7 @@ export function AIChatButton(props: {
             iconOnly={!showLabel || isMobile}
             size="medium"
             variant="header"
-            aria-label={t(language, 'ai_chat_ask', assistant.label)}
+            aria-label={tString(language, 'ai_chat_ask', assistant.label)}
             label={
                 <div className="flex items-center gap-2">
                     {t(language, 'ai_chat_ask', assistant.label)}
