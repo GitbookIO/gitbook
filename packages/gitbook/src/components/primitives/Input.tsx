@@ -177,7 +177,12 @@ export const Input = React.forwardRef<InputElement, InputProps>((props, passedRe
         // If the user wants to handle the keydown by itself, we let him do it.
         if (event.defaultPrevented) return;
 
-        if (event.key === 'Enter' && !event.shiftKey && hasValue) {
+        if (
+            event.key === 'Enter' &&
+            !event.shiftKey &&
+            !event.nativeEvent.isComposing &&
+            hasValue
+        ) {
             event.preventDefault();
             handleSubmit();
         } else if (event.key === 'Escape') {
