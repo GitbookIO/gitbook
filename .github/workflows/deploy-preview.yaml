@@ -19,7 +19,7 @@ jobs:
         name: Deploy v2 to Vercel (preview)
         runs-on: ubuntu-latest
         needs: approval
-        if: ${{ needs.approval.result == 'success' || needs.approval.result == 'skipped' }}
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
           name: 2v-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
@@ -44,7 +44,7 @@ jobs:
         name: Deploy v2 to Cloudflare Worker (preview)
         runs-on: ubuntu-latest
         needs: approval
-        if: ${{ needs.approval.result == 'success' || needs.approval.result == 'skipped' }}
+        if: ${{ always() && (needs.approval.result == 'success' || needs.approval.result == 'skipped') }}
         environment:
           name: 2c-preview
           url: ${{ steps.deploy.outputs.deployment-url }}
