@@ -11,13 +11,21 @@ import { useGitBook } from './GitBookProvider';
 export type GitBookFrameProps = {
     className?: string;
 } & GetFrameURLOptions &
-    GitBookEmbeddableConfiguration;
+    Partial<GitBookEmbeddableConfiguration>;
 
 /**
  * Render a frame with the GitBook Assistant in it.
  */
 export function GitBookFrame(props: GitBookFrameProps) {
-    const { className, visitor, actions, greeting, suggestions, tools } = props;
+    const {
+        className,
+        visitor,
+        actions = [],
+        greeting,
+        suggestions = [],
+        tools = [],
+        tabs = ['assistant', 'docs'],
+    } = props;
 
     const frameRef = useRef<HTMLIFrameElement>(null);
     const gitbook = useGitBook();
@@ -33,13 +41,13 @@ export function GitBookFrame(props: GitBookFrameProps) {
 
     useEffect(() => {
         gitbookFrame?.configure({
-            tabs: ['assistant', 'docs'],
+            tabs,
             actions,
             greeting,
             suggestions,
             tools,
         });
-    }, [gitbookFrame, actions, greeting, suggestions, tools]);
+    }, [gitbookFrame, actions, greeting, suggestions, tools, tabs]);
 
     return (
         <iframe
