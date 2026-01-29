@@ -53,7 +53,7 @@ function useImagesLoadingState() {
         });
     }, []);
 
-    React.useEffect(() => () => cancelAnimationFrame(rafRef.current));
+    React.useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
     const attachListeners = React.useCallback(
         (images: HTMLImageElement[]) => {
