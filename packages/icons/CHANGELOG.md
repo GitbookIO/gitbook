@@ -1,5 +1,11 @@
 # @gitbook/icons
 
+## 0.4.3
+
+### Patch Changes
+
+- 6f1db32: Simplify installation by using public fontawesome mirror.
+
 ## 0.4.2
 
 ### Patch Changes
