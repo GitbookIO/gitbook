@@ -120,7 +120,7 @@ export async function RecordCard(
                             : ['h-auto', 'aspect-video'],
                         objectFits
                     )}
-                    loading={isOffscreen ? 'lazy' : 'eager'}
+                    loading={isOffscreen && context.mode !== 'print' ? 'lazy' : 'eager'}
                 />
             ) : null}
             <div

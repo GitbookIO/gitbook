@@ -77,6 +77,8 @@ export const ru = {
     pdf_download: 'Экспортировать как PDF',
     pdf_goback: 'Вернуться к материалу',
     pdf_print: 'Напечатать или сохранить как PDF',
+    pdf_images_loading: 'Загрузка изображений (${1}/${2})',
+    pdf_images_loaded: 'Все изображения загружены',
     pdf_page_of: '${1} из ${2}',
     pdf_mode_only_page: 'Только эта страница',
     pdf_mode_all: 'Все страницы',

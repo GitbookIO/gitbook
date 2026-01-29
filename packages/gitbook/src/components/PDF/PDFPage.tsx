@@ -24,11 +24,12 @@ import { tcls } from '@/lib/tailwind';
 import { defaultCustomization } from '@/lib/utils';
 import { type PDFSearchParams, getPDFSearchParams } from './urls';
 
+import { PDFPrintControls } from './PDFPrintControls';
 import { PageControlButtons } from './PageControlButtons';
-import { PrintButton } from './PrintButton';
 import './pdf.css';
 import { sanitizeGitBookAppURL } from '@/lib/app';
 import { getPageDocument } from '@/lib/data';
+import { ImagesLoadingStatus } from './ImagesLoadingStatus';
 
 const DEFAULT_LIMIT = 100;
 
@@ -118,28 +119,9 @@ export async function PDFPage(props: {
                 </div>
             ) : null}
 
-            <div className={tcls('fixed', 'right-12', 'top-12', 'print:hidden', 'z-50')}>
-                <PrintButton
-                    title={tString(language, 'pdf_print')}
-                    className={tcls(
-                        'flex',
-                        'flex-row',
-                        'items-center',
-                        'justify-center',
-                        'text-sm',
-                        'text-tint',
-                        'hover:text-primary',
-                        'p-4',
-                        'rounded-full',
-                        'bg-white',
-                        'shadow-xs',
-                        'hover:shadow-md',
-                        'border-slate-300',
-                        'border'
-                    )}
-                >
-                    <Icon icon="print" className={tcls('size-6')} />
-                </PrintButton>
+            <div className="fixed top-12 right-12 z-50 flex flex-col items-end gap-2 print:hidden">
+                <PDFPrintControls language={language} />
+                <ImagesLoadingStatus language={language} />
             </div>
 
             <PageControlButtons
@@ -187,10 +169,8 @@ async function PDFSpaceIntro(props: {
 
     return (
         <PrintPage isFirst>
-            <div className={tcls('flex', 'items-center', 'justify-center', 'py-12')}>
-                <h1 className={tcls('text-6xl', 'font-bold')}>
-                    {customization.title ?? space.title}
-                </h1>
+            <div className="flex items-center justify-center py-12">
+                <h1 className="font-bold text-6xl">{customization.title ?? space.title}</h1>
             </div>
         </PrintPage>
     );
@@ -201,18 +181,8 @@ async function PDFPageGroup(props: { space: Space; page: RevisionPageGroup }) {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <div
-                className={tcls(
-                    'break-before-page',
-                    'mt-10',
-                    'print:mt-0',
-                    'flex',
-                    'items-center',
-                    'justify-center',
-                    'py-12'
-                )}
-            >
-                <h1 className={tcls('text-5xl', 'font-bold')}>{page.title}</h1>
+            <div className="mt-10 flex break-before-page items-center justify-center py-12 print:mt-0">
+                <h1 className="font-bold text-5xl">{page.title}</h1>
             </div>
         </PrintPage>
     );
@@ -227,9 +197,9 @@ async function PDFPageDocument(props: {
 
     return (
         <PrintPage id={getPagePDFContainerId(page)}>
-            <h1 className={tcls('text-4xl', 'font-bold')}>{page.title}</h1>
+            <h1 className="font-bold text-4xl">{page.title}</h1>
             {page.description ? (
-                <p className={tcls('decoration-primary/6', 'mt-2', 'mb-3')}>{page.description}</p>
+                <p className="mt-2 mb-3 decoration-primary/6">{page.description}</p>
             ) : null}
 
             {document ? (
