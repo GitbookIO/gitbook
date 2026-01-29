@@ -137,6 +137,10 @@ export async function resolveContentRef(
         }
 
         case 'file': {
+            if (isContentRefInDifferentSpace(contentRef, context)) {
+                return resolveContentRefInSpace(contentRef.space, context, contentRef, options);
+            }
+
             const file = getRevisionFile({ revision, fileId: contentRef.file });
             if (file) {
                 return {
