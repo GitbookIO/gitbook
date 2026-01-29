@@ -1,9 +1,9 @@
 name: Preview
 on:
-    pull_request:
+    pull_request_target:
     push:
-      branches:
-        - main
+        branches:
+            - main
 jobs:
     deploy-v2-vercel:
         name: Deploy v2 to Vercel (preview)
@@ -16,6 +16,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Deploy to Vercel
               id: deploy
               uses: ./.github/composite/deploy-vercel
@@ -37,6 +39,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Deploy to Cloudflare
               id: deploy
               uses: ./.github/composite/deploy-cloudflare
@@ -63,7 +67,7 @@ jobs:
     comment-deployments:
         runs-on: ubuntu-latest
         name: Comment Deployments (preview)
-        if: always() && !startsWith(github.ref, 'refs/heads/main')
+        if: always() && github.event_name != 'push'
         needs:
             - deploy-v2-vercel
             - deploy-v2-cloudflare
@@ -104,6 +108,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -125,6 +131,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -146,6 +154,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -167,6 +177,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
@@ -187,6 +199,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
             - name: Setup Bun
               uses: ./.github/composite/setup-bun
             - name: Install dependencies
