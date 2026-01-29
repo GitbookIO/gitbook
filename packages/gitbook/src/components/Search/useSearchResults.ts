@@ -47,8 +47,7 @@ export function useSearchResults(props: {
         error: boolean;
     }>({ results: [], fetching: false, error: false });
 
-    const { assistants } = useAI();
-    const withAI = assistants.length > 0;
+    const { assistants, withAI } = useAI();
 
     React.useEffect(() => {
         if (disabled) {

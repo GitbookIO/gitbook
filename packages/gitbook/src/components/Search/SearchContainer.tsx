@@ -58,7 +58,7 @@ export function SearchContainer({
     viewport,
     siteSpaces,
 }: SearchContainerProps) {
-    const { assistants, config } = useAI();
+    const { assistants, withAI, withGitBookAI, withSearchAI, config } = useAI();
 
     const state = useSearchState();
     const setSearchState = useSetSearchState();
@@ -70,9 +70,6 @@ export function SearchContainer({
     const isLoaded = useBodyLoaded();
 
     const isMobile = useIsMobile();
-
-    const withAI = assistants.length > 0;
-    const withSearchAI = assistants.filter((assistant) => assistant.mode === 'search').length > 0;
 
     // Handle initial ask state on page load, once assistants are ready
     const initialRef = React.useRef(state?.ask === undefined || state?.ask === null); // If ask is not set on page load, we will never trigger
@@ -199,7 +196,7 @@ export function SearchContainer({
     );
 
     const { results, fetching, error } = useSearchResults({
-        disabled: !(state?.query || withAI),
+        disabled: !(state?.query || withGitBookAI),
         query: normalizedQuery,
         siteSpaceId: siteSpace.id,
         siteSpaceIds,

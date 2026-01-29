@@ -73,6 +73,9 @@ function useAIConfig(): AIConfig {
 type AIContext = {
     config: AIConfig;
     assistants: Assistant[];
+    withAI: boolean;
+    withSearchAI: boolean;
+    withGitBookAI: boolean;
 };
 
 /**
@@ -149,5 +152,8 @@ export function useAI(): AIContext {
     return {
         config,
         assistants,
+        withAI: assistants.length > 0,
+        withSearchAI: assistants.some((assistant) => assistant.mode === 'search'),
+        withGitBookAI: assistants.some((assistant) => assistant.id.startsWith('gitbook-')),
     };
 }
