@@ -1,19 +1,38 @@
-import type {
-    DocumentBlockCode,
-    DocumentBlockCodeLine,
-    DocumentInlineAnnotation,
+import {
+    CustomizationCodeTheme,
+    type CustomizationThemedCodeTheme,
+    type DocumentBlockCode,
+    type DocumentBlockCodeLine,
+    type DocumentInlineAnnotation,
 } from '@gitbook/api';
 import {
+    type ThemeRegistrationAny,
     type ThemedToken,
-    createCssVariablesTheme,
     createSingletonShorthands,
     createdBundledHighlighter,
 } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import { type BundledLanguage, bundledLanguages } from 'shiki/langs';
+import { bundledThemes } from 'shiki/themes';
 
 import { nullIfNever } from '@/lib/typescript';
+import { customThemes } from './customThemes';
 import { plainHighlight } from './plain-highlight';
+
+export const DEFAULT_THEMES: CustomizationThemedCodeTheme = {
+    light: CustomizationCodeTheme.DefaultLight,
+    dark: CustomizationCodeTheme.DefaultDark,
+};
+
+export type HighlightTheme = {
+    bg?: string;
+    fg?: string;
+    themes: {
+        light: ThemeRegistrationAny;
+        dark: ThemeRegistrationAny;
+    };
+    lines: HighlightLine[];
+};
 
 export type HighlightLine = {
     highlighted: boolean;
@@ -36,12 +55,12 @@ export type RenderedInline = {
 
 const isSafari =
     typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-const theme = createCssVariablesTheme();
 
+// Merge bundled Shiki themes with our custom themes so both are available to the highlighter
 const { getSingletonHighlighter } = createSingletonShorthands(
     createdBundledHighlighter<any, any>({
         langs: bundledLanguages,
-        themes: {},
+        themes: { ...bundledThemes, ...customThemes },
         engine: () => createJavaScriptRegexEngine({ forgiving: true, target: 'ES2018' }),
     })
 );
@@ -49,12 +68,15 @@ const { getSingletonHighlighter } = createSingletonShorthands(
 /**
  * Preload the highlighter for a code block.
  */
-export async function preloadHighlight(block: DocumentBlockCode) {
+export async function preloadHighlight(
+    block: DocumentBlockCode,
+    themes: CustomizationThemedCodeTheme = DEFAULT_THEMES
+) {
     const langName = getBlockLang(block);
     if (langName) {
         await getSingletonHighlighter({
             langs: [langName],
-            themes: [theme],
+            themes: [themes.light, themes.dark],
         });
     }
 }
@@ -67,8 +89,9 @@ export async function highlight(
     inlines: RenderedInline[],
     options?: {
         evaluateInlineExpression?: (expr: string) => string;
+        themes?: CustomizationThemedCodeTheme;
     }
-): Promise<HighlightLine[]> {
+): Promise<HighlightTheme> {
     const langName = getBlockLang(block);
 
     if (!langName || (isSafari && ['powershell', 'cpp'].includes(langName))) {
@@ -80,12 +103,19 @@ export async function highlight(
         return plainHighlight(block, inlines, options);
     }
 
+    const themes = options?.themes ?? DEFAULT_THEMES;
+
     const code = getPlainCodeBlock(block, undefined, options);
 
     const highlighter = await getSingletonHighlighter({
         langs: [langName],
-        themes: [theme],
+        themes: [themes.light, themes.dark],
     });
+
+    const resolvedThemes = {
+        light: highlighter.getTheme(themes.light),
+        dark: highlighter.getTheme(themes.dark),
+    };
 
     let tokenizeMaxLineLength = 400;
     // In some cases, people will use unindented code blocks with a single line.
@@ -94,38 +124,47 @@ export async function highlight(
         tokenizeMaxLineLength = 5000;
     }
 
-    const lines = highlighter.codeToTokensBase(code, {
+    const result = highlighter.codeToTokens(code, {
         lang: langName,
-        theme,
+        themes: resolvedThemes,
+        // Shiki's light-dark() CSS function provides different colors for light/dark modes based on the resolved themes
+        defaultColor: 'light-dark()',
         tokenizeMaxLineLength,
     });
 
+    const lines = result.tokens;
+
     let currentIndex = 0;
-    return lines.map((tokens, index) => {
-        const lineBlock = block.nodes[index];
-        const result: HighlightToken[] = [];
+    return {
+        bg: result.bg,
+        fg: result.fg,
+        themes: resolvedThemes,
+        lines: lines.map((tokens, index) => {
+            const lineBlock = block.nodes[index];
+            const result: HighlightToken[] = [];
 
-        const eatToken = (): PositionedToken | null => {
-            const token = tokens.shift();
-            if (token) {
-                currentIndex += token.content.length;
+            const eatToken = (): PositionedToken | null => {
+                const token = tokens.shift();
+                if (token) {
+                    currentIndex += token.content.length;
+                }
+                return token
+                    ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
+                    : null;
+            };
+
+            while (tokens.length > 0) {
+                result.push(...matchTokenAndInlines(eatToken, inlines));
             }
-            return token
-                ? { ...token, start: currentIndex - token.content.length, end: currentIndex }
-                : null;
-        };
 
-        while (tokens.length > 0) {
-            result.push(...matchTokenAndInlines(eatToken, inlines));
-        }
+            currentIndex += 1; // for the \n
 
-        currentIndex += 1; // for the \n
-
-        return {
-            highlighted: Boolean(lineBlock?.data.highlighted),
-            tokens: result,
-        };
-    });
+            return {
+                highlighted: Boolean(lineBlock?.data.highlighted),
+                tokens: result,
+            };
+        }),
+    };
 }
 
 /**

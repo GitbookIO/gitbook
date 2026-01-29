@@ -9,7 +9,7 @@ import { useAI } from '../AI';
 import { AIChatButton } from '../AIChat';
 import { useTrackEvent } from '../Insights';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { Popover } from '../primitives';
+import { Popover, useBodyLoaded } from '../primitives';
 import { SearchAskAnswer } from './SearchAskAnswer';
 import { useSearchAskState } from './SearchAskContext';
 import { SearchAskProvider } from './SearchAskContext';
@@ -67,6 +67,7 @@ export function SearchContainer({
     const trackEvent = useTrackEvent();
     const resultsRef = useRef<SearchResultsRef>(null);
     const searchInputRef = useRef<HTMLDivElement>(null);
+    const isLoaded = useBodyLoaded();
 
     const isMobile = useIsMobile();
 
@@ -80,11 +81,13 @@ export function SearchContainer({
         if (assistants.length === 0) return;
         if (state?.ask === undefined || state?.ask === null) return;
 
-        initialRef.current = true;
-
         // For simplicity we're only triggering the first assistant
-        assistants[0]?.open(state.ask ?? undefined);
-    }, [state?.ask, assistants.length, assistants[0]?.open]);
+        // Because this is in the layout, we need to await for the body to be loaded.
+        if (isLoaded) {
+            assistants[0]?.open(state.ask ?? undefined);
+            initialRef.current = true;
+        }
+    }, [state?.ask, assistants.length, assistants[0]?.open, isLoaded]);
 
     const onClose = React.useCallback(
         async (to?: string) => {

@@ -2,7 +2,13 @@ import clsx from 'classnames';
 import { type ComponentPropsWithoutRef, forwardRef } from 'react';
 
 export function Section(props: ComponentPropsWithoutRef<'div'>) {
-    return <div {...props} className={clsx('openapi-section', props.className)} />;
+    return (
+        <div
+            {...props}
+            data-follow-color-scheme="true"
+            className={clsx('openapi-section', props.className)}
+        />
+    );
 }
 
 export function SectionHeader(props: ComponentPropsWithoutRef<'div'>) {

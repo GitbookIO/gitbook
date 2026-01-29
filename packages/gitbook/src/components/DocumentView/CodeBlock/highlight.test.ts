@@ -8,7 +8,8 @@ async function highlightWithInlines(block: DocumentBlockCode) {
         inline,
         body: null,
     }));
-    return highlight(block, inlines);
+    const result = await highlight(block, inlines);
+    return result.lines;
 }
 
 it('should parse plain code', async () => {
@@ -224,7 +225,19 @@ it('should parse code with an inline on a single line', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: '"Hello World"',
+                        content: '"',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'Hello World',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '"',
                     },
                 },
                 {
@@ -375,7 +388,19 @@ it('should parse code with an inline on a multiple line', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: '"Hello World"',
+                        content: '"',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'Hello World',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '"',
                     },
                 },
                 {
@@ -631,7 +656,13 @@ it('should support multiple code tokens in an annotation', async () => {
                         {
                             type: 'shiki',
                             token: {
-                                content: '.world',
+                                content: '.',
+                            },
+                        },
+                        {
+                            type: 'shiki',
+                            token: {
+                                content: 'world',
                             },
                         },
                         {
@@ -645,7 +676,13 @@ it('should support multiple code tokens in an annotation', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: ');',
+                        content: ')',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: ';',
                     },
                 },
             ],
@@ -699,7 +736,13 @@ it('should handle \\r', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: '.log',
+                        content: '.',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'log',
                     },
                 },
                 {
@@ -711,7 +754,19 @@ it('should handle \\r', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: '"Hello"',
+                        content: '"',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'Hello',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '"',
                     },
                 },
                 {
@@ -734,7 +789,13 @@ it('should handle \\r', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: '.log',
+                        content: '.',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'log',
                     },
                 },
                 {
@@ -746,7 +807,19 @@ it('should handle \\r', async () => {
                 {
                     type: 'shiki',
                     token: {
-                        content: '"World"',
+                        content: '"',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: 'World',
+                    },
+                },
+                {
+                    type: 'shiki',
+                    token: {
+                        content: '"',
                     },
                 },
                 {

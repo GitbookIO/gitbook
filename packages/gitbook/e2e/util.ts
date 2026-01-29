@@ -2,6 +2,7 @@ import { argosScreenshot } from '@argos-ci/playwright';
 import {
     CustomizationAIMode,
     CustomizationBackground,
+    CustomizationCodeTheme,
     CustomizationCorners,
     CustomizationDefaultFont,
     CustomizationDefaultMonospaceFont,
@@ -298,6 +299,16 @@ export function getCustomizationURL(partial: DeepPartial<SiteCustomizationSettin
             background: CustomizationBackground.Plain,
             icons: CustomizationIconsStyle.Regular,
             links: CustomizationLinksStyle.Default,
+            codeTheme: {
+                default: {
+                    light: CustomizationCodeTheme.DefaultLight,
+                    dark: CustomizationCodeTheme.DefaultDark,
+                },
+                openapi: {
+                    light: CustomizationCodeTheme.DefaultLight,
+                    dark: CustomizationCodeTheme.DefaultDark,
+                },
+            },
             sidebar: {
                 background: CustomizationSidebarBackgroundStyle.Default,
                 list: CustomizationSidebarListStyle.Default,

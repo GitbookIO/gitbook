@@ -296,88 +296,36 @@ html.announcement-hidden #announcement-banner {
     @apply hidden;
 }
 
-/* Shiki theme */
-:root {
-    --shiki-color-text: rgb(var(--tint-11));
-    --shiki-token-punctuation: rgb(var(--tint-11));
-    --shiki-token-comment: rgb(var(--neutral-9));
-    --shiki-token-link: rgb(var(--primary-10));
-
-    --shiki-token-constant: rgb(var(--warning-10));
-    --shiki-token-string: rgb(var(--warning-10));
-    --shiki-token-string-expression: rgb(var(--success-10));
-    --shiki-token-keyword: rgb(var(--danger-10));
-    --shiki-token-parameter: rgb(var(--warning-10));
-    --shiki-token-function: rgb(var(--primary-10));
-
-    --shiki-token-inserted: rgb(var(--success-10));
-    --shiki-token-deleted: rgb(var(--danger-10));
-    --shiki-token-changed: rgb(var(--tint-12));
-}
-
-@media (prefers-contrast: more) {
-    :root {
-        --shiki-color-text: rgb(var(--tint-12));
-        --shiki-token-punctuation: rgb(var(--tint-12));
-        --shiki-token-comment: rgb(var(--neutral-11));
-        --shiki-token-link: rgb(var(--primary-11));
-
-        --shiki-token-constant: rgb(var(--warning-11));
-        --shiki-token-string: rgb(var(--warning-11));
-        --shiki-token-string-expression: rgb(var(--success-11));
-        --shiki-token-keyword: rgb(var(--danger-11));
-        --shiki-token-parameter: rgb(var(--warning-11));
-        --shiki-token-function: rgb(var(--primary-11));
-
-        --shiki-token-inserted: rgb(var(--success-11));
-        --shiki-token-deleted: rgb(var(--danger-11));
-        --shiki-token-changed: rgb(var(--tint-12));
-    }
-}
-
-html.dark {
-    /* Override select colors to have more contrast */
-    --shiki-token-comment: rgb(var(--neutral-9));
-
-    --shiki-token-constant: rgb(var(--warning-11));
-    --shiki-token-string: rgb(var(--warning-11));
-    --shiki-token-string-expression: rgb(var(--success-11));
-    --shiki-token-keyword: rgb(var(--danger-11));
-    --shiki-token-parameter: rgb(var(--warning-11));
-    --shiki-token-function: rgb(var(--primary-11));
-}
-
-.code-monochrome {
-    --shiki-token-constant: rgb(var(--tint-11));
-    --shiki-token-string: rgb(var(--tint-12));
-    --shiki-token-string-expression: rgb(var(--tint-12));
-    --shiki-token-keyword: rgb(var(--primary-10));
-    --shiki-token-parameter: rgb(var(--tint-9));
-    --shiki-token-function: rgb(var(--primary-9));
-}
-
-html.dark.code-monochrome {
-    --shiki-token-constant: rgb(var(--tint-11));
-    --shiki-token-string: rgb(var(--tint-12));
-    --shiki-token-string-expression: rgb(var(--tint-12));
-    --shiki-token-keyword: rgb(var(--primary-11));
-    --shiki-token-parameter: rgb(var(--tint-10));
-    --shiki-token-function: rgb(var(--primary-10));
-}
-
 html.font-Lato {
     /* Lato's default ligatures impact readability, so we turn them off */
     font-variant-ligatures: no-common-ligatures;
 }
 
 /* Code blocks */
+/* Shiki themes can define font styling (style, weight, decoration) via CSS variables.
+ * These variables are prefixed with --shiki-{mode}-{property} and allow themes to customize
+ * typography beyond just colors. We apply them here so code blocks respect theme font styling. */
+.shiki, .shiki span {
+    font-style: var(--shiki-light-font-style) !important;
+    font-weight: var(--shiki-light-font-weight) !important;
+    text-decoration: var(--shiki-light-text-decoration) !important;
+}
+
+html.dark .shiki,
+html.dark .shiki span {
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
 .highlight-line {
-    @apply grid grid-cols-subgrid col-span-2 relative ring-1 ring-transparent hover:ring-tint-hover hover:z-1 rounded-sm;
+    @apply text-tint-strong grid grid-cols-subgrid col-span-2 relative hover:invert-5 hover:z-1 rounded-sm;
     @apply only:hover:ring-transparent;
     @apply [counter-increment:line];
 
     &.highlighted {
-        @apply bg-tint-active;
+        /* Use `invert-` to get a dynamic color that contrasts with the background, regardless of the codeblock's theme. */
+        @apply bg-tint-base invert-10 hover:invert-15;
         @apply first:rounded-t-md first:*:mt-1;
         @apply last:rounded-b-md last:*:mb-1;
         @apply rounded-none;
@@ -397,12 +345,8 @@ html.font-Lato {
 }
 
 .highlight-line-number {
-    @apply text-sm text-right pr-3.5 rounded-l pl-2 sticky left-[-3px] bg-linear-to-r from-80% from-tint-subtle contrast-more:from-tint-base theme-muted:from-tint-base [html.theme-bold.sidebar-filled_&]:from-tint-base to-transparent;
-    @apply before:text-tint before:content-[counter(line)];
-
-    .highlight-line.highlighted > & {
-        @apply before:text-tint bg-linear-to-r from-80% from-tint-active to-transparent;
-    }
+    @apply text-sm text-tint text-right pr-3.5 bg-tint-base rounded-l pl-2 sticky left-[-3px] mask-r-from-80%;
+    @apply before:content-[counter(line)] not-contrast-more:before:opacity-6;
 }
 
 .highlight-line-content {
