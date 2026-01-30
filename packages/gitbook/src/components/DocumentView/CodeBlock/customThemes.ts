@@ -4,8 +4,8 @@ export const customThemes: Record<string, ThemeRegistration> = {
     'default-light': createTheme({
         name: 'default-light',
         type: 'light',
-        bg: 'rgb(var(--tint-2))',
-        fg: 'rgb(var(--tint-12))',
+        bg: 'inherit',
+        fg: 'inherit',
         colors: {
             basic: {
                 comment: 'rgb(var(--neutral-9))',
@@ -62,8 +62,8 @@ export const customThemes: Record<string, ThemeRegistration> = {
     'default-dark': createTheme({
         name: 'default-dark',
         type: 'dark',
-        bg: 'rgb(var(--tint-2))',
-        fg: 'rgb(var(--tint-12))',
+        bg: 'inherit',
+        fg: 'inherit',
         colors: {
             basic: {
                 comment: 'rgb(var(--neutral-9))',
@@ -120,8 +120,8 @@ export const customThemes: Record<string, ThemeRegistration> = {
     'monochrome-light': createTheme({
         name: 'monochrome-light',
         type: 'light',
-        bg: 'rgb(var(--tint-2))',
-        fg: 'rgb(var(--tint-12))',
+        bg: 'inherit',
+        fg: 'inherit',
         colors: {
             basic: {
                 comment: 'rgb(var(--tint-9))',
@@ -178,8 +178,8 @@ export const customThemes: Record<string, ThemeRegistration> = {
     'monochrome-dark': createTheme({
         name: 'monochrome-dark',
         type: 'dark',
-        bg: 'rgb(var(--tint-2))',
-        fg: 'rgb(var(--tint-12))',
+        bg: 'inherit',
+        fg: 'inherit',
         colors: {
             basic: {
                 comment: 'rgb(var(--tint-9))',

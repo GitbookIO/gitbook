@@ -51,7 +51,7 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             <div className="flex items-center justify-start gap-2 text-sm [grid-area:1/1]">
                 {title ? (
                     <div
-                        className="relative top-px z-20 inline-flex items-center justify-center circular-corners:rounded-t-xl rounded-corners:rounded-t-lg straight-corners:rounded-t-xs border border-tint-subtle border-b-0 bg-tint-subtle theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
+                        className="relative top-px z-20 inline-flex items-center justify-center circular-corners:rounded-t-xl rounded-corners:rounded-t-lg straight-corners:rounded-t-xs border border-tint-subtle border-b-0 bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base px-3 py-2 text-tint text-xs leading-none tracking-wide contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base"
                         style={{
                             backgroundColor: bg?.color,
                             ...bg?.vars,
@@ -69,8 +69,8 @@ export const CodeBlockRenderer = forwardRef(function CodeBlockRenderer(
             />
             <pre
                 className={tcls(
-                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-muted:bg-tint-base p-2 text-tint-strong [grid-area:2/1] contrast-more:border-tint contrast-more:bg-tint-base [html.theme-bold.sidebar-filled_&]:bg-tint-base',
-                    'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs shadow-xs',
+                    'relative overflow-auto border border-tint-subtle bg-tint-subtle theme-bold-tint:bg-tint-base theme-muted:bg-tint-base p-2 text-tint-strong [grid-area:2/1] contrast-more:border-tint contrast-more:bg-tint-base',
+                    'circular-corners:rounded-2xl rounded-corners:rounded-xl straight-corners:rounded-xs depth-subtle:shadow-xs',
                     title && 'rounded-ss-none!'
                 )}
                 style={{
@@ -115,14 +115,12 @@ function CodeHighlightLine(props: {
     return (
         <span
             className={tcls('highlight-line', line.highlighted && 'highlighted')}
-            style={
-                line.highlighted
-                    ? {
-                          backgroundColor: bg?.color,
-                          ...bg?.vars,
-                      }
-                    : undefined
-            }
+            style={{
+                color: fg?.color,
+                ...fg?.vars,
+                backgroundColor: bg?.color,
+                ...bg?.vars,
+            }}
         >
             {withLineNumbers && (
                 <span
