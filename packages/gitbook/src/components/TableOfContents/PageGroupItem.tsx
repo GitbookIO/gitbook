@@ -27,7 +27,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
                     '[html.sidebar-filled.theme-bold.tint_&]:bg-tint-base',
                     'lg:[html.sidebar-default.theme-gradient_&]:bg-gradient-primary',
                     'lg:[html.sidebar-default.theme-gradient.tint_&]:bg-gradient-tint',
-                    isFirst ? '-mt-4' : ''
+                    isFirst ? '-mt-2 -top-2 rounded-t-2xl pt-2' : ''
                 )}
             >
                 <TOCPageIcon page={page} />

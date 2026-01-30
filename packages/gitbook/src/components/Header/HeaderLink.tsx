@@ -115,13 +115,6 @@ function HeaderItemButton(
             href={href}
             variant={variant}
             size="medium"
-            className={tcls(
-                {
-                    'button-primary':
-                        'theme-bold:bg-header-link theme-bold:text-header-background theme-bold:shadow-none hover:theme-bold:bg-header-link hover:theme-bold:text-header-background hover:theme-bold:shadow-none',
-                    'button-secondary': '',
-                }[linkStyle]
-            )}
             insights={{
                 type: 'link_click',
                 link: {

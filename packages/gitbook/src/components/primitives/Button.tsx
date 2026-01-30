@@ -70,12 +70,12 @@ export const variantClasses = {
         'bg-tint-base text-tint',
         'hover:theme-clean:bg-tint-subtle',
 
-        'theme-bold:bg-header-link/2',
+        'theme-bold:bg-header-link/1',
         'theme-bold:text-header-link',
         'theme-bold:shadow-none!',
         'theme-bold:border-header-link/4',
 
-        'hover:theme-bold:bg-header-link/3',
+        'hover:theme-bold:bg-header-link/2',
         'hover:theme-bold:text-header-link',
         'hover:theme-bold:shadow-none',
         'hover:theme-bold:border-header-link/5',
