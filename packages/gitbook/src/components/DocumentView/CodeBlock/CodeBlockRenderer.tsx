@@ -115,14 +115,12 @@ function CodeHighlightLine(props: {
     return (
         <span
             className={tcls('highlight-line', line.highlighted && 'highlighted')}
-            style={
-                line.highlighted
-                    ? {
-                          backgroundColor: bg?.color,
-                          ...bg?.vars,
-                      }
-                    : undefined
-            }
+            style={{
+                color: fg?.color,
+                ...fg?.vars,
+                backgroundColor: bg?.color,
+                ...bg?.vars,
+            }}
         >
             {withLineNumbers && (
                 <span

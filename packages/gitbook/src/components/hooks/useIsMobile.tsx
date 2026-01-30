@@ -12,7 +12,6 @@ export function useIsMobile(breakpoint = 1024, container?: string): boolean {
                 // In the case of a container we need a ResizeObserver, since the matchMedia listener might fire at different times than the container size changes.
                 const observer = new ResizeObserver((entries) => {
                     entries.forEach((entry) => {
-                        console.log('checked', entry.contentRect.width < breakpoint);
                         setIsMobile(entry.contentRect.width < breakpoint);
                     });
                 });
