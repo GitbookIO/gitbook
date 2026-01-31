@@ -6,6 +6,7 @@ import { useLanguage } from '@/intl/client';
 import { t, tString } from '@/intl/translate';
 import { tcls } from '@/lib/tailwind';
 
+import { useCustomCookieBanner, useIntegrationsLoaded } from '@/components/Integrations';
 import { isCookiesTrackingDisabled, setCookiesTracking } from '../Insights';
 
 /**
@@ -15,10 +16,18 @@ export function CookiesToast(props: { privacyPolicy?: string }) {
     const { privacyPolicy = 'https://policies.gitbook.com/privacy/cookies' } = props;
     const [show, setShow] = React.useState(false);
     const language = useLanguage();
+    const integrationsLoaded = useIntegrationsLoaded();
+    const { hasCustomCookieBanner } = useCustomCookieBanner();
 
     React.useEffect(() => {
+        // Always wait for integrations to load, and if a custom banner is registered, hide the built-in banner
+        if (!integrationsLoaded || hasCustomCookieBanner) {
+            setShow(false);
+            return;
+        }
+
         setShow(isCookiesTrackingDisabled() === undefined);
-    }, []);
+    }, [hasCustomCookieBanner, integrationsLoaded]);
 
     if (!show) {
         return null;

@@ -46,6 +46,11 @@ export type GitBookAssistant = {
     ui?: boolean;
 };
 
+export type GitBookCookieBannerHandler = (options: {
+    onApprove: () => void;
+    onReject: () => void;
+}) => void;
+
 export type GitBookGlobal = {
     /**
      * Register an event listener.
@@ -72,6 +77,12 @@ export type GitBookGlobal = {
      * Register a custom assistant to be available on the site.
      */
     registerAssistant: (assistant: GitBookAssistant) => () => void;
+
+    /**
+     * Register a custom cookie banner handler.
+     * When registered, the built-in cookie banner will not be displayed.
+     */
+    registerCookieBanner: (handler: GitBookCookieBannerHandler) => void;
 };
 
 declare global {
