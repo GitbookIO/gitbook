@@ -44,8 +44,8 @@ export function Update(props: BlockProps<DocumentBlockUpdate>) {
         >
             <div
                 className={tcls(
-                    // Date is only sticky on larger screens when we use flex-row layout
-                    'h-fit w-40 min-w-40 shrink-0 md:sticky md:top-[calc(var(--toc-top-offset)+8px)]!'
+                    // Date is only sticky on larger screens when we use flex-row layout, with 0px fallback to prevent flicker and flaky tests before JS sets the variable
+                    'h-fit w-40 min-w-40 shrink-0 md:sticky md:top-[calc(var(--toc-top-offset,0px)+8px)]!'
                 )}
             >
                 <time
