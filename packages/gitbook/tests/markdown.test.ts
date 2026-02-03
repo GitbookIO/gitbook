@@ -8,6 +8,7 @@ it('should expose a markdown page with the .md extension', async () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toContain('text/markdown');
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
     expect(await response.text()).toContain('# Text page');
 });
 
@@ -23,5 +24,6 @@ it('should expose a markdown page with the accept header', async () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toContain('text/markdown');
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
     expect(await response.text()).toContain('# Text page');
 });
