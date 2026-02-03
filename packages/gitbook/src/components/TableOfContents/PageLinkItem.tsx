@@ -15,7 +15,7 @@ export function PageLinkItem(props: { page: ClientTOCPageLink }) {
     const isExternal = page.target.kind === 'url';
 
     return (
-        <li className={tcls('flex', 'flex-col')}>
+        <li className="page-link-item flex flex-col [.page-group-item+&]:mt-4">
             <Link
                 href={page.href ?? '#'}
                 classNames={['ToggleableLinkItemStyles']}

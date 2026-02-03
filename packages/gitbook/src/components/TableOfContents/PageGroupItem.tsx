@@ -11,7 +11,7 @@ export function PageGroupItem(props: { page: ClientTOCPageGroup; isFirst?: boole
     const { page, isFirst } = props;
 
     return (
-        <li className="flex flex-col">
+        <li className="page-group-item flex flex-col">
             <div
                 className={tcls(
                     '-top-4 sticky z-1 flex items-center gap-3 px-3',
