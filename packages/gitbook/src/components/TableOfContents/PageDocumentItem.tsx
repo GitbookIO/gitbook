@@ -12,7 +12,7 @@ export function PageDocumentItem(props: { page: ClientTOCPageDocument }) {
     const { page } = props;
 
     return (
-        <li className="flex flex-col">
+        <li className="page-document-item flex flex-col [.page-group-item+&]:mt-4">
             <ToggleableLinkItem
                 href={page.href ?? '#'}
                 pathnames={page.pathnames}
