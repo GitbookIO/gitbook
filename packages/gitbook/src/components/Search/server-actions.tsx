@@ -388,17 +388,19 @@ async function transformSitePageResult(
     };
 
     const pageSections = await Promise.all(
-        pageItem.sections?.map<Promise<ComputedSectionResult>>(async (section) => ({
-            type: 'section',
-            id: `${page.id}/${section.id}`,
-            title: section.title,
-            href: spaceURL
-                ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
-                : linker.toPathInSpace(pageItem.path),
-            body: section.body,
-            pageId: pageItem.id,
-            spaceId: spaceItem.id,
-        })) ?? []
+        pageItem.sections
+            ?.filter((section) => section.title || section.body)
+            .map<Promise<ComputedSectionResult>>(async (section) => ({
+                type: 'section',
+                id: `${page.id}/${section.id}`,
+                title: section.title,
+                href: spaceURL
+                    ? linker.toLinkForContent(joinPathWithBaseURL(spaceURL, section.path))
+                    : linker.toPathInSpace(pageItem.path),
+                body: section.body,
+                pageId: pageItem.id,
+                spaceId: spaceItem.id,
+            })) ?? []
     );
 
     return [page, ...pageSections];
