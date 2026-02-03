@@ -129,7 +129,7 @@ export function SpaceLayout(props: SpaceLayoutProps) {
                         'lg:flex-row',
                         'lg:justify-center',
                         CONTAINER_STYLE,
-                        'site-width-wide:max-w-screen-4xl',
+                        'layout-full-width:max-w-screen-4xl',
                         'transition-[max-width] duration-300',
 
                         // Ensure the footer is display below the viewport even if the content is not enough

@@ -36,20 +36,39 @@ export function PageAside(props: {
             className={tcls(
                 'group/aside',
                 'order-last',
-                'hidden',
-                'max-w-0',
                 'pt-8',
                 'pb-4',
-                'opacity-0',
 
-                'xl:flex',
+                // Hide by default
+                'hidden',
+
+                // Show on xl screens for default layout (normal sidebar)
+                'xl:layout-default:flex',
+                'xl:layout-default:max-w-56',
+                'xl:layout-default:opacity-11',
+                'xl:layout-default:ml-12',
+
+                // Show on xl screens for OpenAPI layout (floating overlay)
+                'xl:layout-openapi:flex',
+                'xl:layout-openapi:opacity-100',
+                'xl:layout-openapi:z-10',
+                'xl:layout-openapi:fixed',
+                'xl:layout-openapi:right-8',
+                'xl:layout-openapi:w-60',
+                'xl:layout-openapi:max-w-60',
+                'xl:layout-openapi:pb-8',
+                'xl:layout-openapi:pt-10',
+                'xl:layout-openapi:ml-0',
+
+                // Always hide for full-width layout
+                'layout-full-width:hidden!',
 
                 'overflow-hidden',
 
-                'xl:max-w-56',
-                'xl:opacity-11',
-                'xl:ml-12',
+                'max-w-0',
+                'opacity-0',
 
+                // Hide when chat is open
                 'xl:max-3xl:chat-open:hidden',
                 'xl:max-3xl:chat-open:max-w-0',
                 'xl:max-3xl:chat-open:opacity-0',
@@ -85,17 +104,7 @@ export function PageAside(props: {
 
                 // Client-side dynamic positioning (CSS vars applied by script)
                 'lg:[html[style*="--outline-top-offset"]_&]:top-(--outline-top-offset)!',
-                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!',
-
-                // When in api page mode, we display it as an overlay on non-large resolutions
-                'xl:max-2xl:page-api-block:z-10',
-                'xl:max-2xl:page-api-block:fixed',
-                'xl:max-2xl:page-api-block:right-8',
-                'xl:max-2xl:page-api-block:w-60',
-                'xl:max-2xl:page-api-block:max-w-60',
-                'xl:max-2xl:page-api-block:pb-8',
-                'xl:max-2xl:page-api-block:pt-10',
-                'xl:max-2xl:[body:has(.openapi-block):has(.page-has-ancestors)_&]:pt-6.5'
+                'lg:[html[style*="--outline-height"]_&]:max-h-(--outline-height)!'
             )}
         >
             <div
@@ -104,17 +113,19 @@ export function PageAside(props: {
                     'min-w-56 shrink-0',
                     'overflow-hidden',
                     'w-full',
-                    'xl:max-2xl:rounded-corners:page-api-block:rounded-md',
-                    'xl:max-2xl:circular-corners:page-api-block:rounded-xl',
-                    'xl:max-2xl:page-api-block:border',
-                    'xl:max-2xl:page-api-block:border-tint',
-                    'xl:max-2xl:page-api-block:bg-tint/9',
-                    'xl:max-2xl:page-api-block:backdrop-blur-lg',
-                    'xl:max-2xl:contrast-more:page-api-block:bg-tint',
-                    'xl:max-2xl:page-api-block:hover:shadow-lg',
-                    'xl:max-2xl:page-api-block:hover:shadow-tint-12/1',
-                    'xl:max-2xl:dark:page-api-block:hover:shadow-tint-1/1',
-                    'xl:max-2xl:page-api-block:not-hover:*:hidden'
+
+                    // OpenAPI layout: floating card styles
+                    'xl:layout-openapi:rounded-md',
+                    'xl:layout-openapi:circular-corners:rounded-xl',
+                    'xl:layout-openapi:border',
+                    'xl:layout-openapi:border-tint',
+                    'xl:layout-openapi:bg-tint/9',
+                    'xl:layout-openapi:backdrop-blur-lg',
+                    'xl:layout-openapi:contrast-more:bg-tint',
+                    'xl:layout-openapi:hover:shadow-lg',
+                    'xl:layout-openapi:hover:shadow-tint-12/1',
+                    'xl:dark:layout-openapi:hover:shadow-tint-1/1',
+                    'xl:layout-openapi:not-hover:*:hidden'
                 )}
             >
                 <PageAsideHeader context={context} />
@@ -136,6 +147,10 @@ export function PageAside(props: {
     );
 }
 
+/**
+ * Header for the aside that shows "ON THIS PAGE" label.
+ * Only visible in OpenAPI layout (floating overlay mode).
+ */
 function PageAsideHeader(props: { context: GitBookSiteContext }) {
     const { context } = props;
     const language = getSpaceLanguage(context);
@@ -144,7 +159,7 @@ function PageAsideHeader(props: { context: GitBookSiteContext }) {
         <div
             className={tcls(
                 'hidden',
-                'xl:max-2xl:page-api-block:flex!',
+                'xl:layout-openapi:flex!',
                 'text-xs',
                 'tracking-wide',
                 'font-semibold',
@@ -187,7 +202,8 @@ function PageAsideActions(props: {
             className={tcls(
                 'flex flex-col gap-3',
                 'border-tint-subtle border-t first:border-none',
-                'sidebar-list-default:px-3 pt-5 first:pt-0 xl:max-2xl:page-api-block:p-5',
+                'sidebar-list-default:px-3 pt-5 first:pt-0',
+                'xl:layout-openapi:p-5',
                 'empty:hidden'
             )}
         >
@@ -209,7 +225,7 @@ async function PageAsideFooter(props: { context: GitBookSiteContext }) {
             className={tcls(
                 'sticky bottom-0 z-10 mt-auto flex flex-col',
                 'bg-tint-base theme-gradient-tint:bg-gradient-tint theme-gradient:bg-gradient-primary theme-muted:bg-tint-subtle [html.sidebar-filled.theme-bold.tint_&]:bg-tint-subtle',
-                'border-tint-subtle xl:max-2xl:page-api-block:border-t xl:max-2xl:page-api-block:p-2',
+                'border-tint-subtle xl:layout-openapi:border-t xl:layout-openapi:p-2',
                 'pt-4'
             )}
         >

@@ -51,6 +51,10 @@ export async function TableOfContents(props: {
                     'max-lg:not-sidebar-filled:border-r',
                     'border-tint-subtle',
 
+                    // Hide completely in full-width mode
+                    'layout-full-width:hidden!',
+                    'lg:layout-full-width:hidden!',
+
                     'lg:flex!',
                     'lg:animate-none!',
                     'lg:sticky',

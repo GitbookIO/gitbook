@@ -3,7 +3,13 @@ import type { JSONDocument, RevisionPageDocument, SiteInsightsDisplayContext } f
 
 import { getSpaceLanguage } from '@/intl/server';
 import { t } from '@/intl/translate';
-import { hasFullWidthBlock, hasMoreThan, hasTopLevelBlock, isNodeEmpty } from '@/lib/document';
+import {
+    hasFullWidthBlock,
+    hasMoreThan,
+    hasOpenAPIBlock,
+    hasTopLevelBlock,
+    isNodeEmpty,
+} from '@/lib/document';
 import type { AncestorRevisionPage } from '@/lib/pages';
 import { tcls } from '@/lib/tailwind';
 import { DocumentView, DocumentViewSkeleton } from '../DocumentView';
@@ -41,6 +47,7 @@ export function PageBody(props: {
     const { customization } = context;
 
     const contentFullWidth = document ? hasFullWidthBlock(document) : false;
+    const contentHasOpenAPI = document ? hasOpenAPIBlock(document) : false;
 
     // Update blocks can only be at the top level of the document, so we optimize the check.
     const contentHasUpdates = document
@@ -55,8 +62,7 @@ export function PageBody(props: {
               LINK_PREVIEW_MAX_COUNT
           )
         : false;
-    const pageWidthWide = page.layout.width === 'wide';
-    const siteWidthWide = pageWidthWide || contentFullWidth;
+
     const language = getSpaceLanguage(context);
     const updatedAt = page.updatedAt ?? page.createdAt;
 
@@ -65,7 +71,20 @@ export function PageBody(props: {
             (page) => page.type !== 'document' || (page.type === 'document' && !page.hidden)
         ).length > 0;
 
-    const pageHasToc = page.layout.tableOfContents && hasVisibleTOCItems;
+    const hasTOC = page.layout.tableOfContents && hasVisibleTOCItems;
+
+    // Determine layout mode:
+    // 1. Full-width: No TOC
+    // 2. OpenAPI: Has TOC + (OpenAPI block OR wide property)
+    // 3. Default: Has TOC, no OpenAPI blocks, not wide
+    const layoutMode = !hasTOC
+        ? 'layout-full-width'
+        : contentHasOpenAPI || page.layout.width === 'wide'
+          ? 'layout-openapi'
+          : 'layout-default';
+
+    // Site-wide width only applies to full-width mode
+    const siteWidthWide = !hasTOC && (page.layout.width === 'wide' || contentFullWidth);
 
     return (
         <CurrentPageProvider page={{ spaceId: context.space.id, pageId: page.id }}>
@@ -73,15 +92,28 @@ export function PageBody(props: {
                 className={tcls(
                     'relative min-w-0 flex-1',
                     'max-w-screen-2xl py-8',
+                    // In full-width layout, expand main to allow cover to go full width
+                    'layout-full-width:max-w-full',
+                    'layout-full-width:px-0',
                     // Allow words to break if they are too long.
                     'break-anywhere',
                     '@container',
-                    pageWidthWide ? 'page-width-wide 3xl:px-8' : 'page-width-default',
+                    // Layout mode class for CSS variants
+                    layoutMode,
+                    // Keep existing classes for backward compatibility
+                    hasTOC ? 'page-has-toc' : 'page-no-toc',
                     siteWidthWide ? 'site-width-wide' : 'site-width-default',
-                    pageHasToc ? 'page-has-toc' : 'page-no-toc'
+                    // Only apply page-width-wide in full-width mode
+                    !hasTOC && page.layout.width === 'wide'
+                        ? 'page-width-wide 3xl:px-8'
+                        : 'page-width-default'
                 )}
             >
-                <PreservePageLayout siteWidthWide={siteWidthWide} pageHasToc={pageHasToc} />
+                <PreservePageLayout
+                    siteWidthWide={siteWidthWide}
+                    layoutMode={layoutMode}
+                    hasTOC={hasTOC}
+                />
                 {page.cover && page.layout.cover && page.layout.coverSize === 'hero' ? (
                     <PageCover as="hero" page={page} cover={page.cover} context={context} />
                 ) : null}
@@ -128,7 +160,24 @@ export function PageBody(props: {
                 {
                     // TODO: after 25/07/2025, we can chage it to a true check as the cache will be updated
                     page.layout.metadata !== false ? (
-                        <div className="mx-auto mt-6 page-api-block:ml-0 flex max-w-3xl page-full-width:max-w-screen-2xl flex-row flex-wrap items-center gap-4 text-tint contrast-more:text-tint-strong">
+                        <div
+                            className={tcls(
+                                'mx-auto',
+                                'mt-6',
+                                'flex',
+                                'max-w-3xl',
+                                'flex-row',
+                                'flex-wrap',
+                                'items-center',
+                                'gap-4',
+                                'text-tint',
+                                'contrast-more:text-tint-strong',
+                                'layout-openapi:max-w-full',
+                                'layout-openapi:pl-12',
+                                'layout-full-width:max-w-5xl',
+                                'layout-full-width:mx-auto'
+                            )}
+                        >
                             {updatedAt ? (
                                 <p className="mr-auto text-sm ">
                                     {t(

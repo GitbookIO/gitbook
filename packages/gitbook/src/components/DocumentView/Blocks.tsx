@@ -84,6 +84,11 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                 ancestorBlocks: props.ancestorBlocks,
             });
 
+        // Determine if this block should expand to full width or use readable width
+        // Text blocks (paragraphs, headings, lists) use a readable max-width
+        // Visual blocks (code, tables, images, etc.) expand to full width
+        const isFullWidthBlock = FULL_WIDTH_BLOCKS.includes(node.type);
+
         return (
             <Block
                 key={node.key || `${node.type}-${index}`}
@@ -94,7 +99,12 @@ export function UnwrappedBlocks<TBlock extends DocumentBlock>(props: UnwrappedBl
                         ? 'max-w-screen-xl'
                         : 'max-w-3xl',
                     !LIST_BLOCKS.includes(node.type) && 'print:break-inside-avoid',
-                    FULL_WIDTH_BLOCKS.includes(node.type) && 'page-width-wide:max-w-full',
+                    isFullWidthBlock && 'page-width-wide:max-w-full',
+                    // In OpenAPI mode, all blocks expand to full width
+                    // In full-width mode, content is capped at 64rem (1024px) and centered
+                    'layout-openapi:max-w-full',
+                    'layout-full-width:max-w-5xl',
+                    'layout-full-width:mx-auto',
                     blockStyle,
                 ]}
                 isEstimatedOffscreen={isOffscreen}

@@ -105,7 +105,7 @@ export function Header(props: {
                                     'hover:theme-bold:bg-header-link/3',
                                     variants.generic.length > 1
                                         ? 'lg:hidden'
-                                        : 'page-no-toc:hidden lg:hidden'
+                                        : 'layout-full-width:hidden lg:hidden'
                                 )}
                             />
                             <HeaderLogo context={context} />

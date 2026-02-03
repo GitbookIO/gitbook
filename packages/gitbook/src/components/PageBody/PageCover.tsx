@@ -83,22 +83,18 @@ export async function PageCover(props: {
             data-full={String(as === 'full')}
             className={tcls(
                 'overflow-hidden',
-                // Negative margin to balance the container padding
-                '-mx-4',
+                'flex',
+                'w-full',
                 'transition-all',
                 as === 'full'
                     ? [
-                          'sm:-mx-6',
-                          'md:-mx-8',
                           !page.layout.tableOfContents &&
                           context.customization.header.preset !== 'none'
                               ? [
-                                    'xl:-ml-76',
                                     // Round the bottom corners once the page is wider than the image
                                     '2xl:circular-corners:rounded-b-3xl 2xl:rounded-corners:rounded-b-xl',
                                 ]
                               : [
-                                    'lg:-ml-12',
                                     // Round the bottom left corner once the sidebar is shown next to it
                                     'lg:rounded-corners:rounded-bl-xl',
                                     'lg:circular-corners:rounded-bl-3xl',
@@ -111,6 +107,11 @@ export async function PageCover(props: {
                           'sm:mx-auto',
                           'max-w-3xl ',
                           'page-width-wide:max-w-screen-2xl',
+                          // In full-width layout, cover spans full viewport width
+                          // Reset negative margins since main has no padding
+                          'layout-full-width:mx-0',
+                          'layout-full-width:max-w-full',
+                          'layout-full-width:rounded-none',
                           'sm:rounded-corners:rounded-xl',
                           'sm:circular-corners:rounded-3xl',
                           'mb-8',

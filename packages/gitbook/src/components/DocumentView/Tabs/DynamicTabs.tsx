@@ -224,7 +224,7 @@ const TabPanel = memo(function TabPanel(props: {
             aria-labelledby={getTabButtonId(tab.id)}
             className="scroll-mt-[calc(var(--content-scroll-margin)+var(--spacing)*20)]"
         >
-            <div className="p-4" hidden={!isActive}>
+            <div className={tcls('p-4')} hidden={!isActive}>
                 {tab.body}
             </div>
         </div>
