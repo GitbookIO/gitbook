@@ -21,6 +21,7 @@ export async function servePageMarkdown(context: GitBookSiteContext, pagePath: s
         return new Response(result, {
             headers: {
                 'Content-Type': 'text/markdown; charset=utf-8',
+                'X-Robots-Tag': 'noindex',
             },
         });
     } catch (error) {
