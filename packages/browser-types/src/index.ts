@@ -83,6 +83,12 @@ export type GitBookGlobal = {
      * When registered, the built-in cookie banner will not be displayed.
      */
     registerCookieBanner: (handler: GitBookCookieBannerHandler) => void;
+
+    /**
+     * Whether the user has granted cookie consent.
+     * Returns true if cookies are granted, false if rejected or unknown.
+     */
+    hasGrantedCookies: () => boolean;
 };
 
 declare global {

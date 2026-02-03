@@ -1,6 +1,6 @@
 'use client';
 
-import { setCookiesTracking } from '@/components/Insights';
+import { hasGrantedCookies, setCookiesTracking } from '@/components/Insights';
 import type {
     GitBookGlobal,
     GitBookIntegrationEvent,
@@ -102,6 +102,7 @@ if (typeof window !== 'undefined') {
                 },
             });
         },
+        hasGrantedCookies: hasGrantedCookies,
     };
     window.GitBook = gitbookGlobal;
 }
