@@ -24,11 +24,19 @@ export function OpenAPIRequiredScopes(props: {
         return null;
     }
 
-    const scopes = selectedSecurity.schemes.flatMap((scheme) => {
-        return scheme.scopes ?? [];
-    });
+    const scopeAlternatives =
+        selectedSecurity.scopeAlternatives.length > 0
+            ? selectedSecurity.scopeAlternatives
+            : [
+                  selectedSecurity.schemes.flatMap((scheme) => {
+                      return scheme.scopes ?? [];
+                  }),
+              ];
+    const resolvedAlternatives = scopeAlternatives
+        .map((scopes) => dedupeScopes(scopes))
+        .filter((scopes) => scopes.length > 0);
 
-    if (!scopes.length) {
+    if (!resolvedAlternatives.length) {
         return null;
     }
 
@@ -51,7 +59,12 @@ export function OpenAPIRequiredScopes(props: {
                         {
                             key: 'scopes',
                             label: '',
-                            body: <OpenAPISchemaScopes scopes={scopes} context={context} />,
+                            body: (
+                                <OpenAPIScopeAlternatives
+                                    alternatives={resolvedAlternatives}
+                                    context={context}
+                                />
+                            ),
                         },
                     ],
                 },
@@ -60,23 +73,57 @@ export function OpenAPIRequiredScopes(props: {
     );
 }
 
+function OpenAPIScopeAlternatives(props: {
+    alternatives: OpenAPISecurityScope[][];
+    context: OpenAPIClientContext;
+}) {
+    const { alternatives, context } = props;
+
+    if (alternatives.length === 1) {
+        return <OpenAPISchemaScopes scopes={alternatives[0]} context={context} />;
+    }
+
+    return (
+        <div className="openapi-scopes-alternatives">
+            <div className="openapi-required-scopes-description">
+                {t(context.translation, 'required_scopes_description')}
+            </div>
+            <div className="openapi-schema-alternatives">
+                {alternatives.map((scopes, index) => (
+                    <div key={index} className="openapi-schema-alternative">
+                        <OpenAPISchemaScopes scopes={scopes} context={context} hideDescription />
+                        {index < alternatives.length - 1 ? (
+                            <span className="openapi-schema-alternative-separator">
+                                {t(context.translation, 'or')}
+                            </span>
+                        ) : null}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function OpenAPISchemaScopes(props: {
-    scopes: OpenAPISecurityScope[];
+    scopes: OpenAPISecurityScope[] | undefined;
     context: OpenAPIClientContext;
     isOAuth2?: boolean;
+    hideDescription?: boolean;
 }) {
-    const { scopes, context, isOAuth2 } = props;
+    const { scopes, context, isOAuth2, hideDescription } = props;
 
     return (
         <div className="openapi-securities-scopes openapi-markdown">
-            <div className="openapi-required-scopes-description">
-                {t(
-                    context.translation,
-                    isOAuth2 ? 'available_scopes' : 'required_scopes_description'
-                )}
-            </div>
+            {!hideDescription ? (
+                <div className="openapi-required-scopes-description">
+                    {t(
+                        context.translation,
+                        isOAuth2 ? 'available_scopes' : 'required_scopes_description'
+                    )}
+                </div>
+            ) : null}
             <ul>
-                {scopes.map((scope) => (
+                {scopes?.map((scope) => (
                     <OpenAPIScopeItem key={scope[0]} scope={scope} context={context} />
                 ))}
             </ul>
@@ -115,4 +162,19 @@ function OpenAPIScopeItemKey(props: {
             <code>{name}</code>
         </OpenAPICopyButton>
     );
+}
+
+function dedupeScopes(scopes: OpenAPISecurityScope[]) {
+    const seen = new Set<string>();
+    const deduped: OpenAPISecurityScope[] = [];
+
+    for (const scope of scopes) {
+        if (seen.has(scope[0])) {
+            continue;
+        }
+        seen.add(scope[0]);
+        deduped.push(scope);
+    }
+
+    return deduped;
 }

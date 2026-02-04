@@ -1040,3 +1040,11 @@ body:has(.openapi-select-popover) {
 .openapi-required-scopes .openapi-required-scopes-description {
     @apply text-xs !text-tint font-normal mb-2;
 }
+
+.openapi-schema-alternatives .openapi-securities-scopes {
+    @apply ml-0 pl-0;
+}
+
+.openapi-scopes-alternatives .openapi-schema-alternatives {
+    @apply flex flex-col gap-2;
+}
