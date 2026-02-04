@@ -847,6 +847,10 @@ body:has(.openapi-select-popover) {
     @apply -mx-3 px-3 py-2.5 transition-all flex flex-col ring-tint-subtle;
 }
 
+.openapi-schemas-disclosure .openapi-schema-properties > .openapi-disclosure > .openapi-disclosure-trigger {
+    @apply px-6;
+}
+
 .openapi-disclosure:not(
         .openapi-disclosure-group .openapi-disclosure,
         .openapi-schema-alternatives .openapi-disclosure,
@@ -875,7 +879,7 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-disclosure-trigger-label {
-    @apply absolute right-3 mr-px px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
+    @apply absolute right-3 font-sans! mr-px px-2 h-5 justify-end shrink-0 ring-tint-subtle truncate text-tint duration-300 transition-all rounded straight-corners:rounded-none circular-corners:rounded-xl flex flex-row gap-1 items-center text-xs;
 }
 
 .openapi-disclosure-trigger-label span {

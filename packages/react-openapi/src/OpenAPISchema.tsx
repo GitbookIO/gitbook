@@ -82,7 +82,8 @@ function OpenAPISchemaProperty(
 
     const header = <OpenAPISchemaPresentation id={id} context={context} property={property} />;
     const content = (() => {
-        if (alternatives?.schemas) {
+        // For oneOf/anyOf, show alternatives. For allOf, merge properties instead
+        if (alternatives?.schemas && alternatives.schemas.length > 0) {
             return (
                 <OpenAPISchemaAlternatives
                     alternatives={alternatives}
@@ -198,8 +199,8 @@ function OpenAPIRootSchema(props: {
     const circularRefs = new Map(parentCircularRefs);
     circularRefs.set(schema, id);
 
-    // Handle root-level oneOf/allOf/anyOf
-    if (alternatives?.schemas) {
+    // Handle root-level oneOf/anyOf (allOf is handled by merging properties in getSchemaProperties)
+    if (alternatives?.schemas && alternatives.schemas.length > 0) {
         return (
             <>
                 {description ? (
@@ -762,8 +763,10 @@ export function getSchemaAlternatives(
         if (schema.oneOf) {
             return ['oneOf', schema.oneOf, schema.discriminator];
         }
+        // For allOf, we merge properties instead of showing alternatives
+        // So return null here to let getSchemaProperties handle the merging
         if (schema.allOf) {
-            return ['allOf', schema.allOf, schema.discriminator];
+            return null;
         }
         return null;
     })();
