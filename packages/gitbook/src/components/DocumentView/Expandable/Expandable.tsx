@@ -15,6 +15,8 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
 
     const title = getNodeFragmentByType(block, 'expandable-title');
     const body = getNodeFragmentByType(block, 'expandable-body');
+    // @ts-expect-error should be removed once we update the API
+    const isDefaultExpanded = block.data.defaultExpanded ?? false;
 
     const titleParagraph = title?.nodes[0];
 
@@ -28,7 +30,7 @@ export function Expandable(props: BlockProps<DocumentBlockExpandable>) {
     return (
         <Details
             id={id}
-            open={context.mode === 'print'}
+            open={context.mode === 'print' || isDefaultExpanded}
             className={tcls('scroll-mt-(--content-scroll-margin)', style)}
         >
             <summary
