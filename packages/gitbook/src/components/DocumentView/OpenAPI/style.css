@@ -848,6 +848,10 @@ body:has(.openapi-select-popover) {
 }
 
 .openapi-schemas-disclosure .openapi-schema-properties > .openapi-disclosure > .openapi-disclosure-trigger {
+    @apply px-3;
+}
+
+.openapi-section-schemas > .openapi-section-body > .openapi-schema-properties > .openapi-disclosure > .openapi-disclosure-trigger {
     @apply px-6;
 }
 
