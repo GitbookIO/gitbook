@@ -384,55 +384,6 @@ describe('getSchemaAlternatives', () => {
         });
 
         it('should merge nested allOf with parent properties', () => {
-            expect(
-                getSchemaAlternatives({
-                    allOf: [
-                        {
-                            type: 'object',
-                            allOf: [
-                                {
-                                    type: 'object',
-                                    allOf: [
-                                        {
-                                            type: 'object',
-                                            properties: {
-                                                id: {
-                                                    type: 'integer',
-                                                    format: 'int32',
-                                                },
-                                            },
-                                            required: ['id'],
-                                            additionalProperties: false,
-                                        },
-                                    ],
-                                    properties: {
-                                        name: {
-                                            type: 'string',
-                                        },
-                                    },
-                                    required: ['name'],
-                                    additionalProperties: false,
-                                },
-                            ],
-                            properties: {
-                                key: {
-                                    type: 'string',
-                                },
-                            },
-                            required: ['key'],
-                            additionalProperties: false,
-                        },
-                    ],
-                    properties: {
-                        labelArgbColor: {
-                            type: 'integer',
-                            format: 'int32',
-                        },
-                    },
-                    required: ['labelArgbColor'],
-                })
-            );
-
             const result = getSchemaAlternatives({
                 allOf: [
                     {
