@@ -763,10 +763,8 @@ export function getSchemaAlternatives(
         if (schema.oneOf) {
             return ['oneOf', schema.oneOf, schema.discriminator];
         }
-        // For allOf, we merge properties instead of showing alternatives
-        // So return null here to let getSchemaProperties handle the merging
         if (schema.allOf) {
-            return null;
+            return ['allOf', schema.allOf, schema.discriminator];
         }
         return null;
     })();
@@ -777,13 +775,45 @@ export function getSchemaAlternatives(
 
     const [type, schemas, discriminator] = alternatives;
 
+    const flattened = flattenAlternatives(type, schemas, new Set(ancestors).add(schema));
+    const merged = mergeAlternatives(type, flattened) ?? [];
+
+    // For allOf, merge the root schema's properties with the merged alternatives
+    if (type === 'allOf' && merged.length > 0 && (schema.properties || schema.required)) {
+        const rootSchema = merged[0];
+        const { allOf: _, ...schemaWithoutAllOf } = schema;
+
+        const result: OpenAPIV3.SchemaObject = {
+            ...rootSchema,
+            ...schemaWithoutAllOf,
+            properties: {
+                ...(rootSchema?.properties || {}),
+                ...(schema.properties || {}),
+            },
+        };
+
+        // Merge required fields
+        const allRequired = new Set<string>();
+        if (Array.isArray(rootSchema?.required)) {
+            rootSchema.required.forEach((req) => allRequired.add(req));
+        }
+        if (Array.isArray(schema?.required)) {
+            schema.required.forEach((req) => allRequired.add(req));
+        }
+        if (allRequired.size > 0) {
+            result.required = Array.from(allRequired);
+        }
+
+        return {
+            type,
+            schemas: [result, ...merged.slice(1)],
+            discriminator,
+        };
+    }
+
     return {
         type,
-        schemas:
-            mergeAlternatives(
-                type,
-                flattenAlternatives(type, schemas, new Set(ancestors).add(schema))
-            ) ?? [],
+        schemas: merged,
         discriminator,
     };
 }
@@ -951,6 +981,61 @@ function flattenSchema(
     if (schema[alternativeType] && !ancestors.has(schema)) {
         const alternatives = getSchemaAlternatives(schema, ancestors);
         if (alternatives?.schemas) {
+            // For allOf, merge the flattened alternatives with the schema's own properties
+            if (alternativeType === 'allOf' && alternatives.schemas.length > 0) {
+                // Merge all flattened alternatives into a single schema
+                const mergedSchema = alternatives.schemas.reduce((acc, s) => {
+                    const merged: OpenAPIV3.SchemaObject = {
+                        ...(acc || {}),
+                        ...s,
+                        properties: {
+                            ...(acc.properties || {}),
+                            ...(s.properties || {}),
+                        },
+                    };
+
+                    // Merge required fields
+                    const allRequired = new Set<string>();
+                    if (Array.isArray(acc.required)) {
+                        acc.required.forEach((req) => allRequired.add(req));
+                    }
+                    if (Array.isArray(s.required)) {
+                        s.required.forEach((req) => allRequired.add(req));
+                    }
+                    if (allRequired.size > 0) {
+                        merged.required = Array.from(allRequired);
+                    }
+
+                    return merged;
+                }, {} as OpenAPIV3.SchemaObject);
+
+                // Merge with the current schema's own properties (excluding allOf since we've already processed it)
+                const { allOf: _, ...schemaWithoutAllOf } = schema;
+                const result: OpenAPIV3.SchemaObject = {
+                    ...mergedSchema,
+                    ...schemaWithoutAllOf,
+                    properties: {
+                        ...(mergedSchema.properties || {}),
+                        ...(schema.properties || {}),
+                    },
+                };
+
+                // Merge required fields from merged schema and current schema
+                const allRequired = new Set<string>();
+                if (Array.isArray(mergedSchema.required)) {
+                    mergedSchema.required.forEach((req) => allRequired.add(req));
+                }
+                if (Array.isArray(schema.required)) {
+                    schema.required.forEach((req) => allRequired.add(req));
+                }
+                if (allRequired.size > 0) {
+                    result.required = Array.from(allRequired);
+                }
+
+                const required = mergeRequiredFields(result, latestAncestor);
+                return [{ ...result, ...(required ? { required } : {}) }];
+            }
+
             return alternatives.schemas.map((s) => {
                 const required = mergeRequiredFields(s, latestAncestor);
                 return {
