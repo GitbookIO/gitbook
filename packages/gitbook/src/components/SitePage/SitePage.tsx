@@ -17,6 +17,7 @@ import { isPageIndexable, isSiteIndexable } from '@/lib/seo';
 
 import { getResizedImageURL } from '@/lib/images';
 import { resolveContentRef } from '@/lib/references';
+import { getSiteSectionTitle } from '@/lib/sites';
 import { tcls } from '@/lib/tailwind';
 import { getPageRSSURL } from '@/routes/rss';
 import { PageContextProvider } from '../PageContext';
@@ -125,6 +126,7 @@ export async function generateSitePageViewport(context: GitBookSiteContext): Pro
  */
 function getSiteStructureTitle(context: GitBookSiteContext): string | null {
     const { visibleSections: sections, siteSpace, visibleSiteSpaces: siteSpaces } = context;
+    const currentLanguage = siteSpace.space.language;
 
     const title = [];
     if (
@@ -132,7 +134,7 @@ function getSiteStructureTitle(context: GitBookSiteContext): string | null {
         sections.current.default === false && // Only if the current section is not the default one
         sections.list.filter((section) => section.object === 'site-section').length > 1 // Only if there are multiple sections
     ) {
-        title.push(sections.current.title);
+        title.push(getSiteSectionTitle(sections.current, currentLanguage));
     }
     if (
         siteSpaces.length > 1 && // Only if there are multiple variants
