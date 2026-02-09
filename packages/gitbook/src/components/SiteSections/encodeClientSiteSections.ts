@@ -1,5 +1,5 @@
 import type { GitBookSiteContext, SiteSections } from '@/lib/context';
-import { getSectionURL, getSiteSpaceURL } from '@/lib/sites';
+import { getSectionURL, getSiteSectionTitle, getSiteSpaceURL } from '@/lib/sites';
 import type { SiteSection, SiteSectionGroup, SiteSpace } from '@gitbook/api';
 import assertNever from 'assert-never';
 
@@ -99,9 +99,10 @@ function encodeChildren(
 }
 
 function encodeSection(context: GitBookSiteContext, section: SiteSection) {
+    const currentLanguage = context.siteSpace.space.language;
     return {
         id: section.id,
-        title: section.title,
+        title: getSiteSectionTitle(section, currentLanguage),
         description: section.description,
         icon: section.icon,
         object: section.object,
