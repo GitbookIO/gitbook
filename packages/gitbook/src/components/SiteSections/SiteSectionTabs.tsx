@@ -18,7 +18,9 @@ import type {
 } from './encodeClientSiteSections';
 
 const SCREEN_OFFSET = 16; // 1rem
-const MAX_ITEMS_PER_COLUMN = 8; // number of items per column
+const MAX_ITEMS_PER_COLUMN = 10; // number of items per column
+const GROUP_MASONRY_THRESHOLD = 6; // if a section group has more than this many child groups, it will be shown in a masonry grid
+
 /**
  * A set of navigational links representing site sections for multi-section sites
  */
@@ -227,7 +229,7 @@ function SectionGroupTileList(props: {
             {hasSections && (
                 <ul
                     className={tcls(
-                        'flex min-w-48 grid-flow-row flex-col gap-x-2 gap-y-1 self-start p-3 md:grid',
+                        'flex min-w-48 shrink-0 grid-flow-row flex-col gap-x-2 gap-y-1 self-start p-3 md:grid',
                         hasGroups ? 'bg-tint-base' : ''
                     )}
                     style={{
@@ -248,7 +250,10 @@ function SectionGroupTileList(props: {
             {hasGroups && (
                 <ul
                     className={tcls(
-                        'flex min-w-48 flex-col items-start justify-start gap-x-8 gap-y-2 p-3 md:flex-row md:gap-y-8',
+                        'grow gap-x-8 space-y-8 p-3',
+                        groups.length > GROUP_MASONRY_THRESHOLD
+                            ? 'w-screen md:columns-[15rem]'
+                            : 'flex flex-col justify-start md:flex-row md:items-start',
                         hasSections
                             ? 'border-tint-subtle bg-tint-subtle max-md:border-t md:border-l'
                             : ''
@@ -321,8 +326,8 @@ function SectionGroupTile(props: {
     const { title, icon, children } = child;
 
     return (
-        <li className="flex shrink-0 flex-col gap-1">
-            <div className="mt-3 mb-2 flex gap-2.5 px-3 font-semibold text-tint-subtle text-xs uppercase tracking-wider">
+        <li className="flex shrink-0 break-inside-avoid flex-col gap-1">
+            <div className="mt-3 mb-1 flex gap-2.5 px-3 font-semibold text-tint-subtle text-xs uppercase tracking-wider">
                 {icon && (
                     <SectionIcon className="mt-0.5" isActive={false} icon={icon as IconName} />
                 )}
